@@ -492,6 +492,8 @@ public class TestRequestSender : ITestRequestSender
             // Send raw message first to unblock handlers waiting to send message to IDEs
             testRunEventsHandler.HandleRawMessage(rawMessage);
 
+            // PERF: DeserializeMessage happens in HandleRawMessage above, as well as here. But with fastJson path where we just grab the routing info from
+            // the raw string, it is not a big issue, it adds a handful of ms at worst. The payload does not get deserialized twice.
             var message = _dataSerializer.DeserializeMessage(rawMessage);
             switch (message.MessageType)
             {

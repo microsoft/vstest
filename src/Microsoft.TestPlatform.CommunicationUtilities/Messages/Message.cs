@@ -39,32 +39,3 @@ public class Message
         return "(" + MessageType + ") -> " + (Payload == null ? "null" : Payload.ToString(Formatting.Indented));
     }
 }
-
-public class MessageHeader
-{
-    public string MessageType { get; set; }
-    public int Version { get; set; }
-
-    public string Content { get; set; }
-}
-
-public class MessageWithRawMessage : VersionedMessage
-{
-
-    public string RawMessage { get; set; }
-}
-
-public class PayloadedMessage<T>
-{
-    /// <summary>
-    /// Gets or sets the version of the message
-    /// </summary>
-    public int Version { get; set; }
-
-    /// <summary>
-    /// Gets or sets the message type.
-    /// </summary>
-    public string MessageType { get; set; }
-
-    public T Payload { get; set; }
-}

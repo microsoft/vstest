@@ -30,8 +30,12 @@ internal class Program
 {
     static void Main(string[] args)
     {
+        var mts = typeof(MessageType).GetFields().Select(f => (string)f.GetValue(null)).ToList().OrderByDescending(m => m.Length).ToList();
         var step = "run";
-        var versions = new[] { 7, 6 };
+        var version = 7;
+        var attempts = Enumerable.Range(1, 4);
+        // For 6 disable the faster json path
+        Environment.SetEnvironmentVariable("VSTEST_DISABLE_FASTER_JSON_SERIALIZATION", version == 6 ? "1" : "0");
 
         if (step == "d")
         {
@@ -46,49 +50,37 @@ internal class Program
                 .Select(File.ReadAllText).ToList();
             Console.WriteLine($"There are {rawMessages.Count} raw messages.");
             var json = JsonDataSerializer.Instance;
-            foreach (var v in versions)
-            {
-                // For 6 disable the faster json path
-                Environment.SetEnvironmentVariable("VSTEST_DISABLE_FASTER_JSON_SERIALIZATION", v == 6 ? "1" : "0");
 
-                foreach (var attempt in Enumerable.Range(1, 2))
+
+            foreach (var attempt in attempts)
+            {
+                int testCount = 0;
+                VersionedMessage lastMessage = null;
+                Stopwatch sw = Stopwatch.StartNew();
+                foreach (string rawMessage in rawMessages)
                 {
-                    int testCount = 0;
-                    VersionedMessage lastMessage = null;
-                    Stopwatch sw = Stopwatch.StartNew();
-                    foreach (string rawMessage in rawMessages)
-                    {
-                        TestRunChangedEventArgs payload;
-                        if (v == 6)
-                        {
-                            Message message = json.DeserializeMessage(rawMessage);
-                            VersionedMessage versionedMessage = (VersionedMessage)message;
-                            versionedMessage.Version = v;
-                            lastMessage = versionedMessage;
-                            payload = json.DeserializePayload<TestRunChangedEventArgs>(versionedMessage);
-                        }
-                        else
-                        {
-                            Message message = json.DeserializeMessage(rawMessage);
-                            MessageWithRawMessage versionedMessage = (MessageWithRawMessage)message;
-                            versionedMessage.Version = v;
-                            lastMessage = versionedMessage;
-                            payload = json.DeserializePayload<TestRunChangedEventArgs>(versionedMessage);
-                        }
-                        testCount += payload.NewTestResults.Count();
-                    }
-                    long duration = sw.ElapsedMilliseconds;
-                    Console.WriteLine($"Try {attempt}:");
-                    Console.WriteLine($" Tests: {testCount}");
-                    Console.WriteLine($" Duration {duration} ms");
-                    Console.WriteLine($" Message version {v}");
-                    Console.WriteLine();
+                    TestRunChangedEventArgs payload;
+
+                    Message message = json.DeserializeMessage(rawMessage);
+                    VersionedMessage versionedMessage = (VersionedMessage)message;
+                    versionedMessage.Version = version;
+                    lastMessage = versionedMessage;
+                    payload = json.DeserializePayload<TestRunChangedEventArgs>(versionedMessage);
+
+                    testCount += payload.NewTestResults.Count();
                 }
+                long duration = sw.ElapsedMilliseconds;
+                Console.WriteLine($"Try {attempt}:");
+                Console.WriteLine($" Tests: {testCount}");
+                Console.WriteLine($" Duration {duration} ms");
+                Console.WriteLine($" Message version {version}");
+                Console.WriteLine();
+
             }
         }
-        if (step == "dd")
+        if (step == "f")
         {
-            Console.WriteLine("Deserialization 2:");
+            Console.WriteLine("Deserialization:");
             var dir = Directory.GetDirectories("C:\\temp\\tp-serialization\\").OrderBy(n => n).Last();
             // Skip first 3 beause that is version check and debugger attach
             // Skip last 1 because that is test run complete
@@ -99,70 +91,106 @@ internal class Program
                 .Select(File.ReadAllText).ToList();
             Console.WriteLine($"There are {rawMessages.Count} raw messages.");
             var json = JsonDataSerializer.Instance;
-            TestRunChangedEventArgs payload6 = null;
-            TestRunChangedEventArgs payload7 = null;
-            foreach (var v in versions)
+
+            foreach (var attempt in attempts)
             {
-                // For 6 disable the faster json path
-                Environment.SetEnvironmentVariable("VSTEST_DISABLE_FASTER_JSON_SERIALIZATION", v == 6 ? "1" : "0");
-
-
-                foreach (var attempt in Enumerable.Range(1, 2))
+                int messageCount = 0;
+                VersionedMessage lastMessage = null;
+                Stopwatch sw = Stopwatch.StartNew();
+                foreach (string rawMessage in rawMessages)
                 {
-                    int testCount = 0;
+                    messageCount++;
 
-                    Stopwatch sw = Stopwatch.StartNew();
-                    Stopwatch getv = new Stopwatch();
-                    Stopwatch getp = new Stopwatch();
-                    foreach (string rawMessage in rawMessages)
-                    {
-                        TestRunChangedEventArgs payload;
-                        if (v == 6)
-                        {
-                            getv.Start();
-                            Message message = json.DeserializeMessage(rawMessage);
-                            getv.Stop();
-                            VersionedMessage versionedMessage = (VersionedMessage)message;
-                            versionedMessage.Version = v;
-                            getp.Start();
-                            payload = json.DeserializePayload<TestRunChangedEventArgs>(versionedMessage);
-                            payload6 = payload;
-                            getp.Stop();
-                        }
-                        else
-                        {
-                            getv.Start();
-                            var m = JsonConvert.DeserializeObject<MessageHeader>(rawMessage, JsonDataSerializer.s_jsonSettings7);
-                            getv.Stop();
-                            getp.Start();
-                            var mm = JsonConvert.DeserializeObject<PayloadedMessage<TestRunChangedEventArgs>>(rawMessage, JsonDataSerializer.s_jsonSettings7);
-                            getp.Stop();
-                            payload = mm.Payload;
-                            payload7 = mm.Payload;
-                        }
-                        testCount += payload.NewTestResults.Count();
-                    }
-
-                    long duration = sw.ElapsedMilliseconds;
-                    Console.WriteLine($"Try {attempt}:");
-                    Console.WriteLine($" Tests: {testCount}");
-                    Console.WriteLine($" Duration {duration} ms");
-                    Console.WriteLine($"   Get header {getv.ElapsedMilliseconds} ms");
-                    Console.WriteLine($"   Get payload {getp.ElapsedMilliseconds} ms");
-                    Console.WriteLine($" Message version {v}");
-                    Console.WriteLine();
+                    Message message = json.DeserializeMessage(rawMessage);
+                    Message message2 = json.DeserializeMessage(rawMessage);
+                    //    VersionedMessage versionedMessage = (VersionedMessage)message;
 
                 }
-
+                long duration = sw.ElapsedMilliseconds;
+                Console.WriteLine($"Try {attempt}:");
+                Console.WriteLine($" Message count: {messageCount}");
+                Console.WriteLine($" Duration {duration} ms");
+                Console.WriteLine($" Message version {version}");
+                Console.WriteLine();
             }
 
-            // Make sure we kept the same data.
-            //if (versions.Distinct().Count() > 1)
-            //{
-            json.SerializePayload("a", payload7).Should().BeEquivalentTo(json.SerializePayload("a", payload6));
-            //}
-
         }
+        //if (step == "dd")
+        //{
+        //    Console.WriteLine("Deserialization 2:");
+        //    var dir = Directory.GetDirectories("C:\\temp\\tp-serialization\\").OrderBy(n => n).Last();
+        //    // Skip first 3 beause that is version check and debugger attach
+        //    // Skip last 1 because that is test run complete
+        //    var rawMessages = Directory.GetFiles(dir)
+        //        // There is no SkipLast on .NET Framework, do this inefficiently by ordering in descending order
+        //        .OrderByDescending(n => n).Skip(1)
+        //        .OrderBy(n => n).Skip(3)
+        //        .Select(File.ReadAllText).ToList();
+        //    Console.WriteLine($"There are {rawMessages.Count} raw messages.");
+        //    var json = JsonDataSerializer.Instance;
+        //    TestRunChangedEventArgs payload6 = null;
+        //    TestRunChangedEventArgs payload7 = null;
+        //    foreach (var v in versions)
+        //    {
+
+
+
+        //        foreach (var attempt in Enumerable.Range(1, 2))
+        //        {
+        //            int testCount = 0;
+
+        //            Stopwatch sw = Stopwatch.StartNew();
+        //            Stopwatch getv = new Stopwatch();
+        //            Stopwatch getp = new Stopwatch();
+        //            foreach (string rawMessage in rawMessages)
+        //            {
+        //                TestRunChangedEventArgs payload;
+        //                if (v == 6)
+        //                {
+        //                    getv.Start();
+        //                    Message message = json.DeserializeMessage(rawMessage);
+        //                    getv.Stop();
+        //                    VersionedMessage versionedMessage = (VersionedMessage)message;
+        //                    versionedMessage.Version = v;
+        //                    getp.Start();
+        //                    payload = json.DeserializePayload<TestRunChangedEventArgs>(versionedMessage);
+        //                    payload6 = payload;
+        //                    getp.Stop();
+        //                }
+        //                else
+        //                {
+        //                    getv.Start();
+        //                    var m = JsonConvert.DeserializeObject<MessageHeader>(rawMessage, JsonDataSerializer.s_jsonSettings7);
+        //                    getv.Stop();
+        //                    getp.Start();
+        //                    var mm = JsonConvert.DeserializeObject<PayloadedMessage<TestRunChangedEventArgs>>(rawMessage, JsonDataSerializer.s_jsonSettings7);
+        //                    getp.Stop();
+        //                    payload = mm.Payload;
+        //                    payload7 = mm.Payload;
+        //                }
+        //                testCount += payload.NewTestResults.Count();
+        //            }
+
+        //            long duration = sw.ElapsedMilliseconds;
+        //            Console.WriteLine($"Try {attempt}:");
+        //            Console.WriteLine($" Tests: {testCount}");
+        //            Console.WriteLine($" Duration {duration} ms");
+        //            Console.WriteLine($"   Get header {getv.ElapsedMilliseconds} ms");
+        //            Console.WriteLine($"   Get payload {getp.ElapsedMilliseconds} ms");
+        //            Console.WriteLine($" Message version {v}");
+        //            Console.WriteLine();
+
+        //        }
+
+        //    }
+
+        //    // Make sure we kept the same data.
+        //    //if (versions.Distinct().Count() > 1)
+        //    //{
+        //    json.SerializePayload("a", payload7).Should().BeEquivalentTo(json.SerializePayload("a", payload6));
+        //    //}
+
+        //}
         else if (step == "s")
         {
             Console.WriteLine("Serialization:");
@@ -182,31 +210,29 @@ internal class Program
             var p = json.DeserializePayload<TestRunChangedEventArgs>(vm);
             var values = Enumerable.Range(0, 10_000).ToList();
             Dictionary<int, string> mmmm = new Dictionary<int, string>();
-            foreach (var v in versions)
-            {
-                // For 6 disable the faster json path
-                Environment.SetEnvironmentVariable("VSTEST_DISABLE_FASTER_JSON_SERIALIZATION", v == 6 ? "1" : "0");
 
-                foreach (var attempt in Enumerable.Range(1, 2))
+
+
+            foreach (var attempt in attempts)
+            {
+                int testCount = 0;
+                VersionedMessage lastMessage = null;
+                Stopwatch sw = Stopwatch.StartNew();
+                foreach (var _ in values)
                 {
-                    int testCount = 0;
-                    VersionedMessage lastMessage = null;
-                    Stopwatch sw = Stopwatch.StartNew();
-                    foreach (var _ in values)
-                    {
-                        mmmm[v] = json.SerializePayload(MessageType.TestRunStatsChange, p, v);
-                        testCount++;
-                    }
-                    long duration = sw.ElapsedMilliseconds;
-                    Console.WriteLine($"Try {attempt}:");
-                    Console.WriteLine($" Tests: {testCount}");
-                    Console.WriteLine($" Duration {duration} ms");
-                    Console.WriteLine($" Message version {v}");
-                    Console.WriteLine();
+                    mmmm[version] = json.SerializePayload(MessageType.TestRunStatsChange, p, 6);
+                    testCount++;
                 }
+                long duration = sw.ElapsedMilliseconds;
+                Console.WriteLine($"Try {attempt}:");
+                Console.WriteLine($" Tests: {testCount}");
+                Console.WriteLine($" Duration {duration} ms");
+                Console.WriteLine($" Message version {version}");
+                Console.WriteLine();
             }
-            Console.WriteLine(mmmm[6]);
-            Console.WriteLine(mmmm[7]);
+
+            //Console.WriteLine(mmmm[6]);
+            //Console.WriteLine(mmmm[7]);
         }
         else
         {
@@ -221,27 +247,25 @@ internal class Program
             // sub-processes. It won't stop at entry-point automatically, don't forget to set your breakpoints, or remove VSTEST_DEBUG_NOBP
             // from the environment variables of this project.
 
-            foreach (var v in versions)
+
+            foreach (var attempt in attempts)
             {
-                foreach (var attempt in Enumerable.Range(1, 2))
+
+                var sw = Stopwatch.StartNew();
+                var thisAssemblyPath = Assembly.GetEntryAssembly().Location;
+                var here = Path.GetDirectoryName(thisAssemblyPath);
+                var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
+
+                var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
+                var consoleOptions = new ConsoleParameters
                 {
-                    // For 6 disable the faster json path
-                    Environment.SetEnvironmentVariable("VSTEST_DISABLE_FASTER_JSON_SERIALIZATION", v == 6 ? "1" : "0");
-                    var sw = Stopwatch.StartNew();
-                    var thisAssemblyPath = Assembly.GetEntryAssembly().Location;
-                    var here = Path.GetDirectoryName(thisAssemblyPath);
-                    var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
+                    LogFilePath = Path.Combine(here, "logs", "log.txt"),
+                    TraceLevel = TraceLevel.Off,
+                };
 
-                    var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
-                    var consoleOptions = new ConsoleParameters
-                    {
-                        LogFilePath = Path.Combine(here, "logs", "log.txt"),
-                        TraceLevel = TraceLevel.Off,
-                    };
+                var r = new VsTestConsoleWrapper(console, consoleOptions);
 
-                    var r = new VsTestConsoleWrapper(console, consoleOptions);
-
-                    var sourceSettings = @"
+                var sourceSettings = @"
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
@@ -251,17 +275,19 @@ internal class Program
                 </RunSettings>
             ";
 
-                    Environment.SetEnvironmentVariable("TEST_COUNT", "10000");
-                    var sources = new[] {
+                Environment.SetEnvironmentVariable("TEST_COUNT", "10000");
+                var sources = new[] {
                 @"C:\p\vstest3\playground\MSTest1\bin\Debug\net472\MSTest1.dll"
             };
 
-                    var options = new TestPlatformOptions();
-                    r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
+                var options = new TestPlatformOptions();
+                var handler = new TestRunHandler();
+                // r.DiscoverTests(sources, sourceSettings, options, handler);
+                r.RunTestsWithCustomTestHost(sources, sourceSettings, options, handler, new DebuggerTestHostLauncher());
 
-                    Console.WriteLine($"Try {attempt}, version {v}.");
-                    Console.WriteLine($"Done in {sw.ElapsedMilliseconds} ms");
-                }
+                Console.WriteLine($"Try {attempt}, version {version}.");
+                Console.WriteLine($"Processed {handler.Count} tests in {sw.ElapsedMilliseconds} ms");
+
             }
         }
     }
@@ -318,8 +344,9 @@ internal class Program
                 : "\t<empty>";
     }
 
-    public class TestRunHandler : ITestRunEventsHandler
+    public class TestRunHandler : ITestRunEventsHandler, ITestDiscoveryEventsHandler2
     {
+        public int Count { get; private set; }
 
         public TestRunHandler()
         {
@@ -338,11 +365,22 @@ internal class Program
         public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
             Console.WriteLine($"[RUN.COMPLETE]: err: {testRunCompleteArgs.Error}, lastChunk:");
+            Count += lastChunkArgs?.NewTestResults?.Count() ?? 0;
             //   Console.WriteLine(WriteTests(lastChunkArgs?.NewTestResults));
         }
 
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
+
+            //var tpp = TestProperty.Register("TestObject.Traits", "Traits", typeof(KeyValuePair<string, string>[]), TestPropertyAttributes.Hidden | TestPropertyAttributes.Trait, typeof(TestObject));
+            //TestObject to = testRunChangedArgs.NewTestResults.First().TestCase;
+            //var t = to.Properties.Contains(tpp);
+            //var traits = to.GetPropertyValue(tpp, Enumerable.Empty<KeyValuePair<string, string>>().ToArray());
+            //foreach (var ttt in traits)
+            //{
+            //    Console.WriteLine(ttt);
+            //}
+            Count += testRunChangedArgs?.NewTestResults?.Count() ?? 0;
             //   Console.WriteLine($"[RUN.PROGRESS]");
             //  Console.WriteLine(WriteTests(testRunChangedArgs.NewTestResults));
         }
@@ -359,6 +397,16 @@ internal class Program
             => testCases?.Any() == true
                 ? "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName))
                 : "\t<empty>";
+
+        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+        {
+            Count += lastChunk?.Count() ?? 0;
+        }
+
+        public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+        {
+            Count += discoveredTestCases?.Count() ?? 0;
+        }
     }
 
     internal class DebuggerTestHostLauncher : ITestHostLauncher2

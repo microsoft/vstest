@@ -18,6 +18,7 @@ public class UnitTest1
 
 
     [TestMethod]
+    [TestCategory("aaaaa")]
     public void TestMethod1_1()
     {
         TestHelper.Test();

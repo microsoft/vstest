@@ -2,9 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
@@ -22,12 +25,11 @@ public class JsonDataSerializer : IDataSerializer
 {
     private static JsonDataSerializer s_instance;
 
-    private static int Version { get; } = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION) ? 6 : 7;
+    private static bool DisableFastJson { get; } = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION);
 
     private static JsonSerializer s_payloadSerializer; // payload serializer for version <= 1
     private static JsonSerializer s_payloadSerializer2; // payload serializer for version >= 2
-    // [DONT MERGE]: public just for custom serialization test in playground
-    public static JsonSerializerSettings s_jsonSettings7; // serializer settings for faster json
+    private static JsonSerializerSettings s_jsonSettings7; // serializer settings for faster json
     private static JsonSerializerSettings s_jsonSettings; // serializer settings for serializer v1, which should be used to deserialize message headers
     private static JsonSerializer s_serializer; // generic serializer
 
@@ -53,14 +55,16 @@ public class JsonDataSerializer : IDataSerializer
 
         var jsonSettings7 = new JsonSerializerSettings
         {
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            DateParseHandling = DateParseHandling.DateTimeOffset,
-            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-            TypeNameHandling = TypeNameHandling.None,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            DateFormatHandling = jsonSettings.DateFormatHandling,
+            DateParseHandling = jsonSettings.DateParseHandling,
+            DateTimeZoneHandling = jsonSettings.DateTimeZoneHandling,
+            TypeNameHandling = jsonSettings.TypeNameHandling,
+            ReferenceLoopHandling = jsonSettings.ReferenceLoopHandling,
+            // PERF: Null value handling has very small impact on serialization and deserialization. Enabling it does not warrant the risk we run
+            // of changing how our consumers get their data.
+            // NullValueHandling = NullValueHandling.Ignore,
 
-            ContractResolver = new DefaultTestPlatformContractResolver7(),
-
+            ContractResolver = new DefaultTestPlatformContractResolver(),
         };
 
         s_jsonSettings7 = jsonSettings7;
@@ -90,15 +94,23 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>A <see cref="Message"/> instance.</returns>
     public Message DeserializeMessage(string rawMessage)
     {
-        if (Version == 7)
+        if (!DisableFastJson)
         {
-            // not sure if we need ot use this one of new one, it probably does not matter we deserialize 2 fields of normal pure json
-            var header = JsonConvert.DeserializeObject<MessageHeader>(rawMessage, s_jsonSettings);
+            // PERF: Try grabbing the version and message type from the string directly, we are pretty certain how the message is serialized
+            // when the format does not match all we do is that we check if 6th character in the message is 'V'
+            if (!FastHeaderParse(rawMessage, out int v, out string m))
+            {
+                // PERF: If the fast path fails, deserialize into header object that does not have any Payload. When the message type info
+                // is at the start of the message, this is also pretty fast. Again, this won't touch the payload.
+                MessageHeader header = JsonConvert.DeserializeObject<MessageHeader>(rawMessage, s_jsonSettings);
+                v = header.Version;
+                m = header.MessageType;
+            }
 
             var message = new MessageWithRawMessage
             {
-                MessageType = header.MessageType,
-                Version = header.Version,
+                Version = v,
+                MessageType = m,
                 RawMessage = rawMessage,
             };
 
@@ -106,13 +118,11 @@ public class JsonDataSerializer : IDataSerializer
         }
         else
         {
+            // PERF: This is slow, we deserialize the message, and the payload into JToken just to get the header. We then
+            // deserialize the data from the JToken, but that is twice as expensive as deserializing the whole object directly into the final object type.
+            // We need this for backward compatibility though.
             return Deserialize<VersionedMessage>(rawMessage);
         }
-    }
-
-    public PayloadedMessage<T> DeserializeMessage<T>(string rawMessage)
-    {
-        return JsonConvert.DeserializeObject<PayloadedMessage<T>>(rawMessage, s_jsonSettings7);
     }
 
     /// <summary>
@@ -123,18 +133,109 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>The deserialized payload.</returns>
     public T DeserializePayload<T>(Message message)
     {
-        if (Version == 7)
+        var versionedMessage = message as VersionedMessage;
+        var payloadSerializer = GetPayloadSerializer(versionedMessage?.Version);
+
+        if (!DisableFastJson)
         {
             var messageWithRawMessage = message as MessageWithRawMessage;
-            var messageWithPayload = JsonConvert.DeserializeObject<PayloadedMessage<T>>(messageWithRawMessage.RawMessage, s_jsonSettings7);
-            return messageWithPayload.Payload;
+            var rawMessage = messageWithRawMessage.RawMessage;
+
+            if (payloadSerializer == s_payloadSerializer2)
+            {
+                // PERF: Fast path is compatibile only with protocol versions that use serializer_2,
+                // and this is faster than deserializing via deserializer_2.
+                var messageWithPayload = JsonConvert.DeserializeObject<PayloadedMessage<T>>(rawMessage, s_jsonSettings7);
+                return messageWithPayload.Payload;
+            }
+            else
+            {
+                // PERF: When payloadSerializer1 was resolved we need to deserialize JToken, and then deserialize that.
+                // This is still better than deserializing the JToken in DeserializeMessage because here we know that the payload
+                // will actually be used.
+                return Deserialize<T>(payloadSerializer, Deserialize<VersionedMessage>(rawMessage).Payload);
+            }
         }
         else
         {
-            var versionedMessage = message as VersionedMessage;
-            var payloadSerializer = GetPayloadSerializer(versionedMessage?.Version);
             return Deserialize<T>(payloadSerializer, message.Payload);
         }
+    }
+
+    private bool FastHeaderParse(string rawMessage, out int version, out string messageType)
+    {
+        // PERF: This can be also done slightly better using ReadOnlySpan<char> but we don't have that available by default in .NET Framework
+        // and the speed improvement does not warrant additional dependency. This is already taking just few ms for 10k messages.
+        version = 0;
+        messageType = null;
+
+        try
+        {
+            // {"Version":6,"MessageType":"TestExecution.GetTestRunnerProcessStartInfoForRunAll","Payload":{
+            if (rawMessage[2] != 'V')
+            {
+                return false;
+            }
+
+            // Version ':' is on index 10, the number starts at the next index. Find wher the next ',' is and grab that as number.
+            var versionColonIndex = 10;
+            if (rawMessage[versionColonIndex] != ':')
+            {
+                return false;
+            }
+
+            var firstVersionNumberIndex = 11;
+            if (!TryGetSubstringUntilDelimiter(rawMessage, firstVersionNumberIndex, ',', maxSearchLength: 4, out string versionString, out int delimiterIndex))
+            {
+                return false;
+            }
+
+            if (!int.TryParse(versionString, out var versionInt))
+            {
+                return false;
+            }
+
+            // Message type delmiter is at at versionCommaIndex + the length of ',"MessageType":"' which is 16 chars
+            var messageTypeQuoteIndex = delimiterIndex + 16;
+
+            // "TestExecution.LaunchAdapterProcessWithDebuggerAttachedCallback" is the longest message we currently have with 62 chars
+            if (!TryGetSubstringUntilDelimiter(rawMessage, messageTypeQuoteIndex, '"', maxSearchLength: 100, out string messageTypeString, out _))
+            {
+                return false;
+            }
+
+
+            version = versionInt;
+            messageType = messageTypeString;
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+
+    /// <summary>
+    ///  Try getting substring until a given delimiter, but don't search more characters than maxSearchLength.
+    /// </summary>
+    private bool TryGetSubstringUntilDelimiter(string rawMessage, int start, char character, int maxSearchLength, out string substring, out int delimiterIndex)
+    {
+        var length = rawMessage.Length;
+        var searchEnd = start + maxSearchLength;
+        for (int i = start; i < length && i <= searchEnd; i++)
+        {
+            if (rawMessage[i] == character)
+            {
+                delimiterIndex = i;
+                substring = rawMessage.Substring(start, i - start);
+                return true;
+            }
+        }
+
+        delimiterIndex = -1;
+        substring = null;
+        return false;
     }
 
     /// <summary>
@@ -179,10 +280,12 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="version">Version for the message.</param>
     /// <returns>Serialized message.</returns>
     public string SerializePayload(string messageType, object payload, int version)
-    {
-        if (version != 7)
+    {       
+        var payloadSerializer = GetPayloadSerializer(version);
+        // Fast json is only equivalent to the serialization that is used for protocol version 2 and upwards (or more precisely for the paths that use s_payloadSerializer2)
+        // so when we resolved the old serializer we should use non-fast path.
+        if (DisableFastJson || payloadSerializer == s_payloadSerializer)
         {
-            var payloadSerializer = GetPayloadSerializer(version);
             var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
             return version > 1 ?
@@ -191,7 +294,7 @@ public class JsonDataSerializer : IDataSerializer
         }
         else
         {
-            return JsonConvert.SerializeObject(new VersionedMessage2 { MessageType = messageType, Version = version, Payload = payload });
+            return JsonConvert.SerializeObject(new VersionedMessage2 { MessageType = messageType, Version = version, Payload = payload }, s_jsonSettings7);
         }
     }
 
@@ -290,5 +393,22 @@ public class JsonDataSerializer : IDataSerializer
             _ => throw new NotSupportedException($"Protocol version {version} is not supported. "
                 + "Ensure it is compatible with the latest serializer or add a new one."),
         };
+    }
+
+    private class MessageHeader
+    {
+        public int Version { get; set; }
+        public string MessageType { get; set; }
+    }
+
+    private class MessageWithRawMessage : VersionedMessage
+    {
+
+        public string RawMessage { get; set; }
+    }
+
+    private class PayloadedMessage<T>
+    {
+        public T Payload { get; set; }
     }
 }

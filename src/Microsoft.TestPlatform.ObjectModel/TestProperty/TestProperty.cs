@@ -22,9 +22,9 @@ public class TestProperty : IEquatable<TestProperty>
     private static readonly Dictionary<string, Type> TypeCache = new();
 
 #if NETSTANDARD1_0
-    private static int Version { get; set; } = 6;
+    private static bool DisableFastJson { get; set; } = true;
 #else
-    private static int Version { get; set; } = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION) ? 6 : 7;
+    private static bool DisableFastJson { get; set; } = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION);
 #endif
 
     //public static Stopwatch 
@@ -41,74 +41,33 @@ public class TestProperty : IEquatable<TestProperty>
     {
         ValidateArg.NotNullOrEmpty(id, nameof(id));
 
-        if (Version == 7)
+        // If the type of property is unexpected, then fail as otherwise we will not be to serialize it over the wcf channel and serialize it in db.
+        if (valueType == typeof(KeyValuePair<string, string>[]))
         {
-            // If the type of property is unexpected, then fail as otherwise we will not be to serialize it over the wcf channel and serialize it in db.
-            if (valueType == typeof(KeyValuePair<string, string>[]))
-            {
-                ValueType = "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]";
-            }
-            else if (valueType == typeof(string)
-                     || valueType == typeof(Uri)
-                     || valueType == typeof(string[])
-                     || valueType.AssemblyQualifiedName.Contains("System.Private")
-                     || valueType.AssemblyQualifiedName.Contains("mscorlib"))
-            {
-                // This comparison is a check to ensure assembly information is not embedded in data.
-                // Use type.FullName instead of type.AssemblyQualifiedName since the internal assemblies
-                // are different in desktop and coreclr. Thus AQN in coreclr includes System.Private.CoreLib which
-                // is not available on the desktop.
-                // Note that this doesn't handle generic types. Such types will fail during serialization.
-                ValueType = valueType.FullName;
-            }
-            else if (valueType.GetTypeInfo().IsValueType)
-            {
-                // In case of custom types, let the assembly qualified name be available to help
-                // deserialization on the client.
-                ValueType = valueType.AssemblyQualifiedName;
-            }
-            else
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.UnexpectedTypeOfProperty, valueType, id));
-            }
+            ValueType = "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]";
+        }
+        else if (valueType == typeof(string)
+                 || valueType == typeof(Uri)
+                 || valueType == typeof(string[])
+                 || valueType.AssemblyQualifiedName.Contains("System.Private")
+                 || valueType.AssemblyQualifiedName.Contains("mscorlib"))
+        {
+            // This comparison is a check to ensure assembly information is not embedded in data.
+            // Use type.FullName instead of type.AssemblyQualifiedName since the internal assemblies
+            // are different in desktop and coreclr. Thus AQN in coreclr includes System.Private.CoreLib which
+            // is not available on the desktop.
+            // Note that this doesn't handle generic types. Such types will fail during serialization.
+            ValueType = valueType.FullName;
+        }
+        else if (valueType.GetTypeInfo().IsValueType)
+        {
+            // In case of custom types, let the assembly qualified name be available to help
+            // deserialization on the client.
+            ValueType = valueType.AssemblyQualifiedName;
         }
         else
         {
-
-            ///
-            /// V6 DON'T Change!
-            ///
-            ////
-
-
-            // If the type of property is unexpected, then fail as otherwise we will not be to serialize it over the wcf channel and serialize it in db.
-            if (valueType == typeof(KeyValuePair<string, string>[]))
-            {
-                ValueType = "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]";
-            }
-            else if (valueType == typeof(string)
-                     || valueType == typeof(Uri)
-                     || valueType == typeof(string[])
-                     || valueType.AssemblyQualifiedName.Contains("System.Private")
-                     || valueType.AssemblyQualifiedName.Contains("mscorlib"))
-            {
-                // This comparison is a check to ensure assembly information is not embedded in data.
-                // Use type.FullName instead of type.AssemblyQualifiedName since the internal assemblies
-                // are different in desktop and coreclr. Thus AQN in coreclr includes System.Private.CoreLib which
-                // is not available on the desktop.
-                // Note that this doesn't handle generic types. Such types will fail during serialization.
-                ValueType = valueType.FullName;
-            }
-            else if (valueType.GetTypeInfo().IsValueType)
-            {
-                // In case of custom types, let the assembly qualified name be available to help
-                // deserialization on the client.
-                ValueType = valueType.AssemblyQualifiedName;
-            }
-            else
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.UnexpectedTypeOfProperty, valueType, id));
-            }
+            throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.UnexpectedTypeOfProperty, valueType, id));
         }
 
         Id = id;
@@ -164,7 +123,7 @@ public class TestProperty : IEquatable<TestProperty>
     public string ValueType { get; set; }
 
 
-#region IEquatable
+    #region IEquatable
 
     /// <inheritdoc/>
     public override int GetHashCode()
@@ -184,7 +143,7 @@ public class TestProperty : IEquatable<TestProperty>
         return (other != null) && (Id == other.Id);
     }
 
-#endregion IEquatable
+    #endregion IEquatable
 
     /// <inheritdoc/>
     public override string ToString()
@@ -209,142 +168,61 @@ public class TestProperty : IEquatable<TestProperty>
 
     private Type GetType(string typeName!!)
     {
-        if (Version == 7)
+        if (!DisableFastJson && TypeCache.TryGetValue(typeName, out var t))
         {
-            if (TypeCache.TryGetValue(typeName, out var t))
+            return t;
+        }
+
+        Type type = null;
+
+        try
+        {
+            // This only works for the type is in the currently executing assembly or in Mscorlib.dll.
+            type = Type.GetType(typeName);
+
+            if (!DisableFastJson)
             {
-                return t;
-            }
-
-            Type type = null;
-
-            try
-            {
-                // This only works for the type is in the currently executing assembly or in Mscorlib.dll.
-                type = Type.GetType(typeName);
-
                 if (type != null)
                 {
                     TypeCache[typeName] = type;
                     return type;
                 }
-
-                if (type == null)
-                {
-                    type = Type.GetType(typeName.Replace("Version=4.0.0.0", "Version=2.0.0.0")); // Try 2.0 version as discovery returns version of 4.0 for all cases
-                }
-
-                // For UAP the type namespace for System.Uri,System.TimeSpan and System.DateTimeOffset differs from the desktop version.
-                if (type == null && typeName.StartsWith("System.Uri"))
-                {
-                    type = typeof(Uri);
-                }
-                else if (type == null && typeName.StartsWith("System.TimeSpan"))
-                {
-                    type = typeof(TimeSpan);
-                }
-                else if (type == null && typeName.StartsWith("System.DateTimeOffset"))
-                {
-                    type = typeof(DateTimeOffset);
-                }
-                else if (type == null && typeName.StartsWith("System.Int16"))
-                {
-                    // For LineNumber property - Int is required
-                    type = typeof(Int16);
-                }
-                else if (type == null && typeName.StartsWith("System.Int32"))
-                {
-                    type = typeof(Int32);
-                }
-                else if (type == null && typeName.StartsWith("System.Int64"))
-                {
-                    type = typeof(Int64);
-                }
-            }
-            catch (Exception)
-            {
-#if FullCLR
-            // Try to see if the typeName contains Windows Phone PKT in that case load it from
-            // desktop side
-            if (typeName.Contains(s_windowsPhonePKT))
-            {
-                type = GetType(typeName.Replace(s_windowsPhonePKT, s_visualStudioPKT));
             }
 
             if (type == null)
             {
-                System.Diagnostics.Debug.Fail("The test property type " + typeName + " of property " + Id + "is not supported.");
-#else
-                System.Diagnostics.Debug.WriteLine("The test property type " + typeName + " of property " + Id + "is not supported.");
-#endif
-#if FullCLR
+                type = Type.GetType(typeName.Replace("Version=4.0.0.0", "Version=2.0.0.0")); // Try 2.0 version as discovery returns version of 4.0 for all cases
             }
-#endif
-            }
-            finally
+
+            // For UAP the type namespace for System.Uri,System.TimeSpan and System.DateTimeOffset differs from the desktop version.
+            if (type == null && typeName.StartsWith("System.Uri"))
             {
-                // default is of string type.
-                if (type == null)
-                {
-                    type = typeof(string);
-                }
+                type = typeof(Uri);
             }
-
-
-            TypeCache[typeName] = type;
-            return type;
+            else if (type == null && typeName.StartsWith("System.TimeSpan"))
+            {
+                type = typeof(TimeSpan);
+            }
+            else if (type == null && typeName.StartsWith("System.DateTimeOffset"))
+            {
+                type = typeof(DateTimeOffset);
+            }
+            else if (type == null && typeName.StartsWith("System.Int16"))
+            {
+                // For LineNumber property - Int is required
+                type = typeof(Int16);
+            }
+            else if (type == null && typeName.StartsWith("System.Int32"))
+            {
+                type = typeof(Int32);
+            }
+            else if (type == null && typeName.StartsWith("System.Int64"))
+            {
+                type = typeof(Int64);
+            }
         }
-        else
+        catch (Exception)
         {
-
-
-            ///
-            /// V6 DON'T Change!
-            ///
-            ////
-            ///
-
-            Type type = null;
-
-            try
-            {
-                // This only works for the type is in the currently executing assembly or in Mscorlib.dll.
-                type = Type.GetType(typeName);
-
-                if (type == null)
-                {
-                    type = Type.GetType(typeName.Replace("Version=4.0.0.0", "Version=2.0.0.0")); // Try 2.0 version as discovery returns version of 4.0 for all cases
-                }
-
-                // For UAP the type namespace for System.Uri,System.TimeSpan and System.DateTimeOffset differs from the desktop version.
-                if (type == null && typeName.StartsWith("System.Uri"))
-                {
-                    type = typeof(Uri);
-                }
-                else if (type == null && typeName.StartsWith("System.TimeSpan"))
-                {
-                    type = typeof(TimeSpan);
-                }
-                else if (type == null && typeName.StartsWith("System.DateTimeOffset"))
-                {
-                    type = typeof(DateTimeOffset);
-                }
-                else if (type == null && typeName.StartsWith("System.Int16"))
-                {
-                    // For LineNumber property - Int is required
-                    type = typeof(Int16);
-                }
-                else if (type == null && typeName.StartsWith("System.Int32"))
-                {
-                    type = typeof(Int32);
-                }
-                else if (type == null && typeName.StartsWith("System.Int64"))
-                {
-                    type = typeof(Int64);
-                }
-            }
-            catch (Exception)
-            {
 #if FullCLR
             // Try to see if the typeName contains Windows Phone PKT in that case load it from
             // desktop side
@@ -357,23 +235,26 @@ public class TestProperty : IEquatable<TestProperty>
             {
                 System.Diagnostics.Debug.Fail("The test property type " + typeName + " of property " + Id + "is not supported.");
 #else
-                System.Diagnostics.Debug.WriteLine("The test property type " + typeName + " of property " + Id + "is not supported.");
+            System.Diagnostics.Debug.WriteLine("The test property type " + typeName + " of property " + Id + "is not supported.");
 #endif
 #if FullCLR
             }
 #endif
-            }
-            finally
-            {
-                // default is of string type.
-                if (type == null)
-                {
-                    type = typeof(string);
-                }
-            }
-
-            return type;
         }
+        finally
+        {
+            // default is of string type.
+            if (type == null)
+            {
+                type = typeof(string);
+            }
+        }
+
+        if (!DisableFastJson)
+        {
+            TypeCache[typeName] = type;
+        }
+        return type;
     }
 
     private static readonly Dictionary<string, KeyValuePair<TestProperty, HashSet<Type>>> Properties = new();

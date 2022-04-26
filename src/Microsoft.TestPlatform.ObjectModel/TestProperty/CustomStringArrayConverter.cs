@@ -17,7 +17,6 @@ internal class CustomStringArrayConverter : TypeConverter
 {
     private readonly DataContractJsonSerializer _serializer;
 
-    private readonly Dictionary<string, string[]> _memoization = new();
     public CustomStringArrayConverter ()
     {
         _serializer = new DataContractJsonSerializer(typeof(string[]));
@@ -38,17 +37,14 @@ internal class CustomStringArrayConverter : TypeConverter
     /// <inheritdoc/>
     public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
     {
+        // PERF: The strings returned here can possibly be cached, but the benefits are not huge speed wise,
+        // and it is unclear how many distinct strings we get, and how much memory this would consume. I was seeing around 200ms improvement on 10k tests.
+
         // String[] are used by adapters. E.g. TestCategory[]
         if (value is string data)
         {
-            if (_memoization.TryGetValue(data, out string[] str))
-            {
-                return str;
-            }
-
             using var stream = new MemoryStream(Encoding.Unicode.GetBytes(data));
             var strings = _serializer.ReadObject(stream) as string[];
-            _memoization[data] = strings;
             return strings;
         }
 

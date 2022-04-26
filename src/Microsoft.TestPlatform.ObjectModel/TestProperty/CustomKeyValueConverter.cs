@@ -21,8 +21,6 @@ internal class CustomKeyValueConverter : TypeConverter
 {
     private readonly DataContractJsonSerializer _serializer;
 
-    private readonly Dictionary<string, KeyValuePair<string, string>[]> _memoization = new();
-
     public CustomKeyValueConverter()
     {
         _serializer = new DataContractJsonSerializer(typeof(TraitObject[]));
@@ -48,15 +46,12 @@ internal class CustomKeyValueConverter : TypeConverter
         // KeyValuePairs are used for traits. 
         if (value is string data)
         {
-            if (_memoization.TryGetValue(data, out KeyValuePair<string, string>[] traits))
-            {
-                return traits;
-            }
+            // PERF: The values returned here can possibly be cached, but the benefits are very small speed wise,
+            // and it is unclear how many distinct objects we get, and how much memory this would consume. I was seeing around 100ms improvement on 10k tests.
 
             using var stream = new MemoryStream(Encoding.Unicode.GetBytes(data));
             // Converting Json data to array of KeyValuePairs with duplicate keys.
             var listOfTraitObjects = _serializer.ReadObject(stream) as TraitObject[];
-            _memoization[data] = traits;
             return listOfTraitObjects.Select(i => new KeyValuePair<string, string>(i.Key, i.Value)).ToArray();
         }
 

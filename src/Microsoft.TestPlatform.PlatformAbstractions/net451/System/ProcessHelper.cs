@@ -16,6 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 public partial class ProcessHelper : IProcessHelper
 {
+    private PlatformArchitecture? _currentProcessArchitecture;
+
     /// <inheritdoc/>
     public string GetCurrentProcessLocation()
         => Path.GetDirectoryName(GetCurrentProcessFileName());
@@ -26,7 +28,7 @@ public partial class ProcessHelper : IProcessHelper
 
     /// <inheritdoc/>
     public PlatformArchitecture GetCurrentProcessArchitecture()
-        => GetProcessArchitecture(Process.GetCurrentProcess().Id);
+        => _currentProcessArchitecture ??= GetProcessArchitecture(Process.GetCurrentProcess().Id);
 
 
     public PlatformArchitecture GetProcessArchitecture(int processId)
