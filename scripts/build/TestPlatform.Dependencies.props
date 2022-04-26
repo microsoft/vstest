@@ -76,6 +76,8 @@
     <RoslynPublicApiAnalyzersVersion>3.3.4-beta1.21554.2</RoslynPublicApiAnalyzersVersion>
     <RoslynBannedApiAnalyzersVersion>3.3.3</RoslynBannedApiAnalyzersVersion>
 
+    <MicrosoftCodeCoverageVersion>17.1.0</MicrosoftCodeCoverageVersion>
+
     <DependencyVersionsImported>true</DependencyVersionsImported>
   </PropertyGroup>
 
