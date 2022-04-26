@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -95,12 +94,6 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         var fullyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered);
         var partiallyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered);
         var notDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
-
-        if (!_parallelProxyDiscoveryManager.IsAbortRequested)
-        {
-            Debug.Assert(notDiscovered.Count == 0 && partiallyDiscovered.Count == 0,
-               "All sources should be discovered upon discovery completion.");
-        }
 
         // Collecting Final Discovery State
         _requestData.MetricsCollection.Add(

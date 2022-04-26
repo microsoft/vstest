@@ -117,7 +117,7 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
             _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count
             + _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count
             + _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count
-            == _actualDiscoveryCriteria?.Sources.Count(),
+            == (_actualDiscoveryCriteria?.Sources.Count() ?? 0),
             "Total count of sources should match the count of sources with status not discovered, partially discovered and fully discovered.");
 
         var allDiscoverersCompleted = false;

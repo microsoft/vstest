@@ -35,6 +35,7 @@ public class ParallelProxyDiscoveryManagerTests
     private readonly List<string> _processedSources;
     private readonly ManualResetEventSlim _discoveryCompleted;
     private readonly Mock<IRequestData> _mockRequestData;
+    private readonly DiscoveryDataAggregator _dataAggregator;
 
     public ParallelProxyDiscoveryManagerTests()
     {
@@ -53,6 +54,7 @@ public class ParallelProxyDiscoveryManagerTests
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
         _mockRequestData.Setup(rd => rd.ProtocolConfig).Returns(new ProtocolConfig());
+        _dataAggregator = new();
     }
 
     [TestMethod]
@@ -229,15 +231,29 @@ public class ParallelProxyDiscoveryManagerTests
         Assert.IsTrue(_proxyManagerFuncCalled);
     }
 
-    private IParallelProxyDiscoveryManager SetupDiscoveryManager(Func<IProxyDiscoveryManager> getProxyManager, int parallelLevel, bool abortDiscovery)
+    [TestMethod]
+    public void DiscoveryTestsWithCompletionMarksAllSourcesAsFullyDiscovered()
     {
-        var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(_mockRequestData.Object, getProxyManager, new(), parallelLevel, false);
+        _testDiscoveryCriteria.TestCaseFilter = "Name~Test";
+        var parallelDiscoveryManager = SetupDiscoveryManager(_proxyManagerFunc, 2, false);
+
+        Task.Run(() => parallelDiscoveryManager.DiscoverTests(_testDiscoveryCriteria, _mockHandler.Object));
+
+        Assert.IsTrue(_discoveryCompleted.Wait(TaskTimeout), "Test discovery not completed.");
+        Assert.AreEqual(_sources.Count, _processedSources.Count, "All Sources must be processed.");
+        CollectionAssert.AreEquivalent(_sources, _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        Assert.AreEqual(0, _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
+        Assert.AreEqual(0, _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
+    }
+
+    private ParallelProxyDiscoveryManager SetupDiscoveryManager(Func<IProxyDiscoveryManager> getProxyManager, int parallelLevel, bool abortDiscovery)
+    {
+        var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(_mockRequestData.Object, getProxyManager, _dataAggregator, parallelLevel, false);
         SetupDiscoveryTests(_processedSources, abortDiscovery);
 
         // Setup a complete handler for parallel discovery manager
         _mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
-            .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>(
-                (discoveryCompleteEventArgs, lastChunk) => _discoveryCompleted.Set());
+            .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>((discoveryCompleteEventArgs, lastChunk) => _discoveryCompleted.Set());
 
         return parallelDiscoveryManager;
     }
@@ -256,9 +272,11 @@ public class ParallelProxyDiscoveryManagerTests
                             processedSources.AddRange(criteria.Sources);
                         }
 
-                        Task.Delay(100).Wait();
+                        _dataAggregator.MarkSourcesWithStatus(criteria.Sources, DiscoveryStatus.FullyDiscovered);
 
+                        Task.Delay(100).Wait();
                         Assert.AreEqual(_testDiscoveryCriteria.TestCaseFilter, criteria.TestCaseFilter);
+
                         handler.HandleDiscoveryComplete(isAbort ? new DiscoveryCompleteEventArgs(-1, isAbort) : new DiscoveryCompleteEventArgs(10, isAbort), null);
                     });
         }
