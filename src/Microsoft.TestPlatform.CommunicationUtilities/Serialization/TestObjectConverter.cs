@@ -93,7 +93,10 @@ public class TestObjectConverter : JsonConverter
 /// </summary>
 internal class TestObjectConverter7 : JsonConverter
 {
-    private static object[] EmptyObjectArray = new object[0];
+    // Empty is not present everywhere
+#pragma warning disable CA1825 // Avoid zero-length array allocations
+    private static readonly object[] EmptyObjectArray = new object[0];
+#pragma warning restore CA1825 // Avoid zero-length array allocations
 
     public TestObjectConverter7()
     {

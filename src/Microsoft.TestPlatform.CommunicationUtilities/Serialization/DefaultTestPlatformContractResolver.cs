@@ -53,9 +53,8 @@ public class DefaultTestPlatformContractResolver : DefaultContractResolver
 /// </summary>
 internal class DefaultTestPlatformContractResolver7 : DefaultContractResolver
 {
-    public DefaultTestPlatformContractResolver7 ()
+    public DefaultTestPlatformContractResolver7()
     {
-
     }
     /// <inheritdoc/>
     protected override JsonContract CreateContract(Type objectType)

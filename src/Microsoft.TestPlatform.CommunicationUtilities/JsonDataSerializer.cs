@@ -2,12 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
@@ -30,7 +27,7 @@ public class JsonDataSerializer : IDataSerializer
     private static JsonSerializer s_payloadSerializer; // payload serializer for version <= 1
     private static JsonSerializer s_payloadSerializer2; // payload serializer for version >= 2
     private static JsonSerializerSettings s_jsonSettings7; // serializer settings for faster json
-    private static JsonSerializerSettings s_jsonSettings; // serializer settings for serializer v1, which should be used to deserialize message headers
+    private static JsonSerializerSettings s_jsonSettings; // serializer settings for serializer v1, which should use to deserialize message headers
     private static JsonSerializer s_serializer; // generic serializer
 
     /// <summary>
@@ -171,7 +168,13 @@ public class JsonDataSerializer : IDataSerializer
 
         try
         {
+            // The incoming message looks like this:
             // {"Version":6,"MessageType":"TestExecution.GetTestRunnerProcessStartInfoForRunAll","Payload":{
+            if (rawMessage.Length < 31)
+            {
+                // {"Version":6,"MessageType":"T"} with length 31 is the smallest valid versioned message we would get.
+                return false;
+            }
             if (rawMessage[2] != 'V')
             {
                 return false;

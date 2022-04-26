@@ -7,7 +7,9 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 
+#if !NETSTANDARD1_0
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+#endif
 
 #nullable disable
 

@@ -9,8 +9,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 
-using FluentAssertions;
-
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -18,9 +16,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using Newtonsoft.Json;
 
 #nullable disable
 
@@ -63,7 +58,6 @@ internal class Program
 
                     Message message = json.DeserializeMessage(rawMessage);
                     VersionedMessage versionedMessage = (VersionedMessage)message;
-                    versionedMessage.Version = version;
                     lastMessage = versionedMessage;
                     payload = json.DeserializePayload<TestRunChangedEventArgs>(versionedMessage);
 
@@ -78,7 +72,7 @@ internal class Program
 
             }
         }
-        if (step == "f")
+        else if (step == "f")
         {
             Console.WriteLine("Deserialization:");
             var dir = Directory.GetDirectories("C:\\temp\\tp-serialization\\").OrderBy(n => n).Last();
@@ -95,7 +89,6 @@ internal class Program
             foreach (var attempt in attempts)
             {
                 int messageCount = 0;
-                VersionedMessage lastMessage = null;
                 Stopwatch sw = Stopwatch.StartNew();
                 foreach (string rawMessage in rawMessages)
                 {
@@ -115,7 +108,7 @@ internal class Program
             }
 
         }
-        //if (step == "dd")
+        // else if (step == "dd")
         //{
         //    Console.WriteLine("Deserialization 2:");
         //    var dir = Directory.GetDirectories("C:\\temp\\tp-serialization\\").OrderBy(n => n).Last();
@@ -209,14 +202,11 @@ internal class Program
             vm.Version = 6;
             var p = json.DeserializePayload<TestRunChangedEventArgs>(vm);
             var values = Enumerable.Range(0, 10_000).ToList();
-            Dictionary<int, string> mmmm = new Dictionary<int, string>();
-
-
+            Dictionary<int, string> mmmm = new();
 
             foreach (var attempt in attempts)
             {
                 int testCount = 0;
-                VersionedMessage lastMessage = null;
                 Stopwatch sw = Stopwatch.StartNew();
                 foreach (var _ in values)
                 {
