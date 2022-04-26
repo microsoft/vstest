@@ -22,11 +22,11 @@ public class JsonDataSerializer : IDataSerializer
 {
     private static JsonDataSerializer s_instance;
 
-    private static bool DisableFastJson { get; } = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION);
+    private static readonly bool DisableFastJson = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION);
 
     private static JsonSerializer s_payloadSerializer; // payload serializer for version <= 1
     private static JsonSerializer s_payloadSerializer2; // payload serializer for version >= 2
-    private static JsonSerializerSettings s_jsonSettings7; // serializer settings for faster json
+    private static JsonSerializerSettings s_fastJsonSettings; // serializer settings for faster json
     private static JsonSerializerSettings s_jsonSettings; // serializer settings for serializer v1, which should use to deserialize message headers
     private static JsonSerializer s_serializer; // generic serializer
 
@@ -50,7 +50,7 @@ public class JsonDataSerializer : IDataSerializer
         s_payloadSerializer = JsonSerializer.Create(jsonSettings);
         s_payloadSerializer2 = JsonSerializer.Create(jsonSettings);
 
-        var jsonSettings7 = new JsonSerializerSettings
+        s_fastJsonSettings = new JsonSerializerSettings
         {
             DateFormatHandling = jsonSettings.DateFormatHandling,
             DateParseHandling = jsonSettings.DateParseHandling,
@@ -63,8 +63,6 @@ public class JsonDataSerializer : IDataSerializer
 
             ContractResolver = new DefaultTestPlatformContractResolver(),
         };
-
-        s_jsonSettings7 = jsonSettings7;
 
         s_payloadSerializer.ContractResolver = new TestPlatformContractResolver1();
         s_payloadSerializer2.ContractResolver = new DefaultTestPlatformContractResolver();
@@ -91,35 +89,33 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>A <see cref="Message"/> instance.</returns>
     public Message DeserializeMessage(string rawMessage)
     {
-        if (!DisableFastJson)
-        {
-            // PERF: Try grabbing the version and message type from the string directly, we are pretty certain how the message is serialized
-            // when the format does not match all we do is that we check if 6th character in the message is 'V'
-            if (!FastHeaderParse(rawMessage, out int v, out string m))
-            {
-                // PERF: If the fast path fails, deserialize into header object that does not have any Payload. When the message type info
-                // is at the start of the message, this is also pretty fast. Again, this won't touch the payload.
-                MessageHeader header = JsonConvert.DeserializeObject<MessageHeader>(rawMessage, s_jsonSettings);
-                v = header.Version;
-                m = header.MessageType;
-            }
-
-            var message = new MessageWithRawMessage
-            {
-                Version = v,
-                MessageType = m,
-                RawMessage = rawMessage,
-            };
-
-            return message;
-        }
-        else
+        if (DisableFastJson)
         {
             // PERF: This is slow, we deserialize the message, and the payload into JToken just to get the header. We then
             // deserialize the data from the JToken, but that is twice as expensive as deserializing the whole object directly into the final object type.
             // We need this for backward compatibility though.
             return Deserialize<VersionedMessage>(rawMessage);
         }
+
+        // PERF: Try grabbing the version and message type from the string directly, we are pretty certain how the message is serialized
+        // when the format does not match all we do is that we check if 6th character in the message is 'V'
+        if (!FastHeaderParse(rawMessage, out int version, out string messageType))
+        {
+            // PERF: If the fast path fails, deserialize into header object that does not have any Payload. When the message type info
+            // is at the start of the message, this is also pretty fast. Again, this won't touch the payload.
+            MessageHeader header = JsonConvert.DeserializeObject<MessageHeader>(rawMessage, s_jsonSettings);
+            version = header.Version;
+            messageType = header.MessageType;
+        }
+
+        var message = new MessageWithRawMessage
+        {
+            Version = version,
+            MessageType = messageType,
+            RawMessage = rawMessage,
+        };
+
+        return message;
     }
 
     /// <summary>
@@ -133,29 +129,27 @@ public class JsonDataSerializer : IDataSerializer
         var versionedMessage = message as VersionedMessage;
         var payloadSerializer = GetPayloadSerializer(versionedMessage?.Version);
 
-        if (!DisableFastJson)
+        if (DisableFastJson)
         {
-            var messageWithRawMessage = message as MessageWithRawMessage;
-            var rawMessage = messageWithRawMessage.RawMessage;
+            return Deserialize<T>(payloadSerializer, message.Payload);
+        }
 
-            if (payloadSerializer == s_payloadSerializer2)
-            {
-                // PERF: Fast path is compatibile only with protocol versions that use serializer_2,
-                // and this is faster than deserializing via deserializer_2.
-                var messageWithPayload = JsonConvert.DeserializeObject<PayloadedMessage<T>>(rawMessage, s_jsonSettings7);
-                return messageWithPayload.Payload;
-            }
-            else
-            {
-                // PERF: When payloadSerializer1 was resolved we need to deserialize JToken, and then deserialize that.
-                // This is still better than deserializing the JToken in DeserializeMessage because here we know that the payload
-                // will actually be used.
-                return Deserialize<T>(payloadSerializer, Deserialize<VersionedMessage>(rawMessage).Payload);
-            }
+        var messageWithRawMessage = (MessageWithRawMessage)message;
+        var rawMessage = messageWithRawMessage.RawMessage;
+
+        if (payloadSerializer == s_payloadSerializer2)
+        {
+            // PERF: Fast path is compatibile only with protocol versions that use serializer_2,
+            // and this is faster than deserializing via deserializer_2.
+            var messageWithPayload = JsonConvert.DeserializeObject<PayloadedMessage<T>>(rawMessage, s_fastJsonSettings);
+            return messageWithPayload.Payload;
         }
         else
         {
-            return Deserialize<T>(payloadSerializer, message.Payload);
+            // PERF: When payloadSerializer1 was resolved we need to deserialize JToken, and then deserialize that.
+            // This is still better than deserializing the JToken in DeserializeMessage because here we know that the payload
+            // will actually be used.
+            return Deserialize<T>(payloadSerializer, Deserialize<VersionedMessage>(rawMessage).Payload);
         }
     }
 
@@ -296,7 +290,7 @@ public class JsonDataSerializer : IDataSerializer
         }
         else
         {
-            return JsonConvert.SerializeObject(new VersionedMessageForSerialization { MessageType = messageType, Version = version, Payload = payload }, s_jsonSettings7);
+            return JsonConvert.SerializeObject(new VersionedMessageForSerialization { MessageType = messageType, Version = version, Payload = payload }, s_fastJsonSettings);
         }
     }
 

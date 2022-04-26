@@ -19,12 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 /// </summary>
 internal class CustomKeyValueConverter : TypeConverter
 {
-    private readonly DataContractJsonSerializer _serializer;
-
-    public CustomKeyValueConverter()
-    {
-        _serializer = new DataContractJsonSerializer(typeof(TraitObject[]));
-    }
+    private readonly DataContractJsonSerializer _serializer = new(typeof(TraitObject[]));
 
     /// <inheritdoc/>
     public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
@@ -52,7 +47,7 @@ internal class CustomKeyValueConverter : TypeConverter
             using var stream = new MemoryStream(Encoding.Unicode.GetBytes(data));
             // Converting Json data to array of KeyValuePairs with duplicate keys.
             var listOfTraitObjects = _serializer.ReadObject(stream) as TraitObject[];
-            return listOfTraitObjects.Select(i => new KeyValuePair<string, string>(i.Key, i.Value)).ToArray();
+            return listOfTraitObjects?.Select(i => new KeyValuePair<string, string>(i.Key, i.Value)).ToArray() ?? new KeyValuePair<string, string>[0];
         }
 
         return null;

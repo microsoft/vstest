@@ -14,12 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 internal class CustomStringArrayConverter : TypeConverter
 {
-    private readonly DataContractJsonSerializer _serializer;
-
-    public CustomStringArrayConverter()
-    {
-        _serializer = new DataContractJsonSerializer(typeof(string[]));
-    }
+    private readonly DataContractJsonSerializer _serializer = new(typeof(string[]));
 
     /// <inheritdoc/>
     public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
