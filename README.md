@@ -13,6 +13,8 @@ There are many ways to contribute to VSTest
 - [Contribute features and fixes](https://github.com/Microsoft/vstest-docs/blob/main/docs/contribute.md).
 - Contribute to the [documentation](https://github.com/Microsoft/vstest-docs).
 
+NOTE: When adding a new public API, always add it directly to the `PublicAPI.Shipped.txt` file. This helps us ensure we are always considering potential breaking changes (even between successive commits of un-released version) and avoids the burden of the unshipped to shipped commit.
+
 ### Documentation
 - [Test Platform Architecture](https://github.com/Microsoft/vstest-docs/blob/main/RFCs/0001-Test-Platform-Architecture.md)
 - [Test Discovery Protocol](https://github.com/Microsoft/vstest-docs/blob/main/RFCs/0002-Test-Discovery-Protocol.md)

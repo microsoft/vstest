@@ -42,17 +42,6 @@
         <target state="translated">A operação Parar a Sessão de Teste foi anulada.</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="CannotFindConsoleRunner">
-        <source>Cannot find the console runner {0}.</source>
-        <target state="translated">Não é possível localizar o executor do console {0}.</target>
-        <note>{0}: the console runner path</note>
-      </trans-unit>
-      <trans-unit id="ProcessStartWin32Failure">
-        <source>An error occurred when opening the file {0} with arguments {1}.</source>
-        <target state="translated">Erro ao abrir o arquivo {0} com argumentos {1}.</target>
-        <note>{0}: process path
-{1}: arguments passed to the process invocation.</note>
-      </trans-unit>
     </body>
   </file>
 </xliff>

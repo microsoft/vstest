@@ -102,7 +102,7 @@ internal class DefaultEngineInvoker :
                 .GetTypeInfo()
                 .Assembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-            EqtTrace.Verbose($"Version: { version }");
+            EqtTrace.Verbose($"Version: {version}");
         }
 
         if (EqtTrace.IsInfoEnabled)

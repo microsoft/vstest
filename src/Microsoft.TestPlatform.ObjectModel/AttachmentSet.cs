@@ -45,7 +45,7 @@ public class AttachmentSet
 
     public override string ToString()
     {
-        return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(DisplayName)}: {DisplayName}, {nameof(Attachments)}: [{ string.Join(",", Attachments)}]";
+        return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(DisplayName)}: {DisplayName}, {nameof(Attachments)}: [{string.Join(",", Attachments)}]";
     }
 }
 

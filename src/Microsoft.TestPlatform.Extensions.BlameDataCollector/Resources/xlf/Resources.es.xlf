@@ -29,9 +29,9 @@ Esta prueba puede ser el origen del bloqueo o no serlo.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
-        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
-        <target state="translated">La clave de parámetro blame {0} solo puede admitir valores {1}/{2}. Se omitirá esta clave.</target>
-        <note></note>
+        <source>The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}</source>
+        <target state="translated">La clave del parámetro de culpa {0} tiene un valor incorrecto: {1}. Los valores admitidos son: {2}</target>
+        <note>{0} and {1} are single values referring to parameters such as BlameHang and Full. {2} is comma separated list of valid values, e.g. Full, Mini, None.</note>
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">
         <source>Could not start process dump: {0}</source>

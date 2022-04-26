@@ -54,7 +54,7 @@
     <PackageReference Condition=" '$(OS)' != 'Windows_NT' " Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(UseBannedApiAnalyzers)' == 'true' ">
+  <ItemGroup Condition=" '$(UseBannedApiAnalyzers)' == 'true' and '$(DotNetBuildFromSource)' != 'true' ">
     <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="$(RoslynBannedApiAnalyzersVersion)">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -129,7 +129,7 @@
           <Version>$(MSTestAssertExtensionVersion)</Version>
         </PackageReference>
         <PackageReference Include="Microsoft.CodeCoverage">
-          <Version>17.1.0</Version>
+          <Version>$(MicrosoftCodeCoverageVersion)</Version>
         </PackageReference>
       </ItemGroup>
     </When>

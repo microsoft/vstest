@@ -11,36 +11,35 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.InProcDataCollector;
 [assembly: AssemblyKeyFile("key.snk")]
 [assembly: AssemblyVersion("9.9.9.9")]
 
-namespace Coverlet.Collector.DataCollection
+namespace Coverlet.Collector.DataCollection;
+
+// This class MUST have the same full name as
+// https://github.com/tonerdo/coverlet/blob/master/src/coverlet.collector/InProcDataCollection/CoverletInProcDataCollector.cs
+// to mimic real behavior
+public class CoverletInProcDataCollector : InProcDataCollection
 {
-    // This class MUST have the same full name as
-    // https://github.com/tonerdo/coverlet/blob/master/src/coverlet.collector/InProcDataCollection/CoverletInProcDataCollector.cs
-    // to mimic real behavior
-    public class CoverletInProcDataCollector : InProcDataCollection
+    public void Initialize(IDataCollectionSink dataCollectionSink)
     {
-        public void Initialize(IDataCollectionSink dataCollectionSink)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
+    }
 
-        public void TestCaseEnd(TestCaseEndArgs testCaseEndArgs)
-        {
-            throw new NotImplementedException();
-        }
+    public void TestCaseEnd(TestCaseEndArgs testCaseEndArgs)
+    {
+        throw new NotImplementedException();
+    }
 
-        public void TestCaseStart(TestCaseStartArgs testCaseStartArgs)
-        {
-            throw new NotImplementedException();
-        }
+    public void TestCaseStart(TestCaseStartArgs testCaseStartArgs)
+    {
+        throw new NotImplementedException();
+    }
 
-        public void TestSessionEnd(TestSessionEndArgs testSessionEndArgs)
-        {
-            throw new NotImplementedException();
-        }
+    public void TestSessionEnd(TestSessionEndArgs testSessionEndArgs)
+    {
+        throw new NotImplementedException();
+    }
 
-        public void TestSessionStart(TestSessionStartArgs testSessionStartArgs)
-        {
-            throw new NotImplementedException();
-        }
+    public void TestSessionStart(TestSessionStartArgs testSessionStartArgs)
+    {
+        throw new NotImplementedException();
     }
 }
