@@ -412,7 +412,7 @@ public class DiscoveryDataAggregatorTests
     }
 
     [TestMethod]
-    public void TryAggregateIsMessageSentIsAvoidRaceConditions()
+    public void TryAggregateIsMessageSentOnlyReportsOnceEvenWhenRunningInParallel()
     {
         // Arrange
         var dataAggregator = new DiscoveryDataAggregator();
