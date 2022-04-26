@@ -46,10 +46,12 @@ public class DefaultTestPlatformContractResolver : DefaultContractResolver
     }
 }
 
+/// TODO: This is not used now, but I was experimenting with this quite a bit for performance, leaving it here in case I was wrong
+/// and the serializer settings actually have signigicant impact on the speed.
 /// <summary>
 /// JSON contract resolver for mapping test platform types.
 /// </summary>
-public class DefaultTestPlatformContractResolver7 : DefaultContractResolver
+internal class DefaultTestPlatformContractResolver7 : DefaultContractResolver
 {
     public DefaultTestPlatformContractResolver7 ()
     {

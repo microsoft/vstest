@@ -29,9 +29,9 @@ Dieser Test kann, muss aber nicht unbedingt die Absturzursache sein.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
-        <source>The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}</source>
-        <target state="new">Der blame-Parameterschlüssel "{0}" kann nur die Werte "{1}"/"{2}" unterstützen. Dieser Schlüssel wird ignoriert.</target>
-        <note>{0} and {1} are single values referring to parameters such as BlameHang and Full. {2} is comma separated list of valid values, e.g. Full, Mini, None.</note>
+        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
+        <target state="translated">Der blame-Parameterschlüssel "{0}" kann nur die Werte "{1}"/"{2}" unterstützen. Dieser Schlüssel wird ignoriert.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">
         <source>Could not start process dump: {0}</source>

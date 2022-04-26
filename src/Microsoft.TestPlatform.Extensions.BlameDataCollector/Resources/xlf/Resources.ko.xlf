@@ -29,9 +29,9 @@ This test may, or may not be the source of the crash.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
-        <source>The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}</source>
-        <target state="new">blame 매개 변수 키 {0}은(는) {1}/{2} 값만 지원할 수 있습니다. 이 키를 무시합니다.</target>
-        <note>{0} and {1} are single values referring to parameters such as BlameHang and Full. {2} is comma separated list of valid values, e.g. Full, Mini, None.</note>
+        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
+        <target state="translated">blame 매개 변수 키 {0}은(는) {1}/{2} 값만 지원할 수 있습니다. 이 키를 무시합니다.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">
         <source>Could not start process dump: {0}</source>

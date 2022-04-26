@@ -1378,8 +1378,6 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         receiverMessageTask.Wait();
         Message message = receiverMessageTask.Result;
 
-        
-
         return message ?? throw new TransationLayerException(
             TranslationLayerResources.FailedToReceiveMessage);
     }

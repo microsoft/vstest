@@ -29,9 +29,9 @@ Ce test est éventuellement à l'origine du plantage.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
-        <source>The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}</source>
-        <target state="new">La clé de paramètre blame {0} peut prendre en charge uniquement les valeurs {1}/{2}. Cette clé est ignorée.</target>
-        <note>{0} and {1} are single values referring to parameters such as BlameHang and Full. {2} is comma separated list of valid values, e.g. Full, Mini, None.</note>
+        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
+        <target state="translated">La clé de paramètre blame {0} peut prendre en charge uniquement les valeurs {1}/{2}. Cette clé est ignorée.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">
         <source>Could not start process dump: {0}</source>

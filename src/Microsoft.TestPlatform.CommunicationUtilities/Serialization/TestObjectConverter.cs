@@ -86,11 +86,12 @@ public class TestObjectConverter : JsonConverter
     }
 }
 
-
+/// TODO: This is not used now, but I was experimenting with this quite a bit for performance, leaving it here in case I was wrong
+/// and the serializer settings actually have signigicant impact on the speed.
 /// <summary>
 /// JSON converter for the <see cref="TestObject"/> and derived entities.
 /// </summary>
-public class TestObjectConverter7 : JsonConverter
+internal class TestObjectConverter7 : JsonConverter
 {
     private static object[] EmptyObjectArray = new object[0];
 

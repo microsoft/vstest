@@ -215,7 +215,6 @@ public class JsonDataSerializer : IDataSerializer
         }
     }
 
-
     /// <summary>
     ///  Try getting substring until a given delimiter, but don't search more characters than maxSearchLength.
     /// </summary>
@@ -280,7 +279,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="version">Version for the message.</param>
     /// <returns>Serialized message.</returns>
     public string SerializePayload(string messageType, object payload, int version)
-    {       
+    {
         var payloadSerializer = GetPayloadSerializer(version);
         // Fast json is only equivalent to the serialization that is used for protocol version 2 and upwards (or more precisely for the paths that use s_payloadSerializer2)
         // so when we resolved the old serializer we should use non-fast path.
@@ -294,7 +293,7 @@ public class JsonDataSerializer : IDataSerializer
         }
         else
         {
-            return JsonConvert.SerializeObject(new VersionedMessage2 { MessageType = messageType, Version = version, Payload = payload }, s_jsonSettings7);
+            return JsonConvert.SerializeObject(new VersionedMessageForSerialization { MessageType = messageType, Version = version, Payload = payload }, s_jsonSettings7);
         }
     }
 
@@ -395,20 +394,53 @@ public class JsonDataSerializer : IDataSerializer
         };
     }
 
+    /// <summary>
+    /// Just the header from versioned messages, to avoid touching the Payload when we deserialize message.
+    /// </summary>
     private class MessageHeader
     {
         public int Version { get; set; }
         public string MessageType { get; set; }
     }
 
+    /// <summary>
+    /// Container for the rawMessage string, to avoid changing how messages are passed.
+    /// This allows us to pass MessageWithRawMessage the same way that Message is passed for protocol version 1.
+    /// And VersionedMessage is passed for later protocol versions, but without touching the payload string when we just
+    /// need to know the header.
+    /// </summary>
     private class MessageWithRawMessage : VersionedMessage
     {
-
         public string RawMessage { get; set; }
     }
 
+    /// <summary>
+    /// This grabs payload from the message, we already know version and message type.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     private class PayloadedMessage<T>
     {
         public T Payload { get; set; }
+    }
+
+    /// <summary>
+    /// For serialization directly into string, without first converting to JToken, and then from JToken to string.
+    /// </summary>
+    private class VersionedMessageForSerialization
+    {
+        /// <summary>
+        /// Gets or sets the version of the message
+        /// </summary>
+        public int Version { get; set; }
+
+        /// <summary>
+        /// Gets or sets the message type.
+        /// </summary>
+        public string MessageType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the payload.
+        /// </summary>
+        public object Payload { get; set; }
     }
 }
