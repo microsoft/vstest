@@ -120,6 +120,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         // Sending discovery complete message to IDE
         if (_discoveryDataAggregator.TryAggregateIsMessageSent())
         {
+            EqtTrace.Verbose("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Sending discovery complete message to IDE.");
             ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
         }
 
@@ -135,6 +136,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         };
 
         // send actual test discovery complete to clients
+        EqtTrace.Verbose("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Sending discovery complete event to clients.");
         _actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);
     }
 

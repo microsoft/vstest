@@ -149,22 +149,31 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
             // Dispose concurrent executors
             UpdateParallelLevel(0);
 
+            if (allDiscoverersCompleted)
+            {
+                EqtTrace.Verbose("ParallelProxyDiscoveryManager.HandlePartialDiscoveryComplete: All sources were discovered.");
+            }
+            else
+            {
+                EqtTrace.Verbose($"ParallelProxyDiscoveryManager.HandlePartialDiscoveryComplete: Abort was requested.");
+            }
+
             return true;
         }
 
-        /*  Discovery is not complete.
-            Now when both.net framework and.net core projects can run in parallel
-            we should clear manager and create new one for both cases.
-            Otherwise `proxyDiscoveryManager` instance is alredy closed by now and it will give exception
-            when trying to do some operation on it.
-        */
+        // Discovery is not complete.
+        // Now when both.net framework and.net core projects can run in parallel we should clear
+        // manager and create new one for both cases. Otherwise 'proxyDiscoveryManager' instance
+        // is already closed by now and it will give exception when trying to do some operation
+        // on it.
         EqtTrace.Verbose("ParallelProxyDiscoveryManager.HandlePartialDiscoveryComplete: Replace discovery manager. Shared: {0}, Aborted: {1}.", SharedHosts, isAborted);
 
         RemoveManager(proxyDiscoveryManager);
 
         if (_currentDiscoveryEventsHandler is null)
         {
-            Debug.Assert(!TryFetchNextSource(_sourceEnumerator, out string nextSource), $"When discovery event handler is null , we should not have any more sources but we got '{nextSource}'.");
+            Debug.Assert(!TryFetchNextSource(_sourceEnumerator, out string nextSource), $"When discovery event handler is null, we should not have any more sources but we got '{nextSource}'.");
+            EqtTrace.Verbose("ParallelProxyDiscoveryManager.HandlePartialDiscoveryComplete: Skip adding more manager because discovery event handler is null.");
             return false;
         }
 
