@@ -108,7 +108,7 @@ public class JsonDataSerializer : IDataSerializer
             messageType = header.MessageType;
         }
 
-        var message = new MessageWithRawMessage
+        var message = new VersionedMessageWithRawMessage
         {
             Version = version,
             MessageType = messageType,
@@ -126,17 +126,33 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>The deserialized payload.</returns>
     public T DeserializePayload<T>(Message message)
     {
-        var versionedMessage = message as VersionedMessage;
-        var payloadSerializer = GetPayloadSerializer(versionedMessage?.Version);
+        if (message.GetType() == typeof(Message))
+        {
+            // Message is specifically a Message, and not any of it's child types like VersionedMessage.
+            // Get the default serializer and deserialize. This would be used for any message from very old test host.
+            //
+            // Unit tests also provide a Message in places where using the deserializer would actually
+            // produce a VersionedMessage or VersionedMessageWithRawMessage.
+            var serializerV1 = GetPayloadSerializer(null);
+            return Deserialize<T>(serializerV1, message.Payload);
+        }
+
+        var versionedMessage = (VersionedMessage)message;
+        var payloadSerializer = GetPayloadSerializer(versionedMessage.Version);
 
         if (DisableFastJson)
         {
+            // When fast json is disabled, then the message is a VersionedMessage
+            // with JToken payload.
             return Deserialize<T>(payloadSerializer, message.Payload);
         }
 
-        var messageWithRawMessage = (MessageWithRawMessage)message;
+        // When fast json is enabled then the message is also a subtype of VersionedMessage, but
+        // the Payload is not populated, and instead the rawMessage string it passed as is.
+        var messageWithRawMessage = (VersionedMessageWithRawMessage)message;
         var rawMessage = messageWithRawMessage.RawMessage;
 
+        // The deserialized message can still have a version (0 or 1), that should use the old deserializer
         if (payloadSerializer == s_payloadSerializer2)
         {
             // PERF: Fast path is compatibile only with protocol versions that use serializer_2,
@@ -149,7 +165,7 @@ public class JsonDataSerializer : IDataSerializer
             // PERF: When payloadSerializer1 was resolved we need to deserialize JToken, and then deserialize that.
             // This is still better than deserializing the JToken in DeserializeMessage because here we know that the payload
             // will actually be used.
-            return Deserialize<T>(payloadSerializer, Deserialize<VersionedMessage>(rawMessage).Payload);
+            return Deserialize<T>(payloadSerializer, Deserialize<Message>(rawMessage).Payload);
         }
     }
 
@@ -162,45 +178,62 @@ public class JsonDataSerializer : IDataSerializer
 
         try
         {
-            // The incoming message looks like this:
+            // The incoming messages look like this, or like this:
             // {"Version":6,"MessageType":"TestExecution.GetTestRunnerProcessStartInfoForRunAll","Payload":{
+            // {"MessageType":"TestExecution.GetTestRunnerProcessStartInfoForRunAll","Payload":{
             if (rawMessage.Length < 31)
             {
-                // {"Version":6,"MessageType":"T"} with length 31 is the smallest valid versioned message we would get.
+                // {"MessageType":"T","Payload":1} with length 31 is the smallest valid message we should be able to parse..
                 return false;
             }
-            if (rawMessage[2] != 'V')
+
+            // If the message is not versioned then the start quote of the message type string is at index 15 {"MessageType":"
+            int messageTypeStartQuoteIndex = 15;
+            int versionInt = 0;
+            if (rawMessage[2] == 'V')
+            {
+                // This is a potential versioned message that looks like this:
+                // {"Version":6,"MessageType":"TestExecution.GetTestRunnerProcessStartInfoForRunAll","Payload":{
+
+                // Version ':' is on index 10, the number starts at the next index. Find wher the next ',' is and grab that as number.
+                var versionColonIndex = 10;
+                if (rawMessage[versionColonIndex] != ':')
+                {
+                    return false;
+                }
+
+                var firstVersionNumberIndex = 11;
+                // The message is versioned, get the version and update the position of first quote that contains message type.
+                if (!TryGetSubstringUntilDelimiter(rawMessage, firstVersionNumberIndex, ',', maxSearchLength: 4, out string versionString, out int versionCommaIndex))
+                {
+                    return false;
+                }
+
+                // Message type delmiter is at at versionCommaIndex + the length of '"MessageType":"' which is 15 chars
+                messageTypeStartQuoteIndex = versionCommaIndex + 15;
+
+                if (!int.TryParse(versionString, out versionInt))
+                {
+                    return false;
+                }
+            }
+            else if (rawMessage[2] != 'M' || rawMessage[12] != 'e')
+            {
+                // Message is not versioned message, and it is also not message that starts with MessageType
+                return false;
+            }
+
+            if (rawMessage[messageTypeStartQuoteIndex] != '"')
             {
                 return false;
             }
 
-            // Version ':' is on index 10, the number starts at the next index. Find wher the next ',' is and grab that as number.
-            var versionColonIndex = 10;
-            if (rawMessage[versionColonIndex] != ':')
+            int messageTypeStartIndex = messageTypeStartQuoteIndex + 1;
+            // "TestExecution.LaunchAdapterProcessWithDebuggerAttachedCallback" is the longest message type we currently have with 62 chars
+            if (!TryGetSubstringUntilDelimiter(rawMessage, messageTypeStartIndex, '"', maxSearchLength: 100, out string messageTypeString, out _))
             {
                 return false;
             }
-
-            var firstVersionNumberIndex = 11;
-            if (!TryGetSubstringUntilDelimiter(rawMessage, firstVersionNumberIndex, ',', maxSearchLength: 4, out string versionString, out int delimiterIndex))
-            {
-                return false;
-            }
-
-            if (!int.TryParse(versionString, out var versionInt))
-            {
-                return false;
-            }
-
-            // Message type delmiter is at at versionCommaIndex + the length of ',"MessageType":"' which is 16 chars
-            var messageTypeQuoteIndex = delimiterIndex + 16;
-
-            // "TestExecution.LaunchAdapterProcessWithDebuggerAttachedCallback" is the longest message we currently have with 62 chars
-            if (!TryGetSubstringUntilDelimiter(rawMessage, messageTypeQuoteIndex, '"', maxSearchLength: 100, out string messageTypeString, out _))
-            {
-                return false;
-            }
-
 
             version = versionInt;
             messageType = messageTypeString;
@@ -405,8 +438,9 @@ public class JsonDataSerializer : IDataSerializer
     /// This allows us to pass MessageWithRawMessage the same way that Message is passed for protocol version 1.
     /// And VersionedMessage is passed for later protocol versions, but without touching the payload string when we just
     /// need to know the header.
+    /// !! This message does not populate the Payload property even though it is still present because that comes from Message.
     /// </summary>
-    private class MessageWithRawMessage : VersionedMessage
+    private class VersionedMessageWithRawMessage : VersionedMessage
     {
         public string RawMessage { get; set; }
     }

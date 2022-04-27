@@ -28,7 +28,7 @@ internal class Program
         var mts = typeof(MessageType).GetFields().Select(f => (string)f.GetValue(null)).ToList().OrderByDescending(m => m.Length).ToList();
         var step = "run";
         var version = 7;
-        var attempts = Enumerable.Range(1, 4);
+        var attempts = Enumerable.Range(1, 3);
         // For 6 disable the faster json path
         Environment.SetEnvironmentVariable("VSTEST_DISABLE_FASTER_JSON_SERIALIZATION", version == 6 ? "1" : "0");
 
@@ -38,6 +38,7 @@ internal class Program
             var dir = Directory.GetDirectories("C:\\temp\\tp-serialization\\").OrderBy(n => n).Last();
             // Skip first 3 beause that is version check and debugger attach
             // Skip last 1 because that is test run complete
+            var completeMessage = File.ReadAllText(Directory.GetFiles(dir).Last());
             var rawMessages = Directory.GetFiles(dir)
                 // There is no SkipLast on .NET Framework, do this inefficiently by ordering in descending order
                 .OrderByDescending(n => n).Skip(1)
@@ -46,6 +47,32 @@ internal class Program
             Console.WriteLine($"There are {rawMessages.Count} raw messages.");
             var json = JsonDataSerializer.Instance;
 
+            var count = Enumerable.Range(0, 10000).ToList();
+
+            foreach (var attempt in attempts)
+            {
+                int testCount = 0;
+                VersionedMessage lastMessage = null;
+                Stopwatch sw = Stopwatch.StartNew();
+                foreach (int _ in count)
+                {
+                    var rawMessage = completeMessage;
+
+
+                    Message message = json.DeserializeMessage(rawMessage);
+                    VersionedMessage versionedMessage = (VersionedMessage)message;
+                    lastMessage = versionedMessage;
+                    var v = json.DeserializePayload<int>(versionedMessage);
+                    testCount++;
+                }
+                long duration = sw.ElapsedMilliseconds;
+                Console.WriteLine($"Try {attempt}:");
+                Console.WriteLine($" Tests: {testCount}");
+                Console.WriteLine($" Duration {duration} ms");
+                Console.WriteLine($" Message version {version}");
+                Console.WriteLine();
+
+            }
 
             foreach (var attempt in attempts)
             {
@@ -272,8 +299,9 @@ internal class Program
 
                 var options = new TestPlatformOptions();
                 var handler = new TestRunHandler();
-                // r.DiscoverTests(sources, sourceSettings, options, handler);
-                r.RunTestsWithCustomTestHost(sources, sourceSettings, options, handler, new DebuggerTestHostLauncher());
+                r.DiscoverTests(sources, sourceSettings, options, handler);
+                var testCases = handler.TestCases;
+                r.RunTestsWithCustomTestHost(testCases, sourceSettings, options, handler, new DebuggerTestHostLauncher());
 
                 Console.WriteLine($"Try {attempt}, version {version}.");
                 Console.WriteLine($"Processed {handler.Count} tests in {sw.ElapsedMilliseconds} ms");
@@ -285,6 +313,7 @@ internal class Program
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
     {
         private int _testCasesCount;
+
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
@@ -336,6 +365,7 @@ internal class Program
 
     public class TestRunHandler : ITestRunEventsHandler, ITestDiscoveryEventsHandler2
     {
+        public List<TestCase> TestCases = new();
         public int Count { get; private set; }
 
         public TestRunHandler()
@@ -390,11 +420,15 @@ internal class Program
 
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
+            if (lastChunk != null) { TestCases.AddRange(lastChunk); }
+
             Count += lastChunk?.Count() ?? 0;
         }
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
+            if (discoveredTestCases != null) { TestCases.AddRange(discoveredTestCases); }
+
             Count += discoveredTestCases?.Count() ?? 0;
         }
     }
