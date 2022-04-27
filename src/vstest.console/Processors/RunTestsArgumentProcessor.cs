@@ -227,12 +227,12 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
                 {
                     _output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                 }
+            }
 
-                // Collect tests session artifacts for post processing
-                if (_commandLineOptions.ArtifactProcessingMode == ArtifactProcessingMode.Collect)
-                {
-                    _artifactProcessingManager.CollectArtifacts(e, RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
-                }
+            // Collect tests session artifacts for post processing
+            if (_commandLineOptions.ArtifactProcessingMode == ArtifactProcessingMode.Collect)
+            {
+                _artifactProcessingManager.CollectArtifacts(e, RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
             }
         }
     }
