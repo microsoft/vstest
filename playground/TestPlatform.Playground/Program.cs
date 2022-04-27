@@ -28,7 +28,7 @@ internal class Program
         var mts = typeof(MessageType).GetFields().Select(f => (string)f.GetValue(null)).ToList().OrderByDescending(m => m.Length).ToList();
         var step = "run";
         var version = 7;
-        var attempts = Enumerable.Range(1, 3);
+        var attempts = Enumerable.Range(1, 1);
         // For 6 disable the faster json path
         Environment.SetEnvironmentVariable("VSTEST_DISABLE_FASTER_JSON_SERIALIZATION", version == 6 ? "1" : "0");
 
@@ -297,14 +297,17 @@ internal class Program
                 @"C:\p\vstest3\playground\MSTest1\bin\Debug\net472\MSTest1.dll"
             };
 
+                r.StartSession();
+                var sw2 = Stopwatch.StartNew();
+
                 var options = new TestPlatformOptions();
                 var handler = new TestRunHandler();
                 r.DiscoverTests(sources, sourceSettings, options, handler);
-                var testCases = handler.TestCases;
-                r.RunTestsWithCustomTestHost(testCases, sourceSettings, options, handler, new DebuggerTestHostLauncher());
+                //var testCases = handler.TestCases;
+                //r.RunTestsWithCustomTestHost(testCases, sourceSettings, options, handler, new DebuggerTestHostLauncher());
 
                 Console.WriteLine($"Try {attempt}, version {version}.");
-                Console.WriteLine($"Processed {handler.Count} tests in {sw.ElapsedMilliseconds} ms");
+                Console.WriteLine($"Processed {handler.Count} tests in {sw.ElapsedMilliseconds} ms, {sw2.ElapsedMilliseconds} ms");
 
             }
         }
@@ -420,14 +423,14 @@ internal class Program
 
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
-            if (lastChunk != null) { TestCases.AddRange(lastChunk); }
+            // if (lastChunk != null) { TestCases.AddRange(lastChunk); }
 
             Count += lastChunk?.Count() ?? 0;
         }
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
-            if (discoveredTestCases != null) { TestCases.AddRange(discoveredTestCases); }
+            // if (discoveredTestCases != null) { TestCases.AddRange(discoveredTestCases); }
 
             Count += discoveredTestCases?.Count() ?? 0;
         }
