@@ -196,7 +196,7 @@ internal class DiscoveryDataAggregator
                     {
                         EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Downgrading source {source} status from '{previousStatus}' to '{status}'.");
                     }
-                    else
+                    else if (previousStatus != status)
                     {
                         EqtTrace.Verbose($"DiscoveryDataAggregator.MarkSourcesWithStatus: Upgrading {source} status from '{previousStatus}' to '{status}'.");
                     }
