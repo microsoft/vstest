@@ -95,6 +95,15 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         var partiallyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered);
         var notDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
 
+        // If any testhost fails we will end up with some sources not fully discovered. In this
+        // case, we want to consider the discovery aborted (not user cancelled) as it indicates
+        // there was a failure during discovery.
+        if (notDiscovered.Count > 0 || partiallyDiscovered.Count > 0)
+        {
+            EqtTrace.Info("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Discovery aborted due to testhost failure.");
+            _discoveryDataAggregator.Aggregate(new(-1, true));
+        }
+
         // Collecting Final Discovery State
         _requestData.MetricsCollection.Add(
             TelemetryDataConstants.DiscoveryState,
