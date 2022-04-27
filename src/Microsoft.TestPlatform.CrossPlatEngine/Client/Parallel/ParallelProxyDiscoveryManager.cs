@@ -162,8 +162,13 @@ internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDi
 
         RemoveManager(proxyDiscoveryManager);
 
+        if (_currentDiscoveryEventsHandler is null)
+        {
+            Debug.Assert(!TryFetchNextSource(_sourceEnumerator, out string nextSource), $"When discovery event handler is null , we should not have any more sources but we got '{nextSource}'.");
+            return false;
+        }
+
         proxyDiscoveryManager = CreateNewConcurrentManager();
-        Debug.Assert(_currentDiscoveryEventsHandler is not null, "Discovery events handler is null, DiscoverTestsPrivate should have been called before reaching this point.");
         var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
             _requestData,
             proxyDiscoveryManager,
