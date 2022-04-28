@@ -52,6 +52,7 @@ public class ParallelProxyDiscoveryManagerTests
         _discoveryCompleted = new ManualResetEventSlim(false);
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+        _mockRequestData.Setup(rd => rd.ProtocolConfig).Returns(new ProtocolConfig());
     }
 
     [TestMethod]
