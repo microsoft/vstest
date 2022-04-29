@@ -45,7 +45,22 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     private readonly IList<ProxyOperationManagerContainer> _proxyContainerList;
     private readonly IDictionary<string, int> _proxyMap;
     private readonly Stopwatch _testSessionStopwatch;
-    private IDictionary<string, string> _runSettingsEnvironmentVariables;
+    private IDictionary<string, string> _testSessionEnvironmentVariables = new Dictionary<string, string>();
+
+    private IDictionary<string, string> TestSessionEnvironmentVariables
+    {
+        get
+        {
+            if (_testSessionEnvironmentVariables.Count == 0)
+            {
+                _testSessionEnvironmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(
+                        _testSessionCriteria.RunSettings)
+                    ?? _testSessionEnvironmentVariables;
+            }
+
+            return _testSessionEnvironmentVariables;
+        }
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyTestSessionManager"/> class.
@@ -65,7 +80,6 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
 
         _proxyContainerList = new List<ProxyOperationManagerContainer>();
         _proxyMap = new Dictionary<string, int>();
-        _runSettingsEnvironmentVariables = new Dictionary<string, string>();
         _testSessionStopwatch = new Stopwatch();
     }
 
@@ -387,31 +401,19 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
 
     private bool CheckRunSettingsAreCompatible(string requestRunSettings)
     {
-        if (_runSettingsEnvironmentVariables.Count == 0)
-        {
-            _runSettingsEnvironmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(
-                    _testSessionCriteria.RunSettings)
-                ?? _runSettingsEnvironmentVariables;
-        }
-
         // Environment variable sets should be identical, otherwise it's not safe to reuse the
         // already running testhosts.
         var requestEnvironmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(requestRunSettings);
         if (requestEnvironmentVariables != null
-            && _runSettingsEnvironmentVariables != null
-            && (requestEnvironmentVariables.Count != _runSettingsEnvironmentVariables.Count
-                || requestEnvironmentVariables.Except(_runSettingsEnvironmentVariables).Any()))
+            && TestSessionEnvironmentVariables != null
+            && (requestEnvironmentVariables.Count != TestSessionEnvironmentVariables.Count
+                || requestEnvironmentVariables.Except(TestSessionEnvironmentVariables).Any()))
         {
             return false;
         }
 
         // Data collection is not supported for test sessions yet.
-        if (XmlRunSettingsUtilities.IsDataCollectionEnabled(requestRunSettings))
-        {
-            return false;
-        }
-
-        return true;
+        return !XmlRunSettingsUtilities.IsDataCollectionEnabled(requestRunSettings);
     }
 }
 

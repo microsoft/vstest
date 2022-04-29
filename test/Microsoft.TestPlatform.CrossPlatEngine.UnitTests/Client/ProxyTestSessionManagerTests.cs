@@ -353,6 +353,41 @@ public class ProxyTestSessionManagerTests
     }
 
     [TestMethod]
+    public void DequeueProxyTwoConsecutiveTimesWithEnqueueShouldBeSuccessful()
+    {
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
+            .Returns(true);
+
+        var testSessionCriteria = CreateTestSession(_fakeTestSources, _runSettingsTwoEnvVars);
+        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+
+        // StartSession should succeed.
+        Assert.IsTrue(proxyManager.StartSession(_mockEventsHandler.Object, _mockRequestData.Object));
+        mockProxyOperationManager.Verify(pom => pom.SetupChannel(
+                It.IsAny<IEnumerable<string>>(),
+                testSessionCriteria.RunSettings),
+            Times.Exactly(testSessionCriteria.Sources.Count));
+        _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
+
+        // Call to DequeueProxy succeeds.
+        Assert.AreEqual(proxyManager.DequeueProxy(
+                testSessionCriteria.Sources[0],
+                testSessionCriteria.RunSettings),
+            mockProxyOperationManager.Object);
+
+        Assert.AreEqual(proxyManager.EnqueueProxy(mockProxyOperationManager.Object.Id), true);
+
+        // Call to DequeueProxy succeeds when called with the same runsettings as before.
+        Assert.AreEqual(proxyManager.DequeueProxy(
+                testSessionCriteria.Sources[0],
+                testSessionCriteria.RunSettings),
+            mockProxyOperationManager.Object);
+    }
+
+    [TestMethod]
     public void DequeueProxyShouldFailIfRunSettingsMatchingFails()
     {
         var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
