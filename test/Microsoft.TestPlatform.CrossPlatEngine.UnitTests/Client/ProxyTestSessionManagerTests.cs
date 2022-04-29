@@ -31,6 +31,42 @@ public class ProxyTestSessionManagerTests
         @"C:\temp\FakeTestAsset7.dll",
         @"C:\temp\FakeTestAsset8.dll",
     };
+    private readonly string _runSettingsNoEnvVars = @"<?xml version=""1.0"" encoding=""utf-8""?>
+            <RunSettings>
+                <RunConfiguration>
+                </RunConfiguration>
+            </RunSettings>";
+    private readonly string _runSettingsOneEnvVar = @"<?xml version=""1.0"" encoding=""utf-8""?>
+            <RunSettings>
+                <RunConfiguration>
+                    <EnvironmentVariables>
+                        <AAA>Test1</AAA>
+                    </EnvironmentVariables>
+                </RunConfiguration>
+            </RunSettings>";
+    private readonly string _runSettingsTwoEnvVars = @"<?xml version=""1.0"" encoding=""utf-8""?>
+            <RunSettings>
+                <RunConfiguration>
+                    <EnvironmentVariables>
+                        <AAA>Test1</AAA>
+                        <BBB>Test2</BBB>
+                    </EnvironmentVariables>
+                </RunConfiguration>
+            </RunSettings>";
+    private readonly string _runSettingsTwoEnvVarsAndDataCollectors = @"<?xml version=""1.0"" encoding=""utf-8""?>
+            <RunSettings>
+                <RunConfiguration>
+                    <EnvironmentVariables>
+                        <AAA>Test1</AAA>
+                        <BBB>Test2</BBB>
+                    </EnvironmentVariables>
+                </RunConfiguration>
+                <DataCollectionRunSettings>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""blame"" enabled=""True""></DataCollector>
+                    </DataCollectors>
+                </DataCollectionRunSettings>
+            </RunSettings>";
     private readonly string _fakeRunSettings = "FakeRunSettings";
     private readonly ProtocolConfig _protocolConfig = new() { Version = 1 };
     private Mock<ITestSessionEventsHandler> _mockEventsHandler;
@@ -281,7 +317,7 @@ public class ProxyTestSessionManagerTests
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
-        var testSessionCriteria = CreateTestSession(_fakeTestSources, _fakeRunSettings);
+        var testSessionCriteria = CreateTestSession(_fakeTestSources, _runSettingsNoEnvVars);
         var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
         // StartSession should succeed.
@@ -302,7 +338,7 @@ public class ProxyTestSessionManagerTests
         // Second call to DequeueProxy fails because of runsettings mismatch.
         Assert.ThrowsException<InvalidOperationException>(() => proxyManager.DequeueProxy(
             testSessionCriteria.Sources[0],
-            "DummyRunSettings"));
+            _runSettingsOneEnvVar));
 
         // Third call to DequeueProxy succeeds.
         Assert.AreEqual(proxyManager.DequeueProxy(
@@ -317,13 +353,126 @@ public class ProxyTestSessionManagerTests
     }
 
     [TestMethod]
+    public void DequeueProxyTwoConsecutiveTimesWithEnqueueShouldBeSuccessful()
+    {
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
+            .Returns(true);
+
+        var testSessionCriteria = CreateTestSession(_fakeTestSources, _runSettingsTwoEnvVars);
+        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+
+        // StartSession should succeed.
+        Assert.IsTrue(proxyManager.StartSession(_mockEventsHandler.Object, _mockRequestData.Object));
+        mockProxyOperationManager.Verify(pom => pom.SetupChannel(
+                It.IsAny<IEnumerable<string>>(),
+                testSessionCriteria.RunSettings),
+            Times.Exactly(testSessionCriteria.Sources.Count));
+        _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
+
+        // Call to DequeueProxy succeeds.
+        Assert.AreEqual(proxyManager.DequeueProxy(
+                testSessionCriteria.Sources[0],
+                testSessionCriteria.RunSettings),
+            mockProxyOperationManager.Object);
+
+        Assert.AreEqual(proxyManager.EnqueueProxy(mockProxyOperationManager.Object.Id), true);
+
+        // Call to DequeueProxy succeeds when called with the same runsettings as before.
+        Assert.AreEqual(proxyManager.DequeueProxy(
+                testSessionCriteria.Sources[0],
+                testSessionCriteria.RunSettings),
+            mockProxyOperationManager.Object);
+    }
+
+    [TestMethod]
+    public void DequeueProxyShouldFailIfRunSettingsMatchingFails()
+    {
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
+            .Returns(true);
+
+        var testSessionCriteria = CreateTestSession(_fakeTestSources, _runSettingsOneEnvVar);
+        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+
+        // StartSession should succeed.
+        Assert.IsTrue(proxyManager.StartSession(_mockEventsHandler.Object, _mockRequestData.Object));
+        mockProxyOperationManager.Verify(pom => pom.SetupChannel(
+                It.IsAny<IEnumerable<string>>(),
+                testSessionCriteria.RunSettings),
+            Times.Exactly(testSessionCriteria.Sources.Count));
+        _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
+
+        // This call to DequeueProxy fails because of runsettings mismatch.
+        Assert.ThrowsException<InvalidOperationException>(() => proxyManager.DequeueProxy(
+            testSessionCriteria.Sources[0],
+            _runSettingsTwoEnvVars));
+    }
+
+    [TestMethod]
+    public void DequeueProxyShouldFailIfRunSettingsMatchingFailsFor2EnvVariables()
+    {
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
+            .Returns(true);
+
+        var testSessionCriteria = CreateTestSession(_fakeTestSources, _runSettingsTwoEnvVars);
+        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+
+        // StartSession should succeed.
+        Assert.IsTrue(proxyManager.StartSession(_mockEventsHandler.Object, _mockRequestData.Object));
+        mockProxyOperationManager.Verify(pom => pom.SetupChannel(
+                It.IsAny<IEnumerable<string>>(),
+                testSessionCriteria.RunSettings),
+            Times.Exactly(testSessionCriteria.Sources.Count));
+        _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
+
+        // This call to DequeueProxy fails because of runsettings mismatch.
+        Assert.ThrowsException<InvalidOperationException>(() => proxyManager.DequeueProxy(
+            testSessionCriteria.Sources[0],
+            _runSettingsOneEnvVar));
+    }
+
+    [TestMethod]
+    public void DequeueProxyShouldFailIfRunSettingsMatchingFailsForDataCollectors()
+    {
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
+            .Returns(true);
+
+        var testSessionCriteria = CreateTestSession(_fakeTestSources, _runSettingsTwoEnvVars);
+        var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
+
+        // StartSession should succeed.
+        Assert.IsTrue(proxyManager.StartSession(_mockEventsHandler.Object, _mockRequestData.Object));
+        mockProxyOperationManager.Verify(pom => pom.SetupChannel(
+                It.IsAny<IEnumerable<string>>(),
+                testSessionCriteria.RunSettings),
+            Times.Exactly(testSessionCriteria.Sources.Count));
+        _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
+                It.IsAny<StartTestSessionCompleteEventArgs>()),
+            Times.Once);
+
+        // This call to DequeueProxy fails because of runsettings mismatch.
+        Assert.ThrowsException<InvalidOperationException>(() => proxyManager.DequeueProxy(
+            testSessionCriteria.Sources[0],
+            _runSettingsTwoEnvVarsAndDataCollectors));
+    }
+
+    [TestMethod]
     public void EnqueueProxyShouldSucceedIfIdentificationCriteriaAreMet()
     {
         var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
-        var testSessionCriteria = CreateTestSession(_fakeTestSources, _fakeRunSettings);
+        var testSessionCriteria = CreateTestSession(_fakeTestSources, _runSettingsNoEnvVars);
         var proxyManager = CreateProxy(testSessionCriteria, mockProxyOperationManager.Object);
 
         // Validate sanity checks.
