@@ -221,7 +221,7 @@ public class SocketCommunicationManagerTests : IDisposable
     #region Message receiver tests
 
     [TestMethod]
-    public async Task ReceiveMessageShouldReceiveDeserializedMessage()
+    public async Task ReceiveMessageShouldReadMessageTypeButNotDeserializeThePayload()
     {
         var client = await StartServerAndWaitForConnection();
         WriteToStream(client.GetStream(), TestDiscoveryStartMessageWithDummyPayload);
@@ -229,7 +229,10 @@ public class SocketCommunicationManagerTests : IDisposable
         var message = _communicationManager.ReceiveMessage();
 
         Assert.AreEqual(MessageType.StartDiscovery, message.MessageType);
-        Assert.AreEqual(DummyPayload, message.Payload);
+        // Payload property is present on the Message, but we don't populate it in the newer versions,
+        // instead we populate internal field with the rawMessage, and wait until Serializer.DeserializePayload<T>(message) 
+        // is called by the message consumer. This avoids deserializing the payload when we just want to route the message.
+        Assert.IsNull(message.Payload);
     }
 
     [TestMethod]
@@ -241,8 +244,11 @@ public class SocketCommunicationManagerTests : IDisposable
         var message = await _communicationManager.ReceiveMessageAsync(CancellationToken.None);
         var versionedMessage = (VersionedMessage)message;
         Assert.AreEqual(MessageType.StartDiscovery, versionedMessage.MessageType);
-        Assert.AreEqual(DummyPayload, versionedMessage.Payload);
         Assert.AreEqual(2, versionedMessage.Version);
+        // Payload property is present on the Message, but we don't populate it in the newer versions,
+        // instead we populate internal field with the rawMessage, and wait until Serializer.DeserializePayload<T>(message) 
+        // is called by the message consumer. This avoids deserializing the payload when we just want to route the message.
+        Assert.IsNull(versionedMessage.Payload);
     }
 
     [TestMethod]

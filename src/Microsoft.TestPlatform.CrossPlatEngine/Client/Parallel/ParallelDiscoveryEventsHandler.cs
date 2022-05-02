@@ -178,7 +178,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     /// <param name="payload"></param>
     private void ConvertToRawMessageAndSend(string messageType, object payload)
     {
-        var rawMessage = _dataSerializer.SerializePayload(messageType, payload);
+        var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig.Version);
         _actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
     }
 

@@ -195,7 +195,7 @@ internal class ParallelRunEventsHandler : ITestRunEventsHandler2
 
     private void ConvertToRawMessageAndSend(string messageType, object payload)
     {
-        var rawMessage = _dataSerializer.SerializePayload(messageType, payload);
+        var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig.Version);
         _actualRunEventsHandler.HandleRawMessage(rawMessage);
     }
 }
