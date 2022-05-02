@@ -44,10 +44,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Coverage.IO" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.TraceDataCollector" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.QualityTools" Version="$(TestPlatformRemoteExternalsVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.QualityTools.DataCollectors" Version="$(TestPlatformRemoteExternalsVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.CUIT" Version="$(TestPlatformRemoteExternalsVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Internal.Intellitrace" Version="$(TestPlatformRemoteExternalsVersion)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.QualityTools" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.QualityTools.DataCollectors" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.CUIT" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Internal.Intellitrace" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Internal.Dia" Version="$(TestPlatformMSDiaVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Internal.Dia.Interop" Version="$(TestPlatformMSDiaVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="$(VSSdkBuildToolsVersion)" PrivateAssets="All" />
@@ -56,7 +56,7 @@
     <PackageReference Include="Microsoft.VisualStudio.RemoteControl" Version="16.3.23" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Utilities.Internal" Version="16.3.23" PrivateAssets="All" />
     <PackageReference Include="Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness" Version="$(MicrosoftFakesVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Internal.Intellitrace.Extensions" Version="$(TestPlatformRemoteExternalsVersion)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Internal.Intellitrace.Extensions" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.NETCore.ILAsm" Version="$(ILAsmPackageVersion)" />
     <PackageReference Include="Microsoft.NETCore.ILDAsm" Version="$(ILAsmPackageVersion)" />
     <PackageReference Include="Microsoft.DotNet.Build.Tasks.Feed" Version="$(MicrosoftDotNetBuildTasksFeedVersion)" PrivateAssets="All" />
