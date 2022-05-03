@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
@@ -23,7 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- TODO: Is there any upgrade for newer .NET Framework? -->
-    <Content Include="..\..\packages\microsoft.internal.dia\$(TestPlatformMSDiaVersion)\tools\net451\**\*">
+    <Content Include="..\..\packages\microsoft.internal.dia\$(TestPlatformMSDiaVersion)\tools\net462\**\*">
     </Content>
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />

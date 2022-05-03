@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests;
 public class DiaSessionTests : IntegrationTestBase
 {
 #if NETFRAMEWORK
-    private const string NET451 = "net451";
+    private const string NET462 = "net462";
 #else
     private const string NETCOREAPP21 = "netcoreapp2.1";
 #endif
@@ -24,7 +24,7 @@ public class DiaSessionTests : IntegrationTestBase
         var currentTargetFrameWork = testEnvironment.TargetFramework;
         testEnvironment.TargetFramework =
 #if NETFRAMEWORK
-            NET451;
+            NET462;
 #else
             NETCOREAPP21;
 #endif

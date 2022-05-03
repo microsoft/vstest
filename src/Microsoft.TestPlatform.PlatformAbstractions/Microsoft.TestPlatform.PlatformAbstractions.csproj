@@ -7,7 +7,7 @@
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.PlatformAbstractions</AssemblyName>
     <RootNamespace>Microsoft.TestPlatform.PlatformAbstractions</RootNamespace>
-    <TargetFrameworks>net45;net451;netcoreapp1.0;netcoreapp2.1;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net462;netcoreapp1.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0;netstandard1.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
@@ -26,7 +26,7 @@
     <DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' OR '$(TargetFramework)' == 'netcoreapp1.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' OR '$(TargetFramework)' == 'netcoreapp1.0' ">
     <PackageReference Include="System.Threading.Thread" Version="4.0.0" />
     <PackageReference Include="System.Diagnostics.Process" Version="4.1.0" />
     <PackageReference Include="System.Diagnostics.TextWriterTraceListener" Version="4.0.0" />
@@ -36,7 +36,7 @@
     <PackageReference Include="System.Net.Http" Version="$(SystemNetHttpVersion)" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' OR '$(TargetFramework)' == 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
     <PackageReference Include="Microsoft.Internal.Dia.Interop" Version="$(TestPlatformMSDiaVersion)" />
 
     <Reference Include="System.Configuration" />
