@@ -38,6 +38,7 @@ public class ParallelDataCollectionEventsHandlerTests
     public ParallelDataCollectionEventsHandlerTests()
     {
         _mockRequestData = new Mock<IRequestData>();
+        _mockRequestData.Setup(r => r.ProtocolConfig).Returns(new ProtocolConfig());
         _mockProxyExecutionManager = new Mock<IProxyExecutionManager>();
         _mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         _mockParallelProxyExecutionManager = new Mock<IParallelProxyExecutionManager>();

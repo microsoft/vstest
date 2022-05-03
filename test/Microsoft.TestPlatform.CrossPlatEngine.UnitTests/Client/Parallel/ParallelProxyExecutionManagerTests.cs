@@ -72,6 +72,7 @@ public class ParallelProxyExecutionManagerTests
         _testRunCriteriaWithTests = new TestRunCriteria(_testCases, 100);
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+        _mockRequestData.Setup(rd => rd.ProtocolConfig).Returns(new ProtocolConfig());
     }
 
     [TestMethod]

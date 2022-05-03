@@ -44,6 +44,9 @@ internal partial class FeatureFlag : IFeatureFlag
     // It can be useful if we need to restore old UX in case users are parsing the console output.
     // Added in 17.2-preview 7.0-preview
     public const string DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX = VSTEST_ + nameof(DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX);
+
+    // Faster JSON serialization relies on less internals of NewtonsoftJson, and on some additional caching.
+    public const string DISABLE_FASTER_JSON_SERIALIZATION = VSTEST_ + nameof(DISABLE_FASTER_JSON_SERIALIZATION);
 }
 
 #endif

@@ -347,7 +347,7 @@ public class DesignModeClient : IDesignModeClient
                 waitHandle.Set();
             };
 
-            _communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid);
+            _communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid, _protocolConfig.Version);
 
             WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 

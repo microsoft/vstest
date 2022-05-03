@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization.Json;
 
 #nullable disable
 
@@ -18,6 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 /// </summary>
 internal class CustomKeyValueConverter : TypeConverter
 {
+    private readonly DataContractJsonSerializer _serializer = new(typeof(TraitObject[]));
+
     /// <inheritdoc/>
     public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
     {
@@ -38,12 +41,13 @@ internal class CustomKeyValueConverter : TypeConverter
         // KeyValuePairs are used for traits. 
         if (value is string data)
         {
+            // PERF: The values returned here can possibly be cached, but the benefits are very small speed wise,
+            // and it is unclear how many distinct objects we get, and how much memory this would consume. I was seeing around 100ms improvement on 10k tests.
+
             using var stream = new MemoryStream(Encoding.Unicode.GetBytes(data));
             // Converting Json data to array of KeyValuePairs with duplicate keys.
-            var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(TraitObject[]));
-            var listOfTraitObjects = serializer.ReadObject(stream) as TraitObject[];
-
-            return listOfTraitObjects.Select(i => new KeyValuePair<string, string>(i.Key, i.Value)).ToArray();
+            var listOfTraitObjects = _serializer.ReadObject(stream) as TraitObject[];
+            return listOfTraitObjects?.Select(i => new KeyValuePair<string, string>(i.Key, i.Value)).ToArray() ?? new KeyValuePair<string, string>[0];
         }
 
         return null;

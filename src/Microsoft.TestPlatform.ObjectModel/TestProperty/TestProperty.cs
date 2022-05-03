@@ -7,6 +7,10 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 
+#if !NETSTANDARD1_0
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+#endif
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -17,6 +21,15 @@ public delegate bool ValidateValueCallback(object value);
 public class TestProperty : IEquatable<TestProperty>
 {
     private Type _valueType;
+    private static readonly Dictionary<string, Type> TypeCache = new();
+
+#if NETSTANDARD1_0
+    private static bool DisableFastJson { get; set; } = true;
+#else
+    private static bool DisableFastJson { get; set; } = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION);
+#endif
+
+    //public static Stopwatch 
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestProperty"/> class.
@@ -157,12 +170,26 @@ public class TestProperty : IEquatable<TestProperty>
 
     private Type GetType(string typeName!!)
     {
+        if (!DisableFastJson && TypeCache.TryGetValue(typeName, out var t))
+        {
+            return t;
+        }
+
         Type type = null;
 
         try
         {
             // This only works for the type is in the currently executing assembly or in Mscorlib.dll.
             type = Type.GetType(typeName);
+
+            if (!DisableFastJson)
+            {
+                if (type != null)
+                {
+                    TypeCache[typeName] = type;
+                    return type;
+                }
+            }
 
             if (type == null)
             {
@@ -225,6 +252,10 @@ public class TestProperty : IEquatable<TestProperty>
             }
         }
 
+        if (!DisableFastJson)
+        {
+            TypeCache[typeName] = type;
+        }
         return type;
     }
 

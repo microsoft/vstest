@@ -214,7 +214,7 @@ public abstract class TestObject
     /// <returns></returns>
     protected virtual object ProtectedGetPropertyValue(TestProperty property!!, object defaultValue)
     {
-        if (!_store.TryGetValue(property, out var value))
+        if (!_store.TryGetValue(property, out var value) || value == null)
         {
             value = defaultValue;
         }
