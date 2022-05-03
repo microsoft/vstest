@@ -283,7 +283,7 @@
     <file src="net451\$Runtime$\de\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\de\Microsoft.CodeCoverage.IO.dll" />
     <file src="net451\$Runtime$\es\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\es\Microsoft.CodeCoverage.IO.dll" />
     <file src="net451\$Runtime$\fr\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\fr\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\it\Microsoft.CocdeCoverage.IO.resources.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\it\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\it\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\it\Microsoft.CodeCoverage.IO.dll" />
     <file src="net451\$Runtime$\ja\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\ja\Microsoft.CodeCoverage.IO.dll" />
     <file src="net451\$Runtime$\ko\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\ko\Microsoft.CodeCoverage.IO.dll" />
     <file src="net451\$Runtime$\pl\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\pl\Microsoft.CodeCoverage.IO.dll" />
