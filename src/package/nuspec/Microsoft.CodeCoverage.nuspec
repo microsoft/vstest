@@ -33,9 +33,9 @@
     <file src="Microsoft.CodeCoverage.props" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage.targets" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.TraceDataCollector.dll" target="build\netstandard1.0\" />
-    <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.Coverage.Core.dll" target="build\netstandard1.0\" />
-    <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.Coverage.Interprocess.dll" target="build\netstandard1.0\" />
-    <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.Coverage.Instrumentation.dll" target="build\netstandard1.0\" />
+    <file src="Microsoft.CodeCoverage\Microsoft.CodeCoverage.Core.dll" target="build\netstandard1.0\" />
+    <file src="Microsoft.CodeCoverage\Microsoft.CodeCoverage.Interprocess.dll" target="build\netstandard1.0\" />
+    <file src="Microsoft.CodeCoverage\Microsoft.CodeCoverage.Instrumentation.dll" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\Mono.Cecil.dll" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\Mono.Cecil.Pdb.dll" target="build\netstandard1.0\" />
     
