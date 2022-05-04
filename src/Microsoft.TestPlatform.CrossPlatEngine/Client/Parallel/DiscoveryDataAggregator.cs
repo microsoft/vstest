@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 /// <summary>
 /// DiscoveryDataAggregator aggregates discovery data from multiple sources running in parallel or in series.
 /// </summary>
-internal class DiscoveryDataAggregator
+internal sealed class DiscoveryDataAggregator
 {
     private readonly object _dataUpdateSyncObject = new();
     private readonly ConcurrentDictionary<string, object> _metricsAggregator = new();
@@ -43,7 +43,6 @@ internal class DiscoveryDataAggregator
     /// A collection of aggregated discovered extensions.
     /// </summary>
     public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; private set; } = new();
-
 
     /// <summary>
     /// Returns the Aggregated Metrics.
@@ -75,12 +74,27 @@ internal class DiscoveryDataAggregator
         return _metricsAggregator;
     }
 
+    public void MarkAsAborted()
+    {
+        lock (_dataUpdateSyncObject)
+        {
+            IsAborted = true;
+            TotalTests = -1;
+        }
+    }
+
     /// <summary>
     /// Aggregate discovery data
     /// Must be thread-safe as this is expected to be called by parallel managers
     /// </summary>
     public void Aggregate(DiscoveryCompleteEventArgs discoveryCompleteEventArgs)
     {
+        if (_isMessageSent == 1)
+        {
+            EqtTrace.Verbose("DiscoveryDataAggregator.Aggregate: Message was already sent so skipping event aggregation.");
+            return;
+        }
+
         lock (_dataUpdateSyncObject)
         {
             IsAborted = IsAborted || discoveryCompleteEventArgs.IsAborted;
@@ -149,7 +163,7 @@ internal class DiscoveryDataAggregator
     /// Handles race conditions as this aggregator is shared across various event handler for the
     /// same discovery request but we want to notify only once.
     /// </remarks>
-    /// <returns><c>initialized</c> if first to send the message; <c>false</c> otherwise.</returns>
+    /// <returns><c>true</c> if first to send the message; <c>false</c> otherwise.</returns>
     public bool TryAggregateIsMessageSent()
         => Interlocked.CompareExchange(ref _isMessageSent, 1, 0) == 0;
 
@@ -163,6 +177,12 @@ internal class DiscoveryDataAggregator
 
     public void MarkSourcesWithStatus(IEnumerable<string?>? sources, DiscoveryStatus status)
     {
+        if (_isMessageSent == 1)
+        {
+            EqtTrace.Verbose("DiscoveryDataAggregator.MarkSourcesWithStatus: Message was already sent so skipping source update.");
+            return;
+        }
+
         if (sources is null)
         {
             return;
@@ -213,6 +233,12 @@ internal class DiscoveryDataAggregator
     /// <returns>The last discovered source or null.</returns>
     public string? MarkSourcesBasedOnDiscoveredTestCases(string? previousSource, IEnumerable<TestCase>? testCases)
     {
+        if (_isMessageSent == 1)
+        {
+            EqtTrace.Verbose("DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases: Message was already sent so skipping source update.");
+            return previousSource;
+        }
+
         // When all testcases count in source is dividable by chunk size (e.g. 100 tests and
         // chunk size of 10) then lastChunk is coming as empty. Otherwise, we receive the
         // remaining test cases to process.

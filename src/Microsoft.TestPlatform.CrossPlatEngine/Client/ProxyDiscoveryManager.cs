@@ -223,6 +223,10 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
             _proxyOperationManager.RequestSender.SendDiscoveryAbort();
         }
 
+        // It is important to ensure we cancel the token and close the channel in case of an abort.
+        // If we don't then we will wait until the completion of this discovery. In case of a
+        // parallel discovery that means we will wait until the source with the less number of tests
+        // is discovered before notifying the caller with the aborted DiscoveryCompleteEventArgs.
         Abort();
     }
 

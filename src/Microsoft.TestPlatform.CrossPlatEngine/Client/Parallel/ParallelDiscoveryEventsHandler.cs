@@ -78,30 +78,39 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             null, // Set lastChunk to null, because we already sent the data using HandleDiscoveredTests above.
             discoveryCompleteEventArgs.IsAborted);
 
-        if (!parallelDiscoveryComplete)
+        if (!parallelDiscoveryComplete
+            || !_discoveryDataAggregator.TryAggregateIsMessageSent())
         {
             return;
         }
 
-        // As we immediately return results to IDE in case of aborting we need to set
-        // isAborted = true and totalTests = -1
-        if (_parallelProxyDiscoveryManager.IsAbortRequested)
-        {
-            _discoveryDataAggregator.Aggregate(new(-1, true));
-        }
-
-        // Manager said we are ready to publish the test discovery completed.
+        // Manager said we are ready to publish the test discovery completed and we haven't yet
+        // published it.
         var fullyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered);
         var partiallyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered);
         var notDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
 
-        // If any testhost fails we will end up with some sources not fully discovered. In this
-        // case, we want to consider the discovery aborted (not user cancelled) as it indicates
-        // there was a failure during discovery.
-        if (notDiscovered.Count > 0 || partiallyDiscovered.Count > 0)
+        // As we immediately return results to IDE in case of aborting we need to set
+        // isAborted = true and totalTests = -1
+        if (!_discoveryDataAggregator.IsAborted)
         {
-            EqtTrace.Info("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Discovery aborted due to testhost failure.");
-            _discoveryDataAggregator.Aggregate(new(-1, true));
+            if (_parallelProxyDiscoveryManager.IsAbortRequested)
+            {
+                EqtTrace.Info("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Abort requested but discovery data aggregator not updated, marking discovery as aborted.");
+                _discoveryDataAggregator.MarkAsAborted();
+            }
+            // If any testhost fails we will end up with some sources not fully discovered. In this
+            // case, we want to consider the discovery aborted (not user cancelled) as it indicates
+            // there was a failure during discovery.
+            else if (notDiscovered.Count > 0 || partiallyDiscovered.Count > 0)
+            {
+                EqtTrace.Info("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Discovery completed but some sources are not fully discovered, marking discovery as aborted.");
+                _discoveryDataAggregator.MarkAsAborted();
+            }
+        }
+        else
+        {
+            EqtTrace.Info("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Discovery completed.");
         }
 
         // Collecting Final Discovery State
@@ -127,11 +136,8 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         };
 
         // Sending discovery complete message to IDE
-        if (_discoveryDataAggregator.TryAggregateIsMessageSent())
-        {
-            EqtTrace.Verbose("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Sending discovery complete message to IDE.");
-            ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
-        }
+        EqtTrace.Verbose("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Sending discovery complete message to IDE.");
+        ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
 
         var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs
         {

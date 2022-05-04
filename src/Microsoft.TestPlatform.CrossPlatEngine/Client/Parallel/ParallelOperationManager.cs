@@ -29,7 +29,7 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
     /// </summary>
     protected bool SharedHosts { get; private set; }
 
-    private IDictionary<T, TU> _concurrentManagerHandlerMap;
+    private ConcurrentDictionary<T, TU> _concurrentManagerHandlerMap;
 
     /// <summary>
     /// Singleton Instance of this class
@@ -68,7 +68,7 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
     /// <param name="manager">Manager to remove</param>
     public void RemoveManager(T manager)
     {
-        _concurrentManagerHandlerMap.Remove(manager);
+        _concurrentManagerHandlerMap.TryRemove(manager, out _);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
     /// <param name="handler">eventHandler of the manager</param>
     public void AddManager(T manager, TU handler)
     {
-        _concurrentManagerHandlerMap.Add(manager, handler);
+        _concurrentManagerHandlerMap.TryAdd(manager, handler);
     }
 
     /// <summary>
@@ -192,32 +192,35 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
 
     protected void DoActionOnAllManagers(Action<T> action, bool doActionsInParallel = false)
     {
-        if (_concurrentManagerHandlerMap != null && _concurrentManagerHandlerMap.Count > 0)
+        if (_concurrentManagerHandlerMap == null
+            || _concurrentManagerHandlerMap.IsEmpty)
         {
-            int i = 0;
-            var actionTasks = new Task[_concurrentManagerHandlerMap.Count];
-            foreach (var client in GetConcurrentManagerInstances())
-            {
-                // Read the array before firing the task - beware of closures
-                if (doActionsInParallel)
-                {
-                    actionTasks[i] = Task.Run(() => action(client));
-                    i++;
-                }
-                else
-                {
-                    DoManagerAction(() => action(client));
-                }
-            }
+            return;
+        }
 
+        int i = 0;
+        var actionTasks = new Task[_concurrentManagerHandlerMap.Count];
+        foreach (var client in GetConcurrentManagerInstances())
+        {
+            // Read the array before firing the task - beware of closures
             if (doActionsInParallel)
             {
-                DoManagerAction(() => Task.WaitAll(actionTasks));
+                actionTasks[i] = Task.Run(() => action(client));
+                i++;
             }
+            else
+            {
+                DoManagerAction(() => action(client));
+            }
+        }
+
+        if (doActionsInParallel)
+        {
+            DoManagerAction(() => Task.WaitAll(actionTasks));
         }
     }
 
-    private void DoManagerAction(Action action)
+    private static void DoManagerAction(Action action)
     {
         try
         {
@@ -228,7 +231,7 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
             // Exception can occur if we are trying to cancel a test run on an executor where test run is not even fired
             // we can safely ignore that as user is just canceling the test run and we don't care about additional parallel executors
             // as we will be disposing them off soon anyway
-            EqtTrace.Warning("AbstractParallelOperationManager: Exception while invoking an action on Proxy Manager instance: {0}", ex);
+            EqtTrace.Warning("ParallelOperationManager.DoManagerAction: Exception while invoking an action on Proxy Manager instance: {0}", ex);
         }
     }
 
