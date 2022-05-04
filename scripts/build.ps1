@@ -616,12 +616,12 @@ function Publish-Package {
         Copy-Loc-Files $eventLogDataCollectorNetFull $coreCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
     }
 
-    # Copy Microsoft.VisualStudio.Coverage.IO dlls
+    # Copy Microsoft.CodeCoverage.IO dlls
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftInternalCodeCoverageVersion
-    $codeCoverageIOPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.io\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkStandard"
-    Copy-Item $codeCoverageIOPackagesDir\Microsoft.VisualStudio.Coverage.IO.dll $coreCLR20PackageDir -Force
+    $codeCoverageIOPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.codecoverage.io\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkStandard"
+    Copy-Item $codeCoverageIOPackagesDir\Microsoft.CodeCoverage.IO.dll $coreCLR20PackageDir -Force
     if ($TPB_LocalizedBuild) {
-        Copy-Loc-Files $codeCoverageIOPackagesDir $coreCLR20PackageDir "Microsoft.VisualStudio.Coverage.IO.resources.dll"
+        Copy-Loc-Files $codeCoverageIOPackagesDir $coreCLR20PackageDir "Microsoft.CodeCoverage.IO.resources.dll"
     }
 
     # If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
@@ -784,10 +784,10 @@ function Publish-VsixPackage {
     $interopExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.InteropExternalsVersion
 
     # Copy Microsoft.VisualStudio.IO to root
-    $codeCoverageIOPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.IO\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework451"
-    Copy-Item $codeCoverageIOPackageDirectory\Microsoft.VisualStudio.Coverage.IO.dll $packageDir -Force
+    $codeCoverageIOPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.CodeCoverage.IO\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework451"
+    Copy-Item $codeCoverageIOPackageDirectory\Microsoft.CodeCoverage.IO.dll $packageDir -Force
     if ($TPB_LocalizedBuild) {
-        Copy-Loc-Files $codeCoverageIOPackageDirectory $packageDir "Microsoft.VisualStudio.Coverage.IO.resources.dll"
+        Copy-Loc-Files $codeCoverageIOPackageDirectory $packageDir "Microsoft.CodeCoverage.IO.resources.dll"
     }
 
     # Copy legacy dependencies
@@ -1011,9 +1011,9 @@ function Copy-CodeCoverage-Package-Artifacts {
     $traceDataCollectorPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.tracedatacollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
     $traceDataCollectorPackagesNetFxDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TraceDataCollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework472"
     $internalCodeCoveragePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\"
-    $codeCoverageCorePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.core\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    $codeCoverageInterprocessPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.interprocess\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    $codeCoverageInstrumentationPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.instrumentation\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
+    $codeCoverageCorePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.codecoverage.core\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
+    $codeCoverageInterprocessPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.codecoverage.interprocess\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
+    $codeCoverageInstrumentationPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.codecoverage.instrumentation\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
     $codeCoverageImUbuntuPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\InstrumentationEngine\ubuntu"
     $codeCoverageImAlpinePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\InstrumentationEngine\alpine"
     $codeCoverageImMacosPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\InstrumentationEngine\macos"
@@ -1026,9 +1026,9 @@ function Copy-CodeCoverage-Package-Artifacts {
 
     Copy-Item $traceDataCollectorPackagesDir\Microsoft.VisualStudio.TraceDataCollector.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $traceDataCollectorPackagesDir\Microsoft.VisualStudio.TraceDataCollector.pdb $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $codeCoverageCorePackagesDir\Microsoft.VisualStudio.Coverage.Core.dll $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $codeCoverageInterprocessPackagesDir\Microsoft.VisualStudio.Coverage.Interprocess.dll $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $codeCoverageInstrumentationPackagesDir\Microsoft.VisualStudio.Coverage.Instrumentation.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $codeCoverageCorePackagesDir\Microsoft.CodeCoverage.Core.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $codeCoverageInterprocessPackagesDir\Microsoft.CodeCoverage.Interprocess.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $codeCoverageInstrumentationPackagesDir\Microsoft.CodeCoverage.Instrumentation.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $codeCoverageInstrumentationPackagesDir\Mono.Cecil.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $codeCoverageInstrumentationPackagesDir\Mono.Cecil.Pdb.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $internalCodeCoveragePackagesDir\CodeCoverage $microsoftCodeCoveragePackageDir -Force -Recurse
