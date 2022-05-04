@@ -58,7 +58,7 @@
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
     <JsonNetVersion>9.0.1</JsonNetVersion>
 
-    <TestPlatformExternalsVersion>17.3.0-preview-2-32502-021</TestPlatformExternalsVersion>
+    <TestPlatformExternalsVersion>17.1.0-preview-2-31925-026</TestPlatformExternalsVersion>
     <!-- <TestPlatformMSDiaVersion>$(TestPlatformExternalsVersion)</TestPlatformMSDiaVersion> -->
     <TestPlatformMSDiaVersion>17.1.0-preview-2-31925-026</TestPlatformMSDiaVersion>
     <!-- Portable CPP test runner -->
