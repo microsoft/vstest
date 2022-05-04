@@ -216,7 +216,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <inheritdoc/>
     public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
     {
-        EqtTrace.Verbose("DiscoveryRequest.HandleDiscoveryComplete: Starting. Aborted:{0}, TotalTests:{1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
+        EqtTrace.Verbose("DiscoveryRequest.HandleDiscoveryComplete: Begin processing discovery complete notification. Aborted: {0}, TotalTests: {1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
 
         lock (_syncObject)
         {
@@ -278,7 +278,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 }
                 else
                 {
-                    EqtTrace.Warning("DiscoveryRequest.HandleDiscoveryComplete: Discovery complete event was null.");
+                    EqtTrace.Warning("DiscoveryRequest.HandleDiscoveryComplete: Discovery request was disposed.");
                 }
 
                 DiscoveryInProgress = false;
@@ -300,7 +300,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             }
         }
 
-        EqtTrace.Info("DiscoveryRequest.HandleDiscoveryComplete: Completed.");
+        EqtTrace.Info("DiscoveryRequest.HandleDiscoveryComplete: Finished processing discovery complete notification.");
     }
 
     /// <inheritdoc/>
