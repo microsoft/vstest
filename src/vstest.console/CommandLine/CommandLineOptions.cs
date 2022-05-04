@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -126,7 +127,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Port IDE process is listening to
     /// </summary>
-    public int Port { get; set; }
+    public TransportAddress Port { get; set; }
 
     /// <summary>
     /// Configuration the project is built for e.g. Debug/Release

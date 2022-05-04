@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -88,7 +90,7 @@ public class ConsoleParameters
     /// vstest.console will need this port number to communicate with this component - translation layer
     /// Currently Internal as we are not intentionally exposing this to consumers of translation layer
     /// </summary>
-    internal int PortNumber { get; set; }
+    internal TransportAddress ConnectionString { get; set; }
 
     /// <summary>
     /// Parent Process ID of the process whose lifetime should dictate the life time of vstest.console.exe

@@ -64,7 +64,7 @@ public class VsTestConsoleWrapperTests
         _consoleWrapper.StartSession();
 
         Assert.AreEqual(expectedParentProcessId, _consoleParameters.ParentProcessId, "Parent process Id must be set");
-        Assert.AreEqual(inputPort, _consoleParameters.PortNumber, "Port number must be set");
+        Assert.AreEqual(inputPort, _consoleParameters.ConnectionString, "Port number must be set");
         Assert.AreEqual(TraceLevel.Verbose, _consoleParameters.TraceLevel, "Default value of trace level should be verbose.");
 
         _mockProcessManager.Verify(pm => pm.StartProcess(_consoleParameters), Times.Once);

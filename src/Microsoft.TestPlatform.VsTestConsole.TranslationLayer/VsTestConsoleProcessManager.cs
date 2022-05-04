@@ -229,11 +229,12 @@ internal class VsTestConsoleProcessManager : IProcessManager
 
     private string[] BuildArguments(ConsoleParameters parameters)
     {
+        // TODO: this needs a version check, because vstest.console can be older, and it only accepts known parameters. So older console should get only old syntax, and use sockets.
         var args = new List<string>
         {
             // Start Vstest.console with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
             string.Format(CultureInfo.InvariantCulture, ParentProcessidArgument, parameters.ParentProcessId),
-            string.Format(CultureInfo.InvariantCulture, PortArgument, parameters.PortNumber)
+            string.Format(CultureInfo.InvariantCulture, PortArgument, parameters.ConnectionString.ToString()),
         };
 
         if (!string.IsNullOrEmpty(parameters.LogFilePath))

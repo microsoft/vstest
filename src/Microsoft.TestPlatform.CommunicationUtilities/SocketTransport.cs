@@ -31,24 +31,35 @@ public sealed class SocketTransport : ITransport
     }
 
     /// <inheritdoc/>
-    public IPEndPoint Initialize()
+    public TransportAddress Initialize()
     {
-        var endpoint = GetIpEndPoint(_connectionInfo.Endpoint);
+        IPEndPoint endpoint = GetIpEndPoint(_connectionInfo.Endpoint);
         switch (_connectionInfo.Role)
         {
             case ConnectionRole.Host:
                 {
                     // In case users passes endpoint Port as 0 HostServer will allocate endpoint at appropriate port,
                     // So reassign endpoint to point to correct endpoint.
-                    endpoint = _communicationManager.HostServer(endpoint);
+                    var address = _communicationManager.HostServer($"{endpoint.Address}:{endpoint.Port}");
                     _communicationManager.AcceptClientAsync();
-                    return endpoint;
+
+                    return new TransportAddress
+                    {
+                        Transport = Transport.Sockets,
+                        Address = address,
+                    };
                 }
 
             case ConnectionRole.Client:
                 {
-                    _communicationManager.SetupClientAsync(GetIpEndPoint(_connectionInfo.Endpoint));
-                    return endpoint;
+                    var ip = GetIpEndPoint(_connectionInfo.Endpoint);
+                    var address = $"{ip.Address}:{ip.Port}";
+                    _communicationManager.SetupClientAsync(address);
+                    return new TransportAddress
+                    {
+                        Transport = Transport.Sockets,
+                        Address = $"{ip.Address}:{ip.Port}",
+                    };
                 }
 
             default:
@@ -99,3 +110,17 @@ public sealed class SocketTransport : ITransport
             : null;
     }
 }
+
+
+public class TransportAddress
+{
+    public static TransportAddress Empty { get; } = new TransportAddress();
+    public Transport Transport { get; set; }
+    public string Address { get; set; }
+
+    public override string ToString()
+    {
+        return $"{Transport}>{Address}";
+    }
+}
+

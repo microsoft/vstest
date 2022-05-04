@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
@@ -147,13 +147,13 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         _testPlatformEventSource.TranslationLayerInitializeStart();
 
         // Start communication
-        var port = _requestSender.InitializeCommunication();
+        var connectionString = _requestSender.InitializeCommunication();
 
-        if (port > 0)
+        if (connectionString != TransportAddress.Empty)
         {
             // Fill the parameters
             _consoleParameters.ParentProcessId = Process.GetCurrentProcess().Id;
-            _consoleParameters.PortNumber = port;
+            _consoleParameters.ConnectionString = connectionString;
 
             // Start vstest.console.exe process
             _vstestConsoleProcessManager.StartProcess(_consoleParameters);
@@ -573,13 +573,13 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
         var timeout = EnvironmentHelper.GetConnectionTimeout();
         // Start communication
-        var port = await _requestSender.InitializeCommunicationAsync(timeout * 1000).ConfigureAwait(false);
+        var address = await _requestSender.InitializeCommunicationAsync(timeout * 1000).ConfigureAwait(false);
 
-        if (port > 0)
+        if (address != TransportAddress.Empty)
         {
             // Fill the parameters
             _consoleParameters.ParentProcessId = Process.GetCurrentProcess().Id;
-            _consoleParameters.PortNumber = port;
+            _consoleParameters.ConnectionString = address;
 
             // Start vstest.console.exe process
             _vstestConsoleProcessManager.StartProcess(_consoleParameters);

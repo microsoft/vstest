@@ -183,7 +183,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
     /// <inheritdoc />
     public void InitializeCommunication(int port)
     {
-        _communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
+        _communicationManager.SetupClientAsync($"{IPAddress.Loopback}:{port}");
     }
 
     /// <inheritdoc />

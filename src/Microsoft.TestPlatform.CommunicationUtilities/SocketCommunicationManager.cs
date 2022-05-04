@@ -96,13 +96,22 @@ public class SocketCommunicationManager : ICommunicationManager
     /// </summary>
     /// <param name="endpoint">End point where server is hosted</param>
     /// <returns>Port of the listener</returns>
-    public IPEndPoint HostServer(IPEndPoint endpoint)
+    public string HostServer(string address)
     {
+        IPEndPoint endpoint = ParseEndPoint(address);
         _tcpListener = new TcpListener(endpoint);
         _tcpListener.Start();
         EqtTrace.Info("Listening on Endpoint : {0}", (IPEndPoint)_tcpListener.LocalEndpoint);
 
-        return (IPEndPoint)_tcpListener.LocalEndpoint;
+        var ipEndpoint = (IPEndPoint)_tcpListener.LocalEndpoint;
+        return $"{ipEndpoint.Address}:{ipEndpoint.Port}";
+    }
+
+    private static IPEndPoint ParseEndPoint(string address)
+    {
+        var addressParts = address.Split(':');
+        var endpoint = new IPEndPoint(IPAddress.Parse(addressParts[0]), int.Parse(addressParts[1]));
+        return endpoint;
     }
 
     /// <summary>
@@ -163,10 +172,11 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <summary>
     /// Connects to server async
     /// </summary>
-    /// <param name="endpoint">EndPointAddress for client to connect</param>
+    /// <param name="address">EndPointAddress for client to connect</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    public async Task SetupClientAsync(IPEndPoint endpoint)
+    public async Task SetupClientAsync(string address)
     {
+        var endpoint = ParseEndPoint(address);
         // TODO: pass cancellation token, if user cancels the operation, so we don't wait 50 secs to connect
         // for now added a check for validation of this.tcpclient
         _clientConnectionAcceptedEvent.Reset();

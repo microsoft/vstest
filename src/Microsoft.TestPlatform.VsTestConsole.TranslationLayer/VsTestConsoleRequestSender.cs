@@ -85,17 +85,28 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     #region ITranslationLayerRequestSender
 
     /// <inheritdoc/>
-    public int InitializeCommunication()
+    public TransportAddress InitializeCommunication()
     {
         EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Started.");
 
+        var transport = Transport.Sockets;
         _processExitCancellationTokenSource = new CancellationTokenSource();
         _handShakeSuccessful = false;
         _handShakeComplete.Reset();
-        int port = -1;
+        var connectionString = TransportAddress.Empty;
         try
         {
-            port = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
+            if (transport != Transport.Sockets)
+            {
+                throw new NotSupportedException($"Transport '{transport}' is not supported.");
+            }
+            var address = $"{IPAddress.Loopback}:0";
+            var serverAddress = _communicationManager.HostServer(address);
+            connectionString = new TransportAddress
+            {
+                Transport = transport,
+                Address = serverAddress,
+            };
             _communicationManager.AcceptClientAsync();
 
             Task.Run(() =>
@@ -115,7 +126,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
         EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Ended.");
 
-        return port;
+        return connectionString;
     }
 
     /// <inheritdoc/>
@@ -126,17 +137,29 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     }
 
     /// <inheritdoc/>
-    public async Task<int> InitializeCommunicationAsync(int clientConnectionTimeout)
+    public async Task<TransportAddress> InitializeCommunicationAsync(int clientConnectionTimeout)
     {
         EqtTrace.Info($"VsTestConsoleRequestSender.InitializeCommunicationAsync: Started with client connection timeout {clientConnectionTimeout} milliseconds.");
 
+        var transport = Transport.Sockets;
         _processExitCancellationTokenSource = new CancellationTokenSource();
         _handShakeSuccessful = false;
         _handShakeComplete.Reset();
-        int port = -1;
+        var connectionString = TransportAddress.Empty;
         try
         {
-            port = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
+            if (transport != Transport.Sockets)
+            {
+                throw new NotSupportedException($"Transport '{transport}' is not supported.");
+            }
+            var address = $"{IPAddress.Loopback}:0";
+            // TODO: here we need to grab communication manager from a factory for the given transport or something.
+            var serverAddress = _communicationManager.HostServer(address);
+            connectionString = new TransportAddress
+            {
+                Transport = transport,
+                Address = serverAddress
+            };
             var timeoutSource = new CancellationTokenSource(clientConnectionTimeout);
             await Task.Run(() =>
                 _communicationManager.AcceptClientAsync(), timeoutSource.Token).ConfigureAwait(false);
@@ -154,7 +177,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
         EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunicationAsync: Ended.");
 
-        return _handShakeSuccessful ? port : -1;
+        return _handShakeSuccessful ? connectionString : TransportAddress.Empty;
     }
 
     /// <inheritdoc/>

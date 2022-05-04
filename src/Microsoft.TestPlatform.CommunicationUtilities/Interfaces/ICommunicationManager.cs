@@ -19,7 +19,7 @@ public interface ICommunicationManager
     /// </summary>
     /// <param name="endpoint">End point where server is hosted</param>
     /// <returns>Port number of the listening endpoint</returns>
-    IPEndPoint HostServer(IPEndPoint endpoint);
+    string HostServer(string endpoint);
 
     /// <summary>
     /// Accepts client connection asynchronously
@@ -55,7 +55,7 @@ public interface ICommunicationManager
     /// </summary>
     /// <param name="endpoint">End point for client to connect to</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    Task SetupClientAsync(IPEndPoint endpoint);
+    Task SetupClientAsync(string endpoint);
 
     /// <summary>
     /// Stops any client connected to server

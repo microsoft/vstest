@@ -65,6 +65,7 @@ public enum Transport
     /// Act as server host
     /// </summary>
     Sockets = 0,
+    File = 1,
 }
 
 /// <summary>

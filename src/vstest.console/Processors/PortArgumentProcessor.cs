@@ -8,6 +8,7 @@ using System.Globalization;
 using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -137,12 +138,18 @@ internal class PortArgumentExecutor : IArgumentExecutor
     /// <param name="argument">Argument that was provided with the command.</param>
     public void Initialize(string argument)
     {
-        if (string.IsNullOrWhiteSpace(argument) || !int.TryParse(argument, out int portNumber))
+        if (string.IsNullOrWhiteSpace(argument))
         {
             throw new CommandLineException(CommandLineResources.InvalidPortArgument);
         }
 
-        _commandLineOptions.Port = portNumber;
+        // comes as transport>address, e.g. sockets>127.0.0.1:490909
+        var argumentParts = argument.Split('>');
+        _commandLineOptions.Port = new TransportAddress
+        {
+            Transport = (Transport)Enum.Parse(typeof(Transport), argumentParts[0], true),
+            Address = argumentParts[1],
+        };
         _commandLineOptions.IsDesignMode = true;
         RunSettingsHelper.Instance.IsDesignMode = true;
         _designModeClient = _designModeInitializer?.Invoke(_commandLineOptions.ParentProcessId, _processHelper);

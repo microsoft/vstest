@@ -16,8 +16,8 @@ public interface ITransport : IDisposable
     /// <summary>
     /// Initializes Transport Layer
     /// </summary>
-    /// <returns>Endpoint</returns>
-    IPEndPoint Initialize();
+    /// <returns>Address</returns>
+    TransportAddress Initialize();
 
     /// <summary>
     /// Waits for the connection over transport layer to established

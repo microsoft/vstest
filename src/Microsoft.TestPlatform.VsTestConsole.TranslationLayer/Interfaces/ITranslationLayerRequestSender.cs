@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -22,8 +23,8 @@ internal interface ITranslationLayerRequestSender : IDisposable, ITranslationLay
     /// Hosts a communication channel and asynchronously connects to vstest.console.exe.
     /// </summary>
     /// 
-    /// <returns>Port number of the hosted server on this side.</returns>
-    int InitializeCommunication();
+    /// <returns>Address of the hosted server on this side.</returns>
+    TransportAddress InitializeCommunication();
 
     /// <summary>
     /// Waits for the request handler to be connected.

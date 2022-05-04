@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -26,7 +27,7 @@ internal interface ITranslationLayerRequestSenderAsync : IDisposable
     ///     ITranslationLayerRequestSender.WaitForRequestHandlerConnection(
     ///     int)"/>.
     /// </summary>
-    Task<int> InitializeCommunicationAsync(int clientConnectionTimeout);
+    Task<TransportAddress> InitializeCommunicationAsync(int clientConnectionTimeout);
 
     /// <summary>
     /// Asynchronous equivalent of ITranslationLayerRequestSender.DiscoverTests/>.

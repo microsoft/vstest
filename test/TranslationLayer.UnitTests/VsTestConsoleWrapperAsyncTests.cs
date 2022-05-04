@@ -63,7 +63,7 @@ public class VsTestConsoleWrapperAsyncTests
         await _consoleWrapper.StartSessionAsync();
 
         Assert.AreEqual(expectedParentProcessId, _consoleParameters.ParentProcessId, "Parent process Id must be set");
-        Assert.AreEqual(inputPort, _consoleParameters.PortNumber, "Port number must be set");
+        Assert.AreEqual(inputPort, _consoleParameters.ConnectionString, "Port number must be set");
 
         _mockProcessManager.Verify(pm => pm.StartProcess(_consoleParameters), Times.Once);
     }

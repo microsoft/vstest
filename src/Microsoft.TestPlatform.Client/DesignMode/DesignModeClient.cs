@@ -97,10 +97,12 @@ public class DesignModeClient : IDesignModeClient
     /// <param name="testRequestManager">
     /// The test Request Manager.
     /// </param>
-    public void ConnectToClientAndProcessRequests(int port, ITestRequestManager testRequestManager)
+    public void ConnectToClientAndProcessRequests(TransportAddress address, ITestRequestManager testRequestManager)
     {
-        EqtTrace.Info("Trying to connect to server on port : {0}", port);
-        _communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
+        EqtTrace.Info("Trying to connect to server on: {0}", address);
+
+         // TODO: grab appropriate communication manager:
+        _communicationManager.SetupClientAsync(address.Address);
 
         var connectionTimeoutInSecs = EnvironmentHelper.GetConnectionTimeout();
 

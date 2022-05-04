@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -21,7 +22,7 @@ public interface IDesignModeClient : IDisposable
     /// Setups client based on port
     /// </summary>
     /// <param name="port">port number to connect</param>
-    void ConnectToClientAndProcessRequests(int port, ITestRequestManager testRequestManager);
+    void ConnectToClientAndProcessRequests(TransportAddress address, ITestRequestManager testRequestManager);
 
     /// <summary>
     /// Send a custom host launch message to IDE

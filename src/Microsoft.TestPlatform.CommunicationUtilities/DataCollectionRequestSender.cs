@@ -58,8 +58,10 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     {
         EqtTrace.Verbose("DataCollectionRequestSender.InitializeCommunication : Initialize communication. ");
 
-        var endpoint = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0));
+        var address = _communicationManager.HostServer($"{IPAddress.Loopback}:0");
         _communicationManager.AcceptClientAsync();
+        var addressParts = address.Split(':');
+        var endpoint = new IPEndPoint(IPAddress.Parse(addressParts[0]), int.Parse(addressParts[1]));
         return endpoint.Port;
     }
 
