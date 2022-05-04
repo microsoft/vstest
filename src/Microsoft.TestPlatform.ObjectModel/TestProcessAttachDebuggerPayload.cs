@@ -16,10 +16,10 @@ public class TestProcessAttachDebuggerPayload
     /// <summary>
     /// Creates a new instance of this class.
     /// </summary>
-    /// <param name="pid">The process id the debugger should attach to.</param>
-    public TestProcessAttachDebuggerPayload(int pid)
+    /// <param name="processId">The process id the debugger should attach to.</param>
+    public TestProcessAttachDebuggerPayload(int processId)
     {
-        ProcessID = pid;
+        ProcessID = processId;
     }
 
     /// <summary>

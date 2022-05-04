@@ -1,22 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-# if NETSTANDARD1_3
-
-#nullable disable
-
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-public class JsonDataSerializer : NewtonsoftJsonDataSerializer { }
-
-#else
 using System;
-using System.ComponentModel;
-using System.Globalization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 #nullable disable
 
@@ -25,48 +18,50 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 /// <summary>
 /// JsonDataSerializes serializes and deserializes data using Json format
 /// </summary>
-public class JsonDataSerializer : IDataSerializer
+public class NewtonsoftJsonDataSerializer : IDataSerializer
 {
-    private static JsonDataSerializer s_instance;
+    private static NewtonsoftJsonDataSerializer s_instance;
 
-    private static JsonSerializerOptions s_jsonSettings1; // serializer settings for v1
-    private static JsonSerializerOptions s_fastJsonSettings; // serializer settings for v2 and faster json
+    private static readonly bool DisableFastJson = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION);
+
+    private static JsonSerializerSettings s_jsonSettings1; // serializer settings for v1
+    private static JsonSerializerSettings s_fastJsonSettings; // serializer settings for v2 and faster json
 
     /// <summary>
     /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
     /// </summary>
-    private JsonDataSerializer()
+    internal NewtonsoftJsonDataSerializer()
     {
-
-
-        s_fastJsonSettings = new JsonSerializerOptions
+        s_jsonSettings1 = new JsonSerializerSettings
         {
-            //DateFormatHandling = s_jsonSettings1.DateFormatHandling,
-            //DateParseHandling = s_jsonSettings1.DateParseHandling,
-            //DateTimeZoneHandling = s_jsonSettings1.DateTimeZoneHandling,
-            //TypeNameHandling = s_jsonSettings1.TypeNameHandling,
-            //ReferenceLoopHandling = s_jsonSettings1.ReferenceLoopHandling,
-            //// PERF: Null value handling has very small impact on serialization and deserialization. Enabling it does not warrant the risk we run
-            //// of changing how our consumers get their data.
-            //// NullValueHandling = NullValueHandling.Ignore,
+            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            DateParseHandling = DateParseHandling.DateTimeOffset,
+            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+            TypeNameHandling = TypeNameHandling.None,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
 
-            //ContractResolver = new DefaultTestPlatformContractResolver(),
-            Converters =
-            {
-                new DateTimeOffsetJsonConverter(),
-                new IntPtrJsonConverter(),
-                new TypeJsonConverter()
-            }
+            ContractResolver = new TestPlatformContractResolver1(),
         };
 
-        // TODO: should be almost the same, but with differen deserializer for the old property format
-        s_jsonSettings1 = s_fastJsonSettings;
+        s_fastJsonSettings = new JsonSerializerSettings
+        {
+            DateFormatHandling = s_jsonSettings1.DateFormatHandling,
+            DateParseHandling = s_jsonSettings1.DateParseHandling,
+            DateTimeZoneHandling = s_jsonSettings1.DateTimeZoneHandling,
+            TypeNameHandling = s_jsonSettings1.TypeNameHandling,
+            ReferenceLoopHandling = s_jsonSettings1.ReferenceLoopHandling,
+            // PERF: Null value handling has very small impact on serialization and deserialization. Enabling it does not warrant the risk we run
+            // of changing how our consumers get their data.
+            // NullValueHandling = NullValueHandling.Ignore,
+
+            ContractResolver = new DefaultTestPlatformContractResolver(),
+        };
     }
 
     /// <summary>
     /// Gets the JSON Serializer instance.
     /// </summary>
-    public static JsonDataSerializer Instance => s_instance ??= new JsonDataSerializer();
+    public static NewtonsoftJsonDataSerializer Instance => s_instance ??= new NewtonsoftJsonDataSerializer();
 
     /// <summary>
     /// Deserialize a <see cref="RoutableMessage"/> from raw JSON text.
@@ -292,9 +287,9 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="settings">Serializer.</param>
     /// <param name="data">Data to be serialized.</param>
     /// <returns>Serialized data.</returns>
-    private string SerializeWithSettings<T>(T data, JsonSerializerOptions settings)
+    private string SerializeWithSettings<T>(T data, JsonSerializerSettings settings)
     {
-        return JsonSerializer.Serialize(data, settings);
+        return JsonConvert.SerializeObject(data, settings);
     }
 
     /// <summary>
@@ -304,12 +299,12 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="serializer">Serializer.</param>
     /// <param name="data">Data to be deserialized.</param>
     /// <returns>Deserialized data.</returns>
-    private T DeserializeWithSettings<T>(string data, JsonSerializerOptions settings)
+    private T DeserializeWithSettings<T>(string data, JsonSerializerSettings settings)
     {
-        return JsonSerializer.Deserialize<T>(data, settings);
+        return JsonConvert.DeserializeObject<T>(data, settings);
     }
 
-    private JsonSerializerOptions GetSerializerSettings(int? version)
+    private JsonSerializerSettings GetSerializerSettings(int? version)
     {
         if (version == null)
         {
@@ -378,32 +373,4 @@ public class JsonDataSerializer : IDataSerializer
         /// </summary>
         public object Payload { get; set; }
     }
-
-    private class DateTimeOffsetJsonConverter : JsonConverter<DateTimeOffset>
-    {
-        public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-            DateTimeOffset.ParseExact(reader.GetString()!, "MM/dd/yyyy", CultureInfo.InvariantCulture);
-
-        public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options) =>
-            writer.WriteStringValue(value.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture));
-    }
-
-    private class IntPtrJsonConverter : JsonConverter<IntPtr>
-    {
-        public override IntPtr Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-            new(int.Parse(reader.GetString()!, CultureInfo.InvariantCulture));
-
-        public override void Write(Utf8JsonWriter writer, IntPtr value, JsonSerializerOptions options) =>
-            writer.WriteStringValue(value.ToString());
-    }
-
-    private class TypeJsonConverter : JsonConverter<Type>
-    {
-        public override Type Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-            Type.GetType(reader.GetString()!);
-
-        public override void Write(Utf8JsonWriter writer, Type value, JsonSerializerOptions options) =>
-            writer.WriteStringValue(value.ToString());
-    }
 }
-#endif
