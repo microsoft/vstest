@@ -72,7 +72,7 @@ public interface ICommunicationManager
     /// Reads message from the binary reader
     /// </summary>
     /// <returns>Returns message read from the binary reader</returns>
-    Message ReceiveMessage();
+    RoutableMessage ReceiveMessage();
 
     /// <summary>
     /// Reads message from the binary reader
@@ -89,7 +89,7 @@ public interface ICommunicationManager
     /// <returns>
     /// Returns message read from the binary reader
     /// </returns>
-    Task<Message> ReceiveMessageAsync(CancellationToken cancellationToken);
+    Task<RoutableMessage> ReceiveMessageAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Reads message from the binary reader using read timeout
@@ -129,5 +129,5 @@ public interface ICommunicationManager
     /// <typeparam name="T"> The type of object to deserialize to. </typeparam>
     /// <param name="message"> Message object </param>
     /// <returns> TestPlatform object </returns>
-    T DeserializePayload<T>(Message message);
+    T DeserializePayload<T>(RoutableMessage message);
 }

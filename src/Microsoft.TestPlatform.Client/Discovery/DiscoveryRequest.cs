@@ -400,7 +400,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <param name="discoveryCompletePayload">Discovery complete payload.</param>
     /// <param name="message">Message.</param>
     /// <returns>Updated rawMessage.</returns>
-    private string UpdateRawMessageWithTelemetryInfo(DiscoveryCompletePayload discoveryCompletePayload, Message message)
+    private string UpdateRawMessageWithTelemetryInfo(DiscoveryCompletePayload discoveryCompletePayload, RoutableMessage message)
     {
         var rawMessage = default(string);
 
@@ -445,21 +445,12 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                     discoveryCompletePayload.DiscoveredExtensions);
             }
 
-            if (message is VersionedMessage message1)
-            {
-                var version = message1.Version;
+            var version = message.Version;
 
-                rawMessage = _dataSerializer.SerializePayload(
-                    MessageType.DiscoveryComplete,
-                    discoveryCompletePayload,
-                    version);
-            }
-            else
-            {
-                rawMessage = _dataSerializer.SerializePayload(
-                    MessageType.DiscoveryComplete,
-                    discoveryCompletePayload);
-            }
+            rawMessage = _dataSerializer.SerializePayload(
+                MessageType.DiscoveryComplete,
+                discoveryCompletePayload,
+                version);
         }
 
         return rawMessage;

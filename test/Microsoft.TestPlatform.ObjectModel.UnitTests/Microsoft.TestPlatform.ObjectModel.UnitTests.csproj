@@ -13,9 +13,8 @@
     <AssemblyName>Microsoft.TestPlatform.ObjectModel.UnitTests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>$(JsonNetVersion)</Version>
-    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="$(JsonNetVersion)" />
+    <PackageReference Include="System.Text.Json" Version="$(SystemTextJsonVersion)" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
     <Reference Include="System.Runtime" />

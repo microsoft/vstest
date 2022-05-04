@@ -312,7 +312,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
         }
     }
 
-    private void HandleBeforeTestRunStart(Message message)
+    private void HandleBeforeTestRunStart(RoutableMessage message)
     {
         // Initialize datacollectors and get environment variables.
         var payload = _dataSerializer.DeserializePayload<BeforeTestRunStartPayload>(message);
@@ -376,7 +376,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
         EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : DataCollection started.");
     }
 
-    private void HandleAfterTestRunEnd(Message message)
+    private void HandleAfterTestRunEnd(RoutableMessage message)
     {
         var isCancelled = _dataSerializer.DeserializePayload<bool>(message);
 

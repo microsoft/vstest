@@ -578,7 +578,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     /// <param name="testRunCompletePayload">Test run complete payload.</param>
     /// <param name="message">Updated rawMessage.</param>
     /// <returns></returns>
-    private string UpdateRawMessageWithTelemetryInfo(TestRunCompletePayload testRunCompletePayload, Message message)
+    private string UpdateRawMessageWithTelemetryInfo(TestRunCompletePayload testRunCompletePayload, RoutableMessage message)
     {
         var rawMessage = default(string);
         if (_requestData.IsTelemetryOptedIn)
@@ -620,22 +620,12 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                     testRunCompletePayload.TestRunCompleteArgs.Metrics,
                     testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions);
             }
+            var version = message.Version;
 
-            if (message is VersionedMessage message1)
-            {
-                var version = message1.Version;
-
-                rawMessage = _dataSerializer.SerializePayload(
-                    MessageType.ExecutionComplete,
-                    testRunCompletePayload,
-                    version);
-            }
-            else
-            {
-                rawMessage = _dataSerializer.SerializePayload(
-                    MessageType.ExecutionComplete,
-                    testRunCompletePayload);
-            }
+            rawMessage = _dataSerializer.SerializePayload(
+                MessageType.ExecutionComplete,
+                testRunCompletePayload,
+                version);
         }
 
         return rawMessage;

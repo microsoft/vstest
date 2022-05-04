@@ -61,17 +61,22 @@ internal class Program
 
         var options = new TestPlatformOptions();
         r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
+        var handler = new PlaygroundTestDiscoveryHandler();
+        r.DiscoverTests(sources, sourceSettings, options, handler);
+        r.RunTests(handler.TestCases, sourceSettings, options, new TestRunHandler());
     }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
     {
         private int _testCasesCount;
+        public List<TestCase> TestCases = new List<TestCase>();
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
             Console.WriteLine($"[DISCOVERY.PROGRESS]");
             Console.WriteLine(WriteTests(discoveredTestCases));
             _testCasesCount += discoveredTestCases.Count();
+            TestCases.AddRange(discoveredTestCases);
         }
 
         public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
@@ -79,6 +84,7 @@ internal class Program
             Console.WriteLine($"[DISCOVERY.COMPLETE] aborted? {isAborted}, tests count: {totalTests}");
             Console.WriteLine("Last chunk:");
             Console.WriteLine(WriteTests(lastChunk));
+            TestCases.AddRange(lastChunk);
         }
 
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
@@ -92,6 +98,7 @@ internal class Program
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.PartiallyDiscoveredSources));
             Console.WriteLine("Not discovered:");
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.NotDiscoveredSources));
+            TestCases.AddRange(lastChunk);
         }
 
         public void HandleLogMessage(TestMessageLevel level, string message)

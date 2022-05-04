@@ -42,9 +42,9 @@ public class DesignModeClient : IDesignModeClient
     private readonly TestSessionMessageLogger _testSessionMessageLogger;
     private readonly object _lockObject = new();
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
-    protected Action<Message> onCustomTestHostLaunchAckReceived;
+    protected Action<RoutableMessage> onCustomTestHostLaunchAckReceived;
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
-    protected Action<Message> onAttachDebuggerAckRecieved;
+    protected Action<RoutableMessage> onAttachDebuggerAckRecieved;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DesignModeClient"/> class.
@@ -300,7 +300,7 @@ public class DesignModeClient : IDesignModeClient
         lock (_lockObject)
         {
             var waitHandle = new AutoResetEvent(false);
-            Message ackMessage = null;
+            RoutableMessage ackMessage = null;
             onCustomTestHostLaunchAckReceived = (ackRawMessage) =>
             {
                 ackMessage = ackRawMessage;
@@ -340,7 +340,7 @@ public class DesignModeClient : IDesignModeClient
         lock (_lockObject)
         {
             var waitHandle = new AutoResetEvent(false);
-            Message ackMessage = null;
+            RoutableMessage ackMessage = null;
             onAttachDebuggerAckRecieved = (ackRawMessage) =>
             {
                 ackMessage = ackRawMessage;

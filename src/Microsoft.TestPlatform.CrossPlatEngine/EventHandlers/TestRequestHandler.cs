@@ -46,8 +46,8 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     private readonly ManualResetEventSlim _requestSenderConnected;
     private readonly ManualResetEventSlim _testHostManagerFactoryReady;
     private readonly ManualResetEventSlim _sessionCompleted;
-    private Action<Message> _onLaunchAdapterProcessWithDebuggerAttachedAckReceived;
-    private Action<Message> _onAttachDebuggerAckRecieved;
+    private Action<RoutableMessage> _onLaunchAdapterProcessWithDebuggerAttachedAckReceived;
+    private Action<RoutableMessage> _onAttachDebuggerAckRecieved;
     private IPathConverter _pathConverter;
     private Exception _messageProcessingUnrecoverableError;
 
@@ -67,8 +67,8 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
         ICommunicationEndpointFactory communicationEndpointFactory,
         IDataSerializer dataSerializer,
         JobQueue<Action> jobQueue,
-        Action<Message> onLaunchAdapterProcessWithDebuggerAttachedAckReceived,
-        Action<Message> onAttachDebuggerAckRecieved)
+        Action<RoutableMessage> onLaunchAdapterProcessWithDebuggerAttachedAckReceived,
+        Action<RoutableMessage> onAttachDebuggerAckRecieved)
     {
         _communicationEndpointFactory = communicationEndpointFactory;
         ConnectionInfo = connectionInfo;
@@ -252,7 +252,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
     {
         var waitHandle = new ManualResetEventSlim(false);
-        Message ackMessage = null;
+        RoutableMessage ackMessage = null;
         _onLaunchAdapterProcessWithDebuggerAttachedAckReceived = (ackRawMessage) =>
         {
             ackMessage = ackRawMessage;
@@ -281,7 +281,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
             return false;
         }
 
-        Message ackMessage = null;
+        RoutableMessage ackMessage = null;
         var waitHandle = new ManualResetEventSlim(false);
 
         _onAttachDebuggerAckRecieved = (ackRawMessage) =>

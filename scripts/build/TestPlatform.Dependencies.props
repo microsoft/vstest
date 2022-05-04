@@ -57,6 +57,7 @@
     <NuGetFrameworksVersion>5.11.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
     <JsonNetVersion>9.0.1</JsonNetVersion>
+    <SystemTextJsonVersion>6.0.0</SystemTextJsonVersion>
 
     <TestPlatformExternalsVersion>17.3.0-preview-2-32502-021</TestPlatformExternalsVersion>
     <!-- <TestPlatformMSDiaVersion>$(TestPlatformExternalsVersion)</TestPlatformMSDiaVersion> -->

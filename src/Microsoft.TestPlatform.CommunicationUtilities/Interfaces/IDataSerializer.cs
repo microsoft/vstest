@@ -15,7 +15,7 @@ public interface IDataSerializer
     /// </summary>
     /// <param name="rawMessage">Raw message off the IPC channel</param>
     /// <returns>Message object</returns>
-    Message DeserializeMessage(string rawMessage);
+    RoutableMessage DeserializeMessage(string rawMessage);
 
     /// <summary>
     /// Deserializes the Message into actual TestPlatform objects
@@ -23,7 +23,7 @@ public interface IDataSerializer
     /// <typeparam name="T"> The type of object to deserialize to. </typeparam>
     /// <param name="message"> Message object </param>
     /// <returns> TestPlatform object </returns>
-    T DeserializePayload<T>(Message message);
+    T DeserializePayload<T>(RoutableMessage message);
 
     /// <summary>
     /// Serializes and creates a raw message given a message type

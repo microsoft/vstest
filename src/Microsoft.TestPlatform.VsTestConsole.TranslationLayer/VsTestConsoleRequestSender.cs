@@ -1369,27 +1369,27 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         }
     }
 
-    private Message TryReceiveMessage()
+    private RoutableMessage TryReceiveMessage()
     {
         var receiverMessageTask = _communicationManager.ReceiveMessageAsync(
             _processExitCancellationTokenSource.Token);
         receiverMessageTask.Wait();
-        Message message = receiverMessageTask.Result;
+        RoutableMessage message = receiverMessageTask.Result;
 
         return message ?? throw new TransationLayerException(
             TranslationLayerResources.FailedToReceiveMessage);
     }
 
-    private async Task<Message> TryReceiveMessageAsync()
+    private async Task<RoutableMessage> TryReceiveMessageAsync()
     {
-        Message message = await _communicationManager.ReceiveMessageAsync(
+        RoutableMessage message = await _communicationManager.ReceiveMessageAsync(
             _processExitCancellationTokenSource.Token).ConfigureAwait(false);
 
         return message ?? throw new TransationLayerException(
             TranslationLayerResources.FailedToReceiveMessage);
     }
 
-    private void HandleCustomHostLaunch(ITestHostLauncher customHostLauncher, Message message)
+    private void HandleCustomHostLaunch(ITestHostLauncher customHostLauncher, RoutableMessage message)
     {
         var ackPayload = new CustomHostLaunchAckPayload()
         {
@@ -1426,7 +1426,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         }
     }
 
-    private void AttachDebuggerToProcess(ITestHostLauncher customHostLauncher, Message message)
+    private void AttachDebuggerToProcess(ITestHostLauncher customHostLauncher, RoutableMessage message)
     {
         var ackPayload = new EditorAttachDebuggerAckPayload()
         {

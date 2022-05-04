@@ -287,7 +287,7 @@ public class SocketCommunicationManager : ICommunicationManager
     /// Reads message from the binary reader
     /// </summary>
     /// <returns>Returns message read from the binary reader</returns>
-    public Message ReceiveMessage()
+    public RoutableMessage ReceiveMessage()
     {
         var rawMessage = ReceiveRawMessage();
         if (!string.IsNullOrEmpty(rawMessage))
@@ -307,7 +307,7 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <returns>
     /// Returns message read from the binary reader
     /// </returns>
-    public async Task<Message> ReceiveMessageAsync(CancellationToken cancellationToken)
+    public async Task<RoutableMessage> ReceiveMessageAsync(CancellationToken cancellationToken)
     {
         var rawMessage = await ReceiveRawMessageAsync(cancellationToken);
         if (!string.IsNullOrEmpty(rawMessage))
@@ -352,7 +352,7 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <typeparam name="T"> The type of object to deserialize to. </typeparam>
     /// <param name="message"> Message object </param>
     /// <returns> TestPlatform object </returns>
-    public T DeserializePayload<T>(Message message)
+    public T DeserializePayload<T>(RoutableMessage message)
     {
         return _dataSerializer.DeserializePayload<T>(message);
     }
