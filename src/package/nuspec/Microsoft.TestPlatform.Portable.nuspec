@@ -43,20 +43,20 @@
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.Client.dll"	target="tools\net451\Microsoft.VisualStudio.TestPlatform.Client.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\net451\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\net451\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.Coverage.IO.dll"	target="tools\net451\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\cs\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\cs\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\de\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\de\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\es\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\es\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\fr\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\fr\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\it\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\it\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\ja\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\ja\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\ko\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\ko\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\pl\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\pl\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\pt-BR\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\pt-BR\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\ru\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\ru\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\tr\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\tr\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\zh-Hans\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\zh-Hans\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="net451\$Runtime$\zh-Hant\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\net451\zh-Hant\Microsoft.VisualStudio.Coverage.IO.dll" />
+    <file src="net451\$Runtime$\Microsoft.CodeCoverage.IO.dll"	target="tools\net451\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\cs\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\cs\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\de\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\de\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\es\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\es\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\fr\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\fr\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\it\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\it\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\ja\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\ja\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\ko\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\ko\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\pl\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\pl\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\pt-BR\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\pt-BR\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\ru\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\ru\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\tr\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\tr\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\zh-Hans\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\zh-Hans\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net451\$Runtime$\zh-Hant\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net451\zh-Hant\Microsoft.CodeCoverage.IO.dll" />
     <file src="net451\$Runtime$\msdia140typelib_clr0200.dll"	target="tools\net451\msdia140typelib_clr0200.dll" />
     <file src="net451\$Runtime$\Newtonsoft.Json.dll"	target="tools\net451\Newtonsoft.Json.dll" />
     <file src="net451\$Runtime$\System.Collections.Immutable.dll"	target="tools\net451\System.Collections.Immutable.dll" />
@@ -338,20 +338,20 @@
     <file src="netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.Client.dll"	target="tools\netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.Client.dll" />
     <file src="netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-    <file src="netcoreapp2.1\Microsoft.VisualStudio.Coverage.IO.dll"	target="tools\netcoreapp2.1\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\cs\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\cs\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\de\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\de\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\es\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\es\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\fr\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\fr\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\it\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\it\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\ja\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\ja\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\ko\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\ko\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\pl\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\pl\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\pt-BR\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\pt-BR\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\ru\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\ru\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\tr\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\tr\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\zh-Hans\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\zh-Hans\Microsoft.VisualStudio.Coverage.IO.dll" />
-    <file src="netcoreapp2.1\zh-Hant\Microsoft.VisualStudio.Coverage.IO.resources.dll"	target="tools\netcoreapp2.1\zh-Hant\Microsoft.VisualStudio.Coverage.IO.dll" />
+    <file src="netcoreapp2.1\Microsoft.CodeCoverage.IO.dll"	target="tools\netcoreapp2.1\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\cs\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\cs\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\de\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\de\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\es\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\es\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\fr\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\fr\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\it\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\it\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\ja\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\ja\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\ko\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\ko\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\pl\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\pl\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\pt-BR\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\pt-BR\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\ru\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\ru\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\tr\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\tr\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\zh-Hans\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\zh-Hans\Microsoft.CodeCoverage.IO.dll" />
+    <file src="netcoreapp2.1\zh-Hant\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\netcoreapp2.1\zh-Hant\Microsoft.CodeCoverage.IO.dll" />
     <file src="netcoreapp2.1\Newtonsoft.Json.dll"	target="tools\netcoreapp2.1\Newtonsoft.Json.dll" />
     <file src="netcoreapp2.1\package.deps.json"	target="tools\netcoreapp2.1\package.deps.json" />
     <file src="netcoreapp2.1\vstest.console.deps.json"	target="tools\netcoreapp2.1\vstest.console.deps.json" />

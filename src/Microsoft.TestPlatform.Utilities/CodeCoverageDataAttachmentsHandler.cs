@@ -28,7 +28,7 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
     private const string XmlFileExtension = ".xml";
     private const string CoverageFriendlyName = "Code Coverage";
 
-    private const string CodeCoverageIoAssemblyName = "Microsoft.VisualStudio.Coverage.IO";
+    private const string CodeCoverageIoAssemblyName = "Microsoft.CodeCoverage.IO";
     private const string CoverageFileUtilityTypeName = "CoverageFileUtility";
     private const string MergeMethodName = "MergeCoverageReportsAsync";
     private const string CoverageMergeOperationName = "CoverageMergeOperation";

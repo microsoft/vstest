@@ -151,6 +151,10 @@
       <NativeBinariesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.arm64.dll" />
       <NativeBinariesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Arm.Resources.dll" />
       <NativeBinariesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll" />
+      <NativeBinariesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Arm.Resources.dll" />
+      <NativeBinariesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.arm64.dll" />
+      <NativeBinariesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Arm.Resources.dll" />
+      <NativeBinariesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\testhost.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\win10-arm64\Microsoft.TestPlatform.PlatformAbstractions.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\win10-arm64\testhost.arm64.dll" />
