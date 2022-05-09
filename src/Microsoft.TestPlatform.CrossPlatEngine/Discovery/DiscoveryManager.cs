@@ -152,17 +152,20 @@ public class DiscoveryManager : IDiscoveryManager
 
                 var isAborted = _cancellationTokenSource.IsCancellationRequested;
 
-                // When discovery is complete and not aborted, we can simply mark all given test
-                // cases and the latest discovered source as fully discovered. Otherwise we still
-                // want to process the last chunk as if it was a normal discovery notification.
+                // When discovery is aborted we still want to process the last chunk as if it was a
+                // normal discovery notification.
                 if (isAborted)
                 {
                     _previousSource = _discoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases(_previousSource, lastChunk);
+                    _discoveryDataAggregator.MarkAsAborted();
                 }
+                // When discovery is complete (i.e. not aborted) we can consider that all sources
+                // are fully discovered (including the last chunk).
                 else
                 {
                     _discoveryDataAggregator.MarkSourcesWithStatus(lastChunk?.Select(x => x.Source), DiscoveryStatus.FullyDiscovered);
-                    _discoveryDataAggregator.MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
+                    _discoveryDataAggregator.MarkSourcesWithStatus(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered), DiscoveryStatus.FullyDiscovered);
+                    _discoveryDataAggregator.MarkSourcesWithStatus(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered), DiscoveryStatus.FullyDiscovered);
                     _previousSource = null;
                 }
 

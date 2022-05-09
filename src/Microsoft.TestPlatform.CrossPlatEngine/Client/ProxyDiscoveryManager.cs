@@ -139,7 +139,9 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
 
         _baseTestDiscoveryEventsHandler = eventHandler;
 
-        // Mark all sources as NotDiscovered before actual discovery starts
+        // All sources are already marked as not discovered by ParallelProxyDiscoveryManager or
+        // DiscoveryManager but it's possible to have this manager called directly so we still need
+        // to ensure correct initial state.
         _discoveryDataAggregator.MarkSourcesWithStatus(discoverySources, DiscoveryStatus.NotDiscovered);
 
         try
@@ -150,6 +152,11 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
             {
                 InitializeExtensions(discoverySources);
                 discoveryCriteria.UpdateDiscoveryCriteria(_testHostManager);
+
+                // Consider the first source as the previous source so that if we are discovering a source
+                // with no tests, we will always consider the source as fully discovered when reaching the
+                // discovery complete event.
+                _previousSource = discoverySources[0];
 
                 _proxyOperationManager.RequestSender.DiscoverTests(discoveryCriteria, this);
             }
@@ -216,6 +223,10 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
             _proxyOperationManager.RequestSender.SendDiscoveryAbort();
         }
 
+        // It is important to ensure we cancel the token and close the channel in case of an abort.
+        // If we don't then we will wait until the completion of this discovery. In case of a
+        // parallel discovery that means we will wait until the source with the less number of tests
+        // is discovered before notifying the caller with the aborted DiscoveryCompleteEventArgs.
         Abort();
     }
 

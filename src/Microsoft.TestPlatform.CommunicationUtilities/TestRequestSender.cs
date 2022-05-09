@@ -65,6 +65,8 @@ public class TestRequestSender : ITestRequestSender
 
     private readonly ITestRuntimeProvider _runtimeProvider;
 
+    private bool _isDiscoveryAborted;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
     /// </summary>
@@ -279,7 +281,9 @@ public class TestRequestSender : ITestRequestSender
     public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 discoveryEventsHandler)
     {
         _messageEventHandler = discoveryEventsHandler;
-        _onDisconnected = (disconnectedEventArgs) => OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, true);
+        // When testhost disconnects, it normally means there was an error in the testhost and it exited unexpectedly.
+        // But when it was us who aborted the run and killed the testhost, we don't want to wait for it to report error, because there won't be any.
+        _onDisconnected = (disconnectedEventArgs) => OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, getClientError: !_isDiscoveryAborted);
         _onMessageReceived = (sender, args) => OnDiscoveryMessageReceived(discoveryEventsHandler, args);
 
         _channel.MessageReceived += _onMessageReceived;
@@ -302,6 +306,7 @@ public class TestRequestSender : ITestRequestSender
             return;
         }
 
+        _isDiscoveryAborted = true;
         EqtTrace.Verbose("TestRequestSender.SendDiscoveryAbort: Sending discovery abort.");
         _channel?.Send(_dataSerializer.SerializeMessage(MessageType.CancelDiscovery));
     }
@@ -635,17 +640,24 @@ public class TestRequestSender : ITestRequestSender
     {
         if (IsOperationComplete())
         {
-            EqtTrace.Verbose("TestRequestSender: OnDiscoveryAbort: Operation is already complete. Skip error message.");
+            EqtTrace.Verbose("TestRequestSender.OnDiscoveryAbort: Operation is already complete. Skip error message.");
             return;
         }
 
-        EqtTrace.Verbose("TestRequestSender: OnDiscoveryAbort: Set operation complete.");
+        EqtTrace.Verbose("TestRequestSender.OnDiscoveryAbort: Set operation complete.");
         SetOperationComplete();
 
         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
-        var reason = GetAbortErrorMessage(exception, getClientError);
-        EqtTrace.Error("TestRequestSender: Aborting test discovery because {0}", reason);
-        LogErrorMessage(string.Format(CommonResources.AbortedTestDiscovery, reason));
+        if (GetAbortErrorMessage(exception, getClientError) is string reason)
+        {
+            EqtTrace.Error("TestRequestSender.OnDiscoveryAbort: Aborting test discovery because {0}.", reason);
+            LogErrorMessage(string.Format(CommonResources.AbortedTestDiscoveryWithReason, reason));
+        }
+        else
+        {
+            EqtTrace.Error("TestRequestSender.OnDiscoveryAbort: Aborting test discovery.");
+            LogErrorMessage(CommonResources.AbortedTestDiscovery);
+        }
 
         // Notify discovery abort to IDE test output
         var payload = new DiscoveryCompletePayload()
@@ -663,7 +675,6 @@ public class TestRequestSender : ITestRequestSender
 
     private string GetAbortErrorMessage(Exception exception, bool getClientError)
     {
-
         EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Exception: " + exception);
 
         // It is also possible for an operation to abort even if client has not
@@ -671,32 +682,33 @@ public class TestRequestSender : ITestRequestSender
         // in this case, we will use the exception as the failure result, if it is present. Otherwise we will
         // try to wait for the client process to exit, and capture it's error output (we are listening to it's standard and
         // error output in the ClientExited callback).
-        var reason = exception?.Message;
-        if (getClientError)
+        if (!getClientError)
         {
-            EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Client has disconnected. Wait for standard error.");
-
-            // Wait for test host to exit for a moment
-            // TODO: this timeout is 10 seconds, make it also configurable like the other famous timeout that is 100ms
-            if (_clientExited.Wait(_clientExitedWaitTime))
-            {
-                // Set a default message of test host process exited and additionally specify the error if we were able to get it
-                // from error output of the process
-                EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
-                reason = CommonResources.TestHostProcessCrashed;
-                if (!string.IsNullOrWhiteSpace(_clientExitErrorMessage))
-                {
-                    reason = $"{reason} : {_clientExitErrorMessage}";
-                }
-            }
-            else
-            {
-                reason = CommonResources.UnableToCommunicateToTestHost;
-                EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Timed out waiting for test host error message.");
-            }
+            return exception?.Message;
         }
 
-        return reason;
+        EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Client has disconnected. Wait for standard error.");
+
+        // Wait for test host to exit for a moment
+        // TODO: this timeout is 10 seconds, make it also configurable like the other famous timeout that is 100ms
+        if (_clientExited.Wait(_clientExitedWaitTime))
+        {
+            // Set a default message of test host process exited and additionally specify the error if we were able to get it
+            // from error output of the process
+            EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
+            var reason = CommonResources.TestHostProcessCrashed;
+            if (!string.IsNullOrWhiteSpace(_clientExitErrorMessage))
+            {
+                reason = $"{reason} : {_clientExitErrorMessage}";
+            }
+
+            return reason;
+        }
+        else
+        {
+            EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Timed out waiting for test host error message.");
+            return CommonResources.UnableToCommunicateToTestHost;
+        }
     }
 
     private void LogErrorMessage(string message)
