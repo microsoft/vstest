@@ -27,7 +27,6 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     private readonly DiscoveryDataAggregator _discoveryDataAggregator;
     private readonly IDataSerializer _dataSerializer;
     private readonly IRequestData _requestData;
-    private readonly object _sendMessageLock = new();
 
     public ParallelDiscoveryEventsHandler(IRequestData requestData,
         IProxyDiscoveryManager proxyDiscoveryManager,
@@ -79,22 +78,48 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             null, // Set lastChunk to null, because we already sent the data using HandleDiscoveredTests above.
             discoveryCompleteEventArgs.IsAborted);
 
-        if (!parallelDiscoveryComplete)
+        if (!parallelDiscoveryComplete
+            || !_discoveryDataAggregator.TryAggregateIsMessageSent())
         {
             return;
         }
 
-        // As we immediately return results to IDE in case of aborting we need to set
-        // isAborted = true and totalTests = -1
-        if (_parallelProxyDiscoveryManager.IsAbortRequested)
-        {
-            _discoveryDataAggregator.Aggregate(new(-1, true));
-        }
-
-        // Manager said we are ready to publish the test discovery completed.
+        // Manager said we are ready to publish the test discovery completed and we haven't yet
+        // published it.
         var fullyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered);
         var partiallyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered);
         var notDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
+
+        // As we immediately return results to IDE in case of aborting we need to set
+        // isAborted = true and totalTests = -1
+        if (!_discoveryDataAggregator.IsAborted)
+        {
+            if (_parallelProxyDiscoveryManager.IsAbortRequested)
+            {
+                EqtTrace.Info("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Abort requested but discovery data aggregator not updated, marking discovery as aborted.");
+                _discoveryDataAggregator.MarkAsAborted();
+            }
+            // If any testhost fails we will end up with some sources not fully discovered. In this
+            // case, we want to consider the discovery aborted (not user cancelled) as it indicates
+            // there was a failure during discovery.
+            else if (notDiscovered.Count > 0 || partiallyDiscovered.Count > 0)
+            {
+                EqtTrace.Info("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Discovery completed but some sources are not fully discovered, marking discovery as aborted.");
+                _discoveryDataAggregator.MarkAsAborted();
+            }
+        }
+        else
+        {
+            EqtTrace.Info("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Discovery completed.");
+        }
+
+        // Collecting Final Discovery State
+        _requestData.MetricsCollection.Add(
+            TelemetryDataConstants.DiscoveryState,
+            discoveryCompleteEventArgs.IsAborted ? "Aborted" : "Completed");
+
+        // Collect Aggregated Metrics Data
+        var aggregatedDiscoveryDataMetrics = _discoveryDataAggregator.GetMetrics();
 
         // In case of sequential discovery - RawMessage would have contained a 'DiscoveryCompletePayload' object
         // To send a raw message - we need to create raw message from an aggregated payload object
@@ -107,19 +132,12 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             PartiallyDiscoveredSources = partiallyDiscovered,
             NotDiscoveredSources = notDiscovered,
             DiscoveredExtensions = _discoveryDataAggregator.DiscoveredExtensions,
+            Metrics = aggregatedDiscoveryDataMetrics,
         };
 
-        // Collecting Final Discovery State
-        _requestData.MetricsCollection.Add(
-            TelemetryDataConstants.DiscoveryState,
-            discoveryCompleteEventArgs.IsAborted ? "Aborted" : "Completed");
-
-        // Collect Aggregated Metrics Data
-        var aggregatedDiscoveryDataMetrics = _discoveryDataAggregator.GetMetrics();
-        testDiscoveryCompletePayload.Metrics = aggregatedDiscoveryDataMetrics;
-
         // Sending discovery complete message to IDE
-        ConvertToRawMessageAndSend(testDiscoveryCompletePayload);
+        EqtTrace.Verbose("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Sending discovery complete message to IDE.");
+        ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
 
         var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs
         {
@@ -129,11 +147,11 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             PartiallyDiscoveredSources = partiallyDiscovered,
             NotDiscoveredSources = notDiscovered,
             DiscoveredExtensions = _discoveryDataAggregator.DiscoveredExtensions,
+            Metrics = aggregatedDiscoveryDataMetrics,
         };
 
-        finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
-
         // send actual test discovery complete to clients
+        EqtTrace.Verbose("ParallelDiscoveryEventsHandler.HandleDiscoveryComplete: Sending discovery complete event to clients.");
         _actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);
     }
 
@@ -180,30 +198,5 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     {
         var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig.Version);
         _actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
-    }
-
-    /// <summary>
-    /// Sending discovery complete message to IDE
-    /// </summary>
-    /// <param name="discoveryDataAggregator">Discovery aggregator to know if we already sent this message</param>
-    /// <param name="testDiscoveryCompletePayload">Discovery complete payload to send</param>
-    private void ConvertToRawMessageAndSend(DiscoveryCompletePayload testDiscoveryCompletePayload)
-    {
-        // When we abort we should send raw message to IDE only once.
-        // All other testhosts which will finish after shouldn't send abort raw message.
-        if (_discoveryDataAggregator.IsMessageSent)
-        {
-            return;
-        }
-
-        lock (_sendMessageLock)
-        {
-            if (!_discoveryDataAggregator.IsMessageSent)
-            {
-                // we have to send raw messages as we block the discovery complete actual raw messages
-                ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
-                _discoveryDataAggregator.AggregateIsMessageSent(true);
-            }
-        }
     }
 }

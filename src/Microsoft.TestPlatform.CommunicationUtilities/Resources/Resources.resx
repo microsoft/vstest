@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AbortedTestDiscovery" xml:space="preserve">
-    <value>The active test discovery was aborted. Reason: {0}</value>
+    <value>The active test discovery was aborted.</value>
   </data>
   <data name="AbortedTestRun" xml:space="preserve">
     <value>The active test run was aborted. Reason: {0}</value>
@@ -146,5 +146,8 @@
   </data>
   <data name="AttachDebuggerToDefaultTestHostFailure" xml:space="preserve">
     <value>Cannot attach the debugger to the default test host.</value>
+  </data>
+  <data name="AbortedTestDiscoveryWithReason" xml:space="preserve">
+    <value>The active test discovery was aborted. Reason: {0}</value>
   </data>
 </root>

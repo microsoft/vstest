@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -17,14 +18,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 /// <summary>
 /// DiscoveryDataAggregator aggregates discovery data from multiple sources running in parallel or in series.
 /// </summary>
-internal class DiscoveryDataAggregator
+internal sealed class DiscoveryDataAggregator
 {
     private readonly object _dataUpdateSyncObject = new();
     private readonly ConcurrentDictionary<string, object> _metricsAggregator = new();
     private readonly ConcurrentDictionary<string, DiscoveryStatus> _sourcesWithDiscoveryStatus = new();
 
     /// <summary>
-    /// Set to true if any of the request is aborted
+    /// Atomic boolean used to detect if message was already sent.
+    /// </summary>
+    private int _isMessageSent;
+
+    /// <summary>
+    /// Set to initialized if any of the request is aborted
     /// </summary>
     public bool IsAborted { get; private set; }
 
@@ -37,11 +43,6 @@ internal class DiscoveryDataAggregator
     /// A collection of aggregated discovered extensions.
     /// </summary>
     public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; private set; } = new();
-
-    /// <summary>
-    /// Indicates if discovery complete payload already sent back to IDE
-    /// </summary>
-    internal bool IsMessageSent { get; private set; }
 
     /// <summary>
     /// Returns the Aggregated Metrics.
@@ -73,12 +74,27 @@ internal class DiscoveryDataAggregator
         return _metricsAggregator;
     }
 
+    public void MarkAsAborted()
+    {
+        lock (_dataUpdateSyncObject)
+        {
+            IsAborted = true;
+            TotalTests = -1;
+        }
+    }
+
     /// <summary>
     /// Aggregate discovery data
     /// Must be thread-safe as this is expected to be called by parallel managers
     /// </summary>
     public void Aggregate(DiscoveryCompleteEventArgs discoveryCompleteEventArgs)
     {
+        if (_isMessageSent == 1)
+        {
+            EqtTrace.Verbose("DiscoveryDataAggregator.Aggregate: Message was already sent so skipping event aggregation.");
+            return;
+        }
+
         lock (_dataUpdateSyncObject)
         {
             IsAborted = IsAborted || discoveryCompleteEventArgs.IsAborted;
@@ -141,13 +157,15 @@ internal class DiscoveryDataAggregator
     }
 
     /// <summary>
-    /// Aggregates the value indicating if we already sent message to IDE.
+    /// Determines if we should send the message to the client.
     /// </summary>
-    /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>
-    public void AggregateIsMessageSent(bool isMessageSent)
-    {
-        IsMessageSent = IsMessageSent || isMessageSent;
-    }
+    /// <remarks>
+    /// Handles race conditions as this aggregator is shared across various event handler for the
+    /// same discovery request but we want to notify only once.
+    /// </remarks>
+    /// <returns><c>true</c> if first to send the message; <c>false</c> otherwise.</returns>
+    public bool TryAggregateIsMessageSent()
+        => Interlocked.CompareExchange(ref _isMessageSent, 1, 0) == 0;
 
     public List<string> GetSourcesWithStatus(DiscoveryStatus discoveryStatus)
         => _sourcesWithDiscoveryStatus.IsEmpty
@@ -159,6 +177,12 @@ internal class DiscoveryDataAggregator
 
     public void MarkSourcesWithStatus(IEnumerable<string?>? sources, DiscoveryStatus status)
     {
+        if (_isMessageSent == 1)
+        {
+            EqtTrace.Verbose("DiscoveryDataAggregator.MarkSourcesWithStatus: Message was already sent so skipping source update.");
+            return;
+        }
+
         if (sources is null)
         {
             return;
@@ -176,7 +200,11 @@ internal class DiscoveryDataAggregator
                 {
                     if (status != DiscoveryStatus.NotDiscovered)
                     {
-                        EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Undiscovered {source}.");
+                        EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Undiscovered {source} added with status: '{status}'.");
+                    }
+                    else
+                    {
+                        EqtTrace.Verbose($"DiscoveryDataAggregator.MarkSourcesWithStatus: Adding {source} with status: '{status}'.");
                     }
 
                     return status;
@@ -186,10 +214,12 @@ internal class DiscoveryDataAggregator
                     if (previousStatus == DiscoveryStatus.FullyDiscovered && status != DiscoveryStatus.FullyDiscovered
                         || previousStatus == DiscoveryStatus.PartiallyDiscovered && status == DiscoveryStatus.NotDiscovered)
                     {
-                        EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Downgrading source status from {previousStatus} to {status}.");
+                        EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Downgrading source {source} status from '{previousStatus}' to '{status}'.");
                     }
-
-                    EqtTrace.Info($"DiscoveryDataAggregator.MarkSourcesWithStatus: Marking {source} with {status} status.");
+                    else if (previousStatus != status)
+                    {
+                        EqtTrace.Verbose($"DiscoveryDataAggregator.MarkSourcesWithStatus: Upgrading {source} status from '{previousStatus}' to '{status}'.");
+                    }
                     return status;
                 });
         }
@@ -203,6 +233,12 @@ internal class DiscoveryDataAggregator
     /// <returns>The last discovered source or null.</returns>
     public string? MarkSourcesBasedOnDiscoveredTestCases(string? previousSource, IEnumerable<TestCase>? testCases)
     {
+        if (_isMessageSent == 1)
+        {
+            EqtTrace.Verbose("DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases: Message was already sent so skipping source update.");
+            return previousSource;
+        }
+
         // When all testcases count in source is dividable by chunk size (e.g. 100 tests and
         // chunk size of 10) then lastChunk is coming as empty. Otherwise, we receive the
         // remaining test cases to process.
@@ -224,6 +260,7 @@ internal class DiscoveryDataAggregator
             }
             else if (currentSource != previousSource)
             {
+                EqtTrace.Verbose($"DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases: Discovered test source changed from {previousSource} to {currentSource}.");
                 MarkSourcesWithStatus(new[] { previousSource }, DiscoveryStatus.FullyDiscovered);
                 MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
             }

@@ -11,6 +11,10 @@
         <note></note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
+        <source>The active test discovery was aborted.</source>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AbortedTestDiscoveryWithReason">
         <source>The active test discovery was aborted. Reason: {0}</source>
         <note></note>
       </trans-unit>

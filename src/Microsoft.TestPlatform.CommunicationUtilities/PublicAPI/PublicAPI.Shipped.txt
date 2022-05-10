@@ -387,3 +387,4 @@ Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.Discovery
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestSender.SendDiscoveryAbort() -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.DiscoveredExtensions.get -> System.Collections.Generic.Dictionary<string, System.Collections.Generic.HashSet<string>>
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.DiscoveryCompletePayload.DiscoveredExtensions.set -> void
+static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources.AbortedTestDiscoveryWithReason.get -> string
