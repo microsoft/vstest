@@ -409,7 +409,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 // and then we write again here. We should refactor this code and write only once.
                 runCompleteArgs.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
                     runCompleteArgs.DiscoveredExtensions,
-                    TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
+                    TestPluginCache.Instance.TestExtensions?.GetCachedExtensions());
 
                 if (_requestData.IsTelemetryOptedIn)
                 {

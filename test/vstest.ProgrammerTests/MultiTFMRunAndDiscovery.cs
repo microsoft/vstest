@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using System.Reflection;
 
 namespace vstest.ProgrammerTests;
 
@@ -108,14 +110,14 @@ public class MultiTFM
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartDiscovery);
-            var startWithSources1Text = startWithSources1.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+            var startWithSources1Text = startWithSources1.Request.GetRawMessage();
             // We sent mstest1.dll.
             startWithSources1Text.Should().Contain("mstest1.dll");
             // And we sent net5 as the target framework, because that is the framework of mstest1.dll.
             startWithSources1Text.Should().Contain(KnownFrameworkStrings.Net5);
 
             var startWithSources2 = testhost2.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartDiscovery);
-            var startWithSources2Text = startWithSources2.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+            var startWithSources2Text = startWithSources2.Request.GetRawMessage();
             // We sent mstest2.dll.
             startWithSources2Text.Should().Contain("mstest2.dll");
             // And we sent net48 as the target framework, because that is the framework of mstest2.dll.
@@ -216,13 +218,13 @@ public class MultiTFM
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartDiscovery);
-            var startWithSources1Text = startWithSources1.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+            var startWithSources1Text = startWithSources1.Request.GetRawMessage();
             // We sent mstest1.dll and net7 because that is what we have in settings.
             startWithSources1Text.Should().Contain("mstest1.dll");
             startWithSources1Text.Should().Contain(KnownFrameworkStrings.Net7);
 
             var startWithSources2 = testhost2.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartDiscovery);
-            var startWithSources2Text = startWithSources2.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+            var startWithSources2Text = startWithSources2.Request.GetRawMessage();
             // We sent mstest2.dll and net7 because that is what we have in settings.
             startWithSources2Text.Should().Contain("mstest2.dll");
             startWithSources2Text.Should().Contain(KnownFrameworkStrings.Net7);
@@ -324,14 +326,14 @@ public class MultiTFM
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
-            var startWithSources1Text = startWithSources1.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+            var startWithSources1Text = startWithSources1.Request.GetRawMessage();
             // We sent mstest1.dll.
             startWithSources1Text.Should().Contain("mstest1.dll");
             // And we sent net5 as the target framework, because that is the framework of mstest1.dll.
             startWithSources1Text.Should().Contain(KnownFrameworkStrings.Net5);
 
             var startWithSources2 = testhost2.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
-            var startWithSources2Text = startWithSources2.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+            var startWithSources2Text = startWithSources2.Request.GetRawMessage();
             // We sent mstest2.dll.
             startWithSources2Text.Should().Contain("mstest2.dll");
             // And we sent net48 as the target framework, because that is the framework of mstest2.dll.
@@ -682,6 +684,21 @@ public class MultiTFMRunAndDiscoveryCompatibilityMode
         startWithSources2Text.Should().Contain(KnownFrameworkStrings.Netcoreapp1);
 
         fixture.ExecutedTests.Should().HaveCount(mstest1Dll.TestCount);
+    }
+}
+
+internal static class MessageExtensions
+{
+    private static MethodInfo? s_messageProperty;
+
+    internal static string GetRawMessage(this Message request)
+    {
+        if (s_messageProperty == null)
+        {
+            s_messageProperty = request.GetType().GetProperty("RawMessage")!.GetGetMethod();
+        }
+
+        return (string)s_messageProperty!.Invoke(request, new object[0])!;
     }
 }
 

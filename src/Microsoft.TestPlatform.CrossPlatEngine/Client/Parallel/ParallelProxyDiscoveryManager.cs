@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Microsoft.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -81,10 +82,14 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         var workloads = SplitToWorkloads(discoveryCriteria, _sourceToTestHostProviderMap);
         _availableTestSources = workloads.Count;
 
-        EqtTrace.Verbose("ParallelProxyDiscoveryManager: Start discovery. Total sources: " + _availableTestSources);
+        EqtTrace.Verbose("ParallelProxyDiscoveryManager.DiscoverTests: Start discovery. Total sources: " + _availableTestSources);
 
-
-        // Marking all sources as not discovered before starting actual discovery
+        // Mark all sources as NotDiscovered here because if we get an early cancellation it's
+        // possible that we didn't yet start all the proxy managers and so we didn't mark all sources
+        // as NotDiscovered.
+        // For example, let's assume we have 10 sources, a batch size of 10 but only 8 cores, we
+        // will then spawn 8 instances of this and if we now cancel, we will have 2 sources not
+        // marked as NotDiscovered.
         _dataAggregator.MarkSourcesWithStatus(discoveryCriteria.Sources.ToList(), DiscoveryStatus.NotDiscovered);
 
         _parallelOperationManager.StartWork(workloads, eventHandler, GetParallelEventHandler, DiscoverTestsOnConcurrentManager);
@@ -125,6 +130,17 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
     /// <inheritdoc/>
     public bool HandlePartialDiscoveryComplete(IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
     {
+#if DEBUG
+        // Ensures that the total count of sources remains the same between each discovery
+        // completion of the same initial discovery request.
+        var notDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count;
+        var partiallyDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count;
+        var fullyDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count;
+        var expectedCount = _availableTestSources;
+        Debug.Assert(notDiscoveredCount + partiallyDiscoveredCount + fullyDiscoveredCount == expectedCount,
+            $"Total count of sources ({expectedCount}) should match the count of sources with status not discovered ({notDiscoveredCount}), partially discovered ({partiallyDiscoveredCount}) and fully discovered ({fullyDiscoveredCount}).");
+#endif
+
         var allDiscoverersCompleted = false;
         // TODO: Interlocked.Increment the count, and the condition below probably does not need to be in a lock?
         lock (_discoveryStatusLockObject)
@@ -136,18 +152,25 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
             // If there are no more sources/testcases, a parallel executor is truly done with discovery
             allDiscoverersCompleted = _discoveryCompletedClients == _availableTestSources;
 
-            EqtTrace.Verbose("ParallelProxyDiscoveryManager: HandlePartialDiscoveryComplete: Total completed clients = {0}, Discovery complete = {1}.", _discoveryCompletedClients, allDiscoverersCompleted);
+            EqtTrace.Verbose("ParallelProxyDiscoveryManager.HandlePartialDiscoveryComplete: Total completed clients = {0}, Discovery complete = {1}, Aborted = {2}, Abort requested: {3}.", _discoveryCompletedClients, allDiscoverersCompleted, isAborted, IsAbortRequested);
         }
 
-        /*
-         If discovery is complete or discovery aborting was requsted by testPlatfrom(user)
-         we need to stop all ongoing discoveries, because we want to separate aborting request
-         when testhost crashed by itself and when user requested it (f.e. through TW)
-         Schedule the clean up for managers and handlers.
-        */
+        // If discovery is complete or discovery aborting was requested by testPlatfrom(user)
+        // we need to stop all ongoing discoveries, because we want to separate aborting request
+        // when testhost crashed by itself and when user requested it (e.g. through TW).
+        // Schedule the clean up for managers and handlers.
         if (allDiscoverersCompleted || IsAbortRequested)
         {
             _parallelOperationManager.StopAllManagers();
+
+            if (allDiscoverersCompleted)
+            {
+                EqtTrace.Verbose("ParallelProxyDiscoveryManager.HandlePartialDiscoveryComplete: All sources were discovered.");
+            }
+            else
+            {
+                EqtTrace.Verbose($"ParallelProxyDiscoveryManager.HandlePartialDiscoveryComplete: Abort was requested.");
+            }
 
             return true;
         }
@@ -226,5 +249,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
                     handler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
                 },
                 TaskContinuationOptions.OnlyOnFaulted);
+
+        EqtTrace.Verbose("ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: No sources available for discovery.");
     }
 }
