@@ -409,7 +409,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 // and then we write again here. We should refactor this code and write only once.
                 runCompleteArgs.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
                     runCompleteArgs.DiscoveredExtensions,
-                    TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
+                    TestPluginCache.Instance.TestExtensions?.GetCachedExtensions());
 
                 if (_requestData.IsTelemetryOptedIn)
                 {
@@ -613,7 +613,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 // would probably mean a performance hit.
                 testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
                     testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions,
-                    TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
+                    TestPluginCache.Instance.TestExtensions?.GetCachedExtensions());
 
                 // Write extensions to telemetry data.
                 TestExtensions.AddExtensionTelemetry(
