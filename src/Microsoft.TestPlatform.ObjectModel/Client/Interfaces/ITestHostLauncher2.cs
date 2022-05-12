@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Threading;
 
 #nullable disable
@@ -26,4 +27,17 @@ public interface ITestHostLauncher2 : ITestHostLauncher
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns><see cref="true"/> if the debugger was successfully attached to the requested process, <see cref="false"/> otherwise.</returns>
     bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken);
+}
+
+public interface ITestHostLauncher3 : ITestHostLauncher2
+{
+    bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo);
+}
+
+public class AttachDebuggerInfo
+{
+    public Version Version { get; set; }
+    public int ProcessId { get; set; }
+    public Framework? TargetFramework { get; set; }
+    public CancellationToken CancellationToken { get; set; }
 }

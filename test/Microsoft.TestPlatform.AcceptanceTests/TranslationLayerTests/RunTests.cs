@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 
 using FluentAssertions;
 
@@ -13,6 +14,7 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -47,7 +49,7 @@ public class RunTests : AcceptanceTestBase
     public void RunAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        
+
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
         vstestConsoleWrapper.RunTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler);
@@ -83,7 +85,8 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM, DebugVSTestConsole = true, JustRow = 1)]
+    [TestHostCompatibilityDataSource]
+    [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM)]
     public void RunAllTestsWithMixedTFMsWillRunTestsFromAllProvidedDllEvenWhenTheyMixTFMs(RunnerInfo runnerInfo)
     {
         // Arrange
@@ -241,5 +244,30 @@ public class RunTests : AcceptanceTestBase
             GetAssetFullPath("SimpleTestProject.dll"),
             GetAssetFullPath("SimpleTestProject2.dll")
         };
+    }
+
+    private class TestHostLauncher : ITestHostLauncher2
+    {
+        public bool IsDebug => true;
+
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            return true;
+        }
+
+        public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
+        {
+            return true;
+        }
+
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
+        {
+            return -1;
+        }
+
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken)
+        {
+            return -1;
+        }
     }
 }
