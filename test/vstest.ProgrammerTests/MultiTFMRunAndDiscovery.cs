@@ -98,7 +98,7 @@ public class MultiTFM
             // -- assert
             fixture.AssertNoErrors();
             // We figure out the framework for each assembly so there should be no incompatibility warnings
-            fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
+            fixture.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which would use different framework*");
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartDiscovery);
@@ -197,8 +197,8 @@ public class MultiTFM
 
             // -- assert
             fixture.AssertNoErrors();
-            // We figure out the framework for each assembly so there should be no incompatibility warnings
-            fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
+            // Runsettings will force NET7, so we should get a warning.
+            fixture.LoggedWarnings.Should().ContainMatch("Test run detected DLL(s) which would use different framework*");
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartDiscovery);
@@ -298,7 +298,7 @@ public class MultiTFM
             // -- assert
             fixture.AssertNoErrors();
             // We figure out the framework for each assembly so there should be no incompatibility warnings
-            fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
+            fixture.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which would use different framework*");
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
@@ -397,8 +397,8 @@ public class MultiTFM
 
             // -- assert
             fixture.AssertNoErrors();
-            // We figure out the framework for each assembly so there should be no incompatibility warnings
-            fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
+            // We specify net7 which is not compatible with either, so we should get warnings
+            fixture.LoggedWarnings.Should().ContainMatch("Test run detected DLL(s) which would use different framework*");
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
@@ -515,7 +515,7 @@ public class MultiTFM
             // -- assert
             fixture.AssertNoErrors();
             // We figure out the framework for each assembly so there should be no incompatibility warnings
-            fixture.TestRunEventsRegistrar.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which were built for different framework*");
+            fixture.LoggedWarnings.Should().NotContainMatch("Test run detected DLL(s) which would use different framework*");
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
@@ -541,7 +541,7 @@ public class MultiTFMRunAndDiscoveryCompatibilityMode
         Given two test assemblies that have the same architecture
         but have different target frameworks.
 
-        When DISABLE_MULTI_TFM_RUN is enabled
+        When DISABLE_MULTI_TFM_RUN is set
         and we execute tests.
 
         Then two testhosts are both started for the same TFM.
@@ -628,7 +628,7 @@ public class MultiTFMRunAndDiscoveryCompatibilityMode
         fixture.AssertNoErrors();
         // We unify the frameworks to netcoreapp1.0 (because the vstest.console dll we are loading is built for netcoreapp and prefers netcoreapp), and because the
         // behavior is to choose the common oldest framework. We then log warning about incompatible sources.
-        fixture.TestRunEventsRegistrar.LoggedWarnings.Should().ContainMatch($"Test run detected DLL(s) which were built for different framework and platform versions*{KnownFrameworkNames.Netcoreapp1}*");
+        fixture.LoggedWarnings.Should().ContainMatch($"Test run detected DLL(s) which would use different framework and platform versions*{KnownFrameworkNames.Netcoreapp1}*");
 
         // We started both testhosts, even thought we know one of them is incompatible.
         fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);

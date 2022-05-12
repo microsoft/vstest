@@ -672,13 +672,20 @@ internal class TestRequestManager : ITestRequestManager
         var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml)
                                 ?? new LoggerRunSettings();
 
-        settingsUpdated |= UpdateFrameworkInRunSettingsIfRequired(
+
+        // True when runsettings don't set target framework. False when runsettings force target framework
+        // in both cases the sourceToFrameworkMap is populated with the real frameworks as we inferred them
+        // from dlls. For sources like .js, we return the default framework.
+        var frameworkWasAutodetected = UpdateFrameworkInRunSettingsIfRequired(
             document,
             navigator,
             sources,
             registrar,
             out Framework chosenFramework,
             out sourceToFrameworkMap);
+
+        settingsUpdated |= frameworkWasAutodetected;
+        var frameworkSetByRunsettings = !frameworkWasAutodetected;
 
         // Choose default architecture based on the framework.
         // For .NET core, the default platform architecture should be based on the process.
@@ -720,7 +727,10 @@ internal class TestRequestManager : ITestRequestManager
 
         EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()} OperatingSystem: {_environment.OperatingSystem}.");
 
-        settingsUpdated |= UpdatePlatform(
+        // True when runsettings don't set platformk. False when runsettings force platform
+        // in both cases the sourceToArchitectureMap is populated with the real architecture as we inferred it
+        // from dlls. For sources like .js, we return the default architecture.
+        var platformWasAutodetected = UpdatePlatform(
             document,
             navigator,
             sources,
@@ -728,15 +738,23 @@ internal class TestRequestManager : ITestRequestManager
             out Architecture chosenPlatform,
             out sourceToArchitectureMap);
 
-        if (FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_MULTI_TFM_RUN))
+        settingsUpdated |= platformWasAutodetected;
+        var platformSetByRunsettings = !platformWasAutodetected;
+
+        // Before MULTI_TFM feature the sourceToArchitectureMap and sourceToFrameworkMap were only used as informational
+        // to be able to do this compatibility check and print warning. And in the later steps only chosenPlatform, chosenFramework
+        // were used, that represented the single architecture and framework to be used.
+        //
+        // After MULTI_TFM  sourceToArchitectureMap and sourceToFrameworkMap are the source of truth, and are propagated forward,
+        // so when we want to revert to the older behavior we need to re-enable the check, and unify all the architecture and
+        // framework entries to the same chosen value.
+        var disableMultiTfm = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_MULTI_TFM_RUN);
+
+        // Do the check only when we enable MULTI_TFM and platform or framework are forced by settings, because then we maybe have some sources
+        // that are not compatible with the chosen settings. And do the check always when MULTI_TFM is disabled, because then we want to warn every
+        // time there are multiple tfms or architectures mixed.
+        if (disableMultiTfm || (!disableMultiTfm && (platformSetByRunsettings || frameworkSetByRunsettings)))
         {
-            // Before MULTI_TFM feature the sourceToArchitectureMap and sourceToFrameworkMap were only used as informational
-            // to be able to do this compatibility check and print warning. And in the later steps only chosenPlatform, chosenFramework
-            // were used, that represented the single architecture and framework to be used.
-            //
-            // After MULTI_TFM  sourceToArchitectureMap and sourceToFrameworkMap are the source of truth, and are propagated forward,
-            // so when we want to revert to the older behavior we need to re-enable the check, and unify all the architecture and
-            // framework entries to the same chosen value.
             CheckSourcesForCompatibility(
                 chosenFramework,
                 chosenPlatform,
@@ -744,12 +762,20 @@ internal class TestRequestManager : ITestRequestManager
                 sourceToArchitectureMap,
                 sourceToFrameworkMap,
                 registrar);
+        }
 
+        // The sourceToArchitectureMap contains the real architecture, overwrite it by the value chosen by runsettings, to force one unified platform to be used.
+        if (disableMultiTfm || platformSetByRunsettings)
+        {
             foreach (var key in sourceToArchitectureMap.Keys)
             {
                 sourceToArchitectureMap[key] = chosenPlatform;
             }
+        }
 
+        // The sourceToFrameworkMap contains the real framework, overwrite it by the value chosen by runsettings, to force one unified framework to be used.
+        if (disableMultiTfm || frameworkSetByRunsettings)
+        {
             foreach (var key in sourceToFrameworkMap.Keys)
             {
                 sourceToFrameworkMap[key] = chosenFramework;
@@ -902,11 +928,20 @@ internal class TestRequestManager : ITestRequestManager
         if (platformSetByRunsettings)
         {
             EqtTrace.Info($"Platform is set by runsettings to be '{commonPlatform}' for all sources.");
-            sourceToPlatformMap = new Dictionary<string, Architecture>();
-            foreach (var source in sources)
-            {
-                sourceToPlatformMap.Add(source, commonPlatform);
-            }
+            // Autodetect platforms from sources, so we can check that they are compatible with the settings, and report
+            // incompatibilities as warnings.
+            //
+            // DO NOT overwrite the common platform, the one forced by runsettings should be used.
+            var _ = _inferHelper.AutoDetectArchitecture(sources, defaultArchitecture, out sourceToPlatformMap);
+
+            // If we would not want to report the incompatibilities later, we would simply return dictionary populated to the
+            // platform that is set by the settings.
+            //
+            // sourceToPlatformMap = new Dictionary<string, Architecture>();
+            // foreach (var source in sources)
+            // {
+            //     sourceToPlatformMap.Add(source, commonPlatform);
+            // }
 
             // Return false, because we did not update runsettings.
             return false;
@@ -933,11 +968,20 @@ internal class TestRequestManager : ITestRequestManager
 
         if (frameworkSetByRunsettings)
         {
-            sourceToFrameworkMap = new Dictionary<string, Framework>();
-            foreach (var source in sources)
-            {
-                sourceToFrameworkMap.Add(source, commonFramework);
-            }
+            // Autodetect frameworks from sources, so we can check that they are compatible with the settings, and report
+            // incompatibilities as warnings.
+            //
+            // DO NOT overwrite the common framework, the one forced by runsettings should be used.
+            var _ = _inferHelper.AutoDetectFramework(sources, out sourceToFrameworkMap);
+
+            // If we would not want to report the incompatibilities later, we would simply return dictionary populated to the
+            // framework that is set by the settings.
+            //
+            // sourceToFrameworkMap = new Dictionary<string, Framework>();
+            // foreach (var source in sources)
+            // {
+            //     sourceToFrameworkMap.Add(source, commonFramework);
+            // }
 
             WriteWarningForNetFramework35IsUnsupported(registrar, commonFramework);
             // Return false because we did not update runsettings.
