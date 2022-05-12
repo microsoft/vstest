@@ -560,7 +560,7 @@ public class TestEngineTests
 
         var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, new Dictionary<string, SourceDetail>());
 
         Assert.IsTrue(((ProxyExecutionManagerWithDataCollection)executionManager).ProxyDataCollectionManager.Sources.Contains("1.dll"));
     }
@@ -573,7 +573,7 @@ public class TestEngineTests
         var testCaseList = new List<TestCase> { new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll") };
         var testRunCriteria = new TestRunCriteria(testCaseList, 100, false, settingXml);
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, _testableTestRuntimeProvider, testRunCriteria);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, new Dictionary<string, SourceDetail>());
 
         Assert.IsTrue(((ProxyExecutionManagerWithDataCollection)executionManager).ProxyDataCollectionManager.Sources.Contains("x.dll"));
     }

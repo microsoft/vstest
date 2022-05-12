@@ -24,12 +24,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
 {
     private readonly IDataSerializer _dataSerializer;
+    private readonly DiscoveryDataAggregator _dataAggregator;
     private readonly ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler2, DiscoveryCriteria> _parallelOperationManager;
     private readonly Dictionary<string, TestRuntimeProviderInfo> _sourceToTestHostProviderMap;
     private int _discoveryCompletedClients;
     private int _availableTestSources = -1;
 
-    private ParallelDiscoveryDataAggregator _currentDiscoveryDataAggregator;
     private bool _skipDefaultAdapters;
     private readonly IRequestData _requestData;
 
@@ -43,21 +43,24 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
     public ParallelProxyDiscoveryManager(
         IRequestData requestData,
         Func<TestRuntimeProviderInfo, IProxyDiscoveryManager> actualProxyManagerCreator,
+        DiscoveryDataAggregator dataAggregator,
         int parallelLevel,
         List<TestRuntimeProviderInfo> testHostProviders)
-        : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, testHostProviders)
+        : this(requestData, actualProxyManagerCreator, dataAggregator, JsonDataSerializer.Instance, parallelLevel, testHostProviders)
     {
     }
 
     internal ParallelProxyDiscoveryManager(
         IRequestData requestData,
         Func<TestRuntimeProviderInfo, IProxyDiscoveryManager> actualProxyManagerCreator,
+        DiscoveryDataAggregator dataAggregator,
         IDataSerializer dataSerializer,
         int parallelLevel,
         List<TestRuntimeProviderInfo> testHostProviders)
     {
         _requestData = requestData;
         _dataSerializer = dataSerializer;
+        _dataAggregator = dataAggregator;
         _parallelOperationManager = new(actualProxyManagerCreator, parallelLevel);
         _sourceToTestHostProviderMap = testHostProviders
             .SelectMany(provider => provider.SourceDetails.Select(s => new KeyValuePair<string, TestRuntimeProviderInfo>(s.Source, provider)))
@@ -80,11 +83,9 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
 
         EqtTrace.Verbose("ParallelProxyDiscoveryManager: Start discovery. Total sources: " + _availableTestSources);
 
-        // One data aggregator per parallel discovery
-        _currentDiscoveryDataAggregator = new ParallelDiscoveryDataAggregator();
 
         // Marking all sources as not discovered before starting actual discovery
-        _currentDiscoveryDataAggregator.MarkSourcesWithStatus(discoveryCriteria.Sources.ToList(), DiscoveryStatus.NotDiscovered);
+        _dataAggregator.MarkSourcesWithStatus(discoveryCriteria.Sources.ToList(), DiscoveryStatus.NotDiscovered);
 
         _parallelOperationManager.StartWork(workloads, eventHandler, GetParallelEventHandler, DiscoverTestsOnConcurrentManager);
     }
@@ -95,7 +96,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
             concurrentManager,
             eventHandler,
             this,
-            _currentDiscoveryDataAggregator);
+            _dataAggregator);
 
     /// <inheritdoc/>
     public void Abort()

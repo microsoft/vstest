@@ -14,10 +14,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 //{
 //    private MockParallelOperationManager _proxyParallelManager;
 
-    public ParallelOperationManagerTests()
-    {
-        Func<SampleConcurrentClass> sampleCreator =
-            () => new SampleConcurrentClass();
+    //public ParallelOperationManagerTests()
+    //{
+    //    Func<SampleConcurrentClass> sampleCreator =
+    //        () => new SampleConcurrentClass();
 
 //        _proxyParallelManager = new MockParallelOperationManager(sampleCreator, 2, true);
 //    }

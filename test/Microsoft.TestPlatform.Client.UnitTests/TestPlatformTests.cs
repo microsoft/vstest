@@ -284,7 +284,7 @@ public class TestPlatformTests
     {
         var mockCustomLauncher = new Mock<ITestHostLauncher>();
         _executionManager.Setup(dm => dm.Initialize(false)).Verifiable();
-        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, _hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(_executionManager.Object);
+        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_executionManager.Object);
         _testEngine.Setup(te => te.GetExtensionManager()).Returns(_extensionManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
 
@@ -293,7 +293,7 @@ public class TestPlatformTests
         _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
             .Returns(testRunCriteria.Sources);
 
-        var testRunRequest = tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions());
+        var testRunRequest = tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), new Dictionary<string, SourceDetail>());
 
         var actualTestRunRequest = testRunRequest as TestRunRequest;
         Assert.AreEqual(testRunCriteria, actualTestRunRequest?.TestRunCriteria);
