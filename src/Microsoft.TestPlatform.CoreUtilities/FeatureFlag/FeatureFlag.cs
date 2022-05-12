@@ -49,7 +49,7 @@ internal partial class FeatureFlag : IFeatureFlag
     public const string DISABLE_FASTER_JSON_SERIALIZATION = VSTEST_ + nameof(DISABLE_FASTER_JSON_SERIALIZATION);
 
     // TODO: Invert this to disable.
-    public const string MULTI_TFM_RUN = VSTEST_ + nameof(MULTI_TFM_RUN);
+    public const string DISABLE_MULTI_TFM_RUN = VSTEST_ + nameof(DISABLE_MULTI_TFM_RUN);
 
     [Obsolete("Only use this in tests.")]
     internal static void Reset()

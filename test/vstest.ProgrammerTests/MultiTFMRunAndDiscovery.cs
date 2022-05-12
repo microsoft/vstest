@@ -30,15 +30,7 @@ public class MultiTFM
         public async Task A()
         {
             // -- arrange
-            using var fixture = new Fixture(
-                new FixtureOptions
-                {
-                    FeatureFlags = new Dictionary<string, bool>
-                    {
-                        [FeatureFlag.MULTI_TFM_RUN] = true
-                    }
-                }
-            );
+            using var fixture = new Fixture();
 
             var mstest1Dll = new FakeTestDllBuilder()
                 .WithPath(@"X:\fake\mstest1.dll")
@@ -138,15 +130,7 @@ public class MultiTFM
         public async Task B()
         {
             // -- arrange
-            using var fixture = new Fixture(
-                new FixtureOptions
-                {
-                    FeatureFlags = new Dictionary<string, bool>
-                    {
-                        [FeatureFlag.MULTI_TFM_RUN] = true
-                    }
-                }
-            );
+            using var fixture = new Fixture();
 
             var mstest1Dll = new FakeTestDllBuilder()
                 .WithPath(@"X:\fake\mstest1.dll")
@@ -246,15 +230,7 @@ public class MultiTFM
         public async Task C()
         {
             // -- arrange
-            using var fixture = new Fixture(
-                new FixtureOptions
-                {
-                    FeatureFlags = new Dictionary<string, bool>
-                    {
-                        [FeatureFlag.MULTI_TFM_RUN] = true
-                    }
-                }
-            );
+            using var fixture = new Fixture();
 
             var mstest1Dll = new FakeTestDllBuilder()
                 .WithPath(@"X:\fake\mstest1.dll")
@@ -354,15 +330,7 @@ public class MultiTFM
         public async Task D()
         {
             // -- arrange
-            using var fixture = new Fixture(
-                new FixtureOptions
-                {
-                    FeatureFlags = new Dictionary<string, bool>
-                    {
-                        [FeatureFlag.MULTI_TFM_RUN] = true
-                    }
-                }
-            );
+            using var fixture = new Fixture();
 
             var mstest1Dll = new FakeTestDllBuilder()
                 .WithPath(@"X:\fake\mstest1.dll")
@@ -434,13 +402,13 @@ public class MultiTFM
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
-            var startWithSources1Text = startWithSources1.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+            var startWithSources1Text = startWithSources1.Request.GetRawMessage();
             // We sent mstest1.dll.
             startWithSources1Text.Should().Contain("mstest1.dll");
             startWithSources1Text.Should().Contain(KnownFrameworkStrings.Net7);
 
             var startWithSources2 = testhost2.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
-            var startWithSources2Text = startWithSources2.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+            var startWithSources2Text = startWithSources2.Request.GetRawMessage();
             // We sent mstest2.dll.
             startWithSources2Text.Should().Contain("mstest2.dll");
             startWithSources2Text.Should().Contain(KnownFrameworkStrings.Net7);
@@ -464,15 +432,7 @@ public class MultiTFM
         public async Task E()
         {
             // -- arrange
-            using var fixture = new Fixture(
-                new FixtureOptions
-                {
-                    FeatureFlags = new Dictionary<string, bool>
-                    {
-                        [FeatureFlag.MULTI_TFM_RUN] = true
-                    }
-                }
-            );
+            using var fixture = new Fixture();
 
             var mstest1Dll = new FakeTestDllBuilder()
                 .WithPath(@"X:\fake\mstest1.dll")
@@ -559,13 +519,13 @@ public class MultiTFM
 
             fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
             var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
-            var startWithSources1Text = startWithSources1.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+            var startWithSources1Text = startWithSources1.Request.GetRawMessage();
             // We sent mstest1.dll.
             startWithSources1Text.Should().Contain("mstest1.dll");
             startWithSources1Text.Should().Contain(mstest1Dll.FrameworkName.ToString());
 
             var startWithSources2 = testhost2.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
-            var startWithSources2Text = startWithSources2.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+            var startWithSources2Text = startWithSources2.Request.GetRawMessage();
             // We sent mstest2.dll.
             startWithSources2Text.Should().Contain("mstest2.dll");
             startWithSources2Text.Should().Contain(mstest2Dll.FrameworkName.ToString());
@@ -577,9 +537,16 @@ public class MultiTFM
 
 public class MultiTFMRunAndDiscoveryCompatibilityMode
 {
-    // TODO: NOMERGE: Add backward compats flag functionality and test it.
-    [Exclude]
-    public async Task GivenMultipleMsTestAssembliesThatHaveTheSameArchitecture_AndHaveDifferentTargetFrameworks_AndMULTI_TFM_RUNFeatureFlagIsDisabled_WhenTestsAreRun_ThenTwoTesthostsAreStartedBothForTheSameTFM()
+    [Test(@"
+        Given two test assemblies that have the same architecture
+        but have different target frameworks.
+
+        When DISABLE_MULTI_TFM_RUN is enabled
+        and we execute tests.
+
+        Then two testhosts are both started for the same TFM.
+    ")]
+    public async Task E()
     {
         // -- arrange
         using var fixture = new Fixture(
@@ -587,7 +554,7 @@ public class MultiTFMRunAndDiscoveryCompatibilityMode
             {
                 FeatureFlags = new Dictionary<string, bool>
                 {
-                    [FeatureFlag.MULTI_TFM_RUN] = false
+                    [FeatureFlag.DISABLE_MULTI_TFM_RUN] = true
                 }
             }
         );
@@ -649,14 +616,10 @@ public class MultiTFMRunAndDiscoveryCompatibilityMode
         mstest1Dll.FrameworkName.Should().NotBe(mstest2Dll.FrameworkName);
 
         // -- act
-        // TODO: Building whole default runconfiguration is needed here, because TestRequestManager does not ensure the basic settings are populated,
-        // and all methods that populate them just silently fail, so TestHostProvider does not get any useful settings.
-        var runConfiguration = new RunConfiguration().ToXml().OuterXml;
         var testRunRequestPayload = new TestRunRequestPayload
         {
             Sources = new List<string> { mstest1Dll.Path, mstest2Dll.Path },
-
-            RunSettings = $"<RunSettings>{runConfiguration}</RunSettings>"
+            RunSettings = $"<RunSettings></RunSettings>",
         };
 
         await testRequestManager.ExecuteWithAbort(tm => tm.RunTests(testRunRequestPayload, testHostLauncher: null, fixture.TestRunEventsRegistrar, fixture.ProtocolConfig));
@@ -670,17 +633,17 @@ public class MultiTFMRunAndDiscoveryCompatibilityMode
         // We started both testhosts, even thought we know one of them is incompatible.
         fixture.ProcessHelper.Processes.Where(p => p.Started).Should().HaveCount(2);
         var startWithSources1 = testhost1.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
-        var startWithSources1Text = startWithSources1.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+        var startWithSources1Text = startWithSources1.Request.GetRawMessage();
         // We sent mstest1.dll
         startWithSources1Text.Should().Contain("mstest1.dll");
-        // And we sent netcoreapp1.0 as the target framework
+        // And we sent netcoreapp1.0 as the target framework, because that is the common fallback
         startWithSources1Text.Should().Contain(KnownFrameworkStrings.Netcoreapp1);
 
         var startWithSources2 = testhost2.FakeCommunicationChannel.ProcessedMessages.Single(m => m.Request.MessageType == MessageType.StartTestExecutionWithSources);
-        var startWithSources2Text = startWithSources2.Request.Payload.Select(t => t.ToString()).JoinBySpace();
+        var startWithSources2Text = startWithSources2.Request.GetRawMessage();
         // We sent mstest2.dll
         startWithSources2Text.Should().Contain("mstest2.dll");
-        // And we sent netcoreapp1.0 as the target framework, even though it is incompatible
+        // And we sent netcoreapp1.0 as the target framework, because that is the common fallback, even though the source is not compatible with it
         startWithSources2Text.Should().Contain(KnownFrameworkStrings.Netcoreapp1);
 
         fixture.ExecutedTests.Should().HaveCount(mstest1Dll.TestCount);

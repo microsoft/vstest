@@ -727,15 +727,34 @@ internal class TestRequestManager : ITestRequestManager
             defaultArchitecture,
             out Architecture chosenPlatform,
             out sourceToArchitectureMap);
-        CheckSourcesForCompatibility(
-            chosenFramework,
-            chosenPlatform,
-            defaultArchitecture,
-            sourceToArchitectureMap,
-            sourceToFrameworkMap,
-            registrar);
 
-        // TODO: NOMERGE: revert all architectures and frameworks on our map to the one common framework and architecture.
+        if (FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_MULTI_TFM_RUN))
+        {
+            // Before MULTI_TFM feature the sourceToArchitectureMap and sourceToFrameworkMap were only used as informational
+            // to be able to do this compatibility check and print warning. And in the later steps only chosenPlatform, chosenFramework
+            // were used, that represented the single architecture and framework to be used.
+            //
+            // After MULTI_TFM  sourceToArchitectureMap and sourceToFrameworkMap are the source of truth, and are propagated forward,
+            // so when we want to revert to the older behavior we need to re-enable the check, and unify all the architecture and
+            // framework entries to the same chosen value.
+            CheckSourcesForCompatibility(
+                chosenFramework,
+                chosenPlatform,
+                defaultArchitecture,
+                sourceToArchitectureMap,
+                sourceToFrameworkMap,
+                registrar);
+
+            foreach (var key in sourceToArchitectureMap.Keys)
+            {
+                sourceToArchitectureMap[key] = chosenPlatform;
+            }
+
+            foreach (var key in sourceToFrameworkMap.Keys)
+            {
+                sourceToFrameworkMap[key] = chosenFramework;
+            }
+        }
 
         settingsUpdated |= UpdateDesignMode(document, runConfiguration);
         settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
