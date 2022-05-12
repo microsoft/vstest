@@ -82,9 +82,11 @@ internal class Program
         };
         var options = new TestPlatformOptions();
         var r = new VsTestConsoleWrapper(console, consoleOptions);
+        var sessionHandler = new TestSessionHandler();
+        r.StartTestSession(sources, sourceSettings, sessionHandler);
         var discoveryHandler = new PlaygroundTestDiscoveryHandler();
-        r.DiscoverTests(sources, sourceSettings, options, discoveryHandler);
-        r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
+        r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
     }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
@@ -210,5 +212,30 @@ internal class Program
         {
             return 1;
         }
+    }
+}
+
+internal class TestSessionHandler : ITestSessionEventsHandler
+{
+    public TestSessionInfo TestSessionInfo { get; private set; }
+
+    public void HandleLogMessage(TestMessageLevel level, string message)
+    {
+        
+    }
+
+    public void HandleRawMessage(string rawMessage)
+    {
+        
+    }
+
+    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs)
+    {
+        TestSessionInfo = eventArgs.TestSessionInfo;
+    }
+
+    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs eventArgs)
+    {
+        
     }
 }
