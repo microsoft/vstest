@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -90,9 +89,8 @@ internal class Condition
     /// <summary>
     /// Evaluate this condition for testObject.
     /// </summary>
-    internal bool Evaluate(Func<string, object> propertyValueProvider)
+    internal bool Evaluate(Func<string, object> propertyValueProvider!!)
     {
-        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
         var result = false;
         var multiValue = GetPropertyValue(propertyValueProvider);
         switch (Operation)
@@ -137,7 +135,7 @@ internal class Condition
                 {
                     foreach (string propertyValue in multiValue)
                     {
-                        Debug.Assert(null != propertyValue, "PropertyValue can not be null.");
+                        TPDebug.Assert(null != propertyValue, "PropertyValue can not be null.");
                         result = result || propertyValue.IndexOf(Value, StringComparison.OrdinalIgnoreCase) != -1;
                         if (result)
                         {
@@ -155,7 +153,7 @@ internal class Condition
                 {
                     foreach (string propertyValue in multiValue)
                     {
-                        Debug.Assert(null != propertyValue, "PropertyValue can not be null.");
+                        TPDebug.Assert(null != propertyValue, "PropertyValue can not be null.");
                         result = result && propertyValue.IndexOf(Value, StringComparison.OrdinalIgnoreCase) == -1;
                         if (!result)
                         {
@@ -173,7 +171,7 @@ internal class Condition
     /// </summary>
     internal static Condition Parse(string conditionString)
     {
-        if (string.IsNullOrWhiteSpace(conditionString))
+        if (conditionString.IsNullOrWhiteSpace())
         {
             ThrownFormatExceptionForInvalidCondition(conditionString);
         }
@@ -193,7 +191,7 @@ internal class Condition
 
         for (int index = 0; index < 3; index++)
         {
-            if (string.IsNullOrWhiteSpace(parts[index]))
+            if (parts[index].IsNullOrWhiteSpace())
             {
                 ThrownFormatExceptionForInvalidCondition(conditionString);
             }

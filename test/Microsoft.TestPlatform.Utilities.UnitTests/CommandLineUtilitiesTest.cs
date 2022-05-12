@@ -5,14 +5,12 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Utilities.Tests;
 
 [TestClass]
 public class CommandLineUtilitiesTest
 {
-    private void VerifyCommandLineSplitter(string commandLine, string[] expected)
+    private static void VerifyCommandLineSplitter(string commandLine, string[] expected)
     {
         CommandLineUtilities.SplitCommandLineIntoArguments(commandLine, out var actual);
 

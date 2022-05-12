@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -11,8 +12,6 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 
@@ -36,28 +35,37 @@ public class TelemetryPerfTestBase : PerformanceTestBase
     /// </summary>
     /// <param name="handlerMetrics"></param>
     /// <param name="scenario"></param>
-    public void PostTelemetry(IDictionary<string, object> handlerMetrics, PerfAnalyzer perfAnalyzer, string projectName, [CallerMemberName] string scenario = null)
+    public void PostTelemetry(IDictionary<string, object> handlerMetrics, PerfAnalyzer perfAnalyzer, string projectName, [CallerMemberName] string? scenario = null)
     {
-        var properties = new Dictionary<string, string>
+        var properties = new Dictionary<string, string?>
         {
-            ["Version"] = "1.0.1",
+            // 1.0.1 -first version was called 1.0.1, and has the basic data correct
+            // 2 - changes version naming to just number, and adds adapter,
+            // in version 2 tests also changed from being just 1 class
+            // to be classes that have 20 tests, so e.g. 500 classes with 20 tests each for 10k tests.
+            // This layout does not favor any of the tested frameworks and is close to what we would see in the wild.
+            ["Version"] = "2",
             ["Project"] = projectName,
+            ["Adapter"] = GetAdapterName(projectName),
             ["Scenario"] = scenario,
             ["Configuration"] = BuildConfiguration,
         };
 
         var metrics = new Dictionary<string, double>();
 
-        foreach (var entry in handlerMetrics)
+        if (handlerMetrics is not null)
         {
-            var stringValue = entry.Value.ToString();
-            if (double.TryParse(stringValue, out var doubleValue))
+            foreach (var entry in handlerMetrics)
             {
-                metrics.Add(entry.Key, doubleValue);
-            }
-            else
-            {
-                properties.Add(entry.Key, stringValue);
+                var stringValue = entry.Value.ToString();
+                if (double.TryParse(stringValue, out var doubleValue))
+                {
+                    metrics.Add(entry.Key, doubleValue);
+                }
+                else
+                {
+                    properties.Add(entry.Key, stringValue);
+                }
             }
         }
 
@@ -68,6 +76,24 @@ public class TelemetryPerfTestBase : PerformanceTestBase
 
         _client.TrackEvent($"{scenario}{projectName}", properties, metrics);
         _client.Flush();
+    }
+
+    private string GetAdapterName(string projectName)
+    {
+        var name = projectName.ToLowerInvariant();
+        if (name.Contains("xunit"))
+            return "xunit";
+
+        if (name.Contains("nunit"))
+            return "nunit";
+
+        if (name.Contains("mstest"))
+            return "mstest";
+
+        if (name.Contains("perfy"))
+            return "perfy";
+
+        throw new InvalidOperationException($"Name of the adapter was not found in the project name {projectName}.");
     }
 
     /// <summary>

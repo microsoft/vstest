@@ -33,8 +33,9 @@
   <ItemGroup>
     <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
-    <ProjectReference Include="$(TestPlatformRoot)src\DataCollectors\DumpMinitool.x86\DumpMinitool.x86.csproj" />
     <ProjectReference Include="$(TestPlatformRoot)src\DataCollectors\DumpMinitool\DumpMinitool.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\DataCollectors\DumpMinitool.x86\DumpMinitool.x86.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\DataCollectors\DumpMinitool.arm64\DumpMinitool.arm64.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net472' AND '$(OS)' != 'Windows_NT' ">
     <Reference Include="System" />

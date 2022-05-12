@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -54,9 +53,9 @@ public class FilterExpressionWrapper
 
                 // TODO: surface an error message to suer.
                 var regexString = options?.FilterRegEx;
-                if (!string.IsNullOrEmpty(regexString))
+                if (!regexString.IsNullOrEmpty())
                 {
-                    Debug.Assert(options.FilterRegExReplacement == null || options.FilterRegEx != null);
+                    TPDebug.Assert(options.FilterRegExReplacement == null || options.FilterRegEx != null);
                     FastFilter.PropertyValueRegex = new Regex(regexString, RegexOptions.Compiled);
                     FastFilter.PropertyValueRegexReplacement = options.FilterRegExReplacement;
                 }
@@ -120,10 +119,8 @@ public class FilterExpressionWrapper
     /// <summary>
     /// Evaluate filterExpression with given propertyValueProvider.
     /// </summary>
-    public bool Evaluate(Func<string, Object> propertyValueProvider)
+    public bool Evaluate(Func<string, Object> propertyValueProvider!!)
     {
-        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
-
         return UseFastFilter
             ? FastFilter.Evaluate(propertyValueProvider)
             : _filterExpression != null && _filterExpression.Evaluate(propertyValueProvider);

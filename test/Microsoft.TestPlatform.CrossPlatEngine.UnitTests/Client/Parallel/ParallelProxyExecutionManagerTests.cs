@@ -23,8 +23,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
@@ -94,6 +92,7 @@ public class ParallelProxyExecutionManagerTests
         _testRunCriteriaWithTestsFrom3Dlls = new TestRunCriteria(_testCases, 100);
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+        _mockRequestData.Setup(rd => rd.ProtocolConfig).Returns(new ProtocolConfig());
     }
 
     [TestMethod]
@@ -384,8 +383,8 @@ public class ParallelProxyExecutionManagerTests
                     });
         }
 
-        Exception assertException = null;
-        _mockEvenHandler.Setup(m => m.HandleTestRunComplete(
+        Exception? assertException = null;
+        _mockHandler.Setup(m => m.HandleTestRunComplete(
             It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(),
             It.IsAny<ICollection<AttachmentSet>>(),

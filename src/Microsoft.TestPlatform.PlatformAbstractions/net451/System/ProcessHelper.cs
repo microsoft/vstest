@@ -8,7 +8,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 #nullable disable
@@ -17,6 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 public partial class ProcessHelper : IProcessHelper
 {
+    private PlatformArchitecture? _currentProcessArchitecture;
+
     /// <inheritdoc/>
     public string GetCurrentProcessLocation()
         => Path.GetDirectoryName(GetCurrentProcessFileName());
@@ -27,19 +28,22 @@ public partial class ProcessHelper : IProcessHelper
 
     /// <inheritdoc/>
     public PlatformArchitecture GetCurrentProcessArchitecture()
-        =>
-        IntPtr.Size == 8
-        ? IsArm64()
-            ? PlatformArchitecture.ARM64
-            : PlatformArchitecture.X64
-        : PlatformArchitecture.X86;
+        => _currentProcessArchitecture ??= GetProcessArchitecture(Process.GetCurrentProcess().Id);
 
-    private static bool IsArm64()
+
+    public PlatformArchitecture GetProcessArchitecture(int processId)
+     => IntPtr.Size == 8
+       ? IsArm64(processId)
+           ? PlatformArchitecture.ARM64
+           : PlatformArchitecture.X64
+       : PlatformArchitecture.X86;
+
+    private static bool IsArm64(int processId)
     {
         try
         {
-            var currentProcess = Process.GetCurrentProcess();
-            if (!NativeMethods.IsWow64Process2(currentProcess.Handle, out ushort processMachine, out ushort nativeMachine))
+            var process = Process.GetProcessById(processId);
+            if (!NativeMethods.IsWow64Process2(process.Handle, out ushort processMachine, out ushort nativeMachine))
             {
                 throw new Win32Exception();
             }
@@ -49,7 +53,7 @@ public partial class ProcessHelper : IProcessHelper
             if (processMachine == NativeMethods.IMAGE_FILE_MACHINE_UNKNOWN && nativeMachine == NativeMethods.IMAGE_FILE_MACHINE_ARM64)
             {
                 // To distinguish between ARM64 and x64 emulated on ARM64 we check the PE header of the current running executable.
-                return IsArm64Executable(currentProcess.MainModule.FileName);
+                return IsArm64Executable(process.MainModule.FileName);
             }
         }
         catch

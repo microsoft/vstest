@@ -40,9 +40,19 @@ public class ConsoleParameters
     }
 
     /// <summary>
-    /// Environment variables to be set for the process
+    /// Environment variables to be set for the process. This will merge the specified entries to the environment variables
+    /// inherited from the current process. If you wish to provide a full set of environment variables yourself set <see cref="InheritEnvironmentVariables"/> to false.
     /// </summary>
-    public Dictionary<string, string> EnvironmentVariables { get; set; }
+    public Dictionary<string, string> EnvironmentVariables { get; set; } = new Dictionary<string, string>();
+
+    /// <summary>
+    /// When set to true (default), all environment variables are inherited from the current process and the entries provided in <see cref="EnvironmentVariables"/> are merged with that set.
+    /// When set to false, only the values you provide in <see cref="EnvironmentVariables"/> are used. Giving you full control of the environment vstest.console is started with.
+    /// This is only rarely useful and can lead to vstest.console not being able to start at all. 
+    /// You most likely want to use <see cref="System.Environment.GetEnvironmentVariables(System.EnvironmentVariableTarget)"/> and combine
+    /// <see cref="System.EnvironmentVariableTarget.Machine"/> and <see cref="System.EnvironmentVariableTarget.User"/> responses.
+    /// </summary>
+    public bool InheritEnvironmentVariables { get; set; } = true;
 
     /// <summary>
     /// Trace level for logs.

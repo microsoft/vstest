@@ -6,8 +6,6 @@ using System.Xml;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests;
 
 [TestClass]

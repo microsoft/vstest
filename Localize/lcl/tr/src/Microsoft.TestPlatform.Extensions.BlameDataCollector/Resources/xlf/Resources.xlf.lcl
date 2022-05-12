@@ -31,12 +31,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";BlameParameterValueIncorrect" ItemType="0" PsrId="308" Leaf="true">
+      <Item ItemId=";BlameParameterValueIncorrect" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.]]></Val>
+          <Val><![CDATA[The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Belirtilen blame parametresi anahtarı {0} yalnızca {1}/{2} değerlerini destekleyebilir. Bu anahtar yoksayılıyor.]]></Val>
+            <Val><![CDATA[{0} blame parametresi anahtarı geçersiz değer içeriyor: {1}. Desteklenen değerler şunlardır: {2}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -112,6 +115,18 @@
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Gerekli ortam değişkeni PROCDUMP_PATH null veya boştu. PROCDUMP_PATH değişkenini uygun yürütülebilir procdump içeren klasörün yoluna ayarlayın.]]></Val>
           </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ProcDumpNotFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[{0} bulunamadı, lütfen yürütülebilir dosyanın PATH üzerinde kullanılabilir olduğundan emin olun veya PROCDUMP_PATH ortam değişkenini {0} yürütülebilir dosyasını içeren bir dizine ayarlayın.]]></Val>
+          </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH, or set PROCDUMP_PATH environment variable to a directory that contains {0} executable.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>

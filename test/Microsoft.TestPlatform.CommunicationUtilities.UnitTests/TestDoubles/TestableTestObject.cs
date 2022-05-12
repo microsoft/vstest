@@ -5,8 +5,6 @@ using System.Runtime.Serialization;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles;
 
 [DataContract]

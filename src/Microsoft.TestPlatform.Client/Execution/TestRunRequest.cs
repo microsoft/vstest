@@ -8,6 +8,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -400,6 +402,22 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                         runCompleteArgs.InvokedDataCollectors,
                         _runRequestTimeTracker.Elapsed);
 
+                // Add extensions discovered by vstest.console.
+                //
+                // TODO(copoiena): Writing telemetry twice is less than ideal.
+                // We first write telemetry data in the _requestData variable in the ParallelRunEventsHandler
+                // and then we write again here. We should refactor this code and write only once.
+                runCompleteArgs.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
+                    runCompleteArgs.DiscoveredExtensions,
+                    TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
+
+                if (_requestData.IsTelemetryOptedIn)
+                {
+                    TestExtensions.AddExtensionTelemetry(
+                        runCompleteArgs.Metrics,
+                        runCompleteArgs.DiscoveredExtensions);
+                }
+
                 // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests)
                 // by either engines - as both calculate at different points
                 // If we use them, it would be an incorrect comparison between TAEF and Rocksteady
@@ -419,7 +437,6 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 
                 // Notify the waiting handle that run is complete
                 _runCompletionEvent.Set();
-
 
                 var executionTotalTimeTaken = DateTime.UtcNow - _executionStartTime;
 
@@ -583,6 +600,25 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 // Fill in the time taken to complete the run
                 var executionTotalTimeTakenForDesignMode = DateTime.UtcNow - _executionStartTime;
                 testRunCompletePayload.TestRunCompleteArgs.Metrics[TelemetryDataConstants.TimeTakenInSecForRun] = executionTotalTimeTakenForDesignMode.TotalSeconds;
+
+                // Add extensions discovered by vstest.console.
+                //
+                // TODO(copoiena):
+                // Doing extension merging here is incorrect because we can end up not merging the
+                // cached extensions for the current process (i.e. vstest.console) and hence have
+                // an incomplete list of discovered extensions. This can happen because this method
+                // is called only if telemetry is opted in (see: HandleRawMessage). We should handle
+                // this merge a level above in order to be consistent, but that means we'd have to
+                // deserialize all raw messages no matter if telemetry is opted in or not and that
+                // would probably mean a performance hit.
+                testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
+                    testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions,
+                    TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
+
+                // Write extensions to telemetry data.
+                TestExtensions.AddExtensionTelemetry(
+                    testRunCompletePayload.TestRunCompleteArgs.Metrics,
+                    testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions);
             }
 
             if (message is VersionedMessage message1)

@@ -5,6 +5,7 @@
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <IsTestProject>false</IsTestProject>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

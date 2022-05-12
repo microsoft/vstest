@@ -13,6 +13,8 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
@@ -45,6 +47,22 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     private readonly IDictionary<string, int> _proxyMap;
     private readonly Stopwatch _testSessionStopwatch;
     private readonly Dictionary<string, TestRuntimeProviderInfo> _sourceToRuntimeProviderInfoMap;
+    private IDictionary<string, string> _testSessionEnvironmentVariables = new Dictionary<string, string>();
+
+    private IDictionary<string, string> TestSessionEnvironmentVariables
+    {
+        get
+        {
+            if (_testSessionEnvironmentVariables.Count == 0)
+            {
+                _testSessionEnvironmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(
+                        _testSessionCriteria.RunSettings)
+                    ?? _testSessionEnvironmentVariables;
+            }
+
+            return _testSessionEnvironmentVariables;
+        }
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyTestSessionManager"/> class.
@@ -232,10 +250,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             // We must ensure the current run settings match the run settings from when the
             // testhost was started. If not, throw an exception to force the caller to create
             // its own proxy instead.
-            //
-            // TODO (copoiena): This run settings match is rudimentary. We should refine the
-            // match criteria in the future.
-            if (!_sourceToRuntimeProviderInfoMap[source].RunSettings.Equals(runSettings))
+            if (!CheckRunSettingsAreCompatible(runSettings))
             {
                 EqtTrace.Verbose($"ProxyTestSessionManager.DequeueProxy: A proxy exists, but the runsettings do not match. Skipping it. Incoming settings: {runSettings}, Settings on proxy: {_testSessionCriteria.RunSettings}");
                 throw new InvalidOperationException(
@@ -387,6 +402,23 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             _proxyContainerList.Clear();
             _proxyMap.Clear();
         }
+    }
+
+    private bool CheckRunSettingsAreCompatible(string requestRunSettings)
+    {
+        // Environment variable sets should be identical, otherwise it's not safe to reuse the
+        // already running testhosts.
+        var requestEnvironmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(requestRunSettings);
+        if (requestEnvironmentVariables != null
+            && TestSessionEnvironmentVariables != null
+            && (requestEnvironmentVariables.Count != TestSessionEnvironmentVariables.Count
+                || requestEnvironmentVariables.Except(TestSessionEnvironmentVariables).Any()))
+        {
+            return false;
+        }
+
+        // Data collection is not supported for test sessions yet.
+        return !XmlRunSettingsUtilities.IsDataCollectionEnabled(requestRunSettings);
     }
 }
 

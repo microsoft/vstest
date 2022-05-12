@@ -62,11 +62,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The active test discovery was aborted. Reason: {0}.
+        ///   Looks up a localized string similar to The active test discovery was aborted..
         /// </summary>
         public static string AbortedTestDiscovery {
             get {
                 return ResourceManager.GetString("AbortedTestDiscovery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The active test discovery was aborted. Reason: {0}.
+        /// </summary>
+        public static string AbortedTestDiscoveryWithReason {
+            get {
+                return ResourceManager.GetString("AbortedTestDiscoveryWithReason", resourceCulture);
             }
         }
         

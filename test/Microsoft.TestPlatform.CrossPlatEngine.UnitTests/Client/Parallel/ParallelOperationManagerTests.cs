@@ -7,20 +7,17 @@
 
 //using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-//#nullable disable
-
-//namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
+namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 //[TestClass]
 //public class ParallelOperationManagerTests
 //{
 //    private MockParallelOperationManager _proxyParallelManager;
 
-//    [TestInitialize]
-//    public void InitializeTests()
-//    {
-//        Func<SampleConcurrentClass> sampleCreator =
-//            () => new SampleConcurrentClass();
+    public ParallelOperationManagerTests()
+    {
+        Func<SampleConcurrentClass> sampleCreator =
+            () => new SampleConcurrentClass();
 
 //        _proxyParallelManager = new MockParallelOperationManager(sampleCreator, 2, true);
 //    }

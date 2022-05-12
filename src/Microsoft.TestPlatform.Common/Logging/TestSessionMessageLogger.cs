@@ -64,7 +64,7 @@ internal class TestSessionMessageLogger : IMessageLogger
     /// <param name="message">The message to be sent.</param>
     public void SendMessage(TestMessageLevel testMessageLevel, string message)
     {
-        if (string.IsNullOrWhiteSpace(message))
+        if (message.IsNullOrWhiteSpace())
         {
             throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(message));
         }

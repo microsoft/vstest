@@ -47,19 +47,15 @@ internal class FilterExpression
     /// </summary>
     private readonly bool _areJoinedByAnd;
 
-    private FilterExpression(FilterExpression left, FilterExpression right, bool areJoinedByAnd)
+    private FilterExpression(FilterExpression left!!, FilterExpression right!!, bool areJoinedByAnd)
     {
-        ValidateArg.NotNull(left, nameof(left));
-        ValidateArg.NotNull(right, nameof(right));
-
         _left = left;
         _right = right;
         _areJoinedByAnd = areJoinedByAnd;
     }
 
-    private FilterExpression(Condition condition)
+    private FilterExpression(Condition condition!!)
     {
-        ValidateArg.NotNull(condition, nameof(condition));
         _condition = condition;
     }
     /// <summary>
@@ -161,10 +157,8 @@ internal class FilterExpression
     /// <summary>
     /// Return FilterExpression after parsing the given filter expression, and a FastFilter when possible.
     /// </summary>
-    internal static FilterExpression Parse(string filterString, out FastFilter fastFilter)
+    internal static FilterExpression Parse(string filterString!!, out FastFilter fastFilter)
     {
-        ValidateArg.NotNull(filterString, nameof(filterString));
-
         // Below parsing doesn't error out on pattern (), so explicitly search for that (empty parenthesis).
         var invalidInput = Regex.Match(filterString, @"\(\s*\)");
         if (invalidInput.Success)
@@ -183,7 +177,7 @@ internal class FilterExpression
         foreach (var inputToken in tokens)
         {
             var token = inputToken.Trim();
-            if (string.IsNullOrEmpty(token))
+            if (token.IsNullOrEmpty())
             {
                 // ignore empty tokens
                 continue;
@@ -276,10 +270,8 @@ internal class FilterExpression
     /// </summary>
     /// <param name="propertyValueProvider"> The property Value Provider.</param>
     /// <returns> True if evaluation is successful. </returns>
-    internal bool Evaluate(Func<string, object> propertyValueProvider)
+    internal bool Evaluate(Func<string, object> propertyValueProvider!!)
     {
-        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
-
         bool filterResult = false;
         if (null != _condition)
         {
@@ -295,9 +287,9 @@ internal class FilterExpression
         return filterResult;
     }
 
-    internal static IEnumerable<string> TokenizeFilterExpressionString(string str)
+    internal static IEnumerable<string> TokenizeFilterExpressionString(string str!!)
     {
-        return str == null ? throw new ArgumentNullException(nameof(str)) : TokenizeFilterExpressionStringHelper(str);
+        return TokenizeFilterExpressionStringHelper(str);
 
         static IEnumerable<string> TokenizeFilterExpressionStringHelper(string s)
         {

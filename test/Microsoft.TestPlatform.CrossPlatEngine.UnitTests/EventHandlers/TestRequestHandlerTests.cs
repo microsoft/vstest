@@ -21,8 +21,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 [TestClass]
@@ -97,7 +95,7 @@ public class TestRequestHandlerTests
         socketClient.Connected += (sender, connectedEventArgs) =>
         {
             Assert.IsFalse(connectedEventArgs.Connected);
-            Assert.AreEqual(typeof(SocketException), connectedEventArgs.Fault.InnerException.GetType());
+            Assert.AreEqual(typeof(SocketException), connectedEventArgs.Fault!.InnerException!.GetType());
         };
         _mockCommunicationEndpointFactory.Setup(f => f.Create(ConnectionRole.Client))
             .Returns(socketClient);

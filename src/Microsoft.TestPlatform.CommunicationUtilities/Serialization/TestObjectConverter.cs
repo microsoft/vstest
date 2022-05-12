@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -82,5 +83,109 @@ public class TestObjectConverter : JsonConverter
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         // Create an array of <Property, Value> dictionary
+    }
+}
+
+/// TODO: This is not used now, but I was experimenting with this quite a bit for performance, leaving it here in case I was wrong
+/// and the serializer settings actually have signigicant impact on the speed.
+/// <summary>
+/// JSON converter for the <see cref="TestObject"/> and derived entities.
+/// </summary>
+internal class TestObjectConverter7 : JsonConverter
+{
+    // Empty is not present everywhere
+#pragma warning disable CA1825 // Avoid zero-length array allocations
+    private static readonly object[] EmptyObjectArray = new object[0];
+#pragma warning restore CA1825 // Avoid zero-length array allocations
+
+    public TestObjectConverter7()
+    {
+#if !NETSTANDARD1_3
+        TestPropertyCtor = typeof(TestProperty).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[0], null);
+#endif
+    }
+
+    /// <inheritdoc/>
+    public override bool CanRead => true;
+
+    /// <inheritdoc/>
+    public override bool CanWrite => false;
+
+    public ConstructorInfo TestPropertyCtor { get; }
+
+    /// <inheritdoc/>
+    public override bool CanConvert(Type objectType)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc/>
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    {
+        if (objectType != typeof(List<KeyValuePair<TestProperty, object>>))
+        {
+            // Support only deserialization of KeyValuePair list
+            throw new ArgumentException("the objectType was not a KeyValuePair list", nameof(objectType));
+        }
+
+        if (reader.TokenType == JsonToken.StartArray)
+        {
+            var deserializedProperties = serializer.Deserialize<List<KeyValuePair<TestPropertyTemplate, JToken>>>(reader);
+            // Initialize the list capacity to be the number of properties we might add.
+            var propertyList = new List<KeyValuePair<TestProperty, object>>(deserializedProperties.Count);
+
+            // Every class that inherits from TestObject uses a properties store for <Property, Object>
+            // key value pairs.
+            foreach (var property in deserializedProperties)
+            {
+                var testProperty = (TestProperty)TestPropertyCtor.Invoke(EmptyObjectArray);
+                testProperty.Id = property.Key.Id;
+                testProperty.Label = property.Key.Label;
+                testProperty.Category = property.Key.Category;
+                testProperty.Description = property.Key.Description;
+                testProperty.Attributes = (TestPropertyAttributes)property.Key.Attributes;
+                testProperty.ValueType = property.Key.ValueType;
+
+
+                object propertyData = null;
+                JToken token = property.Value;
+                if (token.Type != JTokenType.Null)
+                {
+                    // If the property is already a string. No need to convert again.
+                    if (token.Type == JTokenType.String)
+                    {
+                        propertyData = token.ToObject(typeof(string), serializer);
+                    }
+                    else
+                    {
+                        // On deserialization, the value for each TestProperty is always a string. It is up
+                        // to the consumer to deserialize it further as appropriate.
+                        propertyData = token.ToString(Formatting.None).Trim('"');
+                    }
+                }
+
+                propertyList.Add(new KeyValuePair<TestProperty, object>(testProperty, propertyData));
+            }
+
+            return propertyList;
+        }
+
+        return new List<KeyValuePair<TestProperty, object>>();
+    }
+
+    /// <inheritdoc/>
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    {
+        // Create an array of <Property, Value> dictionary
+    }
+
+    private class TestPropertyTemplate
+    {
+        public string Id { get; set; }
+        public string Label { get; set; }
+        public string Category { get; set; }
+        public string Description { get; set; }
+        public int Attributes { get; set; }
+        public string ValueType { get; set; }
     }
 }

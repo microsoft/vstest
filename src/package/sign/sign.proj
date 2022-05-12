@@ -64,8 +64,9 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.VSTestIntegration.dll" />
       <NativeBinariesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.ComInterfaces.dll" />
       <NativeBinariesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\DumpMinitool.exe" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\DumpMinitool.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\dump\DumpMinitool.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\dump\DumpMinitool.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\dump\DumpMinitool.arm64.exe" />
   
       <!-- QualityTools dlls -->
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.TMI.dll" />
@@ -150,6 +151,10 @@
       <NativeBinariesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.arm64.dll" />
       <NativeBinariesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Arm.Resources.dll" />
       <NativeBinariesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll" />
+      <NativeBinariesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Arm.Resources.dll" />
+      <NativeBinariesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.arm64.dll" />
+      <NativeBinariesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Arm.Resources.dll" />
+      <NativeBinariesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\testhost.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\win10-arm64\Microsoft.TestPlatform.PlatformAbstractions.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\win10-arm64\testhost.arm64.dll" />
@@ -258,8 +263,9 @@
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\Microsoft.TestPlatform.Extensions.EventLogCollector.dll" />
-      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\DumpMinitool.exe" />
-      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\DumpMinitool.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\dump\DumpMinitool.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\dump\DumpMinitool.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\dump\DumpMinitool.arm64.exe" />
 
       <!-- Localized resources -->
       <Core10AssembliesToSign Include="$(ArtifactsCore10Directory)%(ResxLang.Identity)\*.*" />

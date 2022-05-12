@@ -42,6 +42,10 @@ indent_size = 2
 [*.{yml,yaml}]
 indent_size = 2
 
+# Translation files
+[*.xlf]
+indent_size = 2
+
 # C# files
 [*.cs]
 
@@ -264,8 +268,8 @@ csharp_style_prefer_parameter_null_checking = true # not default, increased seve
 
 #### .NET Formatting Rules ####
 
-# IDE0055: Fix formatting
-dotnet_diagnostic.IDE0055.severity = suggestion # Downgraded to suggestion due to https://github.com/dotnet/roslyn/issues/59414
+# IDE0055: Fix formatting - Set the severity of all .NET and C# formatting rules (https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/formatting-rules)
+dotnet_diagnostic.IDE0055.severity = warning # ensure all formatting rules are enforced on build
 
 #### C# Formatting Rules ####
 

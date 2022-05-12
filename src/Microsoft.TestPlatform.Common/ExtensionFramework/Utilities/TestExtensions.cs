@@ -7,10 +7,11 @@ using System.Linq;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
-
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
+using SimpleJSON;
 
 #nullable disable
 
@@ -90,6 +91,81 @@ public class TestExtensions
     /// Gets or sets a value indicating whether are test hosts cached.
     /// </summary>
     internal bool AreDataCollectorsCached { get; set; }
+
+    /// <summary>
+    /// Merge two extension dictionaries.
+    /// </summary>
+    /// 
+    /// <param name="first">First extension dictionary.</param>
+    /// <param name="second">Second extension dictionary.</param>
+    /// 
+    /// <returns>
+    /// A dictionary representing the merger between the two input dictionaries.
+    /// </returns>
+    internal static Dictionary<string, HashSet<string>> CreateMergedDictionary(
+        Dictionary<string, HashSet<string>> first,
+        Dictionary<string, HashSet<string>> second)
+    {
+        var isFirstNullOrEmpty = first == null || first.Count == 0;
+        var isSecondNullOrEmpty = second == null || second.Count == 0;
+
+        // Sanity checks.
+        if (isFirstNullOrEmpty && isSecondNullOrEmpty)
+        {
+            return new Dictionary<string, HashSet<string>>();
+        }
+        if (isFirstNullOrEmpty)
+        {
+            return new Dictionary<string, HashSet<string>>(second);
+        }
+        if (isSecondNullOrEmpty)
+        {
+            return new Dictionary<string, HashSet<string>>(first);
+        }
+
+        // Copy all the keys in the first dictionary into the resulting dictionary.
+        var result = first.Where(kvp => (kvp.Value != null && kvp.Value.Count > 0))
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        foreach (var kvp in second)
+        {
+            // If the "source" set is empty there's no reason to continue merging for this key.
+            if (kvp.Value == null || kvp.Value.Count == 0)
+            {
+                continue;
+            }
+
+            // If there's no key-value pair entry in the "destination" dictionary for the current
+            // key in the "source" dictionary, we copy the "source" set wholesale.
+            if (!result.ContainsKey(kvp.Key))
+            {
+                result.Add(kvp.Key, kvp.Value);
+                continue;
+            }
+
+            // Getting here means there's already an entry for the "source" key in the "destination"
+            // dictionary which means we need to copy individual set elements from the "source" set
+            // to the "destination" set.
+            result[kvp.Key] = MergeSets(result[kvp.Key], kvp.Value);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Add extension-related telemetry.
+    /// </summary>
+    /// 
+    /// <param name="metrics">A collection representing the telemetry data.</param>
+    /// <param name="extensions">The input extension collection.</param>
+    internal static void AddExtensionTelemetry(
+        IDictionary<string, object> metrics,
+        Dictionary<string, HashSet<string>> extensions)
+    {
+        metrics.Add(
+            TelemetryDataConstants.DiscoveredExtensions,
+            SerializeExtensionDictionary(extensions));
+    }
 
     /// <summary>
     /// Adds the extensions specified to the current set of extensions.
@@ -308,6 +384,27 @@ public class TestExtensions
     }
 
     /// <summary>
+    /// Gets the cached extensions for the current process.
+    /// </summary>
+    /// 
+    /// <returns>A dictionary representing the cached extensions for the current process.</returns>
+    internal Dictionary<string, HashSet<string>> GetCachedExtensions()
+    {
+        var extensions = new Dictionary<string, HashSet<string>>();
+
+        // Write all "known" cached extension.
+        AddCachedExtensionToDictionary(extensions, "TestDiscoverers", TestDiscoverers?.Values);
+        AddCachedExtensionToDictionary(extensions, "TestExecutors", TestExecutors?.Values);
+        AddCachedExtensionToDictionary(extensions, "TestExecutors2", TestExecutors2?.Values);
+        AddCachedExtensionToDictionary(extensions, "TestSettingsProviders", TestSettingsProviders?.Values);
+        AddCachedExtensionToDictionary(extensions, "TestLoggers", TestLoggers?.Values);
+        AddCachedExtensionToDictionary(extensions, "TestHosts", TestHosts?.Values);
+        AddCachedExtensionToDictionary(extensions, "DataCollectors", DataCollectors?.Values);
+
+        return extensions;
+    }
+
+    /// <summary>
     /// The invalidate cache of plugin infos.
     /// </summary>
     internal void InvalidateCache()
@@ -390,4 +487,50 @@ public class TestExtensions
         }
     }
 
+    private void AddCachedExtensionToDictionary<T>(
+        Dictionary<string, HashSet<string>> extensionDict,
+        string extensionType,
+        IEnumerable<T> extensions)
+        where T : TestPluginInformation
+    {
+        if (extensions == null)
+        {
+            return;
+        }
+
+        extensionDict.Add(extensionType, new HashSet<string>(extensions.Select(e => e.IdentifierData)));
+    }
+
+    private static string SerializeExtensionDictionary(IDictionary<string, HashSet<string>> extensions)
+    {
+        var jsonObject = new JSONObject();
+        foreach (var kvp in extensions)
+        {
+            if (kvp.Value?.Count > 0)
+            {
+                var jsonArray = new JSONArray();
+                foreach (var extension in kvp.Value)
+                {
+                    jsonArray.Add(new JSONString(extension));
+                }
+
+                jsonObject.Add(kvp.Key, jsonArray);
+            }
+        }
+
+        return jsonObject.ToString();
+    }
+
+    private static HashSet<string> MergeSets(HashSet<string> firstSet, HashSet<string> secondSet)
+    {
+        var mergedSet = new HashSet<string>(firstSet);
+
+        // No need to worry about duplicates as the set implementation handles this already.
+        foreach (var key in secondSet)
+        {
+            mergedSet.Add(key);
+        }
+
+        return mergedSet;
+    }
 }

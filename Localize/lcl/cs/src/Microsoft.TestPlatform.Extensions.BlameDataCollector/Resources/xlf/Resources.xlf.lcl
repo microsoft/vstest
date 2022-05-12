@@ -31,12 +31,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";BlameParameterValueIncorrect" ItemType="0" PsrId="308" Leaf="true">
+      <Item ItemId=";BlameParameterValueIncorrect" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.]]></Val>
+          <Val><![CDATA[The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Klíč parametru blame {0} dokáže podporovat jen hodnoty {1}/{2}. Tento klíč se bude ignorovat.]]></Val>
+            <Val><![CDATA[Klíč parametru blame {0} má nesprávnou hodnotu: {1}. Podporované hodnoty jsou: {2}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -112,6 +115,18 @@
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Vyžadovaná proměnná prostředí PROCDUMP_PATH má hodnotu Null nebo je prázdná. Nastavte pro ni cestu ke složce obsahující příslušný spustitelný soubor ProcDump.]]></Val>
           </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ProcDumpNotFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[{0} nelze najít. Zkontrolujte, zda je spustitelný soubor k dispozici v cestě PATH, případně nastavte proměnnou prostředí PROCDUMP_PATH na adresář, který obsahuje spustitelný soubor {0}.]]></Val>
+          </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH, or set PROCDUMP_PATH environment variable to a directory that contains {0} executable.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>

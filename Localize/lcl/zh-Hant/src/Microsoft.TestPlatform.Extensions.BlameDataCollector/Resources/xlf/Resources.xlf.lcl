@@ -31,12 +31,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";BlameParameterValueIncorrect" ItemType="0" PsrId="308" Leaf="true">
+      <Item ItemId=";BlameParameterValueIncorrect" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.]]></Val>
+          <Val><![CDATA[The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[blame 參數索引鍵 {0} 僅支援值 {1}/{2}。即將忽略此索引鍵。]]></Val>
+            <Val><![CDATA[blame 參數金鑰 {0} 的值不正確: {1}。支援的值為: {2}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -112,6 +115,18 @@
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[必要的環境變數 PROCDUMP_PATH 為 null 或是空的。請將 PROCDUMP_PATH 設定為包含適當之 procdump 可執行檔之資料夾的路徑。]]></Val>
           </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ProcDumpNotFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[找不到{0}，請確定可執行檔可在 PATH 上使用。或將 PROCDUMP_PATH 環境變數設定為包含 {0} 可執行檔的目錄。]]></Val>
+          </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH, or set PROCDUMP_PATH environment variable to a directory that contains {0} executable.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>

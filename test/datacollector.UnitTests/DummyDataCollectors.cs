@@ -6,17 +6,15 @@ using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollectorUnitTests;
 
 [DataCollectorFriendlyName("CustomDataCollector")]
 [DataCollectorTypeUri("my://custom/datacollector")]
 public class CustomDataCollector : ObjectModel.DataCollection.DataCollector, ITestExecutionEnvironmentSpecifier
 {
-    public DataCollectionEnvironmentContext DataCollectionEnvironmentContext { get; set; }
+    public DataCollectionEnvironmentContext? DataCollectionEnvironmentContext { get; set; }
 
-    public DataCollectionSink DataSink { get; set; }
+    public DataCollectionSink? DataSink { get; set; }
 
     public override void Initialize(
         XmlElement configurationElement,
@@ -27,7 +25,7 @@ public class CustomDataCollector : ObjectModel.DataCollection.DataCollector, ITe
     {
     }
 
-    public IEnumerable<KeyValuePair<string, string>> GetTestExecutionEnvironmentVariables()
+    public IEnumerable<KeyValuePair<string, string>>? GetTestExecutionEnvironmentVariables()
     {
         return default;
     }

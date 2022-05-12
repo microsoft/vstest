@@ -7,11 +7,9 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
 
-public class TestableTestRunCache : ITestRunCache
+public sealed class TestableTestRunCache : ITestRunCache
 {
     public TestableTestRunCache()
     {
@@ -27,13 +25,13 @@ public class TestableTestRunCache : ITestRunCache
 
     public List<TestResult> TestResultList { get; private set; }
 
-    public ICollection<TestCase> InProgressTests { get; set; }
+    public ICollection<TestCase>? InProgressTests { get; set; }
 
 
     // Use the TestResultList instead to fill in data. This is just to avoid confusion.
-    public ICollection<TestResult> TestResults { get; set; }
+    public ICollection<TestResult>? TestResults { get; set; }
 
-    public TestRunStatistics TestRunStatistics { get; set; }
+    public TestRunStatistics? TestRunStatistics { get; set; }
 
     public long TotalExecutedTests { get; set; }
 

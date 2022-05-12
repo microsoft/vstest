@@ -226,7 +226,7 @@ internal class TestPlatform : ITestPlatform
     private void AddLoggerAssembliesFromSource(IEnumerable<string> sources, TestAdapterLoadingStrategy strategy)
     {
         // Skip discovery unless we're using the default behavior, or NextToSource is specified.
-        if (strategy != TestAdapterLoadingStrategy.Default && strategy.HasFlag(TestAdapterLoadingStrategy.NextToSource))
+        if (strategy != TestAdapterLoadingStrategy.Default && !strategy.HasFlag(TestAdapterLoadingStrategy.NextToSource))
         {
             return;
         }
@@ -332,7 +332,7 @@ internal class TestPlatform : ITestPlatform
 
     private static IEnumerable<string> ExpandAdaptersWithExplicitStrategy(string path, IFileHelper fileHelper, TestAdapterLoadingStrategy strategy)
     {
-        if (strategy.HasFlag(TestAdapterLoadingStrategy.Explicit))
+        if (!strategy.HasFlag(TestAdapterLoadingStrategy.Explicit))
         {
             return Enumerable.Empty<string>();
         }

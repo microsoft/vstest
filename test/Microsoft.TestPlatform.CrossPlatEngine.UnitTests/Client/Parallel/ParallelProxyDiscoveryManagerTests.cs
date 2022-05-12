@@ -20,8 +20,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
@@ -39,6 +37,7 @@ public class ParallelProxyDiscoveryManagerTests
     private readonly List<string> _processedSources;
     private readonly ManualResetEventSlim _discoveryCompleted;
     private readonly Mock<IRequestData> _mockRequestData;
+    private readonly DiscoveryDataAggregator _dataAggregator;
 
     public ParallelProxyDiscoveryManagerTests()
     {
@@ -82,6 +81,8 @@ public class ParallelProxyDiscoveryManagerTests
         _discoveryCompleted = new ManualResetEventSlim(false);
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+        _mockRequestData.Setup(rd => rd.ProtocolConfig).Returns(new ProtocolConfig());
+        _dataAggregator = new();
     }
 
     [TestMethod]
@@ -285,6 +286,21 @@ public class ParallelProxyDiscoveryManagerTests
         Assert.AreEqual(2, _createMockManagerCalled);
     }
 
+    [TestMethod]
+    public void DiscoveryTestsWithCompletionMarksAllSourcesAsFullyDiscovered()
+    {
+        _testDiscoveryCriteria.TestCaseFilter = "Name~Test";
+        var parallelDiscoveryManager = SetupDiscoveryManager(_proxyManagerFunc, 2, false);
+
+        Task.Run(() => parallelDiscoveryManager.DiscoverTests(_testDiscoveryCriteria, _mockHandler.Object));
+
+        Assert.IsTrue(_discoveryCompleted.Wait(TaskTimeout), "Test discovery not completed.");
+        Assert.AreEqual(_sources.Count, _processedSources.Count, "All Sources must be processed.");
+        CollectionAssert.AreEquivalent(_sources, _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        Assert.AreEqual(0, _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
+        Assert.AreEqual(0, _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
+    }
+
     private IParallelProxyDiscoveryManager SetupDiscoveryManager(Func<TestRuntimeProviderInfo, IProxyDiscoveryManager> getProxyManager, int parallelLevel, bool abortDiscovery, int totalTests = 20)
     {
         var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(_mockRequestData.Object, getProxyManager, parallelLevel, _runtimeProviders);
@@ -314,6 +330,8 @@ public class ParallelProxyDiscoveryManagerTests
                         {
                             processedSources.AddRange(criteria.Sources);
                         }
+
+                        _dataAggregator.MarkSourcesWithStatus(criteria.Sources, DiscoveryStatus.FullyDiscovered);
 
                         Task.Delay(100).Wait();
 

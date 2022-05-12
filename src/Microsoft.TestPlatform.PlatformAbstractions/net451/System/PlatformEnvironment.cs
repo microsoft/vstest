@@ -7,7 +7,6 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 #nullable disable

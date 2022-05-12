@@ -423,7 +423,7 @@ function publish_package()
         externals=( \
             # "microsoft.internal.dia/$TPB_EXTERNALS_VERSION/tools/net451"         \ # no linux support (cp to $testhost)
             # "microsoft.internal.dia.interop/$TPB_EXTERNALS_VERSION/tools/net451" \ # no linux support (cp to $testhost)
-            "microsoft.visualstudio.coverage.io/$TPB_CC_EXTERNALS_VERSION/lib/netstandard2.0/"
+            "microsoft.codecoverage.io/$TPB_CC_EXTERNALS_VERSION/lib/netstandard2.0/"
         )
 
         for i in ${externals[@]}; do

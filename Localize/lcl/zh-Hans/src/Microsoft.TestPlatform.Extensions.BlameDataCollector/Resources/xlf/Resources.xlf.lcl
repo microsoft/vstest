@@ -31,12 +31,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";BlameParameterValueIncorrect" ItemType="0" PsrId="308" Leaf="true">
+      <Item ItemId=";BlameParameterValueIncorrect" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.]]></Val>
+          <Val><![CDATA[The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[追责参数键 {0} 只支持值 {1}/{2}。忽略此键。]]></Val>
+            <Val><![CDATA[追责参数键 {0} 值不正确: {1}。支持的值为: {2}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -115,6 +118,18 @@
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[所需环境变量 PROCDUMP_PATH 为空。请将 PROCDUMP_PATH 设为包含适当的可执行进程转储的文件夹路径。]]></Val>
           </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ProcDumpNotFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[找不到 {0}，请确保可执行文件在路径上可用，或者将 PROCDUMP_PATH 环境变量设置为包含 {0} 可执行文件的目录。]]></Val>
+          </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH, or set PROCDUMP_PATH environment variable to a directory that contains {0} executable.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>

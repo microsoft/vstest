@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Execution;
 
 [TestClass]
@@ -368,7 +366,7 @@ public class TestRunCacheBehaviors
 
     #region Helpers
 
-    private Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult GetTestResult(int index)
+    private static Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult GetTestResult(int index)
     {
         var tc = new TestCase("Test" + index, new Uri("executor://dummy"), "DummySourceFileName");
         var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(tc);

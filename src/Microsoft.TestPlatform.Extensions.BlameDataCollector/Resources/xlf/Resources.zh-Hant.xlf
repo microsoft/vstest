@@ -29,9 +29,9 @@ This test may, or may not be the source of the crash.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
-        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
-        <target state="translated">blame 參數索引鍵 {0} 僅支援值 {1}/{2}。即將忽略此索引鍵。</target>
-        <note></note>
+        <source>The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}</source>
+        <target state="translated">blame 參數金鑰 {0} 的值不正確: {1}。支援的值為: {2}</target>
+        <note>{0} and {1} are single values referring to parameters such as BlameHang and Full. {2} is comma separated list of valid values, e.g. Full, Mini, None.</note>
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">
         <source>Could not start process dump: {0}</source>
@@ -77,6 +77,11 @@ This test may, or may not be the source of the crash.</source>
         <source>seconds</source>
         <target state="translated">秒</target>
         <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpNotFound">
+        <source>{0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable</source>
+        <target state="translated">找不到{0}，請確定可執行檔可在 PATH 上使用。或將 PROCDUMP_PATH 環境變數設定為包含 {0} 可執行檔的目錄。</target>
+        <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
       </trans-unit>
     </body>
   </file>

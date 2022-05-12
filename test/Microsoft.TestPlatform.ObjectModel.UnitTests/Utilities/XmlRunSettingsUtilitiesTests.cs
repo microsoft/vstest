@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities;
 
 [TestClass]
@@ -292,7 +290,7 @@ public class XmlRunSettingsUtilitiesTests
     [TestMethod]
     public void CreateDefaultRunSettingsShouldReturnABasicRunSettings()
     {
-        var defaultRunSettings = XmlRunSettingsUtilities.CreateDefaultRunSettings().CreateNavigator().OuterXml;
+        var defaultRunSettings = XmlRunSettingsUtilities.CreateDefaultRunSettings().CreateNavigator()!.OuterXml;
         var expectedRunSettings = string.Join(Environment.NewLine,
             "<RunSettings>",
             "  <DataCollectionRunSettings>",
@@ -1195,7 +1193,7 @@ public class XmlRunSettingsUtilitiesTests
         CollectionAssert.AreEqual(friendlyNameList, new List<string> { "DummyDataCollector1", "DummyDataCollector2" });
     }
 
-    private string ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(string settings)
+    private static string ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(string settings)
     {
         return
             settings.Replace("DataCollectionRunSettings", "InProcDataCollectionRunSettings")

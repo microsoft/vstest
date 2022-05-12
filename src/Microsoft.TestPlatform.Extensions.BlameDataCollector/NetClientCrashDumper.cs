@@ -21,7 +21,7 @@ internal class NetClientCrashDumper : ICrashDumper
         _fileHelper = fileHelper;
     }
 
-    public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType, bool collectAlways)
+    public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType, bool collectAlways, Action<string> logWarning)
     {
         // we don't need to do anything directly here, we setup the env variables
         // in the dumper configuration, including the path

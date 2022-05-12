@@ -16,27 +16,20 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ParallelDiscoveryEventsHandlerTests
 {
-    private ParallelDiscoveryEventsHandler _parallelDiscoveryEventsHandler;
+    private readonly ParallelDiscoveryEventsHandler _parallelDiscoveryEventsHandler;
+    private readonly Mock<IProxyDiscoveryManager> _mockProxyDiscoveryManager;
+    private readonly Mock<ITestDiscoveryEventsHandler2> _mockTestDiscoveryEventsHandler;
+    private readonly Mock<IParallelProxyDiscoveryManager> _mockParallelProxyDiscoveryManager;
+    private readonly Mock<IDataSerializer> _mockDataSerializer;
+    private readonly Mock<IRequestData> _mockRequestData;
+    private readonly int _protocolVersion = 1;
 
-    private Mock<IProxyDiscoveryManager> _mockProxyDiscoveryManager;
-
-    private Mock<ITestDiscoveryEventsHandler2> _mockTestDiscoveryEventsHandler;
-
-    private Mock<IParallelProxyDiscoveryManager> _mockParallelProxyDiscoveryManager;
-
-    private Mock<IDataSerializer> _mockDataSerializer;
-
-    private Mock<IRequestData> _mockRequestData;
-
-    [TestInitialize]
-    public void TestInit()
+    public ParallelDiscoveryEventsHandlerTests()
     {
         _mockProxyDiscoveryManager = new Mock<IProxyDiscoveryManager>();
         _mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
@@ -44,10 +37,11 @@ public class ParallelDiscoveryEventsHandlerTests
         _mockDataSerializer = new Mock<IDataSerializer>();
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+        _mockRequestData.Setup(rd => rd.ProtocolConfig).Returns(new ProtocolConfig { Version = _protocolVersion });
 
         _parallelDiscoveryEventsHandler = new ParallelDiscoveryEventsHandler(_mockRequestData.Object, _mockProxyDiscoveryManager.Object,
             _mockTestDiscoveryEventsHandler.Object, _mockParallelProxyDiscoveryManager.Object,
-            new ParallelDiscoveryDataAggregator(), _mockDataSerializer.Object);
+            new DiscoveryDataAggregator(), _mockDataSerializer.Object);
     }
 
     [TestMethod]
@@ -79,7 +73,7 @@ public class ParallelDiscoveryEventsHandlerTests
         bool aborted = false;
         var lastChunk = new List<TestCase>();
 
-        _mockDataSerializer.Setup(mds => mds.SerializePayload(MessageType.TestCasesFound, lastChunk))
+        _mockDataSerializer.Setup(mds => mds.SerializePayload(MessageType.TestCasesFound, lastChunk, _protocolVersion))
             .Returns(payload);
 
         _mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
@@ -163,7 +157,7 @@ public class ParallelDiscoveryEventsHandlerTests
         _mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.DiscoveryComplete)).Returns(payload);
 
         // Act
-        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted, It.IsAny<List<string>>(), It.IsAny<List<string>>(), It.IsAny<List<string>>());
+        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
         _parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
 
         // Verify

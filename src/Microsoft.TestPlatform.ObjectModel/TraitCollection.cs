@@ -42,31 +42,23 @@ public class TraitCollection : IEnumerable<Trait>
 #endif
     private readonly TestObject _testObject;
 
-    internal TraitCollection(TestObject testObject)
+    internal TraitCollection(TestObject testObject!!)
     {
-        ValidateArg.NotNull(testObject, nameof(testObject));
-
         _testObject = testObject;
     }
 
-    public void Add(Trait trait)
+    public void Add(Trait trait!!)
     {
-        ValidateArg.NotNull(trait, nameof(trait));
-
         AddRange(new[] { trait });
     }
 
-    public void Add(string name, string value)
+    public void Add(string name!!, string value)
     {
-        ValidateArg.NotNull(name, nameof(name));
-
         Add(new Trait(name, value));
     }
 
-    public void AddRange(IEnumerable<Trait> traits)
+    public void AddRange(IEnumerable<Trait> traits!!)
     {
-        ValidateArg.NotNull(traits, nameof(traits));
-
         var existingTraits = GetTraits();
         Add(existingTraits, traits);
     }

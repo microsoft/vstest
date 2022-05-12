@@ -117,7 +117,8 @@ public class TestPluginCache
     /// <returns>
     /// The <see cref="Dictionary"/>. of test plugin info.
     /// </returns>
-    public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(string endsWithPattern)
+    public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(
+        string endsWithPattern)
         where TPluginInfo : TestPluginInformation
     {
         EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: finding test extensions in assemblies ends with: {0} TPluginInfo: {1} TExtension: {2}", endsWithPattern, typeof(TPluginInfo), typeof(TExtension));
@@ -309,35 +310,37 @@ public class TestPluginCache
     /// <returns>
     /// The <see cref="Dictionary"/>.
     /// </returns>
-    internal Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(string extensionAssembly, bool skipCache = false) where TPluginInfo : TestPluginInformation
+    internal Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(
+        string extensionAssembly,
+        bool skipCache = false)
+        where TPluginInfo : TestPluginInformation
     {
         if (skipCache)
         {
             return GetTestExtensions<TPluginInfo, TExtension>(new List<string>() { extensionAssembly });
         }
-        else
+
+        // Check if extensions from this assembly have already been discovered.
+        var extensions = TestExtensions?.GetExtensionsDiscoveredFromAssembly(
+            TestExtensions.GetTestExtensionCache<TPluginInfo>(),
+            extensionAssembly);
+
+        if (extensions?.Count > 0)
         {
-            // Check if extensions from this assembly have already been discovered.
-            var extensions = TestExtensions?.GetExtensionsDiscoveredFromAssembly(
-                TestExtensions.GetTestExtensionCache<TPluginInfo>(),
-                extensionAssembly);
-
-            if (extensions != null && extensions.Count > 0)
-            {
-                return extensions;
-            }
-
-            var pluginInfos = GetTestExtensions<TPluginInfo, TExtension>(new List<string>() { extensionAssembly });
-
-            // Add extensions discovered to the cache.
-            if (TestExtensions == null)
-            {
-                TestExtensions = new TestExtensions();
-            }
-
-            TestExtensions.AddExtension(pluginInfos);
-            return pluginInfos;
+            return extensions;
         }
+
+        var pluginInfos = GetTestExtensions<TPluginInfo, TExtension>(new List<string>() { extensionAssembly });
+
+        // Add extensions discovered to the cache.
+        if (TestExtensions == null)
+        {
+            TestExtensions = new TestExtensions();
+        }
+
+        TestExtensions.AddExtension(pluginInfos);
+
+        return pluginInfos;
     }
 
     /// <summary>
@@ -407,7 +410,7 @@ public class TestPluginCache
     /// </returns>
     protected virtual IEnumerable<string> GetFilteredExtensions(List<string> extensions, string endsWithPattern)
     {
-        return string.IsNullOrEmpty(endsWithPattern)
+        return endsWithPattern.IsNullOrEmpty()
             ? extensions
             : extensions.Where(ext => ext.EndsWith(endsWithPattern, StringComparison.OrdinalIgnoreCase));
     }
@@ -466,7 +469,7 @@ public class TestPluginCache
 
     protected void SetupAssemblyResolver(string extensionAssembly)
     {
-        IList<string> resolutionPaths = string.IsNullOrEmpty(extensionAssembly) ? GetDefaultResolutionPaths() : GetResolutionPaths(extensionAssembly);
+        IList<string> resolutionPaths = extensionAssembly.IsNullOrEmpty() ? GetDefaultResolutionPaths() : GetResolutionPaths(extensionAssembly);
 
         // Add assembly resolver which can resolve the extensions from the specified directory.
         if (_assemblyResolver == null)

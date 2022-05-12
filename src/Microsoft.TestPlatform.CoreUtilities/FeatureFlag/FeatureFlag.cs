@@ -45,6 +45,9 @@ internal partial class FeatureFlag : IFeatureFlag
     // Added in 17.2-preview 7.0-preview
     public const string DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX = VSTEST_ + nameof(DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX);
 
+    // Faster JSON serialization relies on less internals of NewtonsoftJson, and on some additional caching.
+    public const string DISABLE_FASTER_JSON_SERIALIZATION = VSTEST_ + nameof(DISABLE_FASTER_JSON_SERIALIZATION);
+
     // TODO: Invert this to disable.
     public const string MULTI_TFM_RUN = VSTEST_ + nameof(MULTI_TFM_RUN);
 

@@ -26,12 +26,9 @@ internal class TestDiscoveryExtensionManager
     /// </summary>
     /// <remarks>The factory should be used for getting instances of this type so the constructor is not public.</remarks>
     protected TestDiscoveryExtensionManager(
-        IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> discoverers,
-        IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredDiscoverers)
+        IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> discoverers!!,
+        IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredDiscoverers!!)
     {
-        ValidateArg.NotNull(discoverers, nameof(discoverers));
-        ValidateArg.NotNull(unfilteredDiscoverers, nameof(unfilteredDiscoverers));
-
         Discoverers = discoverers;
         UnfilteredDiscoverers = unfilteredDiscoverers;
     }
@@ -153,7 +150,7 @@ internal class TestDiscovererMetadata : ITestDiscovererCapabilities
             FileExtension = new List<string>(fileExtensions);
         }
 
-        if (!string.IsNullOrWhiteSpace(defaultExecutorUri))
+        if (!defaultExecutorUri.IsNullOrWhiteSpace())
         {
             DefaultExecutorUri = new Uri(defaultExecutorUri);
         }

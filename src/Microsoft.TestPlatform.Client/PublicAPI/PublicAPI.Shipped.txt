@@ -85,3 +85,4 @@ static Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeTestHostL
 static Microsoft.VisualStudio.TestPlatform.Client.TestPlatformFactory.GetTestPlatform() -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform
 virtual Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeClient.Dispose(bool disposing) -> void
 virtual Microsoft.VisualStudio.TestPlatform.Client.Execution.TestRunRequest.HandleTestRunStatsChange(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunChangedEventArgs testRunChangedArgs) -> void
+Microsoft.VisualStudio.TestPlatform.Client.RequestHelper.ITestRequestManager.StopTestSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StopTestSessionPayload payload, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler eventsHandler, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ProtocolConfig protocolConfig) -> void

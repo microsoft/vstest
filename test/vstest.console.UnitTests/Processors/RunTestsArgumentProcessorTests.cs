@@ -33,8 +33,6 @@ using Moq;
 using vstest.console.Internal;
 using vstest.console.UnitTests.Processors;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 /// <summary>
@@ -317,16 +315,16 @@ public class RunTestsArgumentProcessorTests
             events.TestResult += Events_TestResult;
         }
 
-        private void Events_TestResult(object sender, TestResultEventArgs e)
+        private void Events_TestResult(object? sender, TestResultEventArgs e)
         {
         }
 
-        private void Events_TestRunComplete(object sender, TestRunCompleteEventArgs e)
+        private void Events_TestRunComplete(object? sender, TestRunCompleteEventArgs e)
         {
 
         }
 
-        private void TestMessageHandler(object sender, TestRunMessageEventArgs e)
+        private void TestMessageHandler(object? sender, TestRunMessageEventArgs e)
         {
         }
     }

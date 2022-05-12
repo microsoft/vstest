@@ -435,10 +435,8 @@ public class InferRunSettingsHelper
         AddNodeIfNotPresent(runSettingsDocument, TargetPlatformNodePath, TargetPlatformNodeName, platform, overwrite);
     }
 
-    public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out string deviceXml)
+    public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator!!, out string deviceXml)
     {
-        ValidateArg.NotNull(runSettingsNavigator, nameof(runSettingsNavigator));
-
         deviceXml = null;
         XPathNavigator targetDeviceNode = runSettingsNavigator.SelectSingleNode(MsTestTargetDeviceNodePath);
         if (targetDeviceNode != null)

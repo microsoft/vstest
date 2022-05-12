@@ -15,17 +15,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
 public class TestAdapterLoadingStrategyArgumentProcessorTests
 {
-    private RunSettings _currentActiveSetting;
+    private readonly RunSettings _currentActiveSetting;
 
-    [TestInitialize]
-    public void TestInit()
+    public TestAdapterLoadingStrategyArgumentProcessorTests()
     {
         _currentActiveSetting = RunSettingsManager.Instance.ActiveRunSettings;
     }

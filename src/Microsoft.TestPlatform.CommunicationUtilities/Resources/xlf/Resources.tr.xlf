@@ -13,9 +13,14 @@
         <target state="translated">Mevcut bir bağlantı uzak konak tarafından zorla kapatıldı.</target>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
+        <source>The active test discovery was aborted.</source>
+        <note></note>
+        <target state="new">The active test discovery was aborted.</target>
+      </trans-unit>
+      <trans-unit id="AbortedTestDiscoveryWithReason">
         <source>The active test discovery was aborted. Reason: {0}</source>
         <note></note>
-        <target state="translated">Etkin test bulma iptal edildi. Nedeni: {0}</target>
+        <target state="new">The active test discovery was aborted. Reason: {0}</target>
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test host process.</source>

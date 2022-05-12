@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources;
 
 using Resources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
 
@@ -107,7 +108,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         // extra double quotes before testing whether the file exists.
         if (!File.Exists(consoleRunnerPath.Trim('"')))
         {
-            throw new FileNotFoundException(string.Format(Resources.CannotFindConsoleRunner, consoleRunnerPath), consoleRunnerPath);
+            throw new FileNotFoundException(string.Format(InternalResources.CannotFindConsoleRunner, consoleRunnerPath), consoleRunnerPath);
         }
 
         var arguments = string.Join(" ", BuildArguments(consoleParameters));
@@ -119,16 +120,25 @@ internal class VsTestConsoleProcessManager : IProcessManager
             RedirectStandardError = true,
         };
 
-        EqtTrace.Verbose("VsTestCommandLineWrapper: Process Start Info {0} {1}", info.FileName, info.Arguments);
+        EqtTrace.Verbose("VsTestCommandLineWrapper.StartProcess: Process Start Info {0} {1}", info.FileName, info.Arguments);
+
+        if (!consoleParameters.InheritEnvironmentVariables)
+        {
+            EqtTrace.Verbose("VsTestCommandLineWrapper.StartProcess: Clearing all environment variables.");
+
+            info.EnvironmentVariables.Clear();
+        }
 
         if (consoleParameters.EnvironmentVariables != null)
         {
-            info.EnvironmentVariables.Clear();
             foreach (var envVariable in consoleParameters.EnvironmentVariables)
             {
                 if (envVariable.Key != null)
                 {
-                    info.EnvironmentVariables.Add(envVariable.Key, envVariable.Value?.ToString());
+                    // Not printing the value on purpose, env variables can contain secrets and we don't need to know the values
+                    // most of the time.
+                    EqtTrace.Verbose("VsTestCommandLineWrapper.StartProcess: Setting environment variable: {0}", envVariable.Key);
+                    info.EnvironmentVariables[envVariable.Key] = envVariable.Value?.ToString();
                 }
             }
         }
@@ -139,7 +149,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         }
         catch (Win32Exception ex)
         {
-            throw new Exception(string.Format(Resources.ProcessStartWin32Failure, consoleRunnerPath, arguments), ex);
+            throw new Exception(string.Format(InternalResources.ProcessStartWin32Failure, consoleRunnerPath, arguments), ex);
         }
 
         lock (_syncObject)

@@ -14,9 +14,6 @@
     <DocumentationFile>$(BaseIntermediateOutputPath)\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Resources.resx" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
@@ -29,6 +26,11 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Resources\InternalResources.Designer.cs">
+      <DependentUpon>InternalResources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -36,9 +38,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Resources\Resources.resx">
+    <EmbeddedResource Include="Resources\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\InternalResources.resx">
+      <LastGenOutput>InternalResources.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup Label="Configuration">

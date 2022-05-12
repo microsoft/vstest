@@ -17,27 +17,20 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ParallelRunEventsHandlerTests
 {
-    private ParallelRunEventsHandler _parallelRunEventsHandler;
+    private readonly ParallelRunEventsHandler _parallelRunEventsHandler;
+    private readonly Mock<IProxyExecutionManager> _mockProxyExecutionManager;
+    private readonly Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
+    private readonly Mock<IParallelProxyExecutionManager> _mockParallelProxyExecutionManager;
+    private readonly Mock<IDataSerializer> _mockDataSerializer;
+    private readonly Mock<IRequestData> _mockRequestData;
+    private readonly int _protocolVersion;
 
-    private Mock<IProxyExecutionManager> _mockProxyExecutionManager;
-
-    private Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
-
-    private Mock<IParallelProxyExecutionManager> _mockParallelProxyExecutionManager;
-
-    private Mock<IDataSerializer> _mockDataSerializer;
-
-    private Mock<IRequestData> _mockRequestData;
-
-    [TestInitialize]
-    public void TestInit()
+    public ParallelRunEventsHandlerTests()
     {
         _mockProxyExecutionManager = new Mock<IProxyExecutionManager>();
         _mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
@@ -45,6 +38,8 @@ public class ParallelRunEventsHandlerTests
         _mockDataSerializer = new Mock<IDataSerializer>();
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+        _protocolVersion = 0;
+        _mockRequestData.Setup(rd => rd.ProtocolConfig).Returns(new ProtocolConfig { Version = _protocolVersion });
 
         _parallelRunEventsHandler = new ParallelRunEventsHandler(_mockRequestData.Object, _mockProxyExecutionManager.Object,
             _mockTestRunEventsHandler.Object, _mockParallelProxyExecutionManager.Object,
@@ -141,7 +136,7 @@ public class ParallelRunEventsHandlerTests
         var lastChunk = new TestRunChangedEventArgs(null, null, null);
         var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.Zero);
 
-        _mockDataSerializer.Setup(mds => mds.SerializePayload(MessageType.TestRunStatsChange, lastChunk))
+        _mockDataSerializer.Setup(mds => mds.SerializePayload(MessageType.TestRunStatsChange, lastChunk, _protocolVersion))
             .Returns(payload);
 
         _mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(

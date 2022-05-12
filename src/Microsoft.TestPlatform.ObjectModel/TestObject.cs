@@ -108,10 +108,8 @@ public abstract class TestObject
     /// </summary>
     /// <param name="property">TestObject's TestProperty</param>
     /// <returns>property value</returns>
-    public object GetPropertyValue(TestProperty property)
+    public object GetPropertyValue(TestProperty property!!)
     {
-        ValidateArg.NotNull(property, nameof(property));
-
         object defaultValue = null;
         var valueType = property.GetValueType();
 
@@ -171,9 +169,8 @@ public abstract class TestObject
     ///  Remove test property from the current TestObject.
     /// </summary>
     /// <param name="property"></param>
-    public void RemovePropertyValue(TestProperty property)
+    public void RemovePropertyValue(TestProperty property!!)
     {
-        ValidateArg.NotNull(property, nameof(property));
         if (_store.TryGetValue(property, out _))
         {
             _store.Remove(property);
@@ -184,11 +181,8 @@ public abstract class TestObject
     /// Returns TestProperty's value
     /// </summary>
     /// <returns>property's value. default value is returned if the property is not present</returns>
-    public T GetPropertyValue<T>(TestProperty property, T defaultValue, CultureInfo culture)
+    public T GetPropertyValue<T>(TestProperty property!!, T defaultValue, CultureInfo culture!!)
     {
-        ValidateArg.NotNull(property, nameof(property));
-        ValidateArg.NotNull(culture, nameof(culture));
-
         object objValue = ProtectedGetPropertyValue(property, defaultValue);
 
         return ConvertPropertyTo<T>(property, culture, objValue);
@@ -197,11 +191,8 @@ public abstract class TestObject
     /// <summary>
     /// Set TestProperty's value to the specified value T.
     /// </summary>
-    public void SetPropertyValue<T>(TestProperty property, T value, CultureInfo culture)
+    public void SetPropertyValue<T>(TestProperty property!!, T value, CultureInfo culture!!)
     {
-        ValidateArg.NotNull(property, nameof(property));
-        ValidateArg.NotNull(culture, nameof(culture));
-
         object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
         ProtectedSetPropertyValue(property, objValue);
@@ -210,11 +201,8 @@ public abstract class TestObject
     /// <summary>
     /// Set TestProperty's value to the specified value T.
     /// </summary>
-    public void SetPropertyValue<T>(TestProperty property, LazyPropertyValue<T> value, CultureInfo culture)
+    public void SetPropertyValue<T>(TestProperty property!!, LazyPropertyValue<T> value, CultureInfo culture!!)
     {
-        ValidateArg.NotNull(property, nameof(property));
-        ValidateArg.NotNull(culture, nameof(culture));
-
         object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
         ProtectedSetPropertyValue(property, objValue);
@@ -224,11 +212,9 @@ public abstract class TestObject
     /// Return TestProperty's value
     /// </summary>
     /// <returns></returns>
-    protected virtual object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
+    protected virtual object ProtectedGetPropertyValue(TestProperty property!!, object defaultValue)
     {
-        ValidateArg.NotNull(property, nameof(property));
-
-        if (!_store.TryGetValue(property, out var value))
+        if (!_store.TryGetValue(property, out var value) || value == null)
         {
             value = defaultValue;
         }
@@ -239,10 +225,8 @@ public abstract class TestObject
     /// <summary>
     /// Set TestProperty's value
     /// </summary>
-    protected virtual void ProtectedSetPropertyValue(TestProperty property, object value)
+    protected virtual void ProtectedSetPropertyValue(TestProperty property!!, object value)
     {
-        ValidateArg.NotNull(property, nameof(property));
-
         _store[property] = property.ValidateValueCallback == null || property.ValidateValueCallback(value)
             ? value
             : throw new ArgumentException(property.Label);
@@ -252,11 +236,8 @@ public abstract class TestObject
     /// Convert passed in value from TestProperty's specified value type.
     /// </summary>
     /// <returns>Converted object</returns>
-    private static object ConvertPropertyFrom<T>(TestProperty property, CultureInfo culture, object value)
+    private static object ConvertPropertyFrom<T>(TestProperty property!!, CultureInfo culture!!, object value)
     {
-        ValidateArg.NotNull(property, nameof(property));
-        ValidateArg.NotNull(culture, nameof(culture));
-
         var valueType = property.GetValueType();
 
         // Do not try conversion if the object is already of the type we're trying to convert.
@@ -304,12 +285,8 @@ public abstract class TestObject
     /// Convert passed in value into the specified type when property is registered.
     /// </summary>
     /// <returns>Converted object</returns>
-    private static T ConvertPropertyTo<T>(TestProperty property, CultureInfo culture, object value)
+    private static T ConvertPropertyTo<T>(TestProperty property!!, CultureInfo culture!!, object value)
     {
-        ValidateArg.NotNull(property, nameof(property));
-        ValidateArg.NotNull(culture, nameof(culture));
-
-
         if (value == null)
         {
             return default;

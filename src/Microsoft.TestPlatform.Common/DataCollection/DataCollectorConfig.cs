@@ -3,12 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 #nullable disable
@@ -26,11 +24,9 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
     /// <param name="type">
     /// The type.
     /// </param>
-    public DataCollectorConfig(Type type)
+    public DataCollectorConfig(Type type!!)
         : base(type)
     {
-        ValidateArg.NotNull(type, nameof(type));
-
         DataCollectorType = type;
         TypeUri = GetTypeUri(type);
         FriendlyName = GetFriendlyName(type);
@@ -93,7 +89,7 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
         if (typeUriAttributes != null && typeUriAttributes.Length > 0)
         {
             var typeUriAttribute = (DataCollectorTypeUriAttribute)typeUriAttributes[0];
-            if (!string.IsNullOrWhiteSpace(typeUriAttribute.TypeUri))
+            if (!typeUriAttribute.TypeUri.IsNullOrWhiteSpace())
             {
                 typeUri = new Uri(typeUriAttribute.TypeUri);
             }
@@ -137,7 +133,7 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
         if (friendlyNameAttributes != null && friendlyNameAttributes.Length > 0)
         {
             var friendlyNameAttribute = (DataCollectorFriendlyNameAttribute)friendlyNameAttributes[0];
-            if (!string.IsNullOrEmpty(friendlyNameAttribute.FriendlyName))
+            if (!friendlyNameAttribute.FriendlyName.IsNullOrEmpty())
             {
                 friendlyName = friendlyNameAttribute.FriendlyName;
             }
@@ -160,8 +156,8 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
     /// </returns>
     private static object[] GetAttributes(Type dataCollectorType, Type attributeType)
     {
-        Debug.Assert(dataCollectorType != null, "null dataCollectorType");
-        Debug.Assert(attributeType != null, "null attributeType");
+        TPDebug.Assert(dataCollectorType != null, "null dataCollectorType");
+        TPDebug.Assert(attributeType != null, "null attributeType");
 
         // If any attribute constructor on the type throws, the exception will bubble up through
         // the "GetCustomAttributes" method.

@@ -132,20 +132,11 @@
   <data name="AbortedTestsRun" xml:space="preserve">
     <value>The active Tests Run was aborted.</value>
   </data>
-  <data name="CannotFindConsoleRunner" xml:space="preserve">
-    <value>Cannot find the console runner {0}.</value>
-    <comment>{0}: the console runner path</comment>
-  </data>
   <data name="FailedToReceiveMessage" xml:space="preserve">
     <value>Failed to receive message from vstest.console process</value>
   </data>
   <data name="InvalidFilePath" xml:space="preserve">
     <value>File {0} does not exists</value>
-  </data>
-  <data name="ProcessStartWin32Failure" xml:space="preserve">
-    <value>An error occurred when opening the file {0} with arguments {1}.</value>
-    <comment>{0}: process path
-{1}: arguments passed to the process invocation.</comment>
   </data>
   <data name="VsTestProcessExitedAbnormally" xml:space="preserve">
     <value>vstest.console process exited abnormally</value>

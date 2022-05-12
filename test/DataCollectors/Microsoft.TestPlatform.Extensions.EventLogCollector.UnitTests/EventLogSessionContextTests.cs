@@ -6,18 +6,15 @@ using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests;
 
 [TestClass]
 public class EventLogSessionContextTests
 {
     private readonly Dictionary<string, IEventLogContainer> _eventLogContainersMap;
-
     private readonly DummyEventLogContainer _mockEventLogContainer;
 
-    private EventLogSessionContext _eventLogSessionContext;
+    private EventLogSessionContext? _eventLogSessionContext;
 
     public EventLogSessionContextTests()
     {
@@ -70,18 +67,18 @@ public class EventLogSessionContextTests
     }
 }
 
-public class DummyEventLogContainer : IEventLogContainer
+public sealed class DummyEventLogContainer : IEventLogContainer
 {
     public DummyEventLogContainer(bool initialize)
     {
         EventLogEntries = new List<EventLogEntry>(10);
-        EventLog eventLog = new("Application");
+        EventLog = new("Application");
 
         if (initialize)
         {
-            int currentIndex = eventLog.Entries[eventLog.Entries.Count - 1].Index - eventLog.Entries[0].Index;
-            EventLogEntries.Add(eventLog.Entries[currentIndex]);
-            EventLogEntries.Add(eventLog.Entries[currentIndex - 1]);
+            int currentIndex = EventLog.Entries[EventLog.Entries.Count - 1].Index - EventLog.Entries[0].Index;
+            EventLogEntries.Add(EventLog.Entries[currentIndex]);
+            EventLogEntries.Add(EventLog.Entries[currentIndex - 1]);
         }
     }
 

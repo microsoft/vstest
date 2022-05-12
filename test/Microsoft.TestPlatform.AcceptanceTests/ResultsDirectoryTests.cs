@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -43,7 +42,7 @@ public class ResultsDirectoryTests : AcceptanceTestBase
 
         var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
         var trxFileName = "TestResults.trx";
-        var relativeDirectory = @"relative\directory";
+        var relativeDirectory = @$"relative_{Guid.NewGuid()}\directory";
         var resultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), relativeDirectory);
 
         var trxFilePath = Path.Combine(resultsDirectory, trxFileName);

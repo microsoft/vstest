@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
@@ -38,20 +37,15 @@ internal class TestPlatformDataCollectionLogger : DataCollectionLogger
     /// <param name="dataCollectorConfig">
     /// The data Collector Information.
     /// </param>
-    internal TestPlatformDataCollectionLogger(IMessageSink sink, DataCollectorConfig dataCollectorConfig)
+    internal TestPlatformDataCollectionLogger(IMessageSink sink!!, DataCollectorConfig dataCollectorConfig!!)
     {
-        ValidateArg.NotNull(dataCollectorConfig, "dataCollectorInformation");
-        ValidateArg.NotNull(sink, nameof(sink));
         _dataCollectorConfig = dataCollectorConfig;
         _sink = sink;
     }
 
     /// <inheritdoc/>
-    public override void LogError(DataCollectionContext context, string text)
+    public override void LogError(DataCollectionContext context!!, string text!!)
     {
-        ValidateArg.NotNull(context, nameof(context));
-        ValidateArg.NotNull(text, nameof(text));
-
         EqtTrace.Error(
             "Data collector '{0}' logged the following error: {1}",
             _dataCollectorConfig.TypeUri,
@@ -61,12 +55,8 @@ internal class TestPlatformDataCollectionLogger : DataCollectionLogger
     }
 
     /// <inheritdoc/>
-    public override void LogError(DataCollectionContext context, string text, Exception exception)
+    public override void LogError(DataCollectionContext context!!, string text!!, Exception exception!!)
     {
-        ValidateArg.NotNull(context, nameof(context));
-        ValidateArg.NotNull(text, nameof(text));
-        ValidateArg.NotNull(exception, nameof(exception));
-
         // Make sure the data collection context is not a derived data collection context.  This
         // is done to safeguard from 3rd parties creating their own data collection contexts.
         if (context.GetType() != typeof(DataCollectionContext))
@@ -97,10 +87,8 @@ internal class TestPlatformDataCollectionLogger : DataCollectionLogger
     }
 
     /// <inheritdoc/>
-    public override void LogWarning(DataCollectionContext context, string text)
+    public override void LogWarning(DataCollectionContext context!!, string text!!)
     {
-        ValidateArg.NotNull(context, nameof(context));
-        ValidateArg.NotNull(text, nameof(text));
         EqtTrace.Warning(
             "Data collector '{0}' logged the following warning: {1}",
             _dataCollectorConfig.TypeUri,
@@ -123,12 +111,9 @@ internal class TestPlatformDataCollectionLogger : DataCollectionLogger
     /// </param>
     /// <exception cref="InvalidOperationException">Throws InvalidOperationException.
     /// </exception>
-    private void SendTextMessage(DataCollectionContext context, string text, TestMessageLevel level)
+    private void SendTextMessage(DataCollectionContext context!!, string text!!, TestMessageLevel level)
     {
-        ValidateArg.NotNull(context, nameof(context));
-        ValidateArg.NotNull(text, nameof(text));
-
-        Debug.Assert(
+        TPDebug.Assert(
             level is >= TestMessageLevel.Informational and <= TestMessageLevel.Error,
             "Invalid level: " + level);
 

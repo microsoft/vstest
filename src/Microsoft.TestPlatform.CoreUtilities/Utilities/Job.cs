@@ -3,8 +3,6 @@
 
 using System.Threading;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -77,9 +75,8 @@ internal class Job<TPayload>
     /// </summary>
     /// <param name="waitEvent"> The wait Event. </param>
     /// <returns> The wait job. </returns>
-    public static Job<TPayload> CreateWaitJob(ManualResetEvent waitEvent)
+    public static Job<TPayload> CreateWaitJob(ManualResetEvent waitEvent!!)
     {
-        ValidateArg.NotNull(waitEvent, nameof(waitEvent));
         var waitJob = new Job<TPayload>();
         waitJob.WaitManualResetEvent = waitEvent;
 

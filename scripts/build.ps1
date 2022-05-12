@@ -51,7 +51,8 @@ Param(
     [Switch] $Force,
 
     [Alias("s")]
-    [String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "PrepareAcceptanceTests")
+    [ValidateSet("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "Pack", "Manifest", "PrepareAcceptanceTests")]
+    [String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "Pack", "Manifest", "PrepareAcceptanceTests")
 )
 
 $ErrorActionPreference = 'Stop'
@@ -134,7 +135,7 @@ if ((Test-Path $vsixUtilDir) -and -not (Test-Path "$vsixUtilDir\$vsSdkBuildTools
 # Procdump gets regularly eaten by antivirus or something. Remove the package dir if it gets broken
 # so nuget restores it correctly.
 $procdumpDir = "$env:TP_ROOT_DIR\packages\procdump"
-if ((Test-Path $procdumpDir) -and 2 -ne @(Get-Item "$procdumpDir\0.0.1\bin").Length) {
+if ((Test-Path $procdumpDir) -and (Test-Path "$procdumpDir\0.0.1\bin") -and 2 -ne @(Get-Item "$procdumpDir\0.0.1\bin").Length) {
     Remove-Item -Recurse -Force $procdumpDir
 }
 
@@ -558,23 +559,32 @@ function Publish-Package {
     $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.BlameDataCollector\bin\$TPB_Configuration"
     $blameDataCollectorNetFull = Join-Path $blameDataCollector $TPB_TargetFramework472
     $blameDataCollectorNetStandard = Join-Path $blameDataCollector $TPB_TargetFrameworkStandard
+    New-Item -ItemType Directory "$fullCLRExtensionsDir/dump" -Force | Out-Null
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetFull\DumpMinitool.exe $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetFull\DumpMinitool.pdb $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetFull\DumpMinitool.exe.config $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.exe $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.pdb $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.exe.config $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.exe "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.pdb "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.exe.config "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.exe "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.pdb "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.exe.config "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.arm64.exe "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.arm64.pdb "$fullCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.arm64.exe.config "$fullCLRExtensionsDir/dump" -Force
 
+    New-Item -ItemType Directory "$coreCLRExtensionsDir/dump" -Force | Out-Null
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $coreCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.exe $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.pdb $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.exe.config $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.exe $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.pdb $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.exe.config $coreCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.exe "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.pdb "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.exe.config "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.exe "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.pdb "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.exe.config "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.arm64.exe "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.arm64.pdb "$coreCLRExtensionsDir/dump" -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.arm64.exe.config "$coreCLRExtensionsDir/dump" -Force
+
     # we use this to dump processes on netcore
     Copy-Item $blameDataCollectorNetStandard\Microsoft.Diagnostics.NETCore.Client.dll $coreCLRExtensionsDir -Force
 
@@ -606,12 +616,12 @@ function Publish-Package {
         Copy-Loc-Files $eventLogDataCollectorNetFull $coreCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
     }
 
-    # Copy Microsoft.VisualStudio.Coverage.IO dlls
+    # Copy Microsoft.CodeCoverage.IO dlls
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftInternalCodeCoverageVersion
-    $codeCoverageIOPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.io\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkStandard"
-    Copy-Item $codeCoverageIOPackagesDir\Microsoft.VisualStudio.Coverage.IO.dll $coreCLR20PackageDir -Force
+    $codeCoverageIOPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.codecoverage.io\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkStandard"
+    Copy-Item $codeCoverageIOPackagesDir\Microsoft.CodeCoverage.IO.dll $coreCLR20PackageDir -Force
     if ($TPB_LocalizedBuild) {
-        Copy-Loc-Files $codeCoverageIOPackagesDir $coreCLR20PackageDir "Microsoft.VisualStudio.Coverage.IO.resources.dll"
+        Copy-Loc-Files $codeCoverageIOPackagesDir $coreCLR20PackageDir "Microsoft.CodeCoverage.IO.resources.dll"
     }
 
     # If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
@@ -759,12 +769,10 @@ function Move-Loc-Files($sourceDir, $destinationDir, $dllName) {
     }
 }
 
-function Create-VsixPackage {
-    Write-Log "Create-VsixPackage: Started."
+function Publish-VsixPackage {
+    Write-Log "Publish-VsixPackage: Started."
     $timer = Start-Timer
 
-    $vsixSourceDir = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
-    $vsixProjectDir = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\VSIX"
     $packageDir = Get-FullCLRPackageDirectory
     $extensionsPackageDir = Join-Path $packageDir "Extensions"
     $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
@@ -775,32 +783,11 @@ function Create-VsixPackage {
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftInternalCodeCoverageVersion
     $interopExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.InteropExternalsVersion
 
-    # Copy Microsoft.VisualStudio.TraceDataCollector to Extensions
-    $traceDataCollectorPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TraceDataCollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework472"
-    Copy-Item $traceDataCollectorPackageDirectory\Microsoft.VisualStudio.TraceDataCollector.dll $extensionsPackageDir -Force
-    if ($TPB_LocalizedBuild) {
-        Copy-Loc-Files $traceDataCollectorPackageDirectory $extensionsPackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
-    }
-
-    # Copy Microsoft.VisualStudio.Core to Extensions
-    $codeCoverageCorePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.core\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    Copy-Item $codeCoverageCorePackagesDir\Microsoft.VisualStudio.Coverage.Core.dll $extensionsPackageDir -Force
-
-    # Copy Microsoft.VisualStudio.Interprocess to Extensions
-    $codeCoverageInterprocessPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.Interprocess\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    Copy-Item $codeCoverageInterprocessPackageDirectory\Microsoft.VisualStudio.Coverage.Interprocess.dll $extensionsPackageDir -Force
-
-    # Copy Microsoft.VisualStudio.Instrumentation to Extensions
-    $codeCoverageInstrumentationPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.Instrumentation\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    Copy-Item $codeCoverageInstrumentationPackageDirectory\Microsoft.VisualStudio.Coverage.Instrumentation.dll $extensionsPackageDir -Force
-    Copy-Item $codeCoverageInstrumentationPackageDirectory\Mono.Cecil.dll $extensionsPackageDir -Force
-    Copy-Item $codeCoverageInstrumentationPackageDirectory\Mono.Cecil.Pdb.dll $extensionsPackageDir -Force
-
     # Copy Microsoft.VisualStudio.IO to root
-    $codeCoverageIOPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.IO\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework451"
-    Copy-Item $codeCoverageIOPackageDirectory\Microsoft.VisualStudio.Coverage.IO.dll $packageDir -Force
+    $codeCoverageIOPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.CodeCoverage.IO\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework451"
+    Copy-Item $codeCoverageIOPackageDirectory\Microsoft.CodeCoverage.IO.dll $packageDir -Force
     if ($TPB_LocalizedBuild) {
-        Copy-Loc-Files $codeCoverageIOPackageDirectory $packageDir "Microsoft.VisualStudio.Coverage.IO.resources.dll"
+        Copy-Loc-Files $codeCoverageIOPackageDirectory $packageDir "Microsoft.CodeCoverage.IO.resources.dll"
     }
 
     # Copy legacy dependencies
@@ -847,9 +834,19 @@ function Create-VsixPackage {
     Copy-Item -Recurse $comComponentsDirectoryTIA\* $legacyTestImpactComComponentsDir -Force
 
     Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt") $packageDir -Force
+    
+    Write-Log "Publish-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Create-VsixPackage {
+    Write-Log "Create-VsixPackage: Started."
+    $timer = Start-Timer
 
     Write-Verbose "Locating MSBuild install path..."
     $msbuildPath = Locate-MSBuildPath
+
+    $vsixSourceDir = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
+    $vsixProjectDir = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\VSIX"
 
     # Create vsix only when msbuild is installed.
     if (![string]::IsNullOrEmpty($msbuildPath)) {
@@ -879,10 +876,14 @@ function Create-NugetPackages {
 
     Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "Icon.png") $stagingDir -Force
 
-    # Remove all locally built nuget packages before we start creating them
-    # we are leaving them in the folder after uzipping them for easier review.
-    if (Test-Path $packageOutputDir) {
-        Remove-Item $packageOutputDir -Recurse -Force
+    # Packages folder should not be cleared on CI.
+    # Artifacts from source-build are downloaded into this directory before the build starts, and this would remove them.
+    if (-not $TPB_CIBuild) {
+        # Remove all locally built nuget packages before we start creating them
+        # we are leaving them in the folder after uzipping them for easier review.
+        if (Test-Path $packageOutputDir) {
+            Remove-Item $packageOutputDir -Recurse -Force
+        }
     }
 
     if (-not (Test-Path $packageOutputDir)) {
@@ -1008,28 +1009,33 @@ function Copy-CodeCoverage-Package-Artifacts {
     # Copy TraceDataCollector to Microsoft.CodeCoverage folder.
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftInternalCodeCoverageVersion
     $traceDataCollectorPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.tracedatacollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
+    $traceDataCollectorPackagesNetFxDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TraceDataCollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework472"
     $internalCodeCoveragePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\"
-    $codeCoverageCorePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.core\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    $codeCoverageInterprocessPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.interprocess\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    $codeCoverageInstrumentationPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.instrumentation\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
+    $codeCoverageCorePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.codecoverage.core\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
+    $codeCoverageInterprocessPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.codecoverage.interprocess\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
+    $codeCoverageInstrumentationPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.codecoverage.instrumentation\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
     $codeCoverageImUbuntuPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\InstrumentationEngine\ubuntu"
     $codeCoverageImAlpinePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\InstrumentationEngine\alpine"
     $codeCoverageImMacosPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\InstrumentationEngine\macos"
 
     $microsoftCodeCoveragePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.CodeCoverage\")
+    $microsoftCodeCoverageExtensionsPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.CodeCoverage.Extensions\")
 
     New-Item -ItemType directory -Path $microsoftCodeCoveragePackageDir -Force | Out-Null
+    New-Item -ItemType directory -Path $microsoftCodeCoverageExtensionsPackageDir -Force | Out-Null
 
     Copy-Item $traceDataCollectorPackagesDir\Microsoft.VisualStudio.TraceDataCollector.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $traceDataCollectorPackagesDir\Microsoft.VisualStudio.TraceDataCollector.pdb $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $codeCoverageCorePackagesDir\Microsoft.VisualStudio.Coverage.Core.dll $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $codeCoverageInterprocessPackagesDir\Microsoft.VisualStudio.Coverage.Interprocess.dll $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $codeCoverageInstrumentationPackagesDir\Microsoft.VisualStudio.Coverage.Instrumentation.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $codeCoverageCorePackagesDir\Microsoft.CodeCoverage.Core.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $codeCoverageInterprocessPackagesDir\Microsoft.CodeCoverage.Interprocess.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $codeCoverageInstrumentationPackagesDir\Microsoft.CodeCoverage.Instrumentation.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $codeCoverageInstrumentationPackagesDir\Mono.Cecil.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $codeCoverageInstrumentationPackagesDir\Mono.Cecil.Pdb.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $internalCodeCoveragePackagesDir\CodeCoverage $microsoftCodeCoveragePackageDir -Force -Recurse
     Copy-Item $internalCodeCoveragePackagesDir\InstrumentationEngine $microsoftCodeCoveragePackageDir -Force -Recurse
     Copy-Item $internalCodeCoveragePackagesDir\Shim $microsoftCodeCoveragePackageDir -Force -Recurse
+
+    Copy-Item $traceDataCollectorPackagesNetFxDir\Microsoft.VisualStudio.TraceDataCollector.dll $microsoftCodeCoverageExtensionsPackageDir -Force
 
     New-Item -ItemType directory -Path $microsoftCodeCoveragePackageDir\InstrumentationEngine\ubuntu\ -Force | Out-Null
     Copy-Item $codeCoverageImUbuntuPackagesDir\x64 $microsoftCodeCoveragePackageDir\InstrumentationEngine\ubuntu\ -Force -Recurse
@@ -1041,6 +1047,7 @@ function Copy-CodeCoverage-Package-Artifacts {
     # Copy TraceDataCollector resource dlls
     if ($TPB_LocalizedBuild) {
         Copy-Loc-Files $traceDataCollectorPackagesDir $microsoftCodeCoveragePackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
+        Copy-Loc-Files $traceDataCollectorPackagesNetFxDir $microsoftCodeCoverageExtensionsPackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
     }
 }
 
@@ -1276,11 +1283,15 @@ if ($Force -or $Steps -contains "Build") {
 
 if ($Force -or $Steps -contains "Publish") {
     Publish-Package
+    Publish-VsixPackage
+}
+
+if ($Force -or $Steps -contains "Pack") { 
     Create-VsixPackage
     Create-NugetPackages
 }
 
-if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
+if ($Force -or $Steps -contains "Manifest") {
     Generate-Manifest -PackageFolder $TPB_PackageOutDir
     if (Test-Path $TPB_SourceBuildPackageOutDir)
     {

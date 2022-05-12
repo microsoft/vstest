@@ -29,9 +29,9 @@ Esse teste pode ser a origem da falha ou não.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
-        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
-        <target state="translated">A chave de parâmetro de blame {0} oferece suporte apenas aos valores {1}/{2}. Ignorando esta chave.</target>
-        <note></note>
+        <source>The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}</source>
+        <target state="translated">A chave de parâmetro {0}, tem um valor incorreto: {1}. Os valores com suporte são: {2}</target>
+        <note>{0} and {1} are single values referring to parameters such as BlameHang and Full. {2} is comma separated list of valid values, e.g. Full, Mini, None.</note>
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">
         <source>Could not start process dump: {0}</source>
@@ -77,6 +77,11 @@ Esse teste pode ser a origem da falha ou não.</target>
         <source>seconds</source>
         <target state="translated">segundos</target>
         <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpNotFound">
+        <source>{0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable</source>
+        <target state="translated">{0} não pôde ser encontrado, verifique se o executável está disponível no CAMINHO. Alternativamente, defina a variável de ambiente PROCDUMP_PATH para um diretório que contenha o executável {0}</target>
+        <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
       </trans-unit>
     </body>
   </file>

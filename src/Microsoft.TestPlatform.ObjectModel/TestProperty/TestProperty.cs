@@ -7,6 +7,10 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 
+#if !NETSTANDARD1_0
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+#endif
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -17,6 +21,15 @@ public delegate bool ValidateValueCallback(object value);
 public class TestProperty : IEquatable<TestProperty>
 {
     private Type _valueType;
+    private static readonly Dictionary<string, Type> TypeCache = new();
+
+#if NETSTANDARD1_0
+    private static bool DisableFastJson { get; set; } = true;
+#else
+    private static bool DisableFastJson { get; set; } = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION);
+#endif
+
+    //public static Stopwatch 
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestProperty"/> class.
@@ -26,13 +39,9 @@ public class TestProperty : IEquatable<TestProperty>
         // Default constructor for Serialization.
     }
 
-    private TestProperty(string id, string label, string category, string description, Type valueType, ValidateValueCallback validateValueCallback, TestPropertyAttributes attributes)
+    private TestProperty(string id, string label!!, string category!!, string description!!, Type valueType!!, ValidateValueCallback validateValueCallback, TestPropertyAttributes attributes)
     {
         ValidateArg.NotNullOrEmpty(id, nameof(id));
-        ValidateArg.NotNull(label, nameof(label));
-        ValidateArg.NotNull(category, nameof(category));
-        ValidateArg.NotNull(description, nameof(description));
-        ValidateArg.NotNull(valueType, nameof(valueType));
 
         // If the type of property is unexpected, then fail as otherwise we will not be to serialize it over the wcf channel and serialize it in db.
         if (valueType == typeof(KeyValuePair<string, string>[]))
@@ -159,9 +168,12 @@ public class TestProperty : IEquatable<TestProperty>
         return _valueType;
     }
 
-    private Type GetType(string typeName)
+    private Type GetType(string typeName!!)
     {
-        ValidateArg.NotNull(typeName, nameof(typeName));
+        if (!DisableFastJson && TypeCache.TryGetValue(typeName, out var t))
+        {
+            return t;
+        }
 
         Type type = null;
 
@@ -169,6 +181,15 @@ public class TestProperty : IEquatable<TestProperty>
         {
             // This only works for the type is in the currently executing assembly or in Mscorlib.dll.
             type = Type.GetType(typeName);
+
+            if (!DisableFastJson)
+            {
+                if (type != null)
+                {
+                    TypeCache[typeName] = type;
+                    return type;
+                }
+            }
 
             if (type == null)
             {
@@ -231,6 +252,10 @@ public class TestProperty : IEquatable<TestProperty>
             }
         }
 
+        if (!DisableFastJson)
+        {
+            TypeCache[typeName] = type;
+        }
         return type;
     }
 
@@ -249,10 +274,8 @@ public class TestProperty : IEquatable<TestProperty>
         }
     }
 
-    public static TestProperty Find(string id)
+    public static TestProperty Find(string id!!)
     {
-        ValidateArg.NotNull(id, nameof(id));
-
         TestProperty result = null;
 
         lock (Properties)
@@ -266,34 +289,23 @@ public class TestProperty : IEquatable<TestProperty>
         return result;
     }
 
-    public static TestProperty Register(string id, string label, Type valueType, Type owner)
+    public static TestProperty Register(string id, string label!!, Type valueType!!, Type owner!!)
     {
         ValidateArg.NotNullOrEmpty(id, nameof(id));
-        ValidateArg.NotNull(label, nameof(label));
-        ValidateArg.NotNull(valueType, nameof(valueType));
-        ValidateArg.NotNull(owner, nameof(owner));
 
         return Register(id, label, string.Empty, string.Empty, valueType, null, TestPropertyAttributes.None, owner);
     }
 
-    public static TestProperty Register(string id, string label, Type valueType, TestPropertyAttributes attributes, Type owner)
+    public static TestProperty Register(string id, string label!!, Type valueType!!, TestPropertyAttributes attributes, Type owner!!)
     {
         ValidateArg.NotNullOrEmpty(id, nameof(id));
-        ValidateArg.NotNull(label, nameof(label));
-        ValidateArg.NotNull(valueType, nameof(valueType));
-        ValidateArg.NotNull(owner, nameof(owner));
 
         return Register(id, label, string.Empty, string.Empty, valueType, null, attributes, owner);
     }
 
-    public static TestProperty Register(string id, string label, string category, string description, Type valueType, ValidateValueCallback validateValueCallback, TestPropertyAttributes attributes, Type owner)
+    public static TestProperty Register(string id, string label!!, string category!!, string description!!, Type valueType!!, ValidateValueCallback validateValueCallback, TestPropertyAttributes attributes, Type owner!!)
     {
         ValidateArg.NotNullOrEmpty(id, nameof(id));
-        ValidateArg.NotNull(label, nameof(label));
-        ValidateArg.NotNull(category, nameof(category));
-        ValidateArg.NotNull(description, nameof(description));
-        ValidateArg.NotNull(valueType, nameof(valueType));
-        ValidateArg.NotNull(owner, nameof(owner));
 
         TestProperty result;
 

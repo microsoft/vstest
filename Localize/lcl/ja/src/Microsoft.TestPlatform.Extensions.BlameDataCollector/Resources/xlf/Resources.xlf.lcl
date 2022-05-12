@@ -31,12 +31,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";BlameParameterValueIncorrect" ItemType="0" PsrId="308" Leaf="true">
+      <Item ItemId=";BlameParameterValueIncorrect" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.]]></Val>
+          <Val><![CDATA[The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[blame パラメーター キー {0} は値 {1}/{2} のみをサポートします。このキーは無視されます。]]></Val>
+            <Val><![CDATA[blame パラメーター キー {0} に正しくない値が含まれています: {1}。サポートされている値: {2}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -112,6 +115,18 @@
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[必須の環境変数 PROCDUMP_PATH は Null または空でした。PROCDUMP_PATH を、適切な procdump 実行可能ファイルを含むフォルダーのパスに設定してください。]]></Val>
           </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ProcDumpNotFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[{0} が見つかりませんでした。PATH で実行可能ファイルを使用できることを確認してください。または、PROCDUMP_PATH 環境変数を、実行可能ファイル {0} が含まれるディレクトリに設定してください]]></Val>
+          </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} could not be found, please make sure that the executable is available on PATH, or set PROCDUMP_PATH environment variable to a directory that contains {0} executable.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>

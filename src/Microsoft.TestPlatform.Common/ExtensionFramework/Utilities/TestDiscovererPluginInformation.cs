@@ -88,7 +88,7 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
             foreach (var attribute in attributes)
             {
                 var fileExtAttribute = (FileExtensionAttribute)attribute;
-                if (!string.IsNullOrEmpty(fileExtAttribute.FileExtension))
+                if (!fileExtAttribute.FileExtension.IsNullOrEmpty())
                 {
                     fileExtensions.Add(fileExtAttribute.FileExtension);
                 }
@@ -112,7 +112,7 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
         {
             DefaultExecutorUriAttribute executorUriAttribute = (DefaultExecutorUriAttribute)attributes[0];
 
-            if (!string.IsNullOrEmpty(executorUriAttribute.ExecutorUri))
+            if (!executorUriAttribute.ExecutorUri.IsNullOrEmpty())
             {
                 result = executorUriAttribute.ExecutorUri;
             }

@@ -16,8 +16,6 @@ using MSTest.TestFramework.AssertExtensions;
 
 using OMResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Utilities.UnitTests;
 
 [TestClass]
@@ -260,19 +258,19 @@ public class InferRunSettingsHelperTests
     public void MakeRunsettingsCompatibleShouldNotDeleteOldRunConfigurationNode()
     {
         var settings = @"<RunSettings>
-								<RunConfiguration>
-									<DesignMode>False</DesignMode>
-									<CollectSourceInformation>False</CollectSourceInformation>
-									<TargetPlatform>x86</TargetPlatform>
-									<TargetFrameworkVersion>net46</TargetFrameworkVersion>
-									<TestAdaptersPaths>dummypath</TestAdaptersPaths>
-									<ResultsDirectory>dummypath</ResultsDirectory>
-									<SolutionDirectory>dummypath</SolutionDirectory>
-									<MaxCpuCount>2</MaxCpuCount>
-									<DisableParallelization>False</DisableParallelization>
-									<DisableAppDomain>False</DisableAppDomain>
-								</RunConfiguration>
-							</RunSettings>";
+                                <RunConfiguration>
+                                    <DesignMode>False</DesignMode>
+                                    <CollectSourceInformation>False</CollectSourceInformation>
+                                    <TargetPlatform>x86</TargetPlatform>
+                                    <TargetFrameworkVersion>net46</TargetFrameworkVersion>
+                                    <TestAdaptersPaths>dummypath</TestAdaptersPaths>
+                                    <ResultsDirectory>dummypath</ResultsDirectory>
+                                    <SolutionDirectory>dummypath</SolutionDirectory>
+                                    <MaxCpuCount>2</MaxCpuCount>
+                                    <DisableParallelization>False</DisableParallelization>
+                                    <DisableAppDomain>False</DisableAppDomain>
+                                </RunConfiguration>
+                            </RunSettings>";
 
         var result = InferRunSettingsHelper.MakeRunsettingsCompatible(settings);
 
@@ -290,15 +288,15 @@ public class InferRunSettingsHelperTests
     public void UpdateTargetDeviceValueFromOldMsTestSettings()
     {
         var settings = @"<RunSettings>
-								<RunConfiguration>
-									<MaxCpuCount>2</MaxCpuCount>
-									<DisableParallelization>False</DisableParallelization>
-									<DisableAppDomain>False</DisableAppDomain>
-								</RunConfiguration>
-								<MSPhoneTest>
-								  <TargetDevice>169.254.193.190</TargetDevice>
-								</MSPhoneTest>
-							</RunSettings>";
+                                <RunConfiguration>
+                                    <MaxCpuCount>2</MaxCpuCount>
+                                    <DisableParallelization>False</DisableParallelization>
+                                    <DisableAppDomain>False</DisableAppDomain>
+                                </RunConfiguration>
+                                <MSPhoneTest>
+                                  <TargetDevice>169.254.193.190</TargetDevice>
+                                </MSPhoneTest>
+                            </RunSettings>";
 
         var xmlDocument = GetXmlDocument(settings);
 
@@ -453,11 +451,11 @@ public class InferRunSettingsHelperTests
     public void IsTestSettingsEnabledShouldReturnTrueIfRunsettingsHasTestSettings()
     {
         string runsettingsString = @"<RunSettings>
-										<MSTest>
-											<SettingsFile>C:\temp.testsettings</SettingsFile>
-											<ForcedLegacyMode>true</ForcedLegacyMode>
-										</MSTest>
-									</RunSettings>";
+                                        <MSTest>
+                                            <SettingsFile>C:\temp.testsettings</SettingsFile>
+                                            <ForcedLegacyMode>true</ForcedLegacyMode>
+                                        </MSTest>
+                                    </RunSettings>";
 
         Assert.IsTrue(InferRunSettingsHelper.IsTestSettingsEnabled(runsettingsString));
     }
@@ -466,10 +464,10 @@ public class InferRunSettingsHelperTests
     public void IsTestSettingsEnabledShouldReturnFalseIfRunsettingsDoesnotHaveTestSettings()
     {
         string runsettingsString = @"<RunSettings>
-										<MSTest>
-											<ForcedLegacyMode>true</ForcedLegacyMode>
-										</MSTest>
-									</RunSettings>";
+                                        <MSTest>
+                                            <ForcedLegacyMode>true</ForcedLegacyMode>
+                                        </MSTest>
+                                    </RunSettings>";
 
         Assert.IsFalse(InferRunSettingsHelper.IsTestSettingsEnabled(runsettingsString));
     }
@@ -478,7 +476,7 @@ public class InferRunSettingsHelperTests
     public void TryGetLegacySettingsForRunSettingsWithoutLegacySettingsShouldReturnFalse()
     {
         string runSettingsXml = @"<RunSettings>
-									  </RunSettings>";
+                                      </RunSettings>";
         Assert.IsFalse(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out _));
     }
 
@@ -486,10 +484,10 @@ public class InferRunSettingsHelperTests
     public void TryGetLegacySettingsForRunSettingsWithInvalidLegacySettingsShouldReturnFalse()
     {
         string runSettingsXml = @"<RunSettings>
-										<LegacySettings>
-											<Foo>
-										</LegacySettings>
-									  </RunSettings>";
+                                        <LegacySettings>
+                                            <Foo>
+                                        </LegacySettings>
+                                      </RunSettings>";
         Assert.IsFalse(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out _));
     }
 
@@ -497,9 +495,9 @@ public class InferRunSettingsHelperTests
     public void TryGetLegacySettingsForRunSettingsWithEmptyLegacySettingsShouldReturnTrueAndEmptyListForLegacySettingElements()
     {
         string runSettingsXml = @"<RunSettings>
-										<LegacySettings>
-										</LegacySettings>
-									  </RunSettings>";
+                                        <LegacySettings>
+                                        </LegacySettings>
+                                      </RunSettings>";
 
         Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out Dictionary<string, string> legacySettings));
         Assert.AreEqual(0, legacySettings.Count);
@@ -509,22 +507,22 @@ public class InferRunSettingsHelperTests
     public void TryGetLegacySettingsForRunSettingsWithValidLegacySettingsShouldReturnTrueAndListForLegacySettingElements()
     {
         string runSettingsXml = @"<RunSettings>
-									   <LegacySettings>
-											<Deployment enabled=""true"" deploySatelliteAssemblies=""true"" >
-												<DeploymentItem filename="".\test.txt"" />
-											</Deployment>
-											<Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
-											<Execution hostProcessPlatform=""MSIL"" parallelTestCount=""4"">
-												<Timeouts testTimeout=""120"" />
-												<TestTypeSpecific>
-													<UnitTestRunConfig>
-														<AssemblyResolution />
-													</UnitTestRunConfig>
-												</TestTypeSpecific>
-												<Hosts />
-											</Execution>
-									   </LegacySettings>
-									  </RunSettings>";
+                                       <LegacySettings>
+                                            <Deployment enabled=""true"" deploySatelliteAssemblies=""true"" >
+                                                <DeploymentItem filename="".\test.txt"" />
+                                            </Deployment>
+                                            <Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
+                                            <Execution hostProcessPlatform=""MSIL"" parallelTestCount=""4"">
+                                                <Timeouts testTimeout=""120"" />
+                                                <TestTypeSpecific>
+                                                    <UnitTestRunConfig>
+                                                        <AssemblyResolution />
+                                                    </UnitTestRunConfig>
+                                                </TestTypeSpecific>
+                                                <Hosts />
+                                            </Execution>
+                                       </LegacySettings>
+                                      </RunSettings>";
 
         var expectedElements = "Deployment, Scripts, Execution, AssemblyResolution, Timeouts, Hosts";
         var expectedDeploymentAttributes = "enabled, deploySatelliteAssemblies";
@@ -541,13 +539,13 @@ public class InferRunSettingsHelperTests
     public void GetEnvironmentVariablesWithValidValuesInRunSettingsShouldReturnValidDictionary()
     {
         string runSettingsXml = @"<RunSettings>
-									   <RunConfiguration>
-										  <EnvironmentVariables>
-											 <RANDOM_PATH>C:\temp</RANDOM_PATH>
-											 <RANDOM_PATH2>C:\temp2</RANDOM_PATH2>
-										  </EnvironmentVariables>
-									   </RunConfiguration>
-									  </RunSettings>";
+                                       <RunConfiguration>
+                                          <EnvironmentVariables>
+                                             <RANDOM_PATH>C:\temp</RANDOM_PATH>
+                                             <RANDOM_PATH2>C:\temp2</RANDOM_PATH2>
+                                          </EnvironmentVariables>
+                                       </RunConfiguration>
+                                      </RunSettings>";
 
         var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
 
@@ -560,13 +558,13 @@ public class InferRunSettingsHelperTests
     public void GetEnvironmentVariablesWithDuplicateEnvValuesInRunSettingsShouldReturnValidDictionary()
     {
         string runSettingsXml = @"<RunSettings>
-									   <RunConfiguration>
-										  <EnvironmentVariables>
-											 <RANDOM_PATH>C:\temp</RANDOM_PATH>
-											 <RANDOM_PATH>C:\temp2</RANDOM_PATH>
-										  </EnvironmentVariables>
-									   </RunConfiguration>
-									  </RunSettings>";
+                                       <RunConfiguration>
+                                          <EnvironmentVariables>
+                                             <RANDOM_PATH>C:\temp</RANDOM_PATH>
+                                             <RANDOM_PATH>C:\temp2</RANDOM_PATH>
+                                          </EnvironmentVariables>
+                                       </RunConfiguration>
+                                      </RunSettings>";
 
         var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
 
@@ -578,11 +576,11 @@ public class InferRunSettingsHelperTests
     public void GetEnvironmentVariablesWithEmptyVariablesInRunSettingsShouldReturnEmptyDictionary()
     {
         string runSettingsXml = @"<RunSettings>
-									   <RunConfiguration>
-										 <EnvironmentVariables>
-										 </EnvironmentVariables>
-									   </RunConfiguration>
-									  </RunSettings>";
+                                       <RunConfiguration>
+                                         <EnvironmentVariables>
+                                         </EnvironmentVariables>
+                                       </RunConfiguration>
+                                      </RunSettings>";
 
         var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
         Assert.AreEqual(0, envVars.Count);
@@ -592,12 +590,12 @@ public class InferRunSettingsHelperTests
     public void GetEnvironmentVariablesWithInvalidValuesInRunSettingsShouldReturnNull()
     {
         string runSettingsXml = @"<RunSettings>
-									   <RunConfiguration>
-										 <EnvironmentVariables>
-											<Foo>
-										 </EnvironmentVariables>
-									   </RunConfiguration>
-									  </RunSettings>";
+                                       <RunConfiguration>
+                                         <EnvironmentVariables>
+                                            <Foo>
+                                         </EnvironmentVariables>
+                                       </RunConfiguration>
+                                      </RunSettings>";
 
         var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
         Assert.IsNull(envVars);
@@ -607,9 +605,9 @@ public class InferRunSettingsHelperTests
     public void GetEnvironmentVariablesWithoutEnvVarNodeInRunSettingsShouldReturnNull()
     {
         string runSettingsXml = @"<RunSettings>
-									   <RunConfiguration>
-									   </RunConfiguration>
-									  </RunSettings>";
+                                       <RunConfiguration>
+                                       </RunConfiguration>
+                                      </RunSettings>";
 
         var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
         Assert.IsNull(envVars);
@@ -622,30 +620,30 @@ public class InferRunSettingsHelperTests
     {
         // Setup
         var runSettingsWithCodeCoverageAndInlineTestSettingsXml = @"
-					<RunSettings>
-					  <RunConfiguration>
-						<TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
-						<ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
-						<SolutionDirectory>C:\TestProject1\</SolutionDirectory>
-						<TargetPlatform>X86</TargetPlatform>
-					  </RunConfiguration>
-					  <MSTest>
-						<SettingsFile>C:\TestProject1\TestSettings1.testsettings</SettingsFile>
-						<ForcedLegacyMode>true</ForcedLegacyMode>
-						<IgnoreTestImpact>true</IgnoreTestImpact>
-					  </MSTest>
-					  <DataCollectionRunSettings>
-						<DataCollectors>
-						  <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""DynamicCoverageDataCollector"">
-							<Configuration>
-							  <CoverageFileName>DevBox 2018-01-07 20_42_30.coverage</CoverageFileName>
-							  <CodeCoverage>
-							  </CodeCoverage>
-							</Configuration>
-						  </DataCollector>
-						</DataCollectors>
-					  </DataCollectionRunSettings>
-					</RunSettings>";
+                    <RunSettings>
+                      <RunConfiguration>
+                        <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+                        <ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
+                        <SolutionDirectory>C:\TestProject1\</SolutionDirectory>
+                        <TargetPlatform>X86</TargetPlatform>
+                      </RunConfiguration>
+                      <MSTest>
+                        <SettingsFile>C:\TestProject1\TestSettings1.testsettings</SettingsFile>
+                        <ForcedLegacyMode>true</ForcedLegacyMode>
+                        <IgnoreTestImpact>true</IgnoreTestImpact>
+                      </MSTest>
+                      <DataCollectionRunSettings>
+                        <DataCollectors>
+                          <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""DynamicCoverageDataCollector"">
+                            <Configuration>
+                              <CoverageFileName>DevBox 2018-01-07 20_42_30.coverage</CoverageFileName>
+                              <CodeCoverage>
+                              </CodeCoverage>
+                            </Configuration>
+                          </DataCollector>
+                        </DataCollectors>
+                      </DataCollectionRunSettings>
+                    </RunSettings>";
 
         // Act and validate
         Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
@@ -658,27 +656,27 @@ public class InferRunSettingsHelperTests
     public void RunSettingsWithFakesAndCodeCoverageAndInlineTestSettingsXml()
     {
         var runSettingsWithFakesAndCodeCoverageAndInlineTestSettingsXml = @"
-				<RunSettings>
-				  <RunConfiguration>
-					<TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
-					<ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
-					<SolutionDirectory>C:\TestProject1\</SolutionDirectory>
-					<TargetPlatform>X86</TargetPlatform>
-				  </RunConfiguration>
-				  <MSTest>
-					<SettingsFile>C:\TestProject1\TestSettings1.testsettings</SettingsFile>
-					<ForcedLegacyMode>true</ForcedLegacyMode>
-					<IgnoreTestImpact>true</IgnoreTestImpact>
-				  </MSTest>
-				  <DataCollectionRunSettings>
-					<DataCollectors>
-					  <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""DynamicCoverageDataCollector"">
-					  </DataCollector>
-					  <DataCollector friendlyName=""UnitTestIsolation"" uri=""datacollector://Microsoft/unittestisolation/1.0"" assemblyQualifiedName=""DynamicCoverageDataCollector"">
-					  </DataCollector>
-					</DataCollectors>
-				  </DataCollectionRunSettings>
-				</RunSettings>";
+                <RunSettings>
+                  <RunConfiguration>
+                    <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+                    <ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
+                    <SolutionDirectory>C:\TestProject1\</SolutionDirectory>
+                    <TargetPlatform>X86</TargetPlatform>
+                  </RunConfiguration>
+                  <MSTest>
+                    <SettingsFile>C:\TestProject1\TestSettings1.testsettings</SettingsFile>
+                    <ForcedLegacyMode>true</ForcedLegacyMode>
+                    <IgnoreTestImpact>true</IgnoreTestImpact>
+                  </MSTest>
+                  <DataCollectionRunSettings>
+                    <DataCollectors>
+                      <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""DynamicCoverageDataCollector"">
+                      </DataCollector>
+                      <DataCollector friendlyName=""UnitTestIsolation"" uri=""datacollector://Microsoft/unittestisolation/1.0"" assemblyQualifiedName=""DynamicCoverageDataCollector"">
+                      </DataCollector>
+                    </DataCollectors>
+                  </DataCollectionRunSettings>
+                </RunSettings>";
 
         // Act and validate
         Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
@@ -691,24 +689,24 @@ public class InferRunSettingsHelperTests
     public void RunSettingsWithEnabledAndDisabledCollectorAndNoEmbeddedTestSettingsXml()
     {
         var runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml = @"
-				<RunSettings>
-					<RunConfiguration>
-						<TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
-						<ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
-						<SolutionDirectory>C:\TestProject1\</SolutionDirectory>
-						<TargetPlatform>X86</TargetPlatform>
-					</RunConfiguration>
-					<DataCollectionRunSettings>
-					<DataCollectors>
-						<DataCollector friendlyName=""Video"" uri=""datacollector://Microsoft/Video/2.0"" assemblyQualifiedName=""VideoCollector"">
-						</DataCollector>
-					</DataCollectors>
-					<DataCollectors>
-						<DataCollector friendlyName=""EventLog"" uri=""datacollector://Microsoft/Log/2.0"" enabled=""false"" assemblyQualifiedName=""LogCollector"">
-						</DataCollector>
-					</DataCollectors>
-					</DataCollectionRunSettings>
-				</RunSettings>";
+                <RunSettings>
+                    <RunConfiguration>
+                        <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+                        <ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
+                        <SolutionDirectory>C:\TestProject1\</SolutionDirectory>
+                        <TargetPlatform>X86</TargetPlatform>
+                    </RunConfiguration>
+                    <DataCollectionRunSettings>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""Video"" uri=""datacollector://Microsoft/Video/2.0"" assemblyQualifiedName=""VideoCollector"">
+                        </DataCollector>
+                    </DataCollectors>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""EventLog"" uri=""datacollector://Microsoft/Log/2.0"" enabled=""false"" assemblyQualifiedName=""LogCollector"">
+                        </DataCollector>
+                    </DataCollectors>
+                    </DataCollectionRunSettings>
+                </RunSettings>";
 
         // Act and validate
         Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
@@ -721,29 +719,29 @@ public class InferRunSettingsHelperTests
     public void RunSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml()
     {
         var runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml = @"
-				<RunSettings>
-					<RunConfiguration>
-						<TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
-						<ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
-						<SolutionDirectory>C:\TestProject1\</SolutionDirectory>
-						<TargetPlatform>X86</TargetPlatform>
-					</RunConfiguration>
-					<MSTest>
-						<SettingsFile>C:\TestProject1\TestSettings1.testsettings</SettingsFile>
-						<ForcedLegacyMode>true</ForcedLegacyMode>
-						<IgnoreTestImpact>true</IgnoreTestImpact>
-					</MSTest>
-					<DataCollectionRunSettings>
-					<DataCollectors>
-						<DataCollector friendlyName=""Video"" uri=""datacollector://Microsoft/Video/2.0"" assemblyQualifiedName=""VideoCollector"">
-						</DataCollector>
-					</DataCollectors>
-					<DataCollectors>
-						<DataCollector friendlyName=""EventLog"" uri=""datacollector://Microsoft/Log/2.0"" enabled=""false"" assemblyQualifiedName=""LogCollector"">
-						</DataCollector>
-					</DataCollectors>
-					</DataCollectionRunSettings>
-				</RunSettings>";
+                <RunSettings>
+                    <RunConfiguration>
+                        <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+                        <ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
+                        <SolutionDirectory>C:\TestProject1\</SolutionDirectory>
+                        <TargetPlatform>X86</TargetPlatform>
+                    </RunConfiguration>
+                    <MSTest>
+                        <SettingsFile>C:\TestProject1\TestSettings1.testsettings</SettingsFile>
+                        <ForcedLegacyMode>true</ForcedLegacyMode>
+                        <IgnoreTestImpact>true</IgnoreTestImpact>
+                    </MSTest>
+                    <DataCollectionRunSettings>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""Video"" uri=""datacollector://Microsoft/Video/2.0"" assemblyQualifiedName=""VideoCollector"">
+                        </DataCollector>
+                    </DataCollectors>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""EventLog"" uri=""datacollector://Microsoft/Log/2.0"" enabled=""false"" assemblyQualifiedName=""LogCollector"">
+                        </DataCollector>
+                    </DataCollectors>
+                    </DataCollectionRunSettings>
+                </RunSettings>";
 
         // Act and validate
         Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
@@ -756,29 +754,29 @@ public class InferRunSettingsHelperTests
     public void RunSettingsWithDisabledCollectionSettingsAndInlineTestSettingsXml()
     {
         var runSettingsWithDisabledCollectionSettingsAndInlineTestSettingsXml = @"
-				<RunSettings>
-				  <RunConfiguration>
-					<TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
-					<ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
-					<SolutionDirectory>C:\TestProject1\</SolutionDirectory>
-					<TargetPlatform>X86</TargetPlatform>
-				  </RunConfiguration>
-				  <MSTest>
-					<SettingsFile>C:\TestProject1\TestSettings1.testsettings</SettingsFile>
-					<ForcedLegacyMode>true</ForcedLegacyMode>
-					<IgnoreTestImpact>true</IgnoreTestImpact>
-				  </MSTest>
-				  <DataCollectionRunSettings>
-					<DataCollectors>
-					  <DataCollector friendlyName=""Video"" uri=""datacollector://Microsoft/Video/2.0"" enabled=""false"" assemblyQualifiedName=""VideoCollector"">
-					  </DataCollector>
-					</DataCollectors>
-					<DataCollectors>
-					  <DataCollector friendlyName=""EventLog"" uri=""datacollector://Microsoft/Log/2.0"" enabled=""false"" assemblyQualifiedName=""LogCollector"">
-					  </DataCollector>
-					</DataCollectors>
-				  </DataCollectionRunSettings>
-				</RunSettings>";
+                <RunSettings>
+                  <RunConfiguration>
+                    <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+                    <ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
+                    <SolutionDirectory>C:\TestProject1\</SolutionDirectory>
+                    <TargetPlatform>X86</TargetPlatform>
+                  </RunConfiguration>
+                  <MSTest>
+                    <SettingsFile>C:\TestProject1\TestSettings1.testsettings</SettingsFile>
+                    <ForcedLegacyMode>true</ForcedLegacyMode>
+                    <IgnoreTestImpact>true</IgnoreTestImpact>
+                  </MSTest>
+                  <DataCollectionRunSettings>
+                    <DataCollectors>
+                      <DataCollector friendlyName=""Video"" uri=""datacollector://Microsoft/Video/2.0"" enabled=""false"" assemblyQualifiedName=""VideoCollector"">
+                      </DataCollector>
+                    </DataCollectors>
+                    <DataCollectors>
+                      <DataCollector friendlyName=""EventLog"" uri=""datacollector://Microsoft/Log/2.0"" enabled=""false"" assemblyQualifiedName=""LogCollector"">
+                      </DataCollector>
+                    </DataCollectors>
+                  </DataCollectionRunSettings>
+                </RunSettings>";
 
         // Act and validate
         Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
@@ -796,7 +794,7 @@ public class InferRunSettingsHelperTests
         return string.Format(CultureInfo.CurrentCulture, OMResources.SourceIncompatible, source, _sourceFrameworks[source].Name, _sourceArchitectures[source]);
     }
 
-    private XmlDocument GetXmlDocument(string settingsXml)
+    private static XmlDocument GetXmlDocument(string settingsXml)
     {
         var doc = new XmlDocument();
         doc.LoadXml(settingsXml);
@@ -804,12 +802,12 @@ public class InferRunSettingsHelperTests
         return doc;
     }
 
-    private string GetValueOf(XmlDocument xmlDocument, string xpath)
+    private static string GetValueOf(XmlDocument xmlDocument, string xpath)
     {
-        return xmlDocument.SelectSingleNode(xpath).InnerText;
+        return xmlDocument.SelectSingleNode(xpath)!.InnerText;
     }
 
-    private string ConvertOutOfProcToInProcDataCollectionSettings(string settings)
+    private static string ConvertOutOfProcToInProcDataCollectionSettings(string settings)
     {
         return settings.Replace("DataCollectionRunSettings", "InProcDataCollectionRunSettings")
             .Replace("<DataCollectors>", "<InProcDataCollectors>")

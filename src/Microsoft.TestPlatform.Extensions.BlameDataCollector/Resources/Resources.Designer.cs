@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -82,7 +82,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key..
+        ///   Looks up a localized string similar to The blame parameter key {0}, has incorrect value: {1}. Supported values are: {2}.
         /// </summary>
         internal static string BlameParameterValueIncorrect {
             get {
@@ -159,6 +159,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         internal static string ProcDumpEnvVarEmpty {
             get {
                 return ResourceManager.GetString("ProcDumpEnvVarEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} could not be found, please make sure that the executable is available on PATH. Alternatively set PROCDUMP_PATH environment variable to a directory that contains {0} executable.
+        /// </summary>
+        internal static string ProcDumpNotFound {
+            get {
+                return ResourceManager.GetString("ProcDumpNotFound", resourceCulture);
             }
         }
         

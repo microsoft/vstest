@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
 
 using FluentAssertions;
 using FluentAssertions.Extensions;
@@ -13,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.PerformanceTests;
 

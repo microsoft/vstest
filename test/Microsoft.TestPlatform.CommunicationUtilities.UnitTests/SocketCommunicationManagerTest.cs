@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests;
 
 [TestClass]

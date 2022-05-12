@@ -26,20 +26,17 @@ using Moq;
 
 using static TestPlatform.CrossPlatEngine.UnitTests.Execution.RunTestsWithSourcesTests;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Execution;
 
 [TestClass]
 public class ExecutionManagerTests
 {
-    private ExecutionManager _executionManager;
-    private TestExecutionContext _testExecutionContext;
-    private Mock<IRequestData> _mockRequestData;
-    private TestSessionMessageLogger _sessionLogger;
+    private readonly ExecutionManager _executionManager;
+    private readonly TestExecutionContext _testExecutionContext;
+    private readonly Mock<IRequestData> _mockRequestData;
+    private readonly TestSessionMessageLogger _sessionLogger;
 
-    [TestInitialize]
-    public void TestInit()
+    public ExecutionManagerTests()
     {
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());

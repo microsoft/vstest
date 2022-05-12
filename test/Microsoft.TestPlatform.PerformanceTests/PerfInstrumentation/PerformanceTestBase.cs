@@ -6,8 +6,6 @@ using System.Collections.Generic;
 
 using Microsoft.TestPlatform.TestUtilities;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 
 /// <summary>
@@ -44,7 +42,7 @@ public class PerformanceTestBase : IntegrationTestBase
     /// </param>
     public void RunExecutionPerformanceTests(string testAsset, string testAdapterPath, string runSettings)
     {
-        using(_perfAnalyzer.Start())
+        using (_perfAnalyzer.Start())
         {
             InvokeVsTestForExecution(testAsset, testAdapterPath, framework: string.Empty, runSettings);
         }

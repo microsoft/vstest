@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.TestUtilities;
 
 public static class TestPluginCacheHelper
@@ -38,17 +36,17 @@ public static class TestPluginCacheHelper
         return testPluginCache;
     }
 
-    public static void SetupMockExtensions(Type callingTest, Mock<IFileHelper> mockFileHelper = null)
+    public static void SetupMockExtensions(Type callingTest, Mock<IFileHelper>? mockFileHelper = null)
     {
         SetupMockExtensions(callingTest, () => { }, mockFileHelper);
     }
 
-    public static void SetupMockExtensions(Type callingTest, Action callback, Mock<IFileHelper> mockFileHelper = null)
+    public static void SetupMockExtensions(Type callingTest, Action callback, Mock<IFileHelper>? mockFileHelper = null)
     {
         SetupMockExtensions(new[] { callingTest.GetTypeInfo().Assembly.Location }, callback, mockFileHelper);
     }
 
-    public static void SetupMockExtensions(string[] extensions, Action callback, Mock<IFileHelper> mockFileHelper = null)
+    public static void SetupMockExtensions(string[] extensions, Action callback, Mock<IFileHelper>? mockFileHelper = null)
     {
         // Setup mocks.
         if (mockFileHelper == null)

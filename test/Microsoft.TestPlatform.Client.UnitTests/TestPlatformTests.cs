@@ -19,8 +19,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests;
 
 [TestClass]
@@ -244,7 +242,7 @@ public class TestPlatformTests
         var actualTestRunRequest = testRunRequest as TestRunRequest;
 
         _executionManager.Verify(em => em.Initialize(false), Times.Once);
-        Assert.AreEqual(testRunCriteria, actualTestRunRequest.TestRunCriteria);
+        Assert.AreEqual(testRunCriteria, actualTestRunRequest?.TestRunCriteria);
     }
 
     [TestMethod]
@@ -279,6 +277,27 @@ public class TestPlatformTests
         InvokeCreateTestRunRequest();
 
         _executionManager.Verify(dm => dm.Initialize(false), Times.Once);
+    }
+
+    [TestMethod]
+    public void CreateTestRunRequestShouldSetCustomHostLauncherOnEngineDefaultLauncherIfSpecified()
+    {
+        var mockCustomLauncher = new Mock<ITestHostLauncher>();
+        _executionManager.Setup(dm => dm.Initialize(false)).Verifiable();
+        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, _hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(_executionManager.Object);
+        _testEngine.Setup(te => te.GetExtensionManager()).Returns(_extensionManager.Object);
+        _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
+
+        var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
+        var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
+        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
+            .Returns(testRunCriteria.Sources);
+
+        var testRunRequest = tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions());
+
+        var actualTestRunRequest = testRunRequest as TestRunRequest;
+        Assert.AreEqual(testRunCriteria, actualTestRunRequest?.TestRunCriteria);
+        _hostManager.Verify(hl => hl.SetCustomLauncher(mockCustomLauncher.Object), Times.Once);
     }
 
     [TestMethod]
@@ -586,7 +605,7 @@ public class TestPlatformTests
             Times.Once);
     }
 
-    private void InvokeCreateDiscoveryRequest(TestPlatformOptions options = null)
+    private void InvokeCreateDiscoveryRequest(TestPlatformOptions? options = null)
     {
         _discoveryManager.Setup(dm => dm.Initialize(false)).Verifiable();
         var discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
@@ -601,7 +620,7 @@ public class TestPlatformTests
         tp.CreateDiscoveryRequest(_mockRequestData.Object, discoveryCriteria, options, new Dictionary<string, SourceDetail>());
     }
 
-    private void InvokeCreateTestRunRequest(TestPlatformOptions options = null)
+    private void InvokeCreateTestRunRequest(TestPlatformOptions? options = null)
     {
         _executionManager.Setup(dm => dm.Initialize(false)).Verifiable();
         _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_executionManager.Object);
@@ -618,20 +637,22 @@ public class TestPlatformTests
 
     private class TestableTestPlatform : TestPlatform
     {
-        public TestableTestPlatform(ITestEngine testEngine, ITestRuntimeProvider hostProvider) : base(testEngine, new FileHelper(), new TestableTestRuntimeProviderManager(hostProvider))
+        public TestableTestPlatform(ITestEngine testEngine, ITestRuntimeProvider hostProvider)
+            : base(testEngine, new FileHelper(), new TestableTestRuntimeProviderManager(hostProvider))
         {
         }
 
-        public TestableTestPlatform(ITestEngine testEngine, IFileHelper fileHelper, ITestRuntimeProvider hostProvider) : base(testEngine, fileHelper, new TestableTestRuntimeProviderManager(hostProvider))
+        public TestableTestPlatform(ITestEngine testEngine, IFileHelper fileHelper, ITestRuntimeProvider? hostProvider)
+            : base(testEngine, fileHelper, new TestableTestRuntimeProviderManager(hostProvider))
         {
         }
     }
 
     private class TestableTestRuntimeProviderManager : TestRuntimeProviderManager
     {
-        private readonly ITestRuntimeProvider _hostProvider;
+        private readonly ITestRuntimeProvider? _hostProvider;
 
-        public TestableTestRuntimeProviderManager(ITestRuntimeProvider hostProvider)
+        public TestableTestRuntimeProviderManager(ITestRuntimeProvider? hostProvider)
             : base(TestSessionMessageLogger.Instance)
         {
             _hostProvider = hostProvider;

@@ -120,4 +120,9 @@ internal class FakeProcessHelper : IProcessHelper
 
         process.Start();
     }
+
+    public PlatformArchitecture GetProcessArchitecture(int processId)
+    {
+        throw new NotImplementedException();
+    }
 }

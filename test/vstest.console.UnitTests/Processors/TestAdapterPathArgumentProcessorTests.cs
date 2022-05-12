@@ -18,17 +18,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
 public class TestAdapterPathArgumentProcessorTests
 {
-    RunSettings _currentActiveSetting;
+    private readonly RunSettings _currentActiveSetting;
 
-    [TestInitialize]
-    public void TestInit()
+    public TestAdapterPathArgumentProcessorTests()
     {
         _currentActiveSetting = RunSettingsManager.Instance.ActiveRunSettings;
     }
@@ -195,7 +192,7 @@ public class TestAdapterPathArgumentProcessorTests
         {
         }
 
-        internal Func<string, IEnumerable<string>> TestAdapters { get; set; }
+        internal Func<string, IEnumerable<string>>? TestAdapters { get; set; }
     }
 
     #endregion

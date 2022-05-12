@@ -5,7 +5,7 @@
     <!-- This version is read by vsts-prebuild.ps1 and is a base for the current version, this should be updated
     at the start of new iteration to the goal number. This is also used to version the local packages. This version needs to be statically
     readable when we read the file as xml, don't move it to a .props file, unless you change the build server process -->
-    <TPVersionPrefix>17.2.0</TPVersionPrefix>
+    <TPVersionPrefix>17.3.0</TPVersionPrefix>
     <LangVersion>preview</LangVersion>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>preview</AnalysisLevel>
@@ -53,7 +53,14 @@
   <ItemGroup>
     <PackageReference Condition=" '$(OS)' != 'Windows_NT' " Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="All" />
   </ItemGroup>
-  
+
+  <ItemGroup Condition=" '$(UseBannedApiAnalyzers)' == 'true' and '$(DotNetBuildFromSource)' != 'true' ">
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="$(RoslynBannedApiAnalyzersVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
   <!-- Include PublicApi analyzers into all projects that are in our src directory, this can't use TestProject == true
   because some projects in test and playground are not tests, but we don't want to analyze those for public apis, because
   we don't ship them.
@@ -122,7 +129,7 @@
           <Version>$(MSTestAssertExtensionVersion)</Version>
         </PackageReference>
         <PackageReference Include="Microsoft.CodeCoverage">
-          <Version>1.0.3</Version>
+          <Version>$(MicrosoftCodeCoverageVersion)</Version>
         </PackageReference>
       </ItemGroup>
     </When>

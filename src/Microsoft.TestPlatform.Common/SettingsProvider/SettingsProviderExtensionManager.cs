@@ -50,14 +50,10 @@ public class SettingsProviderExtensionManager
     /// instances to be used for each run settings.
     /// </remarks>
     protected SettingsProviderExtensionManager(
-        IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settingsProviders,
-        IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredSettingsProviders,
-        IMessageLogger logger)
+        IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settingsProviders!!,
+        IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredSettingsProviders!!,
+        IMessageLogger logger!!)
     {
-        ValidateArg.NotNull(settingsProviders, nameof(settingsProviders));
-        ValidateArg.NotNull(unfilteredSettingsProviders, nameof(unfilteredSettingsProviders));
-        ValidateArg.NotNull(logger, nameof(logger));
-
         _settingsProviders = settingsProviders;
         UnfilteredSettingsProviders = unfilteredSettingsProviders;
         _logger = logger;
@@ -166,7 +162,7 @@ public class SettingsProviderExtensionManager
     /// <returns>Settings provider with the provided name or null if one was not found.</returns>
     internal LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> GetSettingsProvider(string settingsName)
     {
-        if (string.IsNullOrWhiteSpace(settingsName))
+        if (settingsName.IsNullOrWhiteSpace())
         {
             throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(settingsName));
         }
