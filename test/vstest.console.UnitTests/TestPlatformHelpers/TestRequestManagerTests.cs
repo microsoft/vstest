@@ -780,11 +780,11 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload,
             new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
 
-        // we don't infer the settings
-        _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
+        // we infer the architecture and framework, so we can print warning when they don't match settings.
+        _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
-        // we don't update the settings
+        // but we don't update the settings, to keep what user specified
         Assert.IsFalse(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsFalse(actualDiscoveryCriteria!.RunSettings.Contains(nameof(Architecture.ARM)));
     }
@@ -1443,11 +1443,11 @@ public class TestRequestManagerTests
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
-        // don't infer them
-        _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
+        // infer them so we can print warning when dlls are not compatible with runsettings
+        _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
-        // don't update them
+        // but don't update runsettings because we want to keep what user specified
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(nameof(Architecture.ARM)));
     }
@@ -1484,7 +1484,7 @@ public class TestRequestManagerTests
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
-        // don't infer it
+        // Infer 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
         // but infer framework
         _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
@@ -1557,11 +1557,11 @@ public class TestRequestManagerTests
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
-        // don't infer them
-        _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
+        // infer them so we can print warnings when the assemblies are not compatible
+        _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
-        // don't update them
+        // but don't update them in runsettings so we keep what user specified
         Assert.IsFalse(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
     }
