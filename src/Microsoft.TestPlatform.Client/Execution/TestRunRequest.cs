@@ -613,7 +613,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 // would probably mean a performance hit.
                 testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
                     testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions,
-                    TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
+                    TestPluginCache.Instance.TestExtensions?.GetCachedExtensions());
 
                 // Write extensions to telemetry data.
                 TestExtensions.AddExtensionTelemetry(

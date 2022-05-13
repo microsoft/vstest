@@ -436,7 +436,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 // would probably mean a performance hit.
                 discoveryCompletePayload.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
                     discoveryCompletePayload.DiscoveredExtensions,
-                    TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
+                    TestPluginCache.Instance.TestExtensions?.GetCachedExtensions());
 
                 // Write extensions to telemetry data.
                 TestExtensions.AddExtensionTelemetry(
