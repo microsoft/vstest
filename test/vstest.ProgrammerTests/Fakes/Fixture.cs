@@ -28,7 +28,7 @@ internal class Fixture : IDisposable
     public FakeTestRuntimeProviderManager TestRuntimeProviderManager { get; }
     public FakeTestRunEventsRegistrar TestRunEventsRegistrar { get; }
     public FakeEnvironment Environment { get; }
-    public FakeTestDiscoveryEventsRegistrar TestDiscoveryEventsRegistrar { get;  }
+    public FakeTestDiscoveryEventsRegistrar TestDiscoveryEventsRegistrar { get; }
     public TestEngine? TestEngine { get; private set; }
     public TestPlatform? TestPlatform { get; private set; }
     public TestRunResultAggregator? TestRunResultAggregator { get; private set; }

@@ -11,7 +11,7 @@ internal class ActionRecord<T>
 {
     public T Value { get; }
     public string StackTrace { get; }
-    public ActionRecord (T value)
+    public ActionRecord(T value)
     {
         StackTrace = Environment.StackTrace;
         Value = value;

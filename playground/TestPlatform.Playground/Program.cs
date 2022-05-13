@@ -83,7 +83,9 @@ internal class Program
         var options = new TestPlatformOptions();
         var r = new VsTestConsoleWrapper(console, consoleOptions);
         var sessionHandler = new TestSessionHandler();
+#pragma warning disable CS0618 // Type or member is obsolete
         r.StartTestSession(sources, sourceSettings, sessionHandler);
+#pragma warning restore CS0618 // Type or member is obsolete
         var discoveryHandler = new PlaygroundTestDiscoveryHandler();
         r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
         r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
@@ -137,7 +139,7 @@ internal class Program
 
         private static string WriteTests(IEnumerable<TestCase> testCases)
             => testCases?.Any() == true
-                ? "\t" + string.Join("\n\t", testCases.Select(r =>  r.Source + " " + r.DisplayName))
+                ? "\t" + string.Join("\n\t", testCases.Select(r => r.Source + " " + r.DisplayName))
                 : "\t<empty>";
 
         private static string WriteSources(IEnumerable<string> sources)
@@ -221,12 +223,12 @@ internal class TestSessionHandler : ITestSessionEventsHandler
 
     public void HandleLogMessage(TestMessageLevel level, string message)
     {
-        
+
     }
 
     public void HandleRawMessage(string rawMessage)
     {
-        
+
     }
 
     public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs)
@@ -236,6 +238,6 @@ internal class TestSessionHandler : ITestSessionEventsHandler
 
     public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs eventArgs)
     {
-        
+
     }
 }

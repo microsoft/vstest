@@ -93,7 +93,7 @@ internal class TestPlatform : ITestPlatform
         ITestLoggerManager loggerManager = _testEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(discoveryCriteria.RunSettings);
 
-        IProxyDiscoveryManager discoveryManager = _testEngine.GetDiscoveryManager(requestData,  discoveryCriteria, sourceToSourceDetailMap);
+        IProxyDiscoveryManager discoveryManager = _testEngine.GetDiscoveryManager(requestData, discoveryCriteria, sourceToSourceDetailMap);
         discoveryManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager, loggerManager);

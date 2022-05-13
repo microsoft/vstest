@@ -42,7 +42,7 @@ public class TestSessionPoolTests
         var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
             new StartTestSessionCriteria(),
             1,
-            (Func<TestRuntimeProviderInfo, ProxyOperationManager>)(_ => null),
+            (Func<TestRuntimeProviderInfo, ProxyOperationManager>)(_ => null!),
             new List<TestRuntimeProviderInfo>());
         var mockRequestData = new Mock<IRequestData>();
 
@@ -72,7 +72,7 @@ public class TestSessionPoolTests
         var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
             new StartTestSessionCriteria(),
             1,
-            (Func<TestRuntimeProviderInfo, ProxyOperationManager>)(_ => null),
+            (Func<TestRuntimeProviderInfo, ProxyOperationManager>)(_ => null!),
             new List<TestRuntimeProviderInfo>());
 
         mockProxyTestSessionManager.SetupSequence(tsm => tsm.DequeueProxy(It.IsAny<string>(), It.IsAny<string>()))
@@ -104,7 +104,7 @@ public class TestSessionPoolTests
         var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
             new StartTestSessionCriteria(),
             1,
-            (Func<TestRuntimeProviderInfo, ProxyOperationManager>)(_ => null),
+            (Func<TestRuntimeProviderInfo, ProxyOperationManager>)(_ => null!),
             new List<TestRuntimeProviderInfo>());
 
         mockProxyTestSessionManager.SetupSequence(tsm => tsm.EnqueueProxy(It.IsAny<int>()))

@@ -3,8 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,11 +31,7 @@ public class ParallelProxyExecutionManagerTests
     private readonly List<Mock<IProxyExecutionManager>> _usedMockManagers;
     private readonly Func<TestRuntimeProviderInfo, IProxyExecutionManager> _createMockManager;
     private readonly Mock<ITestRunEventsHandler> _mockEvenHandler;
-    private Mock<ITestRuntimeProvider> _mockTestHostManager;
 
-    private Mock<ITestRequestSender> _mockRequestSender;
-
-    private Mock<IProxyDataCollectionManager> _mockDataCollectionManager;
     private readonly List<string> _sources;
     private readonly List<string> _processedSources;
     private readonly TestRunCriteria _testRunCriteriaWith2Sources;
@@ -181,9 +175,9 @@ public class ParallelProxyExecutionManagerTests
     public void HandlePartialRunCompleteShouldCreateNewProxyExecutionManagerIfDataCollectionEnabled()
     {
         var completeArgs = new TestRunCompleteEventArgs(null, isCanceled: false, isAborted: false, null, null, null, TimeSpan.Zero);
-        _mockTestHostManager = new Mock<ITestRuntimeProvider>();
-        _mockRequestSender = new Mock<ITestRequestSender>();
-        _mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
+        var mockTestHostManager = new Mock<ITestRuntimeProvider>();
+        var mockRequestSender = new Mock<ITestRequestSender>();
+        var mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
         var parallelExecutionManager = SetupExecutionManager(_createMockManager, 2, setupTestCases: true);
 
         // Trigger discover tests, this will create a manager by calling the _createMockManager func
@@ -205,8 +199,8 @@ public class ParallelProxyExecutionManagerTests
     public void HandlePartialRunCompleteShouldCreateNewProxyExecutionManagerIfIsAbortedIsTrue()
     {
         var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, null, TimeSpan.Zero);
-        _mockTestHostManager = new Mock<ITestRuntimeProvider>();
-        _mockRequestSender = new Mock<ITestRequestSender>();
+        var mockTestHostManager = new Mock<ITestRuntimeProvider>();
+        var mockRequestSender = new Mock<ITestRequestSender>();
         var parallelExecutionManager = SetupExecutionManager(_createMockManager, 2, setupTestCases: true);
 
         // Trigger discover tests, this will create a manager by calling the _createMockManager func

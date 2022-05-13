@@ -28,7 +28,7 @@ internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
         // so we need to go by order. We also do this resolve twice for each source in parallel run
         // because we first need to know if the provider is shared. So we add to the queue twice.
         // This is brittle, but there is no way around this :(
-        foreach(var provider in runtimeProviders)
+        foreach (var provider in runtimeProviders)
         {
             TestRuntimeProvidersByOrder.Enqueue(provider);
             TestRuntimeProvidersByOrder.Enqueue(provider);

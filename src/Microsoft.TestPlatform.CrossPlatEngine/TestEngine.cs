@@ -271,13 +271,13 @@ public class TestEngine : ITestEngine
 
                     if (proxyOperationManager == null)
                     {
-                            // If the proxy creation process based on test session info failed, then
-                            // we'll proceed with the normal creation process as if no test session
-                            // info was passed in in the first place.
-                            //
-                            // WARNING: This should not normally happen and it raises questions
-                            // regarding the test session pool operation and consistency.
-                            EqtTrace.Warning("ProxyExecutionManager creation with test session failed.");
+                        // If the proxy creation process based on test session info failed, then
+                        // we'll proceed with the normal creation process as if no test session
+                        // info was passed in in the first place.
+                        //
+                        // WARNING: This should not normally happen and it raises questions
+                        // regarding the test session pool operation and consistency.
+                        EqtTrace.Warning("ProxyExecutionManager creation with test session failed.");
 
                         proxyOperationManager = new ProxyOperationManager(
                             requestData,

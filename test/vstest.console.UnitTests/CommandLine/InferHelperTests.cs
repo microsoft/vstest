@@ -47,7 +47,7 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnNullItemInSources()
     {
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { null }, _defaultArchitecture, out _));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { null! }, _defaultArchitecture, out _));
     }
 
     [TestMethod]
@@ -162,7 +162,7 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnDefaultFrameworkOnNullItemInSources()
     {
-        Assert.AreEqual(_defaultFramework, _inferHelper.AutoDetectFramework(new List<string>() { null }, out _));
+        Assert.AreEqual(_defaultFramework, _inferHelper.AutoDetectFramework(new List<string>() { null! }, out _));
     }
 
     [TestMethod]

@@ -238,15 +238,15 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
 
         TestRunCriteria CreateTestRunCriteriaFromTestCasesAndSettings(IEnumerable<TestCase> testCases, TestRunCriteria criteria, string runsettingsXml)
         {
-           return new TestRunCriteria(
-                testCases,
-                testRunCriteria.FrequencyOfRunStatsChangeEvent,
-                testRunCriteria.KeepAlive,
-                runsettingsXml,
-                testRunCriteria.RunStatsChangeEventTimeout,
-                testRunCriteria.TestHostLauncher,
-                testRunCriteria.TestSessionInfo,
-                testRunCriteria.DebugEnabledForTestSession);
+            return new TestRunCriteria(
+                 testCases,
+                 testRunCriteria.FrequencyOfRunStatsChangeEvent,
+                 testRunCriteria.KeepAlive,
+                 runsettingsXml,
+                 testRunCriteria.RunStatsChangeEventTimeout,
+                 testRunCriteria.TestHostLauncher,
+                 testRunCriteria.TestSessionInfo,
+                 testRunCriteria.DebugEnabledForTestSession);
         }
 
         TestRunCriteria CreateTestRunCriteriaFromSourceAndSettings(IEnumerable<string> sources, TestRunCriteria criteria, string runsettingsXml)

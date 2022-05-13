@@ -53,6 +53,6 @@ internal sealed class FakeMessage<T> : FakeMessage
 
     public override string ToString()
     {
-        return $"{MessageType} {{{ Payload }}}";
+        return $"{MessageType} {{{Payload}}}";
     }
 }

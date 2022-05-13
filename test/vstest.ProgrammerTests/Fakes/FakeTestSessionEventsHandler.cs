@@ -10,7 +10,7 @@ internal class FakeTestSessionEventsHandler : ITestSessionEventsHandler
 {
     private readonly FakeErrorAggregator _fakeErrorAggregator;
 
-    public FakeTestSessionEventsHandler (FakeErrorAggregator fakeErrorAggregator)
+    public FakeTestSessionEventsHandler(FakeErrorAggregator fakeErrorAggregator)
     {
         _fakeErrorAggregator = fakeErrorAggregator;
     }

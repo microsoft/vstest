@@ -258,6 +258,7 @@ public class CustomTestHostTests : AcceptanceTestBase
         }
     }
 
+#pragma warning disable CS0618 // Type or member is obsolete
     private class TestHostLauncherV3 : ITestHostLauncher3
     {
         public bool IsDebug => true;
@@ -304,3 +305,5 @@ public class CustomTestHostTests : AcceptanceTestBase
         }
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete
+

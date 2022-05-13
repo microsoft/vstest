@@ -29,15 +29,17 @@ public interface ITestHostLauncher2 : ITestHostLauncher
     bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken);
 }
 
+[Obsolete("Do not use this api, it is not ready yet.")]
 public interface ITestHostLauncher3 : ITestHostLauncher2
 {
     bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo);
 }
 
+[Obsolete("Do not use this api, it is not ready yet.")]
 public class AttachDebuggerInfo
 {
     public Version Version { get; set; }
     public int ProcessId { get; set; }
-    public Framework? TargetFramework { get; set; }
+    public Framework TargetFramework { get; set; }
     public CancellationToken CancellationToken { get; set; }
 }

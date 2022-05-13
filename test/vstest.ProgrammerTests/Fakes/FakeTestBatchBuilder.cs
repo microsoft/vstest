@@ -11,7 +11,7 @@ internal class FakeTestBatchBuilder
     public TimeSpan Duration { get; private set; }
     public int BatchSize { get; private set; }
     public static List<List<TestResult>> Empty => new();
-    public string Source { get; private set; }
+    public string? Source { get; private set; }
 
     public FakeTestBatchBuilder()
     {

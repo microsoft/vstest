@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
@@ -14,7 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,13 +24,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests;
 [TestClass]
 public class TestEngineTests
 {
-    private TestableTestEngine _testEngine;
+    private readonly TestableTestEngine _testEngine;
     private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly ProtocolConfig _protocolConfig = new() { Version = 1 };
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
-
-    private ITestRuntimeProvider _testableTestRuntimeProvider;
 
     public TestEngineTests()
     {
