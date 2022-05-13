@@ -1484,12 +1484,11 @@ public class TestRequestManagerTests
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
-        // Infer 
-        _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
-        // but infer framework
+        // infer platform and framework so we can print warnings when dlls are not compatible with runsettings
+        _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
         _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
-        // don't update it
+        // don't update it in runsettings to keep what user provided
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(targetPlatform));
     }
 
