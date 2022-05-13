@@ -485,7 +485,7 @@ public class TestPlatformTests
                     It.IsAny<IRequestData>(),
                     It.IsAny<StartTestSessionCriteria>(),
                     It.IsAny<Dictionary<string, SourceDetail>>()))
-            .Returns((IProxyTestSessionManager)null);
+            .Returns((IProxyTestSessionManager)null!);
 
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
         var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
@@ -642,7 +642,7 @@ public class TestPlatformTests
         {
         }
 
-        public TestableTestPlatform(ITestEngine testEngine, IFileHelper fileHelper, ITestRuntimeProvider? hostProvider)
+        public TestableTestPlatform(ITestEngine testEngine, IFileHelper fileHelper, ITestRuntimeProvider hostProvider)
             : base(testEngine, fileHelper, new TestableTestRuntimeProviderManager(hostProvider))
         {
         }
@@ -650,9 +650,9 @@ public class TestPlatformTests
 
     private class TestableTestRuntimeProviderManager : TestRuntimeProviderManager
     {
-        private readonly ITestRuntimeProvider? _hostProvider;
+        private readonly ITestRuntimeProvider _hostProvider;
 
-        public TestableTestRuntimeProviderManager(ITestRuntimeProvider? hostProvider)
+        public TestableTestRuntimeProviderManager(ITestRuntimeProvider hostProvider)
             : base(TestSessionMessageLogger.Instance)
         {
             _hostProvider = hostProvider;

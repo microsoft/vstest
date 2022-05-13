@@ -178,7 +178,7 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
     /// <returns></returns>
     private List<ProviderSpecificWorkload<TestRunCriteria>> SplitToWorkloads(TestRunCriteria testRunCriteria, Dictionary<string, TestRuntimeProviderInfo> sourceToTestHostProviderMap)
     {
-        // We split the work to workloads that will run on each testhost, we and add all of them
+        // We split the work to workloads that will run on each testhost, and add all of them
         // to a bag of work that needs to be processed. (The workloads are just
         // a single source, or all test cases for a given source.)
         //
@@ -190,28 +190,29 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         // and we start sending them work. Once any testhost is done processing a given workload,
         // we will get notified with the completed event for the work we are doing. For example for StartTestRun
         // we will get TestExecutionCompleted, and we will call HandlePartialTestExecutionComplete.
-        // (The "partial" here refers to posibly having more work in the work bag. It does not mean that
+        // (The "partial" here refers to possibly having more work in the work bag. It does not mean that
         // there was an error in the testhost and we only did part of execution.).
         //
         // At that point we know that at least one testhost is not busy doing work anymore. It either
-        // processed the workload and waits for another one, or it maybe crashed and we should move to
+        // processed the workload and waits for another one, or it crashed and we should move to
         // another source.
         // 
         // In the "partial" step we check if we have more workloads, and if the currently running testhost
         // is shared we try to find a workload that is appropriate for it. If we don't find any work that the
-        // running testhost can do. Or if the testhost already exited (or maybe crashed), we start another one
+        // running testhost can do. Or if the testhost already exited (possibly because of crash), we start another one
         // and give it the next workload.
         List<ProviderSpecificWorkload<TestRunCriteria>> workloads = new();
         if (testRunCriteria.HasSpecificTests)
         {
             // We split test cases to their respective sources, and associate them with additional info about on
             // which type of provider they can run so we can later select the correct workload for the provider
-            // if we already have a provider running, and it is shared.
-            var testCasesPerSource = testRunCriteria.Tests.GroupBy(t => t.Source);        
+            // if we already have a shared provider running, that can take more sources.
+            var testCasesPerSource = testRunCriteria.Tests.GroupBy(t => t.Source);
             foreach (var group in testCasesPerSource)
             {
                 var testHostProviderInfo = sourceToTestHostProviderMap[group.Key];
                 var runsettings = testHostProviderInfo.RunSettings;
+                // ToList because it is easier to see what is going on when debugging.
                 var testCases = group.ToList();
                 var updatedCriteria = CreateTestRunCriteriaFromTestCasesAndSettings(testCases, testRunCriteria, runsettings);
                 var workload = new ProviderSpecificWorkload<TestRunCriteria>(updatedCriteria, testHostProviderInfo);
@@ -340,25 +341,18 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
 
 /// <summary>
 /// A workload with a specification of a provider that can run that workload. The workload is a list of sources,
-/// or a list of testcases. Provider is a given testhost manager, that is capable of running this workload, so
-/// we end up running .NET sources on .NET testhost, and .NET Framework sources on .NET Framework provider.
+/// or a list of testcases. Provider is a testhost manager, that is capable of running this workload, so
+/// we end up running .NET sources on .NET testhost, and .NET Framework sources on .NET Framework testhost.
 /// </summary>
-internal class ProviderSpecificWorkload<T> : ProviderSpecificWorkload
+internal class ProviderSpecificWorkload<T>
 {
     public T Work { get; }
+
+    public TestRuntimeProviderInfo Provider { get; protected set; }
 
     public ProviderSpecificWorkload(T work, TestRuntimeProviderInfo provider)
     {
         Provider = provider;
         Work = work;
     }
-}
-
-/// <summary>
-/// A "marker" for ProviderSpecificWorkload of T, so we can have a collection that either holds test cases,
-/// or just sources and still know which provider they require.
-/// </summary>
-internal abstract class ProviderSpecificWorkload
-{
-    public TestRuntimeProviderInfo Provider { get; protected set; }
 }

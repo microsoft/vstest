@@ -497,7 +497,7 @@ public class InferRunSettingsHelper
         {
             if (root.Name == RunSettingsNodeName)
             {
-                // When just <RunSettings></RunSettings> is provided to as runsettings, then this will add the common inner node.
+                // When just <RunSettings></RunSettings> is provided in the runsettings string, then this will add the common RunConfiguration inner node.
                 XmlUtilities.AppendOrModifyChild(xmlDocument, RunConfigurationNodePath, RunConfigurationNodeName, innerXml: null);
             }
             else

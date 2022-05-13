@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
@@ -24,7 +25,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-using System.Text;
 
 #nullable disable
 
@@ -63,7 +63,7 @@ public class TestEngine : ITestEngine
     public IProxyDiscoveryManager GetDiscoveryManager(
         IRequestData requestData,
         DiscoveryCriteria discoveryCriteria,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
         // Parallel level determines how many processes at most we should start at the same time. We take the number from settings, and if user
         // has no preference or the preference is 0 then we use the number of logical processors. Or the number of sources, whatever is lower.
@@ -170,7 +170,7 @@ public class TestEngine : ITestEngine
     public IProxyExecutionManager GetExecutionManager(
         IRequestData requestData,
         TestRunCriteria testRunCriteria,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
         // We use mulitple "different" runsettings here. We have runsettings that come with the testRunCriteria,
         // and we use that to figure out the common stuff before we try to setup the run. Later we patch the settings
@@ -318,7 +318,7 @@ public class TestEngine : ITestEngine
     public IProxyTestSessionManager GetTestSessionManager(
         IRequestData requestData,
         StartTestSessionCriteria testSessionCriteria,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
         var parallelLevel = VerifyParallelSettingAndCalculateParallelLevel(
             testSessionCriteria.Sources.Count,
@@ -400,7 +400,7 @@ public class TestEngine : ITestEngine
 
     private List<TestRuntimeProviderInfo> GetTestRuntimeProvidersForUniqueConfigurations(
         string runSettings,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap,
         out ITestRuntimeProvider mostRecentlyCreatedInstance)
     {
         // Group source details to get unique frameworks and architectures for which we will run, so we can figure

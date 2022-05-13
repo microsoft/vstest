@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
-/// Manages work that is done on multiple testhosts in parallel.
+/// Manages work that is done on multiple managers (testhosts) in parallel such as parallel discovery or parallel run.
 /// </summary>
 internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkload> : IDisposable
 {
@@ -30,6 +30,12 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
 
     private readonly object _lock = new();
 
+    /// <summary>
+    /// Creates new instance of ParallelOperationManager.
+    /// </summary>
+    /// <param name="createNewManager">Creates a new manager that is responsible for running a single part of the overall workload.
+    /// A manager is typically a testhost, and the part of workload is discovering or running a single test dll.</param>
+    /// <param name="parallelLevel">Determines the maximum amount of parallel managers that can be active at the same time.</param>
     public ParallelOperationManager(Func<TestRuntimeProviderInfo, TManager> createNewManager, int parallelLevel)
     {
         _createNewManager = createNewManager;
@@ -65,6 +71,8 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         }
     }
 
+    // This does not do anything in parallel, all the workloads we schedule are offloaded to separate Task in the callback.
+    // I did not want to change that, yet but this is the correct place to do that offloading. Not each manager.
     private bool RunWorkInParallel()
     {
         // TODO: Right now we don't re-use shared hosts, but if we did, this is the place
@@ -95,7 +103,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             {
                 var slot = availableSlots[i];
                 slot.IsAvailable = false;
-                var workload = availableWorkloads[i];
+                var workload = workloadsToRun[i];
                 workToRun.Add(new SlotWorkloadPair(slot, workload));
                 _workloads.Remove(workload);
             }
@@ -135,7 +143,12 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                 throw new InvalidOperationException("The provided manager was not found in any slot.");
             }
 
-            var slot = completedSlot.Single();
+            if (completedSlot.Count > 1)
+            {
+                throw new InvalidOperationException("The provided manager was found in multiple slots.");
+            }
+
+            var slot = completedSlot[0];
             slot.IsAvailable = true;
 
             return RunWorkInParallel();
