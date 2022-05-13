@@ -419,6 +419,7 @@ public class ParallelProxyExecutionManagerTests
 
         Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
 
+        // If you are debugging this, maybe it is good idea to set this timeout higher.
         Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
 
         Assert.IsNull(assertException, assertException?.ToString());

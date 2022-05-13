@@ -176,10 +176,17 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             // When HandlePartialDiscovery or HandlePartialRun are in progress, and we call StopAllManagers,
             // it is possible that we will clear all slots, while ClearCompletedSlot is waiting on the lock,
             // so when it is allowed to enter it will fail to find the respective slot and fail. In this case it is
-            // okay that the slot is not found because we stopped all work and cleared the slots.
-            if (completedSlot.Count == 0 && _acceptMoreWork)
+            // okay that the slot is not found, and we do nothing, because we already stopped all work and cleared the slots.
+            if (completedSlot.Count == 0)
             {
-                throw new InvalidOperationException("The provided manager was not found in any slot.");
+                if (_acceptMoreWork)
+                {
+                    throw new InvalidOperationException("The provided manager was not found in any slot.");
+                }
+                else
+                {
+                    return;
+                }
             }
 
             if (completedSlot.Count > 1)
