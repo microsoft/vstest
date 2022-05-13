@@ -286,21 +286,20 @@ public class ParallelProxyDiscoveryManagerTests
         Assert.AreEqual(2, _createMockManagerCalled);
     }
 
-    // NOMERGE: fix this test, it is a new test that uses the old approach
-    //[TestMethod]
-    //public void DiscoveryTestsWithCompletionMarksAllSourcesAsFullyDiscovered()
-    //{
-    //    _testDiscoveryCriteria.TestCaseFilter = "Name~Test";
-    //    var parallelDiscoveryManager = SetupDiscoveryManager(_proxyManagerFunc, 2, false);
+    [TestMethod]
+    public void DiscoveryTestsWithCompletionMarksAllSourcesAsFullyDiscovered()
+    {
+        _discoveryCriteriaWith2Sources.TestCaseFilter = "Name~Test";
+        var parallelDiscoveryManager = SetupDiscoveryManager(_createMockManager, 2, false);
 
-    //    Task.Run(() => parallelDiscoveryManager.DiscoverTests(_testDiscoveryCriteria, _mockHandler.Object));
+        Task.Run(() => parallelDiscoveryManager.DiscoverTests(_discoveryCriteriaWith2Sources, _mockEventHandler.Object));
 
-    //    Assert.IsTrue(_discoveryCompleted.Wait(TaskTimeout), "Test discovery not completed.");
-    //    Assert.AreEqual(_sources.Count, _processedSources.Count, "All Sources must be processed.");
-    //    CollectionAssert.AreEquivalent(_sources, _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
-    //    Assert.AreEqual(0, _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
-    //    Assert.AreEqual(0, _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
-    //}
+        Assert.IsTrue(_discoveryCompleted.Wait(Timeout3Seconds), "Test discovery not completed.");
+        Assert.AreEqual(_sources.Count, _processedSources.Count, "All Sources must be processed.");
+        CollectionAssert.AreEquivalent(_sources, _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        Assert.AreEqual(0, _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
+        Assert.AreEqual(0, _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
+    }
 
     private IParallelProxyDiscoveryManager SetupDiscoveryManager(Func<TestRuntimeProviderInfo, IProxyDiscoveryManager> getProxyManager, int parallelLevel, bool abortDiscovery, int totalTests = 20)
     {

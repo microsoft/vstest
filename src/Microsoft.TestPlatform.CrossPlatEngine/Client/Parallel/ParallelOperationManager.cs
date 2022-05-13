@@ -24,6 +24,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
     private TEventHandler? _eventHandler;
     private Func<TEventHandler, TManager, TEventHandler>? _getEventHandler;
     private Action<TManager, TEventHandler, TWorkload>? _runWorkload;
+    private bool _acceptMoreWork;
     private readonly List<ProviderSpecificWorkload<TWorkload>> _workloads = new();
     private readonly List<Slot> _managerSlots = new();
 
@@ -43,13 +44,14 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
     {
         _createNewManager = createNewManager;
         MaxParallelLevel = parallelLevel;
-        ClearSlots();
+        ClearSlots(acceptMoreWork: true);
     }
 
-    private void ClearSlots()
+    private void ClearSlots(bool acceptMoreWork)
     {
         lock (_lock)
         {
+            _acceptMoreWork = acceptMoreWork;
             _managerSlots.Clear();
             _managerSlots.AddRange(Enumerable.Range(0, MaxParallelLevel).Select(_ => new Slot()));
             SetOccupiedSlotCount();
@@ -74,14 +76,11 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
 
         _workloads.AddRange(workloads);
 
-        lock (_lock)
-        {
-            // This creates as many slots as possible even though we might not use them when we get less workloads to process,
-            // this is not a big issue, and not worth optimizing, because the parallel level is determined by the logical CPU count,
-            // so it is a small number.
-            ClearSlots();
-            RunWorkInParallel();
-        }
+        // This creates as many slots as possible even though we might not use them when we get less workloads to process,
+        // this is not a big issue, and not worth optimizing, because the parallel level is determined by the logical CPU count,
+        // so it is a small number.
+        ClearSlots(acceptMoreWork: true);
+        RunWorkInParallel();
     }
 
     // This does not do anything in parallel, all the workloads we schedule are offloaded to separate Task in the callback.
@@ -101,11 +100,20 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         if (_runWorkload == null)
             throw new InvalidOperationException($"{nameof(_runWorkload)} was not provided.");
 
+        // Reserve slots and assign them work under the lock so we keep
+        // the slots consistent.
         List<SlotWorkloadPair> workToRun = new();
         lock (_lock)
         {
             if (_workloads.Count == 0)
-                return true;
+                return false;
+
+            // When HandlePartialDiscovery or HandlePartialRun are in progress, and we call StopAllManagers,
+            // it is possible that we will clear all slots, and have RunWorkInParallel waiting on the lock,
+            // so when it is allowed to enter it will try to add more work, but we already cancelled,
+            // so we should not start more work.
+            if (!_acceptMoreWork)
+                return false;
 
             var availableSlots = _managerSlots.Where(slot => slot.IsAvailable).ToList();
             var availableWorkloads = _workloads.Where(workload => workload != null).ToList();
@@ -122,11 +130,8 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             }
 
             SetOccupiedSlotCount();
-        }
 
-        foreach (var pair in workToRun)
-        {
-            try
+            foreach (var pair in workToRun)
             {
                 var manager = _createNewManager(pair.Workload.Provider);
                 var eventHandler = _getEventHandler(_eventHandler, manager);
@@ -134,8 +139,17 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                 pair.Slot.Manager = manager;
                 pair.Slot.ManagerInfo = pair.Workload.Provider;
                 pair.Slot.Work = pair.Workload.Work;
+            }
+        }
 
-                _runWorkload(manager, eventHandler, pair.Workload.Work);
+        // Kick of the work in parallel outside of the lock so if we have more requests to run
+        // that come in at the same time we only block them from reserving the same slot at the same time
+        // but not from starting their assigned work at the same time.
+        foreach (var pair in workToRun)
+        {
+            try
+            {
+                _runWorkload(pair.Slot.Manager!, pair.Slot.EventHandler!, pair.Workload.Work);
             }
             finally
             {
@@ -144,16 +158,26 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         }
 
         // Return true when we started more work. Or false, when there was nothing more to do.
-        // This will propagate to handling of partial discovery / run.
+        // This will propagate to handling of partial discovery or partial run.
         return workToRun.Count > 0;
     }
 
     public bool RunNextWork(TManager completedManager!!)
     {
+        ClearCompletedSlot(completedManager);
+        return RunWorkInParallel();
+    }
+
+    private void ClearCompletedSlot(TManager completedManager)
+    {
         lock (_lock)
         {
             var completedSlot = _managerSlots.Where(s => ReferenceEquals(completedManager, s.Manager)).ToList();
-            if (completedSlot.Count == 0)
+            // When HandlePartialDiscovery or HandlePartialRun are in progress, and we call StopAllManagers,
+            // it is possible that we will clear all slots, while ClearCompletedSlot is waiting on the lock,
+            // so when it is allowed to enter it will fail to find the respective slot and fail. In this case it is
+            // okay that the slot is not found because we stopped all work and cleared the slots.
+            if (completedSlot.Count == 0 && _acceptMoreWork)
             {
                 throw new InvalidOperationException("The provided manager was not found in any slot.");
             }
@@ -167,8 +191,6 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             slot.IsAvailable = true;
 
             SetOccupiedSlotCount();
-
-            return RunWorkInParallel();
         }
     }
 
@@ -219,12 +241,12 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
 
     internal void StopAllManagers()
     {
-        ClearSlots();
+        ClearSlots(acceptMoreWork: false);
     }
 
     public void Dispose()
     {
-        ClearSlots();
+        ClearSlots(acceptMoreWork: false);
     }
 
     private class Slot

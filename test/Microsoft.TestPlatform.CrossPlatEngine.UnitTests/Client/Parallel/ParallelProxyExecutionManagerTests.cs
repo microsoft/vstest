@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,7 +32,7 @@ public class ParallelProxyExecutionManagerTests
 
     private readonly List<Mock<IProxyExecutionManager>> _usedMockManagers;
     private readonly Func<TestRuntimeProviderInfo, IProxyExecutionManager> _createMockManager;
-    private readonly Mock<ITestRunEventsHandler> _mockEvenHandler;
+    private readonly Mock<ITestRunEventsHandler> _mockEventHandler;
 
     private readonly List<string> _sources;
     private readonly List<string> _processedSources;
@@ -64,7 +66,7 @@ public class ParallelProxyExecutionManagerTests
             _usedMockManagers.Add(manager);
             return manager.Object;
         };
-        _mockEvenHandler = new Mock<ITestRunEventsHandler>();
+        _mockEventHandler = new Mock<ITestRunEventsHandler>();
 
         // Configure sources
         _sources = new List<string>() { "1.dll", "2.dll" };
@@ -138,7 +140,7 @@ public class ParallelProxyExecutionManagerTests
     {
         var parallelExecutionManager = SetupExecutionManager(_createMockManager, 2);
 
-        parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEvenHandler.Object);
+        parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object);
 
         Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
         Assert.AreEqual(_sources.Count, _processedSources.Count, "All Sources must be processed.");
@@ -152,7 +154,7 @@ public class ParallelProxyExecutionManagerTests
     {
         var parallelExecutionManager = SetupExecutionManager(_createMockManager, 3, setupTestCases: true);
 
-        parallelExecutionManager.StartTestRun(_testRunCriteriaWithTestsFrom3Dlls, _mockEvenHandler.Object);
+        parallelExecutionManager.StartTestRun(_testRunCriteriaWithTestsFrom3Dlls, _mockEventHandler.Object);
 
         Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
         Assert.AreEqual(_testCases.Count, _processedTestCases.Count, "All Tests must be processed.");
@@ -164,7 +166,7 @@ public class ParallelProxyExecutionManagerTests
     {
         var parallelExecutionManager = SetupExecutionManager(_createMockManager, 2);
 
-        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEvenHandler.Object));
+        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
 
         Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
         Assert.AreEqual(_sources.Count, _processedSources.Count, "All Sources must be processed.");
@@ -182,7 +184,7 @@ public class ParallelProxyExecutionManagerTests
 
         // Trigger discover tests, this will create a manager by calling the _createMockManager func
         // which dequeues it to _usedMockManagers.
-        parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEvenHandler.Object);
+        parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object);
         var completedManager = _usedMockManagers[0];
 
         // act
@@ -205,7 +207,7 @@ public class ParallelProxyExecutionManagerTests
 
         // Trigger discover tests, this will create a manager by calling the _createMockManager func
         // which dequeues it to _usedMockManagers.
-        parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEvenHandler.Object);
+        parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object);
         var completedManager = _usedMockManagers[0];
 
         // act
@@ -223,7 +225,7 @@ public class ParallelProxyExecutionManagerTests
     {
         var parallelExecutionManager = SetupExecutionManager(_createMockManager, 3, setupTestCases: true);
 
-        var task = Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWithTestsFrom3Dlls, _mockEvenHandler.Object));
+        var task = Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWithTestsFrom3Dlls, _mockEventHandler.Object));
 
         bool executionCompleted = _executionCompleted.Wait(Timeout3Seconds);
 
@@ -248,7 +250,7 @@ public class ParallelProxyExecutionManagerTests
         SetupMockManagers(_processedSources, isCanceled: true, isAborted: false);
         SetupHandleTestRunComplete(_executionCompleted);
 
-        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEvenHandler.Object));
+        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
 
         Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
         Assert.AreEqual(1, _processedSources.Count, "Abort should stop all sources execution.");
@@ -264,7 +266,7 @@ public class ParallelProxyExecutionManagerTests
         SetupHandleTestRunComplete(_executionCompleted);
 
         parallelExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
-        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEvenHandler.Object));
+        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
 
         Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
         Assert.AreEqual(1, _processedSources.Count, "Abort should stop all sources execution.");
@@ -279,7 +281,7 @@ public class ParallelProxyExecutionManagerTests
         SetupMockManagers(_processedSources, isCanceled: false, isAborted: true);
         SetupHandleTestRunComplete(_executionCompleted);
 
-        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEvenHandler.Object));
+        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
 
         Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
         Assert.AreEqual(2, _processedSources.Count, "Abort should stop all sources execution.");
@@ -295,7 +297,7 @@ public class ParallelProxyExecutionManagerTests
         mockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>()))
             .Throws<NotImplementedException>();
 
-        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEvenHandler.Object));
+        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
 
         // Processed sources should be 1 since the 2nd source is never discovered
         Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
@@ -311,10 +313,10 @@ public class ParallelProxyExecutionManagerTests
         mockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>()))
             .Throws<NotImplementedException>();
 
-        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEvenHandler.Object));
+        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
 
         Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
-        _mockEvenHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+        _mockEventHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
     }
 
     [TestMethod]
@@ -326,104 +328,103 @@ public class ParallelProxyExecutionManagerTests
         mockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>()))
             .Throws<NotImplementedException>();
 
-        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEvenHandler.Object));
+        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
 
         Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
-        _mockEvenHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.TestMessage))));
+        _mockEventHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.TestMessage))));
     }
 
-    // NOMERGE: fix this test, it is a new test that uses the old approach
-    //[TestMethod]
-    //public void StartTestRunShouldAggregateRunData()
-    //{
-    //    var parallelExecutionManager = new ParallelProxyExecutionManager(_mockRequestData.Object, _createMockManager, 2, _runtimeProviders);
-    //    var syncObject = new object();
+    [TestMethod]
+    public void StartTestRunShouldAggregateRunData()
+    {
+        var parallelExecutionManager = new ParallelProxyExecutionManager(_mockRequestData.Object, _createMockManager, 2, _runtimeProviders);
+        var syncObject = new object();
 
-    //    foreach (var manager in _preCreatedMockManagers)
-    //    {
-    //        manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
-    //            Callback<TestRunCriteria, ITestRunEventsHandler>(
-    //                (criteria, handler) =>
-    //                {
-    //                    lock (syncObject)
-    //                    {
-    //                        _processedSources.AddRange(criteria.Sources);
-    //                    }
+        foreach (var manager in _preCreatedMockManagers)
+        {
+            manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
+                Callback<TestRunCriteria, ITestRunEventsHandler>(
+                    (criteria, handler) =>
+                    {
+                        lock (syncObject)
+                        {
+                            _processedSources.AddRange(criteria.Sources);
+                        }
 
-    //                    Task.Delay(100).Wait();
-    //                    var stats = new Dictionary<TestOutcome, long>
-    //                    {
-    //                        { TestOutcome.Passed, 3 },
-    //                        { TestOutcome.Failed, 2 }
-    //                    };
-    //                    var runAttachments = new Collection<AttachmentSet>
-    //                    {
-    //                        new AttachmentSet(new Uri("hello://x/"), "Hello")
-    //                    };
-    //                    var executorUris = new List<string>() { "hello1" };
-    //                    bool isCanceled = false;
-    //                    bool isAborted = false;
-    //                    TimeSpan timespan = TimeSpan.FromMilliseconds(100);
+                        Task.Delay(100).Wait();
+                        var stats = new Dictionary<TestOutcome, long>
+                        {
+                            { TestOutcome.Passed, 3 },
+                            { TestOutcome.Failed, 2 }
+                        };
+                        var runAttachments = new Collection<AttachmentSet>
+                        {
+                            new AttachmentSet(new Uri("hello://x/"), "Hello")
+                        };
+                        var executorUris = new List<string>() { "hello1" };
+                        bool isCanceled = false;
+                        bool isAborted = false;
+                        TimeSpan timespan = TimeSpan.FromMilliseconds(100);
 
-    //                    if (string.Equals(criteria.Sources?.FirstOrDefault(), "2.dll"))
-    //                    {
-    //                        isCanceled = true;
-    //                        isAborted = true;
-    //                        timespan = TimeSpan.FromMilliseconds(200);
-    //                    }
+                        if (string.Equals(criteria.Sources?.FirstOrDefault(), "2.dll"))
+                        {
+                            isCanceled = true;
+                            isAborted = true;
+                            timespan = TimeSpan.FromMilliseconds(200);
+                        }
 
-    //                    var completeArgs = new TestRunCompleteEventArgs(new
-    //                        TestRunStatistics(5, stats), isCanceled, isAborted, null, runAttachments, new Collection<InvokedDataCollector>(), timespan);
-    //                    handler.HandleTestRunComplete(completeArgs, null, runAttachments, executorUris);
-    //                });
-    //    }
+                        var completeArgs = new TestRunCompleteEventArgs(new
+                            TestRunStatistics(5, stats), isCanceled, isAborted, null, runAttachments, new Collection<InvokedDataCollector>(), timespan);
+                        handler.HandleTestRunComplete(completeArgs, null, runAttachments, executorUris);
+                    });
+        }
 
-    //    Exception? assertException = null;
-    //    _mockHandler.Setup(m => m.HandleTestRunComplete(
-    //        It.IsAny<TestRunCompleteEventArgs>(),
-    //        It.IsAny<TestRunChangedEventArgs>(),
-    //        It.IsAny<ICollection<AttachmentSet>>(),
-    //        It.IsAny<ICollection<string>>())).Callback
-    //        <TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<AttachmentSet>, ICollection<string>>(
-    //            (completeArgs, runChangedArgs, runAttachments, executorUris) =>
-    //            {
-    //                try
-    //                {
-    //                    Assert.AreEqual(TimeSpan.FromMilliseconds(200), completeArgs.ElapsedTimeInRunningTests,
-    //                        "Time should be max of all");
-    //                    Assert.AreEqual(2, completeArgs.AttachmentSets.Count,
-    //                        "All Complete Arg attachments should return");
-    //                    Assert.AreEqual(2, runAttachments.Count, "All RunContextAttachments should return");
+        Exception? assertException = null;
+        _mockEventHandler.Setup(m => m.HandleTestRunComplete(
+            It.IsAny<TestRunCompleteEventArgs>(),
+            It.IsAny<TestRunChangedEventArgs>(),
+            It.IsAny<ICollection<AttachmentSet>>(),
+            It.IsAny<ICollection<string>>())).Callback
+            <TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<AttachmentSet>, ICollection<string>>(
+                (completeArgs, runChangedArgs, runAttachments, executorUris) =>
+                {
+                    try
+                    {
+                        Assert.AreEqual(TimeSpan.FromMilliseconds(200), completeArgs.ElapsedTimeInRunningTests,
+                            "Time should be max of all");
+                        Assert.AreEqual(2, completeArgs.AttachmentSets.Count,
+                            "All Complete Arg attachments should return");
+                        Assert.AreEqual(2, runAttachments.Count, "All RunContextAttachments should return");
 
-    //                    Assert.IsTrue(completeArgs.IsAborted, "Aborted value must be OR of all values");
-    //                    Assert.IsTrue(completeArgs.IsCanceled, "Canceled value must be OR of all values");
+                        Assert.IsTrue(completeArgs.IsAborted, "Aborted value must be OR of all values");
+                        Assert.IsTrue(completeArgs.IsCanceled, "Canceled value must be OR of all values");
 
-    //                    Assert.AreEqual(10, completeArgs.TestRunStatistics.ExecutedTests,
-    //                        "Stats must be aggregated properly");
+                        Assert.AreEqual(10, completeArgs.TestRunStatistics.ExecutedTests,
+                            "Stats must be aggregated properly");
 
-    //                    Assert.AreEqual(6, completeArgs.TestRunStatistics.Stats[TestOutcome.Passed],
-    //                        "Stats must be aggregated properly");
-    //                    Assert.AreEqual(4, completeArgs.TestRunStatistics.Stats[TestOutcome.Failed],
-    //                        "Stats must be aggregated properly");
-    //                }
-    //                catch (Exception ex)
-    //                {
-    //                    assertException = ex;
-    //                }
-    //                finally
-    //                {
-    //                    _executionCompleted.Set();
-    //                }
-    //            });
+                        Assert.AreEqual(6, completeArgs.TestRunStatistics.Stats[TestOutcome.Passed],
+                            "Stats must be aggregated properly");
+                        Assert.AreEqual(4, completeArgs.TestRunStatistics.Stats[TestOutcome.Failed],
+                            "Stats must be aggregated properly");
+                    }
+                    catch (Exception ex)
+                    {
+                        assertException = ex;
+                    }
+                    finally
+                    {
+                        _executionCompleted.Set();
+                    }
+                });
 
-    //    Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEvenHandler.Object));
+        Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
 
-    //    Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
+        Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
 
-    //    Assert.IsNull(assertException, assertException?.ToString());
-    //    Assert.AreEqual(_sources.Count, _processedSources.Count, "All Sources must be processed.");
-    //    AssertMissingAndDuplicateSources(_processedSources);
-    //}
+        Assert.IsNull(assertException, assertException?.ToString());
+        Assert.AreEqual(_sources.Count, _processedSources.Count, "All Sources must be processed.");
+        AssertMissingAndDuplicateSources(_processedSources);
+    }
 
     private ParallelProxyExecutionManager SetupExecutionManager(Func<TestRuntimeProviderInfo, IProxyExecutionManager> proxyManagerFunc, int parallelLevel)
     {
@@ -449,7 +450,7 @@ public class ParallelProxyExecutionManagerTests
 
     private void SetupHandleTestRunComplete(ManualResetEventSlim completeEvent)
     {
-        _mockEvenHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
+        _mockEventHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(),
                 It.IsAny<ICollection<AttachmentSet>>(),
                 It.IsAny<ICollection<string>>()))
