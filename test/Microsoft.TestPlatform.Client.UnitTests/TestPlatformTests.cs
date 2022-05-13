@@ -280,27 +280,6 @@ public class TestPlatformTests
     }
 
     [TestMethod]
-    public void CreateTestRunRequestShouldSetCustomHostLauncherOnEngineDefaultLauncherIfSpecified()
-    {
-        var mockCustomLauncher = new Mock<ITestHostLauncher>();
-        _executionManager.Setup(dm => dm.Initialize(false)).Verifiable();
-        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_executionManager.Object);
-        _testEngine.Setup(te => te.GetExtensionManager()).Returns(_extensionManager.Object);
-        _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
-
-        var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
-        var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
-        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
-            .Returns(testRunCriteria.Sources);
-
-        var testRunRequest = tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), new Dictionary<string, SourceDetail>());
-
-        var actualTestRunRequest = testRunRequest as TestRunRequest;
-        Assert.AreEqual(testRunCriteria, actualTestRunRequest?.TestRunCriteria);
-        _hostManager.Verify(hl => hl.SetCustomLauncher(mockCustomLauncher.Object), Times.Once);
-    }
-
-    [TestMethod]
     public void CreateTestRunRequestThrowsIfTestRunCriteriaIsNull()
     {
         var tp = new TestPlatform();
