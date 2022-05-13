@@ -528,11 +528,12 @@ public class ProxyTestSessionManagerTests
         StartTestSessionCriteria testSessionCriteria,
         ProxyOperationManager proxyOperationManager)
     {
+        var runSettings = testSessionCriteria.RunSettings ?? _fakeRunSettings;
         var runtimeProviderInfo = new TestRuntimeProviderInfo
         (
             typeof(ITestRuntimeProvider),
             shared: false,
-            _fakeRunSettings,
+            runSettings,
             testSessionCriteria.Sources.Select(s => new SourceDetail
             {
                 Source = s,
