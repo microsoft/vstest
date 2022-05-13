@@ -17,7 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkload> : IDisposable
 {
     private readonly Func<TestRuntimeProviderInfo, TManager> _createNewManager;
-    private readonly int _maxParallelLevel;
 
     /// <summary>
     /// Default number of Processes
@@ -30,6 +29,10 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
 
     private readonly object _lock = new();
 
+    public int MaxParallelLevel { get; }
+    public int OccupiedSlotCount { get; private set; }
+    public int AvailableSlotCount { get; private set; }
+
     /// <summary>
     /// Creates new instance of ParallelOperationManager.
     /// </summary>
@@ -39,7 +42,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
     public ParallelOperationManager(Func<TestRuntimeProviderInfo, TManager> createNewManager, int parallelLevel)
     {
         _createNewManager = createNewManager;
-        _maxParallelLevel = parallelLevel;
+        MaxParallelLevel = parallelLevel;
         ClearSlots();
     }
 
@@ -48,8 +51,15 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         lock (_lock)
         {
             _managerSlots.Clear();
-            _managerSlots.AddRange(Enumerable.Range(0, _maxParallelLevel).Select(_ => new Slot()));
+            _managerSlots.AddRange(Enumerable.Range(0, MaxParallelLevel).Select(_ => new Slot()));
+            SetOccupiedSlotCount();
         }
+    }
+
+    private void SetOccupiedSlotCount()
+    {
+        AvailableSlotCount = _managerSlots.Count(s => s.IsAvailable);
+        OccupiedSlotCount = _managerSlots.Count - AvailableSlotCount;
     }
 
     public void StartWork(
@@ -66,6 +76,9 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
 
         lock (_lock)
         {
+            // This creates as many slots as possible even though we might not use them when we get less workloads to process,
+            // this is not a big issue, and not worth optimizing, because the parallel level is determined by the logical CPU count,
+            // so it is a small number.
             ClearSlots();
             RunWorkInParallel();
         }
@@ -107,6 +120,8 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                 workToRun.Add(new SlotWorkloadPair(slot, workload));
                 _workloads.Remove(workload);
             }
+
+            SetOccupiedSlotCount();
         }
 
         foreach (var pair in workToRun)
@@ -151,6 +166,8 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             var slot = completedSlot[0];
             slot.IsAvailable = true;
 
+            SetOccupiedSlotCount();
+
             return RunWorkInParallel();
         }
     }
@@ -158,8 +175,8 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
     public void DoActionOnAllManagers(Action<TManager> action, bool doActionsInParallel = false)
     {
         // We don't need to lock here, we just grab the current list of
-        // managers and run action on each one of them.
-        var managers = _managerSlots.Select(slot => slot.Manager).ToList();
+        // slots that are occupied (have managers) and run action on each one of them.
+        var managers = _managerSlots.Where(slot => !slot.IsAvailable).Select(slot => slot.Manager).ToList();
         int i = 0;
         var actionTasks = new Task[managers.Count];
         foreach (var manager in managers)
