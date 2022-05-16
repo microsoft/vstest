@@ -767,7 +767,9 @@ internal class TestRequestManager : ITestRequestManager
         // The sourceToArchitectureMap contains the real architecture, overwrite it by the value chosen by runsettings, to force one unified platform to be used.
         if (disableMultiTfm || platformSetByRunsettings)
         {
-            foreach (var key in sourceToArchitectureMap.Keys)
+            // Copy the list of key, otherwise we will get collection changed exception.
+            var keys = sourceToArchitectureMap.Keys.ToList();
+            foreach (var key in keys)
             {
                 sourceToArchitectureMap[key] = chosenPlatform;
             }
@@ -776,7 +778,9 @@ internal class TestRequestManager : ITestRequestManager
         // The sourceToFrameworkMap contains the real framework, overwrite it by the value chosen by runsettings, to force one unified framework to be used.
         if (disableMultiTfm || frameworkSetByRunsettings)
         {
-            foreach (var key in sourceToFrameworkMap.Keys)
+            // Copy the list of key, otherwise we will get collection changed exception.
+            var keys = sourceToFrameworkMap.Keys.ToList();
+            foreach (var key in keys)
             {
                 sourceToFrameworkMap[key] = chosenFramework;
             }
