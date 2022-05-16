@@ -369,6 +369,12 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
                     runnerLogFileName = LogFile;
                 }
 
+                var runnlerLogFileInfo = new FileInfo(runnerLogFileName);
+                if (!Directory.Exists(runnlerLogFileInfo.DirectoryName))
+                {
+                    Directory.CreateDirectory(runnlerLogFileInfo.DirectoryName);
+                }
+
                 Source.Listeners.Add(new RollingFileTraceListener(runnerLogFileName, ListenerName, s_traceFileSize));
             }
             catch (Exception e)
