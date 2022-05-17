@@ -95,9 +95,7 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll");
-        var xunitAssemblyPath = _testEnvironment.TargetFramework.Equals("net451") ?
-            _testEnvironment.GetTestAsset("XUTestProject.dll", "net46") :
-            _testEnvironment.GetTestAsset("XUTestProject.dll");
+        var xunitAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll");
 
         assemblyPaths = string.Join(" ", assemblyPaths, xunitAssemblyPath.AddDoubleQuote());
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: string.Empty, FrameworkArgValue, string.Empty);

@@ -364,7 +364,7 @@ public class CompatibilityRowsBuilder
         var version = node?.InnerText.Replace("[", "").Replace("]", "") ?? "--WRONG-VERSION--";
         var vstestConsolePath = runnerInfo.IsNetFrameworkRunner
             ? Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "packages", packageName, version,
-                "tools", "net451", "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe")
+                "tools", "net462", "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe")
             : Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "packages", packageName, version,
                 "contentFiles", "any", "netcoreapp2.1", "vstest.console.dll");
 

@@ -61,7 +61,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     // [RunnerCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER_FLOW)]
-    [TestHostCompatibilityDataSource("net451", "netcoreapp2.1", "LegacyStable", BeforeFeature = Features.ATTACH_DEBUGGER_FLOW, DebugVSTestConsole = true)]
+    [TestHostCompatibilityDataSource(Net462TargetFramework, "netcoreapp2.1", "LegacyStable", BeforeFeature = Features.ATTACH_DEBUGGER_FLOW, DebugVSTestConsole = true)]
     [Ignore("This is not working for any testhost prior 16.7.0 where the change was introduced. The launch testhost flow was replaced with AttachDebugger in runner, and the new callback to AttachDebugger happens in testhost."
         + "But any testhost prior 16.7.0 where the change was introduced does not know to call back AttachDebugger, and the call never happens.")]
     // You can confirm that the functionality broke between runner and testhost, past this point by using newer runners, against older testhosts.
