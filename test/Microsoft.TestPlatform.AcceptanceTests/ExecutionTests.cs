@@ -112,7 +112,7 @@ public class ExecutionTests : AcceptanceTestBase
     // and after --arch feature implementation we won't find correct muxer on CI.
     [TestCategory("Windows")]
     [TestMethod]
-    [MSTestCompatibilityDataSource(DebugVSTestConsole = true)]
+    [MSTestCompatibilityDataSource)]
     public void RunMultipleTestAssembliesInParallel(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
