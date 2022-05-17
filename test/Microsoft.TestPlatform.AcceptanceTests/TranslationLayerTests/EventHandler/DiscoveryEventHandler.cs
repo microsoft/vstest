@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -146,7 +147,10 @@ public class DiscoveryEventHandlerForBatchSize : ITestDiscoveryEventsHandler2, I
 
     public void HandleLogMessage(TestMessageLevel level, string message)
     {
-        // No Op
+        if (level == TestMessageLevel.Error)
+        {
+            Console.WriteLine($"ERROR:{message}");
+        };
     }
 
     public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)

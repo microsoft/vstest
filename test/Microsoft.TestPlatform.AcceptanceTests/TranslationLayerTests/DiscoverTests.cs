@@ -124,8 +124,8 @@ public class DiscoverTests : AcceptanceTestBase
             discoveryEventHandlerForBatchSize);
 
         // Assert.
-        Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count);
-        Assert.AreEqual(3, discoveryEventHandlerForBatchSize.BatchSize);
+        Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count, "discovered test cases");
+        Assert.AreEqual(3, discoveryEventHandlerForBatchSize.BatchSize, "batch size");
     }
 
     [TestMethod]

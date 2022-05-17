@@ -31,7 +31,10 @@ public class RunsettingsTests : AcceptanceTestBase
 
         // We pass 2 dlls in RunTestWithRunSettings, for .NET Framework they run in
         // 1 hosts because that host is Shared.
-        var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
+        //
+        // Testhosts are no longer shared, we should see 2 of them always.
+        // var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
+        var expectedNumOfProcessCreated = 2;
 
         // passing parallel
         var runConfigurationDictionary = new Dictionary<string, string>
@@ -71,7 +74,10 @@ public class RunsettingsTests : AcceptanceTestBase
 
         // We pass 2 dlls in RunTestWithRunSettings, for .NET Framework they run in
         // 1 hosts because that host is Shared.
-        var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
+        //
+        // Testhosts are no longer shared, we should see 2 of them always.
+        // var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
+        var expectedNumOfProcessCreated = 2;
 
         // Pass parallel
         var additionalArgs = "/Parallel";
@@ -107,7 +113,10 @@ public class RunsettingsTests : AcceptanceTestBase
 
         // We pass 2 dlls in RunTestWithRunSettings, for .NET Framework they run in
         // 1 hosts because that host is Shared.
-        var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
+        //
+        // Testhosts are no longer shared, we should see 2 of them always.
+        // var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
+        var expectedNumOfProcessCreated = 2;
 
         // passing different platform
         var runConfigurationDictionary = new Dictionary<string, string>
@@ -136,7 +145,10 @@ public class RunsettingsTests : AcceptanceTestBase
 
         // We pass 2 dlls in RunTestWithRunSettings, for .NET Framework they run in
         // 1 hosts because that host is Shared.
-        var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
+        //
+        // Testhosts are no longer shared. We should always see 2.
+        // var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
+        var expectedNumOfProcessCreated = 2;
 
         var runConfigurationDictionary = new Dictionary<string, string>
         {
@@ -160,7 +172,10 @@ public class RunsettingsTests : AcceptanceTestBase
 
         // We pass 2 dlls in RunTestWithRunSettings, for .NET Framework they run in
         // 1 hosts because that host is Shared.
-        var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
+        //
+        // Testhosts are no longer shared, we should see 2 of them always.
+        // var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
+        var expectedNumOfProcessCreated = 2;
 
         var runSettingsArgs = string.Join(
             " ",
@@ -187,7 +202,10 @@ public class RunsettingsTests : AcceptanceTestBase
 
         // We pass 2 dlls in RunTestWithRunSettings, for .NET Framework they run in
         // 1 hosts because that host is Shared.
-        var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
+        //
+        // Testhosts are no longer shared, we should see 2 of them always.
+        // var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
+        var expectedNumOfProcessCreated = 2;
 
         var runConfigurationDictionary = new Dictionary<string, string>
         {

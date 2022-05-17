@@ -112,7 +112,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         // testhosts as we have sources. In the future we will have a maxParallelLevel set to the actual parallel level
         // (which might be lower than the number of sources) and we should do some kind of thinking here to figure out how to split the sources.
         // To follow the way parallel execution and discovery is (supposed to be) working, there should be as many testhosts
-        // as the maxParallel level pre-started,and marked with the Shared, and configuration that they can run.
+        // as the maxParallel level pre-started, and marked with the Shared, and configuration that they can run.
 
         // Create all the proxies in parallel, one task per proxy.
         var taskList = new Task[_maxTesthostCount];

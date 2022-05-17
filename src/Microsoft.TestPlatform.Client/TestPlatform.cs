@@ -75,9 +75,6 @@ internal class TestPlatform : ITestPlatform
         _testHostProviderManager = testHostProviderManager;
     }
 
-    /// <summary>
-    /// Gets or sets the test engine instance.
-    /// </summary>
     private readonly ITestEngine _testEngine;
 
     /// <inheritdoc/>

@@ -78,7 +78,7 @@ internal class FakeCommunicationChannel<TContext> : FakeCommunicationChannel, IC
     /// </summary>
     public Queue<RequestResponsePair<string, FakeMessage, TContext>> NextResponses { get; } = new();
     public FakeErrorAggregator FakeErrorAggregator { get; }
-    public FakeMessage? OutgoingMessage { get; private set; }
+    public FakeMessage? PendingMessage { get; private set; }
     public TContext? Context { get; private set; }
     public List<RequestResponsePair<Message, FakeMessage, TContext>> ProcessedMessages { get; } = new();
     public Task? ProcessIncomingMessagesTask { get; private set; }
@@ -105,9 +105,9 @@ internal class FakeCommunicationChannel<TContext> : FakeCommunicationChannel, IC
             try
             {
                 // TODO: better name for the property? This is message that we are currently trying to send.
-                OutgoingMessage = OutQueue.Take(token);
-                OnMessageReceived(this, new MessageReceivedEventArgs { Data = OutgoingMessage.SerializedMessage });
-                OutgoingMessage = null;
+                PendingMessage = OutQueue.Take(token);
+                OnMessageReceived(this, new MessageReceivedEventArgs { Data = PendingMessage.SerializedMessage });
+                PendingMessage = null;
             }
             catch (OperationCanceledException) { }
             catch (Exception ex)

@@ -142,6 +142,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [TestCategory("Feature")]
+    [Ignore("This is for debugger v3 and does not work yet.")]
     [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM, JustRow = 1)]
     public void RunAllTestsWithMixedTFMsWillProvideAdditionalInformationToTheDebugger(RunnerInfo runnerInfo)
     {
@@ -171,6 +172,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [TestCategory("BackwardCompatibilityWithRunner")]
+    [Ignore("This is for debugger v3 and does not work yet.")]
     [RunnerCompatibilityDataSource(BeforeFeature = Features.MULTI_TFM, JustRow = 1)]
     public void RunAllTestsWithMixedTFMsCallsBackToTestHostLauncherV3EvenWhenRunnerDoesNotSupportItYet(RunnerInfo runnerInfo)
     {
