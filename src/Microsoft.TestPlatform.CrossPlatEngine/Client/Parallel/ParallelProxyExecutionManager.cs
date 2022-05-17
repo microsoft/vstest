@@ -159,7 +159,8 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         // and queue another test run.
         if (!testRunCompleteArgs.IsCanceled && !_abortRequested)
         {
-            var hadMoreWork = _parallelOperationManager.RunNextWork(proxyExecutionManager);
+            _parallelOperationManager.RunNextWork(proxyExecutionManager);
+            //var hadMoreWork = _parallelOperationManager.RunNextWork(proxyExecutionManager);
             // ugh huh????! don't return true, or else stuff will fail!
             //if (!hadMoreWork)
             //{
