@@ -48,6 +48,8 @@ internal partial class FeatureFlag : IFeatureFlag
     // Faster JSON serialization relies on less internals of NewtonsoftJson, and on some additional caching.
     public const string DISABLE_FASTER_JSON_SERIALIZATION = VSTEST_ + nameof(DISABLE_FASTER_JSON_SERIALIZATION);
 
+    // Forces vstest.console to run all sources using the same target framework (TFM) and architecture, instead of allowing
+    // multiple different tfms and architectures to run at the same time.
     public const string DISABLE_MULTI_TFM_RUN = VSTEST_ + nameof(DISABLE_MULTI_TFM_RUN);
 
     [Obsolete("Only use this in tests.")]

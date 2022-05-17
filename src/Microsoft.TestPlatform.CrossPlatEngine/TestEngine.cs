@@ -89,11 +89,15 @@ public class TestEngine : ITestEngine
         if (ShouldRunInProcess(discoveryCriteria.RunSettings, isParallelRun, isDataCollectorEnabled: false, testHostManagers))
         {
             // We are running in process, so whatever the architecture and framework that was figured out is, it must be compatible. If we have more
-            // changes that we want to to runsettings in the future, based on SourceDetail then it will depend on those details. But in general
+            // changes that we want to do to runsettings in the future, based on SourceDetail then it will depend on those details. But in general
             // we will have to check that all source details are the same. Otherwise we for sure cannot run in process.
             // E.g. if we get list of sources where one of them has different architecture we for sure cannot run in process, because the current
             // process can handle only single runsettings.
-            var testHostManagerInfo = testHostManagers.Single();
+            if (testHostManagers.Count != 1)
+            {
+                throw new InvalidOperationException($"Exactly 1 testhost manager must be provided when running in process, but there {testHostManagers.Count} were provided.");
+            }
+            var testHostManagerInfo = testHostManagers[0];
             testHostManager.Initialize(TestSessionMessageLogger.Instance, testHostManagerInfo.RunSettings);
 
             var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
