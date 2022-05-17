@@ -140,7 +140,7 @@ DOTNET_CLI_VERSION=$_ReadGlobalVersion
 #
 TPB_Solution="TestPlatform.sln"
 TPB_Build_From_Source_Solution="TestPlatform_BuildFromSource.sln"
-TPB_TargetFramework="net451"
+TPB_TargetFramework="net462"
 TPB_TargetFrameworkCore="netcoreapp2.1"
 TPB_Configuration=$CONFIGURATION
 TPB_TargetRuntime=$TARGET_RUNTIME
@@ -340,8 +340,8 @@ function publish_package()
         mkdir -p $testhost
 
         if [[ $TP_USE_REPO_API = 0 ]]; then
-            cp -r src/testhost/bin/$TPB_Configuration/net451/win7-x64/* $testhost
-            cp -r src/testhost.x86/bin/$TPB_Configuration/net451/win7-x86/* $testhost
+            cp -r src/testhost/bin/$TPB_Configuration/net462/win7-x64/* $testhost
+            cp -r src/testhost.x86/bin/$TPB_Configuration/net462/win7-x86/* $testhost
         else
             cp -r src/testhost/bin/$TPB_Configuration/net6.0/* $testhost
             cp -r src/testhost.x86/bin/$TPB_Configuration/net6.0/* $testhost
