@@ -415,10 +415,10 @@
     <file src="net462\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net462\$Runtime$\tr\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\vstest.console.resources.dll" />
     <file src="net462\$Runtime$\tr\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\SettingsMigrator.resources.dll" />
-    <file src="net462\$Runtime$\x64\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x64\msdia140.dll" />
-    <file src="net462\$Runtime$\x64\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x64\msdia140.dll.manifest" />
-    <file src="net462\$Runtime$\x86\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x86\msdia140.dll" />
-    <file src="net462\$Runtime$\x86\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x86\msdia140.dll.manifest" />
+    <file src="net451\$Runtime$\x64\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x64\msdia140.dll" />
+    <file src="net451\$Runtime$\x64\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x64\msdia140.dll.manifest" />
+    <file src="net451\$Runtime$\x86\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x86\msdia140.dll" />
+    <file src="net451\$Runtime$\x86\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x86\msdia140.dll.manifest" />
     <file src="net462\$Runtime$\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net462\$Runtime$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net462\$Runtime$\zh-Hans\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
