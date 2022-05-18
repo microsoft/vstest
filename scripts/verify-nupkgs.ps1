@@ -64,7 +64,7 @@ function Verify-Nuget-Packages($packageDirectory, $version)
         }
     }
 
-    if ($errors) { 
+    if ($errors) {
         Write-Error "There are $($errors.Count) errors:`n$($errors -join "`n")"
     }
 
