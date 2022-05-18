@@ -687,10 +687,22 @@ internal class TestRequestManager : ITestRequestManager
         settingsUpdated |= frameworkWasAutodetected;
         var frameworkSetByRunsettings = !frameworkWasAutodetected;
 
+        // Before MULTI_TFM feature the sourceToArchitectureMap and sourceToFrameworkMap were only used as informational
+        // to be able to do this compatibility check and print warning. And in the later steps only chosenPlatform, chosenFramework
+        // were used, that represented the single architecture and framework to be used.
+        //
+        // After MULTI_TFM  sourceToArchitectureMap and sourceToFrameworkMap are the source of truth, and are propagated forward,
+        // so when we want to revert to the older behavior we need to re-enable the check, and unify all the architecture and
+        // framework entries to the same chosen value.
+        var disableMultiTfm = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_MULTI_TFM_RUN);
+
         // Choose default architecture based on the framework.
-        // For .NET core, the default platform architecture should be based on the process.
+        // For a run with mixed tfms enabled, or .NET "Core", the default platform architecture should be based on the process.
+        // This will choose x64 by default for both .NET and .NET Framework, and avoids choosing x86 for a mixed
+        // run, so we will run via .NET testhost.exe, and not via dotnet testhost.dll.
         Architecture defaultArchitecture = Architecture.X86;
-        if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+        if (!disableMultiTfm
+            || chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
             || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
             // This is a special case for 1 version of Nuget.Frameworks that was shipped with using identifier NET5 instead of NETCoreApp5 for .NET 5.
             || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -722,7 +734,7 @@ internal class TestRequestManager : ITestRequestManager
                 defaultArchitecture = GetDefaultArchitecture(runConfiguration);
             }
 
-            // For all other scenario we keep the old default Architecture.X86.
+            // For all other scenarios we keep the old default Architecture.X86.
         }
 
         EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()} OperatingSystem: {_environment.OperatingSystem}.");
@@ -748,7 +760,6 @@ internal class TestRequestManager : ITestRequestManager
         // After MULTI_TFM  sourceToArchitectureMap and sourceToFrameworkMap are the source of truth, and are propagated forward,
         // so when we want to revert to the older behavior we need to re-enable the check, and unify all the architecture and
         // framework entries to the same chosen value.
-        var disableMultiTfm = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_MULTI_TFM_RUN);
 
         // Do the check only when we enable MULTI_TFM and platform or framework are forced by settings, because then we maybe have some sources
         // that are not compatible with the chosen settings. And do the check always when MULTI_TFM is disabled, because then we want to warn every

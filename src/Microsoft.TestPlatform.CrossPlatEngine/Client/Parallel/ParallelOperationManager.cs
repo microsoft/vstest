@@ -83,7 +83,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         RunWorkInParallel();
     }
 
-    // This does not do anything in parallel, all the workloads we schedule are offloaded to separate Task in the callback.
+    // This does not do anything in parallel, all the workloads we schedule are offloaded to separate Task in the _runWorkload callback.
     // I did not want to change that, yet but this is the correct place to do that offloading. Not each manager.
     private bool RunWorkInParallel()
     {
