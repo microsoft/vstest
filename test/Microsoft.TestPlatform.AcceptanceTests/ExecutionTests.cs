@@ -259,7 +259,7 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProject3.dll would use Framework .NETFramework,Version=v4.5.1 and Platform X64";
+        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X64 platform. SimpleTestProjectx86.dll would use Framework .NETFramework,Version=v4.5.1 and Platform X86";
         var assemblyPaths =
             BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProjectx86.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);

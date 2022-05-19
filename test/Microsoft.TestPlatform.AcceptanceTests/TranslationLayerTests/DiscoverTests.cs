@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
+using FluentAssertions;
+
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -109,11 +111,11 @@ public class DiscoverTests : AcceptanceTestBase
         Setup();
 
         var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
-
-        string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+        var batchSize = 2;
+        string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
                                         <RunConfiguration>
-                                        <BatchSize>3</BatchSize>
+                                        <BatchSize>{batchSize}</BatchSize>
                                         </RunConfiguration>
                                     </RunSettings>";
 
@@ -124,8 +126,10 @@ public class DiscoverTests : AcceptanceTestBase
             discoveryEventHandlerForBatchSize);
 
         // Assert.
-        Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count, "discovered test cases");
-        Assert.AreEqual(3, discoveryEventHandlerForBatchSize.BatchSize, "batch size");
+        discoveryEventHandlerForBatchSize.DiscoveredTestCases.Should().HaveCount(6, "we found 6 tests in total");
+        // Batching happens based on size and time interva. The middle batch should almost always be 2,
+        // if the discovery is fast enough, but the only requirement we can reliably check and enforce is that no batch is bigger than the expected size.
+        discoveryEventHandlerForBatchSize.Batches.Should().OnlyContain(v => v <= batchSize, "all batches should be the same size or smaller than the batch size");
     }
 
     [TestMethod]
@@ -137,11 +141,11 @@ public class DiscoverTests : AcceptanceTestBase
         Setup();
 
         var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
-
-        string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+        var batchSize = 2;
+        string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
                                         <RunConfiguration>
-                                        <BatchSize>3</BatchSize>
+                                        <BatchSize>{batchSize}</BatchSize>
                                         </RunConfiguration>
                                     </RunSettings>";
 
@@ -151,8 +155,10 @@ public class DiscoverTests : AcceptanceTestBase
             discoveryEventHandlerForBatchSize);
 
         // Assert.
-        Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count);
-        Assert.AreEqual(3, discoveryEventHandlerForBatchSize.BatchSize);
+        discoveryEventHandlerForBatchSize.DiscoveredTestCases.Should().HaveCount(6, "we found 6 tests in total");
+        // Batching happens based on size and time interva. The middle batch should almost always be 2,
+        // if the discovery is fast enough, but the only requirement we can reliably check and enforce is that no batch is bigger than the expected size.
+        discoveryEventHandlerForBatchSize.Batches.Should().OnlyContain(v => v <= batchSize, "all batches should be the same size or smaller than the batch size");
     }
 
     [TestMethod]

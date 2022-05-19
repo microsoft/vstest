@@ -128,7 +128,7 @@ public class DiscoveryEventHandlerForBatchSize : ITestDiscoveryEventsHandler2, I
     /// <summary>
     /// Gets the batch size.
     /// </summary>
-    public long BatchSize { get; private set; }
+    public List<int> Batches { get; } = new List<int>();
 
     /// <summary>
     /// Gets the discovered test cases.
@@ -174,7 +174,7 @@ public class DiscoveryEventHandlerForBatchSize : ITestDiscoveryEventsHandler2, I
         if (discoveredTestCases != null && discoveredTestCases.Any())
         {
             DiscoveredTestCases.AddRange(discoveredTestCases);
-            BatchSize = discoveredTestCases.Count();
+            Batches.Add(discoveredTestCases.Count());
         }
     }
 }
