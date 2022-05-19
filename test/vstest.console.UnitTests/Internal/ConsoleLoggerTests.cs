@@ -584,8 +584,8 @@ public class ConsoleLoggerTests
         _mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(5));
     }
 
-    [DataRow(".NETFramework,version=v4.5.1", "(net462)", "quiet")]
-    [DataRow(".NETFramework,version=v4.5.1", "(net462)", "minimal")]
+    [DataRow(".NETFramework,version=v4.5.1", "(net451)", "quiet")]
+    [DataRow(".NETFramework,version=v4.5.1", "(net451)", "minimal")]
     [DataRow(null, null, "quiet")]
     [DataRow(null, null, "minimal")]
     [TestMethod]
