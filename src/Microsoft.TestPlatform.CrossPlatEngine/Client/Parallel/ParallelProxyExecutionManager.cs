@@ -159,13 +159,20 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         // and queue another test run.
         if (!testRunCompleteArgs.IsCanceled && !_abortRequested)
         {
-            _parallelOperationManager.RunNextWork(proxyExecutionManager);
-            //var hadMoreWork = _parallelOperationManager.RunNextWork(proxyExecutionManager);
-            // ugh huh????! don't return true, or else stuff will fail!
-            //if (!hadMoreWork)
-            //{
-            //    return true;
-            //}
+            // Do NOT return true here, there should be only one place where this method returns true,
+            // and cancellation or success or any other other combination or timing should result in only one true.
+            // This is largely achieved by returning true above when "allRunsCompleted" is true. That variable is true
+            // when we cancel all sources or when we complete all sources.
+            //
+            // But we can also start a source, and cancel right after, which will remove all managers, and RunNextWork returns
+            // false, because we had no more work to do. If we check that result here and return true, then the whole logic is
+            // broken and we end up calling RunComplete handlers twice and writing logger output to screen twice. So don't do it.
+            // var hadMoreWork = _parallelOperationManager.RunNextWork(proxyExecutionManager);
+            // if (!hadMoreWork)
+            // {
+            //     return true;
+            // }
+            var _ = _parallelOperationManager.RunNextWork(proxyExecutionManager);
         }
 
         return false;
