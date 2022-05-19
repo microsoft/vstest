@@ -2,7 +2,7 @@
 <Project ToolsVersion="12.0" DefaultTargets="SignAssemblies" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <SignType Condition="'$(SignType)' == ''">Test</SignType>
-    <MicrobuildVersion>0.2.0</MicrobuildVersion>
+    <MicrobuildVersion>0.3.0</MicrobuildVersion>
   </PropertyGroup>
 
   <PropertyGroup>
