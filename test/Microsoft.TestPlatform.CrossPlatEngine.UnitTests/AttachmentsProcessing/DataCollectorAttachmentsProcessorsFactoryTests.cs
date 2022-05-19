@@ -118,12 +118,7 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
         // We cannot cleanup at the end because assembly will be copied into tmp directory and loaded
         string testAssetsPath = GetTestAssetsFolder();
         var dataCollectorFilePath = Directory.GetFiles(testAssetsPath, "AttachmentProcessorDataCollector.dll", SearchOption.AllDirectories)
-            .Where(x => x.Contains("bin"))
-#if DEBUG
-            .Where(x => x.Contains("Debug"))
-#else
-            .Where(x => x.Contains("Release"))
-#endif
+            .Where(x => x.Contains("bin") && x.Contains(IntegrationTestEnvironment.BuildConfiguration))
             .Single();
         string tmpDir = Path.Combine(Path.GetTempPath(), nameof(Create_ShouldLoadOrderingByFilePath));
         Directory.CreateDirectory(tmpDir);
