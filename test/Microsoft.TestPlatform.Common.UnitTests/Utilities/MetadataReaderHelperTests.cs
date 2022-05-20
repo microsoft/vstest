@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -22,7 +23,10 @@ public class MetadataReaderHelperTests
     public void MetadataReaderHelper_GetCollectorExtensionTypes()
     {
         string testAssetsPath = GetTestAssetsFolder();
-        var dataCollectorFilePath = Directory.GetFiles(testAssetsPath, "AttachmentProcessorDataCollector.dll", SearchOption.AllDirectories).Where(x => x.Contains("bin")).Single();
+        var dataCollectorFilePath =
+            Directory.GetFiles(testAssetsPath, "AttachmentProcessorDataCollector.dll", SearchOption.AllDirectories)
+            .Where(x => x.Contains("bin") && x.Contains(IntegrationTestEnvironment.BuildConfiguration))
+            .Single();
         var types = _metadataReaderHelper.DiscoverTestExtensionTypesV2Attribute(Assembly.LoadFile(dataCollectorFilePath), dataCollectorFilePath);
         Assert.IsTrue(types.Any(), $"File {dataCollectorFilePath}");
         Assert.IsTrue(types[0].AssemblyQualifiedName.StartsWith("AttachmentProcessorDataCollector.SampleDataCollectorV2"), $"File {dataCollectorFilePath}");
