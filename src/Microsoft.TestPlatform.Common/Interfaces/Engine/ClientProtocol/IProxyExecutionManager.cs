@@ -23,6 +23,8 @@ public interface IProxyExecutionManager
     /// </summary>
     void Initialize(bool skipDefaultAdapters);
 
+    void InitializeTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler);
+
     /// <summary>
     /// Starts the test run.
     /// </summary>

@@ -148,4 +148,9 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
         // it will use TestPluginCache of vstest.console
         _executionManager.Initialize(Enumerable.Empty<string>(), null);
     }
+
+    public void InitializeTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
+    {
+      
+    }
 }

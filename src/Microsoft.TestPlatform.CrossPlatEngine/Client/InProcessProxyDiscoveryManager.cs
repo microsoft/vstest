@@ -115,4 +115,9 @@ internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
         // it will use TestPluginCache of vstest.console
         _discoveryManager.Initialize(Enumerable.Empty<string>(), null);
     }
+
+    public void InitializeDiscovery(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler, bool skipDefaultAdapters)
+    {
+        throw new NotImplementedException();
+    }
 }

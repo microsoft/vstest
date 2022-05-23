@@ -102,7 +102,7 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         // One data aggregator per parallel run
         _currentRunDataAggregator = new ParallelRunDataAggregator(testRunCriteria.TestRunSettings);
 
-        _parallelOperationManager.StartWork(workloads, eventHandler, GetParallelEventHandler, StartTestRunOnConcurrentManager);
+        _parallelOperationManager.StartWork(workloads, eventHandler, GetParallelEventHandler, PrepareTestRunOnConcurrentManager, StartTestRunOnConcurrentManager);
 
         // Why 1? Because this is supposed to be a processId, and that is just the default that was chosen by someone before me,
         // and maybe is checked somewhere, but I don't see it checked in our codebase.
@@ -299,24 +299,47 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
             _currentRunDataAggregator);
     }
 
+    private Task PrepareTestRunOnConcurrentManager(IProxyExecutionManager proxyExecutionManager, ITestRunEventsHandler eventHandler, TestRunCriteria testRunCriteria)
+    {
+        return Task.Run(() =>
+        {
+            if (!proxyExecutionManager.IsInitialized)
+            {
+                proxyExecutionManager.Initialize(_skipDefaultAdapters);
+            }
+            Interlocked.Increment(ref _runStartedClients);
+            proxyExecutionManager.InitializeTestRun(testRunCriteria, eventHandler);
+
+        });
+    }
+
     /// <summary>
     /// Triggers the execution for the next data object on the concurrent executor
     /// Each concurrent executor calls this method, once its completed working on previous data
     /// </summary>
     /// <param name="proxyExecutionManager">Proxy execution manager instance.</param>
     /// <returns>True, if execution triggered</returns>
-    private void StartTestRunOnConcurrentManager(IProxyExecutionManager proxyExecutionManager, ITestRunEventsHandler eventHandler, TestRunCriteria testRunCriteria)
+    private void StartTestRunOnConcurrentManager(IProxyExecutionManager proxyExecutionManager, ITestRunEventsHandler eventHandler, TestRunCriteria testRunCriteria, bool initialized, Task initTask)
     {
         if (testRunCriteria != null)
         {
-            if (!proxyExecutionManager.IsInitialized)
-            {
-                proxyExecutionManager.Initialize(_skipDefaultAdapters);
-            }
-
             Task.Run(() =>
                 {
-                    Interlocked.Increment(ref _runStartedClients);
+                    if (!initialized)
+                    {
+                        if (!proxyExecutionManager.IsInitialized)
+                        {
+                            proxyExecutionManager.Initialize(_skipDefaultAdapters);
+                        }
+
+                        Interlocked.Increment(ref _runStartedClients);
+                        proxyExecutionManager.InitializeTestRun(testRunCriteria, eventHandler);
+                    }
+                    else
+                    {
+                        initTask.Wait();
+                    }
+
                     EqtTrace.Verbose("ParallelProxyExecutionManager: Execution started. Started clients: " + _runStartedClients);
 
                     proxyExecutionManager.StartTestRun(testRunCriteria, eventHandler);
@@ -345,6 +368,11 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         }
 
         EqtTrace.Verbose("ProxyParallelExecutionManager: No sources available for execution.");
+    }
+
+    public void InitializeTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
+    {
+       
     }
 }
 

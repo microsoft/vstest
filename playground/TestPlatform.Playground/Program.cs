@@ -40,55 +40,95 @@ internal class Program
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
 
-
-        var sourceSettings = @"
+        var maxCpuCount = 1;
+        var sourceSettings = $@"
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
-                        <MaxCpuCount>4</MaxCpuCount>
+                        <MaxCpuCount>{maxCpuCount}</MaxCpuCount>
+<DisableAppDomain>false</DisableAppDomain>
+<BatchSize>10</BatchSize>
                     </RunConfiguration>
                 </RunSettings>
             ";
 
         var sources = new[] {
-            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
-            Path.Combine(playground, "MSTest1", "bin", "Debug", "net5.0", "MSTest1.dll"),
-            @"C:\Users\jajares\source\repos\TestProject48\TestProject48\bin\Debug\net48\TestProject48.dll",
-            @"C:\Users\jajares\source\repos\TestProject48\TestProject1\bin\Debug\net48\win10-x64\TestProject1.dll"
+          // @"C:\t\TestProject13_\TestProject1\bin\Debug\net48\TestProject1.dll",
+
+           // @"C:\t\TestProject13_for_mstest\TestProject1\bin\Debug\net48\TestProject1.dll",
+
+             // @"C:\t\TestProject13_for_mstest\TestProject5\bin\Debug\net472\TestProject5.dll",
+//@"C:\t\TestProject13_for_mstest\TestProject6\bin\Debug\net472\TestProject6.dll"
+
+
+////            // net6
+        @"C:\t\ParallelDiscovery2\ReproNetCore\Test1\bin\Debug\net6.0\Test1.dll",
+@"C:\t\ParallelDiscovery2\ReproNetCore\Test7\bin\Debug\net6.0\Test7.dll",
+@"C:\t\ParallelDiscovery2\ReproNetCore\Test2\bin\Debug\net6.0\Test2.dll",
+@"C:\t\ParallelDiscovery2\ReproNetCore\Test6\bin\Debug\net6.0\Test6.dll",
+@"C:\t\ParallelDiscovery2\ReproNetCore\Test8\bin\Debug\net6.0\Test8.dll",
+@"C:\t\ParallelDiscovery2\ReproNetCore\Test5\bin\Debug\net6.0\Test5.dll",
+@"C:\t\ParallelDiscovery2\ReproNetCore\Test3\bin\Debug\net6.0\Test3.dll",
+@"C:\t\ParallelDiscovery2\ReproNetCore\Test4\bin\Debug\net6.0\Test4.dll",
+@"C:\t\ParallelDiscovery2\ReproNetCore\Test10\bin\Debug\net6.0\Test10.dll",
+@"C:\t\ParallelDiscovery2\ReproNetCore\Test9\bin\Debug\net6.0\Test9.dll",
+
+        //// netfx
+         //@"C:\t\ParallelDiscovery2\ReproNetFx\Project4\bin\Debug\net472\Project4.dll",
+         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project1\bin\Debug\net472\Project1.dll",
+         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project2\bin\Debug\net472\Project2.dll",
+         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project3\bin\Debug\net472\Project3.dll",
+         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project9\bin\Debug\net472\Project9.dll",
+         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project10\bin\Debug\net472\Project10.dll",
+         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project5\bin\Debug\net472\Project5.dll",
+         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project8\bin\Debug\net472\Project8.dll",
+         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project7\bin\Debug\net472\Project7.dll",
+         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project6\bin\Debug\net472\Project6.dll",
+
         };
 
-        // console mode
-        var settingsFile = Path.GetTempFileName();
-        try
-        {
-            File.WriteAllText(settingsFile, sourceSettings);
-            var process = Process.Start(console, string.Join(" ", sources) + " --settings:" + settingsFile + " --listtests");
-            process.WaitForExit();
-            if (process.ExitCode != 0)
-            {
-                throw new Exception($"Process failed with {process.ExitCode}");
-            }
-        }
-        finally
-        {
-            try { File.Delete(settingsFile); } catch { }
-        }
+        //// console mode
+        //var settingsFile = Path.GetTempFileName();
+        //try
+        //{
+        //    File.WriteAllText(settingsFile, sourceSettings);
+        //    var process = Process.Start(console, string.Join(" ", sources) + " --settings:" + settingsFile + " --listtests");
+        //    var cmd = console + "\n\n" + string.Join(" ", sources) + " --settings:" + settingsFile + " --listtests";
+        //    var swc = Stopwatch.StartNew();
+        //    process.WaitForExit();
+        //    if (process.ExitCode != 0)
+        //    {
+        //        throw new Exception($"Process failed with {process.ExitCode}");
+        //    }
+        //    Console.WriteLine($"Done in {swc.ElapsedMilliseconds} ms");
+        //}
+        //finally
+        //{
+        //    try { File.Delete(settingsFile); } catch { }
+        //}
 
         // design mode
         var consoleOptions = new ConsoleParameters
         {
             LogFilePath = Path.Combine(here, "logs", "log.txt"),
-            TraceLevel = TraceLevel.Verbose,
+            TraceLevel = TraceLevel.Off
         };
-        var options = new TestPlatformOptions();
+        var options = new TestPlatformOptions { CollectMetrics = true };
         var r = new VsTestConsoleWrapper(console, consoleOptions);
         var sessionHandler = new TestSessionHandler();
 #pragma warning disable CS0618 // Type or member is obsolete
-        r.StartTestSession(sources, sourceSettings, sessionHandler);
+        //       r.StartTestSession(sources, sourceSettings, sessionHandler);
 #pragma warning restore CS0618 // Type or member is obsolete
+        var sw = Stopwatch.StartNew();
+
         var discoveryHandler = new PlaygroundTestDiscoveryHandler();
         r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        var dd = sw.ElapsedMilliseconds;
+        Console.WriteLine($"Discovery done in {sw.ElapsedMilliseconds} ms");
+        sw.Restart();
         r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        var rd = sw.ElapsedMilliseconds;
+        Console.WriteLine($"MaxCpuCount: {maxCpuCount}, Discovery: {dd} ms, Run: {rd} ms, Total: {dd + rd} ms");
     }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
@@ -99,8 +139,8 @@ internal class Program
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
-            Console.WriteLine($"[DISCOVERY.PROGRESS]");
-            Console.WriteLine(WriteTests(discoveredTestCases));
+            //Console.WriteLine($"[DISCOVERY.PROGRESS]");
+            //Console.WriteLine(WriteTests(discoveredTestCases));
             _testCasesCount += discoveredTestCases.Count();
             if (discoveredTestCases != null) { TestCases.AddRange(discoveredTestCases); }
         }
@@ -108,16 +148,16 @@ internal class Program
         public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
         {
             Console.WriteLine($"[DISCOVERY.COMPLETE] aborted? {isAborted}, tests count: {totalTests}");
-            Console.WriteLine("Last chunk:");
-            Console.WriteLine(WriteTests(lastChunk));
+            //Console.WriteLine("Last chunk:");
+            //Console.WriteLine(WriteTests(lastChunk));
             if (lastChunk != null) { TestCases.AddRange(lastChunk); }
         }
 
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
             Console.WriteLine($"[DISCOVERY.COMPLETE] aborted? {discoveryCompleteEventArgs.IsAborted}, tests count: {discoveryCompleteEventArgs.TotalCount}, discovered count: {_testCasesCount}");
-            Console.WriteLine("Last chunk:");
-            Console.WriteLine(WriteTests(lastChunk));
+            //Console.WriteLine("Last chunk:");
+            //Console.WriteLine(WriteTests(lastChunk));
             Console.WriteLine("Fully discovered:");
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.FullyDiscoveredSources));
             Console.WriteLine("Partially discovered:");
@@ -168,13 +208,13 @@ internal class Program
         public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
             Console.WriteLine($"[RUN.COMPLETE]: err: {testRunCompleteArgs.Error}, lastChunk:");
-            Console.WriteLine(WriteTests(lastChunkArgs?.NewTestResults));
+            //Console.WriteLine(WriteTests(lastChunkArgs?.NewTestResults));
         }
 
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
-            Console.WriteLine($"[RUN.PROGRESS]");
-            Console.WriteLine(WriteTests(testRunChangedArgs.NewTestResults));
+            //Console.WriteLine($"[RUN.PROGRESS]");
+            //Console.WriteLine(WriteTests(testRunChangedArgs.NewTestResults));
         }
 
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
