@@ -72,12 +72,15 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
 
         if (coverageReportFilePaths.Count > 1)
         {
-            var mergedCoverageReports = await MergeCodeCoverageFilesAsync(coverageReportFilePaths, progressReporter, cancellationToken).ConfigureAwait(false);
             var resultAttachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
 
-            foreach (var coverageReport in mergedCoverageReports)
+            var mergedCoverageReports = await MergeCodeCoverageFilesAsync(coverageReportFilePaths, progressReporter, cancellationToken).ConfigureAwait(false);
+            if (mergedCoverageReports is not null)
             {
-                resultAttachmentSet.Attachments.Add(UriDataAttachment.CreateFrom(coverageReport, CoverageFriendlyName));
+                foreach (var coverageReport in mergedCoverageReports)
+                {
+                    resultAttachmentSet.Attachments.Add(UriDataAttachment.CreateFrom(coverageReport, CoverageFriendlyName));
+                }
             }
 
             foreach (var coverageOtherFilePath in coverageOtherFilePaths)
