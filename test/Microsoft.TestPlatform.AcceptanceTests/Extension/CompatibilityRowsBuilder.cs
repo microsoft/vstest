@@ -56,8 +56,8 @@ public class CompatibilityRowsBuilder
     public bool DebugVSTestConsole { get; set; }
     public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
-    public bool NoDefaultBreakpoints { get; set; } = true;
-
+    public bool DebugStopAtEntrypoint { get; set; }
+    public int? JustRow { get; internal set; }
 
     public List<RunnerInfo> CreateData()
     {
@@ -78,8 +78,8 @@ public class CompatibilityRowsBuilder
         if (WithInProcess)
             AddInProcess(dataRows);
 
-        var minVersion = SemanticVersion.Parse("0.0.0-alpha.1");
-        var maxVersion = SemanticVersion.Parse("9999.0.0");
+        var minVersion = ParseAndPatchSemanticVersion("0.0.0-alpha.1");
+        var maxVersion = ParseAndPatchSemanticVersion("9999.0.0");
         SemanticVersion? beforeRunnerVersion = maxVersion;
         SemanticVersion? afterRunnerVersion = minVersion;
         SemanticVersion? beforeTestHostVersion = maxVersion;
@@ -90,37 +90,37 @@ public class CompatibilityRowsBuilder
         if (BeforeRunnerFeature != null)
         {
             var feature = Features.TestPlatformFeatures[BeforeRunnerFeature];
-            beforeRunnerVersion = SemanticVersion.Parse(feature.Version.TrimStart('v'));
+            beforeRunnerVersion = ParseAndPatchSemanticVersion(feature.Version);
         }
 
         if (AfterRunnerFeature != null)
         {
             var feature = Features.TestPlatformFeatures[AfterRunnerFeature];
-            afterRunnerVersion = SemanticVersion.Parse(feature.Version.TrimStart('v'));
+            afterRunnerVersion = ParseAndPatchSemanticVersion(feature.Version);
         }
 
         if (BeforeTestHostFeature != null)
         {
             var feature = Features.TestPlatformFeatures[BeforeTestHostFeature];
-            beforeTestHostVersion = SemanticVersion.Parse(feature.Version.TrimStart('v'));
+            beforeTestHostVersion = ParseAndPatchSemanticVersion(feature.Version);
         }
 
         if (AfterTestHostFeature != null)
         {
             var feature = Features.TestPlatformFeatures[AfterTestHostFeature];
-            afterTestHostVersion = SemanticVersion.Parse(feature.Version.TrimStart('v'));
+            afterTestHostVersion = ParseAndPatchSemanticVersion(feature.Version);
         }
 
         if (BeforeAdapterFeature != null)
         {
             var feature = Features.TestPlatformFeatures[BeforeAdapterFeature];
-            beforeAdapterVersion = SemanticVersion.Parse(feature.Version.TrimStart('v'));
+            beforeAdapterVersion = ParseAndPatchSemanticVersion(feature.Version);
         }
 
         if (AfterAdapterFeature != null)
         {
             var feature = Features.AdapterFeatures[AfterAdapterFeature];
-            afterAdapterVersion = SemanticVersion.Parse(feature.Version.TrimStart('v'));
+            afterAdapterVersion = ParseAndPatchSemanticVersion(feature.Version);
         }
 
         var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
@@ -132,12 +132,12 @@ public class CompatibilityRowsBuilder
         // We probably don't have that need right now, because legacy version is 15.x.x, which is very old, and we are still keeping
         // compatibility.
 
-        Func<SemanticVersion, SemanticVersion, SemanticVersion, bool> isInRange = (version, before, after) => version < before && after < version;
+        Func<SemanticVersion, SemanticVersion, SemanticVersion, bool> isInRange = (version, before, after) => version < before && after <= version;
 
         var rows = dataRows.Where(r => r.VSTestConsoleInfo != null
-            && isInRange(SemanticVersion.Parse(r.VSTestConsoleInfo.Version), beforeRunnerVersion, afterRunnerVersion)
-            && r.TestHostInfo != null && isInRange(SemanticVersion.Parse(r.TestHostInfo.Version), beforeTestHostVersion, afterTestHostVersion)
-            && r.AdapterInfo != null && isInRange(SemanticVersion.Parse(r.AdapterInfo.Version), beforeAdapterVersion, afterAdapterVersion)).ToList();
+            && isInRange(ParseAndPatchSemanticVersion(r.VSTestConsoleInfo.Version), beforeRunnerVersion, afterRunnerVersion)
+            && r.TestHostInfo != null && isInRange(ParseAndPatchSemanticVersion(r.TestHostInfo.Version), beforeTestHostVersion, afterTestHostVersion)
+            && r.AdapterInfo != null && isInRange(ParseAndPatchSemanticVersion(r.AdapterInfo.Version), beforeAdapterVersion, afterAdapterVersion)).ToList();
 
         // We use ToString to determine which values are unique. Not great solution, but works better than using records.
         var distinctRows = new Dictionary<string, RunnerInfo>();
@@ -149,7 +149,17 @@ public class CompatibilityRowsBuilder
             throw new InvalidOperationException("There were no rows that matched the specified criteria.");
         }
 
-        return distinctRows.Values.ToList();
+        var allRows = distinctRows.Values.ToList();
+
+        return JustRow == null ? allRows : new List<RunnerInfo> { allRows[JustRow.Value] };
+    }
+
+    private static SemanticVersion ParseAndPatchSemanticVersion(string? version)
+    {
+        // Our developer version is 17.2.0-dev, but we release few preview, that are named 17.2.0-preview or 17.2.0-release, yet we still
+        // want 17.2.0-dev to be considered the latest version. So we patch it.
+        var v = version != null && version.EndsWith("-dev") ? version?.Substring(0, version.Length - 4) + "-ZZZZZZZZZZ" : version;
+        return SemanticVersion.Parse(v?.TrimStart('v'));
     }
 
     private void AddInProcess(List<RunnerInfo> dataRows)
@@ -292,7 +302,7 @@ public class CompatibilityRowsBuilder
             DebugDataCollector = DebugDataCollector,
             DebugTestHost = DebugTestHost,
             DebugVSTestConsole = DebugVSTestConsole,
-            NoDefaultBreakpoints = NoDefaultBreakpoints
+            DebugStopAtEntrypoint = DebugStopAtEntrypoint
         };
     }
 

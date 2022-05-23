@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -44,7 +45,7 @@ public class TestRuntimeProviderManager : ITestRuntimeProviderManager
         return host?.Value;
     }
 
-    public virtual ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
+    public virtual ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration, List<string> _)
     {
         foreach (var testExtension in _testHostExtensionManager.TestExtensions)
         {

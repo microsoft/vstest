@@ -354,7 +354,7 @@ public class DefaultTestHostManagerTests
         CancellationTokenSource cancellationTokenSource = new();
         cancellationTokenSource.Cancel();
 
-        Assert.ThrowsException<AggregateException>(() => _testableTestHostManager.LaunchTestHostAsync(GetDefaultStartInfo(), cancellationTokenSource.Token).Wait());
+        Assert.ThrowsException<OperationCanceledException>(() => _testableTestHostManager.LaunchTestHostAsync(GetDefaultStartInfo(), cancellationTokenSource.Token).Wait());
     }
 
     [TestMethod]

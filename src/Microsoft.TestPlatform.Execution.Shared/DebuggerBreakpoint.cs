@@ -42,11 +42,11 @@ internal static class DebuggerBreakpoint
 
             if (vsPid == null)
             {
-                ConsoleOutput.Instance.WriteLine("Attaching Visual Studio, either a parent or the one that was started first... To specify a VS instance to use, use the PID in the option, instead of 1. No breakpoints are automatically set.", OutputLevel.Information);
+                ConsoleOutput.Instance.WriteLine("Attaching Visual Studio, either a parent or the one that was started first... To specify a VS instance to use, use the PID in the option, instead of 1.", OutputLevel.Information);
             }
             else
             {
-                ConsoleOutput.Instance.WriteLine($"Attaching Visual Studio with PID {vsPid} to the process '{Process.GetCurrentProcess().ProcessName}({Process.GetCurrentProcess().Id})'... No breakpoints are automatically set.", OutputLevel.Information);
+                ConsoleOutput.Instance.WriteLine($"Attaching Visual Studio with PID {vsPid} to the process '{Process.GetCurrentProcess().ProcessName}({Process.GetCurrentProcess().Id})'...", OutputLevel.Information);
             }
 
             AttachVs(Process.GetCurrentProcess(), vsPid);

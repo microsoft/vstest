@@ -92,7 +92,7 @@ public class FrameworkTests : AcceptanceTestBase
         }
         else
         {
-            StdOutputContains("Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.0 framework and X86 platform.");
+            StdOutputContains("Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.0 framework and X64 platform.");
             ValidateSummaryStatus(1, 0, 0);
         }
     }

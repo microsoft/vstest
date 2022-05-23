@@ -138,16 +138,9 @@ internal class DebuggerUtility
                                 }
                             }
                         }
-                        catch (COMException ex)
+                        // Catch the exception if it is COMException coming directly, or coming from methodInvocation, otherwise just let it be.
+                        catch (Exception ex) when (ex is COMException || (ex is TargetInvocationException tie && tie.InnerException is COMException))
                         {
-                            Trace($"ComException: Retrying in 250ms.\n{ex}");
-                            Thread.Sleep(250);
-                        }
-                        catch (TargetInvocationException ex)
-                        {
-                            if (ex.InnerException is not COMException)
-                                throw;
-
                             Trace($"ComException: Retrying in 250ms.\n{ex}");
                             Thread.Sleep(250);
                         }
