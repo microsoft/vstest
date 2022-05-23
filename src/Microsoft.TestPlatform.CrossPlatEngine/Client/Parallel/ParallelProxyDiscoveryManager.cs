@@ -253,7 +253,6 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine($"run, skip init: {discoveryCriteria.Sources.Single().ToString()}");
                     task?.Wait();
                 }
 

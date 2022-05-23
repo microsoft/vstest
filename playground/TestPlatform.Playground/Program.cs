@@ -227,7 +227,7 @@ internal class Program
 
         private static string WriteTests(IEnumerable<TestCase> testCases)
             => testCases?.Any() == true
-                ? "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName))
+                ? "\t" + string.Join("\n\t", testCases.Select(r => r.Source + " " + r.DisplayName))
                 : "\t<empty>";
     }
 
