@@ -302,16 +302,18 @@ public class HtmlLogger : ITestLoggerWithParameters
                 Environment.GetEnvironmentVariable("UserName"), Environment.MachineName,
                 FormatDateTimeForRunName(DateTime.Now));
 
-            XmlFilePath = GetFilePathAndCreateFile(HtmlLoggerConstants.XmlFileExtension, fileName);
+            XmlFilePath = _parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out var string logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue)
+            ? GetFilePath(HtmlLoggerConstants.XmlFileExtension, fileName)
+            : GenerateUniqueFile(HtmlLoggerConstants.XmlFileExtension, fileName);
 
             using (var xmlStream = _fileHelper.GetStream(XmlFilePath, FileMode.OpenOrCreate))
             {
                 _xmlSerializer.WriteObject(xmlStream, TestRunDetails);
             }
 
-            HtmlFilePath = string.IsNullOrEmpty(HtmlFilePath)
-                ? GetFilePathAndCreateFile(HtmlLoggerConstants.HtmlFileExtension, fileName)
-                : HtmlFilePath;
+            HtmlFilePath = _parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out var string logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue)
+                ? HtmlFilePath
+                : GenerateUniqueFile(HtmlLoggerConstants.HtmlFileExtension, fileName);
 
             _htmlTransformer.Transform(XmlFilePath, HtmlFilePath);
         }
@@ -335,14 +337,18 @@ public class HtmlLogger : ITestLoggerWithParameters
         ConsoleOutput.Instance.Information(false, htmlFilePathMessage);
     }
 
-    private string GetFilePathAndCreateFile(string fileExtension, string fileName)
+    private string GetFilePath(string fileExtension, string fileName)
     {
-        var fullFileFormat = $".{fileExtension}";
+        return Path.Combine(TestResultsDirPath, string.Concat("TestResult_", fileName, $".{fileExtension}"));
+    }
+
+    private string GenerateUniqueFile(string fileExtension, string fileName)
+    {
         string fullFilePath;
         for (short i = 0; i < short.MaxValue; i++)
         {
             var fileNameWithIter = i == 0 ? fileName : GetNextIterationFile(fileName, i);
-            fullFilePath = Path.Combine(TestResultsDirPath, string.Concat("TestResult_", fileNameWithIter, fullFileFormat));
+            fullFilePath = Path.Combine(TestResultsDirPath, $"TestResult_{fileNameWithIter}.{fileExtension}");
             lock (LockObject)
             {
                 if (!File.Exists(fullFilePath))
@@ -353,7 +359,7 @@ public class HtmlLogger : ITestLoggerWithParameters
             }
         }
 
-        throw new Exception($"Cannot generate unique filename for: {fileName}");
+        throw new Exception($"Cannot generate unique filename for: {fileName} on path: {TestResultsDirPath}");
     }
 
     private string FormatDateTimeForRunName(DateTime timeStamp)
@@ -363,7 +369,7 @@ public class HtmlLogger : ITestLoggerWithParameters
 
     private string GetNextIterationFile(string baseName, short iteration)
     {
-        return $"{Path.GetFileNameWithoutExtension(baseName)}[{iteration}]{(Path.HasExtension(baseName) ? Path.GetExtension(baseName) : string.Empty)}";
+        return Path.GetFileNameWithoutExtension(baseName) + $"[{iteration}]";
     }
 
     /// <summary>
