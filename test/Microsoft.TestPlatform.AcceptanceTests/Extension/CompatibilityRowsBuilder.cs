@@ -364,7 +364,7 @@ public class CompatibilityRowsBuilder
         var version = node?.InnerText.Replace("[", "").Replace("]", "") ?? "--WRONG-VERSION--";
         var vstestConsolePath = runnerInfo.IsNetFrameworkRunner switch
         {
-            true when NuGetVersion.TryParse(version, out var v) && v <= new NuGetVersion("17.3") => GetToolsPath("net451"),
+            true when NuGetVersion.TryParse(version, out var v) && v < new NuGetVersion("17.3") => GetToolsPath("net451"),
             true => GetToolsPath("net462"),
             false when version.StartsWith("15.") => GetContentFilesPath("netcoreapp2.0"),
             false => GetContentFilesPath("netcoreapp2.1"),
