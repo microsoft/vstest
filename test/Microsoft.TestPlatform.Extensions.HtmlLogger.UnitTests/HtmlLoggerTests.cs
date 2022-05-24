@@ -396,7 +396,7 @@ public class HtmlLoggerTests
     }
 
     [TestMethod]
-    public void TestCompleteHandlerShouldCreateCustumHtmlFileNamewithLogFileNameKey()
+    public void TestCompleteHandlerShouldCreateCustomHtmlFileNamewithLogFileNameKey()
     {
         var parameters = new Dictionary<string, string?>
         {
@@ -415,7 +415,7 @@ public class HtmlLoggerTests
     }
 
     [TestMethod]
-    public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefix()
+    public void TestCompleteHandlerShouldCreateCustomHtmlFileNameWithLogPrefix()
     {
         var parameters = new Dictionary<string, string>
         {
@@ -435,7 +435,7 @@ public class HtmlLoggerTests
     }
 
     [TestMethod]
-    public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefixIfTargetFrameworkIsNull()
+    public void TestCompleteHandlerShouldCreateCustomHtmlFileNameWithLogPrefixIfTargetFrameworkIsNull()
     {
         var parameters = new Dictionary<string, string>
         {
@@ -455,7 +455,7 @@ public class HtmlLoggerTests
     }
 
     [TestMethod]
-    public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefixNull()
+    public void TestCompleteHandlerShouldCreateCustomHtmlFileNameWithLogPrefixNull()
     {
         var parameters = new Dictionary<string, string?>
         {

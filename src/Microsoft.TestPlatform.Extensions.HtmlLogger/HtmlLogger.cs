@@ -302,18 +302,18 @@ public class HtmlLogger : ITestLoggerWithParameters
                 Environment.GetEnvironmentVariable("UserName"), Environment.MachineName,
                 FormatDateTimeForRunName(DateTime.Now));
 
-            XmlFilePath = _parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out var logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue)
-                ? GetFilePath(HtmlLoggerConstants.XmlFileExtension, fileName)
-                : GenerateUniqueFile(HtmlLoggerConstants.XmlFileExtension, fileName);
+            XmlFilePath = GenerateUniqueFilePath(fileName, HtmlLoggerConstants.XmlFileExtension);
 
             using (var xmlStream = _fileHelper.GetStream(XmlFilePath, FileMode.OpenOrCreate))
             {
                 _xmlSerializer.WriteObject(xmlStream, TestRunDetails);
             }
 
-            HtmlFilePath = _parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue)
-                ? HtmlFilePath
-                : GenerateUniqueFile(HtmlLoggerConstants.HtmlFileExtension, fileName);
+            HtmlFilePath = GenerateUniqueFilePath(
+                string.IsNullOrEmpty(HtmlFilePath)
+                    ? fileName
+                    : Path.GetFileNameWithoutExtension(HtmlFilePath),
+                HtmlLoggerConstants.HtmlFileExtension);
 
             _htmlTransformer.Transform(XmlFilePath, HtmlFilePath);
         }
@@ -321,7 +321,7 @@ public class HtmlLogger : ITestLoggerWithParameters
         {
             EqtTrace.Error("HtmlLogger: Failed to populate html file. Exception: {0}",
                 ex.ToString());
-            ConsoleOutput.Instance.Error(false, string.Concat(HtmlResource.HtmlLoggerError), ex.Message);
+            ConsoleOutput.Instance.Error(false, HtmlResource.HtmlLoggerError, ex.Message);
             return;
         }
         finally
@@ -337,17 +337,12 @@ public class HtmlLogger : ITestLoggerWithParameters
         ConsoleOutput.Instance.Information(false, htmlFilePathMessage);
     }
 
-    private string GetFilePath(string fileExtension, string fileName)
-    {
-        return Path.Combine(TestResultsDirPath, $"TestResult_{fileName}.{fileExtension}");
-    }
-
-    private string GenerateUniqueFile(string fileExtension, string fileName)
+    private string GenerateUniqueFilePath(string fileName, string fileExtension)
     {
         string fullFilePath;
         for (short i = 0; i < short.MaxValue; i++)
         {
-            var fileNameWithIter = i == 0 ? fileName : GetNextIterationFile(fileName, i);
+            var fileNameWithIter = i == 0 ? fileName : Path.GetFileNameWithoutExtension(fileName) + $"[{i}]";
             fullFilePath = Path.Combine(TestResultsDirPath, $"TestResult_{fileNameWithIter}.{fileExtension}");
             lock (LockObject)
             {
@@ -359,10 +354,7 @@ public class HtmlLogger : ITestLoggerWithParameters
             }
         }
 
-        throw new InvalidOperationException($"Cannot generate a unique filename for '{fileName}' on path '{TestResultsDirPath}'.");
-
-        static string GetNextIterationFile(string baseName, short iteration)
-            => Path.GetFileNameWithoutExtension(baseName) + $"[{iteration}]";
+        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, HtmlResource.CannotGenerateUniqueFilePath, fileName, TestResultsDirPath));
     }
 
     private string FormatDateTimeForRunName(DateTime timeStamp)
