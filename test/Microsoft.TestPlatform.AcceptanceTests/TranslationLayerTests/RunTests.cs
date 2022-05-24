@@ -196,7 +196,16 @@ public class RunTests : AcceptanceTestBase
             new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
             _runEventHandler);
 
-        var errorMessage = $"The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.{Environment.NewLine}";
+        var errorMessage = "The active test run was aborted. Reason: Test host process crashed : ";
+        if (runnerInfo.TargetFramework.StartsWith("netcoreapp2."))
+        {
+            errorMessage += "Process is terminating due to StackOverflowException.";
+        }
+        else
+        {
+            errorMessage += "Process is terminated due to StackOverflowException.";
+        }
+        errorMessage += Environment.NewLine;
 
         Assert.IsTrue(_runEventHandler.Errors.Contains(errorMessage));
     }
