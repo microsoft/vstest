@@ -354,8 +354,8 @@ public class EventLogDataCollector : DataCollector
 
     private void OnTestCaseEnd(object sender, TestCaseEndEventArgs e!!)
     {
-        Debug.Assert(e.Context != null, "Context is null");
-        Debug.Assert(e.Context!.HasTestCase, "Context is not for a test case");
+        TPDebug.Assert(e.Context != null, "Context is null");
+        TPDebug.Assert(e.Context.HasTestCase, "Context is not for a test case");
 
         EqtTrace.Verbose(
             "EventLogDataCollector: TestCaseEnd received for test '{0}' with Test Outcome: {1}.",
@@ -405,7 +405,6 @@ public class EventLogDataCollector : DataCollector
                     kvp.Value.EventLog.EnableRaisingEvents = false;
                 }
 
-                // REVIEW ME: We are initializing
                 for (int i = context.EventLogContainerStartIndexMap[kvp.Key]; i <= context.EventLogContainerEndIndexMap[kvp.Key]; i++)
                 {
                     eventLogEntries.Add(kvp.Value.EventLogEntries[i]);
