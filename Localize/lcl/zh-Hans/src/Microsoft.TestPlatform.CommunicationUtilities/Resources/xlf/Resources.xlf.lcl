@@ -12,6 +12,18 @@
       <Disp Icon="Str" Disp="true" LocTbl="false" />
       <Item ItemId=";AbortedTestDiscovery" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
+          <Val><![CDATA[The active test discovery was aborted.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[活动的测试发现已中止。]]></Val>
+          </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[The active test discovery was aborted. Reason: {0}]]></Val>
+          </Prev>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";AbortedTestDiscoveryWithReason" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
           <Val><![CDATA[The active test discovery was aborted. Reason: {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[活动的测试发现已中止。原因: {0}]]></Val>
