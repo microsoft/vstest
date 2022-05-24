@@ -36,8 +36,8 @@ public class HtmlLogger : ITestLoggerWithParameters
     private readonly IFileHelper _fileHelper;
     private readonly XmlObjectSerializer _xmlSerializer;
     private readonly IHtmlTransformer _htmlTransformer;
-    private Dictionary<string, string> _parametersDictionary;
     private static readonly object LockObject = new();
+    private Dictionary<string, string> _parametersDictionary;
 
     public HtmlLogger()
         : this(new FileHelper(), new HtmlTransformer(), new DataContractSerializer(typeof(TestRunDetails)))
@@ -302,16 +302,16 @@ public class HtmlLogger : ITestLoggerWithParameters
                 Environment.GetEnvironmentVariable("UserName"), Environment.MachineName,
                 FormatDateTimeForRunName(DateTime.Now));
 
-            XmlFilePath = _parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out var string logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue)
-            ? GetFilePath(HtmlLoggerConstants.XmlFileExtension, fileName)
-            : GenerateUniqueFile(HtmlLoggerConstants.XmlFileExtension, fileName);
+            XmlFilePath = _parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out var logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue)
+                ? GetFilePath(HtmlLoggerConstants.XmlFileExtension, fileName)
+                : GenerateUniqueFile(HtmlLoggerConstants.XmlFileExtension, fileName);
 
             using (var xmlStream = _fileHelper.GetStream(XmlFilePath, FileMode.OpenOrCreate))
             {
                 _xmlSerializer.WriteObject(xmlStream, TestRunDetails);
             }
 
-            HtmlFilePath = _parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out var string logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue)
+            HtmlFilePath = _parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue)
                 ? HtmlFilePath
                 : GenerateUniqueFile(HtmlLoggerConstants.HtmlFileExtension, fileName);
 
@@ -319,7 +319,7 @@ public class HtmlLogger : ITestLoggerWithParameters
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("HtmlLogger : Failed to populate html file. Exception : {0}",
+            EqtTrace.Error("HtmlLogger: Failed to populate html file. Exception: {0}",
                 ex.ToString());
             ConsoleOutput.Instance.Error(false, string.Concat(HtmlResource.HtmlLoggerError), ex.Message);
             return;
@@ -339,7 +339,7 @@ public class HtmlLogger : ITestLoggerWithParameters
 
     private string GetFilePath(string fileExtension, string fileName)
     {
-        return Path.Combine(TestResultsDirPath, string.Concat("TestResult_", fileName, $".{fileExtension}"));
+        return Path.Combine(TestResultsDirPath, $"TestResult_{fileName}.{fileExtension}");
     }
 
     private string GenerateUniqueFile(string fileExtension, string fileName)
@@ -359,17 +359,15 @@ public class HtmlLogger : ITestLoggerWithParameters
             }
         }
 
-        throw new Exception($"Cannot generate unique filename for: {fileName} on path: {TestResultsDirPath}");
+        throw new InvalidOperationException($"Cannot generate a unique filename for '{fileName}' on path '{TestResultsDirPath}'.");
+
+        static string GetNextIterationFile(string baseName, short iteration)
+            => Path.GetFileNameWithoutExtension(baseName) + $"[{iteration}]";
     }
 
     private string FormatDateTimeForRunName(DateTime timeStamp)
     {
         return timeStamp.ToString("yyyyMMdd_HHmmss", DateTimeFormatInfo.InvariantInfo);
-    }
-
-    private string GetNextIterationFile(string baseName, short iteration)
-    {
-        return Path.GetFileNameWithoutExtension(baseName) + $"[{iteration}]";
     }
 
     /// <summary>
