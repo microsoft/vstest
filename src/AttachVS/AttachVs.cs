@@ -10,8 +10,6 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AttachVS;
 
 internal class DebuggerUtility
@@ -26,7 +24,7 @@ internal class DebuggerUtility
                 return false;
             }
             var process = Process.GetProcessById(pid.Value);
-            Trace($"Starting with pid '{pid}({process?.ProcessName})', and vsPid '{vsPid}'");
+            Trace($"Starting with pid '{pid}({process.ProcessName})', and vsPid '{vsPid}'");
             Trace($"Using pid: {pid} to get parent VS.");
             var vs = GetVsFromPid(Process.GetProcessById(vsPid ?? process.Id));
 
@@ -38,20 +36,25 @@ internal class DebuggerUtility
             else
             {
                 Trace($"Parent VS not found, finding the first VS that started.");
-                var processes = Process.GetProcesses().Where(p => p.ProcessName == "devenv").Select(p =>
-                {
-                    try
+                var processes = Process.GetProcesses()
+                    .Where(p => p.ProcessName == "devenv")
+                    .Select(p =>
                     {
-                        return new { Process = p, p.StartTime, p.HasExited };
-                    }
-                    catch
-                    {
-                        return null;
-                    }
-                }).Where(p => p != null && !p.HasExited).OrderBy(p => p.StartTime).ToList();
+                        try
+                        {
+                            return new { Process = p, p.StartTime, p.HasExited };
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    })
+                    .Where(p => p != null && !p.HasExited)
+                    .OrderBy(p => p!.StartTime)
+                    .ToList();
 
-                var firstVs = processes.FirstOrDefault();
-                Trace($"Found VS {firstVs.Process.Id}");
+                var firstVs = processes.First();
+                Trace($"Found VS {firstVs!.Process.Id}");
                 AttachTo(process, firstVs.Process);
             }
             return true;
@@ -79,9 +82,9 @@ internal class DebuggerUtility
 
     private static bool AttachVs(Process vs, int pid)
     {
-        IBindCtx bindCtx = null;
-        IRunningObjectTable runninObjectTable = null;
-        IEnumMoniker enumMoniker = null;
+        IBindCtx? bindCtx = null;
+        IRunningObjectTable? runninObjectTable = null;
+        IEnumMoniker? enumMoniker = null;
         try
         {
             var r = CreateBindCtx(0, out bindCtx);
@@ -183,18 +186,18 @@ internal class DebuggerUtility
         }
     }
 
-    private static Process GetVsFromPid(Process process)
+    private static Process? GetVsFromPid(Process process)
     {
         var parent = process;
         while (!IsVsOrNull(parent))
         {
-            parent = GetParentProcess(parent);
+            parent = GetParentProcess(parent!);
         }
 
         return parent;
     }
 
-    private static bool IsVsOrNull(Process process)
+    private static bool IsVsOrNull(Process? process)
     {
         if (process == null)
         {
@@ -215,18 +218,18 @@ internal class DebuggerUtility
         return isVs;
     }
 
-    private static bool IsCorrectParent(Process currentProcess, Process parent)
+    private static bool IsCorrectParent(Process currentProcess, Process? parent)
     {
         try
         {
-            // Parent needs to start before the child, otherwise it might be a different process 
+            // Parent needs to start before the child, otherwise it might be a different process
             // that is just reusing the same PID.
-            if (parent.StartTime <= currentProcess.StartTime)
+            if (parent?.StartTime <= currentProcess.StartTime)
             {
                 return true;
             }
 
-            Trace($"Process {parent.ProcessName} ({parent.Id}) is not a valid parent because it started after the current process.");
+            Trace($"Process {parent?.ProcessName} ({parent?.Id}) is not a valid parent because it started after the current process.");
             return false;
         }
         catch
@@ -236,7 +239,7 @@ internal class DebuggerUtility
         }
     }
 
-    private static Process GetParentProcess(Process process)
+    private static Process? GetParentProcess(Process process)
     {
         int id;
         try
@@ -253,7 +256,7 @@ internal class DebuggerUtility
             id = -1;
         }
 
-        Process parent = null;
+        Process? parent = null;
         if (id != -1)
         {
             try
@@ -269,7 +272,7 @@ internal class DebuggerUtility
         return IsCorrectParent(process, parent) ? parent : null;
     }
 
-    private static void Trace(string message, [CallerMemberName] string methodName = null)
+    private static void Trace(string message, [CallerMemberName] string? methodName = null)
     {
         System.Diagnostics.Trace.WriteLine($"[AttachVS]{methodName}: {message}");
     }
