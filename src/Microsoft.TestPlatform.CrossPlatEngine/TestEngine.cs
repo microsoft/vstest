@@ -78,11 +78,9 @@ public class TestEngine : ITestEngine
 
         if (ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
         {
-            var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
-            var newRequestData = GetRequestData(isTelemetryOptedIn);
             return new InProcessProxyDiscoveryManager(
                 testHostManager,
-                new TestHostManagerFactory(newRequestData));
+                new TestHostManagerFactory(requestData.IsTelemetryOptedIn));
         }
 
         // Create one data aggregator per parallel discovery and share it with all the proxy discovery managers.
@@ -108,7 +106,8 @@ public class TestEngine : ITestEngine
                     var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
                         discoveryCriteria.TestSessionInfo,
                         source,
-                        discoveryCriteria.RunSettings);
+                        discoveryCriteria.RunSettings,
+                        requestData);
 
                     if (proxyOperationManager == null)
                     {
@@ -181,11 +180,9 @@ public class TestEngine : ITestEngine
                 parallelLevel > 1,
                 isDataCollectorEnabled || isInProcDataCollectorEnabled))
         {
-            var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
-            var newRequestData = GetRequestData(isTelemetryOptedIn);
             return new InProcessProxyExecutionManager(
                 testHostManager,
-                new TestHostManagerFactory(newRequestData));
+                new TestHostManagerFactory(requestData.IsTelemetryOptedIn));
         }
 
         // SetupChannel ProxyExecutionManager with data collection if data collectors are
@@ -216,7 +213,8 @@ public class TestEngine : ITestEngine
                         var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
                             testRunCriteria.TestSessionInfo,
                             source,
-                            testRunCriteria.TestRunSettings);
+                            testRunCriteria.TestRunSettings,
+                            requestData);
 
                         if (proxyOperationManager == null)
                         {
@@ -492,24 +490,6 @@ public class TestEngine : ITestEngine
         }
 
         return false;
-    }
-
-    /// <summary>
-    /// Get request data on basis of telemetry opted in or not.
-    /// </summary>
-    ///
-    /// <param name="isTelemetryOptedIn">A flag indicating if telemetry is opted in.</param>
-    ///
-    /// <returns>The request data.</returns>
-    private IRequestData GetRequestData(bool isTelemetryOptedIn)
-    {
-        return new RequestData
-        {
-            MetricsCollection = isTelemetryOptedIn
-                ? (IMetricsCollection)new MetricsCollection()
-                : new NoOpMetricsCollection(),
-            IsTelemetryOptedIn = isTelemetryOptedIn
-        };
     }
 
     /// <summary>

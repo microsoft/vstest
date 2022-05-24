@@ -125,12 +125,14 @@ public class TestSessionPool
     /// <param name="testSessionInfo">The test session info object.</param>
     /// <param name="source">The source to be associated to this proxy.</param>
     /// <param name="runSettings">The run settings.</param>
+    /// <param name="requestData">The request data.</param>
     /// 
     /// <returns>The proxy object.</returns>
     public virtual ProxyOperationManager TryTakeProxy(
         TestSessionInfo testSessionInfo,
         string source,
-        string runSettings)
+        string runSettings,
+        IRequestData requestData!!)
     {
         ProxyTestSessionManager sessionManager = null;
         lock (_lockObject)
@@ -147,7 +149,13 @@ public class TestSessionPool
         try
         {
             // Deque an actual proxy to do work.
-            return sessionManager.DequeueProxy(source, runSettings);
+            var proxy = sessionManager.DequeueProxy(source, runSettings);
+
+            // Make sure we use the per-request request data instead of the request data used when
+            // creating the test session.
+            proxy.RequestData = requestData;
+
+            return proxy;
         }
         catch (InvalidOperationException ex)
         {

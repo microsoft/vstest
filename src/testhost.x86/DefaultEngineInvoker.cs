@@ -135,13 +135,13 @@ internal class DefaultEngineInvoker :
             ConnectToDatacollector(dcPort);
         }
 
-        var requestData = GetRequestData(argsDictionary);
+        var telemetryOptedIn = GetTelemetryStatusFromArgs(argsDictionary);
 
         // Start processing async in a different task
         EqtTrace.Info("DefaultEngineInvoker.Invoke: Start Request Processing.");
         try
         {
-            StartProcessingAsync(_requestHandler, new TestHostManagerFactory(requestData)).Wait();
+            StartProcessingAsync(_requestHandler, new TestHostManagerFactory(telemetryOptedIn)).Wait();
         }
         finally
         {
@@ -155,29 +155,15 @@ internal class DefaultEngineInvoker :
         }
     }
 
-    private static RequestData GetRequestData(IDictionary<string, string?> argsDictionary)
+    private static bool GetTelemetryStatusFromArgs(IDictionary<string, string?> argsDictionary)
     {
-        // Checks for Telemetry Opted in or not from Command line Arguments.
-        // By Default opting out in Test Host to handle scenario when user running old version of vstest.console
+        // Checks if telemetry is opted in in the command line arguments.
+        // By default opting out in testhost to handle the scenario when the user is running an old
+        // version of vstest.console.
         var telemetryStatus = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, TelemetryOptedIn);
-        var telemetryOptedIn = false;
-        if (!string.IsNullOrWhiteSpace(telemetryStatus))
-        {
-            if (telemetryStatus.Equals("true", StringComparison.Ordinal))
-            {
-                telemetryOptedIn = true;
-            }
-        }
 
-        var requestData = new RequestData
-        {
-            MetricsCollection =
-                telemetryOptedIn
-                    ? new MetricsCollection()
-                    : new NoOpMetricsCollection(),
-            IsTelemetryOptedIn = telemetryOptedIn
-        };
-        return requestData;
+        return !string.IsNullOrWhiteSpace(telemetryStatus)
+            && telemetryStatus.Equals("true", StringComparison.Ordinal);
     }
 
     private void ConnectToDatacollector(int dcPort)

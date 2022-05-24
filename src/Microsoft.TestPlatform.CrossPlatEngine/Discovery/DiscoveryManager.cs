@@ -73,6 +73,9 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
     public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestDiscoveryEventsHandler2 eventHandler)
     {
+        // Clear the request data metrics left over from a potential previous run.
+        _requestData.MetricsCollection.Metrics.Clear();
+
         _testPlatformEventSource.AdapterSearchStart();
         _testDiscoveryEventsHandler = eventHandler;
         if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())
