@@ -87,9 +87,6 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
 
         _workloads.AddRange(workloads);
 
-        // This creates as many slots as possible even though we might not use them when we get less workloads to process,
-        // this is not a big issue, and not worth optimizing, because the parallel level is determined by the logical CPU count,
-        // so it is a small number.
         ClearSlots(acceptMoreWork: true);
         RunWorkInParallel();
     }
@@ -159,12 +156,14 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         // Kick of the work in parallel outside of the lock so if we have more requests to run
         // that come in at the same time we only block them from reserving the same slot at the same time
         // but not from starting their assigned work at the same time.
+
+        // Kick of all pre-started hosts first.
         var startedWork = 0;
         foreach (var slot in slots)
         {
-            if (slot.HasWork)
+            if (slot.HasWork && !slot.IsRunning)
             {
-                if (!slot.ShouldPreStart || (slot.IsPreStarted && !slot.IsRunning))
+                if (slot.IsPreStarted)
                 {
                     startedWork++;
                     slot.IsRunning = true;
@@ -176,6 +175,30 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             if (startedWork == MaxParallelLevel)
             {
                 break;
+            }
+        }
+
+        // We already started as many pre-started testhosts as we are allowed by the max parallel level
+        // skip running more work.
+        if (startedWork < MaxParallelLevel)
+        {
+            foreach (var slot in slots)
+            {
+                if (slot.HasWork && !slot.IsRunning)
+                {
+                    if (!slot.ShouldPreStart)
+                    {
+                        startedWork++;
+                        slot.IsRunning = true;
+                        _runWorkload(slot.Manager!, slot.EventHandler!, slot.Work!, slot.IsPreStarted, slot.InitTask);
+                    }
+                }
+
+                // We already started as many as we were allowed, jump out;
+                if (startedWork == MaxParallelLevel)
+                {
+                    break;
+                }
             }
         }
 
