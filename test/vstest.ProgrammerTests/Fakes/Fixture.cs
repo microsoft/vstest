@@ -12,18 +12,23 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace vstest.ProgrammerTests.Fakes;
 
 internal class Fixture : IDisposable
 {
+    private readonly List<IDisposable> _disposables = new();
+
     public FakeErrorAggregator ErrorAggregator { get; } = new();
     public FakeProcessHelper ProcessHelper { get; }
+    public string LogName { get; }
     public FakeProcess CurrentProcess { get; }
     public FakeFileHelper FileHelper { get; }
     public FakeTestRuntimeProviderManager TestRuntimeProviderManager { get; }
     public FakeTestRunEventsRegistrar TestRunEventsRegistrar { get; }
     public FakeEnvironment Environment { get; }
+    public FakeTestDiscoveryEventsRegistrar TestDiscoveryEventsRegistrar { get; }
     public TestEngine? TestEngine { get; private set; }
     public TestPlatform? TestPlatform { get; private set; }
     public TestRunResultAggregator? TestRunResultAggregator { get; private set; }
@@ -33,10 +38,16 @@ internal class Fixture : IDisposable
     public FakeDataCollectorAttachmentsProcessorsFactory? DataCollectorAttachmentsProcessorsFactory { get; private set; }
     public TestRunAttachmentsProcessingManager? TestRunAttachmentsProcessingManager { get; private set; }
     public TestRequestManager? TestRequestManager { get; private set; }
-    public List<TestResult> ExecutedTests => TestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).ToList();
     public ProtocolConfig ProtocolConfig { get; internal set; }
 
-    public Fixture()
+    public List<TestResult> ExecutedTests => TestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).ToList();
+    public List<TestCase> DiscoveredTests => TestDiscoveryEventsRegistrar.DiscoveredTestsEvents.SelectMany(er => er.Data.DiscoveredTestCases).ToList();
+
+    public List<string> LoggedWarnings => TestRunEventsRegistrar.LoggedWarnings.Concat(TestDiscoveryEventsRegistrar.LoggedWarnings).ToList();
+
+    public FakeTestSessionEventsHandler TestSessionEventsHandler { get; }
+
+    public Fixture(FixtureOptions? fixtureOptions = null)
     {
         // This type is compiled only in DEBUG, and won't exist otherwise.
 #if DEBUG
@@ -51,21 +62,38 @@ internal class Fixture : IDisposable
         }
 #endif
 
-        CurrentProcess = new FakeProcess(ErrorAggregator, @"X:\fake\vstest.console.exe", string.Empty, null, null, null, null, null);
+#pragma warning disable CS0618 // Type or member is obsolete (to prevent use outside of test context)
+        FeatureFlag.Reset();
+        fixtureOptions?.FeatureFlags?.ToList().ForEach(flag => ((FeatureFlag)FeatureFlag.Instance).SetFlag(flag.Key, flag.Value));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // This makes the run a bit slower, but at least we get info in the output window. We probably should add a mode where we don't
+        // use a file to write the output. Just trace listener. That would also be useful for UWP I think.
+        LogName = Path.GetTempPath() + $"/log_{Guid.NewGuid()}.txt";
+        //EqtTrace.InitializeVerboseTrace(LogName);
+
+        CurrentProcess = new FakeProcess(ErrorAggregator, @"X:\fake\vstest.console.exe");
         ProcessHelper = new FakeProcessHelper(ErrorAggregator, CurrentProcess);
         FileHelper = new FakeFileHelper(ErrorAggregator);
         TestRuntimeProviderManager = new FakeTestRuntimeProviderManager(ErrorAggregator);
         TestRunEventsRegistrar = new FakeTestRunEventsRegistrar(ErrorAggregator);
         Environment = new FakeEnvironment();
+        TestDiscoveryEventsRegistrar = new FakeTestDiscoveryEventsRegistrar(ErrorAggregator);
+        TestSessionEventsHandler = new FakeTestSessionEventsHandler(ErrorAggregator);
         ProtocolConfig = new ProtocolConfig();
     }
+
     public void Dispose()
     {
-
+        foreach (var disposable in _disposables)
+        {
+            try { disposable.Dispose(); } catch (ObjectDisposedException) { }
+        }
     }
 
     internal void AddTestHostFixtures(params FakeTestHostFixture[] testhosts)
     {
+        _disposables.AddRange(testhosts);
         var providers = testhosts.Select(t => t.FakeTestRuntimeProvider).ToArray();
         TestRuntimeProviderManager.AddTestRuntimeProviders(providers);
     }
@@ -95,7 +123,14 @@ internal class Fixture : IDisposable
 
         Task<IMetricsPublisher> fakeMetricsPublisherTask = Task.FromResult<IMetricsPublisher>(new FakeMetricsPublisher(ErrorAggregator));
 
-        var commandLineOptions = CommandLineOptions.Instance;
+        var commandLineOptions = new CommandLineOptions
+        {
+            // We are acting like we are running under IDE. This is done because some settings are trying to grab the
+            // value from the pre-parsed settings in command line options. And some are looking at the actual run settings.
+            // Ultimately we should have a single point of truth for both scenarios, but now it is easier to just provide
+            // runsettings to the request.
+            IsDesignMode = true,
+        };
         TestRequestManager testRequestManager = new(
             commandLineOptions,
             TestPlatform,

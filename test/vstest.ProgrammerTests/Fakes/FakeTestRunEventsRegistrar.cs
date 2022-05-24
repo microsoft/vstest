@@ -9,6 +9,7 @@ namespace vstest.ProgrammerTests.Fakes;
 
 internal class FakeTestRunEventsRegistrar : ITestRunEventsRegistrar
 {
+    public Guid Id { get; } = Guid.NewGuid();
     public FakeTestRunEventsRegistrar(FakeErrorAggregator fakeErrorAggregator)
     {
         FakeErrorAggregator = fakeErrorAggregator;

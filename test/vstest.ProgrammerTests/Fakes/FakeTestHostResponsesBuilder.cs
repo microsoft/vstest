@@ -132,4 +132,49 @@ internal class FakeTestHostResponsesBuilder
     {
         return _responses;
     }
+
+    internal FakeTestHostResponsesBuilder DiscoveryInitialize(FakeMessage fakeMessage)
+    {
+        AddPairWithFakeMessage(MessageType.DiscoveryInitialize, fakeMessage);
+        return this;
+    }
+
+    internal FakeTestHostResponsesBuilder StartDiscovery(List<List<TestResult>> testResultBatches)
+    {
+        // Discovery returns back test cases, not test results, but it is easier to take test results, because
+        // we have a builder that can be re-used for both test run and test discovery.
+
+        List<FakeMessage> messages;
+        if (testResultBatches.Count != 0)
+        {
+            // this will create as many test stats changes messages, as there are batches -1
+            // the last batch will be sent as test run complete event
+
+            // see TestRequestSender.OnDiscoveryMessageReceived to see how the vstest.console receives the data
+            List<FakeMessage> changeMessages = testResultBatches.Take(testResultBatches.Count - 1)
+                .Select(batch => new FakeMessage<IEnumerable<TestCase>>(MessageType.TestCasesFound, batch.Select(testResult => testResult.TestCase).ToList()))
+                .ToList<FakeMessage>();
+
+            // TODO: if we send this incorrectly the handler just continues, check logs if we can understand it from there. We should at least write a warning.
+            // because otherwise it hangs.
+            FakeMessage completedMessage = new FakeMessage<DiscoveryCompletePayload>(MessageType.DiscoveryComplete, new DiscoveryCompletePayload
+            {
+                LastDiscoveredTests = testResultBatches.Last().Select(testResult => testResult.TestCase).ToList(),
+            });
+            messages = changeMessages.Concat(new[] { completedMessage }).ToList();
+        }
+        else
+        {
+            FakeMessage completedMessage = new FakeMessage<DiscoveryCompletePayload>(MessageType.DiscoveryComplete, new DiscoveryCompletePayload
+            {
+                LastDiscoveredTests = new List<TestCase>(),
+            });
+
+            messages = completedMessage.AsList();
+        }
+
+        AddPairWithMultipleFakeMessages(MessageType.StartDiscovery, messages);
+
+        return this;
+    }
 }

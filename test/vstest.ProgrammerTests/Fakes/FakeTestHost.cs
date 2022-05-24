@@ -2,8 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace vstest.ProgrammerTests.Fakes;
-
-internal class FakeTestHostFixture
+internal class FakeTestHostFixture : IDisposable
 {
     public int Id { get; }
     public List<FakeTestDllFile> Dlls { get; }
@@ -33,5 +32,10 @@ internal class FakeTestHostFixture
         // refer back to any part of testhost in message responses. E.g. to abort the channel, or exit
         // testhost before or after answering.
         fakeCommunicationChannel.Start(this);
+    }
+
+    public void Dispose()
+    {
+        try { FakeCommunicationChannel.Dispose(); } catch (ObjectDisposedException) { }
     }
 }

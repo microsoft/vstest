@@ -8,9 +8,9 @@
         <target state="translated">參數不可為 null 或空白。</target>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
-        <source>Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.</source>
+        <source>Test run detected DLL(s) which would use different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.</source>
         <note></note>
-        <target state="translated">測試回合偵測到為不同架構和平台版本所建置的 DLL。下列 DLL 與目前的設定不相符，亦即 {0} 架構及 {1} 平台。{2}如需管理這些設定的詳細資料，請前往 {3}。</target>
+        <target state="new">Test run detected DLL(s) which would use different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.</target>
       </trans-unit>
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
@@ -23,8 +23,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="SourceIncompatible">
-        <source>{0} is built for Framework {1} and Platform {2}.</source>
-        <target state="translated">{0} 專為架構 {1} 及平台 {2} 建置。</target>
+        <source>{0} would use Framework {1} and Platform {2}.</source>
+        <target state="new">{0} would use Framework {1} and Platform {2}.</target>
         <note></note>
       </trans-unit>
     </body>

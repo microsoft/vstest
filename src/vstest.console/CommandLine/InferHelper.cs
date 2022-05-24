@@ -26,84 +26,128 @@ internal class InferHelper
     /// <summary>
     /// Determines Architecture from sources.
     /// </summary>
-    public Architecture AutoDetectArchitecture(IList<string> sources, IDictionary<string, Architecture> sourcePlatforms, Architecture defaultArchitecture)
+    public Architecture AutoDetectArchitecture(IList<string> sources, Architecture defaultArchitecture, out IDictionary<string, Architecture> sourceToPlatformMap)
     {
-        var architecture = defaultArchitecture;
+        sourceToPlatformMap = new Dictionary<string, Architecture>();
+        if (sources == null || sources.Count == 0)
+            return defaultArchitecture;
+
+        // Set the default for all sources.
+        foreach (var source in sources)
+        {
+            // TODO: Add default architecture to runtime providers info, or something and that will allow us to have test
+            // cases without any sources. Otherwise change test AutoDetectArchitectureShouldReturnDefaultArchitectureOnNullItemInSources
+            // because this condition is making that test happy.
+            if (source != null)
+            {
+                sourceToPlatformMap.Add(source, defaultArchitecture);
+            }
+        }
+
         try
         {
-            if (sources != null && sources.Count > 0)
+            Architecture? commonArchitecture = null;
+            foreach (string source in sources)
             {
-                Architecture? finalArch = null;
-                foreach (string source in sources)
+                try
                 {
-                    Architecture arch;
-                    if (IsDotNetAssembly(source))
+                    Architecture detectedArchitecture;
+                    if (IsDllOrExe(source))
                     {
-                        arch = _assemblyMetadataProvider.GetArchitecture(source);
+                        detectedArchitecture = _assemblyMetadataProvider.GetArchitecture(source);
+
+                        if (detectedArchitecture == Architecture.AnyCPU)
+                        {
+                            // This is AnyCPU .NET assembly, this source should run using the default architecture,
+                            // which we've already set for the source.
+                            EqtTrace.Info("Determined platform for source '{0}' was AnyCPU and it will use the default plaform {1}.", source, defaultArchitecture);
+                        }
+                        else
+                        {
+                            sourceToPlatformMap[source] = detectedArchitecture;
+                            EqtTrace.Info("Determined platform for source '{0}' was '{1}'.", source, detectedArchitecture);
+                        }
                     }
                     else
                     {
-                        // Set AnyCPU for non dotnet test sources (js, py and other). Otherwise warning will
-                        // show up if there is mismatch with user provided platform.
-                        arch = Architecture.AnyCPU;
-                    }
-                    EqtTrace.Info("Determined platform for source '{0}' is '{1}'", source, arch);
-                    sourcePlatforms[source] = arch;
+                        // This is non-dll source, this source should run using the default architecture,
+                        // which we've already set for the source.
+                        EqtTrace.Info("No platform was determined for source '{0}' because it is not a dll or an executable.", source);
 
-                    if (Architecture.AnyCPU.Equals(arch))
-                    {
-                        // If arch is AnyCPU ignore it.
+                        // This source has no associated architecture so it does not help use determine a common architecture for
+                        // all the sources, so we continue to next one.
+                        sourceToPlatformMap[source] = defaultArchitecture;
                         continue;
                     }
 
-                    if (finalArch == null)
+                    if (Architecture.AnyCPU.Equals(detectedArchitecture))
                     {
-                        finalArch = arch;
+                        // The architecture of the source is AnyCPU and so we can skip to the next one,
+                        // because it does not help use determine a common architecture for all the sources.
                         continue;
                     }
 
-                    if (!finalArch.Equals(arch))
+                    // This is the first source that provided some architecture use that as a candidate
+                    // for the common architecture.
+                    if (commonArchitecture == null)
                     {
-                        finalArch = defaultArchitecture;
-                        EqtTrace.Info("Conflict in platform architecture, using default platform:{0}", finalArch);
+                        commonArchitecture = detectedArchitecture;
+                        continue;
+                    }
+
+                    // The detected architecture, is different than the common architecture. So at least
+                    // one of the sources is incompatible with the others. Use the default architecture as the common
+                    // fallback.
+                    if (!commonArchitecture.Equals(detectedArchitecture))
+                    {
+                        commonArchitecture = defaultArchitecture;
                     }
                 }
-
-                if (finalArch != null)
+                catch (Exception ex)
                 {
-                    architecture = (Architecture)finalArch;
+                    EqtTrace.Error("Failed to determine platform for source: {0}, using default: {1}, exception: {2}", source, defaultArchitecture, ex);
+                    sourceToPlatformMap[source] = defaultArchitecture;
                 }
             }
+
+            if (commonArchitecture != null)
+            {
+                EqtTrace.Info("Determined platform for all sources: {0}", commonArchitecture);
+                return commonArchitecture.Value;
+            }
+
+            EqtTrace.Info("None of the sources provided any runnable platform, using the default platform: {0}", defaultArchitecture);
+
+            return defaultArchitecture;
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("Failed to determine platform: {0}, using default: {1}", ex, architecture);
+            EqtTrace.Error("Failed to determine platform for all sources: {0}, using default: {1}", ex, defaultArchitecture);
+            return defaultArchitecture;
         }
-
-        EqtTrace.Info("Determined platform for all sources: {0}", architecture);
-
-        return architecture;
     }
 
     /// <summary>
     /// Determines Framework from sources.
     /// </summary>
-    public Framework AutoDetectFramework(IList<string> sources, IDictionary<string, Framework> sourceFrameworkVersions)
+    public Framework AutoDetectFramework(IList<string> sources, out IDictionary<string, Framework> sourceToFrameworkMap)
     {
+        sourceToFrameworkMap = new Dictionary<string, Framework>();
         Framework framework = Framework.DefaultFramework;
+
+        if (sources == null || sources.Count == 0)
+            return framework;
+
         try
         {
-            if (sources != null && sources.Count > 0)
+            var finalFx = DetermineFrameworkName(sources, out sourceToFrameworkMap, out var conflictInFxIdentifier);
+            framework = Framework.FromString(finalFx.FullName);
+            if (conflictInFxIdentifier)
             {
-                var finalFx = DetermineFrameworkName(sources, sourceFrameworkVersions, out var conflictInFxIdentifier);
-                framework = Framework.FromString(finalFx.FullName);
-                if (conflictInFxIdentifier)
-                {
-                    // TODO Log to console and client.
-                    EqtTrace.Info(
-                        "conflicts in Framework identifier of provided sources(test assemblies), using default framework:{0}",
-                        framework);
-                }
+                // TODO Log to console and client.
+                EqtTrace.Info(
+                    "conflicts in Framework identifier of provided sources(test assemblies), using default framework:{0}",
+                    framework);
             }
         }
         catch (Exception ex)
@@ -116,62 +160,75 @@ internal class InferHelper
         return framework;
     }
 
-    private FrameworkName DetermineFrameworkName(IEnumerable<string> sources, IDictionary<string, Framework> sourceFrameworkVersions, out bool conflictInFxIdentifier)
+    private FrameworkName DetermineFrameworkName(IEnumerable<string> sources, out IDictionary<string, Framework> sourceToFrameworkMap, out bool conflictInFxIdentifier)
     {
+        sourceToFrameworkMap = new Dictionary<string, Framework>();
+
+        var defaultFramework = Framework.DefaultFramework;
         FrameworkName finalFx = null;
         conflictInFxIdentifier = false;
         foreach (string source in sources)
         {
-            FrameworkName fx;
-            if (IsDotNetAssembly(source))
+            try
             {
-                fx = _assemblyMetadataProvider.GetFrameWork(source);
-            }
-            else
-            {
-                // TODO What else to do with appx, js and other?
-                var extension = Path.GetExtension(source);
-                if (extension.Equals(".js", StringComparison.OrdinalIgnoreCase))
+                FrameworkName fx;
+                if (IsDllOrExe(source))
                 {
-                    // Currently to run tests for .NET Core, assembly need dependency to Microsoft.NET.Test.Sdk. Which is not
-                    // possible for js files. So using default .NET Full framework version.
-                    fx = new FrameworkName(Constants.DotNetFramework40);
+                    fx = _assemblyMetadataProvider.GetFrameWork(source);
                 }
                 else
                 {
-                    fx = extension.Equals(".appx", StringComparison.OrdinalIgnoreCase)
-                         || extension.Equals(".msix", StringComparison.OrdinalIgnoreCase)
-                         || extension.Equals(".appxrecipe", StringComparison.OrdinalIgnoreCase)
-                        ? new FrameworkName(Constants.DotNetFrameworkUap10)
-                        : new FrameworkName(Framework.DefaultFramework.Name);
+                    // TODO What else to do with appx, js and other?
+                    var extension = Path.GetExtension(source);
+                    if (extension.Equals(".js", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Currently to run tests for .NET Core, assembly need dependency to Microsoft.NET.Test.Sdk. Which is not
+                        // possible for js files. So using default .NET Full framework version.
+                        fx = new FrameworkName(Constants.DotNetFramework40);
+                    }
+                    else
+                    {
+                        fx = extension.Equals(".appx", StringComparison.OrdinalIgnoreCase)
+                             || extension.Equals(".msix", StringComparison.OrdinalIgnoreCase)
+                             || extension.Equals(".appxrecipe", StringComparison.OrdinalIgnoreCase)
+                            ? new FrameworkName(Constants.DotNetFrameworkUap10)
+                            : new FrameworkName(Framework.DefaultFramework.Name);
+                    }
                 }
-            }
-            sourceFrameworkVersions[source] = Framework.FromString(fx.FullName);
 
-            if (finalFx == null)
-            {
-                finalFx = fx;
-                continue;
-            }
+                sourceToFrameworkMap.Add(source, Framework.FromString(fx.FullName));
 
-            if (finalFx.Identifier.Equals(fx.Identifier))
-            {
-                // Use latest version.
-                if (finalFx.Version < fx.Version)
+                if (finalFx == null)
                 {
                     finalFx = fx;
+                    continue;
+                }
+
+                if (finalFx.Identifier.Equals(fx.Identifier))
+                {
+                    // Use latest version.
+                    if (finalFx.Version < fx.Version)
+                    {
+                        finalFx = fx;
+                    }
+                }
+                else
+                {
+                    conflictInFxIdentifier = true;
+                    finalFx = new FrameworkName(defaultFramework.Name);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                conflictInFxIdentifier = true;
-                finalFx = new FrameworkName(Framework.DefaultFramework.Name);
+                sourceToFrameworkMap.Add(source, defaultFramework);
+                EqtTrace.Error("Failed to determine framework for source: {0} using default framework: {1}, exception: {2}", source, defaultFramework.Name, ex);
             }
         }
+
         return finalFx;
     }
 
-    private bool IsDotNetAssembly(string filePath)
+    private bool IsDllOrExe(string filePath)
     {
         var extType = Path.GetExtension(filePath);
         return extType != null && (extType.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||

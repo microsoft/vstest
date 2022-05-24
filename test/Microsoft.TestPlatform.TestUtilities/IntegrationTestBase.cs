@@ -250,7 +250,7 @@ public class IntegrationTestBase
                 environmentVariables["VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS"] = "1";
             }
 
-            if (_testEnvironment.DebugInfo.NoDefaultBreakpoints)
+            if (!_testEnvironment.DebugInfo.DebugStopAtEntrypoint)
             {
                 environmentVariables["VSTEST_DEBUG_NOBP"] = "1";
             }

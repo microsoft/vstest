@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
@@ -61,28 +62,47 @@ public class TestEngine : ITestEngine
     /// <inheritdoc/>
     public IProxyDiscoveryManager GetDiscoveryManager(
         IRequestData requestData,
-        ITestRuntimeProvider testHostManager,
-        DiscoveryCriteria discoveryCriteria)
+        DiscoveryCriteria discoveryCriteria,
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
+        // Parallel level determines how many processes at most we should start at the same time. We take the number from settings, and if user
+        // has no preference or the preference is 0 then we use the number of logical processors. Or the number of sources, whatever is lower.
+        // We don't know for sure if we will start that many processes as some of the sources can run in a single testhost. This is determined by
+        // Shared on the test runtime provider. At this point we need to know only if the parallel level is more than 1, and so if we will do parallel
+        // run or not.
         var parallelLevel = VerifyParallelSettingAndCalculateParallelLevel(
             discoveryCriteria.Sources.Count(),
             discoveryCriteria.RunSettings);
 
-        // Collecting IsParallel enabled.
-        requestData.MetricsCollection.Add(
-            TelemetryDataConstants.ParallelEnabledDuringDiscovery,
-            parallelLevel > 1 ? "True" : "False");
-        requestData.MetricsCollection.Add(
-            TelemetryDataConstants.TestSessionId,
-            discoveryCriteria.TestSessionInfo?.Id.ToString() ?? string.Empty);
+        var isParallelRun = parallelLevel > 1;
 
-        if (ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
+        // Collecting IsParallel enabled.
+        requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringDiscovery, isParallelRun ? "True" : "False");
+        requestData.MetricsCollection.Add(TelemetryDataConstants.TestSessionId, discoveryCriteria.TestSessionInfo?.Id.ToString() ?? string.Empty);
+
+        // Get testhost managers by configuration, and either use it for in-process run. or for single source run.
+        List<TestRuntimeProviderInfo> testHostManagers = GetTestRuntimeProvidersForUniqueConfigurations(discoveryCriteria.RunSettings, sourceToSourceDetailMap, out ITestRuntimeProvider testHostManager);
+
+        // This is a big if that figures out if we can run in process. In process run is very restricted, it is non-parallel run
+        // that has the same target framework as the current process, and it also must not be running in DesignMode (server mode / under IDE)
+        // and more conditions. In all other cases we run in a separate testhost process.
+        if (ShouldRunInProcess(discoveryCriteria.RunSettings, isParallelRun, isDataCollectorEnabled: false, testHostManagers))
         {
+            // We are running in process, so whatever the architecture and framework that was figured out is, it must be compatible. If we have more
+            // changes that we want to do to runsettings in the future, based on SourceDetail then it will depend on those details. But in general
+            // we will have to check that all source details are the same. Otherwise we for sure cannot run in process.
+            // E.g. if we get list of sources where one of them has different architecture we for sure cannot run in process, because the current
+            // process can handle only single runsettings.
+            if (testHostManagers.Count != 1)
+            {
+                throw new InvalidOperationException($"Exactly 1 testhost manager must be provided when running in process, but there {testHostManagers.Count} were provided.");
+            }
+            var testHostManagerInfo = testHostManagers[0];
+            testHostManager.Initialize(TestSessionMessageLogger.Instance, testHostManagerInfo.RunSettings);
+
             var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
             var newRequestData = GetRequestData(isTelemetryOptedIn);
-            return new InProcessProxyDiscoveryManager(
-                testHostManager,
-                new TestHostManagerFactory(newRequestData));
+            return new InProcessProxyDiscoveryManager(testHostManager, new TestHostManagerFactory(newRequestData));
         }
 
         // Create one data aggregator per parallel discovery and share it with all the proxy discovery managers.
@@ -91,10 +111,13 @@ public class TestEngine : ITestEngine
         // discovery manager to publish its current state. But doing so we are losing the collected state of all the
         // other managers.
         var discoveryDataAggregator = new DiscoveryDataAggregator();
-        Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = () =>
+        Func<TestRuntimeProviderInfo, IProxyDiscoveryManager> proxyDiscoveryManagerCreator = runtimeProviderInfo =>
         {
-            var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
-            hostManager?.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
+            var sources = runtimeProviderInfo.SourceDetails.Select(r => r.Source).ToList();
+            var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runtimeProviderInfo.RunSettings, sources);
+            hostManager?.Initialize(TestSessionMessageLogger.Instance, runtimeProviderInfo.RunSettings);
+
+            ThrowExceptionIfTestHostManagerIsNull(hostManager, runtimeProviderInfo.RunSettings);
 
             // This function is used to either take a pre-existing proxy operation manager from
             // the test pool or to create a new proxy operation manager on the spot.
@@ -108,7 +131,7 @@ public class TestEngine : ITestEngine
                     var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
                         discoveryCriteria.TestSessionInfo,
                         source,
-                        discoveryCriteria.RunSettings);
+                        runtimeProviderInfo.RunSettings);
 
                     if (proxyOperationManager == null)
                     {
@@ -144,43 +167,54 @@ public class TestEngine : ITestEngine
                     discoveryDataAggregator);
         };
 
-        return (parallelLevel > 1 || !testHostManager.Shared)
-            ? new ParallelProxyDiscoveryManager(
-                requestData,
-                proxyDiscoveryManagerCreator,
-                discoveryDataAggregator,
-                parallelLevel,
-                sharedHosts: testHostManager.Shared)
-            : proxyDiscoveryManagerCreator();
+        return new ParallelProxyDiscoveryManager(requestData, proxyDiscoveryManagerCreator, discoveryDataAggregator, parallelLevel, testHostManagers);
     }
 
     /// <inheritdoc/>
     public IProxyExecutionManager GetExecutionManager(
         IRequestData requestData,
-        ITestRuntimeProvider testHostManager,
-        TestRunCriteria testRunCriteria)
+        TestRunCriteria testRunCriteria,
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
+        // We use mulitple "different" runsettings here. We have runsettings that come with the testRunCriteria,
+        // and we use that to figure out the common stuff before we try to setup the run. Later we patch the settings
+        // from the additional details that were passed. Those should not affect the common properties that are used for setup.
+        // Right now the only two things that change there are the architecture and framework so we can mix them in a single run.
         var distinctSources = GetDistinctNumberOfSources(testRunCriteria);
-        var parallelLevel = VerifyParallelSettingAndCalculateParallelLevel(
-            distinctSources,
-            testRunCriteria.TestRunSettings);
+        var parallelLevel = VerifyParallelSettingAndCalculateParallelLevel(distinctSources, testRunCriteria.TestRunSettings);
+
+        // See comments in GetDiscoveryManager for more info about what is happening in this method.
+        var isParallelRun = parallelLevel > 1;
 
         // Collecting IsParallel enabled.
-        requestData.MetricsCollection.Add(
-            TelemetryDataConstants.ParallelEnabledDuringExecution,
-            parallelLevel > 1 ? "True" : "False");
-        requestData.MetricsCollection.Add(
-            TelemetryDataConstants.TestSessionId,
-            testRunCriteria.TestSessionInfo?.Id.ToString() ?? string.Empty);
+        requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, isParallelRun ? "True" : "False");
+        requestData.MetricsCollection.Add(TelemetryDataConstants.TestSessionId, testRunCriteria.TestSessionInfo?.Id.ToString() ?? string.Empty);
 
         var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
         var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
-        if (ShouldRunInNoIsolation(
+        var testHostProviders = GetTestRuntimeProvidersForUniqueConfigurations(testRunCriteria.TestRunSettings, sourceToSourceDetailMap, out ITestRuntimeProvider testHostManager);
+
+        if (ShouldRunInProcess(
                 testRunCriteria.TestRunSettings,
-                parallelLevel > 1,
-                isDataCollectorEnabled || isInProcDataCollectorEnabled))
+                isParallelRun,
+                isDataCollectorEnabled || isInProcDataCollectorEnabled,
+                testHostProviders))
         {
+            // Not updating runsettings from source detail on purpose here. We are running in process, so whatever the settings we figured out at the start. They must be compatible
+            // with the current process, otherwise we would not be able to run inside of the current process.
+            //
+            // We know that we only have a single testHostManager here, because we figure that out in ShouldRunInProcess.
+            ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
+
+            testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
+
+            // NOTE: The custom launcher should not be set when we have test session info available.
+            if (testRunCriteria.TestHostLauncher != null)
+            {
+                testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
+            }
+
             var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
             var newRequestData = GetRequestData(isTelemetryOptedIn);
             return new InProcessProxyExecutionManager(
@@ -188,134 +222,140 @@ public class TestEngine : ITestEngine
                 new TestHostManagerFactory(newRequestData));
         }
 
-        // SetupChannel ProxyExecutionManager with data collection if data collectors are
-        // specified in run settings.
-        Func<IProxyExecutionManager> proxyExecutionManagerCreator = () =>
-        {
-            // Create a new host manager, to be associated with individual
-            // ProxyExecutionManager(&POM)
-            var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
-            hostManager?.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
+        // This creates a single non-parallel execution manager, based requestData, isDataCollectorEnabled and the
+        // overall testRunCriteria. The overall testRunCriteria are split to smaller pieces (e.g. each source from the overall
+        // testRunCriteria) so we can run them in parallel, and those are then passed to those non-parallel execution managers.
+        //
+        // The function below grabs most of the parameter via closure from the local context,
+        // but gets the runtime provider later, because that is specific info to the source (or sources) it will be running.
+        // This creator does not get those smaller pieces of testRunCriteria, those come later when we call a method on
+        // the non-parallel execution manager we create here. E.g. StartTests(<single piece of testRunCriteria>).
+        Func<TestRuntimeProviderInfo, IProxyExecutionManager> proxyExecutionManagerCreator = runtimeProviderInfo =>
+            CreateNonParallelExecutionManager(requestData, testRunCriteria, isDataCollectorEnabled, runtimeProviderInfo);
 
-            if (testRunCriteria.TestHostLauncher != null)
-            {
-                hostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
-            }
+        var executionManager = new ParallelProxyExecutionManager(requestData, proxyExecutionManagerCreator, parallelLevel, testHostProviders);
 
-            var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
-
-            if (testRunCriteria.TestSessionInfo != null)
-            {
-                // This function is used to either take a pre-existing proxy operation manager from
-                // the test pool or to create a new proxy operation manager on the spot.
-                Func<string, ProxyExecutionManager, ProxyOperationManager>
-                    proxyOperationManagerCreator = (
-                        string source,
-                        ProxyExecutionManager proxyExecutionManager) =>
-                    {
-                        var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
-                            testRunCriteria.TestSessionInfo,
-                            source,
-                            testRunCriteria.TestRunSettings);
-
-                        if (proxyOperationManager == null)
-                        {
-                            // If the proxy creation process based on test session info failed, then
-                            // we'll proceed with the normal creation process as if no test session
-                            // info was passed in in the first place.
-                            //
-                            // WARNING: This should not normally happen and it raises questions
-                            // regarding the test session pool operation and consistency.
-                            EqtTrace.Warning("ProxyExecutionManager creation with test session failed.");
-
-                            proxyOperationManager = new ProxyOperationManager(
-                                requestData,
-                                requestSender,
-                                hostManager,
-                                proxyExecutionManager);
-                        }
-
-                        return proxyOperationManager;
-                    };
-
-                // In case we have an active test session, data collection needs were
-                // already taken care of when first creating the session. As a consequence
-                // we always return this proxy instead of choosing between the vanilla
-                // execution proxy and the one with data collection enabled.
-                return new ProxyExecutionManager(
-                    testRunCriteria.TestSessionInfo,
-                    proxyOperationManagerCreator,
-                    testRunCriteria.DebugEnabledForTestSession);
-            }
-
-            return isDataCollectorEnabled
-                ? new ProxyExecutionManagerWithDataCollection(
-                    requestData,
-                    requestSender,
-                    hostManager,
-                    new ProxyDataCollectionManager(
-                        requestData,
-                        testRunCriteria.TestRunSettings,
-                        GetSourcesFromTestRunCriteria(testRunCriteria)))
-                : new ProxyExecutionManager(
-                    requestData,
-                    requestSender,
-                    hostManager);
-        };
-
-        // parallelLevel = 1 for desktop should go via else route.
-        var executionManager = (parallelLevel > 1 || !testHostManager.Shared)
-            ? new ParallelProxyExecutionManager(
-                requestData,
-                proxyExecutionManagerCreator,
-                parallelLevel,
-                sharedHosts: testHostManager.Shared)
-            : proxyExecutionManagerCreator();
-
-        EqtTrace.Verbose($"TestEngine.GetExecutionManager: Chosen execution manager '{executionManager.GetType().AssemblyQualifiedName}' ParallelLevel '{parallelLevel}' Shared host '{testHostManager.Shared}'");
+        EqtTrace.Verbose($"TestEngine.GetExecutionManager: Chosen execution manager '{executionManager.GetType().AssemblyQualifiedName}' ParallelLevel '{parallelLevel}'.");
 
         return executionManager;
+    }
+
+    // This is internal so tests can use it.
+    internal IProxyExecutionManager CreateNonParallelExecutionManager(IRequestData requestData, TestRunCriteria testRunCriteria, bool isDataCollectorEnabled, TestRuntimeProviderInfo runtimeProviderInfo)
+    {
+        // SetupChannel ProxyExecutionManager with data collection if data collectors are
+        // specified in run settings.
+        // Create a new host manager, to be associated with individual
+        // ProxyExecutionManager(&POM)
+        var sources = runtimeProviderInfo.SourceDetails.Select(r => r.Source).ToList();
+        var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runtimeProviderInfo.RunSettings, sources);
+        ThrowExceptionIfTestHostManagerIsNull(hostManager, runtimeProviderInfo.RunSettings);
+        hostManager.Initialize(TestSessionMessageLogger.Instance, runtimeProviderInfo.RunSettings);
+
+        if (testRunCriteria.TestHostLauncher != null)
+        {
+            hostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
+        }
+
+        var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
+
+        if (testRunCriteria.TestSessionInfo != null)
+        {
+            // This function is used to either take a pre-existing proxy operation manager from
+            // the test pool or to create a new proxy operation manager on the spot.
+            Func<string, ProxyExecutionManager, ProxyOperationManager>
+                proxyOperationManagerCreator = (
+                    string source,
+                    ProxyExecutionManager proxyExecutionManager) =>
+                {
+                    var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
+                        testRunCriteria.TestSessionInfo,
+                        source,
+                        runtimeProviderInfo.RunSettings);
+
+                    if (proxyOperationManager == null)
+                    {
+                        // If the proxy creation process based on test session info failed, then
+                        // we'll proceed with the normal creation process as if no test session
+                        // info was passed in in the first place.
+                        //
+                        // WARNING: This should not normally happen and it raises questions
+                        // regarding the test session pool operation and consistency.
+                        EqtTrace.Warning("ProxyExecutionManager creation with test session failed.");
+
+                        proxyOperationManager = new ProxyOperationManager(
+                            requestData,
+                            requestSender,
+                            hostManager,
+                            proxyExecutionManager);
+                    }
+
+                    return proxyOperationManager;
+                };
+
+            // In case we have an active test session, data collection needs were
+            // already taken care of when first creating the session. As a consequence
+            // we always return this proxy instead of choosing between the vanilla
+            // execution proxy and the one with data collection enabled.
+            return new ProxyExecutionManager(
+                testRunCriteria.TestSessionInfo,
+                proxyOperationManagerCreator,
+                testRunCriteria.DebugEnabledForTestSession);
+        }
+
+        return isDataCollectorEnabled
+            ? new ProxyExecutionManagerWithDataCollection(
+                requestData,
+                requestSender,
+                hostManager,
+                new ProxyDataCollectionManager(
+                    requestData,
+                    runtimeProviderInfo.RunSettings,
+                    sources))
+            : new ProxyExecutionManager(
+                requestData,
+                requestSender,
+                hostManager);
     }
 
     /// <inheritdoc/>
     public IProxyTestSessionManager GetTestSessionManager(
         IRequestData requestData,
-        StartTestSessionCriteria testSessionCriteria)
+        StartTestSessionCriteria testSessionCriteria,
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
         var parallelLevel = VerifyParallelSettingAndCalculateParallelLevel(
             testSessionCriteria.Sources.Count,
             testSessionCriteria.RunSettings);
 
+        bool isParallelRun = parallelLevel > 1;
         requestData.MetricsCollection.Add(
             TelemetryDataConstants.ParallelEnabledDuringStartTestSession,
-            parallelLevel > 1 ? "True" : "False");
+            isParallelRun ? "True" : "False");
 
         var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testSessionCriteria.RunSettings);
         var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testSessionCriteria.RunSettings);
 
-        if (ShouldRunInNoIsolation(
+        List<TestRuntimeProviderInfo> testRuntimeProviders = GetTestRuntimeProvidersForUniqueConfigurations(testSessionCriteria.RunSettings, sourceToSourceDetailMap, out var _);
+
+        if (ShouldRunInProcess(
                 testSessionCriteria.RunSettings,
-                parallelLevel > 1,
-                isDataCollectorEnabled || isInProcDataCollectorEnabled))
+                isParallelRun,
+                isDataCollectorEnabled || isInProcDataCollectorEnabled,
+                testRuntimeProviders))
         {
-            // This condition is the equivalent of the in-process proxy execution manager case.
-            // In this case all tests will be run in the vstest.console process, so there's no
-            // test host to be started. As a consequence there'll be no session info.
+            // In this case all tests will be run in the current process (vstest.console), so there is no
+            // testhost to pre-start. No session will be created, and the session info will be null.
             return null;
         }
 
-        Func<ProxyOperationManager> proxyCreator = () =>
+        Func<TestRuntimeProviderInfo, ProxyOperationManager> proxyCreator = testRuntimeProviderInfo =>
         {
-            var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
-            if (hostManager == null)
-            {
-                throw new TestPlatformException(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        Resources.Resources.NoTestHostProviderFound));
-            }
+            var sources = testRuntimeProviderInfo.SourceDetails.Select(x => x.Source).ToList();
+            var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(testRuntimeProviderInfo.RunSettings, sources);
+            ThrowExceptionIfTestHostManagerIsNull(hostManager, testRuntimeProviderInfo.RunSettings);
 
-            hostManager.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
+            hostManager.Initialize(TestSessionMessageLogger.Instance, testRuntimeProviderInfo.RunSettings);
             if (testSessionCriteria.TestHostLauncher != null)
             {
                 hostManager.SetCustomLauncher(testSessionCriteria.TestHostLauncher);
@@ -344,7 +384,7 @@ public class TestEngine : ITestEngine
                 //     hostManager,
                 //     new ProxyDataCollectionManager(
                 //         requestData,
-                //         testSessionCriteria.RunSettings,
+                //         runsettingsXml,
                 //         testSessionCriteria.Sources))
                 //     {
                 //         CloseRequestSenderChannelOnProxyClose = true
@@ -355,13 +395,40 @@ public class TestEngine : ITestEngine
                     hostManager);
         };
 
-        var testhostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
-        testhostManager.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
-        var testhostCount = (parallelLevel > 1 || !testhostManager.Shared)
-            ? testSessionCriteria.Sources.Count
-            : 1;
+        // TODO: This condition should be returning the maxParallel level to avoid pre-starting way too many testhosts, because maxParallel level,
+        // can be smaller than the number of sources to run.
+        var maxTesthostCount = isParallelRun ? testSessionCriteria.Sources.Count : 1;
 
-        return new ProxyTestSessionManager(testSessionCriteria, testhostCount, proxyCreator);
+        return new ProxyTestSessionManager(testSessionCriteria, maxTesthostCount, proxyCreator, testRuntimeProviders);
+    }
+
+    private List<TestRuntimeProviderInfo> GetTestRuntimeProvidersForUniqueConfigurations(
+        string runSettings,
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap,
+        out ITestRuntimeProvider mostRecentlyCreatedInstance)
+    {
+        // Group source details to get unique frameworks and architectures for which we will run, so we can figure
+        // out which runtime providers would run them, and if the runtime provider is shared or not.
+        mostRecentlyCreatedInstance = null;
+        var testRuntimeProviders = new List<TestRuntimeProviderInfo>();
+        var uniqueRunConfigurations = sourceToSourceDetailMap.Values.GroupBy(k => $"{k.Framework}|{k.Architecture}");
+        foreach (var runConfiguration in uniqueRunConfigurations)
+        {
+            // It is okay to take the first (or any) source detail in the group. We are grouping to get the same source detail, so all architectures and frameworks are the same.
+            var sourceDetail = runConfiguration.First();
+            var runsettingsXml = SourceDetailHelper.UpdateRunSettingsFromSourceDetail(runSettings, sourceDetail);
+            var sources = runConfiguration.Select(c => c.Source).ToList();
+            // TODO: We could improve the implementation by adding an overload that won't create a new instance always, because we only need to know the Type.
+            var testRuntimeProvider = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runsettingsXml, sources);
+            var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider.GetType(), testRuntimeProvider.Shared, runsettingsXml, sourceDetails: runConfiguration.ToList());
+
+            // Outputting the instance, because the code for in-process run uses it, and we don't want to resolve it another time.
+            mostRecentlyCreatedInstance = testRuntimeProvider;
+            testRuntimeProviders.Add(testRuntimeProviderInfo);
+        }
+
+        ThrowExceptionIfAnyTestHostManagerIsNullOrNoneAreFound(testRuntimeProviders);
+        return testRuntimeProviders;
     }
 
     /// <inheritdoc/>
@@ -408,6 +475,7 @@ public class TestEngine : ITestEngine
             // Check the user parallel setting.
             int userParallelSetting = RunSettingsUtilities.GetMaxCpuCount(runSettings);
             parallelLevelToUse = userParallelSetting == 0
+                // TODO: use environment helper so we can control this from tests.
                 ? Environment.ProcessorCount
                 : userParallelSetting;
             var enableParallel = parallelLevelToUse > 1;
@@ -445,11 +513,18 @@ public class TestEngine : ITestEngine
         return parallelLevelToUse;
     }
 
-    private bool ShouldRunInNoIsolation(
+    private bool ShouldRunInProcess(
         string runsettings,
         bool isParallelEnabled,
-        bool isDataCollectorEnabled)
+        bool isDataCollectorEnabled,
+        List<TestRuntimeProviderInfo> testHostProviders)
     {
+        if (testHostProviders.Count > 1)
+        {
+            EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: This run has multiple different architectures or frameworks, running in isolation (in a separate testhost proces).");
+            return false;
+        }
+
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
 
         if (runConfiguration.InIsolation)
@@ -512,15 +587,32 @@ public class TestEngine : ITestEngine
         };
     }
 
-    /// <summary>
-    /// Gets test sources from test run criteria.
-    /// </summary>
-    ///
-    /// <returns>The test sources.</returns>
-    private IEnumerable<string> GetSourcesFromTestRunCriteria(TestRunCriteria testRunCriteria)
+    private static void ThrowExceptionIfTestHostManagerIsNull(ITestRuntimeProvider testHostManager, string settingsXml)
     {
-        return testRunCriteria.HasSpecificTests
-            ? TestSourcesUtility.GetSources(testRunCriteria.Tests)
-            : testRunCriteria.Sources;
+        if (testHostManager == null)
+        {
+            EqtTrace.Error($"{nameof(TestEngine)}.{nameof(ThrowExceptionIfTestHostManagerIsNull)}: No suitable testHostProvider found for runsettings: {settingsXml}");
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.NoTestHostProviderFound));
+        }
+    }
+
+    private static void ThrowExceptionIfAnyTestHostManagerIsNullOrNoneAreFound(List<TestRuntimeProviderInfo> testRuntimeProviders)
+    {
+        if (!testRuntimeProviders.Any())
+            throw new ArgumentException(null, nameof(testRuntimeProviders));
+
+        var missingRuntimeProviders = testRuntimeProviders.Where(p => p.Type == null);
+        if (missingRuntimeProviders.Any())
+        {
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(string.Format(CultureInfo.CurrentCulture, Resources.Resources.NoTestHostProviderFound));
+            foreach (var missingRuntimeProvider in missingRuntimeProviders)
+            {
+                EqtTrace.Error($"{nameof(TestEngine)}.{nameof(ThrowExceptionIfAnyTestHostManagerIsNullOrNoneAreFound)}: No suitable testHostProvider found for sources {missingRuntimeProvider.SourceDetails.Select(s => s.Source)} and runsettings: {missingRuntimeProvider.RunSettings}");
+                missingRuntimeProvider.SourceDetails.ForEach(detail => stringBuilder.AppendLine(detail.Source));
+            }
+
+            throw new TestPlatformException(stringBuilder.ToString());
+        }
     }
 }

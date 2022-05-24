@@ -20,7 +20,6 @@ internal abstract class FakeCommunicationChannel : ICommunicationChannel
 
     public int Id { get; }
     public CancellationTokenSource CancellationTokenSource { get; } = new();
-
     public BlockingCollection<string> InQueue { get; } = new();
     public BlockingCollection<FakeMessage> OutQueue { get; } = new();
 
@@ -47,6 +46,7 @@ internal abstract class FakeCommunicationChannel : ICommunicationChannel
     {
         CancellationTokenSource.Cancel();
         InQueue.CompleteAdding();
+        OutQueue.CompleteAdding();
     }
 
     public Task NotifyDataAvailable()
@@ -78,7 +78,7 @@ internal class FakeCommunicationChannel<TContext> : FakeCommunicationChannel, IC
     /// </summary>
     public Queue<RequestResponsePair<string, FakeMessage, TContext>> NextResponses { get; } = new();
     public FakeErrorAggregator FakeErrorAggregator { get; }
-    public FakeMessage? OutgoingMessage { get; private set; }
+    public FakeMessage? PendingMessage { get; private set; }
     public TContext? Context { get; private set; }
     public List<RequestResponsePair<Message, FakeMessage, TContext>> ProcessedMessages { get; } = new();
     public Task? ProcessIncomingMessagesTask { get; private set; }
@@ -104,11 +104,12 @@ internal class FakeCommunicationChannel<TContext> : FakeCommunicationChannel, IC
         {
             try
             {
-                // TODO: better name? this is message that we are currently trying to send
-                OutgoingMessage = OutQueue.Take();
-                OnMessageReceived(this, new MessageReceivedEventArgs { Data = OutgoingMessage.SerializedMessage });
-                OutgoingMessage = null;
+                // TODO: better name for the property? This is message that we are currently trying to send.
+                PendingMessage = OutQueue.Take(token);
+                OnMessageReceived(this, new MessageReceivedEventArgs { Data = PendingMessage.SerializedMessage });
+                PendingMessage = null;
             }
+            catch (OperationCanceledException) { }
             catch (Exception ex)
             {
                 FakeErrorAggregator.Add(ex);
@@ -182,7 +183,6 @@ internal class FakeCommunicationChannel<TContext> : FakeCommunicationChannel, IC
                         Debugger.Break();
                     }
 
-                    // TODO: passing the raw message in, is strange
                     responsePair.BeforeAction?.Invoke(context);
                     var responses = responsePair.Responses;
                     ProcessedMessages.Add(new RequestResponsePair<Message, FakeMessage, TContext>(requestMessage, responses, false));
@@ -199,11 +199,17 @@ internal class FakeCommunicationChannel<TContext> : FakeCommunicationChannel, IC
                     responsePair.AfterAction?.Invoke(context);
                 }
             }
+            catch (OperationCanceledException) { }
             catch (Exception ex)
             {
                 FakeErrorAggregator.Add(ex);
             }
         }
+    }
+
+    public override string? ToString()
+    {
+        return NextResponses.Peek()?.ToString();
     }
 }
 

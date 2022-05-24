@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
@@ -21,6 +23,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client;
 public class ProxyTestSessionManagerTests
 {
     private readonly IList<string> _fakeTestSources = new List<string>() { @"C:\temp\FakeTestAsset.dll" };
+    private Dictionary<string, TestRuntimeProviderInfo> _fakeTestSourcesToRuntimeProviderMap;
     private readonly IList<string> _fakeTestMultipleSources = new List<string>() {
         @"C:\temp\FakeTestAsset1.dll",
         @"C:\temp\FakeTestAsset2.dll",
@@ -105,6 +108,18 @@ public class ProxyTestSessionManagerTests
         _mockMetricsCollection.Setup(mc => mc.Metrics).Returns(metrics);
         _mockMetricsCollection.Setup(mc => mc.Add(It.IsAny<string>(), It.IsAny<object>()))
             .Callback((string metric, object value) => metrics.Add(metric, value));
+
+        _fakeTestSourcesToRuntimeProviderMap = new Dictionary<string, TestRuntimeProviderInfo>
+        {
+            [_fakeTestSources[0]] = new TestRuntimeProviderInfo(typeof(ITestRuntimeProvider), false, _fakeRunSettings, new List<SourceDetail>
+            {
+                new SourceDetail {
+                    Source = _fakeTestSources[0],
+                    Architecture = Architecture.X86,
+                    Framework = Framework.DefaultFramework
+                }
+            })
+        };
     }
 
     [TestMethod]
@@ -513,10 +528,27 @@ public class ProxyTestSessionManagerTests
         StartTestSessionCriteria testSessionCriteria,
         ProxyOperationManager proxyOperationManager)
     {
+        var runSettings = testSessionCriteria.RunSettings ?? _fakeRunSettings;
+        var runtimeProviderInfo = new TestRuntimeProviderInfo
+        (
+            typeof(ITestRuntimeProvider),
+            shared: false,
+            runSettings,
+            testSessionCriteria.Sources.Select(s => new SourceDetail
+            {
+                Source = s,
+                Architecture = Architecture.X86,
+                Framework = Framework.DefaultFramework
+            }).ToList()
+        );
+
+        var runtimeProviders = new List<TestRuntimeProviderInfo> { runtimeProviderInfo };
         return new ProxyTestSessionManager(
             testSessionCriteria,
             testSessionCriteria.Sources.Count,
-            () => proxyOperationManager);
+            _ => proxyOperationManager,
+            runtimeProviders
+            );
     }
 
     private void CheckStopSessionTelemetry(bool exists)

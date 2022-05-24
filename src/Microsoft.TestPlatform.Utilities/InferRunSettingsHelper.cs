@@ -495,9 +495,16 @@ public class InferRunSettingsHelper
 
         if (root.SelectSingleNode(RunConfigurationNodePath) == null)
         {
-            // TODO: When runsettings are incomplete this will silently return, when we run just TestRequestManager we don't get full settings.
-            EqtTrace.Error("InferRunSettingsHelper.UpdateNodeIfNotPresent: Unable to navigate to RunConfiguration. Current node: " + xmlDocument.LocalName);
-            return;
+            if (root.Name == RunSettingsNodeName)
+            {
+                // When just <RunSettings></RunSettings> is provided in the runsettings string, then this will add the common RunConfiguration inner node.
+                XmlUtilities.AppendOrModifyChild(xmlDocument, RunConfigurationNodePath, RunConfigurationNodeName, innerXml: null);
+            }
+            else
+            {
+                EqtTrace.Error("InferRunSettingsHelper.UpdateNodeIfNotPresent: Unable to navigate to RunConfiguration. Current node: " + xmlDocument.LocalName);
+                return;
+            }
         }
 
         var node = xmlDocument.SelectSingleNode(nodePath);
