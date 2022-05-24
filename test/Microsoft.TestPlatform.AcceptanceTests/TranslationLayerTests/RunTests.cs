@@ -71,7 +71,7 @@ public class RunTests : AcceptanceTestBase
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
+        var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", "net462");
         var incompatibleDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
 
         // Act
@@ -94,7 +94,7 @@ public class RunTests : AcceptanceTestBase
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
+        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", "net462");
         var netDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
 
         // Act

@@ -148,7 +148,7 @@ public class CustomTestHostTests : AcceptanceTestBase
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
+        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", "net462");
         var netDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
         var testHostLauncher = new TestHostLauncherV3();
 
@@ -179,7 +179,7 @@ public class CustomTestHostTests : AcceptanceTestBase
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
+        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", "net462");
         var netDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
         var testHostLauncher = new TestHostLauncherV3();
 
