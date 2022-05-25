@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
@@ -124,7 +125,7 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
                                 .SendMessage((TestMessageLevel)Enum.Parse(typeof(TestMessageLevel), prefix.Substring(prefix.LastIndexOf('.') + 1), false), message);
                             break;
                         case AppDomainPipeMessagePrefix.Report:
-                            _progressReporter?.Report(int.Parse(message));
+                            _progressReporter?.Report(int.Parse(message, CultureInfo.CurrentCulture));
                             break;
                         default:
                             EqtTrace.Error($"DataCollectorAttachmentProcessorAppDomain:PipeReaderTask: Unknown message: {message}");

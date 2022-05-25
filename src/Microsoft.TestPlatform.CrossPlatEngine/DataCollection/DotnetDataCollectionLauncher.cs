@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 
@@ -101,8 +102,7 @@ internal class DotnetDataCollectionLauncher : DataCollectionLauncher
         EqtTrace.Verbose("DotnetDataCollectionLauncher: Full path of dotnet.exe is {0}", currentProcessFileName);
 
         var cliArgs = string.Join(" ", commandLineArguments);
-        var argumentsString = string.Format("{0} \"{1}\" {2} ", args, dataCollectorAssemblyPath, cliArgs);
-
+        var argumentsString = string.Format(CultureInfo.InvariantCulture, "{0} \"{1}\" {2} ", args, dataCollectorAssemblyPath, cliArgs);
         var dataCollectorProcess = _processHelper.LaunchProcess(currentProcessFileName, argumentsString, Directory.GetCurrentDirectory(), environmentVariables, ErrorReceivedCallback, ExitCallBack, null);
 
         DataCollectorProcessId = _processHelper.GetProcessId(dataCollectorProcess);

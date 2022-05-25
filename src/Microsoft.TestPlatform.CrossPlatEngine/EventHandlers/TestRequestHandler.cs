@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
@@ -348,7 +349,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                     // Can only do this after InitializeCommunication because TestHost cannot "Send Log" unless communications are initialized
                     if (!StringUtils.IsNullOrEmpty(EqtTrace.LogFile))
                     {
-                        SendLog(TestMessageLevel.Informational, string.Format(CrossPlatResources.TesthostDiagLogOutputFile, EqtTrace.LogFile));
+                        SendLog(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, CrossPlatResources.TesthostDiagLogOutputFile, EqtTrace.LogFile));
                     }
                     else if (!StringUtils.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
                     {
