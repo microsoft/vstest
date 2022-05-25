@@ -419,7 +419,7 @@ internal class Executor
         }
 
         string assemblyVersionAndArchitecture = $"{assemblyVersion} ({_processHelper.GetCurrentProcessArchitecture().ToString().ToLowerInvariant()})";
-        string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersionAndArchitecture);
+        string commandLineBanner = string.Format(CultureInfo.CurrentCulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersionAndArchitecture);
         Output.WriteLine(commandLineBanner, OutputLevel.Information);
         Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
         PrintWarningIfRunningEmulatedOnArm64();
@@ -465,7 +465,7 @@ internal class Executor
                 }
                 else
                 {
-                    Output.WriteLine(string.Format("vstest.console.exe {0}", responseFileArgs), OutputLevel.Information);
+                    Output.WriteLine($"vstest.console.exe {responseFileArgs}", OutputLevel.Information);
                     outputArguments.AddRange(nestedArgs);
                 }
             }

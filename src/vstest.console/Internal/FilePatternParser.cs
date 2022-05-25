@@ -63,7 +63,7 @@ public class FilePatternParser
             if (!_fileHelper.Exists(filePattern))
             {
                 throw new TestSourceException(
-                    string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, filePattern));
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourceFileNotFound, filePattern));
             }
 
             matchingFiles.Add(filePattern);

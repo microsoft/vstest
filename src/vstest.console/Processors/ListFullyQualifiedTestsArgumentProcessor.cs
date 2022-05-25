@@ -169,7 +169,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
 
         if (!_commandLineOptions.Sources.Any())
         {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
+            throw new CommandLineException(CommandLineResources.MissingTestSourceFile);
         }
 
         if (!EqtTrace.LogFile.IsNullOrEmpty())
@@ -294,7 +294,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
 
             if (filterWrapper.ParseError != null)
             {
-                var fe = new FormatException(string.Format("Invalid Test Case Filter: {0}", filterString));
+                var fe = new FormatException($"Invalid Test Case Filter: {filterString}");
                 EqtTrace.Error("TestCaseFilter.ValidateFilter : Filtering failed with exception : " + fe.Message);
                 throw fe;
             }

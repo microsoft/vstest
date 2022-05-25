@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -301,6 +302,7 @@ internal class TestRequestManager : ITestRequestManager
         {
             throw new SettingsException(
                 string.Format(
+                    CultureInfo.CurrentCulture,
                     Resources.Resources.RunsettingsWithDCErrorMessage,
                     runsettings));
         }
@@ -488,6 +490,7 @@ internal class TestRequestManager : ITestRequestManager
         {
             throw new SettingsException(
                 string.Format(
+                    CultureInfo.CurrentCulture,
                     Resources.Resources.RunsettingsWithDCErrorMessage,
                     payload.RunSettings));
         }
@@ -591,10 +594,7 @@ internal class TestRequestManager : ITestRequestManager
             {
                 // We are collecting telemetry for the legacy nodes and attributes used in the runsettings.
                 requestData.MetricsCollection.Add(
-                    string.Format(
-                        "{0}.{1}",
-                        TelemetryDataConstants.LegacySettingPrefix,
-                        ciData.Key),
+                    $"{TelemetryDataConstants.LegacySettingPrefix}.{ciData.Key}",
                     ciData.Value);
             }
         }

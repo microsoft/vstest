@@ -92,7 +92,7 @@ internal class TestCaseFilterArgumentExecutor : IArgumentExecutor
 
         if (!hasDefaultFilter && argument.IsNullOrWhiteSpace())
         {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestCaseFilterValueRequired));
+            throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestCaseFilterValueRequired));
         }
 
         if (!hasDefaultFilter)
