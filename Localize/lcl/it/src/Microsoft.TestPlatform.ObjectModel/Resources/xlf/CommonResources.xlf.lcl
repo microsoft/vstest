@@ -21,12 +21,12 @@
       </Item>
       <Item ItemId=";DisplayChosenSettings" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.]]></Val>
+          <Val><![CDATA[Test run detected DLL(s) which would use different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[L'esecuzione dei test ha rilevato DLL compilate per versioni diverse del framework e della piattaforma. Le DLL seguenti non corrispondono alle impostazioni correnti, ovvero al framework {0} e alla piattaforma {1}.{2}Per altri dettagli sulla gestione di queste impostazioni, vedere {3}.]]></Val>
+            <Val><![CDATA[L'esecuzione dei test ha rilevato DLL compilate per versioni diverse del framework e della piattaforma. Le DLL seguenti non corrispondono alle impostazioni correnti, ovvero al framework {0} e alla piattaforma {1}.{2}Per altri dettagli sulla gestione di queste impostazioni, vedi {3}.]]></Val>
           </Tgt>
           <Prev Cat="Text">
-            <Val><![CDATA[Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) do not match framework/platform settings.{2}Go to {3} for more details on managing these settings.]D;]A;]]></Val>
+            <Val><![CDATA[Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.]]></Val>
           </Prev>
         </Str>
         <Disp Icon="Str" />
@@ -51,10 +51,13 @@
       </Item>
       <Item ItemId=";SourceIncompatible" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} is built for Framework {1} and Platform {2}.]]></Val>
+          <Val><![CDATA[{0} would use Framework {1} and Platform {2}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} viene compilato per il framework {1} e la piattaforma {2}.]]></Val>
+            <Val><![CDATA[{0} userebbe Framework {1} e platform {2}.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} is built for Framework {1} and Platform {2}.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
