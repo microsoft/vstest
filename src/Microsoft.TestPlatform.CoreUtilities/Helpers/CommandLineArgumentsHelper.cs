@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 

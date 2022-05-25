@@ -208,12 +208,12 @@ public class TestRequestSender : ITestRequestSender
             }
             else if (message.MessageType == MessageType.ProtocolError)
             {
-                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckFailed));
+                throw new TestPlatformException(CommonResources.VersionCheckFailed);
             }
             else
             {
                 throw new TestPlatformException(string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommonResources.UnexpectedMessage,
                     MessageType.VersionCheck,
                     message.MessageType));
@@ -237,7 +237,7 @@ public class TestRequestSender : ITestRequestSender
             var timeout = EnvironmentHelper.GetConnectionTimeout();
             if (!protocolNegotiated.WaitOne(timeout * 1000))
             {
-                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout, timeout, EnvironmentHelper.VstestConnectionTimeout));
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, CommonResources.VersionCheckTimedout, timeout, EnvironmentHelper.VstestConnectionTimeout));
             }
         }
         finally
@@ -341,10 +341,7 @@ public class TestRequestSender : ITestRequestSender
         {
             if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
             {
-                EqtTrace.Warning(
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CommonResources.AttachDebuggerToDefaultTestHostFailure));
+                EqtTrace.Warning(CommonResources.AttachDebuggerToDefaultTestHostFailure);
             }
         }
 
@@ -384,10 +381,7 @@ public class TestRequestSender : ITestRequestSender
         {
             if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
             {
-                EqtTrace.Warning(
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CommonResources.AttachDebuggerToDefaultTestHostFailure));
+                EqtTrace.Warning(CommonResources.AttachDebuggerToDefaultTestHostFailure);
             }
         }
 
@@ -629,7 +623,7 @@ public class TestRequestSender : ITestRequestSender
 
         var reason = GetAbortErrorMessage(exception, getClientError);
         EqtTrace.Error("TestRequestSender: Aborting test run because {0}", reason);
-        LogErrorMessage(string.Format(CommonResources.AbortedTestRun, reason));
+        LogErrorMessage(string.Format(CultureInfo.CurrentCulture, CommonResources.AbortedTestRun, reason));
 
         // notify test run abort to vstest console wrapper.
         var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, null, TimeSpan.Zero);
@@ -656,7 +650,7 @@ public class TestRequestSender : ITestRequestSender
         if (GetAbortErrorMessage(exception, getClientError) is string reason)
         {
             EqtTrace.Error("TestRequestSender.OnDiscoveryAbort: Aborting test discovery because {0}.", reason);
-            LogErrorMessage(string.Format(CommonResources.AbortedTestDiscoveryWithReason, reason));
+            LogErrorMessage(string.Format(CultureInfo.CurrentCulture, CommonResources.AbortedTestDiscoveryWithReason, reason));
         }
         else
         {

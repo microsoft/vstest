@@ -91,7 +91,7 @@ public static class CommandLineUtilities
             if (inQuotes)
             {
                 EqtTrace.Verbose("Executor.Execute: Exiting with exit code of {0}", 1);
-                EqtTrace.Error(string.Format(CultureInfo.InvariantCulture, "Error: Unbalanced '\"' in command line argument file"));
+                EqtTrace.Error("Error: Unbalanced '\"' in command line argument file");
                 hadError = true;
             }
             else if (currentArg.Length > 0)
