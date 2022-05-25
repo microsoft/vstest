@@ -39,7 +39,8 @@ public class RunnerCompatibilityDataSource : TestDataSource<RunnerInfo>
     public bool DebugVSTestConsole { get; set; }
     public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
-    public bool NoDefaultBreakpoints { get; set; } = true;
+    public bool DebugStopAtEntrypoint { get; set; }
+    public int JustRow { get; set; } = -1;
 
     /// <summary>
     /// Add run for in-process using the selected .NET Framework runners, and and all selected adapters.
@@ -75,7 +76,9 @@ public class RunnerCompatibilityDataSource : TestDataSource<RunnerInfo>
         _builder.DebugDataCollector = DebugDataCollector;
         _builder.DebugVSTestConsole = DebugVSTestConsole;
         _builder.DebugTestHost = DebugTestHost;
-        _builder.NoDefaultBreakpoints = NoDefaultBreakpoints;
+        _builder.DebugStopAtEntrypoint = DebugStopAtEntrypoint;
+
+        _builder.JustRow = JustRow < 0 ? null : JustRow;
 
         var data = _builder.CreateData();
         data.ForEach(AddData);

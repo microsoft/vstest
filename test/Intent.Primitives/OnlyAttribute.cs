@@ -3,7 +3,7 @@
 
 namespace Intent;
 
-[AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Constructor | AttributeTargets.Method)]
+[AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
 public class OnlyAttribute : Attribute
 {
 }

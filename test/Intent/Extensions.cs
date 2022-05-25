@@ -19,7 +19,7 @@ public static class Extensions
 
     public static List<Type> SkipNonPublic(this IEnumerable<Type> e)
     {
-        return e.Where(i => i.IsPublic).ToList();
+        return e.Where(i => i.IsPublic || i.IsNestedPublic).ToList();
     }
 
     public static List<MethodInfo> SkipExcluded(this IEnumerable<MethodInfo> e)

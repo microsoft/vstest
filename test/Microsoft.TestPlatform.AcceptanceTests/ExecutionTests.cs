@@ -65,6 +65,8 @@ public class ExecutionTests : AcceptanceTestBase
 
         ValidateSummaryStatus(2, 2, 2);
         ExitCodeEquals(1); // failing tests
+        StdErrHasTestRunFailedMessageButNoOtherError();
+        StdOutHasNoWarnings();
     }
 
     [TestMethod]
@@ -75,6 +77,8 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPaths = BuildMultipleAssemblyPath("MSTestProject1.dll", "MSTestProject2.dll");
+
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
@@ -251,11 +255,11 @@ public class ExecutionTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
-    public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
+    public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsoleWhenGivenIncompatibleX86andX64Dll(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProject3.dll is built for Framework .NETFramework,Version=v4.5.1 and Platform X64";
+        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X64 platform. SimpleTestProjectx86.dll would use Framework .NETFramework,Version=v4.5.1 and Platform X86";
         var assemblyPaths =
             BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProjectx86.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -273,11 +277,11 @@ public class ExecutionTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
-    public void NoIncompatibleSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
+    public void NoIncompatibleSourcesWarningShouldBeDisplayedInTheConsoleWhenGivenSingleX86Dll(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProjectx86 is built for Framework .NETFramework,Version=v4.5.1 and Platform X86";
+        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProjectx86 would use Framework .NETFramework,Version=v4.5.1 and Platform X86";
         var assemblyPaths =
             BuildMultipleAssemblyPath("SimpleTestProjectx86.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -297,7 +301,7 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProject2.dll is built for Framework .NETFramework,Version=v4.5.1 and Platform X64";
+        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProject2.dll would use Framework .NETFramework,Version=v4.5.1 and Platform X64";
         var assemblyPaths =
             BuildMultipleAssemblyPath("SimpleTestProject2.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -312,6 +316,7 @@ public class ExecutionTests : AcceptanceTestBase
         {
             StdOutputDoesNotContains(expectedWarningContains);
         }
+
         // If we are running this test on 32 bit OS, it should output warning message
         else
         {

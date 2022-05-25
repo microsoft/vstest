@@ -2,215 +2,226 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
-/// Abstract class having common parallel manager implementation
+/// Manages work that is done on multiple managers (testhosts) in parallel such as parallel discovery or parallel run.
 /// </summary>
-internal abstract class ParallelOperationManager<T, TU> : IParallelOperationManager, IDisposable
+internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkload> : IDisposable
 {
-    #region ConcurrentManagerInstanceData
-
-    protected Func<T> CreateNewConcurrentManager { get; set; }
-
-    /// <summary>
-    /// Gets a value indicating whether hosts are shared.
-    /// </summary>
-    protected bool SharedHosts { get; private set; }
-
-    private ConcurrentDictionary<T, TU> _concurrentManagerHandlerMap;
-
-    /// <summary>
-    /// Singleton Instance of this class
-    /// </summary>
-    protected static T s_instance;
+    private readonly Func<TestRuntimeProviderInfo, TManager> _createNewManager;
 
     /// <summary>
     /// Default number of Processes
     /// </summary>
-    private int _currentParallelLevel;
+    private TEventHandler? _eventHandler;
+    private Func<TEventHandler, TManager, TEventHandler>? _getEventHandler;
+    private Action<TManager, TEventHandler, TWorkload>? _runWorkload;
+    private bool _acceptMoreWork;
+    private readonly List<ProviderSpecificWorkload<TWorkload>> _workloads = new();
+    private readonly List<Slot> _managerSlots = new();
 
-    #endregion
+    private readonly object _lock = new();
 
-    #region Concurrency Keeper Objects
+    public int MaxParallelLevel { get; }
+    public int OccupiedSlotCount { get; private set; }
+    public int AvailableSlotCount { get; private set; }
 
     /// <summary>
-    /// LockObject to iterate our sourceEnumerator in parallel
-    /// We can use the sourceEnumerator itself as lockObject, but since its a changing object - it's risky to use it as one
+    /// Creates new instance of ParallelOperationManager.
     /// </summary>
-    protected object _sourceEnumeratorLockObject = new();
-
-    #endregion
-
-    protected ParallelOperationManager(Func<T> createNewManager, int parallelLevel, bool sharedHosts)
+    /// <param name="createNewManager">Creates a new manager that is responsible for running a single part of the overall workload.
+    /// A manager is typically a testhost, and the part of workload is discovering or running a single test dll.</param>
+    /// <param name="parallelLevel">Determines the maximum amount of parallel managers that can be active at the same time.</param>
+    public ParallelOperationManager(Func<TestRuntimeProviderInfo, TManager> createNewManager, int parallelLevel)
     {
-        CreateNewConcurrentManager = createNewManager;
-        SharedHosts = sharedHosts;
-
-        // Update Parallel Level
-        UpdateParallelLevel(parallelLevel);
+        _createNewManager = createNewManager;
+        MaxParallelLevel = parallelLevel;
+        ClearSlots(acceptMoreWork: true);
     }
 
-    /// <summary>
-    /// Remove and dispose a manager from concurrent list of manager.
-    /// </summary>
-    /// <param name="manager">Manager to remove</param>
-    public void RemoveManager(T manager)
+    private void ClearSlots(bool acceptMoreWork)
     {
-        _concurrentManagerHandlerMap.TryRemove(manager, out _);
-    }
-
-    /// <summary>
-    /// Add a manager in concurrent list of manager.
-    /// </summary>
-    /// <param name="manager">Manager to add</param>
-    /// <param name="handler">eventHandler of the manager</param>
-    public void AddManager(T manager, TU handler)
-    {
-        _concurrentManagerHandlerMap.TryAdd(manager, handler);
-    }
-
-    /// <summary>
-    /// Update event handler for the manager.
-    /// If it is a new manager, add this.
-    /// </summary>
-    /// <param name="manager">Manager to update</param>
-    /// <param name="handler">event handler to update for manager</param>
-    public void UpdateHandlerForManager(T manager, TU handler)
-    {
-        if (_concurrentManagerHandlerMap.ContainsKey(manager))
+        lock (_lock)
         {
-            _concurrentManagerHandlerMap[manager] = handler;
-        }
-        else
-        {
-            AddManager(manager, handler);
+            _acceptMoreWork = acceptMoreWork;
+            _managerSlots.Clear();
+            _managerSlots.AddRange(Enumerable.Range(0, MaxParallelLevel).Select(_ => new Slot()));
+            SetOccupiedSlotCount();
         }
     }
 
-    /// <summary>
-    /// Get the event handler associated with the manager.
-    /// </summary>
-    /// <param name="manager">Manager</param>
-    public TU GetHandlerForGivenManager(T manager)
+    private void SetOccupiedSlotCount()
     {
-        return _concurrentManagerHandlerMap[manager];
+        AvailableSlotCount = _managerSlots.Count(s => s.IsAvailable);
+        OccupiedSlotCount = _managerSlots.Count - AvailableSlotCount;
     }
 
-    /// <summary>
-    /// Get total number of active concurrent manager
-    /// </summary>
-    public int GetConcurrentManagersCount()
+    public void StartWork(
+        List<ProviderSpecificWorkload<TWorkload>> workloads!!,
+        TEventHandler eventHandler!!,
+        Func<TEventHandler, TManager, TEventHandler> getEventHandler!!,
+        Action<TManager, TEventHandler, TWorkload> runWorkload!!)
     {
-        return _concurrentManagerHandlerMap.Count;
+        _eventHandler = eventHandler;
+        _getEventHandler = getEventHandler;
+        _runWorkload = runWorkload;
+
+        _workloads.AddRange(workloads);
+
+        // This creates as many slots as possible even though we might not use them when we get less workloads to process,
+        // this is not a big issue, and not worth optimizing, because the parallel level is determined by the logical CPU count,
+        // so it is a small number.
+        ClearSlots(acceptMoreWork: true);
+        RunWorkInParallel();
     }
 
-    /// <summary>
-    /// Get instances of all active concurrent manager
-    /// </summary>
-    public IEnumerable<T> GetConcurrentManagerInstances()
+    // This does not do anything in parallel, all the workloads we schedule are offloaded to separate Task in the _runWorkload callback.
+    // I did not want to change that, yet but this is the correct place to do that offloading. Not each manager.
+    private bool RunWorkInParallel()
     {
-        return _concurrentManagerHandlerMap.Keys.ToList();
-    }
+        // TODO: Right now we don't re-use shared hosts, but if we did, this is the place
+        // where we should find a workload that fits the manager if any of them is shared.
+        // Or tear it down, and start a new one.
 
+        if (_eventHandler == null)
+            throw new InvalidOperationException($"{nameof(_eventHandler)} was not provided.");
 
-    /// <summary>
-    /// Updates the Concurrent Executors according to new parallel setting
-    /// </summary>
-    /// <param name="newParallelLevel">Number of Parallel Executors allowed</param>
-    public void UpdateParallelLevel(int newParallelLevel)
-    {
-        if (_concurrentManagerHandlerMap == null)
+        if (_getEventHandler == null)
+            throw new InvalidOperationException($"{nameof(_getEventHandler)} was not provided.");
+
+        if (_runWorkload == null)
+            throw new InvalidOperationException($"{nameof(_runWorkload)} was not provided.");
+
+        // Reserve slots and assign them work under the lock so we keep
+        // the slots consistent.
+        List<SlotWorkloadPair> workToRun = new();
+        lock (_lock)
         {
-            // not initialized yet
-            // create rest of concurrent clients other than default one
-            _concurrentManagerHandlerMap = new ConcurrentDictionary<T, TU>();
-            for (int i = 0; i < newParallelLevel; i++)
+            if (_workloads.Count == 0)
+                return false;
+
+            // When HandlePartialDiscovery or HandlePartialRun are in progress, and we call StopAllManagers,
+            // it is possible that we will clear all slots, and have RunWorkInParallel waiting on the lock,
+            // so when it is allowed to enter it will try to add more work, but we already cancelled,
+            // so we should not start more work.
+            if (!_acceptMoreWork)
+                return false;
+
+            var availableSlots = _managerSlots.Where(slot => slot.IsAvailable).ToList();
+            var availableWorkloads = _workloads.Where(workload => workload != null).ToList();
+            var amount = Math.Min(availableSlots.Count, availableWorkloads.Count);
+            var workloadsToRun = availableWorkloads.Take(amount).ToList();
+
+            for (int i = 0; i < amount; i++)
             {
-                AddManager(CreateNewConcurrentManager(), default);
+                var slot = availableSlots[i];
+                slot.IsAvailable = false;
+                var workload = workloadsToRun[i];
+                workToRun.Add(new SlotWorkloadPair(slot, workload));
+                _workloads.Remove(workload);
+            }
+
+            SetOccupiedSlotCount();
+
+            foreach (var pair in workToRun)
+            {
+                var manager = _createNewManager(pair.Workload.Provider);
+                var eventHandler = _getEventHandler(_eventHandler, manager);
+                pair.Slot.EventHandler = eventHandler;
+                pair.Slot.Manager = manager;
+                pair.Slot.ManagerInfo = pair.Workload.Provider;
+                pair.Slot.Work = pair.Workload.Work;
             }
         }
-        else if (_currentParallelLevel != newParallelLevel)
+
+        // Kick of the work in parallel outside of the lock so if we have more requests to run
+        // that come in at the same time we only block them from reserving the same slot at the same time
+        // but not from starting their assigned work at the same time.
+        foreach (var pair in workToRun)
         {
-            // If number of concurrent clients is less than the new level
-            // Create more concurrent clients and update the list
-            if (_currentParallelLevel < newParallelLevel)
+            try
             {
-                for (int i = 0; i < newParallelLevel - _currentParallelLevel; i++)
+                _runWorkload(pair.Slot.Manager!, pair.Slot.EventHandler!, pair.Workload.Work);
+            }
+            finally
+            {
+                // clean the slot or something, to make sure we don't keep it reserved.
+            }
+        }
+
+        // Return true when we started more work. Or false, when there was nothing more to do.
+        // This will propagate to handling of partial discovery or partial run.
+        return workToRun.Count > 0;
+    }
+
+    public bool RunNextWork(TManager completedManager!!)
+    {
+        ClearCompletedSlot(completedManager);
+        return RunWorkInParallel();
+    }
+
+    private void ClearCompletedSlot(TManager completedManager)
+    {
+        lock (_lock)
+        {
+            var completedSlot = _managerSlots.Where(s => ReferenceEquals(completedManager, s.Manager)).ToList();
+            // When HandlePartialDiscovery or HandlePartialRun are in progress, and we call StopAllManagers,
+            // it is possible that we will clear all slots, while ClearCompletedSlot is waiting on the lock,
+            // so when it is allowed to enter it will fail to find the respective slot and fail. In this case it is
+            // okay that the slot is not found, and we do nothing, because we already stopped all work and cleared the slots.
+            if (completedSlot.Count == 0)
+            {
+                if (_acceptMoreWork)
                 {
-                    AddManager(CreateNewConcurrentManager(), default);
+                    throw new InvalidOperationException("The provided manager was not found in any slot.");
+                }
+                else
+                {
+                    return;
                 }
             }
-            else
+
+            if (completedSlot.Count > 1)
             {
-                // If number of concurrent clients is more than the new level
-                // Dispose off the extra ones
-                int managersCount = _currentParallelLevel - newParallelLevel;
-
-                foreach (var concurrentManager in GetConcurrentManagerInstances())
-                {
-                    if (managersCount == 0)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        RemoveManager(concurrentManager);
-                        managersCount--;
-                    }
-                }
+                throw new InvalidOperationException("The provided manager was found in multiple slots.");
             }
-        }
 
-        // Update current parallel setting to new one
-        _currentParallelLevel = newParallelLevel;
+            var slot = completedSlot[0];
+            slot.IsAvailable = true;
+
+            SetOccupiedSlotCount();
+        }
     }
 
-    public void Dispose()
+    public void DoActionOnAllManagers(Action<TManager> action, bool doActionsInParallel = false)
     {
-        if (_concurrentManagerHandlerMap != null)
-        {
-            foreach (var managerInstance in GetConcurrentManagerInstances())
-            {
-                RemoveManager(managerInstance);
-            }
-        }
-
-        s_instance = default;
-    }
-
-    protected void DoActionOnAllManagers(Action<T> action, bool doActionsInParallel = false)
-    {
-        if (_concurrentManagerHandlerMap == null
-            || _concurrentManagerHandlerMap.IsEmpty)
-        {
-            return;
-        }
-
+        // We don't need to lock here, we just grab the current list of
+        // slots that are occupied (have managers) and run action on each one of them.
+        var managers = _managerSlots.Where(slot => !slot.IsAvailable).Select(slot => slot.Manager).ToList();
         int i = 0;
-        var actionTasks = new Task[_concurrentManagerHandlerMap.Count];
-        foreach (var client in GetConcurrentManagerInstances())
+        var actionTasks = new Task[managers.Count];
+        foreach (var manager in managers)
         {
+            if (manager == null)
+                continue;
+
             // Read the array before firing the task - beware of closures
             if (doActionsInParallel)
             {
-                actionTasks[i] = Task.Run(() => action(client));
+                actionTasks[i] = Task.Run(() => action(manager));
                 i++;
             }
             else
             {
-                DoManagerAction(() => action(client));
+                DoManagerAction(() => action(manager));
             }
         }
 
@@ -235,24 +246,37 @@ internal abstract class ParallelOperationManager<T, TU> : IParallelOperationMana
         }
     }
 
-    /// <summary>
-    /// Fetches the next data object for the concurrent executor to work on
-    /// </summary>
-    /// <param name="source">source data to work on - source file or testCaseList</param>
-    /// <returns>True, if data exists. False otherwise</returns>
-    protected bool TryFetchNextSource<TY>(IEnumerator enumerator, out TY source)
+    internal void StopAllManagers()
     {
-        source = default;
-        var hasNext = false;
-        lock (_sourceEnumeratorLockObject)
-        {
-            if (enumerator != null && enumerator.MoveNext())
-            {
-                source = (TY)enumerator.Current;
-                hasNext = source != null;
-            }
-        }
+        ClearSlots(acceptMoreWork: false);
+    }
 
-        return hasNext;
+    public void Dispose()
+    {
+        ClearSlots(acceptMoreWork: false);
+    }
+
+    private class Slot
+    {
+        public bool IsAvailable { get; set; } = true;
+
+        public TManager? Manager { get; set; }
+
+        public TestRuntimeProviderInfo? ManagerInfo { get; set; }
+
+        public TEventHandler? EventHandler { get; set; }
+
+        public TWorkload? Work { get; set; }
+    }
+
+    private class SlotWorkloadPair
+    {
+        public SlotWorkloadPair(Slot slot, ProviderSpecificWorkload<TWorkload> workload)
+        {
+            Slot = slot;
+            Workload = workload;
+        }
+        public Slot Slot { get; }
+        public ProviderSpecificWorkload<TWorkload> Workload { get; }
     }
 }

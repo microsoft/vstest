@@ -51,6 +51,7 @@ internal class FakeTestDllBuilder
     internal FakeTestDllBuilder WithTestCount(int totalCount, int? batchSize = null)
     {
         _testBatches = new FakeTestBatchBuilder()
+            .WithDllPath(_path)
             .WithTotalCount(totalCount)
             .WithBatchSize(batchSize ?? totalCount)
             .Build();
@@ -63,6 +64,7 @@ internal class FakeTestDllBuilder
         if (_testBatches == null)
         {
             _testBatches = new FakeTestBatchBuilder()
+            .WithDllPath(_path)
             .WithTotalCount(10)
             .WithBatchSize(5)
             .Build();

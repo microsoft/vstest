@@ -22,7 +22,7 @@ internal class TestRequestManagerTestHelper
         _debugOptions = debugOptions;
     }
 
-    public async Task ExecuteWithAbort(Action<TestRequestManager> testRequsestManagerAction)
+    public async Task ExecuteWithAbort(Action<TestRequestManager> testRequestManagerAction)
     {
         // We make sure the test is running for the timeout time at max and then we try to abort
         // if we aborted we write the error to aggregator
@@ -38,18 +38,25 @@ internal class TestRequestManagerTestHelper
         var abortOnTimeout = Task.Run(async () =>
         {
             // Wait until timeout or until we are cancelled.
-            await Task.Delay(TimeSpan.FromSeconds(Debugger.IsAttached ? _debugOptions.DebugTimeout : _debugOptions.Timeout), cancelAbort.Token);
-            if (Debugger.IsAttached && _debugOptions.BreakOnAbort)
+            try
             {
-                var errors = _errorAggregator.Errors;
-                // we will abort because we are hanging, look at errors and at concurrent stacks to see where we are hanging.
-                Debugger.Break();
+                await Task.Delay(TimeSpan.FromSeconds(Debugger.IsAttached ? _debugOptions.DebugTimeout : _debugOptions.Timeout), cancelAbort.Token);
+
+                if (Debugger.IsAttached && _debugOptions.BreakOnAbort)
+                {
+                    var errors = _errorAggregator.Errors;
+                    // we will abort because we are hanging, look at errors and at concurrent stacks to see where we are hanging.
+                    Debugger.Break();
+                }
+                _errorAggregator.Add(new Exception("errr we aborted"));
+                _testRequestManager.AbortTestRun();
             }
-            _errorAggregator.Add(new Exception("errr we aborted"));
-            _testRequestManager.AbortTestRun();
+            catch (TaskCanceledException)
+            {
+            }
         });
 
-        testRequsestManagerAction(_testRequestManager);
+        testRequestManagerAction(_testRequestManager);
 
         cancelAbort.Cancel();
         if (!abortOnTimeout.IsCanceled)

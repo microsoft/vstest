@@ -39,39 +39,70 @@ internal class Program
         var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
-        var consoleOptions = new ConsoleParameters
-        {
-            LogFilePath = Path.Combine(here, "logs", "log.txt"),
-            TraceLevel = TraceLevel.Verbose,
-        };
 
-        var r = new VsTestConsoleWrapper(console, consoleOptions);
 
         var sourceSettings = @"
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
-                        <MaxCpuCount>0</MaxCpuCount>
+                        <MaxCpuCount>4</MaxCpuCount>
                     </RunConfiguration>
                 </RunSettings>
             ";
+
         var sources = new[] {
-            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll")
+            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
+            Path.Combine(playground, "MSTest1", "bin", "Debug", "net5.0", "MSTest1.dll"),
+            @"C:\Users\jajares\source\repos\TestProject48\TestProject48\bin\Debug\net48\TestProject48.dll",
+            @"C:\Users\jajares\source\repos\TestProject48\TestProject1\bin\Debug\net48\win10-x64\TestProject1.dll"
         };
 
+        // console mode
+        var settingsFile = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(settingsFile, sourceSettings);
+            var process = Process.Start(console, string.Join(" ", sources) + " --settings:" + settingsFile + " --listtests");
+            process.WaitForExit();
+            if (process.ExitCode != 0)
+            {
+                throw new Exception($"Process failed with {process.ExitCode}");
+            }
+        }
+        finally
+        {
+            try { File.Delete(settingsFile); } catch { }
+        }
+
+        // design mode
+        var consoleOptions = new ConsoleParameters
+        {
+            LogFilePath = Path.Combine(here, "logs", "log.txt"),
+            TraceLevel = TraceLevel.Verbose,
+        };
         var options = new TestPlatformOptions();
-        r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
+        var r = new VsTestConsoleWrapper(console, consoleOptions);
+        var sessionHandler = new TestSessionHandler();
+#pragma warning disable CS0618 // Type or member is obsolete
+        r.StartTestSession(sources, sourceSettings, sessionHandler);
+#pragma warning restore CS0618 // Type or member is obsolete
+        var discoveryHandler = new PlaygroundTestDiscoveryHandler();
+        r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
     }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
     {
         private int _testCasesCount;
 
+        public List<TestCase> TestCases { get; internal set; } = new List<TestCase>();
+
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
             Console.WriteLine($"[DISCOVERY.PROGRESS]");
             Console.WriteLine(WriteTests(discoveredTestCases));
             _testCasesCount += discoveredTestCases.Count();
+            if (discoveredTestCases != null) { TestCases.AddRange(discoveredTestCases); }
         }
 
         public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
@@ -79,6 +110,7 @@ internal class Program
             Console.WriteLine($"[DISCOVERY.COMPLETE] aborted? {isAborted}, tests count: {totalTests}");
             Console.WriteLine("Last chunk:");
             Console.WriteLine(WriteTests(lastChunk));
+            if (lastChunk != null) { TestCases.AddRange(lastChunk); }
         }
 
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
@@ -92,6 +124,7 @@ internal class Program
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.PartiallyDiscoveredSources));
             Console.WriteLine("Not discovered:");
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.NotDiscoveredSources));
+            if (lastChunk != null) { TestCases.AddRange(lastChunk); }
         }
 
         public void HandleLogMessage(TestMessageLevel level, string message)
@@ -106,7 +139,7 @@ internal class Program
 
         private static string WriteTests(IEnumerable<TestCase> testCases)
             => testCases?.Any() == true
-                ? "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName))
+                ? "\t" + string.Join("\n\t", testCases.Select(r => r.Source + " " + r.DisplayName))
                 : "\t<empty>";
 
         private static string WriteSources(IEnumerable<string> sources)
@@ -181,5 +214,30 @@ internal class Program
         {
             return 1;
         }
+    }
+}
+
+internal class TestSessionHandler : ITestSessionEventsHandler
+{
+    public TestSessionInfo TestSessionInfo { get; private set; }
+
+    public void HandleLogMessage(TestMessageLevel level, string message)
+    {
+
+    }
+
+    public void HandleRawMessage(string rawMessage)
+    {
+
+    }
+
+    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs)
+    {
+        TestSessionInfo = eventArgs.TestSessionInfo;
+    }
+
+    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs eventArgs)
+    {
+
     }
 }

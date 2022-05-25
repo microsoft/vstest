@@ -124,9 +124,12 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     }
 
     /// <inheritdoc/>
-    public async Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
+    public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
     {
-        return await Task.Run(() => LaunchHost(testHostStartInfo, cancellationToken), cancellationToken);
+        // Do NOT offload this to thread pool using Task.Run, we already are on thread pool
+        // and this would go into a queue after all the other startup tasks. Meaning we will start
+        // testhost much later, and not immediately.
+        return Task.FromResult(LaunchHost(testHostStartInfo, cancellationToken));
     }
 
     /// <inheritdoc/>

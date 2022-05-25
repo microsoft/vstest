@@ -11,6 +11,7 @@ internal class FakeTestBatchBuilder
     public TimeSpan Duration { get; private set; }
     public int BatchSize { get; private set; }
     public static List<List<TestResult>> Empty => new();
+    public string? Source { get; private set; }
 
     public FakeTestBatchBuilder()
     {
@@ -45,6 +46,17 @@ internal class FakeTestBatchBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets the dll path (source) to be the provided value.
+    /// </summary>
+    /// <param name="batchSize"></param>
+    /// <returns></returns>
+    internal FakeTestBatchBuilder WithDllPath(string path)
+    {
+        Source = path;
+        return this;
+    }
+
     internal List<List<TestResult>> Build()
     {
         if (BatchSize == 0 && TotalCount != 0)
@@ -55,16 +67,17 @@ internal class FakeTestBatchBuilder
 
         var numberOfBatches = Math.DivRem(TotalCount, BatchSize, out int remainder);
 
-        // TODO: Add adapter uri, and dll name
+        var source = Source ?? "DummySourceFileName";
+        // TODO: Add adapter uri
         // TODO: set duration
         var batches = Enumerable.Range(0, numberOfBatches)
             .Select(batchNumber => Enumerable.Range(0, BatchSize)
-                .Select((index) => new TestResult(new TestCase($"Test{batchNumber}-{index}", new Uri("some://uri"), "DummySourceFileName"))).ToList()).ToList();
+                .Select((index) => new TestResult(new TestCase($"Test{batchNumber}-{index}", new Uri("some://uri"), source))).ToList()).ToList();
 
         if (remainder > 0)
         {
             var reminderBatch = Enumerable.Range(0, remainder)
-                .Select((index) => new TestResult(new TestCase($"Test{numberOfBatches + 1}-{index}", new Uri("some://uri"), "DummySourceFileName"))).ToList();
+                .Select((index) => new TestResult(new TestCase($"Test{numberOfBatches + 1}-{index}", new Uri("some://uri"), source))).ToList();
 
             batches.Add(reminderBatch);
         }

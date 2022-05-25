@@ -571,6 +571,7 @@ public class RunConfiguration : TestRunSettings
             while (reader.NodeType == XmlNodeType.Element)
             {
                 string elementName = reader.Name;
+                // TODO: make run settings nodes case insensitive?
                 switch (elementName)
                 {
                     case "ResultsDirectory":

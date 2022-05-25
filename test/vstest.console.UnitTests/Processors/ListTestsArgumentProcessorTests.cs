@@ -159,7 +159,7 @@ public class ListTestsArgumentProcessorTests
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
         mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Throws(new TestPlatformException("DummyTestPlatformException"));
-        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockDiscoveryRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions();
 
@@ -176,7 +176,7 @@ public class ListTestsArgumentProcessorTests
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
         mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Throws(new SettingsException("DummySettingsException"));
-        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockDiscoveryRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions();
 
@@ -193,7 +193,7 @@ public class ListTestsArgumentProcessorTests
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
         mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Throws(new InvalidOperationException("DummyInvalidOperationException"));
-        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockDiscoveryRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions();
 
@@ -210,7 +210,7 @@ public class ListTestsArgumentProcessorTests
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
         mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Throws(new Exception("DummyException"));
-        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockDiscoveryRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions();
 
@@ -268,7 +268,7 @@ public class ListTestsArgumentProcessorTests
         };
         mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
 
-        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockDiscoveryRequest.Object);
 
 
         ResetAndAddSourceToCommandLineOptions();

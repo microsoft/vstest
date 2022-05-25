@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 using static System.Console;
 using static System.ConsoleColor;
@@ -11,27 +10,19 @@ namespace Intent.Console;
 
 internal class ConsoleLogger : IRunLogger
 {
-    public void WriteTestInconclusive(MethodInfo m)
-    {
-        var currentColor = ForegroundColor;
-        ForegroundColor = Yellow;
-        WriteLine($"[?] {FormatMethodName(m.Name)}");
-        ForegroundColor = currentColor;
-    }
-
-    public void WriteTestPassed(MethodInfo m)
+    public void WriteTestPassed(MethodInfo m, TimeSpan t)
     {
         var currentColor = ForegroundColor;
         ForegroundColor = Green;
-        WriteLine($"[+] {FormatMethodName(m.Name)}");
+        WriteLine($"[+] {FormatMethodName(m)} {(int)t.TotalMilliseconds} ms");
         ForegroundColor = currentColor;
     }
 
-    public void WriteTestFailure(MethodInfo m, Exception ex)
+    public void WriteTestFailure(MethodInfo m, Exception ex, TimeSpan t)
     {
         var currentColor = ForegroundColor;
         ForegroundColor = Red;
-        WriteLine($"[-] {FormatMethodName(m.Name)}{Environment.NewLine}{ex}");
+        WriteLine($"[-] {FormatMethodName(m)} {(int)t.TotalMilliseconds} ms{Environment.NewLine}{ex}");
         ForegroundColor = currentColor;
     }
 
@@ -43,16 +34,30 @@ internal class ConsoleLogger : IRunLogger
         ForegroundColor = currentColor;
     }
 
-    private static string FormatMethodName(string methodName)
+    private static string FormatMethodName(MethodInfo method)
     {
-        var noUnderscores = methodName.Replace('_', ' ');
-        // insert space before every capital letter or number that is after a non-capital letter
-        var spaced = Regex.Replace(noUnderscores, "(?<=[a-z])([A-Z0-9])", " $1");
-        // insert space before every capital leter that is after a number
-        var spaced2 = Regex.Replace(spaced, "(?<=[0-9]|^)([A-Z])", " $1");
-        var newLines = spaced2.Replace("When", $"{Environment.NewLine}     When")
-            .Replace("Then", $"{Environment.NewLine}     Then");
+        var methodName = method.GetCustomAttribute<TestAttribute>() is TestAttribute test ? test.Name : method.Name;
+        if (!methodName.Contains('\n'))
+        {
+            return methodName;
+        }
 
-        return newLines.ToLowerInvariant();
+        var lines = methodName.Split('\n').Select(line => line.Trim());
+        var first = lines.Take(1).ToList();
+        var rest = lines.Skip(1).Select(l => $"{Environment.NewLine}     {l}").ToList();
+
+        return string.Join(null, first.Concat(rest));
+    }
+
+    public void WriteSummary(int passed, List<(MethodInfo method, Exception exception, TimeSpan time)> failures, TimeSpan duration)
+    {
+        WriteLine();
+        WriteLine();
+        if (failures.Count > 0) {
+            WriteLine($"There were {failures.Count} failures:");
+        }
+        failures.ForEach(t => { WriteTestFailure(t.method, t.exception, t.time); WriteLine(); });
+        WriteLine();
+        WriteLine($"Test run finished: Total: {passed + failures.Count} Passed: {passed} Failed: {failures.Count} Duration: {(int)duration.TotalMilliseconds} ms");
     }
 }

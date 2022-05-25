@@ -30,7 +30,9 @@ public class CuitTest : AcceptanceTestBase
         }
 
         var assemblyAbsolutePath = _testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
+
         var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
+        arguments += " -- RunConfiguration.TargetPlatform=x86";
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 0, 0);
