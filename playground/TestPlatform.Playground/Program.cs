@@ -40,13 +40,23 @@ internal class Program
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
 
-        var maxCpuCount = 1;
-        var sourceSettings = $@"
+        var discoverySettings = $@"
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
-                        <MaxCpuCount>{maxCpuCount}</MaxCpuCount>
-<DisableAppDomain>false</DisableAppDomain>
+                        <MaxCpuCount>0</MaxCpuCount>
+<DisableAppDomain>False</DisableAppDomain>
+<BatchSize>10</BatchSize>
+                    </RunConfiguration>
+                </RunSettings>
+            ";
+
+        var runSettings = $@"
+                <RunSettings>
+                    <RunConfiguration>
+                        <InIsolation>true</InIsolation>
+                        <MaxCpuCount>1</MaxCpuCount>
+<DisableAppDomain>False</DisableAppDomain>
 <BatchSize>10</BatchSize>
                     </RunConfiguration>
                 </RunSettings>
@@ -62,28 +72,28 @@ internal class Program
 
 
 ////            // net6
-        @"C:\t\ParallelDiscovery2\ReproNetCore\Test1\bin\Debug\net6.0\Test1.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test7\bin\Debug\net6.0\Test7.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test2\bin\Debug\net6.0\Test2.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test6\bin\Debug\net6.0\Test6.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test8\bin\Debug\net6.0\Test8.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test5\bin\Debug\net6.0\Test5.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test3\bin\Debug\net6.0\Test3.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test4\bin\Debug\net6.0\Test4.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test10\bin\Debug\net6.0\Test10.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test9\bin\Debug\net6.0\Test9.dll",
+//        @"C:\t\ParallelDiscovery2\ReproNetCore\Test1\bin\Debug\net6.0\Test1.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test7\bin\Debug\net6.0\Test7.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test2\bin\Debug\net6.0\Test2.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test6\bin\Debug\net6.0\Test6.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test8\bin\Debug\net6.0\Test8.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test5\bin\Debug\net6.0\Test5.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test3\bin\Debug\net6.0\Test3.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test4\bin\Debug\net6.0\Test4.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test10\bin\Debug\net6.0\Test10.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test9\bin\Debug\net6.0\Test9.dll",
 
         //// netfx
-         //@"C:\t\ParallelDiscovery2\ReproNetFx\Project4\bin\Debug\net472\Project4.dll",
-         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project1\bin\Debug\net472\Project1.dll",
-         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project2\bin\Debug\net472\Project2.dll",
-         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project3\bin\Debug\net472\Project3.dll",
-         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project9\bin\Debug\net472\Project9.dll",
-         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project10\bin\Debug\net472\Project10.dll",
-         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project5\bin\Debug\net472\Project5.dll",
-         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project8\bin\Debug\net472\Project8.dll",
-         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project7\bin\Debug\net472\Project7.dll",
-         //      @"C:\t\ParallelDiscovery2\ReproNetFx\Project6\bin\Debug\net472\Project6.dll",
+         @"C:\t\ParallelDiscovery2\ReproNetFx\Project4\bin\Debug\net472\Project4.dll",
+               @"C:\t\ParallelDiscovery2\ReproNetFx\Project1\bin\Debug\net472\Project1.dll",
+               @"C:\t\ParallelDiscovery2\ReproNetFx\Project2\bin\Debug\net472\Project2.dll",
+               @"C:\t\ParallelDiscovery2\ReproNetFx\Project3\bin\Debug\net472\Project3.dll",
+               @"C:\t\ParallelDiscovery2\ReproNetFx\Project9\bin\Debug\net472\Project9.dll",
+               @"C:\t\ParallelDiscovery2\ReproNetFx\Project10\bin\Debug\net472\Project10.dll",
+               @"C:\t\ParallelDiscovery2\ReproNetFx\Project5\bin\Debug\net472\Project5.dll",
+               @"C:\t\ParallelDiscovery2\ReproNetFx\Project8\bin\Debug\net472\Project8.dll",
+               @"C:\t\ParallelDiscovery2\ReproNetFx\Project7\bin\Debug\net472\Project7.dll",
+               @"C:\t\ParallelDiscovery2\ReproNetFx\Project6\bin\Debug\net472\Project6.dll",
 
         };
 
@@ -122,13 +132,13 @@ internal class Program
         var sw = Stopwatch.StartNew();
 
         var discoveryHandler = new PlaygroundTestDiscoveryHandler();
-        r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        r.DiscoverTests(sources, discoverySettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
         var dd = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery done in {sw.ElapsedMilliseconds} ms");
         sw.Restart();
-        r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, runSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
         var rd = sw.ElapsedMilliseconds;
-        Console.WriteLine($"MaxCpuCount: {maxCpuCount}, Discovery: {dd} ms, Run: {rd} ms, Total: {dd + rd} ms");
+        Console.WriteLine($"Discovery: {dd} ms, Run: {rd} ms, Total: {dd + rd} ms");
     }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2

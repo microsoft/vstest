@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
+using Microsoft.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -157,19 +158,14 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         // that come in at the same time we only block them from reserving the same slot at the same time
         // but not from starting their assigned work at the same time.
 
-        // Kick of all pre-started hosts first.
+        // Kick of all pre-started hosts from the ones that had the longest time to initialize.
         var startedWork = 0;
-        foreach (var slot in slots)
+        foreach (var slot in slots.Where(s => s.HasWork && !s.IsRunning && s.IsPreStarted).OrderBy(s => s.PreStartTime))
         {
-            if (slot.HasWork && !slot.IsRunning)
-            {
-                if (slot.IsPreStarted)
-                {
-                    startedWork++;
-                    slot.IsRunning = true;
-                    _runWorkload(slot.Manager!, slot.EventHandler!, slot.Work!, slot.IsPreStarted, slot.InitTask);
-                }
-            }
+            startedWork++;
+            slot.IsRunning = true;
+            System.Diagnostics.Debug.Write($">>>>>>>>> run on pre-started host: {(DateTime.Now.TimeOfDay - slot.PreStartTime).TotalMilliseconds}ms {slot.InitTask.Status}");
+            _runWorkload(slot.Manager!, slot.EventHandler!, slot.Work!, slot.IsPreStarted, slot.InitTask);
 
             // We already started as many as we were allowed, jump out;
             if (startedWork == MaxParallelLevel)
@@ -190,6 +186,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                     {
                         startedWork++;
                         slot.IsRunning = true;
+                        System.Diagnostics.Debug.Write($">>>>>>>>> started work on host");
                         _runWorkload(slot.Manager!, slot.EventHandler!, slot.Work!, slot.IsPreStarted, slot.InitTask);
                     }
                 }
@@ -208,7 +205,9 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             if (slot.HasWork && slot.ShouldPreStart && !slot.IsPreStarted)
             {
                 preStartedWork++;
+                slot.PreStartTime = DateTime.Now.TimeOfDay;
                 slot.IsPreStarted = true;
+                System.Diagnostics.Debug.Write($">>>>>>>>> pre-start a host");
                 slot.InitTask = _initializeWorkload(slot.Manager!, slot.EventHandler!, slot.Work!);
             }
         }
@@ -251,6 +250,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             }
 
             var slot = completedSlot[0];
+            slot.PreStartTime = TimeSpan.Zero;
             slot.Work = default(TWorkload);
             slot.HasWork = false;
             slot.ShouldPreStart = false;
@@ -338,6 +338,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
 
         public TWorkload? Work { get; set; }
         public bool IsPreStarted { get; internal set; }
+        public TimeSpan PreStartTime { get; internal set; }
 
         public override string ToString()
         {
