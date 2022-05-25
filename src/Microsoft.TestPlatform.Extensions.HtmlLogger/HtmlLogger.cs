@@ -309,11 +309,10 @@ public class HtmlLogger : ITestLoggerWithParameters
                 _xmlSerializer.WriteObject(xmlStream, TestRunDetails);
             }
 
-            HtmlFilePath = GenerateUniqueFilePath(
-                string.IsNullOrEmpty(HtmlFilePath)
-                    ? fileName
-                    : Path.GetFileNameWithoutExtension(HtmlFilePath),
-                HtmlLoggerConstants.HtmlFileExtension);
+            if (string.IsNullOrEmpty(HtmlFilePath))
+            {
+                HtmlFilePath = GenerateUniqueFilePath(fileName, HtmlLoggerConstants.HtmlFileExtension);
+            }
 
             _htmlTransformer.Transform(XmlFilePath, HtmlFilePath);
         }
@@ -348,7 +347,7 @@ public class HtmlLogger : ITestLoggerWithParameters
             {
                 if (!File.Exists(fullFilePath))
                 {
-                    File.Create(fullFilePath);
+                    using var _ = File.Create(fullFilePath);
                     return fullFilePath;
                 }
             }
