@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -153,7 +154,7 @@ internal static class ProcessCodeMethods
             var stat = File.ReadAllText(path);
             var parts = stat.Split(' ');
 
-            return parts.Length < 5 ? InvalidProcessId : int.Parse(parts[3]);
+            return parts.Length < 5 ? InvalidProcessId : int.Parse(parts[3], CultureInfo.CurrentCulture);
         }
         catch (Exception ex)
         {

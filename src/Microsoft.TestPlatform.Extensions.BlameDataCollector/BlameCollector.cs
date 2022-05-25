@@ -201,16 +201,16 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
         if (_inactivityTimespan.TotalSeconds <= 90)
         {
-            value = ((int)_inactivityTimespan.TotalSeconds).ToString();
+            value = ((int)_inactivityTimespan.TotalSeconds).ToString(CultureInfo.InvariantCulture);
             unit = Resources.Resources.Seconds;
         }
         else
         {
-            value = Math.Round(_inactivityTimespan.TotalMinutes, 2).ToString();
+            value = Math.Round(_inactivityTimespan.TotalMinutes, 2).ToString(CultureInfo.InvariantCulture);
             unit = Resources.Resources.Minutes;
         }
 
-        var message = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.InactivityTimeout, value, unit);
+        var message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.InactivityTimeout, value, unit);
 
         EqtTrace.Warning(message);
         _logger.LogWarning(_context.SessionDataCollectionContext, message);
@@ -340,7 +340,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
                 default:
 
-                    _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, blameAttribute.Name));
+                    _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.BlameParameterKeyIncorrect, blameAttribute.Name));
                     break;
             }
         }
@@ -348,7 +348,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
     internal static string FormatBlameParameterValueIncorrectMessage(XmlAttribute attribute, params string[] validValues)
     {
-        return string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, attribute.Value, string.Join(", ", validValues));
+        return string.Format(CultureInfo.CurrentCulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, attribute.Value, string.Join(", ", validValues));
     }
 
     private void ValidateAndAddHangProcessDumpParameters(XmlElement collectDumpNode)
@@ -366,7 +366,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                     }
                     else
                     {
-                        _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.UnexpectedValueForInactivityTimespanValue, attribute.Value));
+                        _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.UnexpectedValueForInactivityTimespanValue, attribute.Value));
                     }
 
                     break;
@@ -403,7 +403,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
                 default:
 
-                    _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, blameAttribute.Name));
+                    _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.BlameParameterKeyIncorrect, blameAttribute.Name));
                     break;
             }
         }
@@ -561,12 +561,12 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         catch (TestPlatformException e)
         {
             EqtTrace.Warning("BlameCollector.TestHostLaunchedHandler: Could not start process dump. {0}", e);
-            _logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, e.Message));
+            _logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentCulture, Resources.Resources.ProcDumpCouldNotStart, e.Message));
         }
         catch (Exception e)
         {
             EqtTrace.Warning("BlameCollector.TestHostLaunchedHandler: Could not start process dump. {0}", e);
-            _logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, e.ToString()));
+            _logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentCulture, Resources.Resources.ProcDumpCouldNotStart, e.ToString()));
         }
     }
 
