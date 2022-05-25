@@ -381,7 +381,7 @@ internal class TestResult : ITestResult, IXmlTestStore
             if (_testRun == null)
             {
                 Debug.Fail("'m_testRun' is null");
-                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunInResult));
+                throw new InvalidOperationException(TrxLoggerResources.Common_MissingRunInResult);
             }
 
             return _testRun.GetResultFilesDirectory(this);

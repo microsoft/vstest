@@ -140,8 +140,7 @@ public class TrxLogger : ITestLoggerWithParameters
 
         if (isLogFilePrefixParameterExists && isLogFileNameParameterExists)
         {
-            var trxParameterErrorMsg = string.Format(CultureInfo.CurrentCulture,
-                TrxLoggerResources.PrefixAndNameProvidedError);
+            var trxParameterErrorMsg = TrxLoggerResources.PrefixAndNameProvidedError;
 
             EqtTrace.Error(trxParameterErrorMsg);
             throw new ArgumentException(trxParameterErrorMsg);

@@ -69,7 +69,7 @@ internal class Converter
         }
 
         var workItems = GetCustomPropertyValueFromTestCase(rockSteadyTestCase, "WorkItemIds")
-            .Select(workItem => int.Parse(workItem));
+            .Select(workItem => int.Parse(workItem, CultureInfo.CurrentCulture));
         foreach (int workItem in workItems)
         {
             testElement.WorkItems.Add(workItem);
