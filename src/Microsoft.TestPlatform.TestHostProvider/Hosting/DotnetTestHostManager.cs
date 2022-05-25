@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -435,7 +436,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 PlatformArchitecture finalTargetArchitecture = forceToX64 ? PlatformArchitecture.X64 : targetArchitecture;
                 if (!_dotnetHostHelper.TryGetDotnetPathByArchitecture(finalTargetArchitecture, out string? muxerPath))
                 {
-                    string message = string.Format(Resources.NoDotnetMuxerFoundForArchitecture, $"dotnet{(_platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : string.Empty)}", finalTargetArchitecture.ToString());
+                    string message = string.Format(CultureInfo.CurrentCulture, Resources.NoDotnetMuxerFoundForArchitecture, $"dotnet{(_platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : string.Empty)}", finalTargetArchitecture.ToString());
                     EqtTrace.Error(message);
                     throw new TestPlatformException(message);
                 }
