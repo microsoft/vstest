@@ -9,8 +9,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.VisualStudio.TestPlatform.Common;
-using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
@@ -162,8 +160,7 @@ internal class DefaultEngineInvoker :
         // version of vstest.console.
         var telemetryStatus = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, TelemetryOptedIn);
 
-        return !string.IsNullOrWhiteSpace(telemetryStatus)
-            && telemetryStatus.Equals("true", StringComparison.Ordinal);
+        return string.Equals(telemetryStatus, "true", StringComparison.Ordinal);
     }
 
     private void ConnectToDatacollector(int dcPort)
