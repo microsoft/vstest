@@ -106,7 +106,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         // extra double quotes before testing whether the file exists.
         if (!File.Exists(consoleRunnerPath.Trim('"')))
         {
-            throw new FileNotFoundException(string.Format(InternalResources.CannotFindConsoleRunner, consoleRunnerPath), consoleRunnerPath);
+            throw new FileNotFoundException(string.Format(CultureInfo.CurrentCulture, InternalResources.CannotFindConsoleRunner, consoleRunnerPath), consoleRunnerPath);
         }
 
         var arguments = string.Join(" ", BuildArguments(consoleParameters));
@@ -147,7 +147,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         }
         catch (Win32Exception ex)
         {
-            throw new Exception(string.Format(InternalResources.ProcessStartWin32Failure, consoleRunnerPath, arguments), ex);
+            throw new Exception(string.Format(CultureInfo.CurrentCulture, InternalResources.ProcessStartWin32Failure, consoleRunnerPath, arguments), ex);
         }
 
         lock (_syncObject)
