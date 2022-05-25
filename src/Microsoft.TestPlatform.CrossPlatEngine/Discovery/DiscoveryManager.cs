@@ -74,7 +74,7 @@ public class DiscoveryManager : IDiscoveryManager
     public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestDiscoveryEventsHandler2 eventHandler)
     {
         // Clear the request data metrics left over from a potential previous run.
-        _requestData.MetricsCollection.Metrics.Clear();
+        _requestData.MetricsCollection?.Metrics?.Clear();
 
         _testPlatformEventSource.AdapterSearchStart();
         _testDiscoveryEventsHandler = eventHandler;
