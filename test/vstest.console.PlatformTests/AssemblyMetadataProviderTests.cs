@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -99,7 +100,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
         var arch = _assemblyMetadataProvider.GetArchitecture(assemblyPath);
         stopWatch.Stop();
 
-        Console.WriteLine("Platform:{0}, {1}", platform, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+        Console.WriteLine("Platform:{0}, {1}", platform, string.Format(CultureInfo.CurrentCulture, PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         Assert.AreEqual(Enum.Parse(typeof(Architecture), platform, ignoreCase: true), arch);
 
         // We should not assert on time elapsed, it will vary depending on machine, & their state, commenting below assert
@@ -129,7 +130,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
             Assert.AreEqual(".NETCoreApp,Version=v2.1", actualFx.FullName);
         }
 
-        Console.WriteLine("Framework:{0}, {1}", framework, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+        Console.WriteLine("Framework:{0}, {1}", framework, string.Format(CultureInfo.CurrentCulture, PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
 
         // We should not assert on time elapsed, it will vary depending on machine, & their state.
         // Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
@@ -161,7 +162,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
         var arch = _assemblyMetadataProvider.GetArchitecture(assemblyPath);
         stopWatch.Stop();
 
-        Console.WriteLine("Framework:{0}, {1}", framework, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+        Console.WriteLine("Framework:{0}, {1}", framework, string.Format(CultureInfo.CurrentCulture, PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         Assert.AreEqual(expectedArch, arch, $"Expected: {expectedArch} Actual: {arch}");
 
         // We should not assert on time elapsed, it will vary depending on machine, & their state.

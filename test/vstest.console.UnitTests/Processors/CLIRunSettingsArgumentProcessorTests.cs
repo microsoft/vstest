@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
@@ -154,7 +155,7 @@ public class CliRunSettingsArgumentProcessorTests
     public void InitializeShouldThrowErrorIfArgumentIsInValid(string arg)
     {
         var args = new string[] { arg };
-        var str = string.Format(CommandLineResources.MalformedRunSettingsKey);
+        var str = CommandLineResources.MalformedRunSettingsKey;
 
         CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(args));
 
@@ -331,7 +332,7 @@ public class CliRunSettingsArgumentProcessorTests
     public void InitializeShouldThrowErrorIfTestRunParameterNodeIsInValid(string arg)
     {
         var args = new string[] { arg };
-        var str = string.Format(CommandLineResources.InvalidTestRunParameterArgument, arg);
+        var str = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestRunParameterArgument, arg);
 
         CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(args));
 

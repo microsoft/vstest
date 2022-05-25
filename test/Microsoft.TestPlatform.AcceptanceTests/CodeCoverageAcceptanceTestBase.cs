@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 
@@ -54,7 +55,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
 
     protected static XmlNode? GetNode(XmlNode node, string type, string name)
     {
-        return node.SelectSingleNode($"//{type}[@name='{name}']") ?? node.SelectSingleNode($"//{type}[@name='{name.ToLower()}']");
+        return node.SelectSingleNode($"//{type}[@name='{name}']") ?? node.SelectSingleNode($"//{type}[@name='{name.ToLower(CultureInfo.CurrentCulture)}']");
     }
 
     protected static XmlDocument GetXmlCoverage(string coverageResult, TempDirectory tempDirectory)
@@ -97,8 +98,8 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
     protected static void AssertCoverage(XmlNode node, double expectedCoverage)
     {
         var coverage = node.Attributes!["block_coverage"] != null
-            ? double.Parse(node.Attributes!["block_coverage"]!.Value)
-            : double.Parse(node.Attributes!["line-rate"]!.Value) * 100;
+            ? double.Parse(node.Attributes!["block_coverage"]!.Value, CultureInfo.InvariantCulture)
+            : double.Parse(node.Attributes!["line-rate"]!.Value, CultureInfo.InvariantCulture) * 100;
         Console.WriteLine($"Checking coverage for {node.Name} {node.Attributes!["name"]!.Value}. Expected at least: {expectedCoverage}. Result: {coverage}");
         Assert.IsTrue(coverage > expectedCoverage, $"Coverage check failed for {node.Name} {node.Attributes!["name"]!.Value}. Expected at least: {expectedCoverage}. Found: {coverage}");
     }

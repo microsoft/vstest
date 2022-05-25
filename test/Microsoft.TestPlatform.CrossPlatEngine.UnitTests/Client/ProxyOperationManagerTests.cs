@@ -93,7 +93,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
                     It.IsAny<IEnumerable<string>>(),
                     It.IsAny<Dictionary<string, string?>>(),
                     It.Is<TestRunnerConnectionInfo>(
-                        t => t.LogFile!.Contains("log.host." + DateTime.Now.ToString("yy-MM-dd"))
+                        t => t.LogFile.Contains("log.host." + DateTime.Now.ToString("yy-MM-dd", CultureInfo.CurrentCulture))
                              && t.LogFile.Contains("_" + Environment.CurrentManagedThreadId + ".txt"))));
 #if NETFRAMEWORK
         EqtTrace.TraceLevel = TraceLevel.Off;
@@ -309,7 +309,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object);
 
         var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings)).Message;
-        Assert.AreEqual(message, string.Format(CultureInfo.CurrentUICulture, Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources.InitializationFailed));
+        Assert.AreEqual(message, Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources.InitializationFailed);
     }
 
     [TestMethod]

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -97,7 +98,7 @@ public class RunTestsWithSourcesTests
 
         var messageFormat =
             "No test is available in {0}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.";
-        var message = string.Format(messageFormat, "a aa b ab");
+        var message = string.Format(CultureInfo.CurrentCulture, messageFormat, "a aa b ab");
         _mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, message),
             Times.Once);
     }

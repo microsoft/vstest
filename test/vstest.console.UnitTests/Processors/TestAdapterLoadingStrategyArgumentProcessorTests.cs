@@ -53,7 +53,7 @@ public class TestAdapterLoadingStrategyArgumentProcessorTests
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
 
         var tempPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables("%temp%"));
-        Assert.AreEqual(string.Format("{0}\\adapters1;{0}\\adapters2", tempPath), runConfiguration.TestAdaptersPaths);
+        Assert.AreEqual($"{tempPath}\\adapters1;{tempPath}\\adapters2", runConfiguration.TestAdaptersPaths);
     }
 
     [TestMethod]
@@ -71,10 +71,7 @@ public class TestAdapterLoadingStrategyArgumentProcessorTests
         mockFileHelper.Setup(x => x.DirectoryExists("c:\\users")).Returns(true);
         var executor = new TestAdapterLoadingStrategyArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, mockFileHelper.Object);
 
-        var message = string.Format(
-            @"The path '{0}' specified in the 'TestAdapterPath' is invalid. Error: {1}",
-            "d:\\users",
-            "The custom test adapter search path provided was not found, provide a valid path and try again.");
+        var message = "The path 'd:\\users' specified in the 'TestAdapterPath' is invalid. Error: The custom test adapter search path provided was not found, provide a valid path and try again.";
 
         var isExceptionThrown = false;
         try
@@ -105,10 +102,7 @@ public class TestAdapterLoadingStrategyArgumentProcessorTests
         var mockOutput = new Mock<IOutput>();
         var executor = new TestAdapterLoadingStrategyArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, new FileHelper());
 
-        var message = string.Format(
-            @"The path '{0}' specified in the 'TestAdapterPath' is invalid. Error: {1}",
-            folder,
-            "The custom test adapter search path provided was not found, provide a valid path and try again.");
+        var message = $"The path '{folder}' specified in the 'TestAdapterPath' is invalid. Error: The custom test adapter search path provided was not found, provide a valid path and try again.";
 
         var isExceptionThrown = false;
 

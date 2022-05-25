@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -796,7 +797,7 @@ public class TestRequestSenderTests
             .Returns(_connectionInfo.Endpoint)
             .Callback(() => _mockServer.Raise(s => s.Connected += null, _mockServer.Object, _connectedEventArgs));
 
-        return _testRequestSender.InitializeCommunication().ToString();
+        return _testRequestSender.InitializeCommunication().ToString(CultureInfo.CurrentCulture);
     }
 
     private void SetupFakeChannelWithVersionNegotiation(int protocolVersion)

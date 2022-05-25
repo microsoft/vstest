@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -87,7 +88,7 @@ public class ParentProcessIdArgumentProcessorTests
     {
         var executor = new ParentProcessIdArgumentExecutor(CommandLineOptions.Instance);
         int parentProcessId = 2345;
-        executor.Initialize(parentProcessId.ToString());
+        executor.Initialize(parentProcessId.ToString(CultureInfo.InvariantCulture));
         Assert.AreEqual(parentProcessId, CommandLineOptions.Instance.ParentProcessId);
     }
 
@@ -97,7 +98,7 @@ public class ParentProcessIdArgumentProcessorTests
         var executor = new ParentProcessIdArgumentExecutor(CommandLineOptions.Instance);
 
         int parentProcessId = 2345;
-        executor.Initialize(parentProcessId.ToString());
+        executor.Initialize(parentProcessId.ToString(CultureInfo.InvariantCulture));
         var result = executor.Execute();
 
         Assert.AreEqual(ArgumentProcessorResult.Success, result);

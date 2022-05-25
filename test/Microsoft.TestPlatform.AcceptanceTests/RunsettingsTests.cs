@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -341,7 +342,7 @@ public class RunsettingsTests : AcceptanceTestBase
                                    </RunSettings>";
 
         // Scripts have relative paths to temp directory where the runsettings is created.
-        var runsettingsXml = string.Format(runsettingsFormat, setupScriptName, cleanupScriptName);
+        var runsettingsXml = string.Format(CultureInfo.CurrentCulture, runsettingsFormat, setupScriptName, cleanupScriptName);
         var runsettingsPath = GetRunsettingsFilePath(null, TempDirectory);
         File.WriteAllText(runsettingsPath, runsettingsXml);
 
@@ -382,7 +383,7 @@ public class RunsettingsTests : AcceptanceTestBase
                                     </LegacySettings>
                                    </RunSettings>";
 
-        var runsettingsXml = string.Format(runsettingsFormat, deploymentItem);
+        var runsettingsXml = string.Format(CultureInfo.CurrentCulture, runsettingsFormat, deploymentItem);
         var runsettingsPath = GetRunsettingsFilePath(null, TempDirectory);
         File.WriteAllText(runsettingsPath, runsettingsXml);
 
@@ -449,7 +450,7 @@ public class RunsettingsTests : AcceptanceTestBase
                                    </RunSettings>";
 
         var testAssemblyDirectory = Path.Combine(_testEnvironment.TestAssetsPath, "LegacySettingsUnitTestProject", "DependencyAssembly");
-        var runsettingsXml = string.Format(runsettingsFormat, testAssemblyDirectory);
+        var runsettingsXml = string.Format(CultureInfo.CurrentCulture, runsettingsFormat, testAssemblyDirectory);
         var runsettingsPath = GetRunsettingsFilePath(null, TempDirectory);
         File.WriteAllText(runsettingsPath, runsettingsXml);
         var arguments = PrepareArguments(testAssemblyPath, string.Empty, runsettingsPath, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);

@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -307,6 +308,7 @@ public class IntegrationTestBase
         {
             // No test should be found/run
             var summaryStatus = string.Format(
+                CultureInfo.CurrentCulture,
                 TestSummaryStatusMessageFormat,
                 @"\d+",
                 @"\d+",
@@ -323,20 +325,20 @@ public class IntegrationTestBase
         }
         else
         {
-            var summaryStatus = string.Format(TotalTestsMessage, totalTestCount);
+            var summaryStatus = string.Format(CultureInfo.CurrentCulture, TotalTestsMessage, totalTestCount);
             if (passed != 0)
             {
-                summaryStatus += string.Format(PassedTestsMessage, passed);
+                summaryStatus += string.Format(CultureInfo.CurrentCulture, PassedTestsMessage, passed);
             }
 
             if (failed != 0)
             {
-                summaryStatus += string.Format(FailedTestsMessage, failed);
+                summaryStatus += string.Format(CultureInfo.CurrentCulture, FailedTestsMessage, failed);
             }
 
             if (skipped != 0)
             {
-                summaryStatus += string.Format(SkippedTestsMessage, skipped);
+                summaryStatus += string.Format(CultureInfo.CurrentCulture, SkippedTestsMessage, skipped);
             }
 
             Assert.IsTrue(
@@ -439,7 +441,7 @@ public class IntegrationTestBase
     public void ValidatePassedTests(params string[] passedTests)
     {
         // Convert the unicode character to its unicode value for assertion
-        _standardTestOutput = Regex.Replace(_standardTestOutput, @"[^\x00-\x7F]", c => string.Format(@"\u{0:x4}", (int)c.Value[0]));
+        _standardTestOutput = Regex.Replace(_standardTestOutput, @"[^\x00-\x7F]", c => $@"\u{(int)c.Value[0]:x4}");
         foreach (var test in passedTests)
         {
             // Check for tick or ? both, in some cases as unicode character for tick is not available
@@ -578,19 +580,19 @@ public class IntegrationTestBase
 
         if (testFramework == UnitTestFramework.MSTest)
         {
-            adapterRelativePath = string.Format(_testAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["MSTestAdapterVersion"]);
+            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _testAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["MSTestAdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.NUnit)
         {
-            adapterRelativePath = string.Format(_nUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
+            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _nUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.XUnit)
         {
-            adapterRelativePath = string.Format(_xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"]);
+            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.Chutzpah)
         {
-            adapterRelativePath = string.Format(_chutzpahTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
+            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _chutzpahTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
         }
 
         return _testEnvironment.GetNugetPackage(adapterRelativePath);

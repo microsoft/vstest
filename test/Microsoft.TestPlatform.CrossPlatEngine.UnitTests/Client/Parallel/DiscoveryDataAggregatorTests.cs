@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -75,7 +76,7 @@ public class DiscoveryDataAggregatorTests
         var runMetrics = aggregator.GetMetrics();
 
         Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsDiscovered, out var value));
-        Assert.AreEqual(4, Convert.ToInt32(value));
+        Assert.AreEqual(4, Convert.ToInt32(value, CultureInfo.CurrentCulture));
     }
 
     [TestMethod]
