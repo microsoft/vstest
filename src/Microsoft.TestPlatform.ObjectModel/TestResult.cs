@@ -119,7 +119,7 @@ public sealed class TestResult : TestObject
 
         // Add the outcome of the test and the name of the test.
         result.AppendFormat(
-            CultureInfo.CurrentUICulture,
+            CultureInfo.CurrentCulture,
             Resources.Resources.BasicTestResultFormat,
             TestCase.DisplayName,
             TestOutcomeHelper.GetOutcomeString(Outcome));
@@ -129,14 +129,14 @@ public sealed class TestResult : TestObject
         {
             // Add Error message.
             result.AppendLine();
-            result.AppendFormat(CultureInfo.CurrentUICulture, Resources.Resources.TestFailureMessageFormat, ErrorMessage);
+            result.AppendFormat(CultureInfo.CurrentCulture, Resources.Resources.TestFailureMessageFormat, ErrorMessage);
 
             // Add stack trace if we have one.
             if (!StringUtils.IsNullOrWhiteSpace(ErrorStackTrace))
             {
                 result.AppendLine();
                 result.AppendFormat(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     Resources.Resources.TestFailureStackTraceFormat,
                     ErrorStackTrace);
             }
@@ -151,7 +151,7 @@ public sealed class TestResult : TestObject
                 if (!StringUtils.IsNullOrEmpty(message?.Category) && !StringUtils.IsNullOrEmpty(message.Text))
                 {
                     testMessages.AppendFormat(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         Resources.Resources.TestResultMessageFormat,
                         message.Category,
                         message.Text);
@@ -160,7 +160,7 @@ public sealed class TestResult : TestObject
 
             result.AppendLine();
             result.AppendFormat(
-                CultureInfo.CurrentUICulture,
+                CultureInfo.CurrentCulture,
                 Resources.Resources.TestResultTextMessagesFormat,
                 testMessages.ToString());
         }
