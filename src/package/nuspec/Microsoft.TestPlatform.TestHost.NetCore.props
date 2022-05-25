@@ -11,11 +11,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </Content>
-    <Content Include="$(MSBuildThisFileDirectory)x86\Microsoft.TestPlatform.PlatformAbstractions.dll">
-      <Link>Microsoft.TestPlatform.PlatformAbstractions.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>False</Visible>
-    </Content>
   </ItemGroup>
   <ItemGroup Condition=" ('$(Platform)'!= 'x86' AND '$(PlatformTarget)' != 'x86') AND '$(OS)' == 'Windows_NT'" >
     <Content Include="$(MSBuildThisFileDirectory)x64\testhost.exe">
@@ -25,18 +20,6 @@
     </Content>
     <Content Include="$(MSBuildThisFileDirectory)x64\testhost.dll">
       <Link>testhost.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>False</Visible>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)x64\Microsoft.TestPlatform.PlatformAbstractions.dll">
-      <Link>Microsoft.TestPlatform.PlatformAbstractions.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>False</Visible>
-    </Content>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(OS)' != 'Windows_NT'" >
-    <Content Include="$(MSBuildThisFileDirectory)Microsoft.TestPlatform.PlatformAbstractions.dll">
-      <Link>Microsoft.TestPlatform.PlatformAbstractions.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </Content>
