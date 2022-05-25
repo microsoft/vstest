@@ -486,7 +486,7 @@ internal class DataCollectionManager : IDataCollectionManager
 
             if (!IsUriValid(dataCollectorUri) && !TryGetUriFromFriendlyName(dataCollectorSettings.FriendlyName, out dataCollectorUri))
             {
-                LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.UnableToFetchUriString, dataCollectorSettings.FriendlyName));
+                LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.UnableToFetchUriString, dataCollectorSettings.FriendlyName));
             }
 
             ObjectModel.DataCollection.DataCollector? dataCollector = null;
@@ -497,7 +497,7 @@ internal class DataCollectionManager : IDataCollectionManager
 
             if (dataCollector == null)
             {
-                LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorNotFound, dataCollectorSettings.FriendlyName));
+                LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorNotFound, dataCollectorSettings.FriendlyName));
                 return;
             }
 
@@ -527,7 +527,7 @@ internal class DataCollectionManager : IDataCollectionManager
             EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while creating data collector {0} : {1}", dataCollectorSettings.FriendlyName, ex);
 
             // No data collector info, so send the error with no direct association to the collector.
-            LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorInitializationError, dataCollectorSettings.FriendlyName, ex));
+            LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorInitializationError, dataCollectorSettings.FriendlyName, ex));
             return;
         }
 
@@ -570,7 +570,7 @@ internal class DataCollectionManager : IDataCollectionManager
                 if (runEnabledDataCollectors.Any(dcSettings => string.Equals(dcSettings.FriendlyName, settings.FriendlyName, StringComparison.OrdinalIgnoreCase)))
                 {
                     // If Uri or assembly qualified type name is repeated, consider data collector as duplicate and ignore it.
-                    LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.IgnoredDuplicateConfiguration, settings.FriendlyName));
+                    LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.IgnoredDuplicateConfiguration, settings.FriendlyName));
                     continue;
                 }
 
@@ -689,7 +689,7 @@ internal class DataCollectionManager : IDataCollectionManager
                 {
                     // Data collector is overriding an already requested variable, possibly an error.
                     var message = string.Format(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         Resources.Resources.DataCollectorRequestedDuplicateEnvironmentVariable,
                         collectorFriendlyName,
                         namevaluepair.Key,

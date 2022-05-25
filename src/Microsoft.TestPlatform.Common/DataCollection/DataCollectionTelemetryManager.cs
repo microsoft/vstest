@@ -91,6 +91,6 @@ internal class DataCollectionTelemetryManager : IDataCollectionTelemetryManager
 
     private static string GetTelemetryKey(string telemetryPrefix, DataCollectorInformation dataCollectorInformation)
     {
-        return string.Format("{0}.{1}", telemetryPrefix, dataCollectorInformation.DataCollectorConfig?.TypeUri?.ToString());
+        return $"{telemetryPrefix}.{dataCollectorInformation.DataCollectorConfig?.TypeUri}";
     }
 }
