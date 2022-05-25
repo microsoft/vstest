@@ -146,7 +146,7 @@ internal static class DebuggerBreakpoint
 
             var currentProcess = Process.GetCurrentProcess();
             ConsoleOutput.Instance.WriteLine(
-                string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName),
+                $"Process Id: {currentProcess.Id}, Name: {currentProcess.ProcessName}",
                 OutputLevel.Information);
 
             while (!Debugger.IsAttached)
