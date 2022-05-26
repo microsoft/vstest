@@ -36,7 +36,7 @@ public class HtmlLogger : ITestLoggerWithParameters
     private readonly IFileHelper _fileHelper;
     private readonly XmlObjectSerializer _xmlSerializer;
     private readonly IHtmlTransformer _htmlTransformer;
-    private static readonly object LockObject = new();
+    private static readonly object FileCreateLockObject = new();
     private Dictionary<string, string> _parametersDictionary;
 
     public HtmlLogger()
@@ -343,7 +343,7 @@ public class HtmlLogger : ITestLoggerWithParameters
         {
             var fileNameWithIter = i == 0 ? fileName : Path.GetFileNameWithoutExtension(fileName) + $"[{i}]";
             fullFilePath = Path.Combine(TestResultsDirPath, $"TestResult_{fileNameWithIter}.{fileExtension}");
-            lock (LockObject)
+            lock (FileCreateLockObject)
             {
                 if (!File.Exists(fullFilePath))
                 {
