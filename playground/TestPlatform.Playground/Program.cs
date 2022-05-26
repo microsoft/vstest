@@ -36,7 +36,7 @@ internal class Program
 
         var thisAssemblyPath = Assembly.GetEntryAssembly().Location;
         var here = Path.GetDirectoryName(thisAssemblyPath);
-        var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
+        //var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
 
@@ -44,7 +44,7 @@ internal class Program
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
-                        <MaxCpuCount>1</MaxCpuCount>
+                        <MaxCpuCount>0</MaxCpuCount>
 <DisableAppDomain>False</DisableAppDomain>
 <BatchSize>10</BatchSize>
                     </RunConfiguration>
@@ -55,7 +55,7 @@ internal class Program
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
-                        <MaxCpuCount>1</MaxCpuCount>
+                        <MaxCpuCount>0</MaxCpuCount>
                     </RunConfiguration>
                 </RunSettings>
             ";
@@ -140,7 +140,7 @@ internal class Program
         var r = new VsTestConsoleWrapper(console, consoleOptions);
         var sessionHandler = new TestSessionHandler();
 #pragma warning disable CS0618 // Type or member is obsolete
-    //    r.StartTestSession(sources, sourceSettings, sessionHandler);
+        //    r.StartTestSession(sources, sourceSettings, sessionHandler);
 #pragma warning restore CS0618 // Type or member is obsolete
         var discoveryHandler = new PlaygroundTestDiscoveryHandler();
         var sw = Stopwatch.StartNew();
