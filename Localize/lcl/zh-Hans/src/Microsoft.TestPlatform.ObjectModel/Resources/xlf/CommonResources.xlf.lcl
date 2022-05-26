@@ -21,12 +21,12 @@
       </Item>
       <Item ItemId=";DisplayChosenSettings" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.]]></Val>
+          <Val><![CDATA[Test run detected DLL(s) which would use different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[测试运行检测到为不同框架和平台版本构建的 DLL。后面的 DLL 与当前设置(即 {0} 框架和 {1} 平台)不匹配。{2}如需了解如何管理这些设置，请转到 {3}。]]></Val>
+            <Val><![CDATA[测试运行检测到将使用不同框架和平台版本的 DLL。后面的 DLL 与当前设置(即 {0} 框架和 {1} 平台)不匹配。{2}要了解如何管理这些设置的更多详细信息，请转到 {3}。]]></Val>
           </Tgt>
           <Prev Cat="Text">
-            <Val><![CDATA[Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) do not match framework/platform settings.{2}Go to {3} for more details on managing these settings.]D;]A;]]></Val>
+            <Val><![CDATA[Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.]]></Val>
           </Prev>
         </Str>
         <Disp Icon="Str" />
@@ -51,10 +51,13 @@
       </Item>
       <Item ItemId=";SourceIncompatible" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} is built for Framework {1} and Platform {2}.]]></Val>
+          <Val><![CDATA[{0} would use Framework {1} and Platform {2}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} 适用于 {1} 框架和 {2} 平台。]]></Val>
+            <Val><![CDATA[{0} 将使用 {1} 框架和 {2} 平台。]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} is built for Framework {1} and Platform {2}.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
