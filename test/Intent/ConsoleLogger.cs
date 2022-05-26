@@ -53,7 +53,8 @@ internal class ConsoleLogger : IRunLogger
     {
         WriteLine();
         WriteLine();
-        if (failures.Count > 0) {
+        if (failures.Count > 0)
+        {
             WriteLine($"There were {failures.Count} failures:");
         }
         failures.ForEach(t => { WriteTestFailure(t.method, t.exception, t.time); WriteLine(); });
