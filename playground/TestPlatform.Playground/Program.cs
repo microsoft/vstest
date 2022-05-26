@@ -40,7 +40,6 @@ internal class Program
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
 
-
         var sourceSettings = @"
                 <RunSettings>
                     <RunConfiguration>
@@ -53,8 +52,6 @@ internal class Program
         var sources = new[] {
             Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
             Path.Combine(playground, "MSTest1", "bin", "Debug", "net5.0", "MSTest1.dll"),
-            @"C:\Users\jajares\source\repos\TestProject48\TestProject48\bin\Debug\net48\TestProject48.dll",
-            @"C:\Users\jajares\source\repos\TestProject48\TestProject1\bin\Debug\net48\win10-x64\TestProject1.dll"
         };
 
         // console mode
@@ -62,7 +59,14 @@ internal class Program
         try
         {
             File.WriteAllText(settingsFile, sourceSettings);
-            var process = Process.Start(console, string.Join(" ", sources) + " --settings:" + settingsFile + " --listtests");
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = console,
+                Arguments = string.Join(" ", sources) + " --settings:" + settingsFile + " --listtests",
+                UseShellExecute = false,
+            };
+            EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
+            var process = Process.Start(processStartInfo);
             process.WaitForExit();
             if (process.ExitCode != 0)
             {
@@ -77,6 +81,7 @@ internal class Program
         // design mode
         var consoleOptions = new ConsoleParameters
         {
+            EnvironmentVariables = EnvironmentVariables.Variables,
             LogFilePath = Path.Combine(here, "logs", "log.txt"),
             TraceLevel = TraceLevel.Verbose,
         };
