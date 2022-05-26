@@ -38,7 +38,8 @@ internal class Program
         var here = Path.GetDirectoryName(thisAssemblyPath);
         var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
 
-        var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
+        var dotnetExe = @"C:\Program Files\dotnet\dotnet.exe";
+        var consoleDll = Path.Combine(here, "vstest.console", "vstest.console.dll");
 
         var sourceSettings = @"
                 <RunSettings>
@@ -61,8 +62,8 @@ internal class Program
             File.WriteAllText(settingsFile, sourceSettings);
             var processStartInfo = new ProcessStartInfo
             {
-                FileName = console,
-                Arguments = string.Join(" ", sources, $"--settings:{settingsFile}", "--listtests"),
+                FileName = dotnetExe,
+                Arguments = string.Join(" ", consoleDll, string.Join(" ", sources), $"--settings:{settingsFile}", "--listtests"),
                 UseShellExecute = false,
             };
             EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
@@ -86,7 +87,7 @@ internal class Program
             TraceLevel = TraceLevel.Verbose,
         };
         var options = new TestPlatformOptions();
-        var r = new VsTestConsoleWrapper(console, consoleOptions);
+        var r = new VsTestConsoleWrapper(consoleDll, dotnetExe, consoleOptions);
         var sessionHandler = new TestSessionHandler();
 #pragma warning disable CS0618 // Type or member is obsolete
         r.StartTestSession(sources, sourceSettings, sessionHandler);
