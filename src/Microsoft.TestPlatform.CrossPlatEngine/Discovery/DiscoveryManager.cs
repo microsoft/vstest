@@ -45,7 +45,7 @@ public class DiscoveryManager : IDiscoveryManager
     /// <summary>
     /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
     /// </summary>
-    public DiscoveryManager(IRequestData requestData)
+    public DiscoveryManager(IRequestData requestData!!)
         : this(requestData, TestPlatformEventSource.Instance)
     {
     }

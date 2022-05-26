@@ -152,7 +152,9 @@ public class TestSessionPool
             var proxy = sessionManager.DequeueProxy(source, runSettings);
 
             // Make sure we use the per-request request data instead of the request data used when
-            // creating the test session.
+            // creating the test session. Otherwise we can end up having irrelevant telemetry for
+            // the current request being fulfilled or even duplicate telemetry which may cause an
+            // exception to be thrown.
             proxy.RequestData = requestData;
 
             return proxy;

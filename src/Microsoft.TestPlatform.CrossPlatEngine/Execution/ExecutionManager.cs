@@ -40,7 +40,7 @@ public class ExecutionManager : IExecutionManager
     /// <summary>
     /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
     /// </summary>
-    public ExecutionManager(IRequestData requestData) : this(TestPlatformEventSource.Instance, requestData)
+    public ExecutionManager(IRequestData requestData!!) : this(TestPlatformEventSource.Instance, requestData)
     {
         _sessionMessageLogger = TestSessionMessageLogger.Instance;
         _sessionMessageLogger.TestRunMessage += TestSessionMessageHandler;
