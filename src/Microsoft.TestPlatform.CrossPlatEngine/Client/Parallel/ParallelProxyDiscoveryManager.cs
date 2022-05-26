@@ -196,31 +196,33 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         {
             var testhostProviderInfo = group.Key;
             // If the run is not parallel and the host is shared, put all testcases on single testhost.
+            // For parallel we prefer to run each source on its own host because we don't know how big the source is
+            // (how many tests there are to discover), and running 10 sources on 10 parallel testhosts is faster
+            // in almost all cases than running 10 sources on 1 testhost.
+            List<string[]> sourceBatches;
             if (!_isParallel && testhostProviderInfo.Shared)
             {
-                var runsettings = testhostProviderInfo.RunSettings;
-                var sourcesToDiscover = group.Select(w => w.Work).ToArray();
-                var updatedCriteria = NewDiscoveryCriteriaFromSourceAndSettings(sourcesToDiscover, discoveryCriteria, runsettings);
-                var workload = new ProviderSpecificWorkload<DiscoveryCriteria>(updatedCriteria, testhostProviderInfo);
-                workloads.Add(workload);
+                // Create one big source batch that will be single workload for single testhost.
+                sourceBatches = new List<string[]> { group.Select(w => w.Work).ToArray() };
             }
             else
             {
-                // Create one workload for each source
-                foreach (var w in group.ToList())
-                {
-                    var runsettings = testhostProviderInfo.RunSettings;
-                    var sourcesToDiscover = new[] { w.Work };
-                    var updatedCriteria = NewDiscoveryCriteriaFromSourceAndSettings(sourcesToDiscover, discoveryCriteria, runsettings);
-                    var workload = new ProviderSpecificWorkload<DiscoveryCriteria>(updatedCriteria, testhostProviderInfo);
-                    workloads.Add(workload);
-                }
+                // Create multiple source batches, each having one source, so each testhost will end up running one source.
+                sourceBatches = group.Select(w => new[] { w.Work }).ToList();
+            }
+
+            foreach (var sourcesToDiscover in sourceBatches)
+            {
+                var runsettings = testhostProviderInfo.RunSettings;
+                var updatedCriteria = NewDiscoveryCriteriaFromSourceAndSettings(sourcesToDiscover, discoveryCriteria, runsettings);
+                var workload = new ProviderSpecificWorkload<DiscoveryCriteria>(updatedCriteria, testhostProviderInfo);
+                workloads.Add(workload);
             }
         }
 
         return workloads;
 
-        static DiscoveryCriteria NewDiscoveryCriteriaFromSourceAndSettings(string[] sources, DiscoveryCriteria discoveryCriteria, string runsettingsXml)
+        static DiscoveryCriteria NewDiscoveryCriteriaFromSourceAndSettings(IEnumerable<string> sources, DiscoveryCriteria discoveryCriteria, string runsettingsXml)
         {
             var criteria = new DiscoveryCriteria(
                 sources,
