@@ -21,12 +21,12 @@
       </Item>
       <Item ItemId=";DisplayChosenSettings" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.]]></Val>
+          <Val><![CDATA[Test run detected DLL(s) which would use different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Test çalıştırması, farklı çerçeve ve platform sürümleri için oluşturulmuş DLL'ler buldu. Aşağıdaki DLL'ler, {0} çerçevesi ve {1} platformu olan geçerli ayarlarla eşleşmiyor. {2}Bu ayarları yönetme hakkında daha fazla ayrıntı için {3} bölümüne gidin.]]></Val>
+            <Val><![CDATA[Test çalıştırması, farklı çerçeve ve platform sürümlerini kullanan DLL’ler algıladı. Aşağıdaki DLL’ler, {0} çerçevesi ve {1} platformu olarak seçilmiş geçerli ayarlarla eşleşmiyor. {2}Bu ayarları yönetme hakkında daha fazla ayrıntı için {3} bölümüne gidin.]]></Val>
           </Tgt>
           <Prev Cat="Text">
-            <Val><![CDATA[Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) do not match framework/platform settings.{2}Go to {3} for more details on managing these settings.]D;]A;]]></Val>
+            <Val><![CDATA[Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.]]></Val>
           </Prev>
         </Str>
         <Disp Icon="Str" />
@@ -51,10 +51,13 @@
       </Item>
       <Item ItemId=";SourceIncompatible" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} is built for Framework {1} and Platform {2}.]]></Val>
+          <Val><![CDATA[{0} would use Framework {1} and Platform {2}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0}, {1} Çerçevesi ve {2} Platformu için derlenmiştir.]]></Val>
+            <Val><![CDATA[{0}, {1} Çerçevesini ve {2} Platformunu kullanır.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} is built for Framework {1} and Platform {2}.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
