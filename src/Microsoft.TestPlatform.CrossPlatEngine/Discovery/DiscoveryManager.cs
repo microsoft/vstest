@@ -59,7 +59,7 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="testPlatformEventSource">
     ///     The test platform event source.
     /// </param>
-    protected DiscoveryManager(IRequestData requestData, ITestPlatformEventSource testPlatformEventSource)
+    protected DiscoveryManager(IRequestData requestData!!, ITestPlatformEventSource testPlatformEventSource)
     {
         _sessionMessageLogger = TestSessionMessageLogger.Instance;
         _sessionMessageLogger.TestRunMessage += TestSessionMessageHandler;
