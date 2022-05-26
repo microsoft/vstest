@@ -223,23 +223,37 @@ internal class DebuggerUtility
         return isVs;
     }
 
+    private static bool IsCorrectParent(Process currentProcess, Process parent)
+    {
+        try
+        {
+            // Parent needs to start before the child, otherwise it might be a different process
+            // that is just reusing the same PID.
+            if (parent.StartTime <= currentProcess.StartTime)
+            {
+                return true;
+            }
+
+            Trace($"Process {parent.ProcessName} ({parent.Id}) is not a valid parent because it started after the current process.");
+        }
+        catch
+        {
+            // Access denied or process exited while we were holding the Process object.
+        }
+
+        return false;
+    }
+
     private static Process? GetParentProcess(Process process)
     {
-        int id = GetProcessId(process);
+        int id = GetParentProcessId(process);
         if (id != -1)
         {
             try
             {
-                Process parent = Process.GetProcessById(id);
-
-                // Parent needs to start before the child, otherwise it might be a different process
-                // that is just reusing the same PID.
-                if (parent.StartTime <= process.StartTime)
-                {
+                var parent = Process.GetProcessById(id);
+                if (IsCorrectParent(process, parent))
                     return parent;
-                }
-
-                Trace($"Process {parent.ProcessName} ({parent.Id}) is not a valid parent because it started after the current process.");
             }
             catch
             {
@@ -249,7 +263,7 @@ internal class DebuggerUtility
 
         return null;
 
-        static int GetProcessId(Process process)
+        static int GetParentProcessId(Process process)
         {
             try
             {
