@@ -7,8 +7,6 @@
 
   <PropertyGroup>
     <TargetFrameworks Condition=" '$(OS)' == 'WINDOWS_NT' ">$(TargetFrameworks);net472;net5.0</TargetFrameworks>
-    <!-- We build this on linux as well, and are including ref assemblies for this framework only. -->
-    <TargetFrameworks Condition=" '$(OS)' != 'WINDOWS_NT' ">$(TargetFrameworks);net451</TargetFrameworks>
     <Prefer32Bit>false</Prefer32Bit>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
