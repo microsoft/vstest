@@ -10,7 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
