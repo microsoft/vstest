@@ -529,7 +529,8 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
                 var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
                     testSessionInfo,
                     source,
-                    _discoveryCriteria.RunSettings);
+                    _discoveryCriteria.RunSettings,
+                    _mockRequestData.Object);
 
                 return proxyOperationManager;
             };
@@ -551,7 +552,8 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
                     tsp => tsp.TryTakeProxy(
                         testSessionInfo,
                         It.IsAny<string>(),
-                        It.IsAny<string>()))
+                        It.IsAny<string>(),
+                        _mockRequestData.Object))
                 .Returns(mockProxyOperationManager.Object);
 
             testDiscoveryManager.Initialize(true);
@@ -563,7 +565,8 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
                 tsp => tsp.TryTakeProxy(
                     testSessionInfo,
                     It.IsAny<string>(),
-                    It.IsAny<string>()),
+                    It.IsAny<string>(),
+                    _mockRequestData.Object),
                 Times.Once);
         }
         finally

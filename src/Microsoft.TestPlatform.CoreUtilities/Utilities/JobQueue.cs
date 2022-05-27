@@ -128,7 +128,7 @@ public class JobQueue<T> : IDisposable
         _exceptionLogger = exceptionLogger;
 
         // Setup the background thread to process the jobs.
-        _backgroundJobProcessor = new Task(() => BackgroundJobProcessor(), TaskCreationOptions.LongRunning);
+        _backgroundJobProcessor = new Task(() => BackgroundJobProcessor(_displayName), TaskCreationOptions.LongRunning);
         _backgroundJobProcessor.Start();
     }
 
@@ -275,8 +275,11 @@ public class JobQueue<T> : IDisposable
     /// <summary>
     /// Method which processes the jobs on the background thread.
     /// </summary>
-    private void BackgroundJobProcessor()
+    private void BackgroundJobProcessor(string threadName)
     {
+#if DEBUG && (NETFRAMEWORK || NET || NETSTANDARD2_0_OR_GREATER)
+        Thread.CurrentThread.Name = threadName;
+#endif
         bool shutdown = false;
 
         do

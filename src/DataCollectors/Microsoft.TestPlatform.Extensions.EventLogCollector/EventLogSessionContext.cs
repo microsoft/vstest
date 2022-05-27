@@ -2,8 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-
-#nullable disable
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
@@ -34,11 +33,12 @@ internal class EventLogSessionContext
     /// <summary>
     /// Gets the end index for EventLogs Entries
     /// </summary>
-    internal Dictionary<string, int> EventLogContainerEndIndexMap { get; private set; }
+    internal Dictionary<string, int>? EventLogContainerEndIndexMap { get; private set; }
 
     /// <summary>
     /// Creates the end index map for EventLogs Entries
     /// </summary>
+    [MemberNotNull(nameof(EventLogContainerEndIndexMap))]
     public void CreateEventLogContainerEndIndexMap()
     {
         EventLogContainerEndIndexMap = new Dictionary<string, int>(_eventLogContainerMap.Count);
@@ -54,6 +54,7 @@ internal class EventLogSessionContext
     /// <summary>
     /// Creates the start index map for EventLogs Entries
     /// </summary>
+    [MemberNotNull(nameof(EventLogContainerStartIndexMap))]
     public void CreateEventLogContainerStartIndexMap()
     {
         EventLogContainerStartIndexMap = new Dictionary<string, int>(_eventLogContainerMap.Count);

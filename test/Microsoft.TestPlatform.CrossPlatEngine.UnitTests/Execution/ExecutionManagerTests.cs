@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+using FluentAssertions;
 
 using static TestPlatform.CrossPlatEngine.UnitTests.Execution.RunTestsWithSourcesTests;
 
@@ -103,6 +104,38 @@ public class ExecutionManagerTests
         {
             Assert.IsTrue(provider.IsExtensionCreated);
         }
+    }
+
+    [TestMethod]
+    public void InitializeShouldClearMetricsCollection()
+    {
+        var metricsCollection = new MetricsCollection();
+
+        metricsCollection.Add("metric", "value");
+        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(metricsCollection);
+        _mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
+
+        var discoveryManager = new ExecutionManager(_mockRequestData.Object);
+
+        metricsCollection.Metrics.Should().ContainKey("metric");
+        discoveryManager.Initialize(null, new Mock<ITestDiscoveryEventsHandler2>().Object);
+        metricsCollection.Metrics.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void InitializeShouldNotFailIfMetricsFieldIsNull()
+    {
+        var mockRequestData = new Mock<IRequestData>();
+        var mockMetricsCollection = new Mock<IMetricsCollection>();
+
+        mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+        mockRequestData.Object.MetricsCollection.Metrics.Should().BeNull();
+
+        var action = () => (new ExecutionManager(mockRequestData.Object))
+            .Initialize(null, new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+        action.Should().NotThrow();
     }
 
     [TestMethod]

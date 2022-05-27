@@ -167,7 +167,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         CheckDisposed();
 
         // Sending 0 size as this event is not expected to contain any data.
-        SafeInvokeAsync(() => TestRunMessage, args, 0, "InternalTestLoggerEvents.SendTestRunMessage");
+        SafeInvokeAsync(TestRunMessage, args, 0, "InternalTestLoggerEvents.SendTestRunMessage");
     }
 
     internal void WaitForEventCompletion()
@@ -190,7 +190,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
             resultSize = FindTestResultSize(args) * sizeof(char);
         }
 
-        SafeInvokeAsync(() => TestResult, args, resultSize, "InternalTestLoggerEvents.SendTestResult");
+        SafeInvokeAsync(TestResult, args, resultSize, "InternalTestLoggerEvents.SendTestResult");
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     {
         CheckDisposed();
 
-        SafeInvokeAsync(() => TestRunStart, args, 0, "InternalTestLoggerEvents.SendTestRunStart");
+        SafeInvokeAsync(TestRunStart, args, 0, "InternalTestLoggerEvents.SendTestRunStart");
     }
 
     /// <summary>
@@ -212,7 +212,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     {
         CheckDisposed();
 
-        SafeInvokeAsync(() => DiscoveryStart, args, 0, "InternalTestLoggerEvents.SendDiscoveryStart");
+        SafeInvokeAsync(DiscoveryStart, args, 0, "InternalTestLoggerEvents.SendDiscoveryStart");
     }
 
     /// <summary>
@@ -224,7 +224,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         CheckDisposed();
 
         // Sending 0 size as this event is not expected to contain any data.
-        SafeInvokeAsync(() => DiscoveryMessage, args, 0, "InternalTestLoggerEvents.SendDiscoveryMessage");
+        SafeInvokeAsync(DiscoveryMessage, args, 0, "InternalTestLoggerEvents.SendDiscoveryMessage");
     }
 
     /// <summary>
@@ -235,7 +235,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     {
         CheckDisposed();
 
-        SafeInvokeAsync(() => DiscoveredTests, args, 0, "InternalTestLoggerEvents.SendDiscoveredTests");
+        SafeInvokeAsync(DiscoveredTests, args, 0, "InternalTestLoggerEvents.SendDiscoveredTests");
     }
 
     /// <summary>
@@ -247,7 +247,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         CheckDisposed();
 
         // Sending 0 size as this event is not expected to contain any data.
-        SafeInvokeAsync(() => DiscoveryComplete, args, 0, "InternalTestLoggerEvents.SendDiscoveryComplete");
+        SafeInvokeAsync(DiscoveryComplete, args, 0, "InternalTestLoggerEvents.SendDiscoveryComplete");
 
         // Wait for the loggers to finish processing the messages for the run.
         _loggerEventQueue.Flush();
@@ -262,7 +262,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         CheckDisposed();
 
         // Size is being send as 0. (It is good to send the size as the job queue uses it)
-        SafeInvokeAsync(() => TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
+        SafeInvokeAsync(TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
 
         // Wait for the loggers to finish processing the messages for the run.
         _loggerEventQueue.Flush();
@@ -286,7 +286,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         var args = new TestRunCompleteEventArgs(stats, isCanceled, isAborted, error, attachmentSet, invokedDataCollectors, elapsedTime);
 
         // Sending 0 size as this event is not expected to contain any data.
-        SafeInvokeAsync(() => TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
+        SafeInvokeAsync(TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
 
         // Wait for the loggers to finish processing the messages for the run.
         _loggerEventQueue.Flush();
@@ -298,7 +298,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     private void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
     {
         // Broadcast the message to the loggers.
-        SafeInvokeAsync(() => TestRunMessage, e, 0, "InternalTestLoggerEvents.SendMessage");
+        SafeInvokeAsync(TestRunMessage, e, 0, "InternalTestLoggerEvents.SendMessage");
     }
 
     /// <summary>
@@ -306,15 +306,16 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// ensuring that each handler is invoked even if one throws.
     /// The actual calling of the subscribers is done on a background thread.
     /// </summary>
-    private void SafeInvokeAsync(Func<MulticastDelegate> eventHandlersFactory!!, EventArgs args!!, int size, string traceDisplayName)
+    private void SafeInvokeAsync(MulticastDelegate eventHandlers, EventArgs args!!, int size, string traceDisplayName)
     {
+        // When there are no subscribers, don't bother creating an empty task on the queue.
+        if (eventHandlers == null)
+        {
+            return;
+        }
+
         // Invoke the handlers on a background thread.
-        _loggerEventQueue.QueueJob(
-            () =>
-            {
-                var eventHandlers = eventHandlersFactory();
-                eventHandlers?.SafeInvoke(this, args, traceDisplayName);
-            }, size);
+        _loggerEventQueue.QueueJob(() => eventHandlers?.SafeInvoke(this, args, traceDisplayName), size);
     }
 
     /// <summary>

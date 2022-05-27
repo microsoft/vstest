@@ -5,13 +5,11 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AttachVS;
 
 internal class Program
 {
-    static void Main(string[] args)
+    static void Main(string[] args!!)
     {
         Trace.Listeners.Add(new ConsoleTraceListener());
 
