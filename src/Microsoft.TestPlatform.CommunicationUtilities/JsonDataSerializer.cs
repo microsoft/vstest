@@ -60,7 +60,6 @@ public class JsonDataSerializer : IDataSerializer
             ReferenceLoopHandling = jsonSettings.ReferenceLoopHandling,
             // PERF: Null value handling has very small impact on serialization and deserialization. Enabling it does not warrant the risk we run
             // of changing how our consumers get their data.
-            // NullValueHandling = NullValueHandling.Ignore,
 
             ContractResolver = s,
         };

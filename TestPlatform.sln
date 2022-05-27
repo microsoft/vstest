@@ -175,7 +175,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "playground", "playground", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestPlatform.Playground", "playground\TestPlatform.Playground\TestPlatform.Playground.csproj", "{545A88D3-1AE2-4D39-9B7C-C691768AD17F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSTest1", "playground\MSTest1\MSTest1.csproj", "{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perfy.TestAdapter", "playground\MSTest1\Perfy.TestAdapter.csproj", "{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AttachmentProcessorDataCollector", "test\TestAssets\AttachmentProcessorDataCollector\AttachmentProcessorDataCollector.csproj", "{B6AF6BCD-64C6-4F4E-ABCA-C8AA2AA66B7B}"
 EndProject

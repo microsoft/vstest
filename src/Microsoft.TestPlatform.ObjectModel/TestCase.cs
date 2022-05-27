@@ -56,6 +56,26 @@ public sealed class TestCase : TestObject
         Source = source;
         LineNumber = -1;
     }
+
+    [DataMember]
+    public string Property1 { get; set; }
+
+    [DataMember]
+    public string Property2 { get; set; }
+
+    [DataMember]
+    public string Property3 { get; set; }
+
+
+    [DataMember]
+    public string Property4 { get; set; }
+
+    [DataMember]
+    public string Property5 { get; set; }
+
+    [DataMember]
+    public Dictionary<string, string> PropertyBag { get; set; }
+
     /// <summary>
     /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
     /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
