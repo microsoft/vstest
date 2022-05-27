@@ -90,7 +90,7 @@ internal class Program
         };
         var options = new TestPlatformOptions();
         // var r = new VsTestConsoleWrapper(consoleDll, dotnetExe, consoleOptions);
-        IVsTestConsoleWrapper r = new InProcessVsTestConsoleWrapper(consoleDll, dotnetExe, consoleOptions);
+        IVsTestConsoleWrapper r = new InProcessVsTestConsoleWrapper(consoleOptions);
         var sessionHandler = new TestSessionHandler();
 #pragma warning disable CS0618 // Type or member is obsolete
        // r.StartTestSession(sources, sourceSettings, sessionHandler);
@@ -108,8 +108,8 @@ internal class Program
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
-            Console.WriteLine($"[DISCOVERY.PROGRESS]");
-            Console.WriteLine(WriteTests(discoveredTestCases));
+            //Console.WriteLine($"[DISCOVERY.PROGRESS]");
+            //Console.WriteLine(WriteTests(discoveredTestCases));
             _testCasesCount += discoveredTestCases.Count();
             if (discoveredTestCases != null) { TestCases.AddRange(discoveredTestCases); }
         }
@@ -117,16 +117,16 @@ internal class Program
         public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
         {
             Console.WriteLine($"[DISCOVERY.COMPLETE] aborted? {isAborted}, tests count: {totalTests}");
-            Console.WriteLine("Last chunk:");
-            Console.WriteLine(WriteTests(lastChunk));
+            //Console.WriteLine("Last chunk:");
+            //Console.WriteLine(WriteTests(lastChunk));
             if (lastChunk != null) { TestCases.AddRange(lastChunk); }
         }
 
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
             Console.WriteLine($"[DISCOVERY.COMPLETE] aborted? {discoveryCompleteEventArgs.IsAborted}, tests count: {discoveryCompleteEventArgs.TotalCount}, discovered count: {_testCasesCount}");
-            Console.WriteLine("Last chunk:");
-            Console.WriteLine(WriteTests(lastChunk));
+            //Console.WriteLine("Last chunk:");
+            //Console.WriteLine(WriteTests(lastChunk));
             Console.WriteLine("Fully discovered:");
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.FullyDiscoveredSources));
             Console.WriteLine("Partially discovered:");
@@ -143,7 +143,7 @@ internal class Program
 
         public void HandleRawMessage(string rawMessage)
         {
-            Console.WriteLine($"[DISCOVERY.MESSAGE] {rawMessage}");
+            //Console.WriteLine($"[DISCOVERY.MESSAGE] {rawMessage}");
         }
 
         private static string WriteTests(IEnumerable<TestCase> testCases)
@@ -171,19 +171,19 @@ internal class Program
 
         public void HandleRawMessage(string rawMessage)
         {
-            Console.WriteLine($"[RUN.MESSAGE]: {rawMessage}");
+            //Console.WriteLine($"[RUN.MESSAGE]: {rawMessage}");
         }
 
         public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
             Console.WriteLine($"[RUN.COMPLETE]: err: {testRunCompleteArgs.Error}, lastChunk:");
-            Console.WriteLine(WriteTests(lastChunkArgs?.NewTestResults));
+            //Console.WriteLine(WriteTests(lastChunkArgs?.NewTestResults));
         }
 
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
-            Console.WriteLine($"[RUN.PROGRESS]");
-            Console.WriteLine(WriteTests(testRunChangedArgs.NewTestResults));
+            //Console.WriteLine($"[RUN.PROGRESS]");
+            //Console.WriteLine(WriteTests(testRunChangedArgs.NewTestResults));
         }
 
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)

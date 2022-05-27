@@ -11,12 +11,17 @@ using System.Threading.Tasks;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
@@ -31,10 +36,11 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     private bool _isInitialized;
     private bool _sessionStarted;
 
-    public InProcessVsTestConsoleWrapper(
-        string vstestConsolePath,
-        string dotnetExePath,
-        ConsoleParameters _consoleParameters)
+    // Must be in sync with the highest supported version in
+    // src/Microsoft.TestPlatform.CrossPlatEngine/EventHandlers/TestRequestHandler.cs file.
+    private readonly int _highestSupportedVersion = 6;
+
+    public InProcessVsTestConsoleWrapper(ConsoleParameters _consoleParameters)
     {
         EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
 
@@ -55,13 +61,20 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             // in the service host, and use the desired set, so all children can inherit it.
             _consoleParameters.EnvironmentVariables.ToList().ForEach(pair => Environment.SetEnvironmentVariable(pair.Key, pair.Value));
 
-            var args = new VsTestConsoleProcessManager(vstestConsolePath, dotnetExePath).BuildArguments(_consoleParameters);
+            string someExistingFile = typeof(InProcessVsTestConsoleWrapper).Assembly.Location;
+            var args = new VsTestConsoleProcessManager(someExistingFile).BuildArguments(_consoleParameters);
             // Skip vstest.console path, we are already running in process, so it would just end up being
-            // understood as test dll to run.
+            // understood as test dll to run. (it is present even though we don't provide dotnet path, because it is a .dll file.
             args = args.Skip(1).ToArray();
             var executor = new Executor(ConsoleOutput.Instance);
 
+            // We standup the client, and it will allocate port as normall that we will never use.
+            // This is just to avoid "duplicating" all the setup logic that is done in argument processors before
+            // client processor. It created design mode client, and stores it as single instance.
+            // We connect back to the client but never use that connection, it only serves as "await"
+            // to make sure the design mode client is already initialized.
             Task.Run<int>(() => executor.Execute(args));
+            WaitForConnection();
         }
         else
         {
@@ -142,14 +155,38 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     {
         _testPlatformEventSource.TranslationLayerDiscoveryStart();
 
-        EnsureInitialized();
-        _requestSender.DiscoverTests(
-            sources,
-            discoverySettings,
-            options,
-            testSessionInfo,
-            discoveryEventsHandler);
+        var designModeClient = (DesignModeClient)DesignModeClient.Instance;
+        var testRequestManager = designModeClient._testRequestManager;
+
+
+        // Comes from DesignModeClient private methods, but without all the sending stuff.
+        try
+        {
+            testRequestManager.ResetOptions();
+            var discoveryRequestPayload = new DiscoveryRequestPayload()
+            {
+                Sources = sources,
+                RunSettings = discoverySettings,
+                TestPlatformOptions = options,
+                TestSessionInfo = testSessionInfo
+            };
+
+            testRequestManager.DiscoverTests(discoveryRequestPayload, new DiscoveryHandlerToEventsRegistrarAdapter(discoveryEventsHandler), new ProtocolConfig { Version = _highestSupportedVersion });
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error("DesignModeClient: Exception in StartDiscovery: " + ex);
+
+            discoveryEventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
+            var errorDiscoveryComplete = new DiscoveryCompleteEventArgs
+            {
+                IsAborted = true,
+                TotalCount = -1,
+            };
+            discoveryEventsHandler.HandleDiscoveryComplete(errorDiscoveryComplete, lastChunk: null);
+        }
     }
+
     private void EnsureInitialized()
     {
         if (!_isInitialized)
@@ -251,14 +288,41 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             testCaseList.Count,
             runSettings ?? string.Empty);
 
-        EnsureInitialized();
-        _requestSender.StartTestRunWithCustomHost(
-            testCaseList,
-            runSettings,
-            options,
-            testSessionInfo,
-            testRunEventsHandler,
-            customTestHostLauncher);
+        var designModeClient = (DesignModeClient)DesignModeClient.Instance;
+        var testRequestManager = designModeClient._testRequestManager;
+        try
+        {
+            testRequestManager.ResetOptions();
+
+            var shouldLaunchTesthost = true;
+
+            // We must avoid re-launching the test host if the test run payload already
+            // contains test session info. Test session info being present is an indicative
+            // of an already running test host spawned by a start test session call.
+            var customLauncher =
+                shouldLaunchTesthost && testSessionInfo == null
+                    ? customTestHostLauncher
+                    : null;
+
+            var testRunPayload = new TestRunRequestPayload
+            {
+                TestCases = testCases.ToList(),
+                RunSettings = runSettings,
+                DebuggingEnabled = customLauncher.IsDebug,
+                TestPlatformOptions = options,
+                TestSessionInfo = testSessionInfo
+            };
+
+            testRequestManager.RunTests(testRunPayload, customLauncher, new RunHandlerToEventsRegistrarAdapter(testRunEventsHandler), new ProtocolConfig { Version = _highestSupportedVersion });
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
+            var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue);
+
+            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
+            testRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, null, null, null);
+        }
     }
 
 
