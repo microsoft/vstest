@@ -140,17 +140,25 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     {
         string testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
 
-        var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "..//");
+        var currentWorkingDirectory =Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
         var argumentsString = " " + connectionInfo.ToCommandLineOptions();
 
         // check in current location for testhost exe
         var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
 
+        var originalTestHostProcessName = testHostProcessName;
         if (!File.Exists(testhostProcessPath))
         {
             // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies, in dotnet SDK.
-            testHostProcessName = Path.Combine("TestHost", testHostProcessName);
-            testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+            testHostProcessName = Path.Combine("TestHost", originalTestHostProcessName);
+            testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", testHostProcessName);
+
+            // NOMERGE: Patching the relative path, so I can run in Playground.
+            if (!File.Exists(testhostProcessPath))
+            {
+                testHostProcessName = Path.Combine("vstest.console", "TestHost", originalTestHostProcessName);
+                testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+            }
         }
 
         if (!Shared)

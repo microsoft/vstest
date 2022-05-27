@@ -10,7 +10,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks Condition=" '$(OS)' == 'WINDOWS_NT' ">$(TargetFrameworks);net472</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'WINDOWS_NT' ">$(TargetFrameworks);net6.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,11 +21,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\datacollector\datacollector.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj" />
     <ProjectReference Include="..\..\src\testhost.x86\testhost.x86.csproj" />
     <ProjectReference Include="..\..\src\testhost\testhost.csproj" />
     <ProjectReference Include="..\..\src\vstest.console\vstest.console.csproj" />
-    <ProjectReference Include="..\MSTest1\MSTest1.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT' ">
     <Reference Include="System" />

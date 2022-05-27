@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.Execution;
-
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 #nullable disable
@@ -21,9 +19,6 @@ public static class Program
     /// <returns>0 if everything was successful and 1 otherwise.</returns>
     public static int Main(string[] args)
     {
-        DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_RUNNER_DEBUG_ATTACHVS");
-        DebuggerBreakpoint.WaitForDebugger("VSTEST_RUNNER_DEBUG");
-        UiLanguageOverride.SetCultureSpecifiedByUser();
         return new Executor(ConsoleOutput.Instance).Execute(args);
     }
 }

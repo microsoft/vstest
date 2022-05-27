@@ -420,11 +420,14 @@ public class TestEngine : ITestEngine
             var sources = runConfiguration.Select(c => c.Source).ToList();
             // TODO: We could improve the implementation by adding an overload that won't create a new instance always, because we only need to know the Type.
             var testRuntimeProvider = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runsettingsXml, sources);
-            var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider.GetType(), testRuntimeProvider.Shared, runsettingsXml, sourceDetails: runConfiguration.ToList());
+            if (testRuntimeProvider != null)
+            {
+                var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider.GetType(), testRuntimeProvider.Shared, runsettingsXml, sourceDetails: runConfiguration.ToList());
 
-            // Outputting the instance, because the code for in-process run uses it, and we don't want to resolve it another time.
-            mostRecentlyCreatedInstance = testRuntimeProvider;
-            testRuntimeProviders.Add(testRuntimeProviderInfo);
+                // Outputting the instance, because the code for in-process run uses it, and we don't want to resolve it another time.
+                mostRecentlyCreatedInstance = testRuntimeProvider;
+                testRuntimeProviders.Add(testRuntimeProviderInfo);
+            }
         }
 
         ThrowExceptionIfAnyTestHostManagerIsNullOrNoneAreFound(testRuntimeProviders);

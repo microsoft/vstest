@@ -13,7 +13,7 @@
     <OutputType>Exe</OutputType>
     <RollForward>Major</RollForward>
     <IsTestProject>false</IsTestProject>
-    <PlatformTarget Condition="'$(TargetFramework)' == 'net451' AND '$(RuntimeIdentifier)' == '' " >AnyCPU</PlatformTarget>
+    <PlatformTarget Condition="'$(TargetFramework)' == 'net451' AND '$(RuntimeIdentifier)' == '' ">AnyCPU</PlatformTarget>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>Microsoft.VisualStudio.TestPlatform.CommandLine</RootNamespace>
   </PropertyGroup>
@@ -47,6 +47,7 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
+    <ProjectReference Include="..\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Resources.Designer.cs">

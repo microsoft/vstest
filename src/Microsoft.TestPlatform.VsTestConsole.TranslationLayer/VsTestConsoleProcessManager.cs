@@ -227,7 +227,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         }
     }
 
-    private string[] BuildArguments(ConsoleParameters parameters)
+    internal string[] BuildArguments(ConsoleParameters parameters)
     {
         var args = new List<string>
         {

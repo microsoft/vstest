@@ -9,7 +9,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 
+using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -33,7 +35,7 @@ internal class Program
         // Use this as playground for your debugging of end-to-end scenarios, it will automatically attach vstest.console and teshost
         // sub-processes. It won't stop at entry-point automatically, don't forget to set your breakpoints, or remove VSTEST_DEBUG_NOBP
         // from the environment variables of this project.
-
+        Console.Title = "Hello";
         var thisAssemblyPath = Assembly.GetEntryAssembly().Location;
         var here = Path.GetDirectoryName(thisAssemblyPath);
         var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
@@ -55,29 +57,29 @@ internal class Program
             Path.Combine(playground, "MSTest1", "bin", "Debug", "net5.0", "MSTest1.dll"),
         };
 
-        // console mode
-        var settingsFile = Path.GetTempFileName();
-        try
-        {
-            File.WriteAllText(settingsFile, sourceSettings);
-            var processStartInfo = new ProcessStartInfo
-            {
-                FileName = dotnetExe,
-                Arguments = string.Join(" ", consoleDll, string.Join(" ", sources), $"--settings:{settingsFile}", "--listtests"),
-                UseShellExecute = false,
-            };
-            EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
-            var process = Process.Start(processStartInfo);
-            process.WaitForExit();
-            if (process.ExitCode != 0)
-            {
-                throw new Exception($"Process failed with {process.ExitCode}");
-            }
-        }
-        finally
-        {
-            try { File.Delete(settingsFile); } catch { }
-        }
+        //// console mode
+        //var settingsFile = Path.GetTempFileName();
+        //try
+        //{
+        //    File.WriteAllText(settingsFile, sourceSettings);
+        //    var processStartInfo = new ProcessStartInfo
+        //    {
+        //        FileName = dotnetExe,
+        //        Arguments = string.Join(" ", consoleDll, string.Join(" ", sources), $"--settings:{settingsFile}", "--listtests"),
+        //        UseShellExecute = false,
+        //    };
+        //    EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
+        //    var process = Process.Start(processStartInfo);
+        //    process.WaitForExit();
+        //    if (process.ExitCode != 0)
+        //    {
+        //        throw new Exception($"Process failed with {process.ExitCode}");
+        //    }
+        //}
+        //finally
+        //{
+        //    try { File.Delete(settingsFile); } catch { }
+        //}
 
         // design mode
         var consoleOptions = new ConsoleParameters
@@ -87,10 +89,11 @@ internal class Program
             TraceLevel = TraceLevel.Verbose,
         };
         var options = new TestPlatformOptions();
-        var r = new VsTestConsoleWrapper(consoleDll, dotnetExe, consoleOptions);
+        // var r = new VsTestConsoleWrapper(consoleDll, dotnetExe, consoleOptions);
+        IVsTestConsoleWrapper r = new InProcessVsTestConsoleWrapper(consoleDll, dotnetExe, consoleOptions);
         var sessionHandler = new TestSessionHandler();
 #pragma warning disable CS0618 // Type or member is obsolete
-        r.StartTestSession(sources, sourceSettings, sessionHandler);
+       // r.StartTestSession(sources, sourceSettings, sessionHandler);
 #pragma warning restore CS0618 // Type or member is obsolete
         var discoveryHandler = new PlaygroundTestDiscoveryHandler();
         r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);

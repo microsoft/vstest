@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -67,6 +68,10 @@ internal class Executor
 
     internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource, IProcessHelper processHelper, IEnvironment environment)
     {
+        DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_RUNNER_DEBUG_ATTACHVS");
+        DebuggerBreakpoint.WaitForDebugger("VSTEST_RUNNER_DEBUG");
+        UiLanguageOverride.SetCultureSpecifiedByUser();
+
         Output = output;
         _testPlatformEventSource = testPlatformEventSource;
         _showHelp = true;

@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 
 using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
 using Microsoft.VisualStudio.TestPlatform.Client.Execution;
@@ -283,6 +284,13 @@ internal class TestPlatform : ITestPlatform
         }
 
         string extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()), "Extensions");
+        if (!fileHelper.DirectoryExists(extensionsFolder))
+        {
+            // NOMERGE: Since we no-longer run from <playground>\vstest.console\vstest.conosle.exe in Playground, the relative extensions folder location changed.
+            // And we need to patch it.
+            extensionsFolder = Path.Combine(Path.GetDirectoryName(extensionsFolder), "vstest.console", "Extensions");
+        }
+
         if (fileHelper.DirectoryExists(extensionsFolder))
         {
             // Load default runtime providers
