@@ -69,6 +69,7 @@ public class TestSessionPoolTests
         TestSessionPool.Instance = null;
 
         var testSessionInfo = new TestSessionInfo();
+        var mockRequestData = new Mock<IRequestData>();
         var mockProxyTestSessionManager = new Mock<ProxyTestSessionManager>(
             new StartTestSessionCriteria(),
             1,
@@ -81,17 +82,17 @@ public class TestSessionPoolTests
 
         Assert.IsNotNull(TestSessionPool.Instance);
         // Take proxy fails because test session is invalid.
-        Assert.IsNull(TestSessionPool.Instance.TryTakeProxy(new TestSessionInfo(), string.Empty, string.Empty));
+        Assert.IsNull(TestSessionPool.Instance.TryTakeProxy(new TestSessionInfo(), string.Empty, string.Empty, mockRequestData.Object));
         mockProxyTestSessionManager.Verify(tsm => tsm.DequeueProxy(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
 
         Assert.IsTrue(TestSessionPool.Instance.AddSession(testSessionInfo, mockProxyTestSessionManager.Object));
 
         // First TakeProxy fails because of throwing, see setup sequence.
-        Assert.IsNull(TestSessionPool.Instance.TryTakeProxy(testSessionInfo, string.Empty, string.Empty));
+        Assert.IsNull(TestSessionPool.Instance.TryTakeProxy(testSessionInfo, string.Empty, string.Empty, mockRequestData.Object));
         mockProxyTestSessionManager.Verify(tsm => tsm.DequeueProxy(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
         // Second TakeProxy succeeds, see setup sequence.
-        Assert.IsNotNull(TestSessionPool.Instance.TryTakeProxy(testSessionInfo, string.Empty, string.Empty));
+        Assert.IsNotNull(TestSessionPool.Instance.TryTakeProxy(testSessionInfo, string.Empty, string.Empty, mockRequestData.Object));
         mockProxyTestSessionManager.Verify(tsm => tsm.DequeueProxy(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
     }
 

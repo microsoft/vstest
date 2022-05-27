@@ -40,7 +40,7 @@ public class ExecutionManager : IExecutionManager
     /// <summary>
     /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
     /// </summary>
-    public ExecutionManager(IRequestData requestData) : this(TestPlatformEventSource.Instance, requestData)
+    public ExecutionManager(IRequestData requestData!!) : this(TestPlatformEventSource.Instance, requestData)
     {
         _sessionMessageLogger = TestSessionMessageLogger.Instance;
         _sessionMessageLogger.TestRunMessage += TestSessionMessageHandler;
@@ -50,7 +50,7 @@ public class ExecutionManager : IExecutionManager
     /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
     /// </summary>
     /// <param name="testPlatformEventSource">Test platform event source.</param>
-    protected ExecutionManager(ITestPlatformEventSource testPlatformEventSource, IRequestData requestData)
+    protected ExecutionManager(ITestPlatformEventSource testPlatformEventSource, IRequestData requestData!!)
     {
         _testPlatformEventSource = testPlatformEventSource;
         _requestData = requestData;
@@ -64,6 +64,9 @@ public class ExecutionManager : IExecutionManager
     /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
     public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestMessageEventHandler testMessageEventsHandler)
     {
+        // Clear the request data metrics left over from a potential previous run.
+        _requestData.MetricsCollection?.Metrics?.Clear();
+
         _testMessageEventsHandler = testMessageEventsHandler;
         _testPlatformEventSource.AdapterSearchStart();
 
