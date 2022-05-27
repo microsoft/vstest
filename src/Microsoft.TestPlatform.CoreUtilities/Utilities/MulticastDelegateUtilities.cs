@@ -57,17 +57,22 @@ public static class MulticastDelegateUtilities
                 try
                 {
                     handler.DynamicInvoke(sender, args);
-                    EqtTrace.Verbose("MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, took {5} ms.",
-                            traceDisplayName,
-                            ++i,
-                            invocationList.Length,
-                            handler.GetTargetName(),
-                            handler.GetMethodName(),
-                            stopwatch.ElapsedMilliseconds);
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
+                        EqtTrace.Verbose("MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, took {5} ms.",
+                                traceDisplayName,
+                                ++i,
+                                invocationList.Length,
+                                handler.GetTargetName(),
+                                handler.GetMethodName(),
+                                stopwatch.ElapsedMilliseconds);
+                    }
                 }
                 catch (TargetInvocationException exception)
                 {
-                    EqtTrace.Error(
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error(
                         "MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, failed after {5} ms with: {6}.",
                         ++i,
                         invocationList.Length,
@@ -76,6 +81,7 @@ public static class MulticastDelegateUtilities
                         traceDisplayName,
                         stopwatch.ElapsedMilliseconds,
                         exception);
+                    }
                 }
             }
         }

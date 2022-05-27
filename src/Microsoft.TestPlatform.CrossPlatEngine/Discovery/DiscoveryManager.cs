@@ -123,11 +123,9 @@ public class DiscoveryManager : IDiscoveryManager
             // If there are sources to discover
             if (verifiedExtensionSourceMap.Any())
             {
-                new DiscovererEnumerator(_requestData, discoveryResultCache, _cancellationTokenSource.Token).LoadTests(
-                    verifiedExtensionSourceMap,
-                    RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
-                    discoveryCriteria.TestCaseFilter,
-                    _sessionMessageLogger);
+                var runSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings);
+                var discovererEnumerator = new DiscovererEnumerator(_requestData, discoveryResultCache, _cancellationTokenSource.Token);
+                discovererEnumerator.LoadTests(verifiedExtensionSourceMap, runSettings, discoveryCriteria.TestCaseFilter, _sessionMessageLogger);
             }
         }
         finally
