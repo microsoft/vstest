@@ -62,7 +62,7 @@ internal class Program
             var processStartInfo = new ProcessStartInfo
             {
                 FileName = console,
-                Arguments = string.Join(" ", sources, $"--settings:{settingsFile}", "--listtests"),
+                Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile} --listtests",
                 UseShellExecute = false,
             };
             EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
