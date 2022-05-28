@@ -90,7 +90,7 @@ public sealed class DummyEventLogContainer : IEventLogContainer
 
     public List<EventLogEntry> EventLogEntries { get; set; }
 
-    public void OnEventLogEntryWritten(object source, EntryWrittenEventArgs e)
+    public void OnEventLogEntryWritten(object? source, EntryWrittenEventArgs? e)
     {
     }
 }

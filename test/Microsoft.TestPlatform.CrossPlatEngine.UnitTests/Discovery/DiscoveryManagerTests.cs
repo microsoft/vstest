@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+using FluentAssertions;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
@@ -67,6 +68,32 @@ public class DiscoveryManagerTests
         Assert.IsTrue(allDiscoverers.Any());
     }
 
+    [TestMethod]
+    public void InitializeShouldClearMetricsCollection()
+    {
+        var metricsCollection = new MetricsCollection();
+
+        metricsCollection.Add("metric", "value");
+        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(metricsCollection);
+        _mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
+
+        var discoveryManager = new DiscoveryManager(_mockRequestData.Object);
+
+        metricsCollection.Metrics.Should().ContainKey("metric");
+        discoveryManager.Initialize(null, new Mock<ITestDiscoveryEventsHandler2>().Object);
+        metricsCollection.Metrics.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void InitializeShouldNotFailIfMetricsFieldIsNull()
+    {
+        _mockRequestData.Object.MetricsCollection.Metrics.Should().BeNull();
+
+        var action = () => (new DiscoveryManager(_mockRequestData.Object))
+            .Initialize(null, new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+        action.Should().NotThrow();
+    }
     #endregion
 
     #region DiscoverTests tests
@@ -287,6 +314,5 @@ public class DiscoveryManagerTests
         Assert.AreEqual(true, receivedDiscoveryCompleteEventArgs!.IsAborted);
         Assert.AreEqual(-1, receivedDiscoveryCompleteEventArgs.TotalCount);
     }
-
     #endregion
 }

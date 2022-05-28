@@ -742,7 +742,8 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
                 var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
                     testSessionInfo,
                     source,
-                    string.Empty);
+                    string.Empty,
+                    _mockRequestData.Object);
 
                 return proxyOperationManager;
             };
@@ -765,7 +766,8 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
                     tsp => tsp.TryTakeProxy(
                         testSessionInfo,
                         It.IsAny<string>(),
-                        It.IsAny<string>()))
+                        It.IsAny<string>(),
+                        _mockRequestData.Object))
                 .Returns(mockProxyOperationManager.Object);
 
             testExecutionManager.Initialize(true);
@@ -777,7 +779,8 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
                 tsp => tsp.TryTakeProxy(
                     testSessionInfo,
                     It.IsAny<string>(),
-                    It.IsAny<string>()),
+                    It.IsAny<string>(),
+                    _mockRequestData.Object),
                 Times.Once);
         }
         finally
