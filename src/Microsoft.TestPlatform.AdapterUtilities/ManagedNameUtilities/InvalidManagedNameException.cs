@@ -18,7 +18,7 @@ public class InvalidManagedNameException :
     , ISerializable
 #endif
 {
-    public InvalidManagedNameException(string? message) : base(message) { }
+    public InvalidManagedNameException(string message) : base(message) { }
 
 #if !NETSTANDARD1_0 && !WINDOWS_UWP
     protected InvalidManagedNameException(SerializationInfo info, StreamingContext context) : base(info, context) { }

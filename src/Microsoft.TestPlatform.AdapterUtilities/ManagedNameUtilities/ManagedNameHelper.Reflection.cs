@@ -80,15 +80,19 @@ public static partial class ManagedNameHelper
     /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in
     /// <see href="https://github.com/microsoft/vstest-docs/blob/main/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
     /// </remarks>
-    public static void GetManagedName(MethodBase method!!, out string managedTypeName, out string managedMethodName, out string[]? hierarchyValues)
+    public static void GetManagedName(MethodBase method!!, out string managedTypeName, out string managedMethodName, out string[] hierarchyValues)
     {
         if (!ReflectionHelpers.IsMethod(method))
         {
+            // TODO: @Haplois, exception expects a message and not a param name.
             throw new NotSupportedException(nameof(method));
         }
 
-        var semanticType = ReflectionHelpers.GetReflectedType(method);
-        if (semanticType is not null && ReflectionHelpers.IsGenericType(semanticType))
+        var semanticType = ReflectionHelpers.GetReflectedType(method)
+            // TODO: @Haplois, exception expects a message and not a param name.
+            ?? throw new NotSupportedException(nameof(method));
+
+        if (ReflectionHelpers.IsGenericType(semanticType))
         {
             // The type might have some of its generic parameters specified, so make
             // sure we are working with the open form of the generic type.
@@ -114,6 +118,11 @@ public static partial class ManagedNameHelper
 
         // Namespace and Type Name (with arity designation)
         var hierarchyPos = AppendTypeString(typeBuilder, semanticType, closedType: false);
+        if (hierarchyPos is null || hierarchyPos.Length != HierarchyConstants.Levels.TotalLevelCount)
+        {
+            // TODO: @Haplois, exception expects a message and not a param name.
+            throw new NotSupportedException(nameof(method));
+        }
 
         // Method Name with method arity
         var arity = method.GetGenericArguments().Length;
@@ -140,13 +149,11 @@ public static partial class ManagedNameHelper
 
         managedTypeName = typeBuilder.ToString();
         managedMethodName = methodBuilder.ToString();
-        hierarchyValues = hierarchyPos != null
-            ? new[]
-            {
-                managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]),
-                managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1),
-            }
-            : null;
+        hierarchyValues = new[]
+        {
+            managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]),
+            managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1),
+        };
     }
 
     /// <summary>
@@ -261,13 +268,12 @@ public static partial class ManagedNameHelper
 
     private static int[]? AppendTypeString(StringBuilder b, Type? type, bool closedType)
     {
-        int[]? hierarchies = null;
-
         if (type is null)
         {
-            return hierarchies;
+            return null;
         }
 
+        int[]? hierarchies = null;
         if (type.IsArray)
         {
             hierarchies = AppendTypeString(b, type.GetElementType(), closedType);

@@ -125,8 +125,7 @@ public class ManagedNameParser
         }
         if (!int.TryParse(Capture(managedMethodName, start + 1, i), out arity))
         {
-            string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorMethodArityMustBeNumeric);
-            throw new InvalidManagedNameException(message);
+            throw new InvalidManagedNameException(Resources.Resources.ErrorMethodArityMustBeNumeric);
         }
         return i;
     }
@@ -164,8 +163,7 @@ public class ManagedNameParser
             }
         }
 
-        string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorIncompleteManagedName);
-        throw new InvalidManagedNameException(message);
+        throw new InvalidManagedNameException(Resources.Resources.ErrorIncompleteManagedName);
     }
 
     private static int ParseParameterType(string managedMethodName, int start, out string parameterType)
@@ -227,8 +225,7 @@ public class ManagedNameParser
             }
         }
 
-        string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorIncompleteManagedName);
-        throw new InvalidManagedNameException(message);
+        throw new InvalidManagedNameException(Resources.Resources.ErrorIncompleteManagedName);
     }
 
     private static int ParseGenericBrackets(string managedMethodName, int start)
@@ -258,7 +255,6 @@ public class ManagedNameParser
             }
         }
 
-        string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorIncompleteManagedName);
-        throw new InvalidManagedNameException(message);
+        throw new InvalidManagedNameException(Resources.Resources.ErrorIncompleteManagedName);
     }
 }
