@@ -194,14 +194,11 @@ internal class TestRequestManager : ITestRequestManager
         var batchSize = runConfiguration.BatchSize;
         var testCaseFilterFromRunsettings = runConfiguration.TestCaseFilter;
 
-        if (requestData.IsTelemetryOptedIn)
-        {
-            // Collect metrics.
-            CollectMetrics(requestData, runConfiguration);
+        // Collect metrics.
+        CollectMetrics(requestData, runConfiguration);
 
-            // Collect commands.
-            LogCommandsTelemetryPoints(requestData);
-        }
+        // Collect commands.
+        LogCommandsTelemetryPoints(requestData);
 
         // Create discovery request.
         var criteria = new DiscoveryCriteria(
@@ -307,17 +304,14 @@ internal class TestRequestManager : ITestRequestManager
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
         var batchSize = runConfiguration.BatchSize;
 
-        if (requestData.IsTelemetryOptedIn)
-        {
-            // Collect metrics.
-            CollectMetrics(requestData, runConfiguration);
+        // Collect metrics.
+        CollectMetrics(requestData, runConfiguration);
 
-            // Collect commands.
-            LogCommandsTelemetryPoints(requestData);
+        // Collect commands.
+        LogCommandsTelemetryPoints(requestData);
 
-            // Collect data for legacy settings.
-            LogTelemetryForLegacySettings(requestData, runsettings);
-        }
+        // Collect data for legacy settings.
+        LogTelemetryForLegacySettings(requestData, runsettings);
 
         // Get Fakes data collector settings.
         if (!string.Equals(Environment.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))

@@ -13,6 +13,8 @@ internal static class TelemetryDataConstants
     // ******************** General ***********************
     public static readonly string DiscoveredExtensions = "VS.TestPlatform.DiscoveredExtensions";
 
+    public static readonly string InProcessRequest = "VS.TestPlatform.InProcessRequest";
+
     // ******************** Execution ***********************
     public static readonly string ParallelEnabledDuringExecution = "VS.TestRun.ParallelEnabled";
 

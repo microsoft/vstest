@@ -99,6 +99,9 @@ public class TestEngine : ITestEngine
             }
             var testHostManagerInfo = testHostManagers[0];
 
+            // Collect telemetry for in-process runs.
+            requestData.MetricsCollection.Add(TelemetryDataConstants.InProcessRequest, "true");
+
             // Don't intialize, we are taking an instance that we created already initialized in GetTestRuntimeProvidersForUniqueConfigurations
             // testHostManager.Initialize(TestSessionMessageLogger.Instance, testHostManagerInfo.RunSettings);
 
@@ -218,6 +221,9 @@ public class TestEngine : ITestEngine
             {
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
             }
+
+            // Collect telemetry for in-process runs.
+            requestData.MetricsCollection.Add(TelemetryDataConstants.InProcessRequest, "true");
 
             return new InProcessProxyExecutionManager(
                 testHostManager,
