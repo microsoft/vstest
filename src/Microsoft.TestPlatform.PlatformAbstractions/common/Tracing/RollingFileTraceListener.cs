@@ -128,6 +128,9 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// this listener.
         /// </summary>
         private TallyKeepingFileStreamWriter _managedWriter;
+        private bool _lastRollFailed;
+        private readonly Stopwatch _sinceLastRoll = Stopwatch.StartNew();
+        private readonly long _failedRollTimeout = TimeSpan.FromMinutes(1).Ticks;
 
         /// <summary>
         /// The trace listener for which rolling is being managed.
@@ -232,6 +235,14 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// <returns>true if update was successful, false if an error occurred.</returns>
         public bool UpdateRollingInformationIfNecessary()
         {
+            // if we fail to move the file, don't retry to move it for a long time
+            // it is most likely locked, and we end up trying to move it twice
+            // on each message write.
+            if (_lastRollFailed && _sinceLastRoll.ElapsedTicks < _failedRollTimeout)
+            {
+                return false;
+            }
+
             // replace writer with the tally keeping version if necessary for size rolling
             if (_managedWriter == null)
             {
@@ -260,7 +271,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
             GC.SuppressFinalize(this);
         }
 
-        private static void SafeMove(string actualFileName, string archiveFileName, DateTime currentDateTime)
+        private void SafeMove(string actualFileName, string archiveFileName, DateTime currentDateTime)
         {
             try
             {
@@ -272,18 +283,27 @@ public class RollingFileTraceListener : TextWriterTraceListener
                 // take care of tunneling issues http://support.microsoft.com/kb/172190
                 File.SetCreationTime(actualFileName, currentDateTime);
                 File.Move(actualFileName, archiveFileName);
+
+                _lastRollFailed = false;
+                _sinceLastRoll.Restart();
             }
             catch (IOException)
             {
+                _lastRollFailed = true;
+
                 // catch errors and attempt move to a new file with a GUID
                 archiveFileName += Guid.NewGuid().ToString();
 
                 try
                 {
                     File.Move(actualFileName, archiveFileName);
+
+                    _lastRollFailed = false;
+                    _sinceLastRoll.Restart();
                 }
                 catch (IOException)
                 {
+                    _lastRollFailed = true;
                 }
             }
         }
