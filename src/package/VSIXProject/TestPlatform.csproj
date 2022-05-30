@@ -189,6 +189,10 @@
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\Cpp\x64\*.*" Exclude="$(VsixInputFileLocation)\Extensions\Cpp\x64\*.pdb">
       <VSIXSubPath>Extensions\Cpp\x64</VSIXSubPath>
     </VsixSourceItem>
+
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\Cpp\x64\*.*" Exclude="$(VsixInputFileLocation)\Extensions\Cpp\arm64\*.pdb">
+      <VSIXSubPath>Extensions\Cpp\arm64</VSIXSubPath>
+    </VsixSourceItem>
     
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\TestImpact\ComComponents\x64\*.*">
       <VSIXSubPath>Extensions\TestImpact\ComComponents\x64</VSIXSubPath>
