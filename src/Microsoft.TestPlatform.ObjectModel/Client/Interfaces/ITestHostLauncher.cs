@@ -21,34 +21,12 @@ public interface IInternalTestHostLauncher
     /// Launches custom test host using the default test process start info
     /// </summary>
     /// <param name="defaultTestHostStartInfo">Default TestHost Process Info</param>
-    /// <returns>Process id of the launched test host</returns>
-    int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo);
-
-    /// <summary>
-    /// Launches custom test host using the default test process start info
-    /// </summary>
-    /// <param name="defaultTestHostStartInfo">Default TestHost Process Info</param>
     /// <param name="cancellationToken">The cancellation Token.</param>
     /// <returns>Process id of the launched test host</returns>
     int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken);
 
-    /// <summary>
-    /// Attach debugger to already running custom test host process.
-    /// </summary>
-    /// <param name="pid">Process ID of the process to which the debugger should be attached.</param>
-    /// <returns><see cref="true"/> if the debugger was successfully attached to the requested process, <see cref="false"/> otherwise.</returns>
-    bool AttachDebuggerToProcess(int pid);
-
-    /// <summary>
-    /// Attach debugger to already running custom test host process.
-    /// </summary>
-    /// <param name="pid">Process ID of the process to which the debugger should be attached.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns><see cref="true"/> if the debugger was successfully attached to the requested process, <see cref="false"/> otherwise.</returns>
-    bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken);
-
     // new in this version
-    // bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken);
+    bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken);
 }
 
 

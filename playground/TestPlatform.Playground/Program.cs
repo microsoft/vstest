@@ -257,6 +257,10 @@ internal class Program
 
     internal class DebuggerTestHostLauncher : ITestHostLauncher3
     {
+        public DebuggerTestHostLauncher()
+        {
+
+        }
         public bool IsDebug => true;
 
         public bool AttachDebuggerToProcess(int pid)

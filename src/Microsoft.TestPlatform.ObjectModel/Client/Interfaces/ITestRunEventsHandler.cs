@@ -2,7 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Threading;
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 #nullable disable
@@ -42,7 +44,7 @@ public interface IInternalTestRunEventsHandler : IInternalTestMessageEventHandle
     /// </summary>
     /// <param name="pid">Process ID of the process to which the debugger should be attached.</param>
     /// <returns><see cref="true"/> if the debugger was successfully attached to the requested process, <see cref="false"/> otherwise.</returns>
-    bool AttachDebuggerToProcess(int pid);
+    bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo);
 }
 
 /// <summary>

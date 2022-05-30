@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -23,7 +24,8 @@ using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Con
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
-/// Test request sender implementation.
+/// Sends test requests from vstest.console (runner) to a testhost. See <see cref="StartTestRun"/> for example of how a request is sent. And <see cref="OnExecutionMessageReceived"/> for how a received message is processed.
+/// This class also handles discovery.
 /// </summary>
 public class TestRequestSender : ITestRequestSender
 {
@@ -537,7 +539,9 @@ public class TestRequestSender : ITestRequestSender
 
                 case MessageType.AttachDebugger:
                     var testProcessPid = _dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
-                    bool result = ((IInternalTestRunEventsHandler)testRunEventsHandler).AttachDebuggerToProcess(testProcessPid.ProcessID);
+                    bool result = testRunEventsHandler.AttachDebuggerToProcess(
+                        // TODO: Add anti corruption layer here.
+                        new AttachDebuggerInfo { ProcessId = testProcessPid.ProcessID });
 
                     var resultMessage = _dataSerializer.SerializePayload(
                         MessageType.AttachDebuggerCallback,

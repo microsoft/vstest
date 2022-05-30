@@ -30,21 +30,9 @@ internal class DesignModeTestHostLauncher : IInternalTestHostLauncher
     public virtual bool IsDebug => false;
 
     /// <inheritdoc/>
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken)
     {
-        return _designModeClient.AttachDebuggerToProcess(pid, CancellationToken.None);
-    }
-
-    /// <inheritdoc/>
-    public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
-    {
-        return _designModeClient.AttachDebuggerToProcess(pid, cancellationToken);
-    }
-
-    /// <inheritdoc/>
-    public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
-    {
-        return _designModeClient.LaunchCustomHost(defaultTestHostStartInfo, CancellationToken.None);
+        return _designModeClient.AttachDebuggerToProcess(attachDebuggerInfo, cancellationToken);
     }
 
     /// <inheritdoc/>

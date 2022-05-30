@@ -18,6 +18,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -327,7 +328,7 @@ public class DesignModeClient : IDesignModeClient
     }
 
     /// <inheritdoc/>
-    public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken)
     {
         // If an attach request is issued but there is no support for attaching on the other
         // side of the communication channel, we simply return and let the caller know the
@@ -347,7 +348,7 @@ public class DesignModeClient : IDesignModeClient
                 waitHandle.Set();
             };
 
-            _communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid, _protocolConfig.Version);
+            _communicationManager.SendMessage(MessageType.EditorAttachDebugger, attachDebuggerInfo.ProcessId, _protocolConfig.Version);
 
             WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 

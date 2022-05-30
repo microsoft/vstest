@@ -653,17 +653,16 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         // Only launch while the test run is in progress and the launcher is a debug one
         if (State == TestRunState.InProgress && TestRunCriteria.TestHostLauncher.IsDebug)
         {
-            processId = TestRunCriteria.TestHostLauncher.LaunchTestHost(testProcessStartInfo);
+            processId = TestRunCriteria.TestHostLauncher.LaunchTestHost(testProcessStartInfo, CancellationToken.None);
         }
 
         return processId;
     }
 
     /// <inheritdoc />
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
     {
-        return TestRunCriteria.TestHostLauncher is IInternalTestHostLauncher launcher
-               && launcher.AttachDebuggerToProcess(pid);
+        return TestRunCriteria.TestHostLauncher.AttachDebuggerToProcess(attachDebuggerInfo, CancellationToken.None);
     }
 
     /// <summary>

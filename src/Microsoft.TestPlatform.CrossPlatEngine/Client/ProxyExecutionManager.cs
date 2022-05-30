@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -338,9 +339,9 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
     }
 
     /// <inheritdoc />
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
     {
-        return ((IInternalTestRunEventsHandler)_baseTestRunEventsHandler).AttachDebuggerToProcess(pid);
+        return _baseTestRunEventsHandler.AttachDebuggerToProcess(attachDebuggerInfo);
     }
 
     /// <inheritdoc/>

@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 #nullable disable
@@ -100,9 +101,9 @@ public class TestRunEventsHandler : IInternalTestRunEventsHandler
     }
 
     /// <inheritdoc/>
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
     {
-        EqtTrace.Info("Sending AttachDebuggerToProcess on additional test process with pid: {0}", pid);
-        return _requestHandler.AttachDebuggerToProcess(pid);
+        EqtTrace.Info("Sending AttachDebuggerToProcess on additional test process with pid: {0}", attachDebuggerInfo.ProcessId);
+        return _requestHandler.AttachDebuggerToProcess(attachDebuggerInfo);
     }
 }

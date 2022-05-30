@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 #nullable disable
@@ -180,9 +181,9 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
     }
 
     /// <inheritdoc />
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
     {
-        return ((IInternalTestRunEventsHandler)_testRunEventsHandler).AttachDebuggerToProcess(pid);
+        return _testRunEventsHandler.AttachDebuggerToProcess(attachDebuggerInfo);
     }
 
     /// <summary>

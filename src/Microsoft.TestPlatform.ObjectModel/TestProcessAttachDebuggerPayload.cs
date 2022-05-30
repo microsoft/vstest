@@ -27,4 +27,10 @@ public class TestProcessAttachDebuggerPayload
     /// </summary>
     [DataMember]
     public int ProcessID { get; set; }
+
+    [DataMember]
+    public Framework Framework { get; set; }
+
+    [DataMember]
+    public Architecture Architecture { get; set; }
 }

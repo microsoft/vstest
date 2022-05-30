@@ -332,8 +332,13 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <inheritdoc />
     public bool AttachDebuggerToTestHost()
     {
-        return _customTestHostLauncher is IInternalTestHostLauncher launcher
-               && launcher.AttachDebuggerToProcess(_testHostProcess.Id);
+        return _customTestHostLauncher.AttachDebuggerToProcess(new AttachDebuggerInfo
+        {
+            ProcessId = _testHostProcess.Id,
+            IsNative = false,
+            TargetFramework = _targetFramework,
+            Architecture = _architecture,
+        }, CancellationToken.None);
     }
 
     /// <summary>

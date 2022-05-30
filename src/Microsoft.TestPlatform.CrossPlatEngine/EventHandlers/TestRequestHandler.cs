@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -271,7 +272,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     }
 
     /// <inheritdoc />
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
     {
         // If an attach request is issued but there is no support for attaching on the other
         // side of the communication channel, we simply return and let the caller know the
@@ -292,7 +293,12 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
 
         var data = _dataSerializer.SerializePayload(
             MessageType.AttachDebugger,
-            new TestProcessAttachDebuggerPayload(pid),
+            // TODO: Add anti corruption layer here?
+            new TestProcessAttachDebuggerPayload(attachDebuggerInfo.ProcessId)
+            {
+                Framework = attachDebuggerInfo.TargetFramework,
+                Architecture = attachDebuggerInfo.Architecture,
+            },
             _protocolVersion);
         SendData(data);
 
