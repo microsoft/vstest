@@ -912,7 +912,7 @@ internal class TestRequestManager : ITestRequestManager
             out var incompatibleSettingWarning);
 
         // Raise warnings for incompatible sources
-        if (!StringUtils.IsNullOrEmpty(incompatibleSettingWarning))
+        if (!incompatibleSettingWarning.IsNullOrEmpty())
         {
             EqtTrace.Warning(incompatibleSettingWarning);
             registrar?.LogWarning(incompatibleSettingWarning);
@@ -1145,7 +1145,7 @@ internal class TestRequestManager : ITestRequestManager
         if (_commandLineOptions.IsDesignMode)
         {
             bool isValidFrameworkXml = InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkXml);
-            var runSettingsHaveValidFramework = isValidFrameworkXml && !StringUtils.IsNullOrWhiteSpace(frameworkXml);
+            var runSettingsHaveValidFramework = isValidFrameworkXml && !frameworkXml.IsNullOrWhiteSpace();
             if (runSettingsHaveValidFramework)
             {
                 // TODO: this should just ask the runsettings to give that value so we always parse it the same way
@@ -1183,7 +1183,7 @@ internal class TestRequestManager : ITestRequestManager
                 navigator,
                 out var platformXml);
 
-            bool runSettingsHaveValidPlatform = isValidPlatformXml && !StringUtils.IsNullOrWhiteSpace(platformXml);
+            bool runSettingsHaveValidPlatform = isValidPlatformXml && !platformXml.IsNullOrWhiteSpace();
             if (runSettingsHaveValidPlatform)
             {
                 // TODO: this should be checking if the enum has the value specified, or ideally just ask the runsettings to give that value
@@ -1231,7 +1231,7 @@ internal class TestRequestManager : ITestRequestManager
         // Collecting Target Device. Here, it will be updated run settings so, target device
         // will be under run configuration only.
         var targetDevice = runConfiguration.TargetDevice;
-        if (StringUtils.IsNullOrEmpty(targetDevice))
+        if (targetDevice.IsNullOrEmpty())
         {
             requestData.MetricsCollection.Add(
                 TelemetryDataConstants.TargetDevice,
@@ -1322,7 +1322,7 @@ internal class TestRequestManager : ITestRequestManager
         }
 
         var settings = _commandLineOptions.SettingsFile;
-        if (!StringUtils.IsNullOrEmpty(settings))
+        if (!settings.IsNullOrEmpty())
         {
             var extension = Path.GetExtension(settings);
             if (string.Equals(extension, ".runsettings", StringComparison.OrdinalIgnoreCase))

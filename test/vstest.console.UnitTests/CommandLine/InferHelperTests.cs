@@ -156,19 +156,19 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnDefaultFrameworkOnEmptySources()
     {
-        Assert.AreEqual(_defaultFramework, _inferHelper.AutoDetectFramework(new List<string>(0), out _));
+        Assert.AreEqual(_defaultFramework, _inferHelper.AutoDetectFramework(new List<string?>(0), out _));
     }
 
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnDefaultFrameworkOnNullItemInSources()
     {
-        Assert.AreEqual(_defaultFramework, _inferHelper.AutoDetectFramework(new List<string>() { null! }, out _));
+        Assert.AreEqual(_defaultFramework, _inferHelper.AutoDetectFramework(new List<string?>() { null }, out _));
     }
 
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnDefaultFrameworkOnEmptyItemInSources()
     {
-        Assert.AreEqual(_defaultFramework.Name, _inferHelper.AutoDetectFramework(new List<string>() { string.Empty }, out _).Name);
+        Assert.AreEqual(_defaultFramework.Name, _inferHelper.AutoDetectFramework(new List<string?>() { string.Empty }, out _).Name);
     }
 
     [TestMethod]
@@ -226,7 +226,7 @@ public class InferHelperTests
             .Returns(new FrameworkName(_frameworkNet46.Name))
             .Returns(new FrameworkName(_frameworkNet47.Name))
             .Returns(new FrameworkName(_frameworkNet45.Name));
-        Assert.AreEqual(_frameworkNet47.Name, _inferHelper.AutoDetectFramework(new List<string>() { "net46.dll", "net47.exe", "net45.dll" }, out _).Name);
+        Assert.AreEqual(_frameworkNet47.Name, _inferHelper.AutoDetectFramework(new List<string?>() { "net46.dll", "net47.exe", "net45.dll" }, out _).Name);
         _mockAssemblyHelper.Verify(ah => ah.GetFrameWork(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -238,7 +238,7 @@ public class InferHelperTests
             .Returns(new FrameworkName(_frameworkNet47.Name))
             .Returns(new FrameworkName(_frameworkNet45.Name));
 
-        Assert.AreEqual(_frameworkNet47.Name, _inferHelper.AutoDetectFramework(new List<string>() { "net46.dll", "net47.exe", "net45.dll" }, out var sourceFrameworks).Name);
+        Assert.AreEqual(_frameworkNet47.Name, _inferHelper.AutoDetectFramework(new List<string?>() { "net46.dll", "net47.exe", "net45.dll" }, out var sourceFrameworks).Name);
 
         Assert.AreEqual(3, sourceFrameworks.Count);
         Assert.AreEqual(_frameworkNet46.Name, sourceFrameworks["net46.dll"].Name);
@@ -254,7 +254,7 @@ public class InferHelperTests
             .Returns(new FrameworkName(_frameworkCore10.Name))
             .Returns(new FrameworkName(_frameworkCore11.Name))
             .Returns(new FrameworkName(_frameworkCore10.Name));
-        Assert.AreEqual(_frameworkCore11.Name, _inferHelper.AutoDetectFramework(new List<string>() { "netcore10_1.dll", "netcore11.dll", "netcore10_2.dll" }, out _).Name);
+        Assert.AreEqual(_frameworkCore11.Name, _inferHelper.AutoDetectFramework(new List<string?>() { "netcore10_1.dll", "netcore11.dll", "netcore10_2.dll" }, out _).Name);
         _mockAssemblyHelper.Verify(ah => ah.GetFrameWork(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -262,7 +262,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.Setup(sh => sh.GetFrameWork(assemblyName))
             .Returns(new FrameworkName(fx.Name));
-        Assert.AreEqual(fx.Name, _inferHelper.AutoDetectFramework(new List<string>() { assemblyName }, out _).Name);
+        Assert.AreEqual(fx.Name, _inferHelper.AutoDetectFramework(new List<string?>() { assemblyName }, out _).Name);
         if (verify)
         {
             _mockAssemblyHelper.Verify(ah => ah.GetFrameWork(assemblyName));

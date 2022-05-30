@@ -222,7 +222,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         }
 
         parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out _targetFramework);
-        _targetFramework = !StringUtils.IsNullOrEmpty(_targetFramework) ? NuGetFramework.Parse(_targetFramework).GetShortFolderName() : _targetFramework;
+        _targetFramework = !_targetFramework.IsNullOrEmpty() ? NuGetFramework.Parse(_targetFramework).GetShortFolderName() : _targetFramework;
 
         Initialize(events, string.Empty);
     }
@@ -267,7 +267,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             var prefix = string.Format(CultureInfo.CurrentCulture, "{0}{1}", Environment.NewLine, TestMessageFormattingPrefix);
             var messageText = message.Text?.Replace(Environment.NewLine, prefix).TrimEnd(TestMessageFormattingPrefix.ToCharArray());
 
-            if (!StringUtils.IsNullOrWhiteSpace(messageText))
+            if (!messageText.IsNullOrWhiteSpace())
             {
                 sb.AppendFormat(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, messageText);
             }
@@ -296,7 +296,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         // Add newline if it is not in given output data.
         var addAdditionalNewLine = false;
 
-        if (!StringUtils.IsNullOrEmpty(result.ErrorMessage))
+        if (!result.ErrorMessage.IsNullOrEmpty())
         {
             addAdditionalNewLine = true;
             Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.ErrorMessageBanner));
@@ -304,7 +304,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             Output.Information(false, ConsoleColor.Red, errorMessage);
         }
 
-        if (!StringUtils.IsNullOrEmpty(result.ErrorStackTrace))
+        if (!result.ErrorStackTrace.IsNullOrEmpty())
         {
             addAdditionalNewLine = false;
             Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StacktraceBanner));
@@ -318,7 +318,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             addAdditionalNewLine = true;
             var stdOutMessages = GetFormattedOutput(stdOutMessagesCollection);
 
-            if (!StringUtils.IsNullOrEmpty(stdOutMessages))
+            if (!stdOutMessages.IsNullOrEmpty())
             {
                 Output.Information(false, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StdOutMessagesBanner));
                 Output.Information(false, stdOutMessages);
@@ -331,7 +331,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             addAdditionalNewLine = false;
             var stdErrMessages = GetFormattedOutput(stdErrMessagesCollection);
 
-            if (!StringUtils.IsNullOrEmpty(stdErrMessages))
+            if (!stdErrMessages.IsNullOrEmpty())
             {
                 Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StdErrMessagesBanner));
                 Output.Information(false, ConsoleColor.Red, stdErrMessages);
@@ -344,7 +344,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             addAdditionalNewLine = false;
             var dbgTrcMessages = GetFormattedOutput(dbgTrcMessagesCollection);
 
-            if (!StringUtils.IsNullOrEmpty(dbgTrcMessages))
+            if (!dbgTrcMessages.IsNullOrEmpty())
             {
                 Output.Information(false, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.DbgTrcMessagesBanner));
                 Output.Information(false, dbgTrcMessages);
@@ -357,7 +357,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             addAdditionalNewLine = false;
             var addnlInfoMessages = GetFormattedOutput(addnlInfoMessagesCollection);
 
-            if (!StringUtils.IsNullOrEmpty(addnlInfoMessages))
+            if (!addnlInfoMessages.IsNullOrEmpty())
             {
                 Output.Information(false, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.AddnlInfoMessagesBanner));
                 Output.Information(false, addnlInfoMessages);
@@ -752,7 +752,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                 var total = sourceSummary.TotalTests.ToString().PadLeft(5);
 
 
-                var frameworkString = StringUtils.IsNullOrEmpty(_targetFramework)
+                var frameworkString = _targetFramework.IsNullOrEmpty()
                     ? string.Empty
                     : $"({_targetFramework})";
 

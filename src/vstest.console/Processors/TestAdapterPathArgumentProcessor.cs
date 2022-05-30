@@ -139,7 +139,7 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
         // Get test adapter paths from RunSettings.
         var testAdapterPathsInRunSettings = _runSettingsManager.QueryRunSettingsNode(RunSettingsPath);
 
-        if (!StringUtils.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
+        if (!testAdapterPathsInRunSettings.IsNullOrWhiteSpace())
         {
             testAdapterPaths.AddRange(SplitPaths(testAdapterPathsInRunSettings));
         }
