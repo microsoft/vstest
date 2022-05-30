@@ -122,7 +122,7 @@ public class TestSessionTests
     [TestMethod]
     public void RunTestsWithSourcesShouldCallConsoleWrapperRunTestsWithCorrectArguments1()
     {
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
         _testSession.RunTests(
             _testSources,
@@ -143,7 +143,7 @@ public class TestSessionTests
     public void RunTestsWithSourcesShouldCallConsoleWrapperRunTestsWithCorrectArguments2()
     {
         var testPlatformOptions = new TestPlatformOptions();
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
         _testSession.RunTests(
             _testSources,
@@ -164,7 +164,7 @@ public class TestSessionTests
     [TestMethod]
     public void RunTestsWithTestCasesShouldCallConsoleWrapperRunTestsWithCorrectArguments1()
     {
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
         _testSession.RunTests(
             _testCases,
@@ -185,7 +185,7 @@ public class TestSessionTests
     public void RunTestsWithTestCasesShouldCallConsoleWrapperRunTestsWithCorrectArguments2()
     {
         var testPlatformOptions = new TestPlatformOptions();
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
         _testSession.RunTests(
             _testCases,
@@ -206,7 +206,7 @@ public class TestSessionTests
     [TestMethod]
     public void RunTestsWithSourcesAndCustomTesthostShouldCallConsoleWrapperRunTestsWithCorrectArguments1()
     {
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
         _testSession.RunTestsWithCustomTestHost(
@@ -230,7 +230,7 @@ public class TestSessionTests
     public void RunTestsWithSourcesAndCustomTesthostShouldCallConsoleWrapperRunTestsWithCorrectArguments2()
     {
         var testPlatformOptions = new TestPlatformOptions();
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
         _testSession.RunTestsWithCustomTestHost(
@@ -254,7 +254,7 @@ public class TestSessionTests
     [TestMethod]
     public void RunTestsWithTestCasesAndCustomTesthostShouldCallConsoleWrapperRunTestsWithCorrectArguments1()
     {
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
         _testSession.RunTestsWithCustomTestHost(
@@ -278,7 +278,7 @@ public class TestSessionTests
     public void RunTestsWithTestCasesAndCustomTesthostShouldCallConsoleWrapperRunTestsWithCorrectArguments2()
     {
         var testPlatformOptions = new TestPlatformOptions();
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
         _testSession.RunTestsWithCustomTestHost(
@@ -390,7 +390,7 @@ public class TestSessionTests
     [TestMethod]
     public async Task RunTestsAsyncWithSourcesShouldCallConsoleWrapperRunTestsWithCorrectArguments1()
     {
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
         await _testSession.RunTestsAsync(
                 _testSources,
@@ -412,7 +412,7 @@ public class TestSessionTests
     public async Task RunTestsAsyncWithSourcesShouldCallConsoleWrapperRunTestsWithCorrectArguments2()
     {
         var testPlatformOptions = new TestPlatformOptions();
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
         await _testSession.RunTestsAsync(
                 _testSources,
@@ -434,7 +434,7 @@ public class TestSessionTests
     [TestMethod]
     public async Task RunTestsAsyncWithTestCasesShouldCallConsoleWrapperRunTestsWithCorrectArguments1()
     {
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
         await _testSession.RunTestsAsync(
                 _testCases,
@@ -456,7 +456,7 @@ public class TestSessionTests
     public async Task RunTestsAsyncWithTestCasesShouldCallConsoleWrapperRunTestsWithCorrectArguments2()
     {
         var testPlatformOptions = new TestPlatformOptions();
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
         await _testSession.RunTestsAsync(
                 _testCases,
@@ -478,7 +478,7 @@ public class TestSessionTests
     [TestMethod]
     public async Task RunTestsAsyncWithSourcesAndCustomTesthostShouldCallConsoleWrapperRunTestsWithCorrectArguments1()
     {
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
         await _testSession.RunTestsWithCustomTestHostAsync(
@@ -503,7 +503,7 @@ public class TestSessionTests
     public async Task RunTestsAsyncWithSourcesAndCustomTesthostShouldCallConsoleWrapperRunTestsWithCorrectArguments2()
     {
         var testPlatformOptions = new TestPlatformOptions();
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
         await _testSession.RunTestsWithCustomTestHostAsync(
@@ -528,7 +528,7 @@ public class TestSessionTests
     [TestMethod]
     public async Task RunTestsAsyncWithTestCasesAndCustomTesthostShouldCallConsoleWrapperRunTestsWithCorrectArguments1()
     {
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
         await _testSession.RunTestsWithCustomTestHostAsync(
@@ -553,7 +553,7 @@ public class TestSessionTests
     public async Task RunTestsAsyncWithTestCasesAndCustomTesthostShouldCallConsoleWrapperRunTestsWithCorrectArguments2()
     {
         var testPlatformOptions = new TestPlatformOptions();
-        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         var mockTestHostLauncher = new Mock<ITestHostLauncher>();
 
         await _testSession.RunTestsWithCustomTestHostAsync(

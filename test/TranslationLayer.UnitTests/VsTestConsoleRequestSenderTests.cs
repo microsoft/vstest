@@ -804,7 +804,7 @@ public class VsTestConsoleRequestSenderTests
     {
         InitializeCommunication();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
         var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
@@ -833,7 +833,7 @@ public class VsTestConsoleRequestSenderTests
     {
         await InitializeCommunicationAsync();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
         var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
@@ -862,7 +862,7 @@ public class VsTestConsoleRequestSenderTests
     {
         InitializeCommunication();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         var testResult = new TestResult(testCase);
@@ -914,7 +914,7 @@ public class VsTestConsoleRequestSenderTests
     {
         await InitializeCommunicationAsync();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         var testResult = new TestResult(testCase);
@@ -968,7 +968,7 @@ public class VsTestConsoleRequestSenderTests
         var sources = new List<string>() { "1.dll" };
         TestRunRequestPayload? receivedRequest = null;
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
@@ -991,7 +991,7 @@ public class VsTestConsoleRequestSenderTests
         var filter = "GivingCampaign";
         TestRunRequestPayload? receivedRequest = null;
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
@@ -1011,7 +1011,7 @@ public class VsTestConsoleRequestSenderTests
     {
         InitializeCommunication();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         var testResult = new TestResult(testCase);
@@ -1072,7 +1072,7 @@ public class VsTestConsoleRequestSenderTests
     {
         await InitializeCommunicationAsync();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         var testResult = new TestResult(testCase);
@@ -1133,7 +1133,7 @@ public class VsTestConsoleRequestSenderTests
     {
         InitializeCommunication();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         var testResult = new TestResult(testCase);
@@ -1182,7 +1182,7 @@ public class VsTestConsoleRequestSenderTests
     {
         await InitializeCommunicationAsync();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         var testResult = new TestResult(testCase);
@@ -1233,7 +1233,7 @@ public class VsTestConsoleRequestSenderTests
         var sources = new List<string>() { "1.dll" };
         TestRunRequestPayload? receivedRequest = null;
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
@@ -1256,7 +1256,7 @@ public class VsTestConsoleRequestSenderTests
         var filter = "GivingCampaign";
         TestRunRequestPayload? receivedRequest = null;
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         SetupMockCommunicationForRunRequest();
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
@@ -1276,7 +1276,7 @@ public class VsTestConsoleRequestSenderTests
     {
         InitializeCommunication();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
         var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
         var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
@@ -1303,7 +1303,7 @@ public class VsTestConsoleRequestSenderTests
     {
         await InitializeCommunicationAsync();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
         var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
         var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
@@ -1330,7 +1330,7 @@ public class VsTestConsoleRequestSenderTests
     {
         InitializeCommunication();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         var testResult = new TestResult(testCase);
@@ -1381,7 +1381,7 @@ public class VsTestConsoleRequestSenderTests
     {
         await InitializeCommunicationAsync();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         var testResult = new TestResult(testCase);
@@ -1432,7 +1432,7 @@ public class VsTestConsoleRequestSenderTests
     {
         InitializeCommunication();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         testCase.Traits.Add(new Trait("a", "b"));
@@ -1485,7 +1485,7 @@ public class VsTestConsoleRequestSenderTests
     {
         await InitializeCommunicationAsync();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         testCase.Traits.Add(new Trait("a", "b"));
@@ -1538,7 +1538,7 @@ public class VsTestConsoleRequestSenderTests
     {
         InitializeCommunication();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         testCase.Traits.Add(new Trait("a", "b"));
@@ -1595,7 +1595,7 @@ public class VsTestConsoleRequestSenderTests
     {
         await InitializeCommunicationAsync();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         testCase.Traits.Add(new Trait("a", "b"));
@@ -1652,7 +1652,7 @@ public class VsTestConsoleRequestSenderTests
     {
         InitializeCommunication();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         var testResult = new TestResult(testCase);
@@ -1711,7 +1711,7 @@ public class VsTestConsoleRequestSenderTests
     {
         await InitializeCommunicationAsync();
 
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         var testResult = new TestResult(testCase);
@@ -1769,7 +1769,7 @@ public class VsTestConsoleRequestSenderTests
     public void StartTestRunWithCustomHostInParallelShouldCallCustomHostMultipleTimes()
     {
         var mockLauncher = new Mock<ITestHostLauncher>();
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
         IEnumerable<string> sources = new List<string> { "1.dll" };
         var p1 = new TestProcessStartInfo() { FileName = "X" };
         var p2 = new TestProcessStartInfo() { FileName = "Y" };
@@ -1808,7 +1808,7 @@ public class VsTestConsoleRequestSenderTests
     public async Task StartTestRunWithCustomHostAsyncInParallelShouldCallCustomHostMultipleTimes()
     {
         var mockLauncher = new Mock<ITestHostLauncher>();
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
         IEnumerable<string> sources = new List<string> { "1.dll" };
         var p1 = new TestProcessStartInfo() { FileName = "X" };
         var p2 = new TestProcessStartInfo() { FileName = "Y" };
@@ -1847,7 +1847,7 @@ public class VsTestConsoleRequestSenderTests
     [TestMethod]
     public void StartTestRunShouldAbortOnExceptionInSendMessage()
     {
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
         var sources = new List<string> { "1.dll" };
         var payload = new TestRunRequestPayload { Sources = sources, RunSettings = null };
         var exception = new IOException();
@@ -1864,7 +1864,7 @@ public class VsTestConsoleRequestSenderTests
     [TestMethod]
     public async Task StartTestRunAsyncShouldAbortOnExceptionInSendMessage()
     {
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
         var sources = new List<string> { "1.dll" };
         var payload = new TestRunRequestPayload { Sources = sources, RunSettings = null };
         var exception = new IOException();
@@ -1881,7 +1881,7 @@ public class VsTestConsoleRequestSenderTests
     [TestMethod]
     public void StartTestRunShouldLogErrorOnProcessExited()
     {
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
         var manualEvent = new ManualResetEvent(false);
         var sources = new List<string> { "1.dll" };
         var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
@@ -1913,7 +1913,7 @@ public class VsTestConsoleRequestSenderTests
     [TestMethod]
     public async Task StartTestRunAsyncShouldLogErrorOnProcessExited()
     {
-        var mockHandler = new Mock<IInternalTestRunEventsHandler>();
+        var mockHandler = new Mock<ITestRunEventsHandler>();
         var sources = new List<string> { "1.dll" };
         var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
         var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
