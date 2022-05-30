@@ -269,9 +269,16 @@ public class TestEngineTests
             ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
+        var metricsCollection = new MetricsCollection();
+        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(metricsCollection);
+
         var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
         Assert.IsNotNull(discoveryManager);
         Assert.IsInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
+
+        Assert.IsTrue(metricsCollection.Metrics.ContainsKey(TelemetryDataConstants.InProcessRequest));
+        Assert.IsTrue(bool.TryParse(metricsCollection.Metrics[TelemetryDataConstants.InProcessRequest] as string, out bool result));
+        Assert.IsTrue(result);
     }
 
     [TestMethod]
