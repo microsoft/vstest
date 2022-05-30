@@ -34,20 +34,20 @@ public class DisableAutoFakesArgumentProcessorTests
     [TestMethod]
     public void DisableAutoFakesArgumentProcessorExecutorShouldThrowIfArgumentIsNullOrEmpty()
     {
-        Assert.ThrowsException<CommandLineException>(() => _disableAutoFakesArgumentProcessor.Executor.Value.Initialize(string.Empty));
-        Assert.ThrowsException<CommandLineException>(() => _disableAutoFakesArgumentProcessor.Executor.Value.Initialize(" "));
+        Assert.ThrowsException<CommandLineException>(() => _disableAutoFakesArgumentProcessor.Executor!.Value.Initialize(string.Empty));
+        Assert.ThrowsException<CommandLineException>(() => _disableAutoFakesArgumentProcessor.Executor!.Value.Initialize(" "));
     }
 
     [TestMethod]
     public void DisableAutoFakesArgumentProcessorExecutorShouldThrowIfArgumentIsNotBooleanString()
     {
-        Assert.ThrowsException<CommandLineException>(() => _disableAutoFakesArgumentProcessor.Executor.Value.Initialize("DisableAutoFakes"));
+        Assert.ThrowsException<CommandLineException>(() => _disableAutoFakesArgumentProcessor.Executor!.Value.Initialize("DisableAutoFakes"));
     }
 
     [TestMethod]
     public void DisableAutoFakesArgumentProcessorExecutorShouldSetCommandLineDisableAutoFakeValueAsPerArgumentProvided()
     {
-        _disableAutoFakesArgumentProcessor.Executor.Value.Initialize("true");
+        _disableAutoFakesArgumentProcessor.Executor!.Value.Initialize("true");
         Assert.IsTrue(CommandLineOptions.Instance.DisableAutoFakes);
     }
 }

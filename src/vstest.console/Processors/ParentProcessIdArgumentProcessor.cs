@@ -2,11 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -20,9 +19,8 @@ internal class ParentProcessIdArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/ParentProcessId";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -34,7 +32,7 @@ internal class ParentProcessIdArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new ParentProcessIdArgumentExecutor(CommandLineOptions.Instance));
@@ -76,7 +74,7 @@ internal class ParentProcessIdArgumentExecutor : IArgumentExecutor
     /// </param>
     public ParentProcessIdArgumentExecutor(CommandLineOptions options)
     {
-        Contract.Requires(options != null);
+        ValidateArg.NotNull(options, nameof(options));
         _commandLineOptions = options;
     }
 
@@ -84,9 +82,9 @@ internal class ParentProcessIdArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        if (string.IsNullOrWhiteSpace(argument) || !int.TryParse(argument, out int parentProcessId))
+        if (argument.IsNullOrWhiteSpace() || !int.TryParse(argument, out int parentProcessId))
         {
             throw new CommandLineException(CommandLineResources.InvalidParentProcessIdArgument);
         }

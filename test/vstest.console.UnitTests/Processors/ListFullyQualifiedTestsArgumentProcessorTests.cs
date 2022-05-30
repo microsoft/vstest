@@ -104,7 +104,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
     public void GetExecuterShouldReturnListFullyQualifiedTestsArgumentProcessorCapabilities()
     {
         var processor = new ListFullyQualifiedTestsArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is ListFullyQualifiedTestsArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is ListFullyQualifiedTestsArgumentExecutor);
     }
 
     #region ListTestsArgumentProcessorCapabilitiesTests

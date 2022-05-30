@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
 internal class ArgumentProcessorUtilities
@@ -45,7 +43,7 @@ internal class ArgumentProcessorUtilities
         {
             var nameValuePair = parameterArg?.Split(nameValueSeparator, StringSplitOptions.RemoveEmptyEntries);
 
-            if (nameValuePair.Length != 2)
+            if (nameValuePair?.Length != 2)
             {
                 throw new CommandLineException(exceptionMessage);
             }

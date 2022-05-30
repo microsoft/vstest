@@ -8,15 +8,12 @@ using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -30,9 +27,8 @@ internal class TestAdapterPathArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/TestAdapterPath";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -44,7 +40,7 @@ internal class TestAdapterPathArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance,
@@ -123,9 +119,9 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        if (string.IsNullOrWhiteSpace(argument))
+        if (argument.IsNullOrWhiteSpace())
         {
             throw new CommandLineException(
                 string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestAdapterPathValueRequired));
@@ -143,7 +139,7 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
         // Get test adapter paths from RunSettings.
         var testAdapterPathsInRunSettings = _runSettingsManager.QueryRunSettingsNode(RunSettingsPath);
 
-        if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
+        if (!StringUtils.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
         {
             testAdapterPaths.AddRange(SplitPaths(testAdapterPathsInRunSettings));
         }
@@ -173,6 +169,6 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     /// <returns>Paths.</returns>
     internal static string[] SplitPaths(string paths)
     {
-        return string.IsNullOrWhiteSpace(paths) ? new string[0] : paths.Split(ArgumentSeparators, StringSplitOptions.RemoveEmptyEntries);
+        return paths.IsNullOrWhiteSpace() ? new string[0] : paths.Split(ArgumentSeparators, StringSplitOptions.RemoveEmptyEntries);
     }
 }

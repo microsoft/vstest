@@ -24,7 +24,7 @@ public class ArgumentProcessorFactoryTests
 
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
 
-        IArgumentProcessor result = factory.CreateArgumentProcessor(argument);
+        IArgumentProcessor result = factory.CreateArgumentProcessor(argument)!;
 
         Assert.AreEqual(typeof(TestSourceArgumentProcessor), result.GetType());
     }
@@ -36,7 +36,7 @@ public class ArgumentProcessorFactoryTests
 
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
 
-        IArgumentProcessor result = factory.CreateArgumentProcessor(argument);
+        IArgumentProcessor result = factory.CreateArgumentProcessor(argument)!;
 
         Assert.AreEqual(typeof(TestSourceArgumentProcessor), result.GetType());
     }
@@ -48,7 +48,7 @@ public class ArgumentProcessorFactoryTests
 
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
 
-        IArgumentProcessor result = factory.CreateArgumentProcessor(argument);
+        IArgumentProcessor result = factory.CreateArgumentProcessor(argument)!;
 
         Assert.AreEqual(typeof(PlatformArgumentProcessor), result.GetType());
     }
@@ -60,7 +60,7 @@ public class ArgumentProcessorFactoryTests
 
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
 
-        IArgumentProcessor result = factory.CreateArgumentProcessor(argument);
+        IArgumentProcessor result = factory.CreateArgumentProcessor(argument)!;
 
         Assert.AreEqual(typeof(PlatformArgumentProcessor), result.GetType());
     }
@@ -71,7 +71,7 @@ public class ArgumentProcessorFactoryTests
         var command = "--";
 
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
-        Action action = () => factory.CreateArgumentProcessor(command, null);
+        Action action = () => factory.CreateArgumentProcessor(command, null!);
 
         ExceptionUtilities.ThrowsException<ArgumentException>(
             action,
@@ -85,7 +85,7 @@ public class ArgumentProcessorFactoryTests
 
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
 
-        IArgumentProcessor result = factory.CreateArgumentProcessor(command, new string[] { "" });
+        IArgumentProcessor result = factory.CreateArgumentProcessor(command, new string[] { "" })!;
 
         Assert.IsNull(result);
     }
@@ -97,7 +97,7 @@ public class ArgumentProcessorFactoryTests
 
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
 
-        IArgumentProcessor result = factory.CreateArgumentProcessor(command, new string[] { "" });
+        IArgumentProcessor result = factory.CreateArgumentProcessor(command, new string[] { "" })!;
 
         Assert.AreEqual(typeof(CliRunSettingsArgumentProcessor), result.GetType());
     }
@@ -145,9 +145,9 @@ public class ArgumentProcessorFactoryTests
         List<string> xplatShortCommandName = new();
 
         // for each short command add there xplat version
-        foreach (string name in shortCommands)
+        foreach (var name in shortCommands)
         {
-            xplatShortCommandName.Add(name.Replace('/', '-'));
+            xplatShortCommandName.Add(name!.Replace('/', '-'));
         }
 
         Mock<IFeatureFlag> featureFlag = new();

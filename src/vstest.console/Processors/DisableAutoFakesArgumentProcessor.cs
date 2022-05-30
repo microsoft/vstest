@@ -5,8 +5,6 @@ using System;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
@@ -17,11 +15,10 @@ internal class DisableAutoFakesArgumentProcessor : IArgumentProcessor
 {
     public const string CommandName = "/DisableAutoFakes";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
-    private Lazy<IArgumentExecutor> _executor;
-
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new DisableAutoFakesArgumentExecutor(CommandLineOptions.Instance));
@@ -60,14 +57,9 @@ internal class DisableAutoFakesArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        if (string.IsNullOrWhiteSpace(argument))
-        {
-            throw new CommandLineException(CommandLineResources.DisableAutoFakesUsage);
-        }
-
-        if (!bool.TryParse(argument, out bool value))
+        if (argument.IsNullOrWhiteSpace() || !bool.TryParse(argument, out bool value))
         {
             throw new CommandLineException(CommandLineResources.DisableAutoFakesUsage);
         }

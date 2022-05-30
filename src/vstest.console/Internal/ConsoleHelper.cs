@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
 internal class ConsoleHelper : IConsoleHelper
