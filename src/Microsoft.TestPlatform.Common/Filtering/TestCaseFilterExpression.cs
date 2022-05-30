@@ -28,9 +28,9 @@ public class TestCaseFilterExpression : ITestCaseFilterExpression
     /// <summary>
     /// Adapter specific filter expression.
     /// </summary>
-    public TestCaseFilterExpression(FilterExpressionWrapper filterWrapper!!)
+    public TestCaseFilterExpression(FilterExpressionWrapper filterWrapper)
     {
-        _filterWrapper = filterWrapper;
+        _filterWrapper = filterWrapper ?? throw new ArgumentNullException(nameof(filterWrapper));
         _validForMatch = filterWrapper.ParseError.IsNullOrEmpty();
     }
 
@@ -61,8 +61,11 @@ public class TestCaseFilterExpression : ITestCaseFilterExpression
     /// <summary>
     /// Match test case with filter criteria.
     /// </summary>
-    public bool MatchTestCase(TestCase testCase!!, Func<string, Object> propertyValueProvider!!)
+    public bool MatchTestCase(TestCase testCase, Func<string, object> propertyValueProvider)
     {
+        ValidateArg.NotNull(testCase, nameof(testCase));
+        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
+
         if (!_validForMatch)
         {
             return false;

@@ -48,17 +48,17 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
     { }
 
     public ArtifactProcessingManager(string? testSessionCorrelationId,
-        IFileHelper fileHelper!!,
-        ITestRunAttachmentsProcessingManager testRunAttachmentsProcessingManager!!,
-        IDataSerializer dataSerialized!!,
-        ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingEventsHandler!!,
-        IFeatureFlag featureFlag!!)
+        IFileHelper fileHelper,
+        ITestRunAttachmentsProcessingManager testRunAttachmentsProcessingManager,
+        IDataSerializer dataSerialized,
+        ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingEventsHandler,
+        IFeatureFlag featureFlag)
     {
-        _fileHelper = fileHelper;
-        _testRunAttachmentsProcessingManager = testRunAttachmentsProcessingManager;
-        _dataSerialized = dataSerialized;
-        _testRunAttachmentsProcessingEventsHandler = testRunAttachmentsProcessingEventsHandler;
-        _featureFlag = featureFlag;
+        _fileHelper = fileHelper ?? throw new ArgumentNullException(nameof(fileHelper));
+        _testRunAttachmentsProcessingManager = testRunAttachmentsProcessingManager ?? throw new ArgumentNullException(nameof(testRunAttachmentsProcessingManager));
+        _dataSerialized = dataSerialized ?? throw new ArgumentNullException(nameof(dataSerialized));
+        _testRunAttachmentsProcessingEventsHandler = testRunAttachmentsProcessingEventsHandler ?? throw new ArgumentNullException(nameof(testRunAttachmentsProcessingEventsHandler));
+        _featureFlag = featureFlag ?? throw new ArgumentNullException(nameof(featureFlag));
 
         // We don't validate for null, it's expected, we'll have testSessionCorrelationId only in case of .NET SDK run.
         if (testSessionCorrelationId is not null)
@@ -69,8 +69,11 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
         }
     }
 
-    public void CollectArtifacts(TestRunCompleteEventArgs testRunCompleteEventArgs!!, string runSettingsXml!!)
+    public void CollectArtifacts(TestRunCompleteEventArgs testRunCompleteEventArgs, string runSettingsXml)
     {
+        ValidateArg.NotNull(testRunCompleteEventArgs, nameof(testRunCompleteEventArgs));
+        ValidateArg.NotNull(runSettingsXml, nameof(runSettingsXml));
+
         if (_featureFlag.IsSet(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING))
         {
             EqtTrace.Verbose("ArtifactProcessingManager.CollectArtifacts: Feature disabled");
@@ -216,13 +219,17 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
         .Select(testSessionArtifact => new TestArtifacts(testSessionArtifact.Key, testSessionArtifact.Select(x => ParseArtifact(x.Artifact)).Where(x => x is not null).ToArray()!)) // Bang because null dataflow doesn't yet backport learning from the `Where` clause
         .ToArray();
 
-    private static Artifact? ParseArtifact(string fileName!!) =>
-        Path.GetFileName(fileName) switch
+    private static Artifact? ParseArtifact(string fileName)
+    {
+        ValidateArg.NotNull(fileName, nameof(fileName));
+
+        return Path.GetFileName(fileName) switch
         {
             RunsettingsFileName => new Artifact(fileName, ArtifactType.Runsettings),
             ExecutionCompleteFileName => new Artifact(fileName, ArtifactType.ExecutionComplete),
             _ => null
         };
+    }
 
     private static bool IsTelemetryOptedIn() => Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")?.Equals("1", StringComparison.Ordinal) == true;
 }

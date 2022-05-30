@@ -179,8 +179,11 @@ public class RunSettings : IRunSettings
     /// </summary>
     /// <param name="reader">Reader to load the section from.</param>
     /// <param name="settingsExtensionManager">Settings extension manager to get the provider from.</param>
-    private void LoadSection(XmlReader reader!!, SettingsProviderExtensionManager settingsExtensionManager!!)
+    private void LoadSection(XmlReader reader, SettingsProviderExtensionManager settingsExtensionManager)
     {
+        ValidateArg.NotNull(reader, nameof(reader));
+        ValidateArg.NotNull(settingsExtensionManager, nameof(settingsExtensionManager));
+
         // Check for duplicate settings
         if (_settings.ContainsKey(reader.Name))
         {

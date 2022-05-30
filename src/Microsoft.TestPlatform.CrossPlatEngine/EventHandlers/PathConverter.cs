@@ -28,8 +28,12 @@ internal class PathConverter : IPathConverter
     // are inverted, it sends us their local path, and thinks about our local path as remote.
     private readonly string _originalPath = "";
 
-    public PathConverter(string originalPath!!, string deploymentPath!!, IFileHelper fileHelper!!)
+    public PathConverter(string originalPath, string deploymentPath, IFileHelper fileHelper)
     {
+        ValidateArg.NotNull(originalPath, nameof(originalPath));
+        ValidateArg.NotNull(deploymentPath, nameof(deploymentPath));
+        ValidateArg.NotNull(fileHelper, nameof(fileHelper));
+
         string unquotedOriginalPath = originalPath.Trim('\"');
         string normalizedLocalPath = fileHelper.GetFullPath(unquotedOriginalPath).TrimEnd('\\').TrimEnd('/') + Path.DirectorySeparatorChar;
         _originalPath = normalizedLocalPath;
@@ -63,63 +67,73 @@ internal class PathConverter : IPathConverter
         return result;
     }
 
-    public IEnumerable<string?> UpdatePaths(IEnumerable<string?> paths!!, PathConversionDirection updateDirection)
+    public IEnumerable<string?> UpdatePaths(IEnumerable<string?> paths, PathConversionDirection updateDirection)
     {
+        ValidateArg.NotNull(paths, nameof(paths));
         return paths.Select(i => UpdatePath(i, updateDirection)).ToList();
     }
 
-    public TestCase UpdateTestCase(TestCase testCase!!, PathConversionDirection updateDirection)
+    public TestCase UpdateTestCase(TestCase testCase, PathConversionDirection updateDirection)
     {
+        ValidateArg.NotNull(testCase, nameof(testCase));
         testCase.CodeFilePath = UpdatePath(testCase.CodeFilePath, updateDirection);
         testCase.Source = UpdatePath(testCase.Source, updateDirection);
         return testCase;
     }
 
-    public IEnumerable<TestCase> UpdateTestCases(IEnumerable<TestCase> testCases!!, PathConversionDirection updateDirection)
+    public IEnumerable<TestCase> UpdateTestCases(IEnumerable<TestCase> testCases, PathConversionDirection updateDirection)
     {
+        ValidateArg.NotNull(testCases, nameof(testCases));
         testCases.ToList().ForEach(tc => UpdateTestCase(tc, updateDirection));
         return testCases;
     }
 
-    public TestRunCompleteEventArgs UpdateTestRunCompleteEventArgs(TestRunCompleteEventArgs testRunCompleteEventArgs!!, PathConversionDirection updateDirection)
+    public TestRunCompleteEventArgs UpdateTestRunCompleteEventArgs(TestRunCompleteEventArgs testRunCompleteEventArgs, PathConversionDirection updateDirection)
     {
+        ValidateArg.NotNull(testRunCompleteEventArgs, nameof(testRunCompleteEventArgs));
         UpdateAttachmentSets(testRunCompleteEventArgs.AttachmentSets, updateDirection);
         return testRunCompleteEventArgs;
     }
 
-    public TestRunChangedEventArgs UpdateTestRunChangedEventArgs(TestRunChangedEventArgs testRunChangedArgs!!, PathConversionDirection updateDirection)
+    public TestRunChangedEventArgs UpdateTestRunChangedEventArgs(TestRunChangedEventArgs testRunChangedArgs, PathConversionDirection updateDirection)
     {
+        ValidateArg.NotNull(testRunChangedArgs, nameof(testRunChangedArgs));
         UpdateTestResults(testRunChangedArgs.NewTestResults, updateDirection);
         UpdateTestCases(testRunChangedArgs.ActiveTests, updateDirection);
         return testRunChangedArgs;
     }
 
-    public Collection<AttachmentSet> UpdateAttachmentSets(Collection<AttachmentSet> attachmentSets!!, PathConversionDirection updateDirection)
+    public Collection<AttachmentSet> UpdateAttachmentSets(Collection<AttachmentSet> attachmentSets, PathConversionDirection updateDirection)
     {
+        ValidateArg.NotNull(attachmentSets, nameof(attachmentSets));
         attachmentSets.ToList().ForEach(i => UpdateAttachmentSet(i, updateDirection));
         return attachmentSets;
     }
 
-    public ICollection<AttachmentSet> UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets!!, PathConversionDirection updateDirection)
+    public ICollection<AttachmentSet> UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, PathConversionDirection updateDirection)
     {
+        ValidateArg.NotNull(attachmentSets, nameof(attachmentSets));
         attachmentSets.ToList().ForEach(i => UpdateAttachmentSet(i, updateDirection));
         return attachmentSets;
     }
 
-    private AttachmentSet UpdateAttachmentSet(AttachmentSet attachmentSet!!, PathConversionDirection updateDirection)
+    private AttachmentSet UpdateAttachmentSet(AttachmentSet attachmentSet, PathConversionDirection updateDirection)
     {
+        ValidateArg.NotNull(attachmentSet, nameof(attachmentSet));
         attachmentSet.Attachments.ToList().ForEach(a => UpdateAttachment(a, updateDirection));
         return attachmentSet;
     }
 
-    private UriDataAttachment UpdateAttachment(UriDataAttachment attachment!!, PathConversionDirection _)
+    private UriDataAttachment UpdateAttachment(UriDataAttachment attachment, PathConversionDirection _)
     {
+        ValidateArg.NotNull(attachment, nameof(attachment));
         // todo: convert uri? https://github.com/microsoft/vstest/issues/3367
         return attachment;
     }
 
-    private IEnumerable<TestResult> UpdateTestResults(IEnumerable<TestResult> testResults!!, PathConversionDirection updateDirection)
+    private IEnumerable<TestResult> UpdateTestResults(IEnumerable<TestResult> testResults, PathConversionDirection updateDirection)
     {
+        ValidateArg.NotNull(testResults, nameof(testResults));
         foreach (var tr in testResults)
         {
             UpdateAttachmentSets(tr.Attachments, updateDirection);
@@ -128,8 +142,9 @@ internal class PathConverter : IPathConverter
         return testResults;
     }
 
-    public DiscoveryCriteria UpdateDiscoveryCriteria(DiscoveryCriteria discoveryCriteria!!, PathConversionDirection updateDirection)
+    public DiscoveryCriteria UpdateDiscoveryCriteria(DiscoveryCriteria discoveryCriteria, PathConversionDirection updateDirection)
     {
+        ValidateArg.NotNull(discoveryCriteria, nameof(discoveryCriteria));
         discoveryCriteria.Package = UpdatePath(discoveryCriteria.Package, updateDirection);
         foreach (var adapter in discoveryCriteria.AdapterSourceMap.ToList())
         {
@@ -139,15 +154,17 @@ internal class PathConverter : IPathConverter
         return discoveryCriteria;
     }
 
-    public TestRunCriteriaWithSources UpdateTestRunCriteriaWithSources(TestRunCriteriaWithSources testRunCriteriaWithSources!!, PathConversionDirection updateDirection)
+    public TestRunCriteriaWithSources UpdateTestRunCriteriaWithSources(TestRunCriteriaWithSources testRunCriteriaWithSources, PathConversionDirection updateDirection)
     {
+        ValidateArg.NotNull(testRunCriteriaWithSources, nameof(testRunCriteriaWithSources));
         testRunCriteriaWithSources.AdapterSourceMap.ToList().ForEach(adapter => testRunCriteriaWithSources.AdapterSourceMap[adapter.Key] = UpdatePaths(adapter.Value, updateDirection));
         var package = UpdatePath(testRunCriteriaWithSources.Package, updateDirection);
         return new TestRunCriteriaWithSources(testRunCriteriaWithSources.AdapterSourceMap, package, testRunCriteriaWithSources.RunSettings, testRunCriteriaWithSources.TestExecutionContext);
     }
 
-    public TestRunCriteriaWithTests UpdateTestRunCriteriaWithTests(TestRunCriteriaWithTests testRunCriteriaWithTests!!, PathConversionDirection updateDirection)
+    public TestRunCriteriaWithTests UpdateTestRunCriteriaWithTests(TestRunCriteriaWithTests testRunCriteriaWithTests, PathConversionDirection updateDirection)
     {
+        ValidateArg.NotNull(testRunCriteriaWithTests, nameof(testRunCriteriaWithTests));
         var tests = UpdateTestCases(testRunCriteriaWithTests.Tests, updateDirection);
         var package = UpdatePath(testRunCriteriaWithTests.Package, updateDirection);
         return new TestRunCriteriaWithTests(tests, package, testRunCriteriaWithTests.RunSettings, testRunCriteriaWithTests.TestExecutionContext);

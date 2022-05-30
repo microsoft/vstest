@@ -108,8 +108,10 @@ public class RunSettingsUtilitiesTests
 [SettingsName("DummyMSTest")]
 public class DummyMsTestSetingsProvider : ISettingsProvider
 {
-    public void Load(XmlReader reader!!)
+    public void Load(XmlReader reader)
     {
+        ValidateArg.NotNull(reader, nameof(reader));
+
         reader.Read();
         StringToVerify = reader.ReadOuterXml();
     }

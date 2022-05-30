@@ -95,12 +95,10 @@ public class TrxLogger : ITestLoggerWithParameters
     #region ITestLogger
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events!!, string testResultsDirPath)
+    public void Initialize(TestLoggerEvents events, string testResultsDirPath)
     {
-        if (string.IsNullOrEmpty(testResultsDirPath))
-        {
-            throw new ArgumentNullException(nameof(testResultsDirPath));
-        }
+        ValidateArg.NotNull(events, nameof(events));
+        ValidateArg.NotNullOrEmpty(testResultsDirPath, nameof(testResultsDirPath));
 
         // Register for the events.
         events.TestRunMessage += TestMessageHandler;
@@ -112,8 +110,9 @@ public class TrxLogger : ITestLoggerWithParameters
     }
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters!!)
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
     {
+        ValidateArg.NotNull(parameters, nameof(parameters));
         if (parameters.Count == 0)
         {
             throw new ArgumentException("No default parameters added", nameof(parameters));
@@ -188,8 +187,10 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <param name="e">
     /// Event args
     /// </param>
-    internal void TestMessageHandler(object sender!!, TestRunMessageEventArgs e!!)
+    internal void TestMessageHandler(object sender, TestRunMessageEventArgs e)
     {
+        ValidateArg.NotNull(sender, nameof(sender));
+        ValidateArg.NotNull(e, nameof(e));
         RunInfo runMessage;
 
         switch (e.Level)

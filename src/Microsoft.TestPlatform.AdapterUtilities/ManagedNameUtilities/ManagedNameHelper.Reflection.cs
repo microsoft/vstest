@@ -82,8 +82,10 @@ public static partial class ManagedNameHelper
     /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in
     /// <see href="https://github.com/microsoft/vstest-docs/blob/main/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
     /// </remarks>
-    public static void GetManagedName(MethodBase method!!, out string managedTypeName, out string managedMethodName, out string[] hierarchyValues)
+    public static void GetManagedName(MethodBase method, out string managedTypeName, out string managedMethodName, out string[] hierarchyValues)
     {
+        _ = method ?? throw new ArgumentNullException(nameof(method));
+
         if (!ReflectionHelpers.IsMethod(method))
         {
             throw new NotSupportedException(nameof(method));

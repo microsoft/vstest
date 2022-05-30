@@ -356,8 +356,9 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <param name="uri">URI of the logger to add.</param>
     /// <param name="parameters">Logger parameters.</param>
     /// <returns>Logger Initialized flag.</returns>
-    internal bool InitializeLoggerByUri(Uri uri!!, Dictionary<string, string> parameters)
+    internal bool InitializeLoggerByUri(Uri uri, Dictionary<string, string> parameters)
     {
+        ValidateArg.NotNull(uri, nameof(uri));
         CheckDisposed();
 
         // Look up the extension and initialize it if one is found.

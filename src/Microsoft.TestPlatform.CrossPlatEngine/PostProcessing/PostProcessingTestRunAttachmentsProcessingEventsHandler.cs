@@ -20,9 +20,9 @@ internal class PostProcessingTestRunAttachmentsProcessingEventsHandler : ITestRu
     private readonly IOutput _consoleOutput;
     private readonly ConcurrentBag<AttachmentSet> _attachmentsSet = new();
 
-    public PostProcessingTestRunAttachmentsProcessingEventsHandler(IOutput consoleOutput!!)
+    public PostProcessingTestRunAttachmentsProcessingEventsHandler(IOutput consoleOutput)
     {
-        _consoleOutput = consoleOutput;
+        _consoleOutput = consoleOutput ?? throw new ArgumentNullException(nameof(consoleOutput));
     }
 
     public void HandleLogMessage(TestMessageLevel level, string message)

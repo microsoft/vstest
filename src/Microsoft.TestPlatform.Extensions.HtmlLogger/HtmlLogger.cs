@@ -104,12 +104,10 @@ public class HtmlLogger : ITestLoggerWithParameters
     public string HtmlFilePath { get; private set; }
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events!!, string testResultsDirPath)
+    public void Initialize(TestLoggerEvents events, string testResultsDirPath)
     {
-        if (string.IsNullOrEmpty(testResultsDirPath))
-        {
-            throw new ArgumentNullException(nameof(testResultsDirPath));
-        }
+        ValidateArg.NotNull(events, nameof(events));
+        ValidateArg.NotNullOrEmpty(testResultsDirPath, nameof(testResultsDirPath));
 
         // Register for the events.
         events.TestRunMessage += TestMessageHandler;
@@ -126,8 +124,9 @@ public class HtmlLogger : ITestLoggerWithParameters
     }
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters!!)
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
     {
+        ValidateArg.NotNull(parameters, nameof(parameters));
         if (parameters.Count == 0)
         {
             throw new ArgumentException("No default parameters added", nameof(parameters));
@@ -149,8 +148,11 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void TestMessageHandler(object sender!!, TestRunMessageEventArgs e!!)
+    public void TestMessageHandler(object sender, TestRunMessageEventArgs e)
     {
+        ValidateArg.NotNull(sender, nameof(sender));
+        ValidateArg.NotNull(e, nameof(e));
+
         switch (e.Level)
         {
             case TestMessageLevel.Informational:
@@ -182,8 +184,11 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void TestResultHandler(object sender!!, TestResultEventArgs e!!)
+    public void TestResultHandler(object sender, TestResultEventArgs e)
     {
+        ValidateArg.NotNull(sender, nameof(sender));
+        ValidateArg.NotNull(e, nameof(e));
+
         var testResult = new ObjectModel.TestResult
         {
             DisplayName = e.Result.DisplayName ?? e.Result.TestCase.FullyQualifiedName,

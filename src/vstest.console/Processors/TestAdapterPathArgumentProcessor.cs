@@ -109,12 +109,12 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="options"> The options. </param>
     /// <param name="testPlatform">The test platform</param>
-    public TestAdapterPathArgumentExecutor(CommandLineOptions options!!, IRunSettingsProvider runSettingsManager!!, IOutput output!!, IFileHelper fileHelper!!)
+    public TestAdapterPathArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager, IOutput output, IFileHelper fileHelper)
     {
-        _commandLineOptions = options;
-        _runSettingsManager = runSettingsManager;
-        _output = output;
-        _fileHelper = fileHelper;
+        _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
+        _runSettingsManager = runSettingsManager ?? throw new ArgumentNullException(nameof(runSettingsManager));
+        _output = output ?? throw new ArgumentNullException(nameof(output));
+        _fileHelper = fileHelper ?? throw new ArgumentNullException(nameof(fileHelper));
     }
 
     #region IArgumentExecutor

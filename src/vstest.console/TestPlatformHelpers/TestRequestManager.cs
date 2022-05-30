@@ -650,7 +650,7 @@ internal class TestRequestManager : ITestRequestManager
     }
 
     private bool UpdateRunSettingsIfRequired(
-        string runsettingsXml!!,
+        string runsettingsXml,
         IList<string> sources,
         IBaseTestEventsRegistrar registrar,
         out string updatedRunSettingsXml,
@@ -658,7 +658,7 @@ internal class TestRequestManager : ITestRequestManager
         out IDictionary<string, Framework> sourceToFrameworkMap)
     {
         bool settingsUpdated = false;
-        updatedRunSettingsXml = runsettingsXml;
+        updatedRunSettingsXml = runsettingsXml ?? throw new ArgumentNullException(nameof(runsettingsXml));
 
         // TargetFramework is full CLR. Set DesignMode based on current context.
         using var stream = new StringReader(runsettingsXml);
@@ -712,8 +712,8 @@ internal class TestRequestManager : ITestRequestManager
             // determines the default architecture to use for AnyCPU dlls
             // and other sources that don't dictate architecture (e.g. js files).
             // This way starting 32-bit dotnet will try to run as 32-bit testhost
-            // using the runtime that was installed with that 32-bit dotnet SDK. 
-            // Similarly ARM64 vstest.console will start ARM64 testhost, making sure 
+            // using the runtime that was installed with that 32-bit dotnet SDK.
+            // Similarly ARM64 vstest.console will start ARM64 testhost, making sure
             // that we choose the architecture that we already know we can run as.
             // 64-bit SDK when running from 64-bit dotnet process.
             // As default architecture we specify the expected test host architecture,
