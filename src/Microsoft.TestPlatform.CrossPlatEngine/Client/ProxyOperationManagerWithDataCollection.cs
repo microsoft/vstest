@@ -108,7 +108,7 @@ public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
     public override bool SetupChannel(
         IEnumerable<string> sources,
         string runSettings,
-        ITestMessageEventHandler eventHandler)
+        IInternalTestMessageEventHandler eventHandler)
     {
         // Log all the messages that are reported while initializing the DataCollectionClient.
         if (DataCollectionRunEventsHandler.Messages.Count > 0)

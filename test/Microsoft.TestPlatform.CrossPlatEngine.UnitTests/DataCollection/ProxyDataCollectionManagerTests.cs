@@ -155,14 +155,14 @@ public class ProxyDataCollectionManagerTests
         _mockRequestData.Setup(r => r.IsTelemetryOptedIn).Returns(true);
 
         BeforeTestRunStartResult res = new(new Dictionary<string, string>(), 123);
-        _mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
+        _mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<IInternalTestMessageEventHandler>())).Returns(res);
 
         var result = _proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
 
         var extensionsFolderPath = Path.Combine(Path.GetDirectoryName(typeof(ITestPlatform).GetTypeInfo().Assembly.Location)!, "Extensions");
         var expectedSettingsXml = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><RunConfiguration><TestAdaptersPaths>{extensionsFolderPath}</TestAdaptersPaths></RunConfiguration></RunSettings>";
         _mockDataCollectionRequestSender.Verify(
-            x => x.SendBeforeTestRunStartAndGetResult(expectedSettingsXml, sourceList, true, It.IsAny<ITestMessageEventHandler>()), Times.Once);
+            x => x.SendBeforeTestRunStartAndGetResult(expectedSettingsXml, sourceList, true, It.IsAny<IInternalTestMessageEventHandler>()), Times.Once);
     }
 
     [TestMethod]
@@ -170,12 +170,12 @@ public class ProxyDataCollectionManagerTests
     {
         BeforeTestRunStartResult res = new(new Dictionary<string, string>(), 123);
         var sourceList = new List<string>() { "testsource1.dll" };
-        _mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
+        _mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<IInternalTestMessageEventHandler>())).Returns(res);
 
         var result = _proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
 
         _mockDataCollectionRequestSender.Verify(
-            x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), sourceList, false, It.IsAny<ITestMessageEventHandler>()), Times.Once);
+            x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), sourceList, false, It.IsAny<IInternalTestMessageEventHandler>()), Times.Once);
         Assert.IsNotNull(result);
         Assert.AreEqual(res.DataCollectionEventsPort, result.DataCollectionEventsPort);
         Assert.AreEqual(res.EnvironmentVariables.Count, result.EnvironmentVariables.Count);
@@ -184,9 +184,9 @@ public class ProxyDataCollectionManagerTests
     [TestMethod]
     public void BeforeTestRunStartsShouldInvokeRunEventsHandlerIfExceptionIsThrown()
     {
-        var mockRunEventsHandler = new Mock<ITestMessageEventHandler>();
+        var mockRunEventsHandler = new Mock<IInternalTestMessageEventHandler>();
         _mockDataCollectionRequestSender.Setup(
-                x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), new List<string>() { "testsource1.dll" }, false, It.IsAny<ITestMessageEventHandler>()))
+                x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), new List<string>() { "testsource1.dll" }, false, It.IsAny<IInternalTestMessageEventHandler>()))
             .Throws<Exception>();
 
         var result = _proxyDataCollectionManager.BeforeTestRunStart(true, true, mockRunEventsHandler.Object);
@@ -204,12 +204,12 @@ public class ProxyDataCollectionManagerTests
         _proxyDataCollectionManager = new ProxyDataCollectionManager(_mockRequestData.Object, string.Empty, testSources, _mockDataCollectionRequestSender.Object, _mockProcessHelper.Object, _mockDataCollectionLauncher.Object);
 
         BeforeTestRunStartResult res = new(new Dictionary<string, string>(), 123);
-        _mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
+        _mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, It.IsAny<bool>(), It.IsAny<IInternalTestMessageEventHandler>())).Returns(res);
 
         var result = _proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
 
         _mockDataCollectionRequestSender.Verify(
-            x => x.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, false, It.IsAny<ITestMessageEventHandler>()), Times.Once);
+            x => x.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, false, It.IsAny<IInternalTestMessageEventHandler>()), Times.Once);
         Assert.IsNotNull(result);
         Assert.AreEqual(res.DataCollectionEventsPort, result.DataCollectionEventsPort);
         Assert.AreEqual(res.EnvironmentVariables.Count, result.EnvironmentVariables.Count);
@@ -233,7 +233,7 @@ public class ProxyDataCollectionManagerTests
             {"key", "value"}
         };
 
-        _mockDataCollectionRequestSender.Setup(x => x.SendAfterTestRunEndAndGetResult(It.IsAny<ITestRunEventsHandler>(), It.IsAny<bool>())).Returns(new AfterTestRunEndResult(attachments, invokedDataCollectors, metrics));
+        _mockDataCollectionRequestSender.Setup(x => x.SendAfterTestRunEndAndGetResult(It.IsAny<IInternalTestRunEventsHandler>(), It.IsAny<bool>())).Returns(new AfterTestRunEndResult(attachments, invokedDataCollectors, metrics));
 
         var result = _proxyDataCollectionManager.AfterTestRunEnd(false, null);
 
@@ -256,9 +256,9 @@ public class ProxyDataCollectionManagerTests
     [TestMethod]
     public void AfterTestRunEndShouldInvokeRunEventsHandlerIfExceptionIsThrown()
     {
-        var mockRunEventsHandler = new Mock<ITestMessageEventHandler>();
+        var mockRunEventsHandler = new Mock<IInternalTestMessageEventHandler>();
         _mockDataCollectionRequestSender.Setup(
-                x => x.SendAfterTestRunEndAndGetResult(It.IsAny<ITestMessageEventHandler>(), It.IsAny<bool>()))
+                x => x.SendAfterTestRunEndAndGetResult(It.IsAny<IInternalTestMessageEventHandler>(), It.IsAny<bool>()))
             .Throws<Exception>();
 
         var result = _proxyDataCollectionManager.AfterTestRunEnd(false, mockRunEventsHandler.Object);

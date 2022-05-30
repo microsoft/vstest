@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests;
 public class CommunicationLayerIntegrationTests
 {
     private readonly string _defaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
-    private readonly Mock<ITestMessageEventHandler> _mockTestMessageEventHandler;
+    private readonly Mock<IInternalTestMessageEventHandler> _mockTestMessageEventHandler;
     private readonly string _dataCollectorSettings, _runSettings;
     private readonly IDataCollectionLauncher _dataCollectionLauncher;
     private readonly IProcessHelper _processHelper;
@@ -33,7 +33,7 @@ public class CommunicationLayerIntegrationTests
 
     public CommunicationLayerIntegrationTests()
     {
-        _mockTestMessageEventHandler = new Mock<ITestMessageEventHandler>();
+        _mockTestMessageEventHandler = new Mock<IInternalTestMessageEventHandler>();
         _mockRequestData = new Mock<IRequestData>();
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);

@@ -54,7 +54,7 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
     }
 
     /// <inheritdoc/>
-    public int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
+    public int StartTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler)
     {
         try
         {
@@ -113,7 +113,7 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
     /// Aborts the test operation.
     /// </summary>
     /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
-    public void Abort(ITestRunEventsHandler eventHandler)
+    public void Abort(IInternalTestRunEventsHandler eventHandler)
     {
         Task.Run(() => _testHostManagerFactory.GetExecutionManager().Abort(eventHandler));
     }
@@ -122,7 +122,7 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
     /// Cancels the test run.
     /// </summary>
     /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
-    public void Cancel(ITestRunEventsHandler eventHandler)
+    public void Cancel(IInternalTestRunEventsHandler eventHandler)
     {
         Task.Run(() => _testHostManagerFactory.GetExecutionManager().Cancel(eventHandler));
     }

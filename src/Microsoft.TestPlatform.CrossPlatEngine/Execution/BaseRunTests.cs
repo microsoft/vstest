@@ -89,7 +89,7 @@ internal abstract class BaseRunTests
         string runSettings,
         TestExecutionContext testExecutionContext,
         ITestCaseEventsHandler testCaseEventsHandler,
-        ITestRunEventsHandler testRunEventsHandler,
+        IInternalTestRunEventsHandler testRunEventsHandler,
         ITestPlatformEventSource testPlatformEventSource)
         : this(
             requestData,
@@ -124,7 +124,7 @@ internal abstract class BaseRunTests
         string runSettings,
         TestExecutionContext testExecutionContext,
         ITestCaseEventsHandler testCaseEventsHandler,
-        ITestRunEventsHandler testRunEventsHandler,
+        IInternalTestRunEventsHandler testRunEventsHandler,
         ITestPlatformEventSource testPlatformEventSource,
         ITestEventsPublisher testEventsPublisher,
         IThread platformThread,
@@ -180,7 +180,7 @@ internal abstract class BaseRunTests
     /// <summary>
     /// Gets the test run events handler.
     /// </summary>
-    protected ITestRunEventsHandler TestRunEventsHandler { get; }
+    protected IInternalTestRunEventsHandler TestRunEventsHandler { get; }
 
     /// <summary>
     /// Gets the test run cache.

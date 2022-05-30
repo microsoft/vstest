@@ -147,7 +147,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     /// <returns>
     /// The <see cref="DataCollectionResult"/>.
     /// </returns>
-    public DataCollectionResult AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler)
+    public DataCollectionResult AfterTestRunEnd(bool isCanceled, IInternalTestMessageEventHandler runEventsHandler)
     {
         AfterTestRunEndResult afterTestRunEnd = null;
         InvokeDataCollectionServiceAction(
@@ -187,7 +187,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     public DataCollectionParameters BeforeTestRunStart(
         bool resetDataCollectors,
         bool isRunStartingNow,
-        ITestMessageEventHandler runEventsHandler)
+        IInternalTestMessageEventHandler runEventsHandler)
     {
         var areTestCaseLevelEventsRequired = false;
         IDictionary<string, string> environmentVariables = new Dictionary<string, string>();
@@ -281,7 +281,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         return connectionTimeout;
     }
 
-    private void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler runEventsHandler)
+    private void InvokeDataCollectionServiceAction(Action action, IInternalTestMessageEventHandler runEventsHandler)
     {
         try
         {
@@ -296,7 +296,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         }
     }
 
-    private void HandleExceptionMessage(ITestMessageEventHandler runEventsHandler, Exception exception)
+    private void HandleExceptionMessage(IInternalTestMessageEventHandler runEventsHandler, Exception exception)
     {
         EqtTrace.Error(exception);
         runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, exception.ToString());

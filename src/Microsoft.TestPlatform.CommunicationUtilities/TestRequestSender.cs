@@ -49,7 +49,7 @@ public class TestRequestSender : ITestRequestSender
     // Set to 1 if Discovery/Execution is complete, i.e. complete handlers have been invoked
     private int _operationCompleted;
 
-    private ITestMessageEventHandler _messageEventHandler;
+    private IInternalTestMessageEventHandler _messageEventHandler;
 
     private string _clientExitErrorMessage;
 
@@ -328,7 +328,7 @@ public class TestRequestSender : ITestRequestSender
     }
 
     /// <inheritdoc />
-    public void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler)
+    public void StartTestRun(TestRunCriteriaWithSources runCriteria, IInternalTestRunEventsHandler eventHandler)
     {
         _messageEventHandler = eventHandler;
         _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
@@ -350,7 +350,7 @@ public class TestRequestSender : ITestRequestSender
             && _runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
             && _protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
         {
-            var handler = (ITestRunEventsHandler2)eventHandler;
+            var handler = (IInternalTestRunEventsHandler)eventHandler;
             if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
             {
                 EqtTrace.Warning(
@@ -371,7 +371,7 @@ public class TestRequestSender : ITestRequestSender
     }
 
     /// <inheritdoc />
-    public void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler)
+    public void StartTestRun(TestRunCriteriaWithTests runCriteria, IInternalTestRunEventsHandler eventHandler)
     {
         _messageEventHandler = eventHandler;
         _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
@@ -393,7 +393,7 @@ public class TestRequestSender : ITestRequestSender
             && _runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
             && _protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
         {
-            var handler = (ITestRunEventsHandler2)eventHandler;
+            var handler = (IInternalTestRunEventsHandler)eventHandler;
             if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
             {
                 EqtTrace.Warning(
@@ -487,7 +487,7 @@ public class TestRequestSender : ITestRequestSender
         GC.SuppressFinalize(this);
     }
 
-    private void OnExecutionMessageReceived(MessageReceivedEventArgs messageReceived, ITestRunEventsHandler testRunEventsHandler)
+    private void OnExecutionMessageReceived(MessageReceivedEventArgs messageReceived, IInternalTestRunEventsHandler testRunEventsHandler)
     {
         try
         {
@@ -537,7 +537,7 @@ public class TestRequestSender : ITestRequestSender
 
                 case MessageType.AttachDebugger:
                     var testProcessPid = _dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
-                    bool result = ((ITestRunEventsHandler2)testRunEventsHandler).AttachDebuggerToProcess(testProcessPid.ProcessID);
+                    bool result = ((IInternalTestRunEventsHandler)testRunEventsHandler).AttachDebuggerToProcess(testProcessPid.ProcessID);
 
                     var resultMessage = _dataSerializer.SerializePayload(
                         MessageType.AttachDebuggerCallback,
@@ -611,7 +611,7 @@ public class TestRequestSender : ITestRequestSender
         }
     }
 
-    private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception, bool getClientError)
+    private void OnTestRunAbort(IInternalTestRunEventsHandler testRunEventsHandler, Exception exception, bool getClientError)
     {
         if (IsOperationComplete())
         {

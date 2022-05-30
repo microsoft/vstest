@@ -23,14 +23,14 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
 [TestClass]
 public class DataCollectionTestRunEventsHandlerTests
 {
-    private readonly Mock<ITestRunEventsHandler> _baseTestRunEventsHandler;
+    private readonly Mock<IInternalTestRunEventsHandler> _baseTestRunEventsHandler;
     private DataCollectionTestRunEventsHandler _testRunEventHandler;
     private readonly Mock<IProxyDataCollectionManager> _proxyDataCollectionManager;
     private readonly Mock<IDataSerializer> _mockDataSerializer;
 
     public DataCollectionTestRunEventsHandlerTests()
     {
-        _baseTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        _baseTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
         _proxyDataCollectionManager = new Mock<IProxyDataCollectionManager>();
         _mockDataSerializer = new Mock<IDataSerializer>();
         _testRunEventHandler = new DataCollectionTestRunEventsHandler(_baseTestRunEventsHandler.Object, _proxyDataCollectionManager.Object, _mockDataSerializer.Object, CancellationToken.None);
@@ -62,7 +62,7 @@ public class DataCollectionTestRunEventsHandlerTests
 
         _testRunEventHandler.HandleRawMessage(string.Empty);
         _proxyDataCollectionManager.Verify(
-            dcm => dcm.AfterTestRunEnd(false, It.IsAny<ITestRunEventsHandler>()),
+            dcm => dcm.AfterTestRunEnd(false, It.IsAny<IInternalTestRunEventsHandler>()),
             Times.Once);
     }
 
@@ -81,7 +81,7 @@ public class DataCollectionTestRunEventsHandlerTests
         _testRunEventHandler.HandleRawMessage(string.Empty);
 
         _proxyDataCollectionManager.Verify(
-            dcm => dcm.AfterTestRunEnd(false, It.IsAny<ITestRunEventsHandler>()),
+            dcm => dcm.AfterTestRunEnd(false, It.IsAny<IInternalTestRunEventsHandler>()),
             Times.Once);
     }
 
@@ -101,7 +101,7 @@ public class DataCollectionTestRunEventsHandlerTests
         _testRunEventHandler.HandleRawMessage(string.Empty);
 
         _proxyDataCollectionManager.Verify(
-            dcm => dcm.AfterTestRunEnd(true, It.IsAny<ITestRunEventsHandler>()),
+            dcm => dcm.AfterTestRunEnd(true, It.IsAny<IInternalTestRunEventsHandler>()),
             Times.Once);
     }
 
@@ -117,7 +117,7 @@ public class DataCollectionTestRunEventsHandlerTests
         _mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
         _mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
             .Returns(new TestRunCompletePayload() { TestRunCompleteArgs = testRunCompleteEventArgs });
-        _proxyDataCollectionManager.Setup(p => p.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()))
+        _proxyDataCollectionManager.Setup(p => p.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<IInternalTestMessageEventHandler>()))
             .Returns(new DataCollectionResult(null, invokedDataCollectors));
         _mockDataSerializer.Setup(r => r.SerializePayload(It.IsAny<string>(), It.IsAny<object>())).Callback((string message, object o) =>
         {
@@ -134,7 +134,7 @@ public class DataCollectionTestRunEventsHandlerTests
         Assert.AreEqual(invokedDataCollectors[0], testRunCompleteEventArgs2.InvokedDataCollectors[0]);
 
         _proxyDataCollectionManager.Verify(
-            dcm => dcm.AfterTestRunEnd(false, It.IsAny<ITestRunEventsHandler>()),
+            dcm => dcm.AfterTestRunEnd(false, It.IsAny<IInternalTestRunEventsHandler>()),
             Times.Once);
     }
 

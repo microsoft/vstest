@@ -48,7 +48,7 @@ public interface IProxyDataCollectionManager : IDisposable
     DataCollectionParameters BeforeTestRunStart(
         bool resetDataCollectors,
         bool isRunStartingNow,
-        ITestMessageEventHandler runEventsHandler);
+        IInternalTestMessageEventHandler runEventsHandler);
 
     /// <summary>
     /// Invoked after ending of test run
@@ -62,7 +62,7 @@ public interface IProxyDataCollectionManager : IDisposable
     /// <returns>
     /// The <see cref="DataCollectionResult"/>.
     /// </returns>
-    DataCollectionResult AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler);
+    DataCollectionResult AfterTestRunEnd(bool isCanceled, IInternalTestMessageEventHandler runEventsHandler);
 
     /// <summary>
     /// Invoked after initialization of test host

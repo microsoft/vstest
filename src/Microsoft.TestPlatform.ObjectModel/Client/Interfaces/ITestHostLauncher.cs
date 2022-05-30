@@ -32,3 +32,6 @@ public interface ITestHostLauncher
     /// <returns>Process id of the launched test host</returns>
     int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken);
 }
+
+
+

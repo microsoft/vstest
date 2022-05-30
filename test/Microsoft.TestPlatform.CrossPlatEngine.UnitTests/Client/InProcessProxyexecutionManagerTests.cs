@@ -53,10 +53,10 @@ public class InProcessProxyExecutionManagerTests
     public void StartTestRunShouldCallInitialize()
     {
         var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
-        var mockTestMessageEventHandler = new Mock<ITestMessageEventHandler>();
+        var mockTestMessageEventHandler = new Mock<IInternalTestMessageEventHandler>();
         _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-        _mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>(), It.IsAny<ITestMessageEventHandler>()), Times.Once, "StartTestRun should call Initialize if not already initialized");
+        _mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>(), It.IsAny<IInternalTestMessageEventHandler>()), Times.Once, "StartTestRun should call Initialize if not already initialized");
     }
 
     [TestMethod]
@@ -167,7 +167,7 @@ public class InProcessProxyExecutionManagerTests
     public void StartTestRunShouldCatchExceptionAndCallHandleRunComplete()
     {
         var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
         var manualResetEvent = new ManualResetEvent(true);
 
         _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.AdapterSourceMap, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, mockTestRunEventsHandler.Object)).Callback(
@@ -186,10 +186,10 @@ public class InProcessProxyExecutionManagerTests
     {
         var manualResetEvent = new ManualResetEvent(true);
 
-        _mockExecutionManager.Setup(o => o.Abort(It.IsAny<ITestRunEventsHandler>())).Callback(
+        _mockExecutionManager.Setup(o => o.Abort(It.IsAny<IInternalTestRunEventsHandler>())).Callback(
             () => manualResetEvent.Set());
 
-        _inProcessProxyExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
+        _inProcessProxyExecutionManager.Abort(It.IsAny<IInternalTestRunEventsHandler>());
 
         Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.Abort should get called");
     }
@@ -199,10 +199,10 @@ public class InProcessProxyExecutionManagerTests
     {
         var manualResetEvent = new ManualResetEvent(true);
 
-        _mockExecutionManager.Setup(o => o.Cancel(It.IsAny<ITestRunEventsHandler>())).Callback(
+        _mockExecutionManager.Setup(o => o.Cancel(It.IsAny<IInternalTestRunEventsHandler>())).Callback(
             () => manualResetEvent.Set());
 
-        _inProcessProxyExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
+        _inProcessProxyExecutionManager.Cancel(It.IsAny<IInternalTestRunEventsHandler>());
 
         Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.Abort should get called");
     }

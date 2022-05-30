@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 /// <summary>
 /// Orchestrates test execution operations for the engine communicating with the client.
 /// </summary>
-internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITestRunEventsHandler2
+internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInternalTestRunEventsHandler
 {
     private readonly TestSessionInfo _testSessionInfo;
     private readonly Func<string, ProxyExecutionManager, ProxyOperationManager> _proxyOperationManagerCreator;
@@ -42,7 +42,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     private bool _isCommunicationEstablished;
 
     private ProxyOperationManager _proxyOperationManager;
-    private ITestRunEventsHandler _baseTestRunEventsHandler;
+    private IInternalTestRunEventsHandler _baseTestRunEventsHandler;
     private bool _skipDefaultAdapters;
     private readonly bool _debugEnabledForTestSession;
 
@@ -146,7 +146,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     }
 
     /// <inheritdoc/>
-    public virtual int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
+    public virtual int StartTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler)
     {
         if (_proxyOperationManager == null)
         {
@@ -261,7 +261,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     }
 
     /// <inheritdoc/>
-    public virtual void Cancel(ITestRunEventsHandler eventHandler)
+    public virtual void Cancel(IInternalTestRunEventsHandler eventHandler)
     {
         // Just in case ExecuteAsync isn't called yet, set the eventhandler.
         if (_baseTestRunEventsHandler == null)
@@ -284,7 +284,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     }
 
     /// <inheritdoc/>
-    public void Abort(ITestRunEventsHandler eventHandler)
+    public void Abort(IInternalTestRunEventsHandler eventHandler)
     {
         // Just in case ExecuteAsync isn't called yet, set the eventhandler.
         if (_baseTestRunEventsHandler == null)
@@ -340,7 +340,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     /// <inheritdoc />
     public bool AttachDebuggerToProcess(int pid)
     {
-        return ((ITestRunEventsHandler2)_baseTestRunEventsHandler).AttachDebuggerToProcess(pid);
+        return ((IInternalTestRunEventsHandler)_baseTestRunEventsHandler).AttachDebuggerToProcess(pid);
     }
 
     /// <inheritdoc/>

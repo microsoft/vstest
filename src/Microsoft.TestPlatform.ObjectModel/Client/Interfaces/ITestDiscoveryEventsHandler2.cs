@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 /// <summary>
 /// Interface contract for handling discovery events during test discovery operation
 /// </summary>
-public interface ITestDiscoveryEventsHandler2 : ITestMessageEventHandler
+public interface ITestDiscoveryEventsHandler2 : IInternalTestMessageEventHandler
 {
     /// <summary>
     /// Dispatch DiscoveryComplete event to listeners.

@@ -28,7 +28,7 @@ using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Res
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.Execution;
 
-public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
+public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 {
     /// <summary>
     /// Specifies whether the run is disposed or not

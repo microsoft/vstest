@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
 /// <summary>
 /// The test run events handler.
 /// </summary>
-public class TestInitializeEventsHandler : ITestMessageEventHandler
+public class TestInitializeEventsHandler : IInternalTestMessageEventHandler
 {
     private readonly ITestRequestHandler _requestHandler;
 

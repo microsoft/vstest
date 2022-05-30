@@ -100,7 +100,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     }
 
     /// <inheritdoc/>
-    public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, IEnumerable<string> sources, bool isTelemetryOptedIn, ITestMessageEventHandler runEventsHandler)
+    public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, IEnumerable<string> sources, bool isTelemetryOptedIn, IInternalTestMessageEventHandler runEventsHandler)
     {
         var isDataCollectionStarted = false;
         BeforeTestRunStartResult result = null;
@@ -138,7 +138,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     }
 
     /// <inheritdoc/>
-    public AfterTestRunEndResult SendAfterTestRunEndAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled)
+    public AfterTestRunEndResult SendAfterTestRunEndAndGetResult(IInternalTestMessageEventHandler runEventsHandler, bool isCancelled)
     {
         var isDataCollectionComplete = false;
         AfterTestRunEndResult result = null;
@@ -170,7 +170,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         return result;
     }
 
-    private void LogDataCollectorMessage(DataCollectionMessageEventArgs dataCollectionMessageEventArgs, ITestMessageEventHandler requestHandler)
+    private void LogDataCollectorMessage(DataCollectionMessageEventArgs dataCollectionMessageEventArgs, IInternalTestMessageEventHandler requestHandler)
     {
         string logMessage;
         if (string.IsNullOrWhiteSpace(dataCollectionMessageEventArgs.FriendlyName))

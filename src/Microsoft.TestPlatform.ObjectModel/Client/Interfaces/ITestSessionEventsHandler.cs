@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 /// <summary>
 /// Interface contract for handling test session events.
 /// </summary>
-public interface ITestSessionEventsHandler : ITestMessageEventHandler
+public interface ITestSessionEventsHandler : IInternalTestMessageEventHandler
 {
     /// <summary>
     /// Dispatch StartTestSession complete event to listeners.

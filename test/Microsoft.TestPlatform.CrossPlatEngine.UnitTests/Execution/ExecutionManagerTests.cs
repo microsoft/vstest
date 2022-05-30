@@ -77,7 +77,7 @@ public class ExecutionManagerTests
     public void InitializeShouldLoadAndInitializeAllExtensions()
     {
         var commonAssemblyLocation = typeof(ExecutionManagerTests).GetTypeInfo().Assembly.Location;
-        var mockTestMessageEventHandler = new Mock<ITestMessageEventHandler>();
+        var mockTestMessageEventHandler = new Mock<IInternalTestMessageEventHandler>();
         TestPluginCacheHelper.SetupMockExtensions(
             new string[] { commonAssemblyLocation },
             () => { });
@@ -154,7 +154,7 @@ public class ExecutionManagerTests
             { assemblyLocation, new List<string> { assemblyLocation } }
         };
 
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         var isExecutorCalled = false;
         RunTestWithSourcesExecutor.RunTestsWithSourcesCallback = (s, rc, fh) =>
@@ -192,7 +192,7 @@ public class ExecutionManagerTests
             new TestCase("A.C.M1", new Uri(RunTestsWithSourcesTestsExecutorUri), assemblyLocation)
         };
 
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         var isExecutorCalled = false;
         RunTestWithSourcesExecutor.RunTestsWithTestsCallback = (s, rc, fh) =>
@@ -225,7 +225,7 @@ public class ExecutionManagerTests
     [TestMethod]
     public void StartTestRunShouldAbortTheRunIfAnyExceptionComesForTheProvidedTests()
     {
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         // Call StartTestRun with faulty runsettings so that it will throw exception
         _executionManager.StartTestRun(new List<TestCase>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", _testExecutionContext, null, mockTestRunEventsHandler.Object);
@@ -238,7 +238,7 @@ public class ExecutionManagerTests
     [TestMethod]
     public void StartTestRunShouldAbortTheRunIfAnyExceptionComesForTheProvidedSources()
     {
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         // Call StartTestRun with faulty runsettings so that it will throw exception
         _executionManager.StartTestRun(new Dictionary<string, IEnumerable<string>>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", _testExecutionContext, null, mockTestRunEventsHandler.Object);
@@ -269,7 +269,7 @@ public class ExecutionManagerTests
     [TestMethod]
     public void InitializeShouldVerifyTheHandlerInitializationWhenAdapterIsFailedToLoad()
     {
-        var mockLogger = new Mock<ITestMessageEventHandler>();
+        var mockLogger = new Mock<IInternalTestMessageEventHandler>();
 
         //when handler instance is null
         _sessionLogger.SendMessage(It.IsAny<TestMessageLevel>(), "verify that the HandleLogMessage method will not be invoked when handler is not initialized");

@@ -32,7 +32,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <summary>
     /// DebugLauncher for launching additional adapter processes under debugger
     /// </summary>
-    private readonly ITestRunEventsHandler _testRunEventsHandler;
+    private readonly IInternalTestRunEventsHandler _testRunEventsHandler;
 
     /// <summary>
     /// Specifies whether the handle is disposed or not
@@ -47,7 +47,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <param name="testExecutionContext"> The test execution context. </param>
     /// <param name="testRunEventsHandler">TestRun Events Handler</param>
     public FrameworkHandle(ITestCaseEventsHandler testCaseEventsHandler, ITestRunCache testRunCache,
-        TestExecutionContext testExecutionContext, ITestRunEventsHandler testRunEventsHandler)
+        TestExecutionContext testExecutionContext, IInternalTestRunEventsHandler testRunEventsHandler)
         : base(testCaseEventsHandler, testRunCache)
     {
         _testExecutionContext = testExecutionContext;
@@ -99,7 +99,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <inheritdoc />
     public bool AttachDebuggerToProcess(int pid)
     {
-        return ((ITestRunEventsHandler2)_testRunEventsHandler).AttachDebuggerToProcess(pid);
+        return ((IInternalTestRunEventsHandler)_testRunEventsHandler).AttachDebuggerToProcess(pid);
     }
 
     public void Dispose()

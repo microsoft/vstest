@@ -22,10 +22,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 /// Handles DataCollection attachments by calling DataCollection Process on Test Run Complete.
 /// Existing functionality of ITestRunEventsHandler is decorated with additional call to Data Collection Process.
 /// </summary>
-internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
+internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandler
 {
     private readonly IProxyDataCollectionManager _proxyDataCollectionManager;
-    private readonly ITestRunEventsHandler _testRunEventsHandler;
+    private readonly IInternalTestRunEventsHandler _testRunEventsHandler;
     private CancellationToken _cancellationToken;
     private readonly IDataSerializer _dataSerializer;
     private Collection<AttachmentSet> _dataCollectionAttachmentSets;
@@ -40,7 +40,7 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     /// <param name="proxyDataCollectionManager">
     /// The proxy Data Collection Manager.
     /// </param>
-    public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, CancellationToken cancellationToken)
+    public DataCollectionTestRunEventsHandler(IInternalTestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, CancellationToken cancellationToken)
         : this(baseTestRunEventsHandler, proxyDataCollectionManager, JsonDataSerializer.Instance, cancellationToken)
     {
     }
@@ -57,7 +57,7 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     /// <param name="dataSerializer">
     /// The data Serializer.
     /// </param>
-    public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, IDataSerializer dataSerializer, CancellationToken cancellationToken)
+    public DataCollectionTestRunEventsHandler(IInternalTestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, IDataSerializer dataSerializer, CancellationToken cancellationToken)
     {
         _proxyDataCollectionManager = proxyDataCollectionManager;
         _testRunEventsHandler = baseTestRunEventsHandler;
@@ -182,7 +182,7 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     /// <inheritdoc />
     public bool AttachDebuggerToProcess(int pid)
     {
-        return ((ITestRunEventsHandler2)_testRunEventsHandler).AttachDebuggerToProcess(pid);
+        return ((IInternalTestRunEventsHandler)_testRunEventsHandler).AttachDebuggerToProcess(pid);
     }
 
     /// <summary>

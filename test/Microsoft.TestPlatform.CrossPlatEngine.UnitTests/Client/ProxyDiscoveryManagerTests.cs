@@ -507,7 +507,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         var mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 

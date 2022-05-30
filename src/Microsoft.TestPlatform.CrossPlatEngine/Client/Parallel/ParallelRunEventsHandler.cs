@@ -20,11 +20,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 /// <summary>
 /// ParallelRunEventsHandler for handling the run events in case of parallel execution
 /// </summary>
-internal class ParallelRunEventsHandler : ITestRunEventsHandler2
+internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
 {
     private readonly IProxyExecutionManager _proxyExecutionManager;
 
-    private readonly ITestRunEventsHandler _actualRunEventsHandler;
+    private readonly IInternalTestRunEventsHandler _actualRunEventsHandler;
 
     private readonly IParallelProxyExecutionManager _parallelProxyExecutionManager;
 
@@ -36,7 +36,7 @@ internal class ParallelRunEventsHandler : ITestRunEventsHandler2
 
     public ParallelRunEventsHandler(IRequestData requestData,
         IProxyExecutionManager proxyExecutionManager,
-        ITestRunEventsHandler actualRunEventsHandler,
+        IInternalTestRunEventsHandler actualRunEventsHandler,
         IParallelProxyExecutionManager parallelProxyExecutionManager,
         ParallelRunDataAggregator runDataAggregator) :
         this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
@@ -45,7 +45,7 @@ internal class ParallelRunEventsHandler : ITestRunEventsHandler2
 
     internal ParallelRunEventsHandler(IRequestData requestData,
         IProxyExecutionManager proxyExecutionManager,
-        ITestRunEventsHandler actualRunEventsHandler,
+        IInternalTestRunEventsHandler actualRunEventsHandler,
         IParallelProxyExecutionManager parallelProxyExecutionManager,
         ParallelRunDataAggregator runDataAggregator,
         IDataSerializer dataSerializer)
@@ -190,7 +190,7 @@ internal class ParallelRunEventsHandler : ITestRunEventsHandler2
     /// <inheritdoc />
     public bool AttachDebuggerToProcess(int pid)
     {
-        return ((ITestRunEventsHandler2)_actualRunEventsHandler).AttachDebuggerToProcess(pid);
+        return ((IInternalTestRunEventsHandler)_actualRunEventsHandler).AttachDebuggerToProcess(pid);
     }
 
     private void ConvertToRawMessageAndSend(string messageType, object payload)

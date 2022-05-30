@@ -35,7 +35,7 @@ public class ExecutionManager : IExecutionManager
     private BaseRunTests _activeTestRun;
     private readonly IRequestData _requestData;
     private readonly TestSessionMessageLogger _sessionMessageLogger;
-    private ITestMessageEventHandler _testMessageEventsHandler;
+    private IInternalTestMessageEventHandler _testMessageEventsHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
@@ -62,7 +62,7 @@ public class ExecutionManager : IExecutionManager
     /// Initializes the execution manager.
     /// </summary>
     /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-    public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestMessageEventHandler testMessageEventsHandler)
+    public void Initialize(IEnumerable<string> pathToAdditionalExtensions, IInternalTestMessageEventHandler testMessageEventsHandler)
     {
         // Clear the request data metrics left over from a potential previous run.
         _requestData.MetricsCollection?.Metrics?.Clear();
@@ -99,7 +99,7 @@ public class ExecutionManager : IExecutionManager
         string runSettings,
         TestExecutionContext testExecutionContext,
         ITestCaseEventsHandler testCaseEventsHandler,
-        ITestRunEventsHandler runEventsHandler)
+        IInternalTestRunEventsHandler runEventsHandler)
     {
         try
         {
@@ -135,7 +135,7 @@ public class ExecutionManager : IExecutionManager
         string runSettings,
         TestExecutionContext testExecutionContext,
         ITestCaseEventsHandler testCaseEventsHandler,
-        ITestRunEventsHandler runEventsHandler)
+        IInternalTestRunEventsHandler runEventsHandler)
     {
         try
         {
@@ -159,7 +159,7 @@ public class ExecutionManager : IExecutionManager
     /// <summary>
     /// Cancel the test execution.
     /// </summary>
-    public void Cancel(ITestRunEventsHandler testRunEventsHandler)
+    public void Cancel(IInternalTestRunEventsHandler testRunEventsHandler)
     {
         if (_activeTestRun == null)
         {
@@ -175,7 +175,7 @@ public class ExecutionManager : IExecutionManager
     /// <summary>
     /// Aborts the test execution.
     /// </summary>
-    public void Abort(ITestRunEventsHandler testRunEventsHandler)
+    public void Abort(IInternalTestRunEventsHandler testRunEventsHandler)
     {
         if (_activeTestRun == null)
         {

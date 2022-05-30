@@ -145,7 +145,7 @@ public class ProxyOperationManager
     public virtual bool SetupChannel(
         IEnumerable<string> sources,
         string runSettings,
-        ITestMessageEventHandler eventHandler)
+        IInternalTestMessageEventHandler eventHandler)
     {
         // NOTE: Event handler is ignored here, but it is used in the overloaded method.
         return SetupChannel(sources, runSettings);
