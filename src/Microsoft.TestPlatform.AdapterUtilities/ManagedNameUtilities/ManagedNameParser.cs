@@ -7,8 +7,6 @@ using System.Globalization;
 
 using Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
 
 public class ManagedNameParser
@@ -66,7 +64,7 @@ public class ManagedNameParser
     /// <exception cref="InvalidManagedNameException">
     /// Thrown if <paramref name="managedMethodName"/> contains spaces, incomplete, or the arity isn't numeric.
     /// </exception>
-    public static void ParseManagedMethodName(string managedMethodName, out string methodName, out int arity, out string[] parameterTypes)
+    public static void ParseManagedMethodName(string managedMethodName, out string methodName, out int arity, out string[]? parameterTypes)
     {
         int pos = ParseMethodName(managedMethodName, 0, out var escapedMethodName, out arity);
         methodName = ReflectionHelpers.ParseEscapedString(escapedMethodName);
@@ -133,7 +131,7 @@ public class ManagedNameParser
         return i;
     }
 
-    private static int ParseParameterTypeList(string managedMethodName, int start, out string[] parameterTypes)
+    private static int ParseParameterTypeList(string managedMethodName, int start, out string[]? parameterTypes)
     {
         parameterTypes = null;
         if (start == managedMethodName.Length)
