@@ -17,6 +17,11 @@
         <target state="translated">Параметры LogFileName и LogFilePrefix не могут использоваться вместе.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="CannotGenerateUniqueFilePath">
+        <source>Cannot generate a unique file name for name '{0}' on path '{1}'.</source>
+        <target state="new">Cannot generate a unique file name for name '{0}' on path '{1}'.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

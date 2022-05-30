@@ -45,7 +45,7 @@ public class DiscoveryManager : IDiscoveryManager
     /// <summary>
     /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
     /// </summary>
-    public DiscoveryManager(IRequestData requestData)
+    public DiscoveryManager(IRequestData requestData!!)
         : this(requestData, TestPlatformEventSource.Instance)
     {
     }
@@ -59,7 +59,7 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="testPlatformEventSource">
     ///     The test platform event source.
     /// </param>
-    protected DiscoveryManager(IRequestData requestData, ITestPlatformEventSource testPlatformEventSource)
+    protected DiscoveryManager(IRequestData requestData!!, ITestPlatformEventSource testPlatformEventSource)
     {
         _sessionMessageLogger = TestSessionMessageLogger.Instance;
         _sessionMessageLogger.TestRunMessage += TestSessionMessageHandler;
@@ -73,6 +73,9 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
     public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestDiscoveryEventsHandler2 eventHandler)
     {
+        // Clear the request data metrics left over from a potential previous run.
+        _requestData.MetricsCollection?.Metrics?.Clear();
+
         _testPlatformEventSource.AdapterSearchStart();
         _testDiscoveryEventsHandler = eventHandler;
         if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())

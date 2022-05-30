@@ -61,7 +61,7 @@ public class EventLogDataCollectorTests
         Assert.ThrowsException<ArgumentNullException>(
             () => _eventLogDataCollector.Initialize(
                 null,
-                null,
+                null!,
                 _mockDataCollectionSink,
                 _mockDataCollectionLogger.Object,
                 _dataCollectionEnvironmentContext));
@@ -74,7 +74,7 @@ public class EventLogDataCollectorTests
             () => _eventLogDataCollector.Initialize(
                 null,
                 _mockDataCollectionEvents.Object,
-                null,
+                null!,
                 _mockDataCollectionLogger.Object,
                 _dataCollectionEnvironmentContext));
     }
@@ -87,7 +87,7 @@ public class EventLogDataCollectorTests
                 null,
                 _mockDataCollectionEvents.Object,
                 _mockDataCollectionSink,
-                null,
+                null!,
                 _dataCollectionEnvironmentContext));
     }
 

@@ -6,8 +6,6 @@ using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
 /// <summary>
@@ -32,7 +30,7 @@ internal class CollectorNameValueConfigurationManager
     /// <param name="configurationElement">
     /// XML element containing the configuration
     /// </param>
-    public CollectorNameValueConfigurationManager(XmlElement configurationElement)
+    public CollectorNameValueConfigurationManager(XmlElement? configurationElement)
     {
         if (configurationElement == null)
         {
@@ -79,14 +77,14 @@ internal class CollectorNameValueConfigurationManager
         }
     }
 
-    internal IDictionary<string, string> NameValuePairs { get; } = new Dictionary<string, string>();
+    internal IDictionary<string, string?> NameValuePairs { get; } = new Dictionary<string, string?>();
 
     /// <summary>
     /// Gets the value of the setting specified by name, or null if it was not found
     /// </summary>
     /// <param name="name">The setting name</param>
     /// <returns>The setting value, or null if the setting was not found</returns>
-    public string this[string name]
+    public string? this[string name]
     {
         get
         {

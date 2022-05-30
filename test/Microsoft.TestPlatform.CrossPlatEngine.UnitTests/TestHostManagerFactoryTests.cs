@@ -23,13 +23,7 @@ public class TestHostManagerFactoryTests
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
-        _testHostManagerFactory = new TestHostManagerFactory(_mockRequestData.Object);
-    }
-
-    [TestMethod]
-    public void ConstructorShouldThrowIfRequestDataIsNull()
-    {
-        Assert.ThrowsException<ArgumentNullException>(() => new TestHostManagerFactory(null));
+        _testHostManagerFactory = new TestHostManagerFactory(false);
     }
 
     [TestMethod]

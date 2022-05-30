@@ -98,7 +98,7 @@ Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestExtensionManager.UseAddi
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestHostManagerFactory
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestHostManagerFactory.GetDiscoveryManager() -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol.IDiscoveryManager
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestHostManagerFactory.GetExecutionManager() -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol.IExecutionManager
-Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestHostManagerFactory.TestHostManagerFactory(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData) -> void
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestHostManagerFactory.TestHostManagerFactory(bool telemetryOptedIn) -> void
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestSessionPool
 override Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.ProxyOperationManagerWithDataCollection.Initialize(bool skipDefaultAdapters) -> void
 override Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.ProxyOperationManagerWithDataCollection.SetupChannel(System.Collections.Generic.IEnumerable<string> sources, string runSettings, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestMessageEventHandler eventHandler) -> bool
@@ -116,7 +116,7 @@ virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ProxyTestSessionMana
 virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ProxyTestSessionManager.EnqueueProxy(int proxyId) -> bool
 virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestSessionPool.AddSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo, Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ProxyTestSessionManager proxyManager) -> bool
 virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestSessionPool.ReturnProxy(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo, int proxyId) -> bool
-virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestSessionPool.TryTakeProxy(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo, string source, string runSettings) -> Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.ProxyOperationManager
+virtual Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestSessionPool.TryTakeProxy(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo, string source, string runSettings, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData) -> Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.ProxyOperationManager
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.DataCollectionResult
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.DataCollectionResult.Attachments.get -> System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet>
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.DataCollectionResult.DataCollectionResult(System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet> attachments, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector> invokedDataCollectors) -> void

@@ -36,7 +36,7 @@ internal class Program
 
         var thisAssemblyPath = Assembly.GetEntryAssembly().Location;
         var here = Path.GetDirectoryName(thisAssemblyPath);
-        var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
+        //var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
 
@@ -44,7 +44,7 @@ internal class Program
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
-                        <MaxCpuCount>4</MaxCpuCount>
+                        <MaxCpuCount>0</MaxCpuCount>
                     </RunConfiguration>
                 </RunSettings>
             ";
@@ -83,17 +83,23 @@ internal class Program
         {
             EnvironmentVariables = EnvironmentVariables.Variables,
             LogFilePath = Path.Combine(here, "logs", "log.txt"),
-            TraceLevel = TraceLevel.Verbose,
+            TraceLevel = TraceLevel.Off,
         };
         var options = new TestPlatformOptions();
         var r = new VsTestConsoleWrapper(console, consoleOptions);
         var sessionHandler = new TestSessionHandler();
 #pragma warning disable CS0618 // Type or member is obsolete
-        r.StartTestSession(sources, sourceSettings, sessionHandler);
+        //    r.StartTestSession(sources, sourceSettings, sessionHandler);
 #pragma warning restore CS0618 // Type or member is obsolete
         var discoveryHandler = new PlaygroundTestDiscoveryHandler();
-        r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        var sw = Stopwatch.StartNew();
+        r.DiscoverTests(sources, discoverySettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        var dd = sw.ElapsedMilliseconds;
+        Console.WriteLine($"Discovery done in {sw.ElapsedMilliseconds} ms");
+        sw.Restart();
         r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        var rd = sw.ElapsedMilliseconds;
+        Console.WriteLine($"Discovery: {dd} ms, Run: {rd} ms, Total: {dd + rd} ms");
     }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2

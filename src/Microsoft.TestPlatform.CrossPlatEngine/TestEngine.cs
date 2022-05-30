@@ -98,11 +98,13 @@ public class TestEngine : ITestEngine
                 throw new InvalidOperationException($"Exactly 1 testhost manager must be provided when running in process, but there {testHostManagers.Count} were provided.");
             }
             var testHostManagerInfo = testHostManagers[0];
-            testHostManager.Initialize(TestSessionMessageLogger.Instance, testHostManagerInfo.RunSettings);
 
-            var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
-            var newRequestData = GetRequestData(isTelemetryOptedIn);
-            return new InProcessProxyDiscoveryManager(testHostManager, new TestHostManagerFactory(newRequestData));
+            // Don't intialize, we are taking an instance that we created already initialized in GetTestRuntimeProvidersForUniqueConfigurations
+            // testHostManager.Initialize(TestSessionMessageLogger.Instance, testHostManagerInfo.RunSettings);
+
+            return new InProcessProxyDiscoveryManager(
+                testHostManager,
+                new TestHostManagerFactory(requestData.IsTelemetryOptedIn));
         }
 
         // Create one data aggregator per parallel discovery and share it with all the proxy discovery managers.
@@ -131,7 +133,8 @@ public class TestEngine : ITestEngine
                     var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
                         discoveryCriteria.TestSessionInfo,
                         source,
-                        runtimeProviderInfo.RunSettings);
+                        runtimeProviderInfo.RunSettings,
+                        requestData);
 
                     if (proxyOperationManager == null)
                     {
@@ -207,7 +210,8 @@ public class TestEngine : ITestEngine
             // We know that we only have a single testHostManager here, because we figure that out in ShouldRunInProcess.
             ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
 
-            testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
+            // Don't intialize, we are taking an instance that we created already initialized in GetTestRuntimeProvidersForUniqueConfigurations
+            // testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
             // NOTE: The custom launcher should not be set when we have test session info available.
             if (testRunCriteria.TestHostLauncher != null)
@@ -215,11 +219,9 @@ public class TestEngine : ITestEngine
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
             }
 
-            var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
-            var newRequestData = GetRequestData(isTelemetryOptedIn);
             return new InProcessProxyExecutionManager(
                 testHostManager,
-                new TestHostManagerFactory(newRequestData));
+                new TestHostManagerFactory(requestData.IsTelemetryOptedIn));
         }
 
         // This creates a single non-parallel execution manager, based requestData, isDataCollectorEnabled and the
@@ -271,7 +273,8 @@ public class TestEngine : ITestEngine
                     var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
                         testRunCriteria.TestSessionInfo,
                         source,
-                        runtimeProviderInfo.RunSettings);
+                        runtimeProviderInfo.RunSettings,
+                        requestData);
 
                     if (proxyOperationManager == null)
                     {
@@ -418,8 +421,10 @@ public class TestEngine : ITestEngine
             var sourceDetail = runConfiguration.First();
             var runsettingsXml = SourceDetailHelper.UpdateRunSettingsFromSourceDetail(runSettings, sourceDetail);
             var sources = runConfiguration.Select(c => c.Source).ToList();
-            // TODO: We could improve the implementation by adding an overload that won't create a new instance always, because we only need to know the Type.
             var testRuntimeProvider = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runsettingsXml, sources);
+
+            // Initialize here, because Shared is picked up from the instance, and it can be set during initalization.
+            testRuntimeProvider.Initialize(TestSessionMessageLogger.Instance, runsettingsXml);
             var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider.GetType(), testRuntimeProvider.Shared, runsettingsXml, sourceDetails: runConfiguration.ToList());
 
             // Outputting the instance, because the code for in-process run uses it, and we don't want to resolve it another time.
@@ -567,24 +572,6 @@ public class TestEngine : ITestEngine
         }
 
         return false;
-    }
-
-    /// <summary>
-    /// Get request data on basis of telemetry opted in or not.
-    /// </summary>
-    ///
-    /// <param name="isTelemetryOptedIn">A flag indicating if telemetry is opted in.</param>
-    ///
-    /// <returns>The request data.</returns>
-    private IRequestData GetRequestData(bool isTelemetryOptedIn)
-    {
-        return new RequestData
-        {
-            MetricsCollection = isTelemetryOptedIn
-                ? (IMetricsCollection)new MetricsCollection()
-                : new NoOpMetricsCollection(),
-            IsTelemetryOptedIn = isTelemetryOptedIn
-        };
     }
 
     private static void ThrowExceptionIfTestHostManagerIsNull(ITestRuntimeProvider testHostManager, string settingsXml)
