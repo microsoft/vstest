@@ -32,5 +32,5 @@ public class StartTestSessionCriteria
     /// Gets or sets the test host launcher used for starting the test session.
     /// </summary>
     [DataMember]
-    public ITestHostLauncher TestHostLauncher { get; set; }
+    public IInternalTestHostLauncher TestHostLauncher { get; set; }
 }

@@ -208,7 +208,7 @@ public class TestHostProviderManagerTests
             HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
-        public void SetCustomLauncher(ITestHostLauncher customLauncher)
+        public void SetCustomLauncher(IInternalTestHostLauncher customLauncher)
         {
             throw new NotImplementedException();
         }
@@ -276,7 +276,7 @@ public class TestHostProviderManagerTests
             HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
-        public void SetCustomLauncher(ITestHostLauncher customLauncher)
+        public void SetCustomLauncher(IInternalTestHostLauncher customLauncher)
         {
             throw new NotImplementedException();
         }

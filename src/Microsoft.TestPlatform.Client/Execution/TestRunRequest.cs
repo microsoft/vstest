@@ -662,7 +662,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// <inheritdoc />
     public bool AttachDebuggerToProcess(int pid)
     {
-        return TestRunCriteria.TestHostLauncher is ITestHostLauncher2 launcher
+        return TestRunCriteria.TestHostLauncher is IInternalTestHostLauncher launcher
                && launcher.AttachDebuggerToProcess(pid);
     }
 

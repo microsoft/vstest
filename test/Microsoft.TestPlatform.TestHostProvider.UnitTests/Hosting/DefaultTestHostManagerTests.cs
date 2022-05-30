@@ -372,7 +372,7 @@ public class DefaultTestHostManagerTests
     [TestMethod]
     public void LaunchTestHostShouldUseCustomHostIfSet()
     {
-        var mockCustomLauncher = new Mock<ITestHostLauncher>();
+        var mockCustomLauncher = new Mock<IInternalTestHostLauncher>();
         _testHostManager.SetCustomLauncher(mockCustomLauncher.Object);
         var currentProcess = Process.GetCurrentProcess();
         mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(currentProcess.Id);
@@ -390,7 +390,7 @@ public class DefaultTestHostManagerTests
     [TestMethod]
     public void LaunchTestHostShouldSetExitCallbackInCaseCustomHost()
     {
-        var mockCustomLauncher = new Mock<ITestHostLauncher>();
+        var mockCustomLauncher = new Mock<IInternalTestHostLauncher>();
         _testHostManager.SetCustomLauncher(mockCustomLauncher.Object);
         var currentProcess = Process.GetCurrentProcess();
         mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(currentProcess.Id);

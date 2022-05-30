@@ -59,7 +59,7 @@ public interface ITestRuntimeProvider
     /// Sets a custom launcher
     /// </summary>
     /// <param name="customLauncher">Custom launcher to set</param>
-    void SetCustomLauncher(ITestHostLauncher customLauncher);
+    void SetCustomLauncher(IInternalTestHostLauncher customLauncher);
 
     /// <summary>
     /// Gets the end point address and behavior of TestRuntime

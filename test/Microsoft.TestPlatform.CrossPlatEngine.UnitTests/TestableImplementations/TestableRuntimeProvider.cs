@@ -41,7 +41,7 @@ public class TestableRuntimeProvider : ITestRuntimeProvider
         return true;
     }
 
-    public void SetCustomLauncher(ITestHostLauncher customLauncher)
+    public void SetCustomLauncher(IInternalTestHostLauncher customLauncher)
     {
     }
 

@@ -34,7 +34,7 @@ public class DotnetTestHostManagerTests
 {
     private const string DefaultDotnetPath = "c:\\tmp\\dotnet.exe";
 
-    private readonly Mock<ITestHostLauncher> _mockTestHostLauncher;
+    private readonly Mock<IInternalTestHostLauncher> _mockTestHostLauncher;
     private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly Mock<IFileHelper> _mockFileHelper;
     private readonly Mock<IWindowsRegistryHelper> _mockWindowsRegistry;
@@ -56,7 +56,7 @@ public class DotnetTestHostManagerTests
 
     public DotnetTestHostManagerTests()
     {
-        _mockTestHostLauncher = new Mock<ITestHostLauncher>();
+        _mockTestHostLauncher = new Mock<IInternalTestHostLauncher>();
         _mockProcessHelper = new Mock<IProcessHelper>();
         _mockFileHelper = new Mock<IFileHelper>();
         _mockMessageLogger = new Mock<IMessageLogger>();

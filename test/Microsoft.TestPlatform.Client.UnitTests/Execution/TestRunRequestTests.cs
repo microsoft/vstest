@@ -593,7 +593,7 @@ public class TestRunRequestTests
     [TestMethod]
     public void LaunchProcessWithDebuggerAttachedShouldNotCallCustomLauncherIfTestRunIsNotInProgress()
     {
-        var mockCustomLauncher = new Mock<ITestHostLauncher>();
+        var mockCustomLauncher = new Mock<IInternalTestHostLauncher>();
         _testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
         _executionManager = new Mock<IProxyExecutionManager>();
         _testRunRequest = new TestRunRequest(_mockRequestData.Object, _testRunCriteria, _executionManager.Object, _loggerManager.Object);
@@ -607,7 +607,7 @@ public class TestRunRequestTests
     [TestMethod]
     public void LaunchProcessWithDebuggerAttachedShouldNotCallCustomLauncherIfLauncherIsNotDebug()
     {
-        var mockCustomLauncher = new Mock<ITestHostLauncher>();
+        var mockCustomLauncher = new Mock<IInternalTestHostLauncher>();
         _testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
         _executionManager = new Mock<IProxyExecutionManager>();
         _testRunRequest = new TestRunRequest(_mockRequestData.Object, _testRunCriteria, _executionManager.Object, _loggerManager.Object);
@@ -623,7 +623,7 @@ public class TestRunRequestTests
     [TestMethod]
     public void LaunchProcessWithDebuggerAttachedShouldCallCustomLauncherIfLauncherIsDebugAndRunInProgress()
     {
-        var mockCustomLauncher = new Mock<ITestHostLauncher>();
+        var mockCustomLauncher = new Mock<IInternalTestHostLauncher>();
         _testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
         _executionManager = new Mock<IProxyExecutionManager>();
         _testRunRequest = new TestRunRequest(_mockRequestData.Object, _testRunCriteria, _executionManager.Object, _loggerManager.Object);

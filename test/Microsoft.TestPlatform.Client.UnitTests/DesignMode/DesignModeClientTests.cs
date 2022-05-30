@@ -181,12 +181,12 @@ public class DesignModeClientTests
                 trm =>
                     trm.RunTests(
                         It.IsAny<TestRunRequestPayload>(),
-                        It.IsAny<ITestHostLauncher>(),
+                        It.IsAny<IInternalTestHostLauncher>(),
                         It.IsAny<ITestRunEventsRegistrar>(),
                         It.IsAny<ProtocolConfig>()))
             .Callback(
                 (TestRunRequestPayload trp,
-                    ITestHostLauncher testHostManager,
+                    IInternalTestHostLauncher testHostManager,
                     ITestRunEventsRegistrar testRunEventsRegistrar,
                     ProtocolConfig config) =>
                 {
@@ -243,12 +243,12 @@ public class DesignModeClientTests
                 trm =>
                     trm.RunTests(
                         It.IsAny<TestRunRequestPayload>(),
-                        It.IsAny<ITestHostLauncher>(),
+                        It.IsAny<IInternalTestHostLauncher>(),
                         It.IsAny<ITestRunEventsRegistrar>(),
                         It.IsAny<ProtocolConfig>()))
             .Callback(
                 (TestRunRequestPayload trp,
-                    ITestHostLauncher testHostManager,
+                    IInternalTestHostLauncher testHostManager,
                     ITestRunEventsRegistrar testRunEventsRegistrar,
                     ProtocolConfig config) =>
                 {
@@ -559,7 +559,7 @@ public class DesignModeClientTests
         _mockTestRequestManager.Setup(
             rm => rm.StartTestSession(
                 It.IsAny<StartTestSessionPayload>(),
-                It.IsAny<ITestHostLauncher>(),
+                It.IsAny<IInternalTestHostLauncher>(),
                 It.IsAny<ITestSessionEventsHandler>(),
                 It.IsAny<ProtocolConfig>())).Throws(new SettingsException("DummyException"));
 

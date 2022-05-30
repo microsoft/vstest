@@ -134,7 +134,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         bool keepAlive,
         string testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher)
+        IInternalTestHostLauncher testHostLauncher)
         : this(
             sources,
             frequencyOfRunStatsChangeEvent,
@@ -171,7 +171,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         bool keepAlive,
         string testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher,
+        IInternalTestHostLauncher testHostLauncher,
         string testCaseFilter,
         FilterOptions filterOptions)
         : this(
@@ -216,7 +216,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         bool keepAlive,
         string testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher,
+        IInternalTestHostLauncher testHostLauncher,
         string testCaseFilter,
         FilterOptions filterOptions,
         TestSessionInfo testSessionInfo,
@@ -291,7 +291,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         bool keepAlive,
         string testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher)
+        IInternalTestHostLauncher testHostLauncher)
         : base(
             frequencyOfRunStatsChangeEvent,
             keepAlive,
@@ -431,7 +431,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         bool keepAlive,
         string testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher)
+        IInternalTestHostLauncher testHostLauncher)
         : this(
             tests,
             frequencyOfRunStatsChangeEvent,
@@ -470,7 +470,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         bool keepAlive,
         string testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher,
+        IInternalTestHostLauncher testHostLauncher,
         TestSessionInfo testSessionInfo,
         bool debugEnabledForTestSession)
         : base(
@@ -765,7 +765,7 @@ public class BaseTestRunCriteria
         bool keepAlive,
         string testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher)
+        IInternalTestHostLauncher testHostLauncher)
     {
         if (frequencyOfRunStatsChangeEvent <= 0)
         {
@@ -805,7 +805,7 @@ public class BaseTestRunCriteria
     /// Gets the custom launcher for test executor.
     /// </summary>
     [DataMember]
-    public ITestHostLauncher TestHostLauncher { get; private set; }
+    public IInternalTestHostLauncher TestHostLauncher { get; private set; }
 
     /// <summary>
     /// Gets the frequency of run stats test event.

@@ -58,7 +58,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private readonly IEnvironment _environment;
     private readonly IDotnetHostHelper _dotnetHostHelper;
 
-    private ITestHostLauncher _customTestHostLauncher;
+    private IInternalTestHostLauncher _customTestHostLauncher;
     private Process _testHostProcess;
     private StringBuilder _testHostProcessStdError;
     private IMessageLogger _messageLogger;
@@ -112,7 +112,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private Action<object, string> ErrorReceivedCallback => (process, data) => TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, data);
 
     /// <inheritdoc/>
-    public void SetCustomLauncher(ITestHostLauncher customLauncher)
+    public void SetCustomLauncher(IInternalTestHostLauncher customLauncher)
     {
         _customTestHostLauncher = customLauncher;
     }
@@ -332,7 +332,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <inheritdoc />
     public bool AttachDebuggerToTestHost()
     {
-        return _customTestHostLauncher is ITestHostLauncher2 launcher
+        return _customTestHostLauncher is IInternalTestHostLauncher launcher
                && launcher.AttachDebuggerToProcess(_testHostProcess.Id);
     }
 
@@ -445,7 +445,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         // additional environmental variables for us to help with probing.
         if ((_customTestHostLauncher == null)
             || (_customTestHostLauncher.IsDebug
-                && _customTestHostLauncher is ITestHostLauncher2))
+                && _customTestHostLauncher is IInternalTestHostLauncher))
         {
             EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
             cancellationToken.ThrowIfCancellationRequested();

@@ -60,7 +60,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private readonly IWindowsRegistryHelper _windowsRegistryHelper;
     private readonly IEnvironmentVariableHelper _environmentVariableHelper;
 
-    private ITestHostLauncher _customTestHostLauncher;
+    private IInternalTestHostLauncher _customTestHostLauncher;
 
     private Process _testHostProcess;
 
@@ -181,7 +181,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     }
 
     /// <inheritdoc/>
-    public void SetCustomLauncher(ITestHostLauncher customLauncher)
+    public void SetCustomLauncher(IInternalTestHostLauncher customLauncher)
     {
         _customTestHostLauncher = customLauncher;
     }
@@ -618,7 +618,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     /// <inheritdoc />
     public bool AttachDebuggerToTestHost()
     {
-        return _customTestHostLauncher is ITestHostLauncher2 launcher
+        return _customTestHostLauncher is IInternalTestHostLauncher launcher
                && launcher.AttachDebuggerToProcess(_testHostProcess.Id);
     }
 
@@ -662,7 +662,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         // additional environmental variables for us to help with probing.
         if ((_customTestHostLauncher == null)
             || (_customTestHostLauncher.IsDebug
-                && _customTestHostLauncher is ITestHostLauncher2))
+                && _customTestHostLauncher is IInternalTestHostLauncher))
         {
             EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 

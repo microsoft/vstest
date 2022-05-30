@@ -261,7 +261,7 @@ internal class TestRequestManager : ITestRequestManager
     /// <inheritdoc />
     public void RunTests(
         TestRunRequestPayload testRunRequestPayload,
-        ITestHostLauncher testHostLauncher,
+        IInternalTestHostLauncher testHostLauncher,
         ITestRunEventsRegistrar testRunEventsRegistrar,
         ProtocolConfig protocolConfig)
     {
@@ -449,7 +449,7 @@ internal class TestRequestManager : ITestRequestManager
     /// <inheritdoc/>
     public void StartTestSession(
         StartTestSessionPayload payload,
-        ITestHostLauncher testHostLauncher,
+        IInternalTestHostLauncher testHostLauncher,
         ITestSessionEventsHandler eventsHandler,
         ProtocolConfig protocolConfig)
     {
