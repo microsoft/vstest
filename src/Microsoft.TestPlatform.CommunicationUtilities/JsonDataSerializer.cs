@@ -50,7 +50,7 @@ public class JsonDataSerializer : IDataSerializer
         s_payloadSerializer = JsonSerializer.Create(jsonSettings);
         s_payloadSerializer2 = JsonSerializer.Create(jsonSettings);
 
-        var s = new DefaultTestPlatformContractResolver();
+        var contractResolver = new DefaultTestPlatformContractResolver();
         s_fastJsonSettings = new JsonSerializerSettings
         {
             DateFormatHandling = jsonSettings.DateFormatHandling,
@@ -62,11 +62,11 @@ public class JsonDataSerializer : IDataSerializer
             // of changing how our consumers get their data.
             // NullValueHandling = NullValueHandling.Ignore,
 
-            ContractResolver = s,
+            ContractResolver = contractResolver,
         };
 
         s_payloadSerializer.ContractResolver = new TestPlatformContractResolver1();
-        s_payloadSerializer2.ContractResolver = s;
+        s_payloadSerializer2.ContractResolver = contractResolver;
 
 #if TRACE_JSON_SERIALIZATION
         // MemoryTraceWriter can help diagnose serialization issues. Enable it for
