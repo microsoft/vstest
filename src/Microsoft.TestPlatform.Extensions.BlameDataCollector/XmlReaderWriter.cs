@@ -104,7 +104,7 @@ public class XmlReaderWriter : IBlameReaderWriter
     /// <returns>Test Case List</returns>
     public List<BlameTestObject> ReadTestSequence(string filePath)
     {
-        ValidateArg.NotNullOrEmpty(filePath, nameof(filePath));
+        ValidateArg.NotNull(filePath, nameof(filePath));
 
         if (!_fileHelper.Exists(filePath))
         {
