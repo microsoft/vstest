@@ -58,8 +58,10 @@ public class XmlReaderWriter : IBlameReaderWriter
     /// The file Path.
     /// </param>
     /// <returns>File path</returns>
-    public string WriteTestSequence(List<Guid> testSequence!!, Dictionary<Guid, BlameTestObject> testObjectDictionary!!, string filePath)
+    public string WriteTestSequence(List<Guid> testSequence, Dictionary<Guid, BlameTestObject> testObjectDictionary, string filePath)
     {
+        ValidateArg.NotNull(testSequence, nameof(testSequence));
+        ValidateArg.NotNull(testObjectDictionary, nameof(testObjectDictionary));
         ValidateArg.NotNullOrEmpty(filePath, nameof(filePath));
 
         filePath += ".xml";
@@ -100,8 +102,10 @@ public class XmlReaderWriter : IBlameReaderWriter
     /// </summary>
     /// <param name="filePath">The path of test sequence file</param>
     /// <returns>Test Case List</returns>
-    public List<BlameTestObject> ReadTestSequence(string filePath!!)
+    public List<BlameTestObject> ReadTestSequence(string filePath)
     {
+        ValidateArg.NotNull(filePath, nameof(filePath));
+
         if (!_fileHelper.Exists(filePath))
         {
             throw new FileNotFoundException();

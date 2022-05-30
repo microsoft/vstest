@@ -5,6 +5,8 @@ using System;
 using System.IO;
 using System.Xml;
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
@@ -23,8 +25,9 @@ public static class ClientUtilities
     /// </summary>
     /// <param name="xmlDocument">Xml Document containing Runsettings xml</param>
     /// <param name="path">Path of the .runsettings xml file</param>
-    public static void FixRelativePathsInRunSettings(XmlDocument xmlDocument!!, string path)
+    public static void FixRelativePathsInRunSettings(XmlDocument xmlDocument, string path)
     {
+        ValidateArg.NotNull(xmlDocument, nameof(xmlDocument));
         if (string.IsNullOrEmpty(path))
         {
             throw new ArgumentNullException(nameof(path));

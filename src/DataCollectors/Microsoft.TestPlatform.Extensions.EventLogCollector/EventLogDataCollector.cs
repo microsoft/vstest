@@ -151,11 +151,16 @@ public class EventLogDataCollector : DataCollector
     [MemberNotNull(nameof(_events), nameof(_dataSink), nameof(_logger))]
     public override void Initialize(
         XmlElement? configurationElement,
-        DataCollectionEvents events!!,
-        DataCollectionSink dataSink!!,
-        DataCollectionLogger logger!!,
-        DataCollectionEnvironmentContext dataCollectionEnvironmentContext!!)
+        DataCollectionEvents events,
+        DataCollectionSink dataSink,
+        DataCollectionLogger logger,
+        DataCollectionEnvironmentContext dataCollectionEnvironmentContext)
     {
+        ValidateArg.NotNull(events, nameof(events));
+        ValidateArg.NotNull(dataSink, nameof(dataSink));
+        ValidateArg.NotNull(logger, nameof(logger));
+        ValidateArg.NotNull(dataCollectionEnvironmentContext, nameof(dataCollectionEnvironmentContext));
+
         _events = events;
         _dataSink = dataSink;
         _logger = logger;
@@ -320,8 +325,9 @@ public class EventLogDataCollector : DataCollector
         return strings;
     }
 
-    private void OnSessionStart(object sender, SessionStartEventArgs e!!)
+    private void OnSessionStart(object sender, SessionStartEventArgs e)
     {
+        ValidateArg.NotNull(e, nameof(e));
         ValidateArg.NotNull(e.Context, "SessionStartEventArgs.Context");
 
         EqtTrace.Verbose("EventLogDataCollector: SessionStart received");
@@ -329,8 +335,9 @@ public class EventLogDataCollector : DataCollector
         StartCollectionForContext(e.Context);
     }
 
-    private void OnSessionEnd(object sender, SessionEndEventArgs e!!)
+    private void OnSessionEnd(object sender, SessionEndEventArgs e)
     {
+        ValidateArg.NotNull(e, nameof(e));
         ValidateArg.NotNull(e.Context, "SessionEndEventArgs.Context");
 
         EqtTrace.Verbose("EventLogDataCollector: SessionEnd received");
@@ -338,8 +345,9 @@ public class EventLogDataCollector : DataCollector
         WriteCollectedEventLogEntries(e.Context, true, TimeSpan.MaxValue, DateTime.UtcNow);
     }
 
-    private void OnTestCaseStart(object sender, TestCaseStartEventArgs e!!)
+    private void OnTestCaseStart(object sender, TestCaseStartEventArgs e)
     {
+        ValidateArg.NotNull(e, nameof(e));
         ValidateArg.NotNull(e.Context, "TestCaseStartEventArgs.Context");
 
         if (!e.Context.HasTestCase)
@@ -353,8 +361,9 @@ public class EventLogDataCollector : DataCollector
         StartCollectionForContext(e.Context);
     }
 
-    private void OnTestCaseEnd(object sender, TestCaseEndEventArgs e!!)
+    private void OnTestCaseEnd(object sender, TestCaseEndEventArgs e)
     {
+        ValidateArg.NotNull(e, nameof(e));
         TPDebug.Assert(e.Context != null, "Context is null");
         TPDebug.Assert(e.Context.HasTestCase, "Context is not for a test case");
 

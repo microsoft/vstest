@@ -1,10 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
-#if NETFRAMEWORK
 using System;
-#endif
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,23 +39,26 @@ public class TraitCollection : IEnumerable<Trait>
 #endif
     private readonly TestObject _testObject;
 
-    internal TraitCollection(TestObject testObject!!)
+    internal TraitCollection(TestObject testObject)
     {
-        _testObject = testObject;
+        _testObject = testObject ?? throw new ArgumentNullException(nameof(testObject));
     }
 
-    public void Add(Trait trait!!)
+    public void Add(Trait trait)
     {
+        ValidateArg.NotNull(trait, nameof(trait));
         AddRange(new[] { trait });
     }
 
-    public void Add(string name!!, string value)
+    public void Add(string name, string value)
     {
+        ValidateArg.NotNull(name, nameof(name));
         Add(new Trait(name, value));
     }
 
-    public void AddRange(IEnumerable<Trait> traits!!)
+    public void AddRange(IEnumerable<Trait> traits)
     {
+        ValidateArg.NotNull(traits, nameof(traits));
         var existingTraits = GetTraits();
         Add(existingTraits, traits);
     }

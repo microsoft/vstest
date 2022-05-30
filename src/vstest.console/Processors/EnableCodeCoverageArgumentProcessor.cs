@@ -284,8 +284,11 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
     /// <param name="runSettingDocument"> XPathNavigable representation of a runsettings file </param>
     /// <param name="dataCollectorFriendlyName"> The data Collector friendly name. </param>
     /// <returns> True if there is a datacollector configured. </returns>
-    private static bool ContainsDataCollectorWithFriendlyName(IXPathNavigable runSettingDocument!!, string dataCollectorFriendlyName!!)
+    private static bool ContainsDataCollectorWithFriendlyName(IXPathNavigable runSettingDocument, string dataCollectorFriendlyName)
     {
+        _ = runSettingDocument ?? throw new ArgumentNullException(nameof(runSettingDocument));
+        _ = dataCollectorFriendlyName ?? throw new ArgumentNullException(nameof(dataCollectorFriendlyName));
+
         var navigator = runSettingDocument.CreateNavigator();
         var nodes = navigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
 

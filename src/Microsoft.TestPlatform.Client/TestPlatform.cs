@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
 using Microsoft.VisualStudio.TestPlatform.Client.Execution;
@@ -80,10 +81,12 @@ internal class TestPlatform : ITestPlatform
     /// <inheritdoc/>
     public IDiscoveryRequest CreateDiscoveryRequest(
         IRequestData requestData,
-        DiscoveryCriteria discoveryCriteria!!,
+        DiscoveryCriteria discoveryCriteria,
         TestPlatformOptions options,
         Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
+        ValidateArg.NotNull(discoveryCriteria, nameof(discoveryCriteria));
+
         PopulateExtensions(discoveryCriteria.RunSettings, discoveryCriteria.Sources);
 
         // Initialize loggers.
@@ -99,10 +102,12 @@ internal class TestPlatform : ITestPlatform
     /// <inheritdoc/>
     public ITestRunRequest CreateTestRunRequest(
         IRequestData requestData,
-        TestRunCriteria testRunCriteria!!,
+        TestRunCriteria testRunCriteria,
         TestPlatformOptions options,
         Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
+        ValidateArg.NotNull(testRunCriteria, nameof(testRunCriteria));
+
         IEnumerable<string> sources = GetSources(testRunCriteria);
         PopulateExtensions(testRunCriteria.TestRunSettings, sources);
 
@@ -119,10 +124,12 @@ internal class TestPlatform : ITestPlatform
     /// <inheritdoc/>
     public bool StartTestSession(
         IRequestData requestData,
-        StartTestSessionCriteria testSessionCriteria!!,
+        StartTestSessionCriteria testSessionCriteria,
         ITestSessionEventsHandler eventsHandler,
         Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
+        ValidateArg.NotNull(testSessionCriteria, nameof(testSessionCriteria));
+
         RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
         TestAdapterLoadingStrategy strategy = runConfiguration.TestAdapterLoadingStrategy;
 
@@ -359,7 +366,7 @@ internal class TestPlatform : ITestPlatform
 
     private static IEnumerable<string> ExpandAdaptersWithDefaultStrategy(string path, IFileHelper fileHelper)
     {
-        // This is the legacy behavior, please do not modify this method unless you're sure of 
+        // This is the legacy behavior, please do not modify this method unless you're sure of
         // side effect when running tests with legacy adapters.
         if (!fileHelper.DirectoryExists(path))
         {

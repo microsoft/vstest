@@ -557,8 +557,9 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     /// <param name="reader">XmlReader having run configuration node.</param>
     /// <returns></returns>
-    public static RunConfiguration FromXml(XmlReader reader!!)
+    public static RunConfiguration FromXml(XmlReader reader)
     {
+        ValidateArg.NotNull(reader, nameof(reader));
         var runConfiguration = new RunConfiguration();
         var empty = reader.IsEmptyElement;
 

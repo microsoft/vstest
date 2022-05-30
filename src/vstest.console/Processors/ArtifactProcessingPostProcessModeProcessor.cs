@@ -74,10 +74,10 @@ internal class ArtifactProcessingPostProcessModeProcessorExecutor : IArgumentExe
     private readonly CommandLineOptions _commandLineOptions;
     private readonly IArtifactProcessingManager _artifactProcessingManage;
 
-    public ArtifactProcessingPostProcessModeProcessorExecutor(CommandLineOptions options!!, IArtifactProcessingManager artifactProcessingManager!!)
+    public ArtifactProcessingPostProcessModeProcessorExecutor(CommandLineOptions options, IArtifactProcessingManager artifactProcessingManager)
     {
-        _commandLineOptions = options;
-        _artifactProcessingManage = artifactProcessingManager; ;
+        _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
+        _artifactProcessingManage = artifactProcessingManager ?? throw new ArgumentNullException(nameof(artifactProcessingManager));
     }
 
     public void Initialize(string? _)

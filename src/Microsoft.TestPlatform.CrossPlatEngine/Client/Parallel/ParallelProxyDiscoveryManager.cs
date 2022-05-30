@@ -76,8 +76,11 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
     }
 
     /// <inheritdoc/>
-    public void DiscoverTests(DiscoveryCriteria discoveryCriteria!!, ITestDiscoveryEventsHandler2 eventHandler!!)
+    public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
     {
+        ValidateArg.NotNull(discoveryCriteria, nameof(discoveryCriteria));
+        ValidateArg.NotNull(eventHandler, nameof(eventHandler));
+
         var workloads = SplitToWorkloads(discoveryCriteria, _sourceToTestHostProviderMap);
         _availableTestSources = workloads.SelectMany(w => w.Work.Sources).Count();
         _availableWorkloads = workloads.Count();

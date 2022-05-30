@@ -26,11 +26,11 @@ internal class TestDiscoveryExtensionManager
     /// </summary>
     /// <remarks>The factory should be used for getting instances of this type so the constructor is not public.</remarks>
     protected TestDiscoveryExtensionManager(
-        IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> discoverers!!,
-        IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredDiscoverers!!)
+        IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> discoverers,
+        IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredDiscoverers)
     {
-        Discoverers = discoverers;
-        UnfilteredDiscoverers = unfilteredDiscoverers;
+        Discoverers = discoverers ?? throw new ArgumentNullException(nameof(discoverers));
+        UnfilteredDiscoverers = unfilteredDiscoverers ?? throw new ArgumentNullException(nameof(unfilteredDiscoverers));
     }
 
     /// <summary>

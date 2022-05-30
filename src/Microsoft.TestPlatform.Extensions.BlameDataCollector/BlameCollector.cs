@@ -115,7 +115,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         XmlElement configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
-        DataCollectionLogger logger!!,
+        DataCollectionLogger logger,
         DataCollectionEnvironmentContext environmentContext)
     {
         _events = events;
@@ -124,7 +124,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         _configurationElement = configurationElement;
         _testSequence = new List<Guid>();
         _testObjectDictionary = new Dictionary<Guid, BlameTestObject>();
-        _logger = logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         // Subscribing to events
         _events.TestHostLaunched += TestHostLaunchedHandler;
