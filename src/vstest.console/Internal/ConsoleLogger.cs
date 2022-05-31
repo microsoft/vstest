@@ -38,6 +38,11 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     private const string TestResultPrefix = "  ";
 
     /// <summary>
+    /// Suffix used for formatting the result output
+    /// </summary>
+    private const string TestResultSuffix = " ";
+
+    /// <summary>
     /// Bool to decide whether Verbose level should be added as prefix or not in log messages.
     /// </summary>
     internal static bool AppendPrefix;
@@ -544,7 +549,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     // Pause the progress indicator before displaying test result information
                     _progressIndicator?.Pause();
 
-                    Output.Write(TestResultPrefix + CommandLineResources.SkippedTestIndicator, OutputLevel.Information, ConsoleColor.Yellow);
+                    Output.Write(GetFormattedTestIndicator(CommandLineResources.SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
                     Output.WriteLine(testDisplayName, OutputLevel.Information);
                     if (VerbosityLevel == Verbosity.Detailed)
                     {
@@ -567,7 +572,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     // Pause the progress indicator before displaying test result information
                     _progressIndicator?.Pause();
 
-                    Output.Write(TestResultPrefix + CommandLineResources.FailedTestIndicator, OutputLevel.Information, ConsoleColor.Red);
+                    Output.Write(GetFormattedTestIndicator(CommandLineResources.FailedTestIndicator), OutputLevel.Information, ConsoleColor.Red);
                     Output.WriteLine(testDisplayName, OutputLevel.Information);
                     DisplayFullInformation(e.Result);
 
@@ -584,7 +589,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                         // Pause the progress indicator before displaying test result information
                         _progressIndicator?.Pause();
 
-                        Output.Write(TestResultPrefix + CommandLineResources.PassedTestIndicator, OutputLevel.Information, ConsoleColor.Green);
+                        Output.Write(GetFormattedTestIndicator(CommandLineResources.PassedTestIndicator), OutputLevel.Information, ConsoleColor.Green);
                         Output.WriteLine(testDisplayName, OutputLevel.Information);
                         if (VerbosityLevel == Verbosity.Detailed)
                         {
@@ -608,7 +613,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     // Pause the progress indicator before displaying test result information
                     _progressIndicator?.Pause();
 
-                    Output.Write(TestResultPrefix + CommandLineResources.SkippedTestIndicator, OutputLevel.Information, ConsoleColor.Yellow);
+                    Output.Write(GetFormattedTestIndicator(CommandLineResources.SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
                     Output.WriteLine(testDisplayName, OutputLevel.Information);
                     if (VerbosityLevel == Verbosity.Detailed)
                     {
@@ -621,6 +626,9 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     break;
                 }
         }
+
+        // Local functions
+        static string GetFormattedTestIndicator(string indicator) => TestResultPrefix + indicator + TestResultSuffix;
     }
 
     private string? GetFormattedDurationString(TimeSpan duration)
