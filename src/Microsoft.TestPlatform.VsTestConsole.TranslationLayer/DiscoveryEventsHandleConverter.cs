@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -24,9 +25,9 @@ public class DiscoveryEventsHandleConverter : ITestDiscoveryEventsHandler2
     /// Converts the ITestDiscoveryEventsHandler to ITestDiscoveryEventsHandler2
     /// </summary>
     /// <param name="testDiscoveryEventsHandler"></param>
-    public DiscoveryEventsHandleConverter(ITestDiscoveryEventsHandler testDiscoveryEventsHandler!!)
+    public DiscoveryEventsHandleConverter(ITestDiscoveryEventsHandler testDiscoveryEventsHandler)
     {
-        _testDiscoveryEventsHandler = testDiscoveryEventsHandler;
+        _testDiscoveryEventsHandler = testDiscoveryEventsHandler ?? throw new ArgumentNullException(nameof(testDiscoveryEventsHandler));
     }
 
     /// <summary>

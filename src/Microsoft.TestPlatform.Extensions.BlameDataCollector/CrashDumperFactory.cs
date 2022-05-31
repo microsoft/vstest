@@ -15,8 +15,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 internal class CrashDumperFactory : ICrashDumperFactory
 {
-    public ICrashDumper Create(string targetFramework!!)
+    public ICrashDumper Create(string targetFramework)
     {
+        ValidateArg.NotNull(targetFramework, nameof(targetFramework));
         EqtTrace.Info($"CrashDumperFactory: Creating dumper for {RuntimeInformation.OSDescription} with target framework {targetFramework}.");
 
         var tfm = NuGetFramework.Parse(targetFramework);

@@ -25,6 +25,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.TestHostProvider\Properties\TestExtensionTypesAttribute.cs" Link="Properties\TestExtensionTypesAttribute.cs" />
+    <Compile Include="..\..\..\NullableAttributes.cs" Link="NullableAttributes.cs" />
+    <Compile Include="..\..\..\TPDebug.cs" Link="TPDebug.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />

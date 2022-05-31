@@ -4,8 +4,6 @@
 using System;
 using System.Reflection;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 internal static partial class ReflectionHelpers
@@ -19,7 +17,7 @@ internal static partial class ReflectionHelpers
 #endif
     }
 
-    internal static MethodBase GetDeclaringMethod(Type type)
+    internal static MethodBase? GetDeclaringMethod(Type type)
     {
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
         return type.DeclaringMethod;

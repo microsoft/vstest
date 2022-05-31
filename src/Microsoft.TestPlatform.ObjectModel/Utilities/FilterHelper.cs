@@ -21,8 +21,9 @@ public static class FilterHelper
     /// </summary>
     /// <param name="str">The input string that contains the text to convert.</param>
     /// <returns>A string of characters with special characters converted to their escaped form.</returns>
-    public static string Escape(string str!!)
+    public static string Escape(string str)
     {
+        ValidateArg.NotNull(str, nameof(str));
         if (str.IndexOfAny(SpecialCharacters) < 0)
         {
             return str;
@@ -47,8 +48,9 @@ public static class FilterHelper
     /// </summary>
     /// <param name="str">The input string that contains the text to convert.</param>
     /// <returns>A filter string of characters with any escaped characters converted to their un-escaped form.</returns>
-    public static string Unescape(string str!!)
+    public static string Unescape(string str)
     {
+        ValidateArg.NotNull(str, nameof(str));
         if (str.IndexOf(EscapeCharacter) < 0)
         {
             return str;

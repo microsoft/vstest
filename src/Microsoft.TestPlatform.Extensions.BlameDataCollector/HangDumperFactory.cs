@@ -17,8 +17,10 @@ internal class HangDumperFactory : IHangDumperFactory
 {
     public Action<string> LogWarning { get; set; }
 
-    public IHangDumper Create(string targetFramework!!)
+    public IHangDumper Create(string targetFramework)
     {
+        ValidateArg.NotNull(targetFramework, nameof(targetFramework));
+
         EqtTrace.Info($"HangDumperFactory: Creating dumper for {RuntimeInformation.OSDescription} with target framework {targetFramework}.");
         var procdumpOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_FORCEPROCDUMP")?.Trim();
         var netdumpOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_FORCENETDUMP")?.Trim();

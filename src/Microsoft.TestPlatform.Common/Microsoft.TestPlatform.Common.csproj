@@ -14,6 +14,7 @@
   <ItemGroup>
     <Compile Include="..\..\NullableAttributes.cs" Link="NullableAttributes.cs" />
     <Compile Include="..\..\scripts\build\ExternalAssemblyVersions.cs" Link="ExternalAssemblyVersions.cs" />
+    <Compile Include="..\..\TPDebug.cs" Link="TPDebug.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />

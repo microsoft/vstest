@@ -355,8 +355,10 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     /// <summary>
     /// Invoked when test run is complete
     /// </summary>
-    public void HandleTestRunComplete(TestRunCompleteEventArgs runCompleteArgs!!, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
+    public void HandleTestRunComplete(TestRunCompleteEventArgs runCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
     {
+        ValidateArg.NotNull(runCompleteArgs, nameof(runCompleteArgs));
+
         bool isAborted = runCompleteArgs.IsAborted;
         bool isCanceled = runCompleteArgs.IsCanceled;
 

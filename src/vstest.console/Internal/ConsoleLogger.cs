@@ -166,8 +166,10 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="events">Events that can be registered for.</param>
     /// <param name="testRunDirectory">Test Run Directory</param>
-    public void Initialize(TestLoggerEvents events!!, string testRunDirectory)
+    public void Initialize(TestLoggerEvents events, string testRunDirectory)
     {
+        ValidateArg.NotNull(events, nameof(events));
+
         if (Output == null)
         {
             Output = ConsoleOutput.Instance;
@@ -193,8 +195,10 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         // events.DiscoveredTests += DiscoveredTestsHandler;
     }
 
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters!!)
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
     {
+        ValidateArg.NotNull(parameters, nameof(parameters));
+
         if (parameters.Count == 0)
         {
             throw new ArgumentException("No default parameters added", nameof(parameters));
@@ -401,8 +405,11 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Called when a test run start is received
     /// </summary>
-    private void TestRunStartHandler(object sender!!, TestRunStartEventArgs e!!)
+    private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
     {
+        ValidateArg.NotNull(sender, nameof(sender));
+        ValidateArg.NotNull(e, nameof(e));
+
         // Print all test containers.
         Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information);
         if (VerbosityLevel == Verbosity.Detailed)
@@ -417,8 +424,11 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Called when a test message is received.
     /// </summary>
-    private void TestMessageHandler(object sender!!, TestRunMessageEventArgs e!!)
+    private void TestMessageHandler(object sender, TestRunMessageEventArgs e)
     {
+        ValidateArg.NotNull(sender, nameof(sender));
+        ValidateArg.NotNull(e, nameof(e));
+
         switch (e.Level)
         {
             case TestMessageLevel.Informational:
@@ -479,8 +489,11 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Called when a test result is received.
     /// </summary>
-    private void TestResultHandler(object sender!!, TestResultEventArgs e!!)
+    private void TestResultHandler(object sender, TestResultEventArgs e)
     {
+        ValidateArg.NotNull(sender, nameof(sender));
+        ValidateArg.NotNull(e, nameof(e));
+
         var testDisplayName = e.Result.DisplayName;
 
         if (string.IsNullOrWhiteSpace(e.Result.DisplayName))

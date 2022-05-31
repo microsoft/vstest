@@ -30,9 +30,9 @@ internal class ParallelRunDataAggregator
 
     private readonly object _dataUpdateSyncObject = new();
 
-    public ParallelRunDataAggregator(string runSettingsXml!!)
+    public ParallelRunDataAggregator(string runSettingsXml)
     {
-        RunSettings = runSettingsXml;
+        RunSettings = runSettingsXml ?? throw new ArgumentNullException(nameof(runSettingsXml));
         ElapsedTime = TimeSpan.Zero;
         RunContextAttachments = new Collection<AttachmentSet>();
         RunCompleteArgsAttachments = new List<AttachmentSet>();

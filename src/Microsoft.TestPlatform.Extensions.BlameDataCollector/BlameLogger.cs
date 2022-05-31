@@ -69,8 +69,9 @@ public class BlameLogger : ITestLogger
     /// </summary>
     /// <param name="events">Events that can be registered for.</param>
     /// <param name="testRunDictionary">Test Run Directory</param>
-    public void Initialize(TestLoggerEvents events!!, string testRunDictionary)
+    public void Initialize(TestLoggerEvents events, string testRunDictionary)
     {
+        ValidateArg.NotNull(events, nameof(events));
         events.TestRunComplete += TestRunCompleteHandler;
     }
 
@@ -79,8 +80,11 @@ public class BlameLogger : ITestLogger
     /// </summary>
     /// <param name="sender">Sender</param>
     /// <param name="e">TestRunCompleteEventArgs</param>
-    private void TestRunCompleteHandler(object sender!!, TestRunCompleteEventArgs e!!)
+    private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
     {
+        ValidateArg.NotNull(sender, nameof(sender));
+        ValidateArg.NotNull(e, nameof(e));
+
         if (!e.IsAborted)
         {
             return;

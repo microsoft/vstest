@@ -7,8 +7,6 @@ using System.Text;
 
 using Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 internal static partial class ReflectionHelpers
