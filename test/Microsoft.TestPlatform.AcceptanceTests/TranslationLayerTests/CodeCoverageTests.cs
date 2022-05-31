@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -17,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 [TestClass]
@@ -26,10 +25,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 [TestCategory("Windows-Review")]
 public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private RunEventHandler _runEventHandler;
-    private TestRunAttachmentsProcessingEventHandler _testRunAttachmentsProcessingEventHandler;
+    private IVsTestConsoleWrapper? _vstestConsoleWrapper;
+    private RunEventHandler? _runEventHandler;
+    private TestRunAttachmentsProcessingEventHandler? _testRunAttachmentsProcessingEventHandler;
 
+    [MemberNotNull(nameof(_vstestConsoleWrapper), nameof(_runEventHandler), nameof(_testRunAttachmentsProcessingEventHandler))]
     private void Setup()
     {
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();
@@ -63,7 +63,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         AssertCoverageResults(_runEventHandler.Attachments);
 
-        Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+        Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics!["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
         Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
     }
 
@@ -87,7 +87,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         AssertCoverageResults(_runEventHandler.Attachments);
 
-        Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+        Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics!["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
         Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
     }
 
@@ -109,7 +109,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         AssertCoverageResults(_runEventHandler.Attachments);
 
-        Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+        Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics!["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
         Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", _runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
     }
 
@@ -153,7 +153,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         AssertCoverageResults(_testRunAttachmentsProcessingEventHandler.Attachments);
 
-        Assert.IsFalse(_testRunAttachmentsProcessingEventHandler.CompleteArgs.IsCanceled);
+        Assert.IsFalse(_testRunAttachmentsProcessingEventHandler.CompleteArgs!.IsCanceled);
         Assert.IsNull(_testRunAttachmentsProcessingEventHandler.CompleteArgs.Error);
 
         for (int i = 0; i < _testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
@@ -209,7 +209,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         AssertCoverageResults(_testRunAttachmentsProcessingEventHandler.Attachments);
 
-        Assert.IsFalse(_testRunAttachmentsProcessingEventHandler.CompleteArgs.IsCanceled);
+        Assert.IsFalse(_testRunAttachmentsProcessingEventHandler.CompleteArgs!.IsCanceled);
         Assert.IsNull(_testRunAttachmentsProcessingEventHandler.CompleteArgs.Error);
 
         for (int i = 0; i < _testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
@@ -262,7 +262,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         AssertCoverageResults(_testRunAttachmentsProcessingEventHandler.Attachments);
 
-        Assert.IsFalse(_testRunAttachmentsProcessingEventHandler.CompleteArgs.IsCanceled);
+        Assert.IsFalse(_testRunAttachmentsProcessingEventHandler.CompleteArgs!.IsCanceled);
         Assert.IsNull(_testRunAttachmentsProcessingEventHandler.CompleteArgs.Error);
 
         for (int i = 0; i < _testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
@@ -319,7 +319,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         AssertCoverageResults(_testRunAttachmentsProcessingEventHandler.Attachments);
 
-        Assert.IsFalse(_testRunAttachmentsProcessingEventHandler.CompleteArgs.IsCanceled);
+        Assert.IsFalse(_testRunAttachmentsProcessingEventHandler.CompleteArgs!.IsCanceled);
         Assert.IsNull(_testRunAttachmentsProcessingEventHandler.CompleteArgs.Error);
 
         for (int i = 0; i < _testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
@@ -380,7 +380,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         AssertCoverageResults(_testRunAttachmentsProcessingEventHandler.Attachments);
 
-        Assert.IsFalse(_testRunAttachmentsProcessingEventHandler.CompleteArgs.IsCanceled);
+        Assert.IsFalse(_testRunAttachmentsProcessingEventHandler.CompleteArgs!.IsCanceled);
         Assert.IsNull(_testRunAttachmentsProcessingEventHandler.CompleteArgs.Error);
 
         for (int i = 0; i < _testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
@@ -496,7 +496,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
                 foreach (var project in GetProjects())
                 {
-                    var moduleNode = GetModuleNode(xmlCoverage.DocumentElement, project);
+                    var moduleNode = GetModuleNode(xmlCoverage.DocumentElement!, project)!;
                     AssertCoverage(moduleNode, ExpectedMinimalModuleCoverage);
                 }
             }

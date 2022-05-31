@@ -7,8 +7,6 @@ using System.IO;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -172,7 +170,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 
         string testAssemblyPath;
         // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
-        if (_testEnvironment.TargetFramework.Equals("net451"))
+        if (string.Equals(_testEnvironment.TargetFramework, "net451", StringComparison.Ordinal))
         {
             testAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll", "net46");
         }

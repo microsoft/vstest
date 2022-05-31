@@ -17,8 +17,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
@@ -41,10 +39,10 @@ public class InProcessProxyDiscoveryManagerTests
     [TestCleanup]
     public void TestCleanup()
     {
-        _mockDiscoveryManager = null;
-        _mockTestHostManagerFactory = null;
-        _inProcessProxyDiscoveryManager = null;
-        _mockTestHostManager = null;
+        _mockDiscoveryManager = null!;
+        _mockTestHostManagerFactory = null!;
+        _inProcessProxyDiscoveryManager = null!;
+        _mockTestHostManager = null!;
     }
 
     [TestMethod]

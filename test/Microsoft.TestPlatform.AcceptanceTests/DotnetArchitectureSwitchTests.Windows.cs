@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Newtonsoft.Json.Linq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -29,7 +27,7 @@ public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
         string dotnetPathTo = GetDownloadedDotnetMuxerFromTools(architectureTo);
         var vstestConsolePath = GetDotnetRunnerPath();
         var dotnetRunnerPath = TempDirectory.CreateDirectory("dotnetrunner");
-        TempDirectory.CopyDirectory(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
+        TempDirectory.CopyDirectory(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)!), dotnetRunnerPath);
 
         // Patch the runner
         string sdkVersion = GetLatestSdkVersion(dotnetPath);
@@ -38,7 +36,7 @@ public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
         patchRuntimeConfig["runtimeOptions"]["framework"]["version"] = sdkVersion;
         File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToString());
 
-        var environmentVariables = new Dictionary<string, string>
+        var environmentVariables = new Dictionary<string, string?>
         {
             ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
             [$"DOTNET_ROOT_{architectureTo}"] = Path.GetDirectoryName(dotnetPathTo),
@@ -69,7 +67,7 @@ public class UnitTest1
         ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out string stdOut, out _, out int exitCode, environmentVariables, TempDirectory.Path);
         Assert.AreEqual(0, exitCode, stdOut);
 
-        environmentVariables = new Dictionary<string, string>
+        environmentVariables = new Dictionary<string, string?>
         {
             ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
             ["DOTNET_ROOT"] = Path.GetDirectoryName(dotnetPathTo),
@@ -78,7 +76,7 @@ public class UnitTest1
         ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out stdOut, out _, out exitCode, environmentVariables, TempDirectory.Path);
         Assert.AreEqual(0, exitCode, stdOut);
 
-        environmentVariables = new Dictionary<string, string>
+        environmentVariables = new Dictionary<string, string?>
         {
             ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
             [$"DOTNET_ROOT_{architectureTo}"] = Path.GetDirectoryName(dotnetPathTo),
@@ -89,8 +87,8 @@ public class UnitTest1
         Assert.AreEqual(0, exitCode, stdOut);
     }
 
-    private string GetLatestSdkVersion(string dotnetPath)
-        => Path.GetFileName(Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(dotnetPath), @"shared/Microsoft.NETCore.App")).OrderByDescending(x => x).First());
+    private static string GetLatestSdkVersion(string dotnetPath)
+        => Path.GetFileName(Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(dotnetPath)!, @"shared/Microsoft.NETCore.App")).OrderByDescending(x => x).First());
 }
 
 #endif

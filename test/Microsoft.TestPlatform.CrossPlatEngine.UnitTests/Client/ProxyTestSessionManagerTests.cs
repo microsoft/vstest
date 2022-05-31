@@ -15,15 +15,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ProxyTestSessionManagerTests
 {
     private readonly IList<string> _fakeTestSources = new List<string>() { @"C:\temp\FakeTestAsset.dll" };
-    private Dictionary<string, TestRuntimeProviderInfo> _fakeTestSourcesToRuntimeProviderMap;
+    private readonly Dictionary<string, TestRuntimeProviderInfo> _fakeTestSourcesToRuntimeProviderMap;
     private readonly IList<string> _fakeTestMultipleSources = new List<string>() {
         @"C:\temp\FakeTestAsset1.dll",
         @"C:\temp\FakeTestAsset2.dll",
@@ -72,12 +70,11 @@ public class ProxyTestSessionManagerTests
             </RunSettings>";
     private readonly string _fakeRunSettings = "FakeRunSettings";
     private readonly ProtocolConfig _protocolConfig = new() { Version = 1 };
-    private Mock<ITestSessionEventsHandler> _mockEventsHandler;
-    private Mock<IRequestData> _mockRequestData;
-    private Mock<IMetricsCollection> _mockMetricsCollection;
+    private readonly Mock<ITestSessionEventsHandler> _mockEventsHandler;
+    private readonly Mock<IRequestData> _mockRequestData;
+    private readonly Mock<IMetricsCollection> _mockMetricsCollection;
 
-    [TestInitialize]
-    public void TestInitialize()
+    public ProxyTestSessionManagerTests()
     {
         TestSessionPool.Instance = null;
 
@@ -526,7 +523,7 @@ public class ProxyTestSessionManagerTests
 
     private ProxyTestSessionManager CreateProxy(
         StartTestSessionCriteria testSessionCriteria,
-        ProxyOperationManager proxyOperationManager)
+        ProxyOperationManager? proxyOperationManager)
     {
         var runSettings = testSessionCriteria.RunSettings ?? _fakeRunSettings;
         var runtimeProviderInfo = new TestRuntimeProviderInfo

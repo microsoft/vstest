@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 /// <summary>
@@ -19,10 +17,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 [TestClass]
 public class RunTestsWithFilterTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
     private RunEventHandler _runEventHandler;
 
-    private void Setup()
+    public RunTestsWithFilterTests()
     {
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _runEventHandler = new RunEventHandler();
@@ -55,7 +53,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
 
         // Assert
         Assert.AreEqual(1, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(TestOutcome.Passed, _runEventHandler.TestResults.FirstOrDefault().Outcome);
+        Assert.AreEqual(TestOutcome.Passed, _runEventHandler.TestResults.First().Outcome);
     }
 
     [TestMethod]
@@ -64,7 +62,6 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     public void RunTestsWithFastFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
 
         var sources = new List<string> { GetAssetFullPath("SimpleTestProject.dll") };
 

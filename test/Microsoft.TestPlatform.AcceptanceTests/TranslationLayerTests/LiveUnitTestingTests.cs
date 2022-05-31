@@ -2,23 +2,23 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 [TestClass]
 public class LiveUnitTestingTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private DiscoveryEventHandler _discoveryEventHandler;
-    private RunEventHandler _runEventHandler;
+    private IVsTestConsoleWrapper? _vstestConsoleWrapper;
+    private DiscoveryEventHandler? _discoveryEventHandler;
+    private RunEventHandler? _runEventHandler;
 
+    [MemberNotNull(nameof(_vstestConsoleWrapper), nameof(_discoveryEventHandler), nameof(_runEventHandler))]
     public void Setup()
     {
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();

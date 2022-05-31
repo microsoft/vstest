@@ -7,8 +7,6 @@ using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities;
 
 [TestClass]
@@ -36,7 +34,7 @@ public class TestPluginInformationTests
     [TestMethod]
     public void MetadataShouldReturnTestExtensionTypesAssemblyQualifiedName()
     {
-        CollectionAssert.AreEqual(new object[] { typeof(TestPluginInformationTests).AssemblyQualifiedName }, _testPluginInformation.Metadata.ToArray());
+        CollectionAssert.AreEqual(new object[] { typeof(TestPluginInformationTests).AssemblyQualifiedName! }, _testPluginInformation.Metadata.ToArray());
     }
 }
 

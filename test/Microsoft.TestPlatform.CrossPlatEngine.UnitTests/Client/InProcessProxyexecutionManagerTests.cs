@@ -18,8 +18,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
@@ -42,10 +40,10 @@ public class InProcessProxyExecutionManagerTests
     [TestCleanup]
     public void TestCleanup()
     {
-        _mockExecutionManager = null;
-        _mockTestHostManagerFactory = null;
-        _inProcessProxyExecutionManager = null;
-        _mockTestHostManager = null;
+        _mockExecutionManager = null!;
+        _mockTestHostManagerFactory = null!;
+        _inProcessProxyExecutionManager = null!;
+        _mockTestHostManager = null!;
     }
 
 
@@ -138,7 +136,7 @@ public class InProcessProxyExecutionManagerTests
         Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
         _mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, inputSource.FirstOrDefault(), testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null));
         _mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
-        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
+        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.First().Source);
     }
 
     [TestMethod]
@@ -160,7 +158,7 @@ public class InProcessProxyExecutionManagerTests
         Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
         _mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null));
         _mockTestHostManager.Verify(hm => hm.GetTestSources(actualSources));
-        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
+        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.First().Source);
     }
 
     [TestMethod]

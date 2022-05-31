@@ -12,8 +12,6 @@ using System.Xml;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -70,7 +68,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["PROCDUMP_PATH"] = _procDumpPath,
         };
@@ -95,7 +93,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["PROCDUMP_PATH"] = _procDumpPath
         };
@@ -120,7 +118,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["PROCDUMP_PATH"] = _procDumpPath
         };
@@ -142,7 +140,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=full;TestTimeout=3s""");
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["PROCDUMP_PATH"] = _procDumpPath
         };
@@ -166,7 +164,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full;CollectAlways=true;CollectHangDump""");
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["PROCDUMP_PATH"] = _procDumpPath
         };
@@ -190,7 +188,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full;CollectAlways=true""");
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["PROCDUMP_PATH"] = _procDumpPath
         };
@@ -212,7 +210,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full""");
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["PROCDUMP_PATH"] = _procDumpPath
         };

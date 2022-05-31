@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,16 +20,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ProxyBaseManagerTests
 {
     private const int Clientprocessexitwait = 10 * 1000;
-    private Mock<ICommunicationEndPoint> _mockCommunicationEndpoint;
-    private ITestRequestSender _testRequestSender;
+    private Mock<ICommunicationEndPoint>? _mockCommunicationEndpoint;
+    private ITestRequestSender? _testRequestSender;
     readonly ProtocolConfig _protocolConfig = new() { Version = 2 };
     private readonly Mock<IRequestData> _mockRequestData;
     protected readonly Mock<ITestRuntimeProvider> _mockTestHostManager;
@@ -62,6 +61,7 @@ public class ProxyBaseManagerTests
             .Returns(Task.FromResult(true));
     }
 
+    [MemberNotNull(nameof(_mockCommunicationEndpoint), nameof(_mockDataSerializer), nameof(_testRequestSender))]
     private void SetupAndInitializeTestRequestSender()
     {
         var connectionInfo = new TestHostConnectionInfo

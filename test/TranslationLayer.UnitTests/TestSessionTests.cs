@@ -14,8 +14,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
 
 [TestClass]
@@ -30,13 +28,12 @@ public class TestSessionTests
         new TestCase("d.e.f", new Uri("g://uri"), "d.dll")
     };
 
-    private TestSessionInfo _testSessionInfo;
-    private ITestSession _testSession;
-    private Mock<ITestSessionEventsHandler> _mockTestSessionEventsHandler;
-    private Mock<IVsTestConsoleWrapper> _mockVsTestConsoleWrapper;
+    private readonly TestSessionInfo _testSessionInfo;
+    private readonly ITestSession _testSession;
+    private readonly Mock<ITestSessionEventsHandler> _mockTestSessionEventsHandler;
+    private readonly Mock<IVsTestConsoleWrapper> _mockVsTestConsoleWrapper;
 
-    [TestInitialize]
-    public void TestInitialize()
+    public TestSessionTests()
     {
         _testSessionInfo = new TestSessionInfo();
         _mockTestSessionEventsHandler = new Mock<ITestSessionEventsHandler>();

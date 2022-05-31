@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -28,9 +26,9 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
 
         // Tell the test project which target framework we are expecting it to run as.
         // It has this value conditionally compiled, so it can compare it.
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
-            ["EXPECTED_TARGET_FRAMEWORK"] = runnerInfo.TargetFramework
+            ["EXPECTED_TARGET_FRAMEWORK"] = runnerInfo.TargetFramework!
         };
 
         InvokeVsTest(arguments, env);

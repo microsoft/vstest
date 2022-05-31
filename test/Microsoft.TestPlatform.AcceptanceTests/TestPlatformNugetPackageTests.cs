@@ -9,22 +9,20 @@ using System.Linq;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
 {
-    private static string s_nugetPackageFolder;
-    private TempDirectory _resultsDirectory;
+    private static string s_nugetPackageFolder = string.Empty;
+    private readonly TempDirectory _resultsDirectory;
 
     [ClassInitialize]
     public static void ClassInit(TestContext _)
     {
         var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
-        var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.*.nupkg").OrderBy(a => a).FirstOrDefault();
-        s_nugetPackageFolder = Path.Combine(new TempDirectory().Path, Path.GetFileNameWithoutExtension(nugetPackage));
+        var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.*.nupkg").OrderBy(a => a).First();
+        s_nugetPackageFolder = Path.Combine(new TempDirectory().Path, Path.GetFileNameWithoutExtension(nugetPackage)!);
         ZipFile.ExtractToDirectory(nugetPackage, s_nugetPackageFolder);
 
         TryMoveDirectory(
@@ -44,8 +42,7 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
         Directory.Delete(s_nugetPackageFolder, true);
     }
 
-    [TestInitialize]
-    public void SetUp()
+    public TestPlatformNugetPackageTests()
     {
         _resultsDirectory = TempDirectory;
     }

@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.Utilities;
 
 [TestClass]
@@ -120,7 +118,7 @@ public class FakesUtilitiesTests
         };
         FakesUtilities.InsertOrReplaceFakesDataCollectorNode(doc, dataCollectorNode2);
         Assert.IsTrue(XmlRunSettingsUtilities.ContainsDataCollector(doc, FakesUtilities.FakesMetadata.DataCollectorUriV2));
-        XmlNodeList nodes = doc.SelectNodes("//RunSettings/RunConfiguration/TargetFrameworkVersion");
-        Assert.AreEqual("FrameworkCore10", nodes[0].InnerText);
+        XmlNodeList nodes = doc.SelectNodes("//RunSettings/RunConfiguration/TargetFrameworkVersion")!;
+        Assert.AreEqual("FrameworkCore10", nodes[0]!.InnerText);
     }
 }

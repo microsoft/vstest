@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 /// <summary>
@@ -25,11 +23,11 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     private const string Netcoreapp = "netcoreapp";
     private const string Message = "VsTestConsoleWrapper does not support .Net Core Runner";
 
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private TempDirectory _logsDir;
-    private RunEventHandler _runEventHandler;
+    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private readonly TempDirectory _logsDir;
+    private readonly RunEventHandler _runEventHandler;
 
-    private void Setup()
+    public RunTestsWithDifferentConfigurationTests()
     {
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         _logsDir = TempDirectory;
@@ -49,10 +47,9 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     public void RunTestsWithTestAdapterPath(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
 
         var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
-        _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
+        _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.First() });
 
         _vstestConsoleWrapper.RunTests(
             GetTestAssemblies(),
@@ -72,7 +69,6 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
 
         string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
@@ -106,7 +102,6 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
         ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
-        Setup();
 
         var testsettingsFile = Path.Combine(TempDirectory.Path, "tempsettings.testsettings");
         string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
@@ -136,7 +131,6 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     public void RunTestsWithX64Source(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
 
         var sources = new List<string>
         {

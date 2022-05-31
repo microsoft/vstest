@@ -26,21 +26,15 @@ using Moq;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ProxyExecutionManagerTests : ProxyBaseManagerTests
 {
     private readonly Mock<ITestRequestSender> _mockRequestSender;
-
     private readonly Mock<TestRunCriteria> _mockTestRunCriteria;
-
     private readonly Mock<IRequestData> _mockRequestData;
-
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
-
     private readonly Mock<IFileHelper> _mockFileHelper;
 
     private ProxyExecutionManager _testExecutionManager;
@@ -111,7 +105,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _testExecutionManager.StartTestRun(testRunCriteria, mockTestRunEventsHandler.Object);
 
         _mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
-        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
+        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.First().Source);
     }
 
     [TestMethod]
@@ -133,7 +127,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _testExecutionManager.StartTestRun(testRunCriteria, mockTestRunEventsHandler.Object);
 
         _mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
-        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
+        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.First().Source);
     }
 
     [TestMethod]
@@ -277,7 +271,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     public void StartTestRunShouldInitializeExtensionsWithExistingExtensionsOnly()
     {
         TestPluginCache.Instance = null;
-        TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "def.TestAdapter.dll", "xyz.TestAdapter.dll" }, false);
+        TestPluginCache.Instance!.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "def.TestAdapter.dll", "xyz.TestAdapter.dll" }, false);
         var expectedOutputPaths = new[] { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" };
 
         _mockTestHostManager.SetupGet(th => th.Shared).Returns(false);
@@ -436,7 +430,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void StartTestRunShouldInitiateTestRunForSourcesThroughTheServer()
     {
-        TestRunCriteriaWithSources testRunCriteriaPassed = null;
+        TestRunCriteriaWithSources? testRunCriteriaPassed = null;
         _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
         _mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), _testExecutionManager))
@@ -456,7 +450,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void StartTestRunShouldInitiateTestRunForTestsThroughTheServer()
     {
-        TestRunCriteriaWithTests testRunCriteriaPassed = null;
+        TestRunCriteriaWithTests? testRunCriteriaPassed = null;
         _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
         _mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), _testExecutionManager))
@@ -801,7 +795,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     private void InvokeAndVerifyStartTestRun(bool skipDefaultAdapters)
     {
         TestPluginCache.Instance = null;
-        TestPluginCache.Instance.DefaultExtensionPaths = new List<string> { "default1.dll", "default2.dll" };
+        TestPluginCache.Instance!.DefaultExtensionPaths = new List<string> { "default1.dll", "default2.dll" };
         TestPluginCache.Instance.UpdateExtensions(new List<string> { "filterTestAdapter.dll" }, false);
         TestPluginCache.Instance.UpdateExtensions(new List<string> { "unfilter.dll" }, true);
 

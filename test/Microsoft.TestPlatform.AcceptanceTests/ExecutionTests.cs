@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 
 using TestPlatform.TestUtilities;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -97,7 +95,7 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll");
-        var xunitAssemblyPath = _testEnvironment.TargetFramework.Equals("net451") ?
+        var xunitAssemblyPath = _testEnvironment.TargetFramework!.Equals("net451") ?
             _testEnvironment.GetTestAsset("XUTestProject.dll", "net46") :
             _testEnvironment.GetTestAsset("XUTestProject.dll");
 
@@ -218,7 +216,7 @@ public class ExecutionTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var errorMessage = "Process is terminated due to StackOverflowException.";
-        if (runnerInfo.TargetFramework.StartsWith("netcoreapp2."))
+        if (runnerInfo.TargetFramework!.StartsWith("netcoreapp2."))
         {
             errorMessage = "Process is terminating due to StackOverflowException.";
         }
