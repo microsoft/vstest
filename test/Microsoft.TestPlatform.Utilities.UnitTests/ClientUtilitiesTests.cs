@@ -18,13 +18,13 @@ public class ClientUtilitiesTests
     [TestMethod]
     public void FixRelativePathsInRunSettingsShouldThrowIfDocumentIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => ClientUtilities.FixRelativePathsInRunSettings(null, "c:\\temp"));
+        Assert.ThrowsException<ArgumentNullException>(() => ClientUtilities.FixRelativePathsInRunSettings(null!, "c:\\temp"));
     }
 
     [TestMethod]
     public void FixRelativePathsInRunSettingsShouldThrowIfPathIsNullOrEmpty()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => ClientUtilities.FixRelativePathsInRunSettings(new XmlDocument(), null));
+        Assert.ThrowsException<ArgumentNullException>(() => ClientUtilities.FixRelativePathsInRunSettings(new XmlDocument(), null!));
         Assert.ThrowsException<ArgumentNullException>(() => ClientUtilities.FixRelativePathsInRunSettings(new XmlDocument(), ""));
     }
 

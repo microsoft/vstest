@@ -21,9 +21,9 @@ internal class XmlUtilities
     /// <param name="runSettingsNavigator"> The xml navigator. </param>
     /// <param name="nodeXPath"> The xPath of the node. </param>
     /// <returns></returns>
-    internal static string? GetNodeXml(XPathNavigator runSettingsNavigator, string nodeXPath)
+    internal static string? GetNodeXml(XPathNavigator? runSettingsNavigator, string nodeXPath)
     {
-        var node = runSettingsNavigator.SelectSingleNode(nodeXPath);
+        var node = runSettingsNavigator?.SelectSingleNode(nodeXPath);
         return node?.InnerXml;
     }
 
@@ -83,10 +83,9 @@ internal class XmlUtilities
         }
     }
 
-    internal static void RemoveChildNode(XPathNavigator parentNavigator, string nodeXPath, string childName)
+    internal static void RemoveChildNode(XPathNavigator? parentNavigator, string nodeXPath, string childName)
     {
-        var childNodeNavigator = parentNavigator.SelectSingleNode(nodeXPath);
-        if (childNodeNavigator != null)
+        if (parentNavigator?.SelectSingleNode(nodeXPath) is { } childNodeNavigator)
         {
             parentNavigator.MoveToChild(childName, string.Empty);
             parentNavigator.DeleteSelf();

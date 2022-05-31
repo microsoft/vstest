@@ -44,7 +44,7 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
         yield return CodeCoverageDataCollectorUri;
     }
 
-    public async Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+    public async Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet>? attachments, IProgress<int> progressReporter, IMessageLogger? logger, CancellationToken cancellationToken)
     {
         if (attachments?.Any() != true)
             return new Collection<AttachmentSet>();

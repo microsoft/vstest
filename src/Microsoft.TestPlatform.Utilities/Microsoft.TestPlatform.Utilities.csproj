@@ -48,9 +48,9 @@
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\vstest2\NullableAttributes.cs" Link="NullableAttributes.cs" />
-    <Compile Include="..\..\..\vstest2\StringUtils.cs" Link="StringUtils.cs" />
-    <Compile Include="..\..\..\vstest2\TPDebug.cs" Link="TPDebug.cs" />
+    <Compile Include="..\..\NullableAttributes.cs" Link="NullableAttributes.cs" />
+    <Compile Include="..\..\StringUtils.cs" Link="StringUtils.cs" />
+    <Compile Include="..\..\TPDebug.cs" Link="TPDebug.cs" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

@@ -43,7 +43,7 @@ public class CodeCoverageRunSettingsProcessorTests
         const string settings = "<Configuration></Configuration>";
         string expected = $"{_defaultSettings.OuterXml}";
 
-        Assert.AreEqual(expected, _processor.Process(settings).OuterXml);
+        Assert.AreEqual(expected, _processor.Process(settings)!.OuterXml);
     }
 
     [TestMethod]
@@ -92,7 +92,7 @@ public class CodeCoverageRunSettingsProcessorTests
         var document = new XmlDocument();
         document.LoadXml(settings);
 
-        Assert.AreEqual(document.OuterXml, _processor.Process(settings).OuterXml);
+        Assert.AreEqual(document.OuterXml, _processor.Process(settings)!.OuterXml);
     }
 
     [TestMethod]

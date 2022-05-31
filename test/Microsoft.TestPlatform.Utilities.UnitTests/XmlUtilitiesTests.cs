@@ -20,7 +20,7 @@ public class XmlUtilitiesTests
     [TestMethod]
     public void GetNodeXmlShouldThrowIfxmlDocumentIsNull()
     {
-        Assert.ThrowsException<NullReferenceException>(() => XmlUtilities.GetNodeXml(null, @"/RunSettings/RunConfiguration"));
+        Assert.ThrowsException<NullReferenceException>(() => XmlUtilities.GetNodeXml(null!, @"/RunSettings/RunConfiguration"));
     }
 
     [TestMethod]
@@ -29,7 +29,7 @@ public class XmlUtilitiesTests
         var settingsXml = @"<RunSettings></RunSettings>";
         var xmlDocument = GetXmlDocument(settingsXml);
 
-        Assert.ThrowsException<XPathException>(() => XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), null));
+        Assert.ThrowsException<XPathException>(() => XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), null!));
     }
 
     [TestMethod]
