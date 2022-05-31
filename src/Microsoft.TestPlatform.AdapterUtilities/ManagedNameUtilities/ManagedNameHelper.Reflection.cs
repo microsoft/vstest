@@ -86,8 +86,7 @@ public static partial class ManagedNameHelper
 
         if (!ReflectionHelpers.IsMethod(method))
         {
-            // TODO: @Haplois, exception expects a message and not a param name.
-            throw new NotSupportedException(nameof(method));
+            throw new ArgumentException(Resources.Resources.ErrorMethodExpectedAsAnArgument, nameof(method));
         }
 
         var semanticType = ReflectionHelpers.GetReflectedType(method)
@@ -119,11 +118,11 @@ public static partial class ManagedNameHelper
         var methodBuilder = new StringBuilder();
 
         // Namespace and Type Name (with arity designation)
+        // hierarchyPos contains [startIndexOfNamespace, endIndexOfNameSpace, endIndexOfTypeName]
         var hierarchyPos = AppendTypeString(typeBuilder, semanticType, closedType: false);
-        if (hierarchyPos is null || hierarchyPos.Length != HierarchyConstants.Levels.TotalLevelCount)
+        if (hierarchyPos is null || hierarchyPos.Length != 3)
         {
-            // TODO: @Haplois, exception expects a message and not a param name.
-            throw new NotSupportedException(nameof(method));
+            throw new ArgumentException(Resources.Resources.ErrorMethodExpectedAsAnArgument, nameof(method));
         }
 
         // Method Name with method arity
@@ -134,6 +133,7 @@ public static partial class ManagedNameHelper
             methodBuilder.Append('`');
             methodBuilder.Append(arity);
         }
+        var methodNameEndIndex = methodBuilder.Length;
 
         // Type Parameters
         var paramList = method.GetParameters();
@@ -151,11 +151,12 @@ public static partial class ManagedNameHelper
 
         managedTypeName = typeBuilder.ToString();
         managedMethodName = methodBuilder.ToString();
-        hierarchyValues = new[]
-        {
-            managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]),
-            managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1),
-        };
+
+        hierarchyValues = new string[HierarchyConstants.Levels.TotalLevelCount];
+        hierarchyValues[HierarchyConstants.Levels.TestGroupIndex] = managedMethodName.Substring(0, methodNameEndIndex);
+        hierarchyValues[HierarchyConstants.Levels.ClassIndex] = managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1);
+        hierarchyValues[HierarchyConstants.Levels.NamespaceIndex] = managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]);
+        hierarchyValues[HierarchyConstants.Levels.ContainerIndex] = method.DeclaringType.GetTypeInfo().Assembly.GetName().Name;
     }
 
     /// <summary>
@@ -265,7 +266,12 @@ public static partial class ManagedNameHelper
         methods = type.GetRuntimeMethods().Where(m => Filter(m, null)).ToArray();
 #endif
 
-        return (MethodInfo?)methods.SingleOrDefault();
+        return (MethodInfo?)(methods.Length switch
+        {
+            1 => methods[0],
+            > 1 => methods.SingleOrDefault(i => i.DeclaringType == type),
+            _ => null
+        });
     }
 
     private static int[]? AppendTypeString(StringBuilder b, Type? type, bool closedType)
@@ -478,15 +484,33 @@ public static partial class ManagedNameHelper
 
     private static bool IsNormalized(string s)
     {
+        var brackets = 0;
+
         for (int i = 0; i < s.Length; i++)
         {
-            if (NeedsEscaping(s[i], i) && s[i] != '.')
+            var c = s[i];
+            if (NeedsEscaping(c, i) && c != '.')
             {
+                if (i != 0)
+                {
+                    if (c == '<')
+                    {
+                        brackets++;
+                        continue;
+                    }
+
+                    if (c == '>' && s[i - 1] != '<' && brackets > 0)
+                    {
+                        brackets--;
+                        continue;
+                    }
+                }
+
                 return false;
             }
         }
 
-        return true;
+        return brackets == 0;
     }
 
     private static bool NeedsEscaping(char c, int pos)
