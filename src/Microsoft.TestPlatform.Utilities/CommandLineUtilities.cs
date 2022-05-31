@@ -8,8 +8,6 @@ using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 public static class CommandLineUtilities

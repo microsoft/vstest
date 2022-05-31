@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,10 +15,7 @@ using System.Xml;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
@@ -34,21 +32,21 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
     private const string CoverageMergeOperationName = "CoverageMergeOperation";
 
     private static readonly Uri CodeCoverageDataCollectorUri = new(CoverageUri);
-    private static Assembly s_codeCoverageAssembly;
-    private static object s_classInstance;
-    private static MethodInfo s_mergeMethodInfo;
-    private static Array s_mergeOperationEnumValues;
+    private static Assembly? s_codeCoverageAssembly;
+    private static object? s_classInstance;
+    private static MethodInfo? s_mergeMethodInfo;
+    private static Array? s_mergeOperationEnumValues;
 
     public bool SupportsIncrementalProcessing => true;
 
-    public IEnumerable<Uri> GetExtensionUris()
+    public IEnumerable<Uri>? GetExtensionUris()
     {
         yield return CodeCoverageDataCollectorUri;
     }
 
     public async Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
     {
-        if ((attachments?.Any()) != true)
+        if (attachments?.Any() != true)
             return new Collection<AttachmentSet>();
 
         var coverageReportFilePaths = new List<string>();
@@ -94,7 +92,7 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
         return attachments;
     }
 
-    private async Task<IList<string>> MergeCodeCoverageFilesAsync(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
+    private async Task<IList<string>?> MergeCodeCoverageFilesAsync(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
     {
         try
         {
@@ -122,7 +120,7 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
         return null;
     }
 
-    private async Task<IList<string>> MergeCodeCoverageFilesAsync(IList<string> files, CancellationToken cancellationToken)
+    private async Task<IList<string>?> MergeCodeCoverageFilesAsync(IList<string> files, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -130,8 +128,12 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
         LoadCodeCoverageAssembly();
         var task = (Task)s_mergeMethodInfo.Invoke(s_classInstance, new object[] { files[0], files, s_mergeOperationEnumValues.GetValue(0), true, cancellationToken });
         await task.ConfigureAwait(false);
-        var coverageData = task.GetType().GetProperty("Result").GetValue(task, null);
-        var mergedResults = coverageData as IList<string>;
+
+        if (task.GetType().GetProperty("Result").GetValue(task, null) is not IList<string> mergedResults)
+        {
+            EqtTrace.Error("CodeCoverageDataCollectorAttachmentsHandler: Failed to merge code coverage files.");
+            return files;
+        }
 
         // Delete original files and keep merged file only
         foreach (var file in files)
@@ -152,10 +154,14 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
         return mergedResults;
     }
 
-    private void LoadCodeCoverageAssembly()
+    [MemberNotNull(nameof(s_codeCoverageAssembly), nameof(s_classInstance), nameof(s_mergeOperationEnumValues), nameof(s_mergeMethodInfo))]
+    private static void LoadCodeCoverageAssembly()
     {
         if (s_codeCoverageAssembly != null)
+        {
+            TPDebug.Assert(s_classInstance != null && s_mergeOperationEnumValues != null && s_mergeMethodInfo != null);
             return;
+        }
 
         var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageIoAssemblyName + ".dll");
         s_codeCoverageAssembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(assemblyPath);
@@ -166,6 +172,6 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
         var types = s_codeCoverageAssembly.GetTypes();
         var mergeOperationEnum = Array.Find(types, d => d.Name == CoverageMergeOperationName);
         s_mergeOperationEnumValues = Enum.GetValues(mergeOperationEnum);
-        s_mergeMethodInfo = classType?.GetMethod(MergeMethodName, new[] { typeof(string), typeof(IList<string>), mergeOperationEnum, typeof(bool), typeof(CancellationToken) });
+        s_mergeMethodInfo = classType.GetMethod(MergeMethodName, new[] { typeof(string), typeof(IList<string>), mergeOperationEnum, typeof(bool), typeof(CancellationToken) });
     }
 }

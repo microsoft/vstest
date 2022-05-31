@@ -8,8 +8,6 @@ using System.Security;
 using System.Xml;
 using System.Xml.XPath;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
@@ -23,7 +21,7 @@ internal class XmlUtilities
     /// <param name="runSettingsNavigator"> The xml navigator. </param>
     /// <param name="nodeXPath"> The xPath of the node. </param>
     /// <returns></returns>
-    internal static string GetNodeXml(XPathNavigator runSettingsNavigator, string nodeXPath)
+    internal static string? GetNodeXml(XPathNavigator runSettingsNavigator, string nodeXPath)
     {
         var node = runSettingsNavigator.SelectSingleNode(nodeXPath);
         return node?.InnerXml;
@@ -55,7 +53,7 @@ internal class XmlUtilities
         XmlDocument xmlDocument,
         string nodeXPath,
         string nodeName,
-        string innerXml)
+        string? innerXml)
     {
         var childNode = xmlDocument.SelectSingleNode(nodeXPath);
 
@@ -65,13 +63,13 @@ internal class XmlUtilities
         var secureInnerXml = SecurityElement.Escape(innerXml);
 #else
         // fixing manually as we currently target to netcore 1.1 and we don't have default implementation for Escape functionality
-        var secureInnerXml = string.IsNullOrEmpty(innerXml) ? innerXml : innerXml.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;").Replace("'", "&apos;");
+        var secureInnerXml = innerXml.IsNullOrEmpty() ? innerXml : innerXml.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;").Replace("'", "&apos;");
 #endif
         if (childNode == null)
         {
             var childElement = xmlDocument.CreateElement(nodeName);
 
-            if (!string.IsNullOrEmpty(innerXml))
+            if (!innerXml.IsNullOrEmpty())
             {
                 childElement.InnerXml = secureInnerXml;
             }
@@ -79,7 +77,7 @@ internal class XmlUtilities
             var parentNode = xmlDocument.SelectSingleNode(nodeXPath.Substring(0, nodeXPath.LastIndexOf('/')));
             parentNode?.AppendChild(childElement);
         }
-        else if (!string.IsNullOrEmpty(innerXml))
+        else if (!innerXml.IsNullOrEmpty())
         {
             childNode.InnerXml = secureInnerXml;
         }
