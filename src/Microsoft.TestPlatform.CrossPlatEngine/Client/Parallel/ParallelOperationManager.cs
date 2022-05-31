@@ -23,7 +23,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
     /// </summary>
     private TEventHandler? _eventHandler;
     private Func<TEventHandler, TManager, TEventHandler>? _getEventHandler;
-    private Action<TManager, TEventHandler, TWorkload>? _runWorkload;
+    private Action<TManager, TEventHandler, ProviderSpecificWorkload<TWorkload>>? _runWorkload;
     private bool _acceptMoreWork;
     private readonly List<ProviderSpecificWorkload<TWorkload>> _workloads = new();
     private readonly List<Slot> _managerSlots = new();
@@ -68,7 +68,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         List<ProviderSpecificWorkload<TWorkload>> workloads,
         TEventHandler eventHandler,
         Func<TEventHandler, TManager, TEventHandler> getEventHandler,
-        Action<TManager, TEventHandler, TWorkload> runWorkload)
+        Action<TManager, TEventHandler, ProviderSpecificWorkload<TWorkload>> runWorkload)
     {
         _ = workloads ?? throw new ArgumentNullException(nameof(workloads));
         _eventHandler = eventHandler ?? throw new ArgumentNullException(nameof(eventHandler));
@@ -150,7 +150,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         {
             try
             {
-                _runWorkload(pair.Slot.Manager!, pair.Slot.EventHandler!, pair.Workload.Work);
+                _runWorkload(pair.Slot.Manager!, pair.Slot.EventHandler!, pair.Workload);
             }
             finally
             {

@@ -30,7 +30,7 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
 {
     private readonly IDataSerializer _dataSerializer;
     private readonly bool _isParallel;
-    private readonly ParallelOperationManager<IProxyExecutionManager, ITestRunEventsHandler, TestRunCriteria> _parallelOperationManager;
+    private readonly ParallelOperationManager<IProxyExecutionManager, IInternalTestRunEventsHandler, TestRunCriteria> _parallelOperationManager;
     private readonly Dictionary<string, TestRuntimeProviderInfo> _sourceToTestHostProviderMap;
 
     #region TestRunSpecificData
@@ -91,7 +91,7 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         _skipDefaultAdapters = skipDefaultAdapters;
     }
 
-    public int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
+    public int StartTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler)
     {
         var workloads = SplitToWorkloads(testRunCriteria, _sourceToTestHostProviderMap);
         _availableWorkloads = workloads.Count;
@@ -111,14 +111,14 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         return 1;
     }
 
-    public void Abort(ITestRunEventsHandler runEventsHandler)
+    public void Abort(IInternalTestRunEventsHandler runEventsHandler)
     {
         // Test platform initiated abort.
         _abortRequested = true;
         _parallelOperationManager.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(runEventsHandler), doActionsInParallel: true);
     }
 
-    public void Cancel(ITestRunEventsHandler runEventsHandler)
+    public void Cancel(IInternalTestRunEventsHandler runEventsHandler)
     {
         _parallelOperationManager.DoActionOnAllManagers((proxyManager) => proxyManager.Cancel(runEventsHandler), doActionsInParallel: true);
     }
@@ -324,7 +324,7 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         }
     }
 
-    private ParallelRunEventsHandler GetParallelEventHandler(ITestRunEventsHandler eventHandler, IProxyExecutionManager concurrentManager)
+    private ParallelRunEventsHandler GetParallelEventHandler(IInternalTestRunEventsHandler eventHandler, IProxyExecutionManager concurrentManager)
     {
         if (concurrentManager is ProxyExecutionManagerWithDataCollection)
         {
@@ -355,8 +355,9 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
     /// </summary>
     /// <param name="proxyExecutionManager">Proxy execution manager instance.</param>
     /// <returns>True, if execution triggered</returns>
-    private void StartTestRunOnConcurrentManager(IProxyExecutionManager proxyExecutionManager, ITestRunEventsHandler eventHandler, TestRunCriteria testRunCriteria)
+    private void StartTestRunOnConcurrentManager(IProxyExecutionManager proxyExecutionManager, IInternalTestRunEventsHandler eventHandler, ProviderSpecificWorkload<TestRunCriteria> workload)
     {
+        var testRunCriteria = workload.Work;
         if (testRunCriteria != null)
         {
             if (!proxyExecutionManager.IsInitialized)

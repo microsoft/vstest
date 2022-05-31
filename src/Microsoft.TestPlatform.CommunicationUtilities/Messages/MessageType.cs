@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
@@ -198,7 +200,7 @@ public static class MessageType
     /// <summary>
     /// Attach debugger to process.
     /// </summary>
-    [ProtocolVersion(Version3, typeof(int), Description = "Carries the process id the IDE should attach to.")]
+    [ProtocolVersion(Version3, typeof(int), Deprecated = Version7, Description = "Carries the process id the IDE should attach to. DEPRECATED, use EditorAttachDebugger2 instead.")]
     public const string EditorAttachDebugger = "TestExecution.EditorAttachDebugger";
 
     /// <summary>
@@ -276,5 +278,11 @@ public static class MessageType
     /// Ack Event message type send to datacollector process before test case execution starts.
     /// </summary>
     public const string DataCollectionTestStartAck = "DataCollection.TestStartAck";
+
+    /// <summary>
+    /// Attach debugger to process.
+    /// </summary>
+    [ProtocolVersion(Version7, typeof(EditorAttachDebuggerPayload))]
+    public const string EditorAttachDebugger2 = "TestExecution.EditorAttachDebugger2";
 
 }

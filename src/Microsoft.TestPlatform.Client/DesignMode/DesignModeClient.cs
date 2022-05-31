@@ -18,6 +18,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -329,7 +330,7 @@ public class DesignModeClient : IDesignModeClient
     }
 
     /// <inheritdoc/>
-    public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken)
     {
         // If an attach request is issued but there is no support for attaching on the other
         // side of the communication channel, we simply return and let the caller know the
@@ -349,7 +350,24 @@ public class DesignModeClient : IDesignModeClient
                 waitHandle.Set();
             };
 
-            _communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid, _protocolConfig.Version);
+            // TODO: formalize this so we can the deprecation version from the message data, and automatically switch
+            // to the new message, including type safety, where we determine T from the payload. And maybe give SendMessage
+            // a type of T as well to prevent some more mistakes.
+            if (_protocolConfig.Version < 7)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                _communicationManager.SendMessage(MessageType.EditorAttachDebugger, attachDebuggerInfo.ProcessId, _protocolConfig.Version);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+                var payload = new EditorAttachDebuggerPayload
+                {
+                    TargetFramework = attachDebuggerInfo.TargetFramework.ToString(),
+                    ProcessID = attachDebuggerInfo.ProcessId,
+                };
+                _communicationManager.SendMessage(MessageType.EditorAttachDebugger2, payload);
+            }
 
             WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 

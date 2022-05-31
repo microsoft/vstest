@@ -38,7 +38,7 @@ public class DesignModeClientTests
     private readonly Mock<ITestRequestManager> _mockTestRequestManager;
     private readonly Mock<ICommunicationManager> _mockCommunicationManager;
     private readonly DesignModeClient _designModeClient;
-    private readonly int _protocolVersion = 6;
+    private readonly int _protocolVersion = 7;
     private readonly AutoResetEvent _completeEvent;
     private readonly Mock<IEnvironment> _mockPlatformEnvrironment;
 
@@ -181,7 +181,7 @@ public class DesignModeClientTests
                 trm =>
                     trm.RunTests(
                         It.IsAny<TestRunRequestPayload>(),
-                        It.IsAny<ITestHostLauncher>(),
+                        It.IsAny<ITestHostLauncher3>(),
                         It.IsAny<ITestRunEventsRegistrar>(),
                         It.IsAny<ProtocolConfig>()))
             .Callback(
@@ -243,7 +243,7 @@ public class DesignModeClientTests
                 trm =>
                     trm.RunTests(
                         It.IsAny<TestRunRequestPayload>(),
-                        It.IsAny<ITestHostLauncher>(),
+                        It.IsAny<ITestHostLauncher3>(),
                         It.IsAny<ITestRunEventsRegistrar>(),
                         It.IsAny<ProtocolConfig>()))
             .Callback(
@@ -559,7 +559,7 @@ public class DesignModeClientTests
         _mockTestRequestManager.Setup(
             rm => rm.StartTestSession(
                 It.IsAny<StartTestSessionPayload>(),
-                It.IsAny<ITestHostLauncher>(),
+                It.IsAny<ITestHostLauncher3>(),
                 It.IsAny<ITestSessionEventsHandler>(),
                 It.IsAny<ProtocolConfig>())).Throws(new SettingsException("DummyException"));
 

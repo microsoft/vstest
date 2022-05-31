@@ -4,8 +4,6 @@
 using System;
 using System.Threading;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
 /// <summary>
@@ -29,17 +27,17 @@ public interface ITestHostLauncher2 : ITestHostLauncher
     bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken);
 }
 
-[Obsolete("Do not use this api, it is not ready yet.")]
 public interface ITestHostLauncher3 : ITestHostLauncher2
 {
-    bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo);
+    bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken);
 }
 
-[Obsolete("Do not use this api, it is not ready yet.")]
 public class AttachDebuggerInfo
 {
-    public Version Version { get; set; }
+    public AttachDebuggerInfo()
+    {
+
+    }
     public int ProcessId { get; set; }
-    public Framework TargetFramework { get; set; }
-    public CancellationToken CancellationToken { get; set; }
+    public Framework? TargetFramework { get; set; }
 }

@@ -36,7 +36,7 @@ public class VsTestConsoleRequestSenderTests
     private readonly ITranslationLayerRequestSender _requestSender;
     private readonly Mock<ICommunicationManager> _mockCommunicationManager;
     private readonly int _waitTimeout = 2000;
-    private readonly int _protocolVersion = 6;
+    private readonly int _protocolVersion = 7;
     private readonly IDataSerializer _serializer = JsonDataSerializer.Instance;
 
     public VsTestConsoleRequestSenderTests()

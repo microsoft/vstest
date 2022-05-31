@@ -56,7 +56,7 @@ public interface ITestRequestManager : IDisposable
     /// <param name="protocolConfig">Protocol related information.</param>
     void RunTests(
         TestRunRequestPayload testRunRequestPayLoad,
-        ITestHostLauncher customTestHostLauncher,
+        ITestHostLauncher3 customTestHostLauncher,
         ITestRunEventsRegistrar testRunEventsRegistrar,
         ProtocolConfig protocolConfig);
 
@@ -86,7 +86,7 @@ public interface ITestRequestManager : IDisposable
     /// <param name="protocolConfig">Protocol related information.</param>
     void StartTestSession(
         StartTestSessionPayload payload,
-        ITestHostLauncher testHostLauncher,
+        ITestHostLauncher3 testHostLauncher,
         ITestSessionEventsHandler eventsHandler,
         ProtocolConfig protocolConfig);
 

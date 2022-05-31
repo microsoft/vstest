@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -13,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 /// <summary>
 /// DesignMode TestHost Launcher for hosting of test process
 /// </summary>
-internal class DesignModeTestHostLauncher : ITestHostLauncher2
+internal class DesignModeTestHostLauncher : ITestHostLauncher3
 {
     private readonly IDesignModeClient _designModeClient;
 
@@ -30,15 +31,22 @@ internal class DesignModeTestHostLauncher : ITestHostLauncher2
     public virtual bool IsDebug => false;
 
     /// <inheritdoc/>
+    [Obsolete("Don't use, internal implementations should use only the latest interface.", true)]
     public bool AttachDebuggerToProcess(int pid)
     {
-        return _designModeClient.AttachDebuggerToProcess(pid, CancellationToken.None);
+        throw new NotSupportedException();
     }
 
     /// <inheritdoc/>
+    [Obsolete("Don't use, internal implementations should use only the latest interface.", true)]
     public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
     {
-        return _designModeClient.AttachDebuggerToProcess(pid, cancellationToken);
+        throw new NotSupportedException();
+    }
+
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken)
+    {
+        return _designModeClient.AttachDebuggerToProcess(attachDebuggerInfo, cancellationToken);
     }
 
     /// <inheritdoc/>

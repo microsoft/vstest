@@ -408,7 +408,7 @@ public class JsonDataSerializer : IDataSerializer
             // unless this is disabled by VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE
             // env variable.
             0 or 1 or 3 => s_payloadSerializer,
-            2 or 4 or 5 or 6 => s_payloadSerializer2,
+            2 or 4 or 5 or 6 or 7 => s_payloadSerializer2,
 
             _ => throw new NotSupportedException($"Protocol version {version} is not supported. "
                 + "Ensure it is compatible with the latest serializer or add a new one."),
@@ -434,6 +434,11 @@ public class JsonDataSerializer : IDataSerializer
     private class VersionedMessageWithRawMessage : VersionedMessage
     {
         public string RawMessage { get; set; }
+
+        public override string ToString()
+        {
+            return $"({MessageType}) -> {RawMessage}";
+        }
     }
 
     /// <summary>

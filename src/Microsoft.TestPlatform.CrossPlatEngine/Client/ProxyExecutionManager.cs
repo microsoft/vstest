@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -30,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 /// <summary>
 /// Orchestrates test execution operations for the engine communicating with the client.
 /// </summary>
-internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITestRunEventsHandler2
+internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInternalTestRunEventsHandler
 {
     private readonly TestSessionInfo _testSessionInfo;
     private readonly Func<string, ProxyExecutionManager, ProxyOperationManager> _proxyOperationManagerCreator;
@@ -42,7 +43,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     private bool _isCommunicationEstablished;
 
     private ProxyOperationManager _proxyOperationManager;
-    private ITestRunEventsHandler _baseTestRunEventsHandler;
+    private IInternalTestRunEventsHandler _baseTestRunEventsHandler;
     private bool _skipDefaultAdapters;
     private readonly bool _debugEnabledForTestSession;
 
@@ -96,11 +97,13 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     public ProxyExecutionManager(
         IRequestData requestData,
         ITestRequestSender requestSender,
-        ITestRuntimeProvider testHostManager) :
+        ITestRuntimeProvider testHostManager,
+        Framework testHostManagerFramework) :
         this(
             requestData,
             requestSender,
             testHostManager,
+            testHostManagerFramework,
             JsonDataSerializer.Instance,
             new FileHelper())
     {
@@ -123,6 +126,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
         IRequestData requestData,
         ITestRequestSender requestSender,
         ITestRuntimeProvider testHostManager,
+        Framework testHostManagerFramework,
         IDataSerializer dataSerializer,
         IFileHelper fileHelper)
     {
@@ -132,7 +136,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
         _fileHelper = fileHelper;
 
         // Create a new proxy operation manager.
-        _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
+        _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, testHostManagerFramework, this);
     }
 
 
@@ -146,7 +150,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     }
 
     /// <inheritdoc/>
-    public virtual int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
+    public virtual int StartTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler)
     {
         if (_proxyOperationManager == null)
         {
@@ -261,7 +265,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     }
 
     /// <inheritdoc/>
-    public virtual void Cancel(ITestRunEventsHandler eventHandler)
+    public virtual void Cancel(IInternalTestRunEventsHandler eventHandler)
     {
         // Just in case ExecuteAsync isn't called yet, set the eventhandler.
         if (_baseTestRunEventsHandler == null)
@@ -284,7 +288,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     }
 
     /// <inheritdoc/>
-    public void Abort(ITestRunEventsHandler eventHandler)
+    public void Abort(IInternalTestRunEventsHandler eventHandler)
     {
         // Just in case ExecuteAsync isn't called yet, set the eventhandler.
         if (_baseTestRunEventsHandler == null)
@@ -338,9 +342,17 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITest
     }
 
     /// <inheritdoc />
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
     {
-        return ((ITestRunEventsHandler2)_baseTestRunEventsHandler).AttachDebuggerToProcess(pid);
+        // TestHost did not provide any additional TargetFramework info for the process it wants to attach to,
+        // specify the TargetFramework of the testhost, in case it is just an old testhost that is not aware
+        // of this capability.
+        if (attachDebuggerInfo.TargetFramework == default(Framework))
+        {
+            attachDebuggerInfo.TargetFramework = _proxyOperationManager.TestHostManagerFramework;
+        };
+
+        return _baseTestRunEventsHandler.AttachDebuggerToProcess(attachDebuggerInfo);
     }
 
     /// <inheritdoc/>

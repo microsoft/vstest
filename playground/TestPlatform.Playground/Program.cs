@@ -72,42 +72,42 @@ internal class Program
 
 ////            // net6
         @"C:\t\ParallelDiscovery2\ReproNetCore\Test1\bin\Debug\net6.0\Test1.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test7\bin\Debug\net6.0\Test7.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test2\bin\Debug\net6.0\Test2.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test6\bin\Debug\net6.0\Test6.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test8\bin\Debug\net6.0\Test8.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test5\bin\Debug\net6.0\Test5.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test3\bin\Debug\net6.0\Test3.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test4\bin\Debug\net6.0\Test4.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test10\bin\Debug\net6.0\Test10.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test9\bin\Debug\net6.0\Test9.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test7\bin\Debug\net6.0\Test7.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test2\bin\Debug\net6.0\Test2.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test6\bin\Debug\net6.0\Test6.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test8\bin\Debug\net6.0\Test8.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test5\bin\Debug\net6.0\Test5.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test3\bin\Debug\net6.0\Test3.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test4\bin\Debug\net6.0\Test4.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test10\bin\Debug\net6.0\Test10.dll",
+//@"C:\t\ParallelDiscovery2\ReproNetCore\Test9\bin\Debug\net6.0\Test9.dll",
 
-        //// netfx
-         @"C:\t\ParallelDiscovery2\ReproNetFx\Project4\bin\Debug\net472\Project4.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project1\bin\Debug\net472\Project1.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project2\bin\Debug\net472\Project2.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project3\bin\Debug\net472\Project3.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project9\bin\Debug\net472\Project9.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project10\bin\Debug\net472\Project10.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project5\bin\Debug\net472\Project5.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project8\bin\Debug\net472\Project8.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project7\bin\Debug\net472\Project7.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project6\bin\Debug\net472\Project6.dll",
+//        //// netfx
+//         @"C:\t\ParallelDiscovery2\ReproNetFx\Project4\bin\Debug\net472\Project4.dll",
+//               @"C:\t\ParallelDiscovery2\ReproNetFx\Project1\bin\Debug\net472\Project1.dll",
+//               @"C:\t\ParallelDiscovery2\ReproNetFx\Project2\bin\Debug\net472\Project2.dll",
+//               @"C:\t\ParallelDiscovery2\ReproNetFx\Project3\bin\Debug\net472\Project3.dll",
+//               @"C:\t\ParallelDiscovery2\ReproNetFx\Project9\bin\Debug\net472\Project9.dll",
+//               @"C:\t\ParallelDiscovery2\ReproNetFx\Project10\bin\Debug\net472\Project10.dll",
+//               @"C:\t\ParallelDiscovery2\ReproNetFx\Project5\bin\Debug\net472\Project5.dll",
+//               @"C:\t\ParallelDiscovery2\ReproNetFx\Project8\bin\Debug\net472\Project8.dll",
+//               @"C:\t\ParallelDiscovery2\ReproNetFx\Project7\bin\Debug\net472\Project7.dll",
+//               @"C:\t\ParallelDiscovery2\ReproNetFx\Project6\bin\Debug\net472\Project6.dll",
 
         
-        //// mix
-@"C:\t\MultipleTfmAndArch\Tst1\bin\Debug\net472\win7-x86\Tst1.dll",
-@"C:\t\MultipleTfmAndArch\Tst1\bin\Debug\net48\win7-x86\Tst1.dll",
-@"C:\t\MultipleTfmAndArch\Tst3\bin\Debug\net48\win7-x86\Tst3.dll",
-@"C:\t\MultipleTfmAndArch\Tst1\bin\Debug\net5.0\win7-x86\Tst1.dll",
-@"C:\t\MultipleTfmAndArch\Tst2\bin\Debug\net472\win7-x64\Tst2.dll",
-@"C:\t\MultipleTfmAndArch\Tst3\bin\Debug\net472\win7-x86\Tst3.dll",
-@"C:\t\MultipleTfmAndArch\Tst2\bin\Debug\net48\win7-x64\Tst2.dll",
-@"C:\t\MultipleTfmAndArch\Tst2\bin\Debug\netcoreapp3.1\win7-x64\Tst2.dll",
-@"C:\t\MultipleTfmAndArch\Tst3\bin\Debug\netcoreapp3.1\win7-x86\Tst3.dll",
-@"C:\t\MultipleTfmAndArch\Tst2\bin\Debug\net5.0\win7-x64\Tst2.dll",
-@"C:\t\MultipleTfmAndArch\Tst3\bin\Debug\net5.0\win7-x86\Tst3.dll",
-@"C:\t\MultipleTfmAndArch\Tst1\bin\Debug\netcoreapp3.1\win7-x86\Tst1.dll",
+//        //// mix
+//@"C:\t\MultipleTfmAndArch\Tst1\bin\Debug\net472\win7-x86\Tst1.dll",
+//@"C:\t\MultipleTfmAndArch\Tst1\bin\Debug\net48\win7-x86\Tst1.dll",
+//@"C:\t\MultipleTfmAndArch\Tst3\bin\Debug\net48\win7-x86\Tst3.dll",
+//@"C:\t\MultipleTfmAndArch\Tst1\bin\Debug\net5.0\win7-x86\Tst1.dll",
+//@"C:\t\MultipleTfmAndArch\Tst2\bin\Debug\net472\win7-x64\Tst2.dll",
+//@"C:\t\MultipleTfmAndArch\Tst3\bin\Debug\net472\win7-x86\Tst3.dll",
+//@"C:\t\MultipleTfmAndArch\Tst2\bin\Debug\net48\win7-x64\Tst2.dll",
+//@"C:\t\MultipleTfmAndArch\Tst2\bin\Debug\netcoreapp3.1\win7-x64\Tst2.dll",
+//@"C:\t\MultipleTfmAndArch\Tst3\bin\Debug\netcoreapp3.1\win7-x86\Tst3.dll",
+//@"C:\t\MultipleTfmAndArch\Tst2\bin\Debug\net5.0\win7-x64\Tst2.dll",
+//@"C:\t\MultipleTfmAndArch\Tst3\bin\Debug\net5.0\win7-x86\Tst3.dll",
+//@"C:\t\MultipleTfmAndArch\Tst1\bin\Debug\netcoreapp3.1\win7-x86\Tst1.dll",
 
         };
         //// console mode
@@ -253,7 +253,7 @@ internal class Program
                 : "\t<empty>";
     }
 
-    internal class DebuggerTestHostLauncher : ITestHostLauncher2
+    internal class DebuggerTestHostLauncher : ITestHostLauncher3
     {
         public bool IsDebug => true;
 
@@ -263,6 +263,11 @@ internal class Program
         }
 
         public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
+        {
+            return true;
+        }
+
+        public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken)
         {
             return true;
         }

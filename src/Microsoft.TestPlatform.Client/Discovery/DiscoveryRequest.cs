@@ -119,6 +119,9 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
             if (DiscoveryInProgress)
             {
+                // TODO: COMPAT: This should not check the default protocol config, that is vstest.console maximum protocol version, not the
+                // version we negotiated with testhost. Instead this should be handled by the proxy discovery manager, based on the protocol
+                // version it has.
                 // If testhost has old version, we should use old cancel logic
                 // to be consistent and not create regression issues
                 if (Constants.DefaultProtocolConfig.Version < Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport)
