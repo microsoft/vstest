@@ -27,6 +27,10 @@ using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Con
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
+/// <summary>
+/// Listents inside of testhost for request, that are sent from vstest.console. Requests are handled in <see cref="OnMessageReceived"/>
+/// and responses are sent back via various methods, for example <see cref="SendExecutionComplete"/>.
+/// </summary>
 public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestRequestHandler
 {
     private int _protocolVersion = 1;
@@ -55,9 +59,6 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     string IDeploymentAwareTestRequestHandler.LocalPath { get; set; }
     string IDeploymentAwareTestRequestHandler.RemotePath { get; set; }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TestRequestHandler" />.
-    /// </summary>
     public TestRequestHandler() : this(JsonDataSerializer.Instance, new CommunicationEndpointFactory())
     {
     }
