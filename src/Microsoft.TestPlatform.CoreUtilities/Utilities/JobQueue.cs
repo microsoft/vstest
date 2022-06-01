@@ -84,6 +84,10 @@ public class JobQueue<T> : IDisposable
     /// </summary>
     private readonly Action<string> _exceptionLogger;
 
+    /// <summary>
+    /// True when the job queue is paused. Don't use this for synchronization,
+    /// it is not super thread-safe. Just use it to see if the queue was started already.
+    /// </summary>
     public bool IsPaused { get; private set; }
 
     /// <summary>
