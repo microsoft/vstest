@@ -32,8 +32,9 @@ public static class AssemblyHelper
     /// Only assembly name and public key token are match. Version is ignored for matching.
     /// Returns null if not able to check if source references assembly.
     /// </summary>
-    public static bool? DoesReferencesAssembly(string source, AssemblyName referenceAssembly!!)
+    public static bool? DoesReferencesAssembly(string source, AssemblyName referenceAssembly)
     {
+        ValidateArg.NotNull(referenceAssembly, nameof(referenceAssembly));
         try
         {
             ValidateArg.NotNullOrEmpty(source, nameof(source));
@@ -321,8 +322,9 @@ public static class AssemblyHelper
     }
 #endif
 
-    public static IEnumerable<Attribute> GetCustomAttributes(this Assembly assembly!!, string fullyQualifiedName)
+    public static IEnumerable<Attribute> GetCustomAttributes(this Assembly assembly, string fullyQualifiedName)
     {
+        ValidateArg.NotNull(assembly, nameof(assembly));
         ValidateArg.NotNullOrWhiteSpace(fullyQualifiedName, nameof(fullyQualifiedName));
 
         return assembly.GetType(fullyQualifiedName) is Type attribute

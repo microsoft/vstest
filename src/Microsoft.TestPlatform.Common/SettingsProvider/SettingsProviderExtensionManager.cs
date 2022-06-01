@@ -50,13 +50,13 @@ public class SettingsProviderExtensionManager
     /// instances to be used for each run settings.
     /// </remarks>
     protected SettingsProviderExtensionManager(
-        IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settingsProviders!!,
-        IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredSettingsProviders!!,
-        IMessageLogger logger!!)
+        IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settingsProviders,
+        IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredSettingsProviders,
+        IMessageLogger logger)
     {
-        _settingsProviders = settingsProviders;
-        UnfilteredSettingsProviders = unfilteredSettingsProviders;
-        _logger = logger;
+        _settingsProviders = settingsProviders ?? throw new ArgumentNullException(nameof(settingsProviders));
+        UnfilteredSettingsProviders = unfilteredSettingsProviders ?? throw new ArgumentNullException(nameof(unfilteredSettingsProviders));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         // Populate the map to avoid threading issues
         SettingsProvidersMap = new Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();

@@ -36,6 +36,7 @@ public class HtmlLogger : ITestLoggerWithParameters
     private readonly IFileHelper _fileHelper;
     private readonly XmlObjectSerializer _xmlSerializer;
     private readonly IHtmlTransformer _htmlTransformer;
+    private static readonly object FileCreateLockObject = new();
     private Dictionary<string, string> _parametersDictionary;
 
     public HtmlLogger()
@@ -103,12 +104,10 @@ public class HtmlLogger : ITestLoggerWithParameters
     public string HtmlFilePath { get; private set; }
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events!!, string testResultsDirPath)
+    public void Initialize(TestLoggerEvents events, string testResultsDirPath)
     {
-        if (string.IsNullOrEmpty(testResultsDirPath))
-        {
-            throw new ArgumentNullException(nameof(testResultsDirPath));
-        }
+        ValidateArg.NotNull(events, nameof(events));
+        ValidateArg.NotNullOrEmpty(testResultsDirPath, nameof(testResultsDirPath));
 
         // Register for the events.
         events.TestRunMessage += TestMessageHandler;
@@ -125,8 +124,9 @@ public class HtmlLogger : ITestLoggerWithParameters
     }
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters!!)
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
     {
+        ValidateArg.NotNull(parameters, nameof(parameters));
         if (parameters.Count == 0)
         {
             throw new ArgumentException("No default parameters added", nameof(parameters));
@@ -148,8 +148,11 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void TestMessageHandler(object sender!!, TestRunMessageEventArgs e!!)
+    public void TestMessageHandler(object sender, TestRunMessageEventArgs e)
     {
+        ValidateArg.NotNull(sender, nameof(sender));
+        ValidateArg.NotNull(e, nameof(e));
+
         switch (e.Level)
         {
             case TestMessageLevel.Informational:
@@ -181,8 +184,11 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void TestResultHandler(object sender!!, TestResultEventArgs e!!)
+    public void TestResultHandler(object sender, TestResultEventArgs e)
     {
+        ValidateArg.NotNull(sender, nameof(sender));
+        ValidateArg.NotNull(e, nameof(e));
+
         var testResult = new ObjectModel.TestResult
         {
             DisplayName = e.Result.DisplayName ?? e.Result.TestCase.FullyQualifiedName,
@@ -301,25 +307,25 @@ public class HtmlLogger : ITestLoggerWithParameters
                 Environment.GetEnvironmentVariable("UserName"), Environment.MachineName,
                 FormatDateTimeForRunName(DateTime.Now));
 
-            XmlFilePath = GetFilePath(HtmlLoggerConstants.XmlFileExtension, fileName);
+            XmlFilePath = GenerateUniqueFilePath(fileName, HtmlLoggerConstants.XmlFileExtension);
 
-            using (var xmlStream = _fileHelper.GetStream(XmlFilePath, FileMode.Create))
+            using (var xmlStream = _fileHelper.GetStream(XmlFilePath, FileMode.OpenOrCreate))
             {
                 _xmlSerializer.WriteObject(xmlStream, TestRunDetails);
             }
 
             if (string.IsNullOrEmpty(HtmlFilePath))
             {
-                HtmlFilePath = GetFilePath(HtmlLoggerConstants.HtmlFileExtension, fileName);
+                HtmlFilePath = GenerateUniqueFilePath(fileName, HtmlLoggerConstants.HtmlFileExtension);
             }
 
             _htmlTransformer.Transform(XmlFilePath, HtmlFilePath);
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("HtmlLogger : Failed to populate html file. Exception : {0}",
+            EqtTrace.Error("HtmlLogger: Failed to populate html file. Exception: {0}",
                 ex.ToString());
-            ConsoleOutput.Instance.Error(false, string.Concat(HtmlResource.HtmlLoggerError), ex.Message);
+            ConsoleOutput.Instance.Error(false, HtmlResource.HtmlLoggerError, ex.Message);
             return;
         }
         finally
@@ -335,10 +341,24 @@ public class HtmlLogger : ITestLoggerWithParameters
         ConsoleOutput.Instance.Information(false, htmlFilePathMessage);
     }
 
-    private string GetFilePath(string fileExtension, string fileName)
+    private string GenerateUniqueFilePath(string fileName, string fileExtension)
     {
-        var fullFileFormat = $".{fileExtension}";
-        return Path.Combine(TestResultsDirPath, string.Concat("TestResult_", fileName, fullFileFormat));
+        string fullFilePath;
+        for (short i = 0; i < short.MaxValue; i++)
+        {
+            var fileNameWithIter = i == 0 ? fileName : Path.GetFileNameWithoutExtension(fileName) + $"[{i}]";
+            fullFilePath = Path.Combine(TestResultsDirPath, $"TestResult_{fileNameWithIter}.{fileExtension}");
+            lock (FileCreateLockObject)
+            {
+                if (!File.Exists(fullFilePath))
+                {
+                    using var _ = File.Create(fullFilePath);
+                    return fullFilePath;
+                }
+            }
+        }
+
+        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, HtmlResource.CannotGenerateUniqueFilePath, fileName, TestResultsDirPath));
     }
 
     private string FormatDateTimeForRunName(DateTime timeStamp)

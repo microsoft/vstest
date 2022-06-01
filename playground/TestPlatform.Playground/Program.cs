@@ -40,12 +40,11 @@ internal class Program
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
 
-
         var sourceSettings = @"
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
-                        <MaxCpuCount>4</MaxCpuCount>
+                        <MaxCpuCount>0</MaxCpuCount>
                     </RunConfiguration>
                 </RunSettings>
             ";
@@ -53,8 +52,6 @@ internal class Program
         var sources = new[] {
             Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
             Path.Combine(playground, "MSTest1", "bin", "Debug", "net5.0", "MSTest1.dll"),
-            @"C:\Users\jajares\source\repos\TestProject48\TestProject48\bin\Debug\net48\TestProject48.dll",
-            @"C:\Users\jajares\source\repos\TestProject48\TestProject1\bin\Debug\net48\win10-x64\TestProject1.dll"
         };
 
         // console mode
@@ -62,7 +59,14 @@ internal class Program
         try
         {
             File.WriteAllText(settingsFile, sourceSettings);
-            var process = Process.Start(console, string.Join(" ", sources) + " --settings:" + settingsFile + " --listtests");
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = console,
+                Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile} --listtests",
+                UseShellExecute = false,
+            };
+            EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
+            var process = Process.Start(processStartInfo);
             process.WaitForExit();
             if (process.ExitCode != 0)
             {
@@ -77,18 +81,37 @@ internal class Program
         // design mode
         var consoleOptions = new ConsoleParameters
         {
+            EnvironmentVariables = EnvironmentVariables.Variables,
             LogFilePath = Path.Combine(here, "logs", "log.txt"),
             TraceLevel = TraceLevel.Verbose,
         };
-        var options = new TestPlatformOptions();
+        var options = new TestPlatformOptions
+        {
+            CollectMetrics = true,
+        };
         var r = new VsTestConsoleWrapper(console, consoleOptions);
         var sessionHandler = new TestSessionHandler();
 #pragma warning disable CS0618 // Type or member is obsolete
-        r.StartTestSession(sources, sourceSettings, sessionHandler);
+        //// TestSessions
+        // r.StartTestSession(sources, sourceSettings, sessionHandler);
 #pragma warning restore CS0618 // Type or member is obsolete
         var discoveryHandler = new PlaygroundTestDiscoveryHandler();
+        var sw = Stopwatch.StartNew();
+        // Discovery
         r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        var discoveryDuration = sw.ElapsedMilliseconds;
+        Console.WriteLine($"Discovery done in {discoveryDuration} ms");
+        sw.Restart();
+        // Run with test cases and custom testhost launcher
         r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        //// Run with test cases and without custom testhost launcher
+        //r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
+        //// Run with sources and custom testhost launcher
+        //r.RunTestsWithCustomTestHost(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        //// Run with sources
+        //r.RunTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
+        var rd = sw.ElapsedMilliseconds;
+        Console.WriteLine($"Discovery: {discoveryDuration} ms, Run: {rd} ms, Total: {discoveryDuration + rd} ms");
     }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2

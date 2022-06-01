@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
 #nullable disable
@@ -63,9 +65,9 @@ internal class RunSettingsManager : IRunSettingsProvider
     /// Set the active run settings.
     /// </summary>
     /// <param name="runSettings">RunSettings to make the active Run Settings.</param>
-    public void SetActiveRunSettings(RunSettings runSettings!!)
+    public void SetActiveRunSettings(RunSettings runSettings)
     {
-        ActiveRunSettings = runSettings;
+        ActiveRunSettings = runSettings ?? throw new ArgumentNullException(nameof(runSettings));
     }
 
 }

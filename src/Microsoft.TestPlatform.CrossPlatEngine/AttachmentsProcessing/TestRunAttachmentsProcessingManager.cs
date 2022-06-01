@@ -37,10 +37,10 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRunAttachmentsProcessingManager"/> class.
     /// </summary>
-    public TestRunAttachmentsProcessingManager(ITestPlatformEventSource testPlatformEventSource!!, IDataCollectorAttachmentsProcessorsFactory dataCollectorAttachmentsProcessorsFactory!!)
+    public TestRunAttachmentsProcessingManager(ITestPlatformEventSource testPlatformEventSource, IDataCollectorAttachmentsProcessorsFactory dataCollectorAttachmentsProcessorsFactory)
     {
-        _testPlatformEventSource = testPlatformEventSource;
-        _dataCollectorAttachmentsProcessorsFactory = dataCollectorAttachmentsProcessorsFactory;
+        _testPlatformEventSource = testPlatformEventSource ?? throw new ArgumentNullException(nameof(testPlatformEventSource));
+        _dataCollectorAttachmentsProcessorsFactory = dataCollectorAttachmentsProcessorsFactory ?? throw new ArgumentNullException(nameof(dataCollectorAttachmentsProcessorsFactory));
     }
 
     /// <inheritdoc/>
@@ -218,9 +218,9 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
     {
         private readonly ITestRunAttachmentsProcessingEventsHandler _eventsHandler;
 
-        public AttachmentsProcessingMessageLogger(ITestRunAttachmentsProcessingEventsHandler eventsHandler!!)
+        public AttachmentsProcessingMessageLogger(ITestRunAttachmentsProcessingEventsHandler eventsHandler)
         {
-            _eventsHandler = eventsHandler;
+            _eventsHandler = eventsHandler ?? throw new ArgumentNullException(nameof(eventsHandler));
         }
 
         public void SendMessage(TestMessageLevel testMessageLevel, string message)

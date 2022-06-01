@@ -45,9 +45,9 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
 
     public bool HasAttachmentProcessor { get; private set; }
 
-    public DataCollectorAttachmentProcessorRemoteWrapper(string pipeShutdownMessagePrefix!!)
+    public DataCollectorAttachmentProcessorRemoteWrapper(string pipeShutdownMessagePrefix)
     {
-        _pipeShutdownMessagePrefix = pipeShutdownMessagePrefix;
+        _pipeShutdownMessagePrefix = pipeShutdownMessagePrefix ?? throw new ArgumentNullException(nameof(pipeShutdownMessagePrefix));
     }
 
     public string GetClientHandleAsString() => _pipeServerStream.GetClientHandleAsString();
@@ -156,10 +156,10 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
         private readonly string _name;
         private readonly DataCollectorAttachmentProcessorRemoteWrapper _wrapper;
 
-        public MessageLogger(DataCollectorAttachmentProcessorRemoteWrapper wrapper!!, string name!!)
+        public MessageLogger(DataCollectorAttachmentProcessorRemoteWrapper wrapper, string name)
         {
-            _wrapper = wrapper;
-            _name = name;
+            _wrapper = wrapper ?? throw new ArgumentNullException(nameof(wrapper));
+            _name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
         public void SendMessage(TestMessageLevel testMessageLevel, string message)
@@ -170,7 +170,7 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
     {
         private readonly Action<int> _report;
 
-        public SynchronousProgress(Action<int> report!!) => _report = report;
+        public SynchronousProgress(Action<int> report) => _report = report ?? throw new ArgumentNullException(nameof(report));
 
         public void Report(int value) => _report(value);
     }

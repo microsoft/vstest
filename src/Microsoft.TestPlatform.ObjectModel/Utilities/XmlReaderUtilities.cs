@@ -19,8 +19,9 @@ public static class XmlReaderUtilities
     /// Reads up to the next Element in the document.
     /// </summary>
     /// <param name="reader">Reader to move to the next element.</param>
-    public static void ReadToNextElement(this XmlReader reader!!)
+    public static void ReadToNextElement(this XmlReader reader)
     {
+        ValidateArg.NotNull(reader, nameof(reader));
         while (!reader.EOF && reader.Read() && reader.NodeType != XmlNodeType.Element)
         {
         }
@@ -30,8 +31,9 @@ public static class XmlReaderUtilities
     /// Skips the current element and moves to the next Element in the document.
     /// </summary>
     /// <param name="reader">Reader to move to the next element.</param>
-    public static void SkipToNextElement(this XmlReader reader!!)
+    public static void SkipToNextElement(this XmlReader reader)
     {
+        ValidateArg.NotNull(reader, nameof(reader));
         reader.Skip();
 
         if (reader.NodeType != XmlNodeType.Element)
@@ -45,8 +47,10 @@ public static class XmlReaderUtilities
     /// </summary>
     /// <param name="path">Path to the file.</param>
     /// <param name="reader">XmlReader for the file.</param>
-    public static void ReadToRootNode(XmlReader reader!!)
+    public static void ReadToRootNode(XmlReader reader)
     {
+        ValidateArg.NotNull(reader, nameof(reader));
+
         // Read to the root node.
         reader.ReadToNextElement();
 

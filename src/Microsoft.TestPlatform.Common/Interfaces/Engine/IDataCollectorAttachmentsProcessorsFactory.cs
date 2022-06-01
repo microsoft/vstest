@@ -39,10 +39,12 @@ internal class DataCollectorAttachmentProcessor : IDisposable
     /// </summary>
     public IDataCollectorAttachmentProcessor DataCollectorAttachmentProcessorInstance { get; private set; }
 
-    public DataCollectorAttachmentProcessor(string friendlyName, IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessor!!)
+    public DataCollectorAttachmentProcessor(string friendlyName, IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessor)
     {
-        FriendlyName = friendlyName.IsNullOrEmpty() ? throw new ArgumentException("Invalid FriendlyName", nameof(friendlyName)) : friendlyName;
-        DataCollectorAttachmentProcessorInstance = dataCollectorAttachmentProcessor;
+        FriendlyName = friendlyName.IsNullOrEmpty()
+            ? throw new ArgumentException($"'{nameof(friendlyName)}' cannot be null or empty.", nameof(friendlyName))
+            : friendlyName;
+        DataCollectorAttachmentProcessorInstance = dataCollectorAttachmentProcessor ?? throw new ArgumentNullException(nameof(dataCollectorAttachmentProcessor));
     }
 
     public void Dispose()

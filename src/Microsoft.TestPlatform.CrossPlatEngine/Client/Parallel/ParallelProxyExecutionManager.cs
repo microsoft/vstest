@@ -29,6 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
 {
     private readonly IDataSerializer _dataSerializer;
+    private readonly bool _isParallel;
     private readonly ParallelOperationManager<IProxyExecutionManager, ITestRunEventsHandler, TestRunCriteria> _parallelOperationManager;
     private readonly Dictionary<string, TestRuntimeProviderInfo> _sourceToTestHostProviderMap;
 
@@ -78,6 +79,7 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
     {
         _requestData = requestData;
         _dataSerializer = dataSerializer;
+        _isParallel = parallelLevel > 1;
         _parallelOperationManager = new(actualProxyManagerCreator, parallelLevel);
         _sourceToTestHostProviderMap = testHostProviders
             .SelectMany(provider => provider.SourceDetails.Select(s => new KeyValuePair<string, TestRuntimeProviderInfo>(s.Source, provider)))
@@ -189,11 +191,10 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
     {
         // We split the work to workloads that will run on each testhost, and add all of them
         // to a bag of work that needs to be processed. (The workloads are just
-        // a single source, or all test cases for a given source.)
+        // a single source, multiple sources, or all test cases for a given source.)
         //
         // For every workload we associated a given type of testhost that can run the work.
-        // This is important when we have shared testhosts. A shared testhost can re-use the same process
-        // to run more than one workload, as long as the provider is the same. 
+        // This is important when we have shared testhosts.
         //
         // We then start as many instances of testhost as we are allowed by parallel level,
         // and we start sending them work. Once any testhost is done processing a given workload,
@@ -210,36 +211,85 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         // is shared we try to find a workload that is appropriate for it. If we don't find any work that the
         // running testhost can do. Or if the testhost already exited (possibly because of crash), we start another one
         // and give it the next workload.
+
+
+        // List all the sources (dlls) we have and group them by their provider, so we can run either multiple sources
+        // on a single instance of the appropriate testhost (for non-paralell, shared),
+        // or each source in its own instance of the provider
+        // (for non-parallel, non-shared, and both parallel shared, and parallel non-shared).
+        //
+        // We prefer running more work in parallel when we can, because doing work on 10 testhosts in
+        // parallel is faster than doing the same work on 1 testhost. Even when the sources to discover
+        // contain just a few tests.
         List<ProviderSpecificWorkload<TestRunCriteria>> workloads = new();
         if (testRunCriteria.HasSpecificTests)
         {
             // We split test cases to their respective sources, and associate them with additional info about on
             // which type of provider they can run so we can later select the correct workload for the provider
             // if we already have a shared provider running, that can take more sources.
-            var testCasesPerSource = testRunCriteria.Tests.GroupBy(t => t.Source);
-            foreach (var group in testCasesPerSource)
-            {
-                var testHostProviderInfo = sourceToTestHostProviderMap[group.Key];
-                var runsettings = testHostProviderInfo.RunSettings;
-                // ToList because it is easier to see what is going on when debugging.
-                var testCases = group.ToList();
-                var updatedCriteria = CreateTestRunCriteriaFromTestCasesAndSettings(testCases, testRunCriteria, runsettings);
-                var workload = new ProviderSpecificWorkload<TestRunCriteria>(updatedCriteria, testHostProviderInfo);
-                workloads.Add(workload);
-            }
+            Dictionary<string, TestCase[]> sourceToTestCasesMap = testRunCriteria.Tests.GroupBy(t => t.Source).ToDictionary(k => k.Key, v => v.ToArray());
 
+            var sources = sourceToTestCasesMap.Keys;
+            // Each source is grouped with its respective provider.
+            var providerGroups = sources.Select(source => new ProviderSpecificWorkload<string>(source, sourceToTestHostProviderMap[source])).GroupBy(psw => psw.Provider);
+
+            foreach (var group in providerGroups)
+            {
+                var testhostProviderInfo = group.Key;
+
+                List<TestCase[]> testCaseBatches;
+                if (!_isParallel && testhostProviderInfo.Shared)
+                {
+                    // Create one big batch of testcases that will be single workload for single testhost.
+                    testCaseBatches = new List<TestCase[]> { group.SelectMany(w => sourceToTestCasesMap[w.Work]).ToArray() };
+                }
+                else
+                {
+                    // Create multiple testcase batches, each having set of testcases from single source,
+                    // so each testhost will end up running one source.
+                    testCaseBatches = group.Select(w => sourceToTestCasesMap[w.Work]).ToList();
+                }
+
+                foreach (var testCases in testCaseBatches)
+                {
+                    var runsettings = testhostProviderInfo.RunSettings;
+                    var updatedCriteria = CreateTestRunCriteriaFromTestCasesAndSettings(testCases, testRunCriteria, runsettings);
+                    var workload = new ProviderSpecificWorkload<TestRunCriteria>(updatedCriteria, testhostProviderInfo);
+                    workloads.Add(workload);
+                }
+            }
         }
         else
         {
-            // We associate every source with additional info about on which type of provider it can run so we can later
-            // select the correct workload for the provider if we already have a provider running, and it is shared.
-            foreach (var source in testRunCriteria.Sources)
+            var sources = testRunCriteria.Sources;
+            // Each source is grouped with its respective provider.
+            var providerGroups = sources
+                .Select(source => new ProviderSpecificWorkload<string>(source, sourceToTestHostProviderMap[source]))
+                .GroupBy(psw => psw.Provider);
+
+            foreach (var group in providerGroups)
             {
-                var testHostProviderInfo = sourceToTestHostProviderMap[source];
-                var runsettings = testHostProviderInfo.RunSettings;
-                var updatedCriteria = CreateTestRunCriteriaFromSourceAndSettings(new[] { source }, testRunCriteria, runsettings);
-                var workload = new ProviderSpecificWorkload<TestRunCriteria>(updatedCriteria, testHostProviderInfo);
-                workloads.Add(workload);
+                var testhostProviderInfo = group.Key;
+
+                List<string[]> sourceBatches;
+                if (!_isParallel && testhostProviderInfo.Shared)
+                {
+                    // Create one big source batch that will be single workload for single testhost.
+                    sourceBatches = new List<string[]> { group.Select(w => w.Work).ToArray() };
+                }
+                else
+                {
+                    // Create multiple source batches, each having one source, so each testhost will end up running one source.
+                    sourceBatches = group.Select(w => new[] { w.Work }).ToList();
+                }
+
+                foreach (var sourcesToRun in sourceBatches)
+                {
+                    var runsettings = testhostProviderInfo.RunSettings;
+                    var updatedCriteria = CreateTestRunCriteriaFromSourceAndSettings(sourcesToRun, testRunCriteria, runsettings);
+                    var workload = new ProviderSpecificWorkload<TestRunCriteria>(updatedCriteria, testhostProviderInfo);
+                    workloads.Add(workload);
+                }
             }
         }
 

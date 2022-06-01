@@ -31,15 +31,12 @@ public class BlameTestObject
     /// <param name="source">
     /// Test container source from which the test is discovered.
     /// </param>
-    public BlameTestObject(string fullyQualifiedName, Uri executorUri!!, string source)
+    public BlameTestObject(string fullyQualifiedName, Uri executorUri, string source)
     {
-        ValidateArg.NotNullOrEmpty(fullyQualifiedName, nameof(fullyQualifiedName));
-        ValidateArg.NotNullOrEmpty(source, nameof(source));
-
         Id = Guid.Empty;
-        FullyQualifiedName = fullyQualifiedName;
-        ExecutorUri = executorUri;
-        Source = source;
+        FullyQualifiedName = ValidateArg.NotNullOrEmpty(fullyQualifiedName, nameof(fullyQualifiedName));
+        ExecutorUri = executorUri ?? throw new ArgumentNullException(nameof(executorUri));
+        Source = ValidateArg.NotNullOrEmpty(source, nameof(source));
         IsCompleted = false;
     }
 

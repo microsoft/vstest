@@ -95,9 +95,9 @@ public class JobQueue<T> : IDisposable
     /// <param name="maxQueueSize">The max Queue Size.</param>
     /// <param name="enableBounds">The enable Bounds.</param>
     /// <param name="exceptionLogger">The exception Logger.</param>
-    public JobQueue(Action<T> processJob!!, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
+    public JobQueue(Action<T> processJob, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
     {
-        _processJob = processJob;
+        _processJob = processJob ?? throw new ArgumentNullException(nameof(processJob));
 
         if (string.IsNullOrWhiteSpace(displayName))
         {

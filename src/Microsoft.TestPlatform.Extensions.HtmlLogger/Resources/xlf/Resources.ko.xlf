@@ -17,6 +17,11 @@
         <target state="translated">LogFileName 및 LogFilePrefix 매개 변수는 함께 제공할 수 없습니다.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="CannotGenerateUniqueFilePath">
+        <source>Cannot generate a unique file name for name '{0}' on path '{1}'.</source>
+        <target state="translated">‘{1}’ 경로에서 ‘{0}’ 이름에 대한 고유 파일 이름을 생성할 수 없습니다.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

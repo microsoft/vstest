@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -24,11 +23,12 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
 {
     private readonly IDataSerializer _dataSerializer;
     private readonly DiscoveryDataAggregator _dataAggregator;
+    private readonly bool _isParallel;
     private readonly ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler2, DiscoveryCriteria> _parallelOperationManager;
     private readonly Dictionary<string, TestRuntimeProviderInfo> _sourceToTestHostProviderMap;
     private int _discoveryCompletedClients;
     private int _availableTestSources = -1;
-
+    private int _availableWorkloads;
     private bool _skipDefaultAdapters;
     private readonly IRequestData _requestData;
 
@@ -60,6 +60,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         _requestData = requestData;
         _dataSerializer = dataSerializer;
         _dataAggregator = dataAggregator;
+        _isParallel = parallelLevel > 1;
         _parallelOperationManager = new(actualProxyManagerCreator, parallelLevel);
         _sourceToTestHostProviderMap = testHostProviders
             .SelectMany(provider => provider.SourceDetails.Select(s => new KeyValuePair<string, TestRuntimeProviderInfo>(s.Source, provider)))
@@ -75,10 +76,14 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
     }
 
     /// <inheritdoc/>
-    public void DiscoverTests(DiscoveryCriteria discoveryCriteria!!, ITestDiscoveryEventsHandler2 eventHandler!!)
+    public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
     {
+        ValidateArg.NotNull(discoveryCriteria, nameof(discoveryCriteria));
+        ValidateArg.NotNull(eventHandler, nameof(eventHandler));
+
         var workloads = SplitToWorkloads(discoveryCriteria, _sourceToTestHostProviderMap);
-        _availableTestSources = workloads.Count;
+        _availableTestSources = workloads.SelectMany(w => w.Work.Sources).Count();
+        _availableWorkloads = workloads.Count();
 
         EqtTrace.Verbose("ParallelProxyDiscoveryManager.DiscoverTests: Start discovery. Total sources: " + _availableTestSources);
 
@@ -135,7 +140,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         var partiallyDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count;
         var fullyDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count;
         var expectedCount = _availableTestSources;
-        Debug.Assert(notDiscoveredCount + partiallyDiscoveredCount + fullyDiscoveredCount == expectedCount,
+        TPDebug.Assert(notDiscoveredCount + partiallyDiscoveredCount + fullyDiscoveredCount == expectedCount,
             $"Total count of sources ({expectedCount}) should match the count of sources with status not discovered ({notDiscoveredCount}), partially discovered ({partiallyDiscoveredCount}) and fully discovered ({fullyDiscoveredCount}).");
 #endif
 
@@ -148,7 +153,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
             _discoveryCompletedClients++;
 
             // If there are no more sources/testcases, a parallel executor is truly done with discovery
-            allDiscoverersCompleted = _discoveryCompletedClients == _availableTestSources;
+            allDiscoverersCompleted = _discoveryCompletedClients == _availableWorkloads;
 
             EqtTrace.Verbose("ParallelProxyDiscoveryManager.HandlePartialDiscoveryComplete: Total completed clients = {0}, Discovery complete = {1}, Aborted = {2}, Abort requested: {3}.", _discoveryCompletedClients, allDiscoverersCompleted, isAborted, IsAbortRequested);
         }
@@ -182,21 +187,47 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
 
     private List<ProviderSpecificWorkload<DiscoveryCriteria>> SplitToWorkloads(DiscoveryCriteria discoveryCriteria, Dictionary<string, TestRuntimeProviderInfo> sourceToTestHostProviderMap)
     {
+        var sources = discoveryCriteria.Sources;
+        // Each source is grouped with its respective provider.
+        var providerGroups = sources
+            .Select(source => new ProviderSpecificWorkload<string>(source, sourceToTestHostProviderMap[source]))
+            .GroupBy(psw => psw.Provider);
+
         List<ProviderSpecificWorkload<DiscoveryCriteria>> workloads = new();
-        foreach (var source in discoveryCriteria.Sources)
+        foreach (var group in providerGroups)
         {
-            var testHostProviderInfo = sourceToTestHostProviderMap[source];
-            var runsettingsXml = testHostProviderInfo.RunSettings;
-            var updatedDiscoveryCriteria = new ProviderSpecificWorkload<DiscoveryCriteria>(NewDiscoveryCriteriaFromSourceAndSettings(source, discoveryCriteria, runsettingsXml), testHostProviderInfo);
-            workloads.Add(updatedDiscoveryCriteria);
+            var testhostProviderInfo = group.Key;
+            // If the run is not parallel and the host is shared, put all testcases on single testhost.
+            // For parallel we prefer to run each source on its own host because we don't know how big the source is
+            // (how many tests there are to discover), and running 10 sources on 10 parallel testhosts is faster
+            // in almost all cases than running 10 sources on 1 testhost.
+            List<string[]> sourceBatches;
+            if (!_isParallel && testhostProviderInfo.Shared)
+            {
+                // Create one big source batch that will be single workload for single testhost.
+                sourceBatches = new List<string[]> { group.Select(w => w.Work).ToArray() };
+            }
+            else
+            {
+                // Create multiple source batches, each having one source, so each testhost will end up running one source.
+                sourceBatches = group.Select(w => new[] { w.Work }).ToList();
+            }
+
+            foreach (var sourcesToDiscover in sourceBatches)
+            {
+                var runsettings = testhostProviderInfo.RunSettings;
+                var updatedCriteria = NewDiscoveryCriteriaFromSourceAndSettings(sourcesToDiscover, discoveryCriteria, runsettings);
+                var workload = new ProviderSpecificWorkload<DiscoveryCriteria>(updatedCriteria, testhostProviderInfo);
+                workloads.Add(workload);
+            }
         }
 
         return workloads;
 
-        static DiscoveryCriteria NewDiscoveryCriteriaFromSourceAndSettings(string source, DiscoveryCriteria discoveryCriteria, string runsettingsXml)
+        static DiscoveryCriteria NewDiscoveryCriteriaFromSourceAndSettings(IEnumerable<string> sources, DiscoveryCriteria discoveryCriteria, string runsettingsXml)
         {
             var criteria = new DiscoveryCriteria(
-                new[] { source },
+                sources,
                 discoveryCriteria.FrequencyOfDiscoveredTestsEvent,
                 discoveryCriteria.DiscoveredTestEventTimeout,
                 runsettingsXml,

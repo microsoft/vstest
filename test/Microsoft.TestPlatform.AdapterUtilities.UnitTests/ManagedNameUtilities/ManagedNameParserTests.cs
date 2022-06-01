@@ -28,7 +28,7 @@ public class ManagedNameParserTests
     [TestMethod]
     public void ParseMethodName()
     {
-        (string, int, string[]) Parse(string managedMethodName)
+        (string, int, string[]?) Parse(string managedMethodName)
         {
             ManagedNameParser.ParseManagedMethodName(managedMethodName, out var method, out var arity, out var parameterTypes);
             return (method, arity, parameterTypes);
@@ -55,7 +55,7 @@ public class ManagedNameParserTests
     [TestMethod]
     public void ParseInvalidMethodName()
     {
-        static (string, int, string[]) Parse(string methodName)
+        static (string, int, string[]?) Parse(string methodName)
         {
             ManagedNameParser.ParseManagedMethodName(methodName, out var method, out var arity, out var parameterTypes);
             return (method, arity, parameterTypes);
