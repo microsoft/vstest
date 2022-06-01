@@ -84,6 +84,8 @@ public class JobQueue<T> : IDisposable
     /// </summary>
     private readonly Action<string> _exceptionLogger;
 
+    public bool IsPaused { get; private set; }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="JobQueue{T}"/> class.
     /// </summary>
@@ -155,6 +157,7 @@ public class JobQueue<T> : IDisposable
         CheckDisposed();
 
         // Do not allow any jobs to be processed.
+        IsPaused = true;
         _queueProcessing.Reset();
     }
 
@@ -167,6 +170,7 @@ public class JobQueue<T> : IDisposable
 
         // Resume processing of jobs.
         _queueProcessing.Set();
+        IsPaused = false;
     }
 
     /// <summary>
