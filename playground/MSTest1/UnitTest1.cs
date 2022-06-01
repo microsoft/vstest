@@ -7,22 +7,10 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable disable
 
 namespace MSTest1;
-
-[TestClass]
-public class UnitTest1
-{
-    [TestMethod]
-    public void TestMethod1()
-    {
-        // Thread.Sleep(1000);
-    }
-}
-
 [ExtensionUri("uri://myadapter")]
 public class Adapter : ITestExecutor2, ITestDiscoverer
 {
