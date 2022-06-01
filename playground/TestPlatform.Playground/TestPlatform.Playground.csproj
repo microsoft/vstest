@@ -10,7 +10,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks Condition=" '$(OS)' == 'WINDOWS_NT' ">$(TargetFrameworks);net472</TargetFrameworks>
+    <TargetFrameworks>$(TargetFrameworks);net472</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
