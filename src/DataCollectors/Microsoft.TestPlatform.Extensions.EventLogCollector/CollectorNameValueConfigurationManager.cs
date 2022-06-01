@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Xml;
 
+using Microsoft.VisualStudio.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
@@ -50,7 +51,7 @@ internal class CollectorNameValueConfigurationManager
 
             // Get the setting name
             string settingName = settingElement.GetAttribute(SettingNameAttributeName);
-            if (string.IsNullOrWhiteSpace(settingName))
+            if (settingName.IsNullOrWhiteSpace())
             {
                 EqtTrace.Warning("Skipping configuration setting due to missing setting name");
                 continue;
@@ -58,7 +59,7 @@ internal class CollectorNameValueConfigurationManager
 
             // Get the setting value
             string settingValue = settingElement.GetAttribute(SettingValueAttributeName);
-            if (string.IsNullOrWhiteSpace(settingValue))
+            if (settingValue.IsNullOrWhiteSpace())
             {
                 EqtTrace.Warning("Skipping configuration setting '{0}' due to missing value", settingName);
                 continue;
