@@ -31,24 +31,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal;
 [TestClass]
 public class ConsoleLoggerTests
 {
-    private Mock<IRequestData> _mockRequestData;
-    private Mock<IMetricsCollection> _mockMetricsCollection;
-    private Mock<IOutput> _mockOutput;
-    private ConsoleLogger _consoleLogger;
-    private Mock<IProgressIndicator> _mockProgressIndicator;
-    private Mock<IFeatureFlag> _mockFeatureFlag;
+    private readonly Mock<IRequestData> _mockRequestData;
+    private readonly Mock<IMetricsCollection> _mockMetricsCollection;
+    private readonly Mock<IOutput> _mockOutput;
+    private readonly ConsoleLogger _consoleLogger;
+    private readonly Mock<IProgressIndicator> _mockProgressIndicator;
+    private readonly Mock<IFeatureFlag> _mockFeatureFlag;
 
     private const string PassedTestIndicator = "  Passed ";
     private const string FailedTestIndicator = "  Failed ";
     private const string SkippedTestIndicator = "  Skipped ";
 
-    [TestInitialize]
-    public void Initialize()
+    public ConsoleLoggerTests()
     {
         RunTestsArgumentProcessorTests.SetupMockExtensions();
 
         // Setup Mocks and other dependencies
-        Setup();
+        _mockRequestData = new Mock<IRequestData>();
+        _mockMetricsCollection = new Mock<IMetricsCollection>();
+        _mockFeatureFlag = new Mock<IFeatureFlag>();
+        _mockFeatureFlag.Setup(x => x.IsSet(It.IsAny<string>())).Returns(false);
+        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
+
+        _mockOutput = new Mock<IOutput>();
+        _mockProgressIndicator = new Mock<IProgressIndicator>();
+        _consoleLogger = new ConsoleLogger(_mockOutput.Object, _mockProgressIndicator.Object, _mockFeatureFlag.Object);
     }
 
     [TestMethod]
@@ -83,7 +90,7 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeWithParametersShouldThrowExceptionIfParametersIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, (Dictionary<string, string>)null));
+        Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, (Dictionary<string, string>?)null));
     }
 
     [TestMethod]
@@ -1229,19 +1236,6 @@ public class ConsoleLoggerTests
     private TestCase CreateTestCase(string testCaseName)
     {
         return new TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");
-    }
-
-    private void Setup()
-    {
-        _mockRequestData = new Mock<IRequestData>();
-        _mockMetricsCollection = new Mock<IMetricsCollection>();
-        _mockFeatureFlag = new Mock<IFeatureFlag>();
-        _mockFeatureFlag.Setup(x => x.IsSet(It.IsAny<string>())).Returns(false);
-        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
-
-        _mockOutput = new Mock<IOutput>();
-        _mockProgressIndicator = new Mock<IProgressIndicator>();
-        _consoleLogger = new ConsoleLogger(_mockOutput.Object, _mockProgressIndicator.Object, _mockFeatureFlag.Object);
     }
 
     private List<ObjectModel.TestResult> GetTestResultsObject()
