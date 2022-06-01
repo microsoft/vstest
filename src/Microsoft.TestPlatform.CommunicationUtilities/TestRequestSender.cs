@@ -779,7 +779,7 @@ internal class MessageConverter
         return new AttachDebuggerInfo
         {
             ProcessId = attachDebuggerPayload.ProcessID,
-            TargetFramework = attachDebuggerPayload?.TargetFramework,
+            TargetFramework = Framework.FromString(attachDebuggerPayload?.TargetFramework),
         };
     }
 

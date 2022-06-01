@@ -267,7 +267,7 @@ public class CustomTestHostTests : AcceptanceTestBase
 
         public List<AttachDebuggerInfo> AttachDebuggerInfos { get; } = new();
 
-        public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
+        public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken)
         {
             AttachDebuggerInfos.Add(attachDebuggerInfo);
 
@@ -280,9 +280,7 @@ public class CustomTestHostTests : AcceptanceTestBase
             {
                 ProcessId = pid,
                 TargetFramework = null,
-                Version = null,
-                CancellationToken = CancellationToken.None
-            });
+            }, CancellationToken.None);
         }
 
         public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
@@ -291,9 +289,7 @@ public class CustomTestHostTests : AcceptanceTestBase
             {
                 ProcessId = pid,
                 TargetFramework = null,
-                Version = null,
-                CancellationToken = cancellationToken
-            });
+            }, CancellationToken.None);
         }
 
         public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)

@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Threading;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
 /// <summary>
-/// Interface defining contract for custom test host implementations
+/// Interface defining contract for custom test host launcher implementation.
 /// </summary>
 public interface ITestHostLauncher2 : ITestHostLauncher
 {
@@ -25,19 +24,4 @@ public interface ITestHostLauncher2 : ITestHostLauncher
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns><see cref="true"/> if the debugger was successfully attached to the requested process, <see cref="false"/> otherwise.</returns>
     bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken);
-}
-
-public interface ITestHostLauncher3 : ITestHostLauncher2
-{
-    bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken);
-}
-
-public class AttachDebuggerInfo
-{
-    public AttachDebuggerInfo()
-    {
-
-    }
-    public int ProcessId { get; set; }
-    public Framework? TargetFramework { get; set; }
 }

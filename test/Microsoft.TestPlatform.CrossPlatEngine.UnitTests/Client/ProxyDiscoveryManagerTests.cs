@@ -52,6 +52,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             _mockRequestData.Object,
             _mockRequestSender.Object,
             _mockTestHostManager.Object,
+            Framework.DefaultFramework,
             _discoveryDataAggregator,
             _mockDataSerializer.Object,
             _mockFileHelper.Object);

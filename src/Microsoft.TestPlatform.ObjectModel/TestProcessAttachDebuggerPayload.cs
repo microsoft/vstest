@@ -28,7 +28,7 @@ public class TestProcessAttachDebuggerPayload
 
     [DataMember]
     // Added in version 7.
-    public Framework? TargetFramework { get; set; }
+    public string? TargetFramework { get; set; }
 }
 
 [DataContract]

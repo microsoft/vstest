@@ -945,4 +945,17 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebugger
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.Version.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.ITestHostLauncher3
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.ITestHostLauncher3.AttachDebuggerToProcess(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo attachDebuggerInfo) -> bool
-
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IInternalTestRunEventsHandler
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IInternalTestRunEventsHandler.AttachDebuggerToProcess(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo attachDebuggerInfo) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IInternalTestRunEventsHandler.HandleTestRunComplete(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs testRunCompleteArgs, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunChangedEventArgs lastChunkArgs, System.Collections.Generic.ICollection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet> runContextAttachments, System.Collections.Generic.ICollection<string> executorUris) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IInternalTestRunEventsHandler.HandleTestRunStatsChange(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunChangedEventArgs testRunChangedArgs) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IInternalTestRunEventsHandler.LaunchProcessWithDebuggerAttached(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessStartInfo testProcessStartInfo) -> int
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.ITestHostLauncher3.AttachDebuggerToProcess(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo attachDebuggerInfo, System.Threading.CancellationToken cancellationToken) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload.EditorAttachDebuggerPayload() -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload.ProcessID.get -> int
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload.ProcessID.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload.TargetFramework.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload.TargetFramework.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessAttachDebuggerPayload.TargetFramework.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessAttachDebuggerPayload.TargetFramework.set -> void

@@ -9,8 +9,10 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
@@ -99,7 +101,22 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <inheritdoc />
     public bool AttachDebuggerToProcess(int pid)
     {
-        return ((ITestRunEventsHandler2)_testRunEventsHandler).AttachDebuggerToProcess(pid);
+
+        var fmw =
+#if NETSTANDARD1_3
+                Framework.DefaultFramework.ToString();
+#elif NETSTANDARD
+            System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+#elif NETFRAMEWORK
+               Framework.DefaultFramework.ToString();
+#endif
+
+        var attachDebuggerInfo = new AttachDebuggerInfo
+        {
+            ProcessId = pid,
+            TargetFramework = Framework.FromString(fmw),
+        };
+        return _testRunEventsHandler.AttachDebuggerToProcess(attachDebuggerInfo);
     }
 
     public void Dispose()

@@ -355,9 +355,8 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
     /// </summary>
     /// <param name="proxyExecutionManager">Proxy execution manager instance.</param>
     /// <returns>True, if execution triggered</returns>
-    private void StartTestRunOnConcurrentManager(IProxyExecutionManager proxyExecutionManager, IInternalTestRunEventsHandler eventHandler, ProviderSpecificWorkload<TestRunCriteria> workload)
+    private void StartTestRunOnConcurrentManager(IProxyExecutionManager proxyExecutionManager, IInternalTestRunEventsHandler eventHandler, TestRunCriteria testRunCriteria)
     {
-        var testRunCriteria = workload.Work;
         if (testRunCriteria != null)
         {
             if (!proxyExecutionManager.IsInitialized)

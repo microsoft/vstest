@@ -61,6 +61,7 @@ internal class Program
             ";
 
         var sources = new[] {
+            @"C:\p\vstest\playground\MSTest1\bin\Debug\net472\MSTest1.TestAdapter.dll",
 
           // @"C:\t\TestProject13_\TestProject1\bin\Debug\net48\TestProject1.dll",
 
@@ -71,7 +72,7 @@ internal class Program
 
 
 ////            // net6
-        @"C:\t\ParallelDiscovery2\ReproNetCore\Test1\bin\Debug\net6.0\Test1.dll",
+       // @"C:\t\ParallelDiscovery2\ReproNetCore\Test1\bin\Debug\net6.0\Test1.dll",
 //@"C:\t\ParallelDiscovery2\ReproNetCore\Test7\bin\Debug\net6.0\Test7.dll",
 //@"C:\t\ParallelDiscovery2\ReproNetCore\Test2\bin\Debug\net6.0\Test2.dll",
 //@"C:\t\ParallelDiscovery2\ReproNetCore\Test6\bin\Debug\net6.0\Test6.dll",
@@ -149,6 +150,7 @@ internal class Program
         Console.WriteLine($"Discovery done in {sw.ElapsedMilliseconds} ms");
         sw.Restart();
         r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
         var rd = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery: {dd} ms, Run: {rd} ms, Total: {dd + rd} ms");
     }

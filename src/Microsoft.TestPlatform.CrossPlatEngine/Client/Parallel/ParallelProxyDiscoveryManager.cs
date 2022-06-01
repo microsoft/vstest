@@ -245,9 +245,8 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
     /// Each concurrent discoverer calls this method, once its completed working on previous data
     /// </summary>
     /// <param name="ProxyDiscoveryManager">Proxy discovery manager instance.</param>
-    private void DiscoverTestsOnConcurrentManager(IProxyDiscoveryManager proxyDiscoveryManager, ITestDiscoveryEventsHandler2 eventHandler, ProviderSpecificWorkload<DiscoveryCriteria> workload)
+    private void DiscoverTestsOnConcurrentManager(IProxyDiscoveryManager proxyDiscoveryManager, ITestDiscoveryEventsHandler2 eventHandler, DiscoveryCriteria discoveryCriteria)
     {
-        var discoveryCriteria = workload.Work;
         // Kick off another discovery task for the next source
         Task.Run(() =>
             {

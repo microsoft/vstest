@@ -294,7 +294,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
             MessageType.AttachDebugger,
             new TestProcessAttachDebuggerPayload(attachDebuggerInfo.ProcessId)
             {
-                TargetFramework = attachDebuggerInfo.TargetFramework,
+                TargetFramework = attachDebuggerInfo.TargetFramework.ToString(),
             },
             _protocolVersion);
         SendData(data);

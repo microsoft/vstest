@@ -16,8 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
+    <PackageReference Include="Microsoft.CodeCoverage" Version="17.2.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,7 +26,7 @@
     <ProjectReference Include="..\..\src\testhost.x86\testhost.x86.csproj" />
     <ProjectReference Include="..\..\src\testhost\testhost.csproj" />
     <ProjectReference Include="..\..\src\vstest.console\vstest.console.csproj" />
-    <ProjectReference Include="..\MSTest1\MSTest1.csproj" />
+    <ProjectReference Include="..\MSTest1\MSTest1.TestAdapter.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT' ">
     <Reference Include="System" />

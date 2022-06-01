@@ -23,14 +23,14 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
 [TestClass]
 public class DataCollectionTestRunEventsHandlerTests
 {
-    private readonly Mock<ITestRunEventsHandler> _baseTestRunEventsHandler;
+    private readonly Mock<IInternalTestRunEventsHandler> _baseTestRunEventsHandler;
     private DataCollectionTestRunEventsHandler _testRunEventHandler;
     private readonly Mock<IProxyDataCollectionManager> _proxyDataCollectionManager;
     private readonly Mock<IDataSerializer> _mockDataSerializer;
 
     public DataCollectionTestRunEventsHandlerTests()
     {
-        _baseTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        _baseTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
         _proxyDataCollectionManager = new Mock<IProxyDataCollectionManager>();
         _mockDataSerializer = new Mock<IDataSerializer>();
         _testRunEventHandler = new DataCollectionTestRunEventsHandler(_baseTestRunEventsHandler.Object, _proxyDataCollectionManager.Object, _mockDataSerializer.Object, CancellationToken.None);

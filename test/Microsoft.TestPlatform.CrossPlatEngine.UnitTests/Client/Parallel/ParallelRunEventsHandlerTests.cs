@@ -24,7 +24,7 @@ public class ParallelRunEventsHandlerTests
 {
     private readonly ParallelRunEventsHandler _parallelRunEventsHandler;
     private readonly Mock<IProxyExecutionManager> _mockProxyExecutionManager;
-    private readonly Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
+    private readonly Mock<IInternalTestRunEventsHandler> _mockTestRunEventsHandler;
     private readonly Mock<IParallelProxyExecutionManager> _mockParallelProxyExecutionManager;
     private readonly Mock<IDataSerializer> _mockDataSerializer;
     private readonly Mock<IRequestData> _mockRequestData;
@@ -33,7 +33,7 @@ public class ParallelRunEventsHandlerTests
     public ParallelRunEventsHandlerTests()
     {
         _mockProxyExecutionManager = new Mock<IProxyExecutionManager>();
-        _mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        _mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
         _mockParallelProxyExecutionManager = new Mock<IParallelProxyExecutionManager>();
         _mockDataSerializer = new Mock<IDataSerializer>();
         _mockRequestData = new Mock<IRequestData>();

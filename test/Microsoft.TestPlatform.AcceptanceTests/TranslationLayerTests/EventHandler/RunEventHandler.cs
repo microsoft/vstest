@@ -14,7 +14,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 /// <inheritdoc />
-public class RunEventHandler : ITestRunEventsHandler2
+public class RunEventHandler : ITestRunEventsHandler
 {
     /// <summary>
     /// Gets the test results.
@@ -115,11 +115,5 @@ public class RunEventHandler : ITestRunEventsHandler2
     {
         // No op
         return -1;
-    }
-
-    public virtual bool AttachDebuggerToProcess(int pid)
-    {
-        // No op
-        return true;
     }
 }

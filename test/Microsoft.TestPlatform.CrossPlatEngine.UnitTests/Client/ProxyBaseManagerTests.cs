@@ -106,6 +106,7 @@ public class ProxyBaseManagerTests
             _mockRequestData.Object,
             _testRequestSender,
             _mockTestHostManager.Object,
+            Framework.DefaultFramework,
             _discoveryDataAggregator,
             _mockDataSerializer.Object,
             _mockFileHelper.Object);
@@ -118,7 +119,7 @@ public class ProxyBaseManagerTests
         SetupAndInitializeTestRequestSender();
         _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
         var testExecutionManager = new ProxyExecutionManager(_mockRequestData.Object, _testRequestSender,
-            _mockTestHostManager.Object, _mockDataSerializer.Object, _mockFileHelper.Object);
+            _mockTestHostManager.Object, Framework.DefaultFramework, _mockDataSerializer.Object, _mockFileHelper.Object);
 
         return testExecutionManager;
     }
