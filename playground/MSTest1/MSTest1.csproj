@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'WINDOWS_NT' ">$(TargetFrameworks);net472;net5.0</TargetFrameworks>
+    <TargetFrameworks>$(TargetFrameworks);net472;net5.0</TargetFrameworks>
     <Prefer32Bit>false</Prefer32Bit>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
