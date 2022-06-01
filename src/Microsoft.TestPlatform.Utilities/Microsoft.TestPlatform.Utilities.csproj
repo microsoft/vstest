@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
   </PropertyGroup>
+  <Import Project="..\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems" Label="Shared" />
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.Utilities</AssemblyName>
@@ -46,11 +47,6 @@
     <!-- Framework specific API -->
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\..\NullableAttributes.cs" Link="NullableAttributes.cs" />
-    <Compile Include="..\..\StringUtils.cs" Link="StringUtils.cs" />
-    <Compile Include="..\..\TPDebug.cs" Link="TPDebug.cs" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

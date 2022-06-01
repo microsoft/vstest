@@ -7,7 +7,6 @@ using System.Xml.XPath;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.Utilities.UnitTests;
@@ -29,7 +28,7 @@ public class XmlUtilitiesTests
         var settingsXml = @"<RunSettings></RunSettings>";
         var xmlDocument = GetXmlDocument(settingsXml);
 
-        Assert.ThrowsException<XPathException>(() => XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), null!));
+        Assert.ThrowsException<XPathException>(() => XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator()!, null!));
     }
 
     [TestMethod]
@@ -38,7 +37,7 @@ public class XmlUtilitiesTests
         var settingsXml = @"<RunSettings></RunSettings>";
         var xmlDocument = GetXmlDocument(settingsXml);
 
-        Assert.ThrowsException<XPathException>(() => XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), @"Rs\r"));
+        Assert.ThrowsException<XPathException>(() => XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator()!, @"Rs\r"));
     }
 
     [TestMethod]
@@ -47,7 +46,7 @@ public class XmlUtilitiesTests
         var settingsXml = @"<RunSettings></RunSettings>";
         var xmlDocument = GetXmlDocument(settingsXml);
 
-        Assert.IsNull(XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), @"/RunSettings/RunConfiguration"));
+        Assert.IsNull(XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator()!, @"/RunSettings/RunConfiguration"));
     }
 
     [TestMethod]
@@ -56,7 +55,7 @@ public class XmlUtilitiesTests
         var settingsXml = @"<RunSettings><RC>abc</RC></RunSettings>";
         var xmlDocument = GetXmlDocument(settingsXml);
 
-        Assert.AreEqual("abc", XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), @"/RunSettings/RC"));
+        Assert.AreEqual("abc", XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator()!, @"/RunSettings/RC"));
     }
 
     #endregion
