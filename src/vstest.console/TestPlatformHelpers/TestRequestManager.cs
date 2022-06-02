@@ -47,6 +47,9 @@ internal class TestRequestManager : ITestRequestManager
 {
     private static ITestRequestManager s_testRequestManagerInstance;
 
+    // Defines the default architecture to be used for AnyCPU or non-dll sources. This is just temporary, and unsupported, DO NOT use.
+    private static readonly PlatformArchitecture? VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU = Enum.TryParse<PlatformArchitecture>(Environment.GetEnvironmentVariable(nameof(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU)), out var arch) ? arch : null;
+
     private const int RunRequestTimeout = 5000;
 
     private readonly ITestPlatform _testPlatform;
@@ -734,7 +737,7 @@ internal class TestRequestManager : ITestRequestManager
                 defaultArchitecture = GetDefaultArchitecture(runConfiguration);
             }
 
-            // For all other scenarios we keep the old default Architecture.X86.
+            // Other scenarios, most notably .NET Framework with MultiTFM disabled, will use the old default X86 architecture.
         }
 
         EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()} OperatingSystem: {_environment.OperatingSystem}.");
@@ -808,7 +811,7 @@ internal class TestRequestManager : ITestRequestManager
 
         Architecture GetDefaultArchitecture(RunConfiguration runConfiguration)
             => RunSettingsHelper.Instance.IsDefaultTargetArchitecture
-                ? TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture())
+                ? TranslateToArchitecture(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU ?? _processHelper.GetCurrentProcessArchitecture())
                 : runConfiguration.TargetPlatform;
 
         static Architecture TranslateToArchitecture(PlatformArchitecture targetArchitecture)
