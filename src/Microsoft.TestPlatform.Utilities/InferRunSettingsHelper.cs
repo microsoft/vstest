@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -434,7 +435,7 @@ public class InferRunSettingsHelper
     public static void UpdateTargetPlatform(XmlDocument runSettingsDocument, string platform, bool overwrite = false)
         => AddNodeIfNotPresent(runSettingsDocument, TargetPlatformNodePath, TargetPlatformNodeName, platform, overwrite);
 
-    public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out string? deviceXml)
+    public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, [NotNullWhen(true)] out string? deviceXml)
     {
         ValidateArg.NotNull(runSettingsNavigator, nameof(runSettingsNavigator));
 

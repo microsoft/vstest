@@ -5,8 +5,6 @@ using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
 
 public static class Constants
