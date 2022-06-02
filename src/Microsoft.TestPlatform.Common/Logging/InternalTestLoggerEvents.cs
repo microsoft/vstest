@@ -316,8 +316,24 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// </summary>
     private void SafeInvokeAsync(Func<MulticastDelegate> eventHandlersFactory, EventArgs args, int size, string traceDisplayName)
     {
+        // If you are wondering why this is taking a Func<MulticastDelegate> rather than just a MulticastDelegate it is because
+        // taking just that will capture only the subscribers that were present at the time we passed the delegate into this
+        // method. Which means that if there were no subscribers we will capture null, and later when the queue is unpaused
+        // we won't call any logger that subscribed while the queue was paused.
+
         ValidateArg.NotNull(eventHandlersFactory, nameof(eventHandlersFactory));
         ValidateArg.NotNull(args, nameof(args));
+
+        // When the logger event queue is paused we want to enqueue the work because maybe there are no
+        // loggers yet, and there are maybe errors that the loggers should report once they subscribe.
+        // When the queue is running, don't bother adding tasks to the queue when there are no subscribers
+        // because there is very slim chance that a new logger will be added in the few milliseconds that will
+        // pass until we process the task, and it just puts pressure on the queue. If this proves to be a problem
+        // we have a race condition, and that side should pause the queue while it adds all the loggers and then resume.
+        if (!_loggerEventQueue.IsPaused && eventHandlersFactory() == null)
+        {
+            return;
+        }
 
         // Invoke the handlers on a background thread.
         _loggerEventQueue.QueueJob(
