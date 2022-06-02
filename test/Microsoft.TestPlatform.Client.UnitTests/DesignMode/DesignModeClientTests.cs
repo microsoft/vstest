@@ -129,7 +129,8 @@ public class DesignModeClientTests
     [TestMethod]
     public void DesignModeClientDuringConnectShouldHighestCommonVersionWhenReceivedVersionIsGreaterThanSupportedVersion()
     {
-        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 6 };
+        var reallyHighProtocolVersion = 10000;
+        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = reallyHighProtocolVersion };
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);

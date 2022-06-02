@@ -436,8 +436,9 @@ public class TestEngine : ITestEngine
             var testRuntimeProvider = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runsettingsXml, sources);
 
             // Initialize here, because Shared is picked up from the instance, and it can be set during initalization.
-            testRuntimeProvider.Initialize(TestSessionMessageLogger.Instance, runsettingsXml);
-            var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider.GetType(), testRuntimeProvider.Shared, runsettingsXml, sourceDetails: runConfiguration.ToList());
+            testRuntimeProvider?.Initialize(TestSessionMessageLogger.Instance, runsettingsXml);
+            // If the type is null, we throw in ThrowExceptionIfAnyTestHostManagerIsNullOrNoneAreFound
+            var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider?.GetType(), testRuntimeProvider?.Shared ?? false, runsettingsXml, sourceDetails: runConfiguration.ToList());
 
             // Outputting the instance, because the code for in-process run uses it, and we don't want to resolve it another time.
             mostRecentlyCreatedInstance = testRuntimeProvider;

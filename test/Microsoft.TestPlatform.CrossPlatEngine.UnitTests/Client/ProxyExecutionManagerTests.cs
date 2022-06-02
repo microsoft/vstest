@@ -761,7 +761,8 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
             var mockProxyOperationManager = new Mock<ProxyOperationManager>(
                 _mockRequestData.Object,
                 _mockRequestSender.Object,
-                _mockTestHostManager.Object);
+                _mockTestHostManager.Object,
+                null);
             mockTestSessionPool.Setup(
                     tsp => tsp.TryTakeProxy(
                         testSessionInfo,

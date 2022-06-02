@@ -1445,10 +1445,10 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 switch (customHostLauncher)
                 {
                     case ITestHostLauncher3 launcher3:
-                        launcher3.AttachDebuggerToProcess(new AttachDebuggerInfo { ProcessId = attachDebuggerPayload.ProcessID, TargetFramework = Framework.FromString(attachDebuggerPayload.TargetFramework) }, CancellationToken.None);
+                        ackPayload.Attached = launcher3.AttachDebuggerToProcess(new AttachDebuggerInfo { ProcessId = attachDebuggerPayload.ProcessID, TargetFramework = attachDebuggerPayload.TargetFramework }, CancellationToken.None);
                         break;
                     case ITestHostLauncher2 launcher2:
-                        launcher2.AttachDebuggerToProcess(attachDebuggerPayload.ProcessID);
+                        ackPayload.Attached = launcher2.AttachDebuggerToProcess(attachDebuggerPayload.ProcessID);
                         break;
                     default:
                         // TODO: Maybe we should do something, but the rest of the story is broken, so it's better to not block users.
@@ -1464,10 +1464,10 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 switch (customHostLauncher)
                 {
                     case ITestHostLauncher3 launcher3:
-                        launcher3.AttachDebuggerToProcess(new AttachDebuggerInfo { ProcessId = pid }, CancellationToken.None);
+                        ackPayload.Attached = launcher3.AttachDebuggerToProcess(new AttachDebuggerInfo { ProcessId = pid }, CancellationToken.None);
                         break;
                     case ITestHostLauncher2 launcher2:
-                        launcher2.AttachDebuggerToProcess(pid);
+                        ackPayload.Attached = launcher2.AttachDebuggerToProcess(pid);
                         break;
                     default:
                         // TODO: Maybe we should do something, but the rest of the story is broken, so it's better to not block users.

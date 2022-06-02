@@ -114,7 +114,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
         var attachDebuggerInfo = new AttachDebuggerInfo
         {
             ProcessId = pid,
-            TargetFramework = Framework.FromString(fmw),
+            TargetFramework = fmw,
         };
         return _testRunEventsHandler.AttachDebuggerToProcess(attachDebuggerInfo);
     }

@@ -62,7 +62,7 @@ public class DataCollectionTestRunEventsHandlerTests
 
         _testRunEventHandler.HandleRawMessage(string.Empty);
         _proxyDataCollectionManager.Verify(
-            dcm => dcm.AfterTestRunEnd(false, It.IsAny<ITestRunEventsHandler>()),
+            dcm => dcm.AfterTestRunEnd(false, It.IsAny<IInternalTestRunEventsHandler>()),
             Times.Once);
     }
 
@@ -81,7 +81,7 @@ public class DataCollectionTestRunEventsHandlerTests
         _testRunEventHandler.HandleRawMessage(string.Empty);
 
         _proxyDataCollectionManager.Verify(
-            dcm => dcm.AfterTestRunEnd(false, It.IsAny<ITestRunEventsHandler>()),
+            dcm => dcm.AfterTestRunEnd(false, It.IsAny<IInternalTestRunEventsHandler>()),
             Times.Once);
     }
 
@@ -101,7 +101,7 @@ public class DataCollectionTestRunEventsHandlerTests
         _testRunEventHandler.HandleRawMessage(string.Empty);
 
         _proxyDataCollectionManager.Verify(
-            dcm => dcm.AfterTestRunEnd(true, It.IsAny<ITestRunEventsHandler>()),
+            dcm => dcm.AfterTestRunEnd(true, It.IsAny<IInternalTestRunEventsHandler>()),
             Times.Once);
     }
 
@@ -134,7 +134,7 @@ public class DataCollectionTestRunEventsHandlerTests
         Assert.AreEqual(invokedDataCollectors[0], testRunCompleteEventArgs2.InvokedDataCollectors[0]);
 
         _proxyDataCollectionManager.Verify(
-            dcm => dcm.AfterTestRunEnd(false, It.IsAny<ITestRunEventsHandler>()),
+            dcm => dcm.AfterTestRunEnd(false, It.IsAny<IInternalTestRunEventsHandler>()),
             Times.Once);
     }
 

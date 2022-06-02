@@ -5,10 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
 public class AttachDebuggerInfo
 {
-    public AttachDebuggerInfo()
-    {
-    }
-
     public int ProcessId { get; set; }
-    public Framework? TargetFramework { get; set; }
+    public string? TargetFramework { get; set; }
 }

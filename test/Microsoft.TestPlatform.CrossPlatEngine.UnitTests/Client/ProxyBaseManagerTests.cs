@@ -71,7 +71,6 @@ public class ProxyBaseManagerTests
             Transport = Transport.Sockets
         };
         _mockCommunicationEndpoint = new Mock<ICommunicationEndPoint>();
-        _mockDataSerializer = new Mock<IDataSerializer>();
         _testRequestSender = new TestRequestSender(_mockCommunicationEndpoint.Object, connectionInfo, _mockDataSerializer.Object, _protocolConfig, Clientprocessexitwait);
         _mockCommunicationEndpoint.Setup(mc => mc.Start(connectionInfo.Endpoint)).Returns(connectionInfo.Endpoint).Callback(() => _mockCommunicationEndpoint.Raise(
             s => s.Connected += null,

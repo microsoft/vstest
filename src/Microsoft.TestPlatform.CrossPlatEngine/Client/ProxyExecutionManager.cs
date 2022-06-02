@@ -347,9 +347,9 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
         // TestHost did not provide any additional TargetFramework info for the process it wants to attach to,
         // specify the TargetFramework of the testhost, in case it is just an old testhost that is not aware
         // of this capability.
-        if (attachDebuggerInfo.TargetFramework == default(Framework))
+        if (attachDebuggerInfo.TargetFramework == default(string))
         {
-            attachDebuggerInfo.TargetFramework = _proxyOperationManager.TestHostManagerFramework;
+            attachDebuggerInfo.TargetFramework = _proxyOperationManager.TestHostManagerFramework.ToString();
         };
 
         return _baseTestRunEventsHandler.AttachDebuggerToProcess(attachDebuggerInfo);

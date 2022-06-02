@@ -937,7 +937,7 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebugger
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.AttachDebuggerInfo() -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.ProcessId.get -> int
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.ProcessId.set -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.TargetFramework.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Framework
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.TargetFramework.get -> string
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.TargetFramework.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.ITestHostLauncher3
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IInternalTestRunEventsHandler

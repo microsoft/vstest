@@ -142,7 +142,6 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [TestCategory("Feature")]
-    [Ignore("This is for debugger v3 and does not work yet.")]
     [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM, JustRow = 1)]
     public void RunAllTestsWithMixedTFMsWillProvideAdditionalInformationToTheDebugger(RunnerInfo runnerInfo)
     {
@@ -164,7 +163,7 @@ public class CustomTestHostTests : AcceptanceTestBase
         runEventHandler.Errors.Should().BeEmpty();
         testHostLauncher.AttachDebuggerInfos.Should().HaveCount(2);
         var targetFrameworks = testHostLauncher.AttachDebuggerInfos.Select(i => i.TargetFramework).ToList();
-        targetFrameworks.Should().OnlyContain(tfm => tfm == Framework.FromString("net451") || tfm == Framework.FromString("netcoreapp2.1"));
+        targetFrameworks.Should().OnlyContain(tfm => tfm == "net451" || tfm == "netcoreapp2.1");
 
         runEventHandler.TestResults.Should().HaveCount(6, "we run all tests from both assemblies");
     }
@@ -172,7 +171,6 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [TestCategory("BackwardCompatibilityWithRunner")]
-    [Ignore("This is for debugger v3 and does not work yet.")]
     [RunnerCompatibilityDataSource(BeforeFeature = Features.MULTI_TFM, JustRow = 1)]
     public void RunAllTestsWithMixedTFMsCallsBackToTestHostLauncherV3EvenWhenRunnerDoesNotSupportItYet(RunnerInfo runnerInfo)
     {
@@ -194,7 +192,7 @@ public class CustomTestHostTests : AcceptanceTestBase
         runEventHandler.Errors.Should().BeEmpty();
         testHostLauncher.AttachDebuggerInfos.Should().HaveCount(2);
         var targetFrameworks = testHostLauncher.AttachDebuggerInfos.Select(i => i.TargetFramework).ToList();
-        targetFrameworks.Should().OnlyContain(tfm => tfm == Framework.FromString("net451") || tfm == Framework.FromString("netcoreapp2.1"));
+        targetFrameworks.Should().OnlyContain(tfm => tfm == "net451" || tfm == "netcoreapp2.1");
 
         runEventHandler.TestResults.Should().HaveCount(6, "we run all tests from both assemblies");
     }

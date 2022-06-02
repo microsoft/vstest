@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace MSTest1;
 [ExtensionUri("uri://myadapter")]
+[DefaultExecutorUri("uri://myadapter")]
 public class Adapter : ITestExecutor2, ITestDiscoverer
 {
     public void Cancel()
@@ -21,7 +22,7 @@ public class Adapter : ITestExecutor2, ITestDiscoverer
 
     public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
     {
-        discoverySink.SendTestCase(new TestCase("abc", new Uri("uri://myadapter"), "aaa.dll"));
+        discoverySink.SendTestCase(new TestCase("abc", new Uri("uri://myadapter"), typeof(Adapter).Assembly.Location));
     }
 
     public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)

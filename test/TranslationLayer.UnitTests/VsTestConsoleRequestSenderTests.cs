@@ -2635,8 +2635,8 @@ public class VsTestConsoleRequestSenderTests
                     eventArgs.Metrics[TelemetryDataConstants.TestSessionId],
                     testSessionInfo.Id.ToString());
             });
-        var mockTesthostLauncher = new Mock<ITestHostLauncher2>();
-        mockTesthostLauncher.Setup(tl => tl.AttachDebuggerToProcess(TesthostPid)).Returns(true);
+        var mockTesthostLauncher = new Mock<ITestHostLauncher3>();
+        mockTesthostLauncher.Setup(tl => tl.AttachDebuggerToProcess(It.IsAny<AttachDebuggerInfo>(), It.IsAny<CancellationToken>())).Returns(true);
 
         var launchMessage = CreateMessage(
             MessageType.EditorAttachDebugger,
@@ -2681,10 +2681,8 @@ public class VsTestConsoleRequestSenderTests
                 mockTesthostLauncher.Object).ConfigureAwait(false));
 
         // Verify
-        mockTesthostLauncher.Verify(tl => tl.AttachDebuggerToProcess(TesthostPid), Times.Once);
-        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(
-                It.IsAny<StartTestSessionCompleteEventArgs>()),
-            Times.Once);
+        mockTesthostLauncher.Verify(tl => tl.AttachDebuggerToProcess(It.Is<AttachDebuggerInfo>(i => i.ProcessId == TesthostPid), It.IsAny<CancellationToken>()), Times.Once);
+        mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(It.IsAny<StartTestSessionCompleteEventArgs>()), Times.Once);
     }
     #endregion
 
