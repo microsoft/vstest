@@ -812,16 +812,20 @@ internal class TestRequestManager : ITestRequestManager
                 return runConfiguration.TargetPlatform;
             }
 
-            var environmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(runsettingsXml);
-            string? defaultArchitectureFromRunsettings = environmentVariables.TryGetValue(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU, out var architecture) ? architecture : null;
-
-            if (defaultArchitectureFromRunsettings != null)
+            // Returns null, where there are none.
+            Dictionary<string, string>? environmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(runsettingsXml);
+            if (environmentVariables != null)
             {
-                Architecture? defaultArchitecture = Enum.TryParse<Architecture>(defaultArchitectureFromRunsettings, out var arch) ? arch : null;
+                string? defaultArchitectureFromRunsettings = environmentVariables.TryGetValue(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU, out var architecture) ? architecture : null;
 
-                if (defaultArchitecture != null)
+                if (defaultArchitectureFromRunsettings != null)
                 {
-                    return defaultArchitecture.Value;
+                    Architecture? defaultArchitecture = Enum.TryParse<Architecture>(defaultArchitectureFromRunsettings, out var arch) ? arch : null;
+
+                    if (defaultArchitecture != null)
+                    {
+                        return defaultArchitecture.Value;
+                    }
                 }
             }
 
