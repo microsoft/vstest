@@ -189,6 +189,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "testhost.arm64", "src\testh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpMinitool.arm64", "src\DataCollectors\DumpMinitool.arm64\DumpMinitool.arm64.csproj", "{62E9D32B-B989-43CF-81A2-B38B3367FCA3}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Microsoft.TestPlatform.Nullability", "src\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.shproj", "{9DF3BC3C-2A53-46E7-9291-40728ACE5F82}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1023,6 +1025,7 @@ Global
 		{29270853-90DC-4C39-9621-F47AE40A79B6} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
 		{186069FE-E1E8-4DE1-BEA4-0FF1484D22D1} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
 		{62E9D32B-B989-43CF-81A2-B38B3367FCA3} = {B705537C-B82C-4A30-AFA5-6244D9A7DAEB}
+		{9DF3BC3C-2A53-46E7-9291-40728ACE5F82} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0541B30C-FF51-4E28-B172-83F5F3934BCD}
@@ -1037,6 +1040,7 @@ Global
 		src\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems*{68adc720-316e-4895-9f8e-c3ccadd262be}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{71cb42ff-e750-4a3b-9c3a-ac938853cc89}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{7f26eda3-c8c4-4b7f-a9b6-d278c2f40a13}*SharedItemsImports = 13
+		src\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems*{9df3bc3c-2a53-46e7-9291-40728ace5f82}*SharedItemsImports = 13
 		src\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems*{fbf74c8f-695c-4967-84ac-358eefb1376d}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

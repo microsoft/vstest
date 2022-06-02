@@ -859,12 +859,13 @@ internal class TestRequestManager : ITestRequestManager
         XPathNavigator navigator,
         XmlDocument document)
     {
-        bool updateRequired = InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml);
-        if (updateRequired)
+        if (InferRunSettingsHelper.TryGetDeviceXml(navigator, out string? deviceXml))
         {
             InferRunSettingsHelper.UpdateTargetDevice(document, deviceXml);
+            return true;
         }
-        return updateRequired;
+
+        return false;
     }
 
     private bool UpdateCollectSourceInformation(
