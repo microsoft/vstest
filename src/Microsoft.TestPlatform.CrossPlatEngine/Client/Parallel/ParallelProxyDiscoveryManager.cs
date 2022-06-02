@@ -27,7 +27,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
     private readonly ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler2, DiscoveryCriteria> _parallelOperationManager;
     private readonly Dictionary<string, TestRuntimeProviderInfo> _sourceToTestHostProviderMap;
     private int _discoveryCompletedClients;
-    private int _availableTestSources = -1;
+    private int _availableTestSources;
     private int _availableWorkloads;
     private bool _skipDefaultAdapters;
     private readonly IRequestData _requestData;
