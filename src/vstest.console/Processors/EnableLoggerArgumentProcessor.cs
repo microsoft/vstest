@@ -2,17 +2,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -27,14 +25,13 @@ internal class EnableLoggerArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/Logger";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new EnableLoggerArgumentExecutor(RunSettingsManager.Instance));
@@ -99,10 +96,9 @@ internal class EnableLoggerArgumentExecutor : IArgumentExecutor
     /// </summary>
     public EnableLoggerArgumentExecutor(IRunSettingsProvider runSettingsManager)
     {
-        Contract.Requires(runSettingsManager != null);
+        ValidateArg.NotNull(runSettingsManager, nameof(runSettingsManager));
         _runSettingsManager = runSettingsManager;
     }
-
 
     #region IArgumentProcessor
 
@@ -110,12 +106,12 @@ internal class EnableLoggerArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.LoggerUriInvalid, argument);
 
         // Throw error in case logger argument null or empty.
-        if (string.IsNullOrWhiteSpace(argument))
+        if (argument.IsNullOrWhiteSpace())
         {
             throw new CommandLineException(exceptionMessage);
         }

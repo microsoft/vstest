@@ -31,7 +31,7 @@ internal class ArtifactProcessingCollectModeProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new ArtifactProcessingCollectModeProcessorExecutor(CommandLineOptions.Instance));

@@ -4,8 +4,6 @@
 using System;
 using System.Globalization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Execution;
 
 internal static class UiLanguageOverride
@@ -16,7 +14,7 @@ internal static class UiLanguageOverride
 
     internal static void SetCultureSpecifiedByUser()
     {
-        CultureInfo language = GetOverriddenUiLanguage();
+        var language = GetOverriddenUiLanguage();
         if (language == null)
         {
             return;
@@ -32,7 +30,7 @@ internal static class UiLanguageOverride
         CultureInfo.DefaultThreadCurrentUICulture = language;
     }
 
-    private static CultureInfo GetOverriddenUiLanguage()
+    private static CultureInfo? GetOverriddenUiLanguage()
     {
         // DOTNET_CLI_UI_LANGUAGE=<culture name> is the main way for users to customize the CLI's UI language.
         string dotnetCliLanguage = Environment.GetEnvironmentVariable(DotnetCliUiLanguage);

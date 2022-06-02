@@ -22,7 +22,7 @@ public class TestCaseFilterArgumentProcessorTests
     public void GetExecutorShouldReturnTestCaseFilterArgumentProcessorCapabilities()
     {
         TestCaseFilterArgumentProcessor processor = new();
-        Assert.IsTrue(processor.Executor.Value is TestCaseFilterArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is TestCaseFilterArgumentExecutor);
     }
 
     #region TestCaseFilterArgumentProcessorCapabilitiesTests

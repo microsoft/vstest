@@ -3,15 +3,13 @@
 
 using System.Reflection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
 public class Product
 {
-    public static readonly string Version = GetProductVersion();
+    public static readonly string? Version = GetProductVersion();
 
-    private static string GetProductVersion()
+    private static string? GetProductVersion()
     {
         var attr = typeof(Product)
             .GetTypeInfo()

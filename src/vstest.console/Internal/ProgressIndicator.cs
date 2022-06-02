@@ -7,8 +7,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using Timer = System.Timers.Timer;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
 /// <summary>
@@ -18,7 +16,7 @@ internal class ProgressIndicator : IProgressIndicator
 {
     private readonly object _syncObject = new();
     private int _dotCounter;
-    private Timer _timer;
+    private Timer? _timer;
     private readonly string _testRunProgressString;
 
     /// <summary>

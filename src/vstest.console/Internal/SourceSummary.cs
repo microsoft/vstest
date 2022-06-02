@@ -3,12 +3,10 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
 /// <summary>
-/// Summary of test results per source. 
+/// Summary of test results per source.
 /// </summary>
 internal class SourceSummary
 {

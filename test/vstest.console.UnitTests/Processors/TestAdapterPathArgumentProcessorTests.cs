@@ -48,7 +48,7 @@ public class TestAdapterPathArgumentProcessorTests
     public void GetExecuterShouldReturnTestAdapterPathArgumentProcessorCapabilities()
     {
         var processor = new TestAdapterPathArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is TestAdapterPathArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is TestAdapterPathArgumentExecutor);
     }
 
     #region TestAdapterPathArgumentProcessorCapabilities tests

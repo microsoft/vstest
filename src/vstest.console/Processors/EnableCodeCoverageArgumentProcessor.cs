@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
@@ -29,9 +27,8 @@ internal class EnableCodeCoverageArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/EnableCodeCoverage";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -43,7 +40,7 @@ internal class EnableCodeCoverageArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, new FileHelper()));
@@ -171,7 +168,7 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
     }
 
     /// <inheritdoc />
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         _commandLineOptions.EnableCodeCoverage = true;
 

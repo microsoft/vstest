@@ -2,11 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
+using System.Diagnostics.CodeAnalysis;
 
-using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
@@ -37,12 +35,7 @@ internal class CommandArgumentPair
     /// <param name="input">Input to break up.</param>
     public CommandArgumentPair(string input)
     {
-        if (string.IsNullOrWhiteSpace(input))
-        {
-            throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, nameof(input));
-        }
-        Contract.Ensures(!string.IsNullOrWhiteSpace(Command));
-
+        ValidateArg.NotNullOrWhiteSpace(input, nameof(input));
         Parse(input);
     }
 
@@ -53,14 +46,7 @@ internal class CommandArgumentPair
     /// <param name="argument">The argument portion of the input.</param>
     public CommandArgumentPair(string command, string argument)
     {
-        if (string.IsNullOrWhiteSpace(command))
-        {
-            throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, nameof(command));
-        }
-
-        Contract.Ensures(Command == command);
-        Contract.Ensures(Argument == argument);
-
+        ValidateArg.NotNullOrWhiteSpace(command, nameof(command));
         Command = command;
         Argument = argument;
     }
@@ -69,11 +55,10 @@ internal class CommandArgumentPair
     /// Parses the input into the command and argument parts.
     /// </summary>
     /// <param name="input">Input string to parse.</param>
+    [MemberNotNull(nameof(Command), nameof(Argument))]
     private void Parse(string input)
     {
-        Contract.Requires(!string.IsNullOrWhiteSpace(input));
-        Contract.Ensures(!string.IsNullOrWhiteSpace(Command));
-        Contract.Ensures(Argument != null);
+        ValidateArg.NotNull(input, nameof(input));
 
         // Find the index of the separator (":")
         int index = input.IndexOf(Separator, StringComparison.OrdinalIgnoreCase);
