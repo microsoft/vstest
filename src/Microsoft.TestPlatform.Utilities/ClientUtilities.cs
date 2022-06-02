@@ -7,8 +7,6 @@ using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
@@ -28,10 +26,7 @@ public static class ClientUtilities
     public static void FixRelativePathsInRunSettings(XmlDocument xmlDocument, string path)
     {
         ValidateArg.NotNull(xmlDocument, nameof(xmlDocument));
-        if (string.IsNullOrEmpty(path))
-        {
-            throw new ArgumentNullException(nameof(path));
-        }
+        ValidateArg.NotNullOrEmpty(path, nameof(path));
 
         string root = Path.GetDirectoryName(path);
 
@@ -62,7 +57,7 @@ public static class ClientUtilities
         string fileName = node.InnerXml;
         fileName = Environment.ExpandEnvironmentVariables(fileName);
 
-        if (!string.IsNullOrEmpty(fileName)
+        if (!fileName.IsNullOrEmpty()
             && !Path.IsPathRooted(fileName))
         {
             // We have a relative file path...
