@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -14,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 using OMResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
 using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
@@ -62,7 +61,7 @@ public class InferRunSettingsHelper
     /// </summary>
     /// <param name="runsettingsXml">string content of runsettings </param>
     /// <returns>compatible runsettings</returns>
-    public static string MakeRunsettingsCompatible(string runsettingsXml)
+    public static string? MakeRunsettingsCompatible(string? runsettingsXml)
     {
         // These are the list of valid RunConfiguration setting name which old testhost understand.
         var listOfValidRunConfigurationSettings = new HashSet<string>
@@ -76,73 +75,76 @@ public class InferRunSettingsHelper
             "DisableParallelization",
             "DisableAppDomain"
         };
+
         return MakeRunsettingsCompatible(runsettingsXml, listOfValidRunConfigurationSettings, null);
     }
 
-    private static string MakeRunsettingsCompatible(string runsettingsXml, HashSet<string> listOfValidRunConfigurationSettings, HashSet<string> listOfInValidRunConfigurationSettings)
+    private static string? MakeRunsettingsCompatible(string? runsettingsXml, HashSet<string>? listOfValidRunConfigurationSettings, HashSet<string>? listOfInValidRunConfigurationSettings)
     {
         var updatedRunSettingsXml = runsettingsXml;
 
-        if (!string.IsNullOrWhiteSpace(runsettingsXml))
+        if (runsettingsXml.IsNullOrWhiteSpace())
         {
-            using var stream = new StringReader(runsettingsXml);
-            using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
-            var document = new XmlDocument();
-            document.Load(reader);
+            return updatedRunSettingsXml;
+        }
 
-            var runSettingsNavigator = document.CreateNavigator();
+        using var stream = new StringReader(runsettingsXml);
+        using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
+        var document = new XmlDocument();
+        document.Load(reader);
 
-            // Move navigator to RunConfiguration node
-            if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
-                !runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
+        var runSettingsNavigator = document.CreateNavigator();
+
+        // Move navigator to RunConfiguration node
+        if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
+            !runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
+        {
+            EqtTrace.Error("InferRunSettingsHelper.MakeRunsettingsCompatible: Unable to navigate to RunConfiguration. Current node: " + runSettingsNavigator.LocalName);
+        }
+        else if (runSettingsNavigator.HasChildren)
+        {
+            if (listOfInValidRunConfigurationSettings is null)
             {
-                EqtTrace.Error("InferRunSettingsHelper.MakeRunsettingsCompatible: Unable to navigate to RunConfiguration. Current node: " + runSettingsNavigator.LocalName);
+                listOfInValidRunConfigurationSettings = new HashSet<string>();
             }
-            else if (runSettingsNavigator.HasChildren)
+
+            // Find all invalid RunConfiguration Settings
+            runSettingsNavigator.MoveToFirstChild();
+            if (listOfValidRunConfigurationSettings != null)
             {
-                if (listOfInValidRunConfigurationSettings is null)
+                do
                 {
-                    listOfInValidRunConfigurationSettings = new HashSet<string>();
-                }
-
-                // Find all invalid RunConfiguration Settings
-                runSettingsNavigator.MoveToFirstChild();
-                if (listOfValidRunConfigurationSettings != null)
-                {
-                    do
+                    if (!listOfValidRunConfigurationSettings.Contains(runSettingsNavigator.LocalName))
                     {
-                        if (!listOfValidRunConfigurationSettings.Contains(runSettingsNavigator.LocalName))
-                        {
-                            listOfInValidRunConfigurationSettings.Add(runSettingsNavigator.LocalName);
-                        }
-                    } while (runSettingsNavigator.MoveToNext());
-                }
-
-                // Delete all invalid RunConfiguration Settings
-                if (listOfInValidRunConfigurationSettings.Count > 0)
-                {
-                    string settingsName = string.Join(", ", listOfInValidRunConfigurationSettings);
-                    EqtTrace.Warning("InferRunSettingsHelper.MakeRunsettingsCompatible: Removing the following settings: {0} from RunSettings file. To use those settings please move to latest version of Microsoft.NET.Test.Sdk", settingsName);
-
-                    // move navigator to RunConfiguration node
-                    runSettingsNavigator.MoveToParent();
-
-                    foreach (var s in listOfInValidRunConfigurationSettings)
-                    {
-                        var nodePath = RunConfigurationNodePath + "/" + s;
-                        XmlUtilities.RemoveChildNode(runSettingsNavigator, nodePath, s);
+                        listOfInValidRunConfigurationSettings.Add(runSettingsNavigator.LocalName);
                     }
+                } while (runSettingsNavigator.MoveToNext());
+            }
 
-                    runSettingsNavigator.MoveToRoot();
-                    updatedRunSettingsXml = runSettingsNavigator.OuterXml;
+            // Delete all invalid RunConfiguration Settings
+            if (listOfInValidRunConfigurationSettings.Count > 0)
+            {
+                string settingsName = string.Join(", ", listOfInValidRunConfigurationSettings);
+                EqtTrace.Warning("InferRunSettingsHelper.MakeRunsettingsCompatible: Removing the following settings: {0} from RunSettings file. To use those settings please move to latest version of Microsoft.NET.Test.Sdk", settingsName);
+
+                // move navigator to RunConfiguration node
+                runSettingsNavigator.MoveToParent();
+
+                foreach (var s in listOfInValidRunConfigurationSettings)
+                {
+                    var nodePath = RunConfigurationNodePath + "/" + s;
+                    XmlUtilities.RemoveChildNode(runSettingsNavigator, nodePath, s);
                 }
+
+                runSettingsNavigator.MoveToRoot();
+                updatedRunSettingsXml = runSettingsNavigator.OuterXml;
             }
         }
 
         return updatedRunSettingsXml;
     }
 
-    public static string RemoveTargetPlatformElement(string runsettingsXml)
+    public static string? RemoveTargetPlatformElement(string? runsettingsXml)
         => MakeRunsettingsCompatible(runsettingsXml, null, new HashSet<string> { "TargetPlatform" });
 
     /// <summary>
@@ -152,7 +154,7 @@ public class InferRunSettingsHelper
     /// <param name="architecture"> The architecture. </param>
     /// <param name="framework"> The framework. </param>
     /// <param name="resultsDirectory"> The results directory. </param>
-    public static void UpdateRunSettingsWithUserProvidedSwitches(XmlDocument runSettingsDocument, Architecture architecture, Framework framework, string resultsDirectory)
+    public static void UpdateRunSettingsWithUserProvidedSwitches(XmlDocument runSettingsDocument, Architecture architecture, Framework framework, string? resultsDirectory)
     {
         var runSettingsNavigator = runSettingsDocument.CreateNavigator();
 
@@ -236,7 +238,7 @@ public class InferRunSettingsHelper
     /// </summary>
     /// <param name="runsettings">RunSettings used for the run</param>
     /// <returns>True if an incompatible collector is found</returns>
-    public static bool AreRunSettingsCollectorsIncompatibleWithTestSettings(string runsettings)
+    public static bool AreRunSettingsCollectorsIncompatibleWithTestSettings(string? runsettings)
     {
         // If there's no embedded testsettings.. bail out
         if (!IsTestSettingsEnabled(runsettings))
@@ -365,21 +367,21 @@ public class InferRunSettingsHelper
         return true;
     }
 
-    private static List<string> GetNodeAttributes(XPathNavigator node)
+    private static List<string>? GetNodeAttributes(XPathNavigator? node)
     {
-        if (node != null && node.HasAttributes)
+        if (node == null || !node.HasAttributes)
         {
-            var attributes = new List<string>();
-            node.MoveToFirstAttribute();
-            attributes.Add(node.Name);
-            while (node.MoveToNextAttribute())
-            {
-                attributes.Add(node.Name);
-            }
-            return attributes;
+            return null;
         }
 
-        return null;
+        var attributes = new List<string>();
+        node.MoveToFirstAttribute();
+        attributes.Add(node.Name);
+        while (node.MoveToNextAttribute())
+        {
+            attributes.Add(node.Name);
+        }
+        return attributes;
     }
 
     /// <summary>
@@ -387,9 +389,9 @@ public class InferRunSettingsHelper
     /// </summary>
     /// <param name="runsettingsXml">The run settings xml string</param>
     /// <returns>Environment Variables Dictionary</returns>
-    public static Dictionary<string, string> GetEnvironmentVariables(string runSettings)
+    public static Dictionary<string, string?>? GetEnvironmentVariables(string runSettings)
     {
-        Dictionary<string, string> environmentVariables = null;
+        Dictionary<string, string?>? environmentVariables = null;
         try
         {
             using var stream = new StringReader(runSettings);
@@ -404,12 +406,12 @@ public class InferRunSettingsHelper
                 return null;
             }
 
-            environmentVariables = new Dictionary<string, string>();
+            environmentVariables = new Dictionary<string, string?>();
             var childNodes = node.SelectChildren(XPathNodeType.Element);
 
             while (childNodes.MoveNext())
             {
-                if (!environmentVariables.ContainsKey(childNodes.Current.Name))
+                if (!environmentVariables.ContainsKey(childNodes.Current!.Name))
                 {
                     environmentVariables.Add(childNodes.Current.Name, childNodes.Current?.Value);
                 }
@@ -431,11 +433,9 @@ public class InferRunSettingsHelper
     /// <param name="platform">Value to set</param>
     /// <param name="overwrite">Overwrite option.</param>
     public static void UpdateTargetPlatform(XmlDocument runSettingsDocument, string platform, bool overwrite = false)
-    {
-        AddNodeIfNotPresent(runSettingsDocument, TargetPlatformNodePath, TargetPlatformNodeName, platform, overwrite);
-    }
+        => AddNodeIfNotPresent(runSettingsDocument, TargetPlatformNodePath, TargetPlatformNodeName, platform, overwrite);
 
-    public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out string deviceXml)
+    public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, [NotNullWhen(true)] out string? deviceXml)
     {
         ValidateArg.NotNull(runSettingsNavigator, nameof(runSettingsNavigator));
 
@@ -454,9 +454,9 @@ public class InferRunSettingsHelper
     /// </summary>
     /// <param name="runsettingsXml">xml string of runsetting</param>
     /// <returns></returns>
-    public static bool IsTestSettingsEnabled(string runsettingsXml)
+    public static bool IsTestSettingsEnabled(string? runsettingsXml)
     {
-        if (string.IsNullOrWhiteSpace(runsettingsXml))
+        if (runsettingsXml.IsNullOrWhiteSpace())
         {
             return false;
         }
@@ -478,7 +478,7 @@ public class InferRunSettingsHelper
             }
 
             var node = runSettingsNavigator.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
-            if (node != null && !string.IsNullOrEmpty(node.InnerXml))
+            if (node != null && !node.InnerXml.IsNullOrEmpty())
             {
                 return true;
             }
@@ -491,6 +491,7 @@ public class InferRunSettingsHelper
     /// Adds node under RunConfiguration setting. No op if node is already present.
     /// </summary>
     private static void AddNodeIfNotPresent<T>(XmlDocument xmlDocument, string nodePath, string nodeName, T nodeValue, bool overwrite = false)
+        where T : notnull
     {
         // Navigator should be at Root of runsettings xml, attempt to move to /RunSettings/RunConfiguration
         var root = xmlDocument.DocumentElement;
@@ -569,7 +570,7 @@ public class InferRunSettingsHelper
         XmlDocument xmlDocument,
         Architecture effectivePlatform,
         Framework effectiveFramework,
-        string resultsDirectory)
+        string? resultsDirectory)
     {
         var childNode = xmlDocument.SelectSingleNode(ResultsDirectoryNodePath);
         if (childNode != null)
@@ -584,7 +585,7 @@ public class InferRunSettingsHelper
         XmlUtilities.AppendOrModifyChild(xmlDocument, TargetFrameworkNodePath, TargetFrameworkNodeName, effectiveFramework.ToString());
     }
 
-    public static bool TryGetPlatformXml(XPathNavigator runSettingsNavigator, out string platformXml)
+    public static bool TryGetPlatformXml(XPathNavigator runSettingsNavigator, out string? platformXml)
     {
         platformXml = XmlUtilities.GetNodeXml(runSettingsNavigator, TargetPlatformNodePath);
 
@@ -606,7 +607,7 @@ public class InferRunSettingsHelper
     /// <summary>
     /// Validate if TargetFrameworkVersion in run settings has valid value.
     /// </summary>
-    public static bool TryGetFrameworkXml(XPathNavigator runSettingsNavigator, out string frameworkXml)
+    public static bool TryGetFrameworkXml(XPathNavigator runSettingsNavigator, out string? frameworkXml)
     {
         frameworkXml = XmlUtilities.GetNodeXml(runSettingsNavigator, TargetFrameworkNodePath);
 
