@@ -62,7 +62,7 @@ public class RunSpecificTestsArgumentProcessorTests
         _mockAssemblyMetadataProvider = new Mock<IAssemblyMetadataProvider>();
         _inferHelper = new InferHelper(_mockAssemblyMetadataProvider.Object);
         _mockAssemblyMetadataProvider.Setup(x => x.GetArchitecture(It.IsAny<string>())).Returns(Architecture.X64);
-        _mockAssemblyMetadataProvider.Setup(x => x.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework40));
+        _mockAssemblyMetadataProvider.Setup(x => x.GetFrameworkName(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework40));
         _mockFileHelper.Setup(fh => fh.Exists(_dummyTestFilePath)).Returns(true);
         _mockFileHelper.Setup(x => x.GetCurrentDirectory()).Returns("");
         _mockMetricsPublisher = new Mock<IMetricsPublisher>();
