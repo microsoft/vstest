@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
@@ -16,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -36,9 +33,8 @@ internal class ListTestsArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/ListTests";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -50,7 +46,7 @@ internal class ListTestsArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new ListTestsArgumentExecutor(
@@ -135,7 +131,7 @@ internal class ListTestsArgumentExecutor : IArgumentExecutor
         ITestRequestManager testRequestManager,
         IOutput output)
     {
-        Contract.Requires(options != null);
+        ValidateArg.NotNull(options, nameof(options));
 
         _commandLineOptions = options;
         Output = output;
@@ -145,16 +141,15 @@ internal class ListTestsArgumentExecutor : IArgumentExecutor
         _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output);
     }
 
-
     #region IArgumentExecutor
 
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        if (!string.IsNullOrWhiteSpace(argument))
+        if (!argument.IsNullOrWhiteSpace())
         {
             _commandLineOptions.AddSource(argument);
         }
@@ -165,9 +160,9 @@ internal class ListTestsArgumentExecutor : IArgumentExecutor
     /// </summary>
     public ArgumentProcessorResult Execute()
     {
-        Contract.Assert(Output != null);
-        Contract.Assert(_commandLineOptions != null);
-        Contract.Assert(!string.IsNullOrWhiteSpace(_runSettingsManager?.ActiveRunSettings?.SettingsXml));
+        TPDebug.Assert(Output != null);
+        TPDebug.Assert(_commandLineOptions != null);
+        TPDebug.Assert(!StringUtils.IsNullOrWhiteSpace(_runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
         if (!_commandLineOptions.Sources.Any())
         {
@@ -175,7 +170,7 @@ internal class ListTestsArgumentExecutor : IArgumentExecutor
         }
 
         Output.WriteLine(CommandLineResources.ListTestsHeaderMessage, OutputLevel.Information);
-        if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+        if (!StringUtils.IsNullOrEmpty(EqtTrace.LogFile))
         {
             Output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
         }

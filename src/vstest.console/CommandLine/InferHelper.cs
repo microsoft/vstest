@@ -7,10 +7,7 @@ using System.IO;
 using System.Runtime.Versioning;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
 
@@ -26,7 +23,7 @@ internal class InferHelper
     /// <summary>
     /// Determines Architecture from sources.
     /// </summary>
-    public Architecture AutoDetectArchitecture(IList<string> sources, Architecture defaultArchitecture, out IDictionary<string, Architecture> sourceToPlatformMap)
+    public Architecture AutoDetectArchitecture(IList<string?>? sources, Architecture defaultArchitecture, out IDictionary<string, Architecture> sourceToPlatformMap)
     {
         sourceToPlatformMap = new Dictionary<string, Architecture>();
         if (sources == null || sources.Count == 0)
@@ -47,8 +44,11 @@ internal class InferHelper
         try
         {
             Architecture? commonArchitecture = null;
-            foreach (string source in sources)
+            foreach (var source in sources)
             {
+                if (source == null)
+                    continue;
+
                 try
                 {
                     Architecture detectedArchitecture;
@@ -130,7 +130,7 @@ internal class InferHelper
     /// <summary>
     /// Determines Framework from sources.
     /// </summary>
-    public Framework AutoDetectFramework(IList<string> sources, out IDictionary<string, Framework> sourceToFrameworkMap)
+    public Framework AutoDetectFramework(IList<string?>? sources, out IDictionary<string, Framework> sourceToFrameworkMap)
     {
         sourceToFrameworkMap = new Dictionary<string, Framework>();
         Framework framework = Framework.DefaultFramework;
@@ -141,6 +141,7 @@ internal class InferHelper
         try
         {
             var finalFx = DetermineFrameworkName(sources, out sourceToFrameworkMap, out var conflictInFxIdentifier);
+            TPDebug.Assert(finalFx != null, "finalFx should not be null");
             framework = Framework.FromString(finalFx.FullName);
             if (conflictInFxIdentifier)
             {
@@ -160,15 +161,20 @@ internal class InferHelper
         return framework;
     }
 
-    private FrameworkName DetermineFrameworkName(IEnumerable<string> sources, out IDictionary<string, Framework> sourceToFrameworkMap, out bool conflictInFxIdentifier)
+    private FrameworkName? DetermineFrameworkName(IEnumerable<string?> sources, out IDictionary<string, Framework> sourceToFrameworkMap, out bool conflictInFxIdentifier)
     {
         sourceToFrameworkMap = new Dictionary<string, Framework>();
 
         var defaultFramework = Framework.DefaultFramework;
-        FrameworkName finalFx = null;
+        FrameworkName? finalFx = null;
         conflictInFxIdentifier = false;
-        foreach (string source in sources)
+        foreach (var source in sources)
         {
+            if (source is null)
+            {
+                continue;
+            }
+
             try
             {
                 FrameworkName fx;
@@ -228,7 +234,7 @@ internal class InferHelper
         return finalFx;
     }
 
-    private bool IsDllOrExe(string filePath)
+    private static bool IsDllOrExe(string? filePath)
     {
         var extType = Path.GetExtension(filePath);
         return extType != null && (extType.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||

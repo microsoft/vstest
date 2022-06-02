@@ -5,7 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -18,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using NuGet.Frameworks;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
@@ -107,7 +105,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Framework on which the test runs.
     /// </summary>
-    private string _targetFramework;
+    private string? _targetFramework;
 
     /// <summary>
     /// Default constructor.
@@ -130,13 +128,13 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// Gets instance of IOutput used for sending output.
     /// </summary>
     /// <remarks>Protected so this can be detoured for testing purposes.</remarks>
-    protected static IOutput Output
+    protected static IOutput? Output
     {
         get;
         private set;
     }
 
-    private IProgressIndicator _progressIndicator;
+    private IProgressIndicator? _progressIndicator;
 
     private readonly IFeatureFlag _featureFlag = FeatureFlag.Instance;
 
@@ -156,7 +154,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as
     /// tracking counts per source for the minimal and quiet output.
     /// </summary>
-    private ConcurrentDictionary<Guid, MinimalTestResult> LeafTestResults { get; set; }
+    private ConcurrentDictionary<Guid, MinimalTestResult>? LeafTestResults { get; set; }
 
 
     #region ITestLoggerWithParameters
@@ -166,6 +164,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="events">Events that can be registered for.</param>
     /// <param name="testRunDirectory">Test Run Directory</param>
+    [MemberNotNull(nameof(Output), nameof(LeafTestResults))]
     public void Initialize(TestLoggerEvents events, string testRunDirectory)
     {
         ValidateArg.NotNull(events, nameof(events));
@@ -223,7 +222,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         }
 
         parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out _targetFramework);
-        _targetFramework = !string.IsNullOrEmpty(_targetFramework) ? NuGetFramework.Parse(_targetFramework).GetShortFolderName() : _targetFramework;
+        _targetFramework = !_targetFramework.IsNullOrEmpty() ? NuGetFramework.Parse(_targetFramework).GetShortFolderName() : _targetFramework;
 
         Initialize(events, string.Empty);
     }
@@ -257,22 +256,23 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     private static string GetFormattedOutput(Collection<TestResultMessage> testMessageCollection)
     {
-        if (testMessageCollection != null)
+        if (testMessageCollection == null)
         {
-            var sb = new StringBuilder();
-            foreach (var message in testMessageCollection)
-            {
-                var prefix = string.Format(CultureInfo.CurrentCulture, "{0}{1}", Environment.NewLine, TestMessageFormattingPrefix);
-                var messageText = message.Text?.Replace(Environment.NewLine, prefix).TrimEnd(TestMessageFormattingPrefix.ToCharArray());
-
-                if (!string.IsNullOrWhiteSpace(messageText))
-                {
-                    sb.AppendFormat(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, messageText);
-                }
-            }
-            return sb.ToString();
+            return string.Empty;
         }
-        return string.Empty;
+
+        var sb = new StringBuilder();
+        foreach (var message in testMessageCollection)
+        {
+            var prefix = string.Format(CultureInfo.CurrentCulture, "{0}{1}", Environment.NewLine, TestMessageFormattingPrefix);
+            var messageText = message.Text?.Replace(Environment.NewLine, prefix).TrimEnd(TestMessageFormattingPrefix.ToCharArray());
+
+            if (!messageText.IsNullOrWhiteSpace())
+            {
+                sb.AppendFormat(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, messageText);
+            }
+        }
+        return sb.ToString();
     }
 
     /// <summary>
@@ -290,12 +290,13 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     private static void DisplayFullInformation(TestResult result)
     {
+        TPDebug.Assert(result != null, "a null result can not be displayed");
+        TPDebug.Assert(Output != null, "Initialize should have been called.");
 
         // Add newline if it is not in given output data.
         var addAdditionalNewLine = false;
 
-        Debug.Assert(result != null, "a null result can not be displayed");
-        if (!string.IsNullOrEmpty(result.ErrorMessage))
+        if (!result.ErrorMessage.IsNullOrEmpty())
         {
             addAdditionalNewLine = true;
             Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.ErrorMessageBanner));
@@ -303,7 +304,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             Output.Information(false, ConsoleColor.Red, errorMessage);
         }
 
-        if (!string.IsNullOrEmpty(result.ErrorStackTrace))
+        if (!result.ErrorStackTrace.IsNullOrEmpty())
         {
             addAdditionalNewLine = false;
             Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StacktraceBanner));
@@ -317,7 +318,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             addAdditionalNewLine = true;
             var stdOutMessages = GetFormattedOutput(stdOutMessagesCollection);
 
-            if (!string.IsNullOrEmpty(stdOutMessages))
+            if (!stdOutMessages.IsNullOrEmpty())
             {
                 Output.Information(false, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StdOutMessagesBanner));
                 Output.Information(false, stdOutMessages);
@@ -330,7 +331,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             addAdditionalNewLine = false;
             var stdErrMessages = GetFormattedOutput(stdErrMessagesCollection);
 
-            if (!string.IsNullOrEmpty(stdErrMessages))
+            if (!stdErrMessages.IsNullOrEmpty())
             {
                 Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StdErrMessagesBanner));
                 Output.Information(false, ConsoleColor.Red, stdErrMessages);
@@ -343,7 +344,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             addAdditionalNewLine = false;
             var dbgTrcMessages = GetFormattedOutput(dbgTrcMessagesCollection);
 
-            if (!string.IsNullOrEmpty(dbgTrcMessages))
+            if (!dbgTrcMessages.IsNullOrEmpty())
             {
                 Output.Information(false, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.DbgTrcMessagesBanner));
                 Output.Information(false, dbgTrcMessages);
@@ -356,7 +357,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             addAdditionalNewLine = false;
             var addnlInfoMessages = GetFormattedOutput(addnlInfoMessagesCollection);
 
-            if (!string.IsNullOrEmpty(addnlInfoMessages))
+            if (!addnlInfoMessages.IsNullOrEmpty())
             {
                 Output.Information(false, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.AddnlInfoMessagesBanner));
                 Output.Information(false, addnlInfoMessages);
@@ -409,6 +410,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     {
         ValidateArg.NotNull(sender, nameof(sender));
         ValidateArg.NotNull(e, nameof(e));
+        TPDebug.Assert(Output != null, "Initialize should have been called");
 
         // Print all test containers.
         Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information);
@@ -493,16 +495,17 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     {
         ValidateArg.NotNull(sender, nameof(sender));
         ValidateArg.NotNull(e, nameof(e));
+        TPDebug.Assert(Output != null && LeafTestResults != null, "Initialize should have been called");
 
         var testDisplayName = e.Result.DisplayName;
 
-        if (string.IsNullOrWhiteSpace(e.Result.DisplayName))
+        if (e.Result.DisplayName.IsNullOrWhiteSpace())
         {
             testDisplayName = e.Result.TestCase.DisplayName;
         }
 
-        string formattedDuration = GetFormattedDurationString(e.Result.Duration);
-        if (!string.IsNullOrEmpty(formattedDuration))
+        string? formattedDuration = GetFormattedDurationString(e.Result.Duration);
+        if (!formattedDuration.IsNullOrEmpty())
         {
             testDisplayName = string.Format("{0} [{1}]", testDisplayName, formattedDuration);
         }
@@ -617,7 +620,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         }
     }
 
-    private string GetFormattedDurationString(TimeSpan duration)
+    private string? GetFormattedDurationString(TimeSpan duration)
     {
         if (duration == default)
         {
@@ -656,6 +659,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
     {
+        TPDebug.Assert(Output != null, "Initialize should have been called");
+
         // Stop the progress indicator as we are about to print the summary
         _progressIndicator?.Stop();
         var passedTests = 0;
@@ -665,7 +670,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         Output.WriteLine(string.Empty, OutputLevel.Information);
 
         // Printing Run-level Attachments
-        var runLevelAttachementCount = (e.AttachmentSets == null) ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
+        var runLevelAttachementCount = e.AttachmentSets == null ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
         if (runLevelAttachementCount > 0)
         {
             // If ARTIFACTS_POSTPROCESSING is disabled
@@ -676,6 +681,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                 CommandLineOptions.Instance.TestSessionCorrelationId is null)
             {
                 Output.Information(false, CommandLineResources.AttachmentsBanner);
+                TPDebug.Assert(e.AttachmentSets != null, "e.AttachmentSets should not be null when runLevelAttachementCount > 0.");
                 foreach (var attachmentSet in e.AttachmentSets)
                 {
                     foreach (var uriDataAttachment in attachmentSet.Attachments)
@@ -746,7 +752,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                 var total = sourceSummary.TotalTests.ToString().PadLeft(5);
 
 
-                var frameworkString = string.IsNullOrEmpty(_targetFramework)
+                var frameworkString = _targetFramework.IsNullOrEmpty()
                     ? string.Empty
                     : $"({_targetFramework})";
 

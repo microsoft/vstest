@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 internal class ListExtensionsArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
@@ -40,8 +38,8 @@ internal class ListExtensionsArgumentProcessorCapabilities : BaseArgumentProcess
 
 internal abstract class ListExtensionsArgumentProcessor : IArgumentProcessor
 {
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
     private readonly Func<IArgumentExecutor> _getExecutor;
     private readonly Func<IArgumentProcessorCapabilities> _getCapabilities;
 
@@ -51,7 +49,7 @@ internal abstract class ListExtensionsArgumentProcessor : IArgumentProcessor
         _getCapabilities = getCapabilities;
     }
 
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(_getExecutor);
 
@@ -78,7 +76,7 @@ internal class ListDiscoverersArgumentProcessor : ListExtensionsArgumentProcesso
 
 internal class ListDiscoverersArgumentExecutor : IArgumentExecutor
 {
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
     }
 
@@ -115,7 +113,7 @@ internal class ListExecutorsArgumentProcessor : ListExtensionsArgumentProcessor
 
 internal class ListExecutorsArgumentExecutor : IArgumentExecutor
 {
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
     }
 
@@ -151,7 +149,7 @@ internal class ListLoggersArgumentProcessor : ListExtensionsArgumentProcessor
 
 internal class ListLoggersArgumentExecutor : IArgumentExecutor
 {
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
     }
 
@@ -195,7 +193,7 @@ internal class ListSettingsProvidersArgumentProcessor : ListExtensionsArgumentPr
 
 internal class ListSettingsProvidersArgumentExecutor : IArgumentExecutor
 {
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
     }
 

@@ -5,8 +5,6 @@ using System;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
@@ -20,7 +18,7 @@ internal class ResponseFileArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "@";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
 
     /// <summary>
     /// Gets the metadata.
@@ -35,7 +33,7 @@ internal class ResponseFileArgumentProcessor : IArgumentProcessor
     /// <remarks>
     /// As this manipulates the command line arguments themselves, this has no executor.
     /// </remarks>
-    public Lazy<IArgumentExecutor> Executor { get; set; }
+    public Lazy<IArgumentExecutor>? Executor { get; set; }
 }
 
 internal class ResponseFileArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities

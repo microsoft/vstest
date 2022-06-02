@@ -32,7 +32,7 @@ public class EnableLoggersArgumentProcessorTests
     public void GetExecuterShouldReturnEnableLoggerArgumentExecutor()
     {
         EnableLoggerArgumentProcessor processor = new();
-        Assert.IsTrue(processor.Executor.Value is EnableLoggerArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is EnableLoggerArgumentExecutor);
     }
 
     [TestMethod]

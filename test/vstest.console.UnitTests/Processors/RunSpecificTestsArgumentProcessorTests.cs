@@ -89,7 +89,7 @@ public class RunSpecificTestsArgumentProcessorTests
     {
         RunSpecificTestsArgumentProcessor processor = new();
 
-        Assert.IsTrue(processor.Executor.Value is RunSpecificTestsArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is RunSpecificTestsArgumentExecutor);
     }
 
     #region RunSpecificTestsArgumentProcessorCapabilitiesTests
