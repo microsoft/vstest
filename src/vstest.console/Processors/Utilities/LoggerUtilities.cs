@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
 internal class LoggerUtilities
@@ -22,7 +20,7 @@ internal class LoggerUtilities
     /// <param name="loggerIdentifier">Logger Identifier.</param>
     /// <param name="loggerParameters">Logger parameters.</param>
     /// <param name="runSettingsManager">Run settings manager.</param>
-    public static void AddLoggerToRunSettings(string loggerIdentifier, Dictionary<string, string> loggerParameters, IRunSettingsProvider runSettingsManager)
+    public static void AddLoggerToRunSettings(string loggerIdentifier, Dictionary<string, string>? loggerParameters, IRunSettingsProvider runSettingsManager)
     {
         // Creating default run settings if required.
         var settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
@@ -33,7 +31,6 @@ internal class LoggerUtilities
         }
 
         var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(settings) ?? new LoggerRunSettings();
-
 
         LoggerSettings logger;
         try

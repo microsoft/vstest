@@ -803,7 +803,7 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
         // Verify.
-        _mockMetricsPublisher.Verify(mp => mp.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, It.IsAny<IDictionary<string, object>>()), Times.Once);
+        _mockMetricsPublisher.Verify(mp => mp.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, It.IsAny<IDictionary<string, object?>>()), Times.Once);
     }
 
     [TestMethod]
@@ -1258,7 +1258,7 @@ public class TestRequestManagerTests
 
         _testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, _protocolConfig);
 
-        _mockMetricsPublisher.Verify(mp => mp.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, It.IsAny<IDictionary<string, object>>()), Times.Once);
+        _mockMetricsPublisher.Verify(mp => mp.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, It.IsAny<IDictionary<string, object?>>()), Times.Once);
     }
 
     // TODO: add tests in design mode and executor that they are handling all the exceptions properly including printing inner exception.
@@ -2136,9 +2136,12 @@ public class TestRequestManagerTests
         _mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStop());
 
         _mockMetricsPublisher.Verify(p => p.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent,
-            It.Is<Dictionary<string, object>>(m => m.Count == 2 &&
-                                                   m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing) && (int)m[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing] == 5 &&
-                                                   m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsAfterProcessing) && (int)m[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing] == 1)));
+            It.Is<Dictionary<string, object?>>(m =>
+                m.Count == 2
+                && m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing)
+                && (int)m[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing]! == 5
+                && m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsAfterProcessing)
+                && (int)m[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing]! == 1)));
     }
 
     [TestMethod]
@@ -2202,7 +2205,10 @@ public class TestRequestManagerTests
         _mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStop());
 
         _mockMetricsPublisher.Verify(p => p.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent,
-            It.Is<Dictionary<string, object>>(m => m.Count == 1 && m.ContainsKey(TelemetryDataConstants.AttachmentsProcessingState) && (string)m[TelemetryDataConstants.AttachmentsProcessingState] == "Canceled")));
+            It.Is<Dictionary<string, object?>>(m =>
+                m.Count == 1
+                && m.ContainsKey(TelemetryDataConstants.AttachmentsProcessingState)
+                && (string?)m[TelemetryDataConstants.AttachmentsProcessingState] == "Canceled")));
     }
 
     [TestMethod]

@@ -31,7 +31,7 @@ public class HelpArgumentProcessorTests
     public void GetExecuterShouldReturnHelpArgumentProcessorCapabilities()
     {
         HelpArgumentProcessor processor = new();
-        Assert.IsTrue(processor.Executor.Value is HelpArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is HelpArgumentExecutor);
     }
 
     #region HelpArgumentProcessorCapabilitiesTests

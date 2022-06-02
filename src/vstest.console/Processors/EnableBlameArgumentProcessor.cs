@@ -21,8 +21,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 internal class EnableBlameArgumentProcessor : IArgumentProcessor
@@ -32,9 +30,8 @@ internal class EnableBlameArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/Blame";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EnableBlameArgumentProcessor"/> class.
@@ -50,7 +47,7 @@ internal class EnableBlameArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new EnableBlameArgumentExecutor(RunSettingsManager.Instance, new PlatformEnvironment(), new FileHelper()));
@@ -119,14 +116,14 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         var enableDump = false;
         var enableHangDump = false;
         var exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidBlameArgument, argument);
-        Dictionary<string, string> collectDumpParameters = null;
+        Dictionary<string, string>? collectDumpParameters = null;
 
-        if (!string.IsNullOrWhiteSpace(argument))
+        if (!StringUtils.IsNullOrWhiteSpace(argument))
         {
             // Get blame argument list.
             var blameArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
@@ -174,7 +171,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="enableCrashDump">Enable dump.</param>
     /// <param name="blameParameters">Blame parameters.</param>
-    private void InitializeBlame(bool enableCrashDump, bool enableHangDump, Dictionary<string, string> collectDumpParameters)
+    private void InitializeBlame(bool enableCrashDump, bool enableHangDump, Dictionary<string, string>? collectDumpParameters)
     {
         // Add Blame Logger
         LoggerUtilities.AddLoggerToRunSettings(BlameFriendlyName, null, _runSettingsManager);
@@ -260,9 +257,9 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="settings">Settings xml.</param>
     /// <returns>Results directory.</returns>
-    private string GetResultsDirectory(string settings)
+    private string? GetResultsDirectory(string? settings)
     {
-        string resultsDirectory = null;
+        string? resultsDirectory = null;
         if (settings != null)
         {
             try

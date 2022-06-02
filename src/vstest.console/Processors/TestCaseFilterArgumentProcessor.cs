@@ -2,12 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 
-using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -21,9 +20,8 @@ internal class TestCaseFilterArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/TestCaseFilter";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -35,7 +33,7 @@ internal class TestCaseFilterArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new TestCaseFilterArgumentExecutor(CommandLineOptions.Instance));
@@ -77,7 +75,7 @@ internal class TestCaseFilterArgumentExecutor : IArgumentExecutor
     /// </param>
     public TestCaseFilterArgumentExecutor(CommandLineOptions options)
     {
-        Contract.Requires(options != null);
+        ValidateArg.NotNull(options, nameof(options));
         _commandLineOptions = options;
     }
 
@@ -87,12 +85,12 @@ internal class TestCaseFilterArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         var defaultFilter = _commandLineOptions.TestCaseFilterValue;
-        var hasDefaultFilter = !string.IsNullOrWhiteSpace(defaultFilter);
+        var hasDefaultFilter = !defaultFilter.IsNullOrWhiteSpace();
 
-        if (!hasDefaultFilter && string.IsNullOrWhiteSpace(argument))
+        if (!hasDefaultFilter && argument.IsNullOrWhiteSpace())
         {
             throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestCaseFilterValueRequired));
         }

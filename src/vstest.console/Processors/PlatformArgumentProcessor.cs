@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
@@ -13,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -29,9 +26,8 @@ internal class PlatformArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/Platform";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -43,7 +39,7 @@ internal class PlatformArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
@@ -87,8 +83,8 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
     /// <param name="runSettingsManager"> The runsettings manager. </param>
     public PlatformArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
     {
-        Contract.Requires(options != null);
-        Contract.Requires(runSettingsManager != null);
+        ValidateArg.NotNull(options, nameof(options));
+        ValidateArg.NotNull(runSettingsManager, nameof(runSettingsManager));
         _commandLineOptions = options;
         _runSettingsManager = runSettingsManager;
     }
@@ -100,9 +96,9 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        if (string.IsNullOrWhiteSpace(argument))
+        if (argument.IsNullOrWhiteSpace())
         {
             throw new CommandLineException(CommandLineResources.PlatformTypeRequired);
         }

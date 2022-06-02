@@ -41,7 +41,7 @@ public class PortArgumentProcessorTests
     public void GetExecutorShouldReturnPortArgumentProcessorCapabilities()
     {
         var processor = new PortArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is PortArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is PortArgumentExecutor);
     }
 
     #region PortArgumentProcessorCapabilitiesTests

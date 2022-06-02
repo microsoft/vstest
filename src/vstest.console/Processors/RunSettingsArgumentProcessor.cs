@@ -19,8 +19,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 internal class RunSettingsArgumentProcessor : IArgumentProcessor
@@ -30,9 +28,8 @@ internal class RunSettingsArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/Settings";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -44,7 +41,7 @@ internal class RunSettingsArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new RunSettingsArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
@@ -82,9 +79,9 @@ internal class RunSettingsArgumentExecutor : IArgumentExecutor
         FileHelper = new FileHelper();
     }
 
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        if (string.IsNullOrWhiteSpace(argument))
+        if (argument.IsNullOrWhiteSpace())
         {
             throw new CommandLineException(CommandLineResources.RunSettingsRequired);
         }

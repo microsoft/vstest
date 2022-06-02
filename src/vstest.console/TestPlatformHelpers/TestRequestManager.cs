@@ -36,8 +36,6 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 
 /// <summary>
@@ -45,12 +43,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 /// </summary>
 internal class TestRequestManager : ITestRequestManager
 {
-    private static ITestRequestManager s_testRequestManagerInstance;
+    private static ITestRequestManager? s_testRequestManagerInstance;
 
     // Defines the default architecture to be used for AnyCPU or non-dll sources. This is just temporary, and unsupported, DO NOT use.
     private static readonly string VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU = nameof(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU);
-
-    private const int RunRequestTimeout = 5000;
 
     private readonly ITestPlatform _testPlatform;
     private readonly ITestPlatformEventSource _testPlatformEventSource;
@@ -72,19 +68,19 @@ internal class TestRequestManager : ITestRequestManager
     /// Maintains the current active execution request.
     /// Assumption: There can only be one active execution request.
     /// </summary>
-    private ITestRunRequest _currentTestRunRequest;
+    private ITestRunRequest? _currentTestRunRequest;
 
     /// <summary>
     /// Maintains the current active discovery request.
     /// Assumption: There can only be one active discovery request.
     /// </summary>
-    private IDiscoveryRequest _currentDiscoveryRequest;
+    private IDiscoveryRequest? _currentDiscoveryRequest;
 
     /// <summary>
     /// Maintains the current active test run attachments processing cancellation token source.
     /// Assumption: There can only be one active attachments processing request.
     /// </summary>
-    private CancellationTokenSource _currentAttachmentsProcessingCancellationTokenSource;
+    private CancellationTokenSource? _currentAttachmentsProcessingCancellationTokenSource;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRequestManager"/> class.
@@ -264,7 +260,7 @@ internal class TestRequestManager : ITestRequestManager
     /// <inheritdoc />
     public void RunTests(
         TestRunRequestPayload testRunRequestPayload,
-        ITestHostLauncher3 testHostLauncher,
+        ITestHostLauncher3? testHostLauncher,
         ITestRunEventsRegistrar testRunEventsRegistrar,
         ProtocolConfig protocolConfig)
     {
@@ -295,8 +291,8 @@ internal class TestRequestManager : ITestRequestManager
         var sourceToSourceDetailMap = sources.Select(source => new SourceDetail
         {
             Source = source,
-            Architecture = sourceToArchitectureMap[source],
-            Framework = sourceToFrameworkMap[source],
+            Architecture = sourceToArchitectureMap[source!],
+            Framework = sourceToFrameworkMap[source!],
         }).ToDictionary(k => k.Source);
 
         if (InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(runsettings))
@@ -452,7 +448,7 @@ internal class TestRequestManager : ITestRequestManager
     /// <inheritdoc/>
     public void StartTestSession(
         StartTestSessionPayload payload,
-        ITestHostLauncher3 testHostLauncher,
+        ITestHostLauncher3? testHostLauncher,
         ITestSessionEventsHandler eventsHandler,
         ProtocolConfig protocolConfig)
     {
@@ -654,8 +650,8 @@ internal class TestRequestManager : ITestRequestManager
 
     private bool UpdateRunSettingsIfRequired(
         string runsettingsXml,
-        IList<string> sources,
-        IBaseTestEventsRegistrar registrar,
+        IList<string?>? sources,
+        IBaseTestEventsRegistrar? registrar,
         out string updatedRunSettingsXml,
         out IDictionary<string, Architecture> sourceToArchitectureMap,
         out IDictionary<string, Framework> sourceToFrameworkMap)
@@ -817,7 +813,7 @@ internal class TestRequestManager : ITestRequestManager
             }
 
             var environmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(runsettingsXml);
-            string defaultArchitectureFromRunsettings = environmentVariables.TryGetValue(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU, out var architecture) ? architecture : null;
+            string? defaultArchitectureFromRunsettings = environmentVariables.TryGetValue(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU, out var architecture) ? architecture : null;
 
             if (defaultArchitectureFromRunsettings != null)
             {
@@ -925,7 +921,7 @@ internal class TestRequestManager : ITestRequestManager
         Architecture defaultArchitecture,
         IDictionary<string, Architecture> sourcePlatforms,
         IDictionary<string, Framework> sourceFrameworks,
-        IBaseTestEventsRegistrar registrar)
+        IBaseTestEventsRegistrar? registrar)
     {
         // Find compatible sources.
         var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(
@@ -937,7 +933,7 @@ internal class TestRequestManager : ITestRequestManager
             out var incompatibleSettingWarning);
 
         // Raise warnings for incompatible sources
-        if (!string.IsNullOrEmpty(incompatibleSettingWarning))
+        if (!incompatibleSettingWarning.IsNullOrEmpty())
         {
             EqtTrace.Warning(incompatibleSettingWarning);
             registrar?.LogWarning(incompatibleSettingWarning);
@@ -951,7 +947,7 @@ internal class TestRequestManager : ITestRequestManager
     private bool UpdatePlatform(
         XmlDocument document,
         XPathNavigator navigator,
-        IList<string> sources,
+        IList<string?>? sources,
         Architecture defaultArchitecture,
         out Architecture commonPlatform,
         out IDictionary<string, Architecture> sourceToPlatformMap)
@@ -995,8 +991,8 @@ internal class TestRequestManager : ITestRequestManager
     private bool UpdateFrameworkInRunSettingsIfRequired(
         XmlDocument document,
         XPathNavigator navigator,
-        IList<string> sources,
-        IBaseTestEventsRegistrar registrar,
+        IList<string?>? sources,
+        IBaseTestEventsRegistrar? registrar,
         out Framework commonFramework,
         out IDictionary<string, Framework> sourceToFrameworkMap)
     {
@@ -1034,14 +1030,14 @@ internal class TestRequestManager : ITestRequestManager
         return true;
     }
 
-    private static void WriteWarningForNetFramework35IsUnsupported(IBaseTestEventsRegistrar registrar, Framework commonFramework)
+    private static void WriteWarningForNetFramework35IsUnsupported(IBaseTestEventsRegistrar? registrar, Framework commonFramework)
     {
         // Raise warnings for unsupported frameworks.
         // TODO: Look at the sourceToFrameworkMap, and report paths to the sources that use that framework, rather than the chosen framework
         if (ObjectModel.Constants.DotNetFramework35.Equals(commonFramework.Name))
         {
             EqtTrace.Warning("TestRequestManager.UpdateRunSettingsIfRequired: throw warning on /Framework:Framework35 option.");
-            registrar.LogWarning(Resources.Resources.Framework35NotSupported);
+            registrar?.LogWarning(Resources.Resources.Framework35NotSupported);
         }
     }
 
@@ -1107,7 +1103,7 @@ internal class TestRequestManager : ITestRequestManager
         IRequestData requestData,
         TestRunCriteria testRunCriteria,
         ITestRunEventsRegistrar testRunEventsRegistrar,
-        TestPlatformOptions options,
+        TestPlatformOptions? options,
         Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
         // Make sure to run the run request inside a lock as the below section is not thread-safe.
@@ -1170,7 +1166,7 @@ internal class TestRequestManager : ITestRequestManager
         if (_commandLineOptions.IsDesignMode)
         {
             bool isValidFrameworkXml = InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkXml);
-            var runSettingsHaveValidFramework = isValidFrameworkXml && !string.IsNullOrWhiteSpace(frameworkXml);
+            var runSettingsHaveValidFramework = isValidFrameworkXml && !frameworkXml.IsNullOrWhiteSpace();
             if (runSettingsHaveValidFramework)
             {
                 // TODO: this should just ask the runsettings to give that value so we always parse it the same way
@@ -1208,7 +1204,7 @@ internal class TestRequestManager : ITestRequestManager
                 navigator,
                 out var platformXml);
 
-            bool runSettingsHaveValidPlatform = isValidPlatformXml && !string.IsNullOrWhiteSpace(platformXml);
+            bool runSettingsHaveValidPlatform = isValidPlatformXml && !platformXml.IsNullOrWhiteSpace();
             if (runSettingsHaveValidPlatform)
             {
                 // TODO: this should be checking if the enum has the value specified, or ideally just ask the runsettings to give that value
@@ -1256,7 +1252,7 @@ internal class TestRequestManager : ITestRequestManager
         // Collecting Target Device. Here, it will be updated run settings so, target device
         // will be under run configuration only.
         var targetDevice = runConfiguration.TargetDevice;
-        if (string.IsNullOrEmpty(targetDevice))
+        if (targetDevice.IsNullOrEmpty())
         {
             requestData.MetricsCollection.Add(
                 TelemetryDataConstants.TargetDevice,
@@ -1347,7 +1343,7 @@ internal class TestRequestManager : ITestRequestManager
         }
 
         var settings = _commandLineOptions.SettingsFile;
-        if (!string.IsNullOrEmpty(settings))
+        if (!settings.IsNullOrEmpty())
         {
             var extension = Path.GetExtension(settings);
             if (string.Equals(extension, ".runsettings", StringComparison.OrdinalIgnoreCase))
@@ -1385,16 +1381,16 @@ internal class TestRequestManager : ITestRequestManager
             ProtocolConfig = protocolConfig,
             MetricsCollection =
                 _telemetryOptedIn || IsTelemetryOptedIn()
-                    ? (IMetricsCollection)new MetricsCollection()
+                    ? new MetricsCollection()
                     : new NoOpMetricsCollection(),
             IsTelemetryOptedIn = _telemetryOptedIn || IsTelemetryOptedIn()
         };
     }
 
-    private List<string> GetSources(TestRunRequestPayload testRunRequestPayload)
+    private static List<string?> GetSources(TestRunRequestPayload testRunRequestPayload)
     {
         // TODO: This should also use hashset to only return distinct sources.
-        List<string> sources = new();
+        List<string?> sources = new();
         if (testRunRequestPayload.Sources != null
             && testRunRequestPayload.Sources.Count > 0)
         {
@@ -1403,7 +1399,7 @@ internal class TestRequestManager : ITestRequestManager
         else if (testRunRequestPayload.TestCases != null
                  && testRunRequestPayload.TestCases.Count > 0)
         {
-            ISet<string> sourcesSet = new HashSet<string>();
+            ISet<string?> sourcesSet = new HashSet<string?>();
             foreach (var testCase in testRunRequestPayload.TestCases)
             {
                 sourcesSet.Add(testCase.Source);

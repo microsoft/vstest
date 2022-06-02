@@ -38,7 +38,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
     private readonly ITestRunAttachmentsProcessingEventsHandler _testRunAttachmentsProcessingEventsHandler;
     private readonly IFeatureFlag _featureFlag;
 
-    public ArtifactProcessingManager(string testSessionCorrelationId) :
+    public ArtifactProcessingManager(string? testSessionCorrelationId) :
         this(testSessionCorrelationId,
             new FileHelper(),
             new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()),

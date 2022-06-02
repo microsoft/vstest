@@ -2,17 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -23,9 +20,8 @@ internal class ParallelArgumentProcessor : IArgumentProcessor
 {
     public const string CommandName = "/Parallel";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -37,7 +33,7 @@ internal class ParallelArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new ParallelArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
@@ -82,12 +78,11 @@ internal class ParallelArgumentExecutor : IArgumentExecutor
     /// <param name="runSettingsManager"> The runsettings manager. </param>
     public ParallelArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
     {
-        Contract.Requires(options != null);
-        Contract.Requires(runSettingsManager != null);
+        ValidateArg.NotNull(options, nameof(options));
+        ValidateArg.NotNull(runSettingsManager, nameof(runSettingsManager));
         _commandLineOptions = options;
         _runSettingsManager = runSettingsManager;
     }
-
 
     #region IArgumentExecutor
 
@@ -95,10 +90,10 @@ internal class ParallelArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         // parallel does not require any argument, throws exception if argument specified
-        if (!string.IsNullOrWhiteSpace(argument))
+        if (!argument.IsNullOrWhiteSpace())
         {
             throw new CommandLineException(
                 string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidParallelCommand, argument));

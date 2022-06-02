@@ -10,10 +10,9 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Execution;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("ApiDesign", "RS0030:Do not used banned APIs", Justification = "StringUtils is not available for all TFMs of testhost")]
 internal static class DebuggerBreakpoint
 {
     internal static void AttachVisualStudioDebugger(string environmentVariable)
@@ -87,7 +86,7 @@ internal static class DebuggerBreakpoint
 #endif
     }
 
-    private static string FindAttachVs()
+    private static string? FindAttachVs()
     {
 #if NETCOREAPP1_0
         return null;
@@ -115,7 +114,7 @@ internal static class DebuggerBreakpoint
 #endif
     }
 
-    private static string FindOnPath(string exeName)
+    private static string? FindOnPath(string exeName)
     {
         var paths = Environment.GetEnvironmentVariable("PATH").Split(';');
         foreach (var p in paths)

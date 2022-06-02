@@ -2,17 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -24,9 +21,8 @@ internal class InIsolationArgumentProcessor : IArgumentProcessor
 {
     public const string CommandName = "/InIsolation";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -38,7 +34,7 @@ internal class InIsolationArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new InIsolationArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
@@ -76,7 +72,7 @@ internal class InIsolationArgumentExecutor : IArgumentExecutor
     /// <param name="runSettingsManager">the runsettings manager</param>
     public InIsolationArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
     {
-        Contract.Requires(options != null);
+        ValidateArg.NotNull(options, nameof(options));
         _commandLineOptions = options;
         _runSettingsManager = runSettingsManager;
     }
@@ -87,10 +83,10 @@ internal class InIsolationArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         // InIsolation does not require any argument, throws exception if argument specified
-        if (!string.IsNullOrWhiteSpace(argument))
+        if (!argument.IsNullOrWhiteSpace())
         {
             throw new CommandLineException(
                 string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidInIsolationCommand, argument));

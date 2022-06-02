@@ -22,7 +22,7 @@ public class ListTestsTargetPathArgumentProcessorTests
     public void GetExecutorShouldReturnListTestsTargetPathArgumentProcessorCapabilities()
     {
         ListTestsTargetPathArgumentProcessor processor = new();
-        Assert.IsTrue(processor.Executor.Value is ListTestsTargetPathArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is ListTestsTargetPathArgumentExecutor);
     }
 
     #region TestCaseFilterArgumentProcessorCapabilitiesTests

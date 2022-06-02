@@ -14,13 +14,11 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
 internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
 {
-    private static AssemblyMetadataProvider s_instance;
+    private static AssemblyMetadataProvider? s_instance;
     private readonly IFileHelper _fileHelper;
 
     /// <summary>

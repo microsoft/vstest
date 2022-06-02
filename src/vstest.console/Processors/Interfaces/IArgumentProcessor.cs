@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
@@ -16,7 +14,7 @@ internal interface IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    Lazy<IArgumentExecutor> Executor { get; set; }
+    Lazy<IArgumentExecutor>? Executor { get; set; }
 
     /// <summary>
     /// Gets the metadata.

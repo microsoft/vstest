@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
@@ -15,5 +13,5 @@ internal interface IArgumentsExecutor : IArgumentExecutor
     /// Initializes the Argument Processor with the arguments that was provided with the command.
     /// </summary>
     /// <param name="arguments">Arguments that are provided with the command.</param>
-    void Initialize(string[] arguments);
+    void Initialize(string[]? arguments);
 }
