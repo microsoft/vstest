@@ -4,18 +4,17 @@
 using System;
 using System.Runtime.InteropServices;
 
+using Microsoft.VisualStudio.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 using NuGet.Frameworks;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 internal class HangDumperFactory : IHangDumperFactory
 {
-    public Action<string> LogWarning { get; set; }
+    public Action<string>? LogWarning { get; set; }
 
     public IHangDumper Create(string targetFramework)
     {
@@ -37,7 +36,7 @@ internal class HangDumperFactory : IHangDumperFactory
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             // On some system the interop dumper will thrown AccessViolationException, add an option to force procdump.
-            var forceUsingProcdump = !string.IsNullOrWhiteSpace(procdumpOverride) && procdumpOverride != "0";
+            var forceUsingProcdump = !procdumpOverride.IsNullOrWhiteSpace() && procdumpOverride != "0";
             if (forceUsingProcdump)
             {
                 EqtTrace.Info($"HangDumperFactory: This is Windows on  Forcing the use of ProcDumpHangDumper that uses ProcDump utility, via VSTEST_DUMP_FORCEPROCDUMP={procdumpOverride}.");
@@ -45,7 +44,7 @@ internal class HangDumperFactory : IHangDumperFactory
             }
 
             // On some system the interop dumper will thrown AccessViolationException, add an option to force procdump.
-            var forceUsingNetdump = !string.IsNullOrWhiteSpace(netdumpOverride) && netdumpOverride != "0";
+            var forceUsingNetdump = !netdumpOverride.IsNullOrWhiteSpace() && netdumpOverride != "0";
             if (forceUsingNetdump)
             {
                 var isLessThan50 = tfm.Framework == ".NETCoreApp" && tfm.Version < Version.Parse("5.0.0.0");

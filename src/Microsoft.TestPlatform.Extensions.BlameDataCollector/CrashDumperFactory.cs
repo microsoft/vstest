@@ -4,12 +4,11 @@
 using System;
 using System.Runtime.InteropServices;
 
+using Microsoft.VisualStudio.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 using NuGet.Frameworks;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
@@ -45,7 +44,7 @@ internal class CrashDumperFactory : ICrashDumperFactory
             // This proven to be working okay while net5.0 could not create dumps from Task.Run, and I was using this same technique
             // to get dump of testhost. This needs PROCDUMP_PATH set to directory with procdump.exe, or having it in path.
             var procdumpOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_FORCEPROCDUMP")?.Trim();
-            var forceUsingProcdump = !string.IsNullOrWhiteSpace(procdumpOverride) && procdumpOverride != "0";
+            var forceUsingProcdump = !procdumpOverride.IsNullOrWhiteSpace() && procdumpOverride != "0";
             if (forceUsingProcdump)
             {
                 EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework}. Forcing the use of ProcDumpCrashDumper that uses ProcDump utility, via VSTEST_DUMP_FORCEPROCDUMP={procdumpOverride}.");
