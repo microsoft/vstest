@@ -12,6 +12,7 @@
     <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3270;MSB3276</MSBuildWarningsAsMessages>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
   </PropertyGroup>
+  <Import Project="..\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems" Label="Shared" />
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup Label="Configuration">
     <RootNamespace>Microsoft.TestPlatform.Extensions.BlameDataCollector</RootNamespace>
@@ -23,6 +24,7 @@
     <IsTestProject>false</IsTestProject>
     <!-- to copy the netcore.client dependency to bin folder on build -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.TestHostProvider\Properties\TestExtensionTypesAttribute.cs" Link="Properties\TestExtensionTypesAttribute.cs" />
@@ -60,6 +62,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <AdditionalFiles Include="BannedSymbols.txt" />
     <!-- API that is common to all frameworks that we build for. -->
     <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />

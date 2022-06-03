@@ -41,7 +41,7 @@ public class BlameLoggerTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfEventsIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _blameLogger.Initialize(null, string.Empty));
+        Assert.ThrowsException<ArgumentNullException>(() => _blameLogger.Initialize(null!, string.Empty));
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public class BlameLoggerTests
         _mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
     }
 
-    private AttachmentSet GetAttachmentSet()
+    private static AttachmentSet GetAttachmentSet()
     {
         var attachmentSet = new AttachmentSet(new Uri("test://uri"), "Blame");
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:/folder1/sequence.xml"), "description"));
