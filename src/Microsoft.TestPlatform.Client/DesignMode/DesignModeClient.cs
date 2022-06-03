@@ -31,9 +31,9 @@ using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.Comm
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 
 /// <summary>
-/// The design mode client, which listens inside of vstest.console when we are running under an IDE (like VS), and proceses
+/// The design mode client, which listens inside of vstest.console when we are running in server mode (e.g. under an IDE like VS), and proceses
 /// the incoming requests. See <see cref="ProcessRequests"/> for how the requests are received, and for example <see cref="StartTestRun"/>
-/// for how a single request is handled, and a result is sent back to the IDE.
+/// for how a single request is handled, and a result is sent back to the IDE or other consumer.
 /// </summary>
 public class DesignModeClient : IDesignModeClient
 {

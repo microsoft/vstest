@@ -14,13 +14,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\datacollector\datacollector.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj" />
     <ProjectReference Include="..\..\src\testhost.x86\testhost.x86.csproj" />
     <ProjectReference Include="..\..\src\testhost\testhost.csproj" />
     <ProjectReference Include="..\..\src\vstest.console\vstest.console.csproj" />
-    <ProjectReference Include="..\MSTest1\MSTest1.TestAdapter.csproj" />
+    <ProjectReference Include="..\MSTest1\MSTest1.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT' ">
     <Reference Include="System" />

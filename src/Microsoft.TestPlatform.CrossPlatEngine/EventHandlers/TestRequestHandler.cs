@@ -29,7 +29,7 @@ using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Con
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
-/// Listents inside of testhost for request, that are sent from vstest.console. Requests are handled in <see cref="OnMessageReceived"/>
+/// Listens inside of testhost for requests, that are sent from vstest.console. Requests are handled in <see cref="OnMessageReceived"/>
 /// and responses are sent back via various methods, for example <see cref="SendExecutionComplete"/>.
 /// </summary>
 public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestRequestHandler

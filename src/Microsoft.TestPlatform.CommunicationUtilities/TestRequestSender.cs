@@ -535,7 +535,7 @@ public class TestRequestSender : ITestRequestSender
                 case MessageType.AttachDebugger:
                     var testProcessAttachDebuggerPayload = _dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
                     AttachDebuggerInfo attachDebugerInfo = MessageConverter.ConvertToAttachDebuggerInfo(testProcessAttachDebuggerPayload, message, _protocolVersion);
-                    bool result = (testRunEventsHandler).AttachDebuggerToProcess(attachDebugerInfo);
+                    bool result = testRunEventsHandler.AttachDebuggerToProcess(attachDebugerInfo);
 
                     var resultMessage = _dataSerializer.SerializePayload(
                         MessageType.AttachDebuggerCallback,
