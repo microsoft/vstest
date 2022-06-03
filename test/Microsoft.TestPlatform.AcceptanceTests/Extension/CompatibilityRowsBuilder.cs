@@ -113,7 +113,7 @@ public class CompatibilityRowsBuilder
 
         if (BeforeAdapterFeature != null)
         {
-            var feature = Features.TestPlatformFeatures[BeforeAdapterFeature];
+            var feature = Features.AdapterFeatures[BeforeAdapterFeature];
             beforeAdapterVersion = ParseAndPatchSemanticVersion(feature.Version);
         }
 
@@ -150,6 +150,10 @@ public class CompatibilityRowsBuilder
         }
 
         var allRows = distinctRows.Values.ToList();
+        for (var i = 0; i < allRows.Count; i++)
+        {
+            allRows[i].Index = i;
+        }
 
         return JustRow == null ? allRows : new List<RunnerInfo> { allRows[JustRow.Value] };
     }
