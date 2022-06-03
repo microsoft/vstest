@@ -813,7 +813,7 @@ internal class TestRequestManager : ITestRequestManager
             }
 
             // Returns null, where there are none.
-            Dictionary<string, string>? environmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(runsettingsXml);
+            Dictionary<string, string?>? environmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(runsettingsXml);
             if (environmentVariables != null)
             {
                 string? defaultArchitectureFromRunsettings = environmentVariables.TryGetValue(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU, out var architecture) ? architecture : null;
