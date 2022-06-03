@@ -3,8 +3,6 @@
 
 using System.Xml.XPath;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
@@ -36,18 +34,20 @@ public static class ParallelRunSettingsUtilities
     {
         var node = navigator.SelectSingleNode(XpathOfMaxCpuCount);
         // run settings given by user takes precedence over parallel switch
-        if (node == null)
+        if (node != null)
         {
-            var runConfigurationNavigator = navigator.SelectSingleNode(XpathOfRunConfiguration);
-            if (runConfigurationNavigator != null)
-            {
-                runConfigurationNavigator.AppendChild(MaxCpuCountSettingTemplate);
-            }
-            else
-            {
-                runConfigurationNavigator = navigator.SelectSingleNode(XpathOfRunSettings);
-                runConfigurationNavigator?.AppendChild(RunConfigurationWithMaxCpuCountSettingTemplate);
-            }
+            return;
+        }
+
+        var runConfigurationNavigator = navigator.SelectSingleNode(XpathOfRunConfiguration);
+        if (runConfigurationNavigator != null)
+        {
+            runConfigurationNavigator.AppendChild(MaxCpuCountSettingTemplate);
+        }
+        else
+        {
+            runConfigurationNavigator = navigator.SelectSingleNode(XpathOfRunSettings);
+            runConfigurationNavigator?.AppendChild(RunConfigurationWithMaxCpuCountSettingTemplate);
         }
     }
 }

@@ -26,7 +26,7 @@ internal class FakeAssemblyMetadataProvider : IAssemblyMetadataProvider
         return file.Architecture;
     }
 
-    public FrameworkName GetFrameWork(string filePath)
+    public FrameworkName GetFrameworkName(string filePath)
     {
         var file = FakeFileHelper.GetFakeFile<FakeTestDllFile>(filePath);
         return file.FrameworkName;

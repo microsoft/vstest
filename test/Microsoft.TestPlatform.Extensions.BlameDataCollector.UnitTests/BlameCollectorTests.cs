@@ -78,8 +78,8 @@ public class BlameCollectorTests
             _configurationElement,
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
-            null,
-            null));
+            null!,
+            null!));
     }
 
     /// <summary>

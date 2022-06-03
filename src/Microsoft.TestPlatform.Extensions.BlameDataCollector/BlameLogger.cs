@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 /// <summary>
@@ -69,7 +67,7 @@ public class BlameLogger : ITestLogger
     /// </summary>
     /// <param name="events">Events that can be registered for.</param>
     /// <param name="testRunDictionary">Test Run Directory</param>
-    public void Initialize(TestLoggerEvents events, string testRunDictionary)
+    public void Initialize(TestLoggerEvents events, string? testRunDictionary)
     {
         ValidateArg.NotNull(events, nameof(events));
         events.TestRunComplete += TestRunCompleteHandler;
@@ -126,21 +124,25 @@ public class BlameLogger : ITestLogger
         var faultyTestCaseNames = new List<string>();
         foreach (var attachmentSet in e.AttachmentSets)
         {
-            if (attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
+            if (!attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
             {
-                // Process only Sequence_<GUID>.xml attachments
-                var uriDataAttachment = attachmentSet.Attachments.LastOrDefault((attachment) => attachment.Uri.ToString().EndsWith(".xml"));
+                continue;
+            }
 
-                if (uriDataAttachment != null)
-                {
-                    var filepath = uriDataAttachment.Uri.LocalPath;
-                    var testCaseList = _blameReaderWriter.ReadTestSequence(filepath);
-                    if (testCaseList.Count > 0)
-                    {
-                        var testcases = testCaseList.Where(t => !t.IsCompleted).Select(t => t.FullyQualifiedName).ToList();
-                        faultyTestCaseNames.AddRange(testcases);
-                    }
-                }
+            // Process only Sequence_<GUID>.xml attachments
+            var uriDataAttachment = attachmentSet.Attachments.LastOrDefault((attachment) => attachment.Uri.ToString().EndsWith(".xml"));
+
+            if (uriDataAttachment == null)
+            {
+                continue;
+            }
+
+            var filepath = uriDataAttachment.Uri.LocalPath;
+            var testCaseList = _blameReaderWriter.ReadTestSequence(filepath);
+            if (testCaseList.Count > 0)
+            {
+                var testcases = testCaseList.Where(t => !t.IsCompleted).Select(t => t.FullyQualifiedName!).ToList();
+                faultyTestCaseNames.AddRange(testcases);
             }
         }
 

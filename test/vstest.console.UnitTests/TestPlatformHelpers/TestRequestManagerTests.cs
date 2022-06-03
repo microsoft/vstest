@@ -96,7 +96,7 @@ public class TestRequestManagerTests
             .Returns(_mockRunRequest.Object);
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.X86);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework40));
         _mockProcessHelper.Setup(x => x.GetCurrentProcessId()).Returns(1234);
         _mockProcessHelper.Setup(x => x.GetProcessName(It.IsAny<int>())).Returns("dotnet.exe");
@@ -667,7 +667,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -677,7 +677,7 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
         Assert.IsTrue(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
@@ -701,7 +701,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.X86);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework451));
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -711,7 +711,7 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Never);
 
         Assert.IsTrue(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
@@ -733,7 +733,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = false;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -742,7 +742,7 @@ public class TestRequestManagerTests
 
         _testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
         Assert.IsTrue(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
@@ -768,7 +768,7 @@ public class TestRequestManagerTests
         _commandLineOptions.TargetArchitecture = Architecture.X86;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -782,7 +782,7 @@ public class TestRequestManagerTests
 
         // we infer the architecture and framework, so we can print warning when they don't match settings.
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Once);
 
         // but we don't update the settings, to keep what user specified
         Assert.IsFalse(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
@@ -881,7 +881,7 @@ public class TestRequestManagerTests
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockDiscoveryRequest.Object);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework35));
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework35));
 
         var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
         var mockCustomlauncher = new Mock<ITestHostLauncher3>();
@@ -1397,7 +1397,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -1407,7 +1407,7 @@ public class TestRequestManagerTests
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
@@ -1434,7 +1434,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.X86);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework451));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -1445,7 +1445,7 @@ public class TestRequestManagerTests
 
         // infer them so we can print warning when dlls are not compatible with runsettings
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Once);
 
         // but don't update runsettings because we want to keep what user specified
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
@@ -1475,7 +1475,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.X86);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework451));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -1486,7 +1486,7 @@ public class TestRequestManagerTests
 
         // infer platform and framework so we can print warnings when dlls are not compatible with runsettings
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Once);
 
         // don't update it in runsettings to keep what user provided
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(targetPlatform));
@@ -1509,7 +1509,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = false;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -1519,7 +1519,7 @@ public class TestRequestManagerTests
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
@@ -1547,7 +1547,7 @@ public class TestRequestManagerTests
 
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -1558,7 +1558,7 @@ public class TestRequestManagerTests
 
         // infer them so we can print warnings when the assemblies are not compatible
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Once);
 
         // but don't update them in runsettings so we keep what user specified
         Assert.IsFalse(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
@@ -1589,7 +1589,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>())).Callback<string>(archSources.Add)
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>())).Callback<string>(fxSources.Add)
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>())).Callback<string>(fxSources.Add)
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -1599,7 +1599,7 @@ public class TestRequestManagerTests
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
@@ -2264,7 +2264,7 @@ public class TestRequestManagerTests
                 a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
         _mockAssemblyMetadataProvider.Setup(
-                a => a.GetFrameWork(It.IsAny<string>()))
+                a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
 
         _mockTestPlatform.Setup(
@@ -2288,7 +2288,7 @@ public class TestRequestManagerTests
             _protocolConfig);
 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
     }
 
     [TestMethod]

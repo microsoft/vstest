@@ -3,17 +3,15 @@
 
 using System.Diagnostics;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 internal class ProcessTreeNode
 {
-    public Process Process { get; set; }
+    public Process? Process { get; set; }
 
     public int Level { get; set; }
 
     public int ParentId { get; set; }
 
-    public Process ParentProcess { get; set; }
+    public Process? ParentProcess { get; set; }
 }

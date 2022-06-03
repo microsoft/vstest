@@ -133,35 +133,24 @@ internal class InferHelper
     public Framework AutoDetectFramework(IList<string?>? sources, out IDictionary<string, Framework> sourceToFrameworkMap)
     {
         sourceToFrameworkMap = new Dictionary<string, Framework>();
-        Framework framework = Framework.DefaultFramework;
 
         if (sources == null || sources.Count == 0)
-            return framework;
+            return Framework.DefaultFramework;
 
-        try
+        var framework = DetermineFramework(sources, out sourceToFrameworkMap, out var conflictInFxIdentifier);
+        if (conflictInFxIdentifier)
         {
-            var finalFx = DetermineFrameworkName(sources, out sourceToFrameworkMap, out var conflictInFxIdentifier);
-            TPDebug.Assert(finalFx != null, "finalFx should not be null");
-            framework = Framework.FromString(finalFx.FullName);
-            if (conflictInFxIdentifier)
-            {
-                // TODO Log to console and client.
-                EqtTrace.Info(
-                    "conflicts in Framework identifier of provided sources(test assemblies), using default framework:{0}",
-                    framework);
-            }
-        }
-        catch (Exception ex)
-        {
-            EqtTrace.Error("Failed to determine framework:{0}, using default: {1}", ex, framework);
+            // TODO Log to console and client.
+            EqtTrace.Info(
+                "conflicts in Framework identifier of provided sources(test assemblies), using default framework: {0}",
+                framework);
         }
 
         EqtTrace.Info("Determined framework for all sources: {0}", framework);
-
         return framework;
     }
 
-    private FrameworkName? DetermineFrameworkName(IEnumerable<string?> sources, out IDictionary<string, Framework> sourceToFrameworkMap, out bool conflictInFxIdentifier)
+    private Framework DetermineFramework(IEnumerable<string?> sources, out IDictionary<string, Framework> sourceToFrameworkMap, out bool conflictInFxIdentifier)
     {
         sourceToFrameworkMap = new Dictionary<string, Framework>();
 
@@ -180,7 +169,7 @@ internal class InferHelper
                 FrameworkName fx;
                 if (IsDllOrExe(source))
                 {
-                    fx = _assemblyMetadataProvider.GetFrameWork(source);
+                    fx = _assemblyMetadataProvider.GetFrameworkName(source);
                 }
                 else
                 {
@@ -231,7 +220,9 @@ internal class InferHelper
             }
         }
 
-        return finalFx;
+        return finalFx != null
+            ? Framework.FromString(finalFx.FullName)
+            : defaultFramework;
     }
 
     private static bool IsDllOrExe(string? filePath)

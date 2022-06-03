@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
 
 /// <summary>
@@ -42,10 +40,10 @@ public class TestResultCollection
     /// <summary>
     /// List of test results.
     /// </summary>
-    [DataMember] public List<TestResult> ResultList { get; set; }
+    [DataMember] public List<TestResult>? ResultList { get; set; }
 
     /// <summary>
     /// List of failed test results.
     /// </summary>
-    [DataMember] public List<TestResult> FailedResultList { get; set; }
+    [DataMember] public List<TestResult>? FailedResultList { get; set; }
 }
