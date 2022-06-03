@@ -101,14 +101,12 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <inheritdoc />
     public bool AttachDebuggerToProcess(int pid)
     {
-
-        var fmw =
 #if NETSTANDARD1_3
-                Framework.DefaultFramework.ToString();
-#elif NETSTANDARD
-            System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
-#elif NETFRAMEWORK
-               Framework.DefaultFramework.ToString();
+        var fmw = Framework.DefaultFramework.ToString();
+#elif NETSTANDARD || NET
+        var fmw = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+#else
+        var fmw = Framework.DefaultFramework.ToString();
 #endif
 
         var attachDebuggerInfo = new AttachDebuggerInfo
