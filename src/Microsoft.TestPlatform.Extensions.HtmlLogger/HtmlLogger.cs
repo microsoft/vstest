@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -22,8 +23,6 @@ using NuGet.Frameworks;
 using HtmlLoggerConstants = Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Constants;
 using HtmlResource = Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
 
 /// <summary>
@@ -37,7 +36,7 @@ public class HtmlLogger : ITestLoggerWithParameters
     private readonly XmlObjectSerializer _xmlSerializer;
     private readonly IHtmlTransformer _htmlTransformer;
     private static readonly object FileCreateLockObject = new();
-    private Dictionary<string, string> _parametersDictionary;
+    private Dictionary<string, string?>? _parametersDictionary;
 
     public HtmlLogger()
         : this(new FileHelper(), new HtmlTransformer(), new DataContractSerializer(typeof(TestRunDetails)))
@@ -55,23 +54,23 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// <summary>
     /// Gets the directory under which default html file and test results attachments should be saved.
     /// </summary>
-    public string TestResultsDirPath { get; private set; }
+    public string? TestResultsDirPath { get; private set; }
 
     /// <summary>
     /// Total results are stored in sequential order
     /// </summary>
     /// <returns></returns>
-    public ConcurrentDictionary<Guid, ObjectModel.TestResult> Results { get; private set; }
+    public ConcurrentDictionary<Guid, ObjectModel.TestResult>? Results { get; private set; }
 
     /// <summary>
     ///
     /// </summary>
-    public ConcurrentDictionary<string, TestResultCollection> ResultCollectionDictionary { get; private set; }
+    public ConcurrentDictionary<string, TestResultCollection>? ResultCollectionDictionary { get; private set; }
 
     /// <summary>
     /// Test results stores all the summary and the details of every results in hierarchical order.
     /// </summary>
-    public TestRunDetails TestRunDetails { get; private set; }
+    public TestRunDetails? TestRunDetails { get; private set; }
 
     /// <summary>
     /// Total passed tests in the test results.
@@ -96,14 +95,15 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// <summary>
     /// Path to the xml file.
     /// </summary>
-    public string XmlFilePath { get; private set; }
+    public string? XmlFilePath { get; private set; }
 
     /// <summary>
     /// path to html file.
     /// </summary>
-    public string HtmlFilePath { get; private set; }
+    public string? HtmlFilePath { get; private set; }
 
     /// <inheritdoc/>
+    [MemberNotNull(nameof(TestResultsDirPath), nameof(TestRunDetails), nameof(Results), nameof(ResultCollectionDictionary))]
     public void Initialize(TestLoggerEvents events, string testResultsDirPath)
     {
         ValidateArg.NotNull(events, nameof(events));
@@ -124,7 +124,8 @@ public class HtmlLogger : ITestLoggerWithParameters
     }
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+    [MemberNotNull(nameof(_parametersDictionary))]
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters)
     {
         ValidateArg.NotNull(parameters, nameof(parameters));
         if (parameters.Count == 0)
@@ -140,7 +141,7 @@ public class HtmlLogger : ITestLoggerWithParameters
             throw new ArgumentException(htmlParameterErrorMsg);
         }
 
-        Initialize(events, parameters[DefaultLoggerParameterNames.TestRunDirectory]);
+        Initialize(events, parameters[DefaultLoggerParameterNames.TestRunDirectory]!);
     }
 
     /// <summary>
@@ -148,10 +149,11 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void TestMessageHandler(object sender, TestRunMessageEventArgs e)
+    public void TestMessageHandler(object? sender, TestRunMessageEventArgs e)
     {
-        ValidateArg.NotNull(sender, nameof(sender));
         ValidateArg.NotNull(e, nameof(e));
+
+        TPDebug.Assert(TestRunDetails != null, "Initialize must be called before this method.");
 
         switch (e.Level)
         {
@@ -184,10 +186,11 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void TestResultHandler(object sender, TestResultEventArgs e)
+    public void TestResultHandler(object? sender, TestResultEventArgs e)
     {
-        ValidateArg.NotNull(sender, nameof(sender));
         ValidateArg.NotNull(e, nameof(e));
+
+        TPDebug.Assert(ResultCollectionDictionary != null && TestRunDetails != null && Results != null, "Initialize must be called before this method.");
 
         var testResult = new ObjectModel.TestResult
         {
@@ -212,7 +215,7 @@ public class HtmlLogger : ITestLoggerWithParameters
                 FailedResultList = new List<ObjectModel.TestResult>(),
             };
             ResultCollectionDictionary.TryAdd(e.Result.TestCase.Source, testResultCollection);
-            TestRunDetails.ResultCollectionList.Add(testResultCollection);
+            TestRunDetails.ResultCollectionList!.Add(testResultCollection);
         }
 
         TotalTests++;
@@ -238,10 +241,10 @@ public class HtmlLogger : ITestLoggerWithParameters
         {
             if (e.Result.Outcome == TestOutcome.Failed)
             {
-                testResultCollection.FailedResultList.Add(testResult);
+                testResultCollection.FailedResultList!.Add(testResult);
             }
 
-            testResultCollection.ResultList.Add(testResult);
+            testResultCollection.ResultList!.Add(testResult);
         }
         else
         {
@@ -251,6 +254,9 @@ public class HtmlLogger : ITestLoggerWithParameters
 
     private void AddToParentResult(Guid parentExecutionId, ObjectModel.TestResult testResult)
     {
+        TPDebug.Assert(Results != null, "Initialize must be called before this method.");
+
+
         if (Results.TryGetValue(parentExecutionId, out var parentTestResult))
         {
             if (parentTestResult.InnerTestResults == null)
@@ -265,8 +271,10 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
+    public void TestRunCompleteHandler(object? sender, TestRunCompleteEventArgs e)
     {
+        TPDebug.Assert(TestRunDetails != null && _parametersDictionary != null, "Initialize must be called before this method.");
+
         TestRunDetails.Summary = new TestRunSummary
         {
             FailedTests = FailedTests,
@@ -276,7 +284,7 @@ public class HtmlLogger : ITestLoggerWithParameters
             PassPercentage = TotalTests == 0 ? 0 : PassedTests * 100 / TotalTests,
             TotalRunTime = GetFormattedDurationString(e.ElapsedTimeInRunningTests),
         };
-        if (_parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue))
+        if (_parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string? logFilePrefixValue) && !logFilePrefixValue.IsNullOrWhiteSpace())
         {
             var framework = _parametersDictionary[DefaultLoggerParameterNames.TargetFramework];
             if (framework != null)
@@ -290,7 +298,7 @@ public class HtmlLogger : ITestLoggerWithParameters
         }
         else
         {
-            if (_parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue))
+            if (_parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string? logFileNameValue) && !logFileNameValue.IsNullOrWhiteSpace())
             {
                 HtmlFilePath = Path.Combine(TestResultsDirPath, logFileNameValue);
             }
@@ -314,7 +322,7 @@ public class HtmlLogger : ITestLoggerWithParameters
                 _xmlSerializer.WriteObject(xmlStream, TestRunDetails);
             }
 
-            if (string.IsNullOrEmpty(HtmlFilePath))
+            if (HtmlFilePath.IsNullOrEmpty())
             {
                 HtmlFilePath = GenerateUniqueFilePath(fileName, HtmlLoggerConstants.HtmlFileExtension);
             }
@@ -361,7 +369,7 @@ public class HtmlLogger : ITestLoggerWithParameters
         throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, HtmlResource.CannotGenerateUniqueFilePath, fileName, TestResultsDirPath));
     }
 
-    private string FormatDateTimeForRunName(DateTime timeStamp)
+    private static string FormatDateTimeForRunName(DateTime timeStamp)
     {
         return timeStamp.ToString("yyyyMMdd_HHmmss", DateTimeFormatInfo.InvariantInfo);
     }
@@ -371,7 +379,7 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns></returns>
-    private Guid GetParentExecutionId(TestPlatform.ObjectModel.TestResult testResult)
+    private static Guid GetParentExecutionId(TestPlatform.ObjectModel.TestResult testResult)
     {
         var parentExecutionIdProperty = testResult.Properties.FirstOrDefault(property =>
             property.Id.Equals(HtmlLoggerConstants.ParentExecutionIdPropertyIdentifier));
@@ -385,7 +393,7 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns></returns>
-    private Guid GetExecutionId(TestPlatform.ObjectModel.TestResult testResult)
+    private static Guid GetExecutionId(TestPlatform.ObjectModel.TestResult testResult)
     {
         var executionIdProperty = testResult.Properties.FirstOrDefault(property =>
             property.Id.Equals(HtmlLoggerConstants.ExecutionIdPropertyIdentifier));
@@ -404,7 +412,7 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="duration"></param>
     /// <returns></returns>
-    internal string GetFormattedDurationString(TimeSpan duration)
+    internal static string? GetFormattedDurationString(TimeSpan duration)
     {
         if (duration == default)
         {

@@ -855,7 +855,7 @@ internal class TestRequestManager : ITestRequestManager
         return !designMode || consoleLoggerUpdated;
     }
 
-    private bool UpdateTargetDevice(
+    private static bool UpdateTargetDevice(
         XPathNavigator navigator,
         XmlDocument document)
     {
