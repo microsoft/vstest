@@ -65,7 +65,7 @@ public class CommandLineOptionsTests
     [TestMethod]
     public void CommandLineOptionsAddSourceShouldThrowCommandLineExceptionForNullSource()
     {
-        Assert.ThrowsException<TestSourceException>(() => CommandLineOptions.Instance.AddSource(null));
+        Assert.ThrowsException<TestSourceException>(() => CommandLineOptions.Instance.AddSource(null!));
     }
 
     [TestMethod]

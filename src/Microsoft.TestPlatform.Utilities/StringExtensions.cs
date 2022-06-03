@@ -4,15 +4,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 public static class StringExtensions
 {
-    public static IEnumerable<string> Tokenize(this string input, char separator, char escape)
+    public static IEnumerable<string> Tokenize(this string? input, char separator, char escape)
     {
-        if (string.IsNullOrEmpty(input)) yield break;
+        if (input.IsNullOrEmpty())
+            yield break;
 
         var buffer = new StringBuilder();
         var escaping = false;
@@ -36,7 +35,8 @@ public static class StringExtensions
                 buffer.Append(c);
             }
         }
-        if (buffer.Length > 0 || input[input.Length - 1] == separator) yield return buffer.Flush();
+        if (buffer.Length > 0 || input[input.Length - 1] == separator)
+            yield return buffer.Flush();
     }
 
     private static string Flush(this StringBuilder stringBuilder)

@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
@@ -20,23 +19,20 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 internal class RunTestsArgumentProcessor : IArgumentProcessor
 {
     public const string CommandName = "/RunTests";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     public Lazy<IArgumentProcessorCapabilities> Metadata
         => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
             new RunTestsArgumentProcessorCapabilities());
 
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new RunTestsArgumentExecutor(
@@ -111,7 +107,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         IArtifactProcessingManager artifactProcessingManager,
         IOutput output)
     {
-        Contract.Requires(commandLineOptions != null);
+        ValidateArg.NotNull(commandLineOptions, nameof(commandLineOptions));
 
         _commandLineOptions = commandLineOptions;
         _runSettingsManager = runSettingsProvider;
@@ -120,7 +116,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions, artifactProcessingManager);
     }
 
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         // Nothing to do.
     }
@@ -130,8 +126,8 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
     /// </summary>
     public ArgumentProcessorResult Execute()
     {
-        Contract.Assert(_commandLineOptions != null);
-        Contract.Assert(!string.IsNullOrWhiteSpace(_runSettingsManager?.ActiveRunSettings?.SettingsXml));
+        TPDebug.Assert(_commandLineOptions != null);
+        TPDebug.Assert(!StringUtils.IsNullOrWhiteSpace(_runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
         if (_commandLineOptions.IsDesignMode)
         {
@@ -147,7 +143,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         }
 
         Output.WriteLine(CommandLineResources.StartingExecution, OutputLevel.Information);
-        if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+        if (!StringUtils.IsNullOrEmpty(EqtTrace.LogFile))
         {
             Output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
         }

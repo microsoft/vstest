@@ -102,7 +102,7 @@ public class ListTestsArgumentProcessorTests
     public void GetExecuterShouldReturnListTestsArgumentProcessorCapabilities()
     {
         var processor = new ListTestsArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is ListTestsArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is ListTestsArgumentExecutor);
     }
 
     #region ListTestsArgumentProcessorCapabilitiesTests

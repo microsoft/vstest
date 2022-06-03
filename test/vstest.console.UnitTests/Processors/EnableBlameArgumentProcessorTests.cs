@@ -57,7 +57,7 @@ public class EnableBlameArgumentProcessorTests
     public void GetExecuterShouldReturnEnableBlameArgumentProcessorCapabilities()
     {
         var processor = new EnableBlameArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is EnableBlameArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is EnableBlameArgumentExecutor);
     }
 
     [TestMethod]

@@ -42,7 +42,7 @@ public class ResultsDirectoryArgumentProcessorTests
     public void GetExecuterShouldReturnResultsDirectoryArgumentExecutor()
     {
         var processor = new ResultsDirectoryArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is ResultsDirectoryArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is ResultsDirectoryArgumentExecutor);
     }
 
     #region ResultsDirectoryArgumentProcessorCapabilities tests

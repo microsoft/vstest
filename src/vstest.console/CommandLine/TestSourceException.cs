@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 /// <summary>
@@ -24,7 +22,7 @@ public class TestSourceException : Exception
     /// Initializes with the message.
     /// </summary>
     /// <param name="message">Message for the exception.</param>
-    public TestSourceException(string message)
+    public TestSourceException(string? message)
         : this(message, innerException: null)
     {
     }
@@ -34,7 +32,7 @@ public class TestSourceException : Exception
     /// </summary>
     /// <param name="message">Message for the exception.</param>
     /// <param name="innerException">The exception that is the cause of the current exception, or a null reference.</param>
-    public TestSourceException(string message, Exception innerException)
+    public TestSourceException(string? message, Exception? innerException)
         : base(message, innerException)
     {
     }

@@ -86,7 +86,7 @@ public class RunTestsArgumentProcessorTests
     public void GetExecuterShouldReturnRunTestsArgumentProcessorCapabilities()
     {
         RunTestsArgumentProcessor processor = new();
-        Assert.IsTrue(processor.Executor.Value is RunTestsArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is RunTestsArgumentExecutor);
     }
 
     #region RunTestsArgumentProcessorCapabilitiesTests

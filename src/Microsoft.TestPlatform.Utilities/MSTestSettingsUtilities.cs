@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
@@ -60,7 +58,7 @@ public static class MSTestSettingsUtilities
         return defaultRunSettings;
     }
 
-    public static bool IsLegacyTestSettingsFile(string settingsFile)
+    public static bool IsLegacyTestSettingsFile(string? settingsFile)
     {
         return string.Equals(Path.GetExtension(settingsFile), ".testSettings", StringComparison.OrdinalIgnoreCase)
             || string.Equals(Path.GetExtension(settingsFile), ".testrunConfig", StringComparison.OrdinalIgnoreCase)

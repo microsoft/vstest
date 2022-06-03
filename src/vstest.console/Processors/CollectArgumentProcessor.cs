@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -20,8 +21,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
@@ -34,9 +33,8 @@ internal class CollectArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/Collect";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -48,7 +46,7 @@ internal class CollectArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new CollectArgumentExecutor(RunSettingsManager.Instance, new FileHelper()));
@@ -56,7 +54,6 @@ internal class CollectArgumentProcessor : IArgumentProcessor
         set => _executor = value;
     }
 }
-
 
 internal class CollectArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
 {
@@ -86,7 +83,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     }
 
     /// <inheritdoc />
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         // 1. Disable all other data collectors. Enable only those data collectors that are explicitly specified by user.
         // 2. Check if Code Coverage Data Collector is specified in runsettings, if not add it and also set enable to true.
@@ -94,7 +91,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
         string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.DataCollectorFriendlyNameInvalid, argument);
 
         // if argument is null or doesn't contain any element, don't do anything.
-        if (string.IsNullOrWhiteSpace(argument))
+        if (argument.IsNullOrWhiteSpace())
         {
             throw new CommandLineException(exceptionMessage);
         }
@@ -118,7 +115,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     /// <summary>
     /// Returns coverlet code base searching coverlet.collector.dll assembly inside adaptersPaths
     /// </summary>
-    private static string GetCoverletCodeBasePath(IRunSettingsProvider runSettingProvider, IFileHelper fileHelper)
+    private static string? GetCoverletCodeBasePath(IRunSettingsProvider runSettingProvider, IFileHelper fileHelper)
     {
         foreach (string adapterPath in RunSettingsUtilities.GetTestAdaptersPaths(runSettingProvider.ActiveRunSettings.SettingsXml))
         {
@@ -142,7 +139,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     internal static DataCollectorSettings EnableDataCollectorUsingFriendlyName(string argument, DataCollectionRunSettings dataCollectionRunSettings)
     {
 
-        if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out DataCollectorSettings dataCollectorSettings))
+        if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out var dataCollectorSettings))
         {
             dataCollectorSettings = new DataCollectorSettings();
             dataCollectorSettings.FriendlyName = argument;
@@ -205,7 +202,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     internal static void EnableCoverletInProcDataCollector(string argument, DataCollectionRunSettings dataCollectionRunSettings, IRunSettingsProvider runSettingProvider, IFileHelper fileHelper)
     {
 
-        if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out DataCollectorSettings dataCollectorSettings))
+        if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out DataCollectorSettings? dataCollectorSettings))
         {
             // Create a new setting with default values
             dataCollectorSettings = new DataCollectorSettings();
@@ -226,7 +223,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
 
     private static bool DoesDataCollectorSettingsExist(string friendlyName,
         DataCollectionRunSettings dataCollectionRunSettings,
-        out DataCollectorSettings dataCollectorSettings)
+        [NotNullWhen(returnValue: true)] out DataCollectorSettings? dataCollectorSettings)
     {
         dataCollectorSettings = null;
         foreach (var dataCollectorSetting in dataCollectionRunSettings.DataCollectorSettingsList)

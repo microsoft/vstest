@@ -33,7 +33,7 @@ internal class TestSessionCorrelationIdProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new TestSessionCorrelationIdProcessorModeProcessorExecutor(CommandLineOptions.Instance));
@@ -72,7 +72,7 @@ internal class TestSessionCorrelationIdProcessorModeProcessorExecutor : IArgumen
 
     public void Initialize(string? argument)
     {
-        if (string.IsNullOrEmpty(argument))
+        if (argument.IsNullOrEmpty())
         {
             throw new CommandLineException(CommandLineResources.InvalidTestSessionCorrelationId);
         }
