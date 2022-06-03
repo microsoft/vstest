@@ -32,7 +32,7 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
     }
 
     /// <inheritdoc />
-    public FrameworkName GetFrameWork(string filePath)
+    public FrameworkName GetFrameworkName(string filePath)
     {
         FrameworkName frameworkName = new(Framework.DefaultFramework.Name);
         try
@@ -42,10 +42,10 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
         }
         catch (Exception ex)
         {
-            EqtTrace.Warning("AssemblyMetadataProvider.GetFrameWork: failed to determine TargetFrameworkVersion exception: {0} for assembly: {1}", ex, filePath);
+            EqtTrace.Warning("AssemblyMetadataProvider.GetFrameworkName: failed to determine TargetFrameworkVersion exception: {0} for assembly: {1}", ex, filePath);
         }
 
-        EqtTrace.Info("AssemblyMetadataProvider.GetFrameWork: Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
+        EqtTrace.Info("AssemblyMetadataProvider.GetFrameworkName: Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
 
         return frameworkName;
     }
