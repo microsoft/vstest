@@ -222,18 +222,18 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnHighestVersionFxOnSameFxName()
     {
-        _mockAssemblyHelper.SetupSequence(sh => sh.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyHelper.SetupSequence(sh => sh.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(_frameworkNet46.Name))
             .Returns(new FrameworkName(_frameworkNet47.Name))
             .Returns(new FrameworkName(_frameworkNet45.Name));
         Assert.AreEqual(_frameworkNet47.Name, _inferHelper.AutoDetectFramework(new List<string?>() { "net46.dll", "net47.exe", "net45.dll" }, out _).Name);
-        _mockAssemblyHelper.Verify(ah => ah.GetFrameWork(It.IsAny<string>()), Times.Exactly(3));
+        _mockAssemblyHelper.Verify(ah => ah.GetFrameworkName(It.IsAny<string>()), Times.Exactly(3));
     }
 
     [TestMethod]
     public void AutoDetectFrameworkShouldPopulatetheDictionaryForAllTheSources()
     {
-        _mockAssemblyHelper.SetupSequence(sh => sh.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyHelper.SetupSequence(sh => sh.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(_frameworkNet46.Name))
             .Returns(new FrameworkName(_frameworkNet47.Name))
             .Returns(new FrameworkName(_frameworkNet45.Name));
@@ -244,28 +244,28 @@ public class InferHelperTests
         Assert.AreEqual(_frameworkNet46.Name, sourceFrameworks["net46.dll"].Name);
         Assert.AreEqual(_frameworkNet47.Name, sourceFrameworks["net47.exe"].Name);
         Assert.AreEqual(_frameworkNet45.Name, sourceFrameworks["net45.dll"].Name);
-        _mockAssemblyHelper.Verify(ah => ah.GetFrameWork(It.IsAny<string>()), Times.Exactly(3));
+        _mockAssemblyHelper.Verify(ah => ah.GetFrameworkName(It.IsAny<string>()), Times.Exactly(3));
     }
 
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnHighestVersionFxOnEvenManyLowerVersionFxNameExists()
     {
-        _mockAssemblyHelper.SetupSequence(sh => sh.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyHelper.SetupSequence(sh => sh.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(_frameworkCore10.Name))
             .Returns(new FrameworkName(_frameworkCore11.Name))
             .Returns(new FrameworkName(_frameworkCore10.Name));
         Assert.AreEqual(_frameworkCore11.Name, _inferHelper.AutoDetectFramework(new List<string?>() { "netcore10_1.dll", "netcore11.dll", "netcore10_2.dll" }, out _).Name);
-        _mockAssemblyHelper.Verify(ah => ah.GetFrameWork(It.IsAny<string>()), Times.Exactly(3));
+        _mockAssemblyHelper.Verify(ah => ah.GetFrameworkName(It.IsAny<string>()), Times.Exactly(3));
     }
 
     private void SetupAndValidateForSingleAssembly(string assemblyName, Framework fx, bool verify)
     {
-        _mockAssemblyHelper.Setup(sh => sh.GetFrameWork(assemblyName))
+        _mockAssemblyHelper.Setup(sh => sh.GetFrameworkName(assemblyName))
             .Returns(new FrameworkName(fx.Name));
         Assert.AreEqual(fx.Name, _inferHelper.AutoDetectFramework(new List<string?>() { assemblyName }, out _).Name);
         if (verify)
         {
-            _mockAssemblyHelper.Verify(ah => ah.GetFrameWork(assemblyName));
+            _mockAssemblyHelper.Verify(ah => ah.GetFrameworkName(assemblyName));
         }
     }
 }

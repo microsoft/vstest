@@ -4,8 +4,6 @@
 using System;
 using System.Threading;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 public class InactivityTimer : IInactivityTimer

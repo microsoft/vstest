@@ -3,8 +3,6 @@
 
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
 
 /// <summary>
@@ -21,7 +19,7 @@ public class TestRunSummary
     /// <summary>
     /// Total test run time.
     /// </summary>
-    [DataMember] public string TotalRunTime { get; set; }
+    [DataMember] public string? TotalRunTime { get; set; }
 
     /// <summary>
     /// Total tests of a test run.

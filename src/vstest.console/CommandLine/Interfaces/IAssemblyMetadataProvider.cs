@@ -15,7 +15,7 @@ internal interface IAssemblyMetadataProvider
     /// <summary>
     /// Determines FrameworkName from filePath.
     /// </summary>
-    FrameworkName GetFrameWork(string filePath);
+    FrameworkName GetFrameworkName(string filePath);
 
     /// <summary>
     /// Determines Architecture from filePath.
