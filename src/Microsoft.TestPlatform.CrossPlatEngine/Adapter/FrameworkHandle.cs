@@ -9,8 +9,10 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
@@ -32,7 +34,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <summary>
     /// DebugLauncher for launching additional adapter processes under debugger
     /// </summary>
-    private readonly ITestRunEventsHandler _testRunEventsHandler;
+    private readonly IInternalTestRunEventsHandler _testRunEventsHandler;
 
     /// <summary>
     /// Specifies whether the handle is disposed or not
@@ -47,7 +49,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <param name="testExecutionContext"> The test execution context. </param>
     /// <param name="testRunEventsHandler">TestRun Events Handler</param>
     public FrameworkHandle(ITestCaseEventsHandler testCaseEventsHandler, ITestRunCache testRunCache,
-        TestExecutionContext testExecutionContext, ITestRunEventsHandler testRunEventsHandler)
+        TestExecutionContext testExecutionContext, IInternalTestRunEventsHandler testRunEventsHandler)
         : base(testCaseEventsHandler, testRunCache)
     {
         _testExecutionContext = testExecutionContext;
@@ -99,7 +101,20 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <inheritdoc />
     public bool AttachDebuggerToProcess(int pid)
     {
-        return ((ITestRunEventsHandler2)_testRunEventsHandler).AttachDebuggerToProcess(pid);
+#if NETSTANDARD1_3
+        var fmw = Framework.DefaultFramework.ToString();
+#elif NETSTANDARD || NET
+        var fmw = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+#else
+        var fmw = Framework.DefaultFramework.ToString();
+#endif
+
+        var attachDebuggerInfo = new AttachDebuggerInfo
+        {
+            ProcessId = pid,
+            TargetFramework = fmw,
+        };
+        return _testRunEventsHandler.AttachDebuggerToProcess(attachDebuggerInfo);
     }
 
     public void Dispose()

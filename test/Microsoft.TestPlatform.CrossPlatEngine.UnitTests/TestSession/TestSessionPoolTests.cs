@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -78,7 +79,7 @@ public class TestSessionPoolTests
 
         mockProxyTestSessionManager.SetupSequence(tsm => tsm.DequeueProxy(It.IsAny<string>(), It.IsAny<string>()))
             .Throws(new InvalidOperationException("Test Exception"))
-            .Returns(new ProxyOperationManager(null, null, null));
+            .Returns(new ProxyOperationManager(null, null, null, Framework.DefaultFramework));
 
         Assert.IsNotNull(TestSessionPool.Instance);
         // Take proxy fails because test session is invalid.

@@ -508,7 +508,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     {
         public TestableProxyOperationManager(IRequestData requestData,
             ITestRequestSender requestSender,
-            ITestRuntimeProvider testHostManager) : base(requestData, requestSender, testHostManager)
+            ITestRuntimeProvider testHostManager) : base(requestData, requestSender, testHostManager, Framework.DefaultFramework)
         {
         }
 
@@ -516,7 +516,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
             IRequestData requestData,
             ITestRequestSender requestSender,
             ITestRuntimeProvider testHostManager,
-            CancellationTokenSource cancellationTokenSource) : base(requestData, requestSender, testHostManager)
+            CancellationTokenSource cancellationTokenSource) : base(requestData, requestSender, testHostManager, Framework.DefaultFramework)
         {
             CancellationTokenSource = cancellationTokenSource;
         }

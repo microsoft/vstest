@@ -73,7 +73,7 @@ public class FrameworkHandleTests
     {
         var tec = GetTestExecutionContext();
         tec.IsDebug = true;
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         var frameworkHandle = new FrameworkHandle(
             null,

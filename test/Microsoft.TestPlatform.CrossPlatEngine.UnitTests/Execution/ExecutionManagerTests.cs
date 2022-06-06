@@ -154,7 +154,7 @@ public class ExecutionManagerTests
             { assemblyLocation, new List<string> { assemblyLocation } }
         };
 
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         var isExecutorCalled = false;
         RunTestWithSourcesExecutor.RunTestsWithSourcesCallback = (s, rc, fh) =>
@@ -192,7 +192,7 @@ public class ExecutionManagerTests
             new TestCase("A.C.M1", new Uri(RunTestsWithSourcesTestsExecutorUri), assemblyLocation)
         };
 
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         var isExecutorCalled = false;
         RunTestWithSourcesExecutor.RunTestsWithTestsCallback = (s, rc, fh) =>
@@ -225,7 +225,7 @@ public class ExecutionManagerTests
     [TestMethod]
     public void StartTestRunShouldAbortTheRunIfAnyExceptionComesForTheProvidedTests()
     {
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         // Call StartTestRun with faulty runsettings so that it will throw exception
         _executionManager.StartTestRun(new List<TestCase>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", _testExecutionContext, null, mockTestRunEventsHandler.Object);
@@ -238,7 +238,7 @@ public class ExecutionManagerTests
     [TestMethod]
     public void StartTestRunShouldAbortTheRunIfAnyExceptionComesForTheProvidedSources()
     {
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         // Call StartTestRun with faulty runsettings so that it will throw exception
         _executionManager.StartTestRun(new Dictionary<string, IEnumerable<string>>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", _testExecutionContext, null, mockTestRunEventsHandler.Object);

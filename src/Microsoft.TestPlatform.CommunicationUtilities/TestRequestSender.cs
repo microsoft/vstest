@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -57,9 +58,7 @@ public class TestRequestSender : ITestRequestSender
     // that implies host is using version 1.
     private int _protocolVersion = 1;
 
-    // Must be in sync with the highest supported version in
-    // src/Microsoft.TestPlatform.CrossPlatEngine/EventHandlers/TestRequestHandler.cs file.
-    private readonly int _highestSupportedVersion = 6;
+    private readonly int _highestSupportedVersion = ProtocolVersioning.HighestSupportedVersion;
 
     private readonly TestHostConnectionInfo _connectionInfo;
 
@@ -328,7 +327,7 @@ public class TestRequestSender : ITestRequestSender
     }
 
     /// <inheritdoc />
-    public void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler)
+    public void StartTestRun(TestRunCriteriaWithSources runCriteria, IInternalTestRunEventsHandler eventHandler)
     {
         _messageEventHandler = eventHandler;
         _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
@@ -350,7 +349,6 @@ public class TestRequestSender : ITestRequestSender
             && _runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
             && _protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
         {
-            var handler = (ITestRunEventsHandler2)eventHandler;
             if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
             {
                 EqtTrace.Warning(
@@ -371,7 +369,7 @@ public class TestRequestSender : ITestRequestSender
     }
 
     /// <inheritdoc />
-    public void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler)
+    public void StartTestRun(TestRunCriteriaWithTests runCriteria, IInternalTestRunEventsHandler eventHandler)
     {
         _messageEventHandler = eventHandler;
         _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
@@ -393,7 +391,6 @@ public class TestRequestSender : ITestRequestSender
             && _runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
             && _protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
         {
-            var handler = (ITestRunEventsHandler2)eventHandler;
             if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
             {
                 EqtTrace.Warning(
@@ -487,7 +484,7 @@ public class TestRequestSender : ITestRequestSender
         GC.SuppressFinalize(this);
     }
 
-    private void OnExecutionMessageReceived(MessageReceivedEventArgs messageReceived, ITestRunEventsHandler testRunEventsHandler)
+    private void OnExecutionMessageReceived(MessageReceivedEventArgs messageReceived, IInternalTestRunEventsHandler testRunEventsHandler)
     {
         try
         {
@@ -536,8 +533,9 @@ public class TestRequestSender : ITestRequestSender
                     break;
 
                 case MessageType.AttachDebugger:
-                    var testProcessPid = _dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
-                    bool result = ((ITestRunEventsHandler2)testRunEventsHandler).AttachDebuggerToProcess(testProcessPid.ProcessID);
+                    var testProcessAttachDebuggerPayload = _dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
+                    AttachDebuggerInfo attachDebugerInfo = MessageConverter.ConvertToAttachDebuggerInfo(testProcessAttachDebuggerPayload, message, _protocolVersion);
+                    bool result = testRunEventsHandler.AttachDebuggerToProcess(attachDebugerInfo);
 
                     var resultMessage = _dataSerializer.SerializePayload(
                         MessageType.AttachDebuggerCallback,
@@ -611,7 +609,7 @@ public class TestRequestSender : ITestRequestSender
         }
     }
 
-    private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception, bool getClientError)
+    private void OnTestRunAbort(IInternalTestRunEventsHandler testRunEventsHandler, Exception exception, bool getClientError)
     {
         if (IsOperationComplete())
         {
@@ -767,5 +765,26 @@ public class TestRequestSender : ITestRequestSender
             EqtTrace.Verbose("TestRequestSender is acting as server.");
             return new SocketServer();
         }
+    }
+}
+
+internal class MessageConverter
+{
+    internal static AttachDebuggerInfo ConvertToAttachDebuggerInfo(TestProcessAttachDebuggerPayload attachDebuggerPayload, Message message, int protocolVersion)
+    {
+        // There is nothing to do differently based on those versions.
+        //var sourceVersion = GetVersion(message);
+        //var targetVersion = protocolVersion;
+
+        return new AttachDebuggerInfo
+        {
+            ProcessId = attachDebuggerPayload.ProcessID,
+            TargetFramework = attachDebuggerPayload?.TargetFramework,
+        };
+    }
+
+    private static int GetVersion(Message message)
+    {
+        return (message as VersionedMessage)?.Version ?? 0;
     }
 }
