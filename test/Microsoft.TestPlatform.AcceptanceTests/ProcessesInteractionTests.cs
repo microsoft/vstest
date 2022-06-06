@@ -30,7 +30,7 @@ public class ProcessesInteractionTests : AcceptanceTestBase
 
         // Assert
         ExitCodeEquals(1);
-        StdErrorContains("The framework 'Microsoft.NETCore.App', version '0.0.0' (x64) was not found.");
+        StdErrorRegexIsMatch("You must install or update \\.NET to run this application\\. App: .*testhost\\.exe Architecture: x64 Framework: 'Microsoft\\.NETCore\\.App', version '0\\.0\\.0' \\(x64\\)");
 
         static void UpdateRuntimeConfigJsonWithInvalidFramework(string assemblyPath, string testAssetProjectName)
         {

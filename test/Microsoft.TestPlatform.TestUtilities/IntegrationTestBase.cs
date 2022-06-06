@@ -406,6 +406,11 @@ public class IntegrationTestBase
         Assert.IsTrue(_standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", _standardTestError, substring);
     }
 
+    public void StdErrorRegexIsMatch(string pattern)
+    {
+        Assert.IsTrue(Regex.IsMatch(_standardTestError, pattern), "StdErrorOutput - [{0}] did not contain expected pattern '{1}'", _standardTestError, pattern);
+    }
+
     public void StdErrorDoesNotContains(string substring)
     {
         Assert.IsFalse(_standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", _standardTestError, substring);
