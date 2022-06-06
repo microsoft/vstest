@@ -52,6 +52,8 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private const string TestAdapterRegexPattern = @"TestAdapter.dll";
     private const string PROCESSOR_ARCHITECTURE = nameof(PROCESSOR_ARCHITECTURE);
 
+    private static readonly Version Version6_0 = new(6, 0);
+
     private readonly IDotnetHostHelper _dotnetHostHelper;
     private readonly IEnvironment _platformEnvironment;
     private readonly IProcessHelper _processHelper;
@@ -469,19 +471,24 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         // i.e. I've got only private install and no global installation, in this case apphost needs to use env var to locate runtime.
         if (testHostExeFound)
         {
-            string prefix = "VSTEST_WINAPPHOST_";
-            string dotnetRootEnvName = $"{prefix}DOTNET_ROOT(x86)";
-            var dotnetRoot = _environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName);
-            if (dotnetRoot is null)
+            const string prefix = "VSTEST_WINAPPHOST_";
+            const string dotnetRoot = "DOTNET_ROOT";
+            string vstestDotnetRootEnvName = $"{prefix}{dotnetRoot}(x86)";
+            var vstestDotnetRootEnvValue = _environmentVariableHelper.GetEnvironmentVariable(vstestDotnetRootEnvName);
+            if (vstestDotnetRootEnvValue is null)
             {
-                dotnetRootEnvName = $"{prefix}DOTNET_ROOT";
-                dotnetRoot = _environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName);
+                vstestDotnetRootEnvName = $"{prefix}{dotnetRoot}";
+                vstestDotnetRootEnvValue = _environmentVariableHelper.GetEnvironmentVariable(vstestDotnetRootEnvName);
             }
 
-            if (dotnetRoot != null)
+            if (vstestDotnetRootEnvValue != null)
             {
-                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{dotnetRootEnvName}' in env variables, value '{dotnetRoot}', forwarding to '{dotnetRootEnvName.Replace(prefix, string.Empty)}'");
-                startInfo.EnvironmentVariables.Add(dotnetRootEnvName.Replace(prefix, string.Empty), dotnetRoot);
+                string dotnetRootEnvName = Version.Parse(_targetFramework.Version) >= Version6_0
+                    ? $"{dotnetRoot}_{_architecture.ToString().ToUpperInvariant()}"
+                    : vstestDotnetRootEnvName.Replace(prefix, string.Empty);
+
+                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{vstestDotnetRootEnvName}' in env variables, value '{vstestDotnetRootEnvValue}', forwarding to '{dotnetRootEnvName}' (target framework is {_targetFramework.Name}, Version={_targetFramework.Version}).");
+                startInfo.EnvironmentVariables.Add(dotnetRootEnvName, vstestDotnetRootEnvValue);
             }
             else
             {
