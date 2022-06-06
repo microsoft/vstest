@@ -471,29 +471,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         // i.e. I've got only private install and no global installation, in this case apphost needs to use env var to locate runtime.
         if (testHostExeFound)
         {
-            const string prefix = "VSTEST_WINAPPHOST_";
-            const string dotnetRoot = "DOTNET_ROOT";
-            string vstestDotnetRootEnvName = $"{prefix}{dotnetRoot}(x86)";
-            var vstestDotnetRootEnvValue = _environmentVariableHelper.GetEnvironmentVariable(vstestDotnetRootEnvName);
-            if (vstestDotnetRootEnvValue is null)
-            {
-                vstestDotnetRootEnvName = $"{prefix}{dotnetRoot}";
-                vstestDotnetRootEnvValue = _environmentVariableHelper.GetEnvironmentVariable(vstestDotnetRootEnvName);
-            }
-
-            if (vstestDotnetRootEnvValue != null)
-            {
-                string dotnetRootEnvName = Version.Parse(_targetFramework.Version) >= Version6_0
-                    ? $"{dotnetRoot}_{_architecture.ToString().ToUpperInvariant()}"
-                    : vstestDotnetRootEnvName.Replace(prefix, string.Empty);
-
-                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{vstestDotnetRootEnvName}' in env variables, value '{vstestDotnetRootEnvValue}', forwarding to '{dotnetRootEnvName}' (target framework is {_targetFramework.Name}, Version={_targetFramework.Version}).");
-                startInfo.EnvironmentVariables.Add(dotnetRootEnvName, vstestDotnetRootEnvValue);
-            }
-            else
-            {
-                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Prefix '{prefix}*' not found in env variables");
-            }
+            ForwardDotnetRootEnvironmentVariable(startInfo);
         }
 
         startInfo.WorkingDirectory = sourceDirectory;
@@ -570,6 +548,33 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                    _platformEnvironment.Architecture == PlatformArchitecture.ARM64 &&
                    new Version(_targetFramework.Version).Major < 5;
         }
+    }
+
+    internal /* for testing purposes */ void ForwardDotnetRootEnvironmentVariable(TestProcessStartInfo startInfo)
+    {
+        const string prefix = "VSTEST_WINAPPHOST_";
+        const string dotnetRoot = "DOTNET_ROOT";
+        string vstestDotnetRootEnvName = $"{prefix}{dotnetRoot}(x86)";
+
+        var vstestDotnetRootEnvValue = _environmentVariableHelper.GetEnvironmentVariable(vstestDotnetRootEnvName);
+        if (vstestDotnetRootEnvValue is null)
+        {
+            vstestDotnetRootEnvName = $"{prefix}{dotnetRoot}";
+            vstestDotnetRootEnvValue = _environmentVariableHelper.GetEnvironmentVariable(vstestDotnetRootEnvName);
+
+            if (vstestDotnetRootEnvValue is null)
+            {
+                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Prefix '{prefix}*' not found in env variables");
+                return;
+            }
+        }
+
+        string dotnetRootEnvName = Version.Parse(_targetFramework.Version) >= Version6_0
+            ? $"{dotnetRoot}_{_processHelper.GetCurrentProcessArchitecture().ToString().ToUpperInvariant()}"
+            : vstestDotnetRootEnvName.Replace(prefix, string.Empty);
+
+        EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{vstestDotnetRootEnvName}' in env variables, value '{vstestDotnetRootEnvValue}', forwarding to '{dotnetRootEnvName}' (target framework is {_targetFramework.Name}, Version={_targetFramework.Version}).");
+        startInfo.EnvironmentVariables.Add(dotnetRootEnvName, vstestDotnetRootEnvValue);
     }
 
     /// <inheritdoc/>
