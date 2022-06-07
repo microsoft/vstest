@@ -61,7 +61,7 @@ public class ProxyBaseManagerTests
             .Returns(Task.FromResult(true));
     }
 
-    [MemberNotNull(nameof(_mockCommunicationEndpoint), nameof(_mockDataSerializer), nameof(_testRequestSender))]
+    [MemberNotNull(nameof(_mockCommunicationEndpoint), nameof(_testRequestSender))]
     private void SetupAndInitializeTestRequestSender()
     {
         var connectionInfo = new TestHostConnectionInfo

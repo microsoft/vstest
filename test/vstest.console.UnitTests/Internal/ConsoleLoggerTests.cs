@@ -61,7 +61,7 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfEventsIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(null, string.Empty));
+        Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(null!, string.Empty));
     }
 
     [TestMethod]
@@ -78,7 +78,7 @@ public class ConsoleLoggerTests
             { "param1", "value" },
         };
 
-        Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(null, parameters));
+        Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(null!, parameters));
     }
 
     [TestMethod]
@@ -90,7 +90,7 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeWithParametersShouldThrowExceptionIfParametersIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, (Dictionary<string, string>?)null));
+        Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, (Dictionary<string, string>)null!));
     }
 
     [TestMethod]
