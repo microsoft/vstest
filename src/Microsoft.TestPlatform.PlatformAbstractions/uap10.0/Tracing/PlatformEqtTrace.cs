@@ -7,8 +7,6 @@ using System;
 using System.Diagnostics.Tracing;
 using System.IO;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -30,9 +28,9 @@ public class PlatformEqtTrace : IPlatformEqtTrace
 
     private static bool s_isInitialized;
 
-    public static string ErrorOnInitialization { get; set; }
+    public static string? ErrorOnInitialization { get; set; }
 
-    public static string LogFile { get; set; }
+    public static string? LogFile { get; set; }
 
     public bool DoNotInitialize
     {
@@ -103,7 +101,7 @@ public class PlatformEqtTrace : IPlatformEqtTrace
     }
 
     /// <inheritdoc/>
-    public string GetLogFile()
+    public string? GetLogFile()
     {
         return LogFile;
     }
@@ -137,7 +135,7 @@ public class PlatformEqtTrace : IPlatformEqtTrace
 
             try
             {
-                var eventListener = new FileEventListener(string.IsNullOrEmpty(LogFile) ? "UnitTestLog" : LogFile);
+                var eventListener = new FileEventListener(LogFile.IsNullOrEmpty() ? "UnitTestLog" : LogFile);
 
                 PlatformTraceLevel traceLevel = GetTraceLevel();
                 if (traceLevel > PlatformTraceLevel.Off)

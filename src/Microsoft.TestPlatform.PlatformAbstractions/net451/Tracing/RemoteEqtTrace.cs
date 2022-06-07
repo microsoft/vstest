@@ -6,8 +6,6 @@
 using System;
 using System.Diagnostics;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -35,7 +33,7 @@ public sealed class RemoteEqtTrace : MarshalByRefObject
     /// Register listeners from parent domain in current domain.
     /// </summary>
     /// <param name="listener">Trace listener instance.</param>
-    internal void SetupRemoteListeners(TraceListener listener)
+    internal void SetupRemoteListeners(TraceListener? listener)
     {
         PlatformEqtTrace.SetupRemoteListeners(listener);
     }

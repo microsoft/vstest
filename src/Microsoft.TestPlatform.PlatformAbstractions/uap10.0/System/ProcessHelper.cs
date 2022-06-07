@@ -9,8 +9,6 @@ using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <summary>
@@ -19,14 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 public partial class ProcessHelper : IProcessHelper
 {
     /// <inheritdoc/>
-    public object LaunchProcess(
-        string processPath,
-        string arguments,
-        string workingDirectory,
-        IDictionary<string, string> environmentVariables,
-        Action<object, string> errorCallback,
-        Action<object> exitCallBack,
-        Action<object, string> outputCallback)
+    public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string>? envVariables, Action<object?, string>? errorCallback, Action<object>? exitCallBack, Action<object?, string>? outputCallBack)
     {
         throw new NotImplementedException();
     }
@@ -62,24 +53,24 @@ public partial class ProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc/>
-    public bool TryGetExitCode(object process, out int exitCode)
+    public bool TryGetExitCode(object? process, out int exitCode)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public void SetExitCallback(int parentProcessId, Action<object> callbackAction)
+    public void SetExitCallback(int parentProcessId, Action<object?>? callbackAction)
     {
     }
 
     /// <inheritdoc/>
-    public void TerminateProcess(object process)
+    public void TerminateProcess(object? process)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public int GetProcessId(object process)
+    public int GetProcessId(object? process)
     {
         return -1;
     }
@@ -98,7 +89,7 @@ public partial class ProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc/>
-    public void WaitForProcessExit(object process)
+    public void WaitForProcessExit(object? process)
     {
         throw new NotImplementedException();
     }
