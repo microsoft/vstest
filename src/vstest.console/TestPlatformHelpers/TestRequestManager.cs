@@ -45,6 +45,9 @@ internal class TestRequestManager : ITestRequestManager
 {
     private static ITestRequestManager? s_testRequestManagerInstance;
 
+    // Defines the default architecture to be used for AnyCPU or non-dll sources. This is just temporary, and unsupported, DO NOT use.
+    private static readonly string VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU = nameof(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU);
+
     private readonly ITestPlatform _testPlatform;
     private readonly ITestPlatformEventSource _testPlatformEventSource;
     // TODO: No idea what is Task supposed to buy us, Tasks start immediately on instantiation
@@ -257,7 +260,7 @@ internal class TestRequestManager : ITestRequestManager
     /// <inheritdoc />
     public void RunTests(
         TestRunRequestPayload testRunRequestPayload,
-        ITestHostLauncher? testHostLauncher,
+        ITestHostLauncher3? testHostLauncher,
         ITestRunEventsRegistrar testRunEventsRegistrar,
         ProtocolConfig protocolConfig)
     {
@@ -445,7 +448,7 @@ internal class TestRequestManager : ITestRequestManager
     /// <inheritdoc/>
     public void StartTestSession(
         StartTestSessionPayload payload,
-        ITestHostLauncher? testHostLauncher,
+        ITestHostLauncher3? testHostLauncher,
         ITestSessionEventsHandler eventsHandler,
         ProtocolConfig protocolConfig)
     {
@@ -716,7 +719,7 @@ internal class TestRequestManager : ITestRequestManager
             // it can be specified by user on the command line with --arch or through runsettings.
             // If it's not specified by user will be filled by current processor architecture;
             // should be the same as SDK.
-            defaultArchitecture = GetDefaultArchitecture(runConfiguration);
+            defaultArchitecture = GetDefaultArchitecture(runConfiguration, runsettingsXml);
         }
         else
         {
@@ -727,10 +730,10 @@ internal class TestRequestManager : ITestRequestManager
                 // As default architecture we specify the expected test host architecture,
                 // it can be specified by user on the command line with /Platform or through runsettings.
                 // If it's not specified by user will be filled by current processor architecture.
-                defaultArchitecture = GetDefaultArchitecture(runConfiguration);
+                defaultArchitecture = GetDefaultArchitecture(runConfiguration, runsettingsXml);
             }
 
-            // For all other scenarios we keep the old default Architecture.X86.
+            // Other scenarios, most notably .NET Framework with MultiTFM disabled, will use the old default X86 architecture.
         }
 
         EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()} OperatingSystem: {_environment.OperatingSystem}.");
@@ -802,10 +805,32 @@ internal class TestRequestManager : ITestRequestManager
 
         return settingsUpdated;
 
-        Architecture GetDefaultArchitecture(RunConfiguration runConfiguration)
-            => RunSettingsHelper.Instance.IsDefaultTargetArchitecture
-                ? TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture())
-                : runConfiguration.TargetPlatform;
+        Architecture GetDefaultArchitecture(RunConfiguration runConfiguration, string runsettingsXml)
+        {
+            if (!RunSettingsHelper.Instance.IsDefaultTargetArchitecture)
+            {
+                return runConfiguration.TargetPlatform;
+            }
+
+            // Returns null, where there are none.
+            Dictionary<string, string?>? environmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(runsettingsXml);
+            if (environmentVariables != null)
+            {
+                string? defaultArchitectureFromRunsettings = environmentVariables.TryGetValue(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU, out var architecture) ? architecture : null;
+
+                if (defaultArchitectureFromRunsettings != null)
+                {
+                    Architecture? defaultArchitecture = Enum.TryParse<Architecture>(defaultArchitectureFromRunsettings, out var arch) ? arch : null;
+
+                    if (defaultArchitecture != null)
+                    {
+                        return defaultArchitecture.Value;
+                    }
+                }
+            }
+
+            return TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture());
+        }
 
         static Architecture TranslateToArchitecture(PlatformArchitecture targetArchitecture)
         {

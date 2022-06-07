@@ -105,7 +105,7 @@ public class TestRunRequestTests
     {
         //ExecuteAsync has not been called, so State is not InProgress
         _testRunRequest.Abort();
-        _executionManager.Verify(dm => dm.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Never);
+        _executionManager.Verify(dm => dm.Abort(It.IsAny<IInternalTestRunEventsHandler>()), Times.Never);
     }
 
     [TestMethod]
@@ -115,7 +115,7 @@ public class TestRunRequestTests
         _testRunRequest.ExecuteAsync();
 
         _testRunRequest.Abort();
-        _executionManager.Verify(dm => dm.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        _executionManager.Verify(dm => dm.Abort(It.IsAny<IInternalTestRunEventsHandler>()), Times.Once);
     }
 
     [TestMethod]
@@ -142,7 +142,7 @@ public class TestRunRequestTests
     public void CancelAsyncIfTestRunStateNotInProgressWillNotCallExecutionManagerCancel()
     {
         _testRunRequest.CancelAsync();
-        _executionManager.Verify(dm => dm.Cancel(It.IsAny<ITestRunEventsHandler>()), Times.Never);
+        _executionManager.Verify(dm => dm.Cancel(It.IsAny<IInternalTestRunEventsHandler>()), Times.Never);
     }
 
     [TestMethod]
@@ -150,7 +150,7 @@ public class TestRunRequestTests
     {
         _testRunRequest.ExecuteAsync();
         _testRunRequest.CancelAsync();
-        _executionManager.Verify(dm => dm.Cancel(It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        _executionManager.Verify(dm => dm.Cancel(It.IsAny<IInternalTestRunEventsHandler>()), Times.Once);
     }
 
     [TestMethod]
@@ -158,7 +158,7 @@ public class TestRunRequestTests
     {
         _testRunRequest.ExecuteAsync();
         _testRunRequest.OnTestSessionTimeout(null);
-        _executionManager.Verify(o => o.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        _executionManager.Verify(o => o.Abort(It.IsAny<IInternalTestRunEventsHandler>()), Times.Once);
     }
 
     [TestMethod]
@@ -198,12 +198,12 @@ public class TestRunRequestTests
 
         ManualResetEvent onTestSessionTimeoutCalled = new(true);
         onTestSessionTimeoutCalled.Reset();
-        executionManager.Setup(o => o.Abort(It.IsAny<ITestRunEventsHandler>())).Callback(() => onTestSessionTimeoutCalled.Set());
+        executionManager.Setup(o => o.Abort(It.IsAny<IInternalTestRunEventsHandler>())).Callback(() => onTestSessionTimeoutCalled.Set());
 
         testRunRequest.ExecuteAsync();
         onTestSessionTimeoutCalled.WaitOne(20 * 1000);
 
-        executionManager.Verify(o => o.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        executionManager.Verify(o => o.Abort(It.IsAny<IInternalTestRunEventsHandler>()), Times.Once);
     }
 
     /// <summary>
@@ -224,11 +224,11 @@ public class TestRunRequestTests
         var executionManager = new Mock<IProxyExecutionManager>();
         var testRunRequest = new TestRunRequest(_mockRequestData.Object, testRunCriteria, executionManager.Object, _loggerManager.Object);
 
-        executionManager.Setup(o => o.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).Callback(() => Thread.Sleep(5 * 1000));
+        executionManager.Setup(o => o.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<IInternalTestRunEventsHandler>())).Callback(() => Thread.Sleep(5 * 1000));
 
         testRunRequest.ExecuteAsync();
 
-        executionManager.Verify(o => o.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Never);
+        executionManager.Verify(o => o.Abort(It.IsAny<IInternalTestRunEventsHandler>()), Times.Never);
     }
 
     [TestMethod]

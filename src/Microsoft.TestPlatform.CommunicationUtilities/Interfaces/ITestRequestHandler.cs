@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -94,5 +95,5 @@ public interface ITestRequestHandler : IDisposable
     /// </summary>
     /// <param name="pid">Process ID of the process to which the debugger should be attached.</param>
     /// <returns><see cref="true"/> if the debugger was successfully attached to the requested process, <see cref="false"/> otherwise.</returns>
-    bool AttachDebuggerToProcess(int pid);
+    bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo);
 }

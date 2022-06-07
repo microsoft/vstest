@@ -102,6 +102,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         IRequestData requestData,
         ITestRequestSender requestSender,
         ITestRuntimeProvider testHostManager,
+        Framework testhostManagerFramework,
         DiscoveryDataAggregator discoveryDataAggregator = null,
         IDataSerializer dataSerializer = null,
         IFileHelper fileHelper = null)
@@ -112,7 +113,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         _fileHelper = fileHelper ?? new FileHelper();
 
         // Create a new proxy operation manager.
-        _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
+        _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, testhostManagerFramework, this);
     }
 
     #region IProxyDiscoveryManager implementation.

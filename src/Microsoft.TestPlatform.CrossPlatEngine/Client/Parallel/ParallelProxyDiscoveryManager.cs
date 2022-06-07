@@ -140,6 +140,8 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         var partiallyDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count;
         var fullyDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count;
         var expectedCount = _availableTestSources;
+        // When this fails, look at the _dataAggregator and look at the sources that it holds. It is possible that adapter incorrectly reports
+        // the source on the testcase object. Each distinct source that will appear on TestCase will be considered a file.
         TPDebug.Assert(notDiscoveredCount + partiallyDiscoveredCount + fullyDiscoveredCount == expectedCount,
             $"Total count of sources ({expectedCount}) should match the count of sources with status not discovered ({notDiscoveredCount}), partially discovered ({partiallyDiscoveredCount}) and fully discovered ({fullyDiscoveredCount}).");
 #endif
@@ -247,7 +249,6 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
     /// <param name="ProxyDiscoveryManager">Proxy discovery manager instance.</param>
     private void DiscoverTestsOnConcurrentManager(IProxyDiscoveryManager proxyDiscoveryManager, ITestDiscoveryEventsHandler2 eventHandler, DiscoveryCriteria discoveryCriteria)
     {
-
         // Kick off another discovery task for the next source
         Task.Run(() =>
             {

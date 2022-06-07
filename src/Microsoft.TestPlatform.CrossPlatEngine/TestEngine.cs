@@ -150,6 +150,8 @@ public class TestEngine : ITestEngine
                             requestData,
                             new TestRequestSender(requestData.ProtocolConfig, hostManager),
                             hostManager,
+                            // There is always at least one, and all of them have the same framework and architecture.
+                            runtimeProviderInfo.SourceDetails[0].Framework,
                             proxyDiscoveryManager);
                     }
 
@@ -167,6 +169,8 @@ public class TestEngine : ITestEngine
                     requestData,
                     new TestRequestSender(requestData.ProtocolConfig, hostManager),
                     hostManager,
+                    // There is always at least one, and all of them have the same framework and architecture.
+                    runtimeProviderInfo.SourceDetails[0].Framework,
                     discoveryDataAggregator);
         };
 
@@ -290,6 +294,8 @@ public class TestEngine : ITestEngine
                             requestData,
                             requestSender,
                             hostManager,
+                            // There is always at least one, and all of them have the same framework and architecture.
+                            runtimeProviderInfo.SourceDetails[0].Framework,
                             proxyExecutionManager);
                     }
 
@@ -311,6 +317,8 @@ public class TestEngine : ITestEngine
                 requestData,
                 requestSender,
                 hostManager,
+                // There is always at least one, and all of them have the same framework and architecture.
+                runtimeProviderInfo.SourceDetails[0].Framework,
                 new ProxyDataCollectionManager(
                     requestData,
                     runtimeProviderInfo.RunSettings,
@@ -318,7 +326,9 @@ public class TestEngine : ITestEngine
             : new ProxyExecutionManager(
                 requestData,
                 requestSender,
-                hostManager);
+                hostManager,
+                // There is always at least one, and all of them have the same framework and architecture.
+                runtimeProviderInfo.SourceDetails[0].Framework);
     }
 
     /// <inheritdoc/>
@@ -395,7 +405,9 @@ public class TestEngine : ITestEngine
                 : new ProxyOperationManager(
                     requestData,
                     requestSender,
-                    hostManager);
+                    hostManager,
+                    // There is always at least one, and all of them have the same framework and architecture.
+                    testRuntimeProviderInfo.SourceDetails[0].Framework);
         };
 
         // TODO: This condition should be returning the maxParallel level to avoid pre-starting way too many testhosts, because maxParallel level,
@@ -424,8 +436,9 @@ public class TestEngine : ITestEngine
             var testRuntimeProvider = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runsettingsXml, sources);
 
             // Initialize here, because Shared is picked up from the instance, and it can be set during initalization.
-            testRuntimeProvider.Initialize(TestSessionMessageLogger.Instance, runsettingsXml);
-            var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider.GetType(), testRuntimeProvider.Shared, runsettingsXml, sourceDetails: runConfiguration.ToList());
+            testRuntimeProvider?.Initialize(TestSessionMessageLogger.Instance, runsettingsXml);
+            // If the type is null, we throw in ThrowExceptionIfAnyTestHostManagerIsNullOrNoneAreFound
+            var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider?.GetType(), testRuntimeProvider?.Shared ?? false, runsettingsXml, sourceDetails: runConfiguration.ToList());
 
             // Outputting the instance, because the code for in-process run uses it, and we don't want to resolve it another time.
             mostRecentlyCreatedInstance = testRuntimeProvider;

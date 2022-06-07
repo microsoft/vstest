@@ -150,7 +150,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         {
             try
             {
-                _runWorkload(pair.Slot.Manager!, pair.Slot.EventHandler!, pair.Workload.Work);
+                _runWorkload(pair.Slot.Manager!, pair.Slot.EventHandler!, pair.Workload.Work!);
             }
             finally
             {

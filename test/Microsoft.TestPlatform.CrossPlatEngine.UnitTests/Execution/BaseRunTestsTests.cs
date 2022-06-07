@@ -42,7 +42,7 @@ public class BaseRunTestsTests
     private const string BadBaseRunTestsExecutorUri = "executor://BadBaseRunTestsExecutor/";
 
     private readonly TestExecutionContext _testExecutionContext;
-    private readonly Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
+    private readonly Mock<IInternalTestRunEventsHandler> _mockTestRunEventsHandler;
     private readonly Mock<ITestPlatformEventSource> _mockTestPlatformEventSource;
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
@@ -69,7 +69,7 @@ public class BaseRunTestsTests
             isDebug: false,
             testCaseFilter: string.Empty,
             filterOptions: null);
-        _mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        _mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         _mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
 
@@ -921,7 +921,7 @@ public class BaseRunTestsTests
             string? runSettings,
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler? testCaseEventsHandler,
-            ITestRunEventsHandler testRunEventsHandler,
+            IInternalTestRunEventsHandler testRunEventsHandler,
             ITestPlatformEventSource testPlatformEventSource,
             ITestEventsPublisher? testEventsPublisher,
             IThread platformThread,
@@ -962,7 +962,7 @@ public class BaseRunTestsTests
         /// <summary>
         /// Gets the test run events handler.
         /// </summary>
-        public ITestRunEventsHandler GetTestRunEventsHandler => TestRunEventsHandler;
+        public IInternalTestRunEventsHandler GetTestRunEventsHandler => TestRunEventsHandler;
 
         /// <summary>
         /// Gets the test run cache.
