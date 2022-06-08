@@ -1027,6 +1027,8 @@ public class DotnetTestHostManagerTests
     [DataRow("DOTNET_ROOT_X86", "net6.0")]
     [DataRow("DOTNET_ROOT_X64", "net5.0")]
     [DataRow("DOTNET_ROOT_X64", "net6.0")]
+    [DataRow("DOTNET_ROOT_ARM64", "net5.0")]
+    [DataRow("DOTNET_ROOT_ARM64", "net6.0")]
     public void ForwardDotnetRootEnvironmentVariableWhenIncorrectEnvVarDoesNothing(string envVarName, string framework)
     {
         // Arrange
