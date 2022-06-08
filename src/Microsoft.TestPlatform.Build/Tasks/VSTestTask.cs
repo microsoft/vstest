@@ -11,7 +11,6 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Microsoft.TestPlatform.Build.Trace;
 using Microsoft.TestPlatform.Build.Utils;
-using Microsoft.VisualStudio.TestPlatform;
 
 namespace Microsoft.TestPlatform.Build.Tasks;
 

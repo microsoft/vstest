@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Xml;
 
-using Microsoft.VisualStudio.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector;

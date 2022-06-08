@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Diagnostics.NETCore.Client;
-using Microsoft.VisualStudio.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 

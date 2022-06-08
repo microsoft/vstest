@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 
-using Microsoft.VisualStudio.TestPlatform;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.TestUtilities;

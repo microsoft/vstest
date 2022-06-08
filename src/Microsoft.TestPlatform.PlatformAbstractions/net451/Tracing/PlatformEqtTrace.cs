@@ -6,6 +6,8 @@
 using System;
 using System.Diagnostics;
 
+using Microsoft.TestPlatform.PlatformAbstractions;
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
