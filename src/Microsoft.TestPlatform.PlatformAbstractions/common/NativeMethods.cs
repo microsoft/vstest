@@ -14,7 +14,7 @@ internal class NativeMethods
     public const ushort IMAGE_FILE_MACHINE_UNKNOWN = 0;
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    public static extern bool IsWow64Process2(IntPtr process, out ushort processMachine, out ushort nativeMachine);
+    public static extern bool IsWow64Process2([In] IntPtr process, [Out] out ushort processMachine, [Out] out ushort nativeMachine);
 
     // A pointer to a value that is set to TRUE if the process is running under WOW64.
     // If the process is running under 32-bit Windows, the value is set to FALSE.
