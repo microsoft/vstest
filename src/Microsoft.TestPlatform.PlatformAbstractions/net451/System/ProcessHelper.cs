@@ -37,28 +37,26 @@ public partial class ProcessHelper : IProcessHelper
 
     public PlatformArchitecture GetProcessArchitecture(int processId)
     {
-        try
+        if (_currentProcess.Id == processId)
         {
-            if (_currentProcess.Id == processId)
+            // If we already cached the current process architecture, no need to figure it out again.
+            if (_currentProcessArchitecture != null)
             {
-                // If we already cached the current process architecture, no need to figure it out again.
-                if (_currentProcessArchitecture != null)
-                {
-                    return _currentProcessArchitecture.Value;
-                }
-
-                // When this is current process, we can just check if IntPointer size to get if we are 64-bit or 32-bit.
-                // When it is 32-bit we can just return, if it is 64-bit we need to clarify if x64 or arm64.
-                if (IntPtr.Size == 4)
-                {
-                    return PlatformArchitecture.X86;
-                }
+                return _currentProcessArchitecture.Value;
             }
 
+            // When this is current process, we can just check if IntPointer size to get if we are 64-bit or 32-bit.
+            // When it is 32-bit we can just return, if it is 64-bit we need to clarify if x64 or arm64.
+            if (IntPtr.Size == 4)
+            {
+                return PlatformArchitecture.X86;
+            }
+        }
 
-
-            // If the current process is 64-bit, or this is any remote process, we need to query it via native api.
-            var process = processId == _currentProcess.Id ? _currentProcess : Process.GetProcessById(processId);
+        // If the current process is 64-bit, or this is any remote process, we need to query it via native api.
+        var process = processId == _currentProcess.Id ? _currentProcess : Process.GetProcessById(processId);
+        try
+        {
             if (!NativeMethods.IsWow64Process2(process.Handle, out ushort processMachine, out ushort nativeMachine))
             {
                 throw new Win32Exception();
@@ -98,10 +96,33 @@ public partial class ProcessHelper : IProcessHelper
             // we loaded runner version of Microsoft.TestPlatform.PlatformAbstractions but newer version Microsoft.TestPlatform.ObjectModel(the one close
             // to the test container) and the old PlatformAbstractions doesn't contain the methods expected by the new ObjectModel throwing
             // a MissedMethodException.
-        }
 
-        // In case of error just return the current process architecture.
-        return GetCurrentProcessArchitecture();
+            try
+            {
+                if (!Environment.Is64BitOperatingSystem)
+                {
+                    // When we know this is not 64-bit operating system, then all processes are running as 32-bit, both
+                    // the current process and other processes.
+                    return PlatformArchitecture.X86;
+                }
+
+                var isWow64Process = NativeMethods.IsWow64Process(process.Handle, out var isWow64);
+                if (!isWow64Process)
+                {
+                    // Do nothing we cannot log errors here.
+                }
+
+                // The process is running using WOW64, which suggests it is 32-bit (or any of the other machines, that we cannot
+                // handle, so we just assume x86). If it is not wow, we assume x64, because we failed the call to more advanced api
+                // that can tell us if this is arm64, so we are probably on older version of OS which is x64.
+                // We could call PlatformArchitecture.Architecture, but that uses the same api that we just failed to invoke.
+                return isWow64 ? PlatformArchitecture.X86 : PlatformArchitecture.X64;
+            }
+            catch
+            {
+                // Do nothing we cannot log errors here.
+            }
+        }
     }
 
     private static bool IsArm64Executable(string path)

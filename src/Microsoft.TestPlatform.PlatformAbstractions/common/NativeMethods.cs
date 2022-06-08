@@ -15,6 +15,13 @@ internal class NativeMethods
 
     [DllImport("kernel32.dll", SetLastError = true)]
     public static extern bool IsWow64Process2(IntPtr process, out ushort processMachine, out ushort nativeMachine);
+
+    // A pointer to a value that is set to TRUE if the process is running under WOW64.
+    // If the process is running under 32-bit Windows, the value is set to FALSE.
+    // If the process is a 64-bit application running under 64-bit Windows, the value is also set to FALSE.
+    [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool IsWow64Process([In] IntPtr process, [Out] out bool wow64Process);
 }
 
 #endif
