@@ -21,8 +21,16 @@ public class Test32Bit
         {
             FileName = "TestProcess32.exe",
             RedirectStandardError = true,
-            RedirectStandardOutput = true
+            RedirectStandardOutput = true,
         };
+
+        var envVarName = Environment.GetEnvironmentVariable("EXPECTED_ENV_VAR_NAME");
+        Assert.IsNotNull(envVarName, "Calling process didn't set EXPECTED_ENV_VAR_NAME.");
+        var envVarValue = Environment.GetEnvironmentVariable("EXPECTED_ENV_VAR_VALUE");
+        Assert.IsNotNull(envVarValue, "Calling process didn't set EXPECTED_ENV_VAR_VALUE.");
+        // Set the DOTNET_ROOT* env variable so that the 32bits process can locate dotnet
+        // even if there is no global installation.
+        process.StartInfo.EnvironmentVariables[envVarName] = envVarValue;
 
         process.Start();
         var stderr = process.StandardError.ReadToEnd();
@@ -33,11 +41,5 @@ public class Test32Bit
 
         Assert.IsTrue(string.IsNullOrEmpty(stderr),
             $"There was some error in process run: {stderr}");
-
-        var expectedEnvVarName = Environment.GetEnvironmentVariable("EXPECTED_ENV_VAR_NAME");
-        Assert.IsNotNull(expectedEnvVarName);
-        var expectedEnvVarValue = Environment.GetEnvironmentVariable("EXPECTED_ENV_VAR_VALUE");
-        Assert.IsNotNull(expectedEnvVarValue);
-        Assert.AreEqual(expectedEnvVarValue, Environment.GetEnvironmentVariable(expectedEnvVarName));
     }
 }

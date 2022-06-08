@@ -18,77 +18,42 @@ public class DotnetArchitectureTests : AcceptanceTestBase
         var runnerDataSource = new NetCoreTargetFrameworkDataSource(useDesktopRunner: false);
         foreach (var entry in runnerDataSource.GetData(null))
         {
-            yield return new object[] { entry[0], "DOTNET_ROOT(x86)", "dotnet_x86" };
-            yield return new object[] { entry[0], "DOTNET_ROOT_X86", "dotnet_x86" };
-            yield return new object[] { entry[0], "DOTNET_ROOT", "dotnet" };
-            yield return new object[] { entry[0], "DOTNET_ROOT_X64", "dotnet" };
+            yield return new object[] { entry[0], "net6.0", "6.0.100", "DOTNET_ROOT_X86" };
+            yield return new object[] { entry[0], "net6.0", "6.0.100", "DOTNET_ROOT(x86)" };
+            yield return new object[] { entry[0], "net6.0", "6.0.100", "DOTNET_ROOT" };
+
+            yield return new object[] { entry[0], "net5.0", "5.0.100", "DOTNET_ROOT_X86" };
+            yield return new object[] { entry[0], "net5.0", "5.0.100", "DOTNET_ROOT(x86)" };
+            yield return new object[] { entry[0], "net5.0", "5.0.100", "DOTNET_ROOT" };
         }
     }
 
     [TestMethod]
     [DynamicData(nameof(GetRunnerAndDotnetRootEnvVar), DynamicDataSourceType.Method)]
-    public void DotnetTestWithNet6ProjectLaunching32BitsProcess(RunnerInfo runnerInfo, string envVarName, string dotnetSubFolder)
+    public void Run32BitsProcessFrom64BitsDotnet(RunnerInfo runnerInfo, string targetFramework, string sdkVersion, string dotnetRootEnvVarName)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         // We want some isolated directory because we are going to pin the SDK used to ensure
         // the dotnet directory detection mechanism is the correct one.
-        var dllPath = GetIsolatedTestDllForFramework("ProjectLaunch32BitsProcess.dll", "net6.0");
-        File.WriteAllText(Path.Combine(Path.GetDirectoryName(dllPath)!, "global.json"), @"{
-  ""sdk"": {
-    ""version"": ""6.0.100""
-  },
-  ""tools"": {
-    ""dotnet"": ""6.0.100""
-  }
-}");
+        var dllPath = GetIsolatedTestDllForFramework("ProjectLaunch32BitsProcess.dll", targetFramework);
+        var isolatedDirectory = Path.GetDirectoryName(dllPath)!;
+        File.WriteAllText(Path.Combine(isolatedDirectory, "global.json"), $@"{{
+  ""sdk"": {{
+    ""version"": ""{sdkVersion}""
+  }},
+  ""tools"": {{
+    ""dotnet"": ""{sdkVersion}""
+  }}
+}}");
 
-        var dotnetX86LocalPath = Path.Combine(_testEnvironment.ToolsDirectory, dotnetSubFolder);
+        var dotnetX86LocalPath = Path.Combine(_testEnvironment.ToolsDirectory, "dotnet_x86");
         var env = new Dictionary<string, string>
         {
-            // If we don't set DOTNET_ROOT/DOTNET_ROOT(x86), the test result depends on whether or not
-            // there is a global x86 .NET installed.
-            [envVarName] = dotnetX86LocalPath,
-            // Used by test to assert which env var is supposed to be found.
-            ["EXPECTED_ENV_VAR_NAME"] = envVarName,
+            ["EXPECTED_ENV_VAR_NAME"] = dotnetRootEnvVarName,
             ["EXPECTED_ENV_VAR_VALUE"] = dotnetX86LocalPath,
         };
-        InvokeDotnetTest(dllPath, env, useDotnetFromTools: true);
-
-        ExitCodeEquals(0);
-    }
-
-    [TestMethod]
-    [DynamicData(nameof(GetRunnerAndDotnetRootEnvVar), DynamicDataSourceType.Method)]
-    public void DotnetTestWithNet5ProjectLaunching32BitsProcess(RunnerInfo runnerInfo, string envVarName, string dotnetSubFolder)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        // We want some isolated directory because we are going to pin the SDK used to ensure
-        // the dotnet directory detection mechanism is the correct one.
-        var dllPath = GetIsolatedTestDllForFramework("ProjectLaunch32BitsProcess.dll", "net5.0");
-        File.WriteAllText(Path.Combine(Path.GetDirectoryName(dllPath)!, "global.json"), @"{
-  ""sdk"": {
-    ""version"": ""5.0.100""
-  },
-  ""tools"": {
-    ""dotnet"": ""5.0.100""
-  }
-}");
-
-        var dotnetX86LocalPath = Path.Combine(_testEnvironment.ToolsDirectory, dotnetSubFolder);
-        var env = new Dictionary<string, string>
-        {
-            // If we don't set DOTNET_ROOT/DOTNET_ROOT(x86), the test result depends on whether or not
-            // there is a global x86 .NET installed.
-            [envVarName] = dotnetX86LocalPath,
-            // Used by test to assert which env var is supposed to be found.
-            ["EXPECTED_ENV_VAR_NAME"] = envVarName,
-            ["EXPECTED_ENV_VAR_VALUE"] = dotnetX86LocalPath,
-            //["COREHOST_TRACE"] = "1",
-            //["COREHOST_TRACEFILE"] = @"C:\src\temp\net5.tx",
-        };
-        InvokeDotnetTest(dllPath, env, useDotnetFromTools: true);
+        InvokeDotnetTest(dllPath, env, useDotnetFromTools: true, workingDirectory: isolatedDirectory);
 
         ExitCodeEquals(0);
     }

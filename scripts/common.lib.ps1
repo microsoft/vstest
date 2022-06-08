@@ -118,7 +118,9 @@ function Install-DotNetCli
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Channel '7.0' -Architecture x86 -NoPath -Version $env:DOTNET_CLI_VERSION
 
     # The SDKs listed below are used for some of the acceptance tests
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}" -Channel '5.0' -Architecture x64 -NoPath -Version '5.0.100'
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Channel '5.0' -Architecture x86 -NoPath -Version '5.0.100'
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}" -Channel '6.0' -Architecture x64 -NoPath -Version '6.0.100'
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Channel '6.0' -Architecture x86 -NoPath -Version '6.0.100'
 
     $env:DOTNET_ROOT= $dotnetInstallPath
