@@ -75,7 +75,7 @@ public class CliRunSettingsArgumentProcessorTests
     public void GetExecuterShouldReturnRunSettingsArgumentProcessorCapabilities()
     {
         var processor = new CliRunSettingsArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is CliRunSettingsArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is CliRunSettingsArgumentExecutor);
     }
 
     #region CLIRunSettingsArgumentProcessorCapabilities tests

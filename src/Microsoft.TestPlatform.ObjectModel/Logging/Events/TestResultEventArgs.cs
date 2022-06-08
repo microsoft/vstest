@@ -18,9 +18,9 @@ public class TestResultEventArgs : EventArgs
     /// <param name="result">
     /// Test Result for the event.
     /// </param>
-    public TestResultEventArgs(TestResult result!!)
+    public TestResultEventArgs(TestResult result)
     {
-        Result = result;
+        Result = result ?? throw new ArgumentNullException(nameof(result));
     }
 
     /// <summary>

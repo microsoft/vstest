@@ -39,8 +39,10 @@ public static class MulticastDelegateUtilities
     /// <param name="sender">Sender to use when raising the event.</param>
     /// <param name="args">Arguments to provide.</param>
     /// <param name="traceDisplayName">Name to use when tracing out errors.</param>
-    public static void SafeInvoke(this Delegate delegates, object sender, object args!!, string traceDisplayName)
+    public static void SafeInvoke(this Delegate delegates, object sender, object args, string traceDisplayName)
     {
+        ValidateArg.NotNull(args, nameof(args));
+
         if (string.IsNullOrWhiteSpace(traceDisplayName))
         {
             throw new ArgumentNullException(nameof(traceDisplayName));

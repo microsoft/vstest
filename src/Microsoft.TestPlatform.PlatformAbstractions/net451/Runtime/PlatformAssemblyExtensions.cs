@@ -5,8 +5,6 @@
 
 using System.Reflection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <summary>

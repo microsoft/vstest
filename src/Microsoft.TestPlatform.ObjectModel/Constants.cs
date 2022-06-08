@@ -175,7 +175,11 @@ public static class Constants
     /// <summary>
     /// The default protocol version
     /// </summary>
-    public static readonly ProtocolConfig DefaultProtocolConfig = new() { Version = 6 };
+    // TODO: COMPAT: This is not great because it is not a constant, and so an external dll tells us what
+    // capabilities we have in the implementer (e.g. client), instead we should move this closer to communication
+    // utilities where protocol version actually makes sense. And review all the usages of this, because there are few
+    // ways that the default version is determined.
+    public static readonly ProtocolConfig DefaultProtocolConfig = new() { Version = 7 };
 
     /// <summary>
     /// The minimum protocol version that has debug support

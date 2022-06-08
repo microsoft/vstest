@@ -51,9 +51,9 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
     private IMessageLogger? _processAttachmentSetsLogger;
     private IProgress<int>? _progressReporter;
 
-    public DataCollectorAttachmentProcessorAppDomain(InvokedDataCollector invokedDataCollector!!, IMessageLogger dataCollectorAttachmentsProcessorsLogger)
+    public DataCollectorAttachmentProcessorAppDomain(InvokedDataCollector invokedDataCollector, IMessageLogger dataCollectorAttachmentsProcessorsLogger)
     {
-        _invokedDataCollector = invokedDataCollector;
+        _invokedDataCollector = invokedDataCollector ?? throw new ArgumentNullException(nameof(invokedDataCollector));
         _appDomain = AppDomain.CreateDomain(invokedDataCollector.Uri.ToString());
         _dataCollectorAttachmentsProcessorsLogger = dataCollectorAttachmentsProcessorsLogger;
         _wrapper = (DataCollectorAttachmentProcessorRemoteWrapper)_appDomain.CreateInstanceFromAndUnwrap(

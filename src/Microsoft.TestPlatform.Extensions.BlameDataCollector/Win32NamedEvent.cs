@@ -4,8 +4,6 @@
 using System;
 using System.Runtime.InteropServices;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 public class Win32NamedEvent

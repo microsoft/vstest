@@ -47,16 +47,16 @@ internal class FilterExpression
     /// </summary>
     private readonly bool _areJoinedByAnd;
 
-    private FilterExpression(FilterExpression left!!, FilterExpression right!!, bool areJoinedByAnd)
+    private FilterExpression(FilterExpression left, FilterExpression right, bool areJoinedByAnd)
     {
-        _left = left;
-        _right = right;
+        _left = left ?? throw new ArgumentNullException(nameof(left));
+        _right = right ?? throw new ArgumentNullException(nameof(right));
         _areJoinedByAnd = areJoinedByAnd;
     }
 
-    private FilterExpression(Condition condition!!)
+    private FilterExpression(Condition condition)
     {
-        _condition = condition;
+        _condition = condition ?? throw new ArgumentNullException(nameof(condition));
     }
     /// <summary>
     /// Create a new filter expression 'And'ing 'this' with 'filter'.
@@ -157,8 +157,10 @@ internal class FilterExpression
     /// <summary>
     /// Return FilterExpression after parsing the given filter expression, and a FastFilter when possible.
     /// </summary>
-    internal static FilterExpression Parse(string filterString!!, out FastFilter fastFilter)
+    internal static FilterExpression Parse(string filterString, out FastFilter fastFilter)
     {
+        ValidateArg.NotNull(filterString, nameof(filterString));
+
         // Below parsing doesn't error out on pattern (), so explicitly search for that (empty parenthesis).
         var invalidInput = Regex.Match(filterString, @"\(\s*\)");
         if (invalidInput.Success)
@@ -270,8 +272,9 @@ internal class FilterExpression
     /// </summary>
     /// <param name="propertyValueProvider"> The property Value Provider.</param>
     /// <returns> True if evaluation is successful. </returns>
-    internal bool Evaluate(Func<string, object> propertyValueProvider!!)
+    internal bool Evaluate(Func<string, object> propertyValueProvider)
     {
+        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
         bool filterResult = false;
         if (null != _condition)
         {
@@ -287,8 +290,9 @@ internal class FilterExpression
         return filterResult;
     }
 
-    internal static IEnumerable<string> TokenizeFilterExpressionString(string str!!)
+    internal static IEnumerable<string> TokenizeFilterExpressionString(string str)
     {
+        ValidateArg.NotNull(str, nameof(str));
         return TokenizeFilterExpressionStringHelper(str);
 
         static IEnumerable<string> TokenizeFilterExpressionStringHelper(string s)

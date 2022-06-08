@@ -58,11 +58,13 @@ public class ProxyOperationManager
     public ProxyOperationManager(
         IRequestData requestData,
         ITestRequestSender requestSender,
-        ITestRuntimeProvider testHostManager)
+        ITestRuntimeProvider testHostManager,
+        Framework testhostManagerFramework)
         : this(
             requestData,
             requestSender,
             testHostManager,
+            testhostManagerFramework,
             null)
     { }
 
@@ -78,6 +80,7 @@ public class ProxyOperationManager
         IRequestData requestData,
         ITestRequestSender requestSender,
         ITestRuntimeProvider testHostManager,
+        Framework testhostManagerFramework,
         IBaseProxy baseProxy)
     {
         RequestData = requestData;
@@ -90,6 +93,7 @@ public class ProxyOperationManager
         _testHostProcessId = -1;
         _processHelper = new ProcessHelper();
         CancellationTokenSource = new CancellationTokenSource();
+        TestHostManagerFramework = testhostManagerFramework;
     }
 
     /// <summary>
@@ -116,6 +120,8 @@ public class ProxyOperationManager
     /// Gets or sets the cancellation token source.
     /// </summary>
     public CancellationTokenSource CancellationTokenSource { get; set; }
+
+    public Framework TestHostManagerFramework { get; }
 
     #region IProxyOperationManager implementation.
     /// <summary>

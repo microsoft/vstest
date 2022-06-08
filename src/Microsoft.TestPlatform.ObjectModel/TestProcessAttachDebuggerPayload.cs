@@ -3,8 +3,6 @@
 
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -27,4 +25,22 @@ public class TestProcessAttachDebuggerPayload
     /// </summary>
     [DataMember]
     public int ProcessID { get; set; }
+
+    [DataMember]
+    // Added in version 7.
+    public string? TargetFramework { get; set; }
+}
+
+[DataContract]
+// Added in version 7.
+public class EditorAttachDebuggerPayload
+{
+    /// <summary>
+    /// The process id the debugger should attach to.
+    /// </summary>
+    [DataMember]
+    public int ProcessID { get; set; }
+
+    [DataMember]
+    public string? TargetFramework { get; set; }
 }

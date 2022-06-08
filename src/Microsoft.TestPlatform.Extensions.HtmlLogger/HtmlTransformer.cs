@@ -5,8 +5,6 @@ using System;
 using System.Xml;
 using System.Xml.Xsl;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
 
 /// <summary>

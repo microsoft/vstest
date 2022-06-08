@@ -45,7 +45,7 @@ public class DiscoveryManager : IDiscoveryManager
     /// <summary>
     /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
     /// </summary>
-    public DiscoveryManager(IRequestData requestData!!)
+    public DiscoveryManager(IRequestData requestData)
         : this(requestData, TestPlatformEventSource.Instance)
     {
     }
@@ -59,12 +59,12 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="testPlatformEventSource">
     ///     The test platform event source.
     /// </param>
-    protected DiscoveryManager(IRequestData requestData!!, ITestPlatformEventSource testPlatformEventSource)
+    protected DiscoveryManager(IRequestData requestData, ITestPlatformEventSource testPlatformEventSource)
     {
+        _requestData = requestData ?? throw new ArgumentNullException(nameof(requestData));
         _sessionMessageLogger = TestSessionMessageLogger.Instance;
         _sessionMessageLogger.TestRunMessage += TestSessionMessageHandler;
         _testPlatformEventSource = testPlatformEventSource;
-        _requestData = requestData;
     }
 
     /// <summary>

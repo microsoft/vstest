@@ -78,7 +78,7 @@ public class ListTestsArgumentProcessorTests
         _mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
         _mockAssemblyMetadataProvider = new Mock<IAssemblyMetadataProvider>();
         _mockAssemblyMetadataProvider.Setup(x => x.GetArchitecture(It.IsAny<string>())).Returns(Architecture.X64);
-        _mockAssemblyMetadataProvider.Setup(x => x.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework40));
+        _mockAssemblyMetadataProvider.Setup(x => x.GetFrameworkName(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework40));
         _inferHelper = new InferHelper(_mockAssemblyMetadataProvider.Object);
         _mockProcessHelper = new Mock<IProcessHelper>();
         _mockAttachmentsProcessingManager = new Mock<ITestRunAttachmentsProcessingManager>();
@@ -102,7 +102,7 @@ public class ListTestsArgumentProcessorTests
     public void GetExecuterShouldReturnListTestsArgumentProcessorCapabilities()
     {
         var processor = new ListTestsArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is ListTestsArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is ListTestsArgumentExecutor);
     }
 
     #region ListTestsArgumentProcessorCapabilitiesTests

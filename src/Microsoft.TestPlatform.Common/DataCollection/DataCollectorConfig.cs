@@ -24,10 +24,10 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
     /// <param name="type">
     /// The type.
     /// </param>
-    public DataCollectorConfig(Type type!!)
+    public DataCollectorConfig(Type type)
         : base(type)
     {
-        DataCollectorType = type;
+        DataCollectorType = type ?? throw new ArgumentNullException(nameof(type));
         TypeUri = GetTypeUri(type);
         FriendlyName = GetFriendlyName(type);
         AttachmentsProcessorType = GetAttachmentsProcessors(type);

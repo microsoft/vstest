@@ -162,6 +162,10 @@ internal class Program
         var dd = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery done in {sw.ElapsedMilliseconds} ms");
         sw.Restart();
+        var discoveryDuration = sw.ElapsedMilliseconds;
+        Console.WriteLine($"Discovery done in {discoveryDuration} ms");
+        sw.Restart();
+        // Run with test cases and custom testhost launcher
         r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
         var rd = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery: {dd} ms, Run: {rd} ms, Total: {dd + rd} ms");

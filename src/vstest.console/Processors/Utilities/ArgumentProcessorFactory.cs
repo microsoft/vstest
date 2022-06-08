@@ -3,13 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -31,8 +30,8 @@ internal class ArgumentProcessorFactory
     /// <summary>
     /// Available argument processors.
     /// </summary>
-    private Dictionary<string, IArgumentProcessor> _commandToProcessorMap;
-    private Dictionary<string, IArgumentProcessor> _specialCommandToProcessorMap;
+    private Dictionary<string, IArgumentProcessor>? _commandToProcessorMap;
+    private Dictionary<string, IArgumentProcessor>? _specialCommandToProcessorMap;
 
     /// Initializes the argument processor factory.
     /// </summary>
@@ -47,7 +46,7 @@ internal class ArgumentProcessorFactory
     /// </remarks>
     protected ArgumentProcessorFactory(IEnumerable<IArgumentProcessor> argumentProcessors)
     {
-        Contract.Requires(argumentProcessors != null);
+        ValidateArg.NotNull(argumentProcessors, nameof(argumentProcessors));
         AllArgumentProcessors = argumentProcessors;
     }
 
@@ -58,7 +57,7 @@ internal class ArgumentProcessorFactory
     /// The feature flag support.
     /// </param>
     /// <returns>ArgumentProcessorFactory.</returns>
-    internal static ArgumentProcessorFactory Create(IFeatureFlag featureFlag = null)
+    internal static ArgumentProcessorFactory Create(IFeatureFlag? featureFlag = null)
     {
         var defaultArgumentProcessor = DefaultArgumentProcessors;
 
@@ -118,13 +117,9 @@ internal class ArgumentProcessorFactory
     /// </summary>
     /// <param name="argument">Command line argument to create the argument processor for.</param>
     /// <returns>The argument processor or null if one was not found.</returns>
-    public IArgumentProcessor CreateArgumentProcessor(string argument)
+    public IArgumentProcessor? CreateArgumentProcessor(string argument)
     {
-        if (string.IsNullOrWhiteSpace(argument))
-        {
-            throw new ArgumentException("Cannot be null or empty", nameof(argument));
-        }
-        Contract.EndContractBlock();
+        ValidateArg.NotNullOrWhiteSpace(argument, nameof(argument));
 
         // Parse the input into its command and argument parts.
         var pair = new CommandArgumentPair(argument);
@@ -157,7 +152,7 @@ internal class ArgumentProcessorFactory
     /// <param name="command">Command name of the argument processor.</param>
     /// <param name="arguments">Command line arguments to create the argument processor for.</param>
     /// <returns>The argument processor or null if one was not found.</returns>
-    public IArgumentProcessor CreateArgumentProcessor(string command, string[] arguments)
+    public IArgumentProcessor? CreateArgumentProcessor(string command, string[] arguments)
     {
         if (arguments == null || arguments.Length == 0)
         {
@@ -236,6 +231,7 @@ internal class ArgumentProcessorFactory
     /// <summary>
     /// Builds the command to processor map and special command to processor map.
     /// </summary>
+    [MemberNotNull(nameof(_commandToProcessorMap), nameof(_specialCommandToProcessorMap))]
     private void BuildCommandMaps()
     {
         _commandToProcessorMap = new Dictionary<string, IArgumentProcessor>(StringComparer.OrdinalIgnoreCase);
@@ -255,7 +251,7 @@ internal class ArgumentProcessorFactory
             commandName = string.Concat("--", commandName.Remove(0, 1));
             processorsMap.Add(commandName, argumentProcessor);
 
-            if (!string.IsNullOrEmpty(argumentProcessor.Metadata.Value.ShortCommandName))
+            if (!argumentProcessor.Metadata.Value.ShortCommandName.IsNullOrEmpty())
             {
                 string shortCommandName = argumentProcessor.Metadata.Value.ShortCommandName;
                 processorsMap.Add(shortCommandName, argumentProcessor);
@@ -273,15 +269,15 @@ internal class ArgumentProcessorFactory
     /// <param name="processor">The lazy processor.</param>
     /// <param name="initArg">The argument with which the real processor should be initialized.</param>
     /// <returns>The decorated lazy processor.</returns>
-    public static IArgumentProcessor WrapLazyProcessorToInitializeOnInstantiation(IArgumentProcessor processor, string initArg = null)
+    public static IArgumentProcessor WrapLazyProcessorToInitializeOnInstantiation(IArgumentProcessor processor, string? initArg = null)
     {
         var processorExecutor = processor.Executor;
         var lazyArgumentProcessor = new Lazy<IArgumentExecutor>(() =>
         {
-            IArgumentExecutor instance = null;
+            IArgumentExecutor? instance = null;
             try
             {
-                instance = processorExecutor.Value;
+                instance = processorExecutor!.Value;
             }
             catch (Exception e)
             {
@@ -289,17 +285,14 @@ internal class ArgumentProcessorFactory
                 throw;
             }
 
-            if (instance != null)
+            try
             {
-                try
-                {
-                    instance.Initialize(initArg);
-                }
-                catch (Exception e)
-                {
-                    EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
-                    throw;
-                }
+                instance.Initialize(initArg);
+            }
+            catch (Exception e)
+            {
+                EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
+                throw;
             }
 
             return instance;
@@ -322,10 +315,10 @@ internal class ArgumentProcessorFactory
         var processorExecutor = processor.Executor;
         var lazyArgumentProcessor = new Lazy<IArgumentExecutor>(() =>
         {
-            IArgumentsExecutor instance = null;
+            IArgumentsExecutor? instance = null;
             try
             {
-                instance = (IArgumentsExecutor)processorExecutor.Value;
+                instance = (IArgumentsExecutor)processorExecutor!.Value;
             }
             catch (Exception e)
             {
@@ -333,18 +326,16 @@ internal class ArgumentProcessorFactory
                 throw;
             }
 
-            if (instance != null)
+            try
             {
-                try
-                {
-                    instance.Initialize(initArgs);
-                }
-                catch (Exception e)
-                {
-                    EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
-                    throw;
-                }
+                instance.Initialize(initArgs);
             }
+            catch (Exception e)
+            {
+                EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
+                throw;
+            }
+
             return instance;
         }, System.Threading.LazyThreadSafetyMode.PublicationOnly);
         processor.Executor = lazyArgumentProcessor;

@@ -7,7 +7,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -98,7 +97,9 @@ public class TestEngine : ITestEngine
                 throw new InvalidOperationException($"Exactly 1 testhost manager must be provided when running in process, but there {testHostManagers.Count} were provided.");
             }
             var testHostManagerInfo = testHostManagers[0];
-            testHostManager.Initialize(TestSessionMessageLogger.Instance, testHostManagerInfo.RunSettings);
+
+            // Don't intialize, we are taking an instance that we created already initialized in GetTestRuntimeProvidersForUniqueConfigurations
+            // testHostManager.Initialize(TestSessionMessageLogger.Instance, testHostManagerInfo.RunSettings);
 
             return new InProcessProxyDiscoveryManager(
                 testHostManager,
@@ -148,6 +149,8 @@ public class TestEngine : ITestEngine
                             requestData,
                             new TestRequestSender(requestData.ProtocolConfig, hostManager),
                             hostManager,
+                            // There is always at least one, and all of them have the same framework and architecture.
+                            runtimeProviderInfo.SourceDetails[0].Framework,
                             proxyDiscoveryManager);
                     }
 
@@ -165,6 +168,8 @@ public class TestEngine : ITestEngine
                     requestData,
                     new TestRequestSender(requestData.ProtocolConfig, hostManager),
                     hostManager,
+                    // There is always at least one, and all of them have the same framework and architecture.
+                    runtimeProviderInfo.SourceDetails[0].Framework,
                     discoveryDataAggregator);
         };
 
@@ -208,7 +213,8 @@ public class TestEngine : ITestEngine
             // We know that we only have a single testHostManager here, because we figure that out in ShouldRunInProcess.
             ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
 
-            testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
+            // Don't intialize, we are taking an instance that we created already initialized in GetTestRuntimeProvidersForUniqueConfigurations
+            // testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
             // NOTE: The custom launcher should not be set when we have test session info available.
             if (testRunCriteria.TestHostLauncher != null)
@@ -287,6 +293,8 @@ public class TestEngine : ITestEngine
                             requestData,
                             requestSender,
                             hostManager,
+                            // There is always at least one, and all of them have the same framework and architecture.
+                            runtimeProviderInfo.SourceDetails[0].Framework,
                             proxyExecutionManager);
                     }
 
@@ -308,6 +316,8 @@ public class TestEngine : ITestEngine
                 requestData,
                 requestSender,
                 hostManager,
+                // There is always at least one, and all of them have the same framework and architecture.
+                runtimeProviderInfo.SourceDetails[0].Framework,
                 new ProxyDataCollectionManager(
                     requestData,
                     runtimeProviderInfo.RunSettings,
@@ -315,7 +325,9 @@ public class TestEngine : ITestEngine
             : new ProxyExecutionManager(
                 requestData,
                 requestSender,
-                hostManager);
+                hostManager,
+                // There is always at least one, and all of them have the same framework and architecture.
+                runtimeProviderInfo.SourceDetails[0].Framework);
     }
 
     /// <inheritdoc/>
@@ -392,7 +404,9 @@ public class TestEngine : ITestEngine
                 : new ProxyOperationManager(
                     requestData,
                     requestSender,
-                    hostManager);
+                    hostManager,
+                    // There is always at least one, and all of them have the same framework and architecture.
+                    testRuntimeProviderInfo.SourceDetails[0].Framework);
         };
 
         // TODO: This condition should be returning the maxParallel level to avoid pre-starting way too many testhosts, because maxParallel level,
@@ -418,16 +432,16 @@ public class TestEngine : ITestEngine
             var sourceDetail = runConfiguration.First();
             var runsettingsXml = SourceDetailHelper.UpdateRunSettingsFromSourceDetail(runSettings, sourceDetail);
             var sources = runConfiguration.Select(c => c.Source).ToList();
-            // TODO: We could improve the implementation by adding an overload that won't create a new instance always, because we only need to know the Type.
             var testRuntimeProvider = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runsettingsXml, sources);
-            if (testRuntimeProvider != null)
-            {
-                var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider.GetType(), testRuntimeProvider.Shared, runsettingsXml, sourceDetails: runConfiguration.ToList());
 
-                // Outputting the instance, because the code for in-process run uses it, and we don't want to resolve it another time.
-                mostRecentlyCreatedInstance = testRuntimeProvider;
-                testRuntimeProviders.Add(testRuntimeProviderInfo);
-            }
+            // Initialize here, because Shared is picked up from the instance, and it can be set during initalization.
+            testRuntimeProvider?.Initialize(TestSessionMessageLogger.Instance, runsettingsXml);
+            // If the type is null, we throw in ThrowExceptionIfAnyTestHostManagerIsNullOrNoneAreFound
+            var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider?.GetType(), testRuntimeProvider?.Shared ?? false, runsettingsXml, sourceDetails: runConfiguration.ToList());
+
+            // Outputting the instance, because the code for in-process run uses it, and we don't want to resolve it another time.
+            mostRecentlyCreatedInstance = testRuntimeProvider;
+            testRuntimeProviders.Add(testRuntimeProviderInfo);
         }
 
         ThrowExceptionIfAnyTestHostManagerIsNullOrNoneAreFound(testRuntimeProviders);

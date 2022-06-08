@@ -142,8 +142,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [TestCategory("Feature")]
-    [Ignore("This is for debugger v3 and does not work yet.")]
-    [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM, JustRow = 1)]
+    [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM)]
     public void RunAllTestsWithMixedTFMsWillProvideAdditionalInformationToTheDebugger(RunnerInfo runnerInfo)
     {
         // Arrange
@@ -164,7 +163,7 @@ public class CustomTestHostTests : AcceptanceTestBase
         runEventHandler.Errors.Should().BeEmpty();
         testHostLauncher.AttachDebuggerInfos.Should().HaveCount(2);
         var targetFrameworks = testHostLauncher.AttachDebuggerInfos.Select(i => i.TargetFramework).ToList();
-        targetFrameworks.Should().OnlyContain(tfm => tfm == Framework.FromString("net451") || tfm == Framework.FromString("netcoreapp2.1"));
+        targetFrameworks.Should().OnlyContain(tfm => tfm.StartsWith(".NETFramework") || tfm.StartsWith(".NET "));
 
         runEventHandler.TestResults.Should().HaveCount(6, "we run all tests from both assemblies");
     }
@@ -172,9 +171,10 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [TestCategory("BackwardCompatibilityWithRunner")]
-    [Ignore("This is for debugger v3 and does not work yet.")]
-    [RunnerCompatibilityDataSource(BeforeFeature = Features.MULTI_TFM, JustRow = 1)]
-    public void RunAllTestsWithMixedTFMsCallsBackToTestHostLauncherV3EvenWhenRunnerDoesNotSupportItYet(RunnerInfo runnerInfo)
+    // "Just row" used here because mstest does not cooperate with older versions of vstest.console correctly, so we test with just the single version available
+    // before the multi tfm feature.
+    [RunnerCompatibilityDataSource(BeforeFeature = Features.MULTI_TFM, JustRow = 0)]
+    public void RunAllTestsCallsBackToTestHostLauncherV3EvenWhenRunnerDoesNotSupportMultiTfmOrTheNewAttachDebugger2MessageYet(RunnerInfo runnerInfo)
     {
         // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -192,11 +192,11 @@ public class CustomTestHostTests : AcceptanceTestBase
 
         // Assert
         runEventHandler.Errors.Should().BeEmpty();
-        testHostLauncher.AttachDebuggerInfos.Should().HaveCount(2);
-        var targetFrameworks = testHostLauncher.AttachDebuggerInfos.Select(i => i.TargetFramework).ToList();
-        targetFrameworks.Should().OnlyContain(tfm => tfm == Framework.FromString("net451") || tfm == Framework.FromString("netcoreapp2.1"));
+        testHostLauncher.AttachDebuggerInfos.Should().HaveCount(1);
+        var pid = testHostLauncher.AttachDebuggerInfos.Select(i => i.ProcessId).Single();
+        pid.Should().NotBe(0);
 
-        runEventHandler.TestResults.Should().HaveCount(6, "we run all tests from both assemblies");
+        runEventHandler.TestResults.Should().HaveCount(3, "we run all tests from just one of the assemblies, because the runner does not support multi tfm");
     }
 
     private static void EnsureTestsRunWithoutErrors(RunEventHandler runEventHandler, int passed, int failed, int skipped)
@@ -267,7 +267,7 @@ public class CustomTestHostTests : AcceptanceTestBase
 
         public List<AttachDebuggerInfo> AttachDebuggerInfos { get; } = new();
 
-        public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
+        public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken)
         {
             AttachDebuggerInfos.Add(attachDebuggerInfo);
 
@@ -280,9 +280,7 @@ public class CustomTestHostTests : AcceptanceTestBase
             {
                 ProcessId = pid,
                 TargetFramework = null,
-                Version = null,
-                CancellationToken = CancellationToken.None
-            });
+            }, CancellationToken.None);
         }
 
         public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
@@ -291,9 +289,7 @@ public class CustomTestHostTests : AcceptanceTestBase
             {
                 ProcessId = pid,
                 TargetFramework = null,
-                Version = null,
-                CancellationToken = cancellationToken
-            });
+            }, CancellationToken.None);
         }
 
         public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)

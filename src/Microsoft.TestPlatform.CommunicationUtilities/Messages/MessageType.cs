@@ -1,6 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+using static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ProtocolVersioning;
+
 #nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -13,31 +18,39 @@ public static class MessageType
     /// <summary>
     /// The session start.
     /// </summary>
+    [ProtocolVersion(Version0, typeof(void), Description = "Not used.")]
     public const string SessionStart = "TestSession.Start";
 
     /// <summary>
     /// The session end.
     /// </summary>
+    [ProtocolVersion(Version0, typeof(void))]
     public const string SessionEnd = "TestSession.Terminate";
 
     /// <summary>
     /// The is aborted.
     /// </summary>
+    [ProtocolVersion(Version0, typeof(void), Description = "Is sent to testhost, and then ignored.")]
     public const string SessionAbort = "TestSession.Abort";
 
     /// <summary>
     /// The session connected.
     /// </summary>
+    [ProtocolVersion(Version0, typeof(void), Description = "Is sent from DesignMode client (vstest.console) back to IDE, to signal that we are ready to recieve requests.")]
     public const string SessionConnected = "TestSession.Connected";
 
     /// <summary>
     /// Test Message
     /// </summary>
+    [ProtocolVersion(Version0, typeof(TestMessagePayload), Description = "A log message or similar message sent back from console or testhost.")]
     public const string TestMessage = "TestSession.Message";
 
     /// <summary>
     /// Protocol Version
     /// </summary>
+    [ProtocolVersion(Version1, typeof(int), Description = @"Used for version handshake from IDE to vstest.console and from vstest.console to testhost,
+        the highest common version is used. Version that is negotiated with vstest.console, is used for testhost handshake to ensure that testhost
+        does not use a protocol that is newer than what we negotiated with IDE.")]
     public const string VersionCheck = "ProtocolVersion";
 
     /// <summary>
@@ -173,21 +186,25 @@ public static class MessageType
     /// <summary>
     /// Attach debugger to process.
     /// </summary>
+    [ProtocolVersion(Version3, typeof(TestProcessAttachDebuggerPayload))]
     public const string AttachDebugger = "TestExecution.AttachDebugger";
 
     /// <summary>
     /// Attach debugger to process callback.
     /// </summary>
+    [ProtocolVersion(Version3, typeof(bool))]
     public const string AttachDebuggerCallback = "TestExecution.AttachDebuggerCallback";
 
     /// <summary>
     /// Attach debugger to process.
     /// </summary>
+    [ProtocolVersion(Version3, typeof(int), Deprecated = Version7, Description = "Carries the process id the IDE should attach to. DEPRECATED, use EditorAttachDebugger2 instead.")]
     public const string EditorAttachDebugger = "TestExecution.EditorAttachDebugger";
 
     /// <summary>
     /// Attach debugger to process callback.
     /// </summary>
+    [ProtocolVersion(Version3, typeof(EditorAttachDebuggerAckPayload))]
     public const string EditorAttachDebuggerCallback = "TestExecution.EditorAttachDebuggerCallback";
 
     /// <summary>
@@ -259,5 +276,11 @@ public static class MessageType
     /// Ack Event message type send to datacollector process before test case execution starts.
     /// </summary>
     public const string DataCollectionTestStartAck = "DataCollection.TestStartAck";
+
+    /// <summary>
+    /// Attach debugger to process.
+    /// </summary>
+    [ProtocolVersion(Version7, typeof(EditorAttachDebuggerPayload))]
+    public const string EditorAttachDebugger2 = "TestExecution.EditorAttachDebugger2";
 
 }

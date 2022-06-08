@@ -69,7 +69,7 @@ public class RunTestsArgumentProcessorTests
         SetupMockExtensions();
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.X86);
-        _mockAssemblyMetadataProvider.Setup(x => x.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework40));
+        _mockAssemblyMetadataProvider.Setup(x => x.GetFrameworkName(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework40));
         _mockProcessHelper = new Mock<IProcessHelper>();
         _mockAttachmentsProcessingManager = new Mock<ITestRunAttachmentsProcessingManager>();
         _environment = new Mock<IEnvironment>();
@@ -86,7 +86,7 @@ public class RunTestsArgumentProcessorTests
     public void GetExecuterShouldReturnRunTestsArgumentProcessorCapabilities()
     {
         RunTestsArgumentProcessor processor = new();
-        Assert.IsTrue(processor.Executor.Value is RunTestsArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is RunTestsArgumentExecutor);
     }
 
     #region RunTestsArgumentProcessorCapabilitiesTests

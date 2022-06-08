@@ -2,7 +2,7 @@
 <xsl:stylesheet version="2.0"
     xmlns:tp="http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"            
+    xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"
     xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxs tp">
   <xsl:output method="html" indent="yes"/>
   <xsl:template match="/">
@@ -109,7 +109,7 @@
     </xsl:if>
     <h2>All Results</h2><xsl:call-template name ="Results"/>
   </xsl:template>
-  
+
    <xsl:template match="tp:RunLevelMessageInformational">
     <div>
     <h2>Informational messages</h2>
@@ -118,7 +118,7 @@
       </xsl:for-each>
     </div>
   </xsl:template>
-  
+
   <xsl:template match="tp:RunLevelMessageErrorAndWarning">
     <div>
       <h2>Error and Warning messages</h2>
@@ -127,7 +127,7 @@
       </xsl:for-each>
     </div>
   </xsl:template>
-  
+
   <xsl:template name ="Results">
     <xsl:for-each select ="tp:TestResultCollection">
       <xsl:variable name="Source" select="tp:Id" />
@@ -149,23 +149,23 @@
           <xsl:for-each select ="tp:FailedResultList/tp:TestResult"><xsl:call-template name ="TestResult"/></xsl:for-each>
         </div>
       </xsl:if>
-    </xsl:for-each>    
-  </xsl:template>  
-  
+    </xsl:for-each>
+  </xsl:template>
+
   <xsl:template name="TestResult" match="tp:TestResult">
     <xsl:variable name="TestResultId" select="tp:TestResultId" />
-    
+
     <xsl:if test ="tp:InnerTestResults!=''">
       <div class ="row" onclick="ToggleClass('{concat($TestResultId,'-',name(..))}')"><xsl:call-template name = "Result" /></div>
       <a Id="{concat($TestResultId,'-',name(..))}" style="display:none;"><xsl:apply-templates select = "tp:InnerTestResults" /></a>
-    </xsl:if> 
-    
+    </xsl:if>
+
     <xsl:if test ="tp:InnerTestResults=''">
       <div class ="leaf-division"><xsl:call-template name = "Result" /></div>
-    </xsl:if>   
-    
+    </xsl:if>
+
   </xsl:template>
-  
+
   <xsl:template match="tp:InnerTestResults">
     <div class ="inner-row"><xsl:apply-templates select = "tp:TestResult" /></div>
   </xsl:template>
@@ -176,12 +176,12 @@
       <xsl:apply-templates select = "tp:DisplayName" />
       <div class="duration"><xsl:apply-templates select = "tp:Duration" /></div>
     </div>
-   <div class="error-info"> 
+   <div class="error-info">
      <xsl:if test ="tp:ErrorMessage!=''"><xsl:apply-templates select = "tp:ErrorMessage" /></xsl:if>
      <xsl:if test ="tp:ErrorStackTrace!=''"><xsl:apply-templates select = "tp:ErrorStackTrace" /></xsl:if>
    </div>
   </xsl:template>
-  
+
   <xsl:template match = "tp:ErrorMessage">
     Error: <span class="error-message"><pre><xsl:value-of select = "." /></pre></span><br />
   </xsl:template>
@@ -223,7 +223,7 @@
   <xsl:template match = "tp:Duration">
     <span><xsl:value-of select = "." /></span><br />
   </xsl:template>
-  
+
   <xsl:template match = "tp:DisplayName">
     <span>&#160;<xsl:value-of select = "." />&#8203;</span>
   </xsl:template>

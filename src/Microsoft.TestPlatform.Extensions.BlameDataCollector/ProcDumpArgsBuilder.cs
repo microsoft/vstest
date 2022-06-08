@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform;
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
@@ -44,7 +44,7 @@ public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
         }
 
         procDumpArgument.Append($"{processId} {filename}.dmp");
-        var argument = string.IsNullOrWhiteSpace(procdumpArgumentsFromEnv) ? procDumpArgument.ToString() : procdumpArgumentsFromEnv;
+        var argument = procdumpArgumentsFromEnv.IsNullOrWhiteSpace() ? procDumpArgument.ToString() : procdumpArgumentsFromEnv;
         if (!argument.ToUpperInvariant().Contains("-accepteula".ToUpperInvariant()))
         {
             argument = $"-accepteula {argument}";

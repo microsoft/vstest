@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -43,8 +42,6 @@ using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Res
 //   Help output.
 //   Required
 //   Single or multiple
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
@@ -93,7 +90,7 @@ internal class Executor
     /// <returns>
     /// Exit Codes - Zero (for successful command execution), One (for bad command)
     /// </returns>
-    internal int Execute(params string[] args)
+    internal int Execute(params string[]? args)
     {
         _testPlatformEventSource.VsTestConsoleStart();
 
@@ -117,7 +114,7 @@ internal class Executor
         int exitCode = 0;
 
         // If we have no arguments, set exit code to 1, add a message, and include the help processor in the args.
-        if (args == null || args.Length == 0 || args.Any(string.IsNullOrWhiteSpace))
+        if (args == null || args.Length == 0 || args.Any(StringUtils.IsNullOrWhiteSpace))
         {
             Output.Error(true, CommandLineResources.NoArgumentsProvided);
             args = new string[] { HelpArgumentProcessor.CommandName };
@@ -130,7 +127,7 @@ internal class Executor
             var diag = Environment.GetEnvironmentVariable("VSTEST_DIAG");
             // This takes Verbose, Info (not Information), Warning, and Error.
             var diagVerbosity = Environment.GetEnvironmentVariable("VSTEST_DIAG_VERBOSITY");
-            if (!string.IsNullOrWhiteSpace(diag))
+            if (!StringUtils.IsNullOrWhiteSpace(diag))
             {
                 var verbosity = TraceLevel.Verbose;
                 if (diagVerbosity != null)
@@ -206,7 +203,7 @@ internal class Executor
             if (arg.Equals("--"))
             {
                 var cliRunSettingsProcessor = processorFactory.CreateArgumentProcessor(arg, args.Skip(index + 1).ToArray());
-                processors.Add(cliRunSettingsProcessor);
+                processors.Add(cliRunSettingsProcessor!);
                 break;
             }
 
@@ -225,7 +222,7 @@ internal class Executor
                 if (result == 0)
                 {
                     result = 1;
-                    processors.Add(processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName));
+                    processors.Add(processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName)!);
                 }
             }
         }
@@ -255,12 +252,12 @@ internal class Executor
         processors.Sort((p1, p2) => Comparer<ArgumentProcessorPriority>.Default.Compare(p1.Metadata.Value.Priority, p2.Metadata.Value.Priority));
         foreach (var processor in processors)
         {
-            IArgumentExecutor executorInstance;
+            IArgumentExecutor? executorInstance;
             try
             {
                 // Ensure the instance is created.  Note that the Lazy not only instantiates
                 // the argument processor, but also initializes it.
-                executorInstance = processor.Executor.Value;
+                executorInstance = processor.Executor?.Value;
             }
             catch (Exception ex)
             {
@@ -289,7 +286,7 @@ internal class Executor
         // If some argument was invalid, add help argument processor in beginning(i.e. at highest priority)
         if (result == 1 && _showHelp && processors.First().Metadata.Value.CommandName != HelpArgumentProcessor.CommandName)
         {
-            processors.Insert(0, processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName));
+            processors.Insert(0, processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName)!);
         }
         return result;
     }
@@ -339,8 +336,8 @@ internal class Executor
     /// <param name="processorFactory">A factory for creating argument processors.</param>
     private void EnsureActionArgumentIsPresent(List<IArgumentProcessor> argumentProcessors, ArgumentProcessorFactory processorFactory)
     {
-        Contract.Requires(argumentProcessors != null);
-        Contract.Requires(processorFactory != null);
+        ValidateArg.NotNull(argumentProcessors, nameof(argumentProcessors));
+        ValidateArg.NotNull(processorFactory, nameof(processorFactory));
 
         // Determine if any of the argument processors are actions.
         var isActionIncluded = argumentProcessors.Any((processor) => processor.Metadata.Value.IsAction);
@@ -364,7 +361,9 @@ internal class Executor
         ArgumentProcessorResult result;
         try
         {
-            result = processor.Executor.Value.Execute();
+            // TODO: Only executor that could return null is ResponseFileArgumentProcessor, maybe it could be updated
+            // to follow a pattern similar to other processors and avoid returning null.
+            result = processor.Executor!.Value.Execute();
         }
         catch (Exception ex)
         {
@@ -390,7 +389,7 @@ internal class Executor
             }
         }
 
-        Debug.Assert(
+        TPDebug.Assert(
             result is >= ArgumentProcessorResult.Success and <= ArgumentProcessorResult.Abort,
             "Invalid argument processor result.");
 
@@ -411,7 +410,7 @@ internal class Executor
     /// </summary>
     private void PrintSplashScreen(bool isDiag)
     {
-        string assemblyVersion = Product.Version;
+        string? assemblyVersion = Product.Version;
         if (!isDiag)
         {
             var end = Product.Version?.IndexOf("-release");
@@ -490,18 +489,14 @@ internal class Executor
     /// <param name="args">argument in the file as string.</param>
     /// <param name="arguments">Modified argument after sanitizing the contents of the file.</param>
     /// <returns>0 if successful and 1 otherwise.</returns>
-    public bool ReadArgumentsAndSanitize(string fileName, out string args, out string[] arguments)
+    public bool ReadArgumentsAndSanitize(string fileName, out string? args, out string[]? arguments)
     {
         arguments = null;
-        if (GetContentUsingFile(fileName, out args))
-        {
-            return true;
-        }
-
-        return !string.IsNullOrEmpty(args) && Utilities.CommandLineUtilities.SplitCommandLineIntoArguments(args, out arguments);
+        return GetContentUsingFile(fileName, out args)
+            || (!args.IsNullOrEmpty() && Utilities.CommandLineUtilities.SplitCommandLineIntoArguments(args, out arguments));
     }
 
-    private bool GetContentUsingFile(string fileName, out string contents)
+    private bool GetContentUsingFile(string fileName, out string? contents)
     {
         contents = null;
         try

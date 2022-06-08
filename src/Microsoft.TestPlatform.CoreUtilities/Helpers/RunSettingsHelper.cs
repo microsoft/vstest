@@ -19,6 +19,8 @@ internal class RunSettingsHelper : IRunSettingsHelper
     /// <summary>
     /// If false user updated the RunConfiguration.TargetPlatform using
     /// --arch or runsettings file or -- RunConfiguration.TargetPlatform=arch
+    /// This option is needed because we otherwise don't know if user specified an architecture or if we inferred it from
+    /// the dll. When we add the capability to distinguish this in runsettings, this helper won't be needed.
     /// </summary>
     public bool IsDefaultTargetArchitecture { get; set; } = true;
 

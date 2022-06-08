@@ -313,7 +313,11 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
                 TestSessionInfo = testSessionInfo
             };
 
-            testRequestManager.RunTests(testRunPayload, customLauncher, new RunHandlerToEventsRegistrarAdapter(testRunEventsHandler), new ProtocolConfig { Version = _highestSupportedVersion });
+            // TODO: this will need to be via an adapter instead. Because we will get a "live" implementation rather than our own implementation
+            // that we normally have in design mode client. It probably will even throw on this cast.
+            var upcastCustomLauncher = (ITestHostLauncher3)customLauncher;
+
+            testRequestManager.RunTests(testRunPayload, upcastCustomLauncher, new RunHandlerToEventsRegistrarAdapter(testRunEventsHandler), new ProtocolConfig { Version = _highestSupportedVersion });
         }
         catch (Exception ex)
         {

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -59,7 +57,7 @@ public partial interface IPlatformEqtTrace
     /// Gets file path for trace log file.
     /// </summary>
     /// <returns>True if tracing is enabled.</returns>
-    string GetLogFile();
+    string? GetLogFile();
 
     /// <summary>
     /// Sets platform specific trace value for tracing verbosity.

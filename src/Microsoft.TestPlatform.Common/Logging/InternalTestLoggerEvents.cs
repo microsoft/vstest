@@ -162,12 +162,13 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Raises a test run message event to the enabled loggers.
     /// </summary>
     /// <param name="args">Arguments to be raised.</param>
-    internal void RaiseTestRunMessage(TestRunMessageEventArgs args!!)
+    internal void RaiseTestRunMessage(TestRunMessageEventArgs args)
     {
+        ValidateArg.NotNull(args, nameof(args));
         CheckDisposed();
 
         // Sending 0 size as this event is not expected to contain any data.
-        SafeInvokeAsync(TestRunMessage, args, 0, "InternalTestLoggerEvents.SendTestRunMessage");
+        SafeInvokeAsync(() => TestRunMessage, args, 0, "InternalTestLoggerEvents.SendTestRunMessage");
     }
 
     internal void WaitForEventCompletion()
@@ -179,8 +180,9 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Raises a test result event to the enabled loggers.
     /// </summary>
     /// <param name="args">Arguments to be raised.</param>
-    internal void RaiseTestResult(TestResultEventArgs args!!)
+    internal void RaiseTestResult(TestResultEventArgs args)
     {
+        ValidateArg.NotNull(args, nameof(args));
         CheckDisposed();
 
         // find the approx size of test result
@@ -190,64 +192,69 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
             resultSize = FindTestResultSize(args) * sizeof(char);
         }
 
-        SafeInvokeAsync(TestResult, args, resultSize, "InternalTestLoggerEvents.SendTestResult");
+        SafeInvokeAsync(() => TestResult, args, resultSize, "InternalTestLoggerEvents.SendTestResult");
     }
 
     /// <summary>
     /// Raises the test run start event to enabled loggers.
     /// </summary>
     /// <param name="args">Arguments to be raised.</param>
-    internal void RaiseTestRunStart(TestRunStartEventArgs args!!)
+    internal void RaiseTestRunStart(TestRunStartEventArgs args)
     {
+        ValidateArg.NotNull(args, nameof(args));
         CheckDisposed();
 
-        SafeInvokeAsync(TestRunStart, args, 0, "InternalTestLoggerEvents.SendTestRunStart");
+        SafeInvokeAsync(() => TestRunStart, args, 0, "InternalTestLoggerEvents.SendTestRunStart");
     }
 
     /// <summary>
     /// Raises a discovery start event to the enabled loggers.
     /// </summary>
     /// <param name="args">Arguments to be raised.</param>
-    internal void RaiseDiscoveryStart(DiscoveryStartEventArgs args!!)
+    internal void RaiseDiscoveryStart(DiscoveryStartEventArgs args)
     {
+        ValidateArg.NotNull(args, nameof(args));
         CheckDisposed();
 
-        SafeInvokeAsync(DiscoveryStart, args, 0, "InternalTestLoggerEvents.SendDiscoveryStart");
+        SafeInvokeAsync(() => DiscoveryStart, args, 0, "InternalTestLoggerEvents.SendDiscoveryStart");
     }
 
     /// <summary>
     /// Raises a discovery message event to the enabled loggers.
     /// </summary>
     /// <param name="args">Arguments to be raised.</param>
-    internal void RaiseDiscoveryMessage(TestRunMessageEventArgs args!!)
+    internal void RaiseDiscoveryMessage(TestRunMessageEventArgs args)
     {
+        ValidateArg.NotNull(args, nameof(args));
         CheckDisposed();
 
         // Sending 0 size as this event is not expected to contain any data.
-        SafeInvokeAsync(DiscoveryMessage, args, 0, "InternalTestLoggerEvents.SendDiscoveryMessage");
+        SafeInvokeAsync(() => DiscoveryMessage, args, 0, "InternalTestLoggerEvents.SendDiscoveryMessage");
     }
 
     /// <summary>
     /// Raises discovered tests event to the enabled loggers.
     /// </summary>
     /// <param name="args"> Arguments to be raised. </param>
-    internal void RaiseDiscoveredTests(DiscoveredTestsEventArgs args!!)
+    internal void RaiseDiscoveredTests(DiscoveredTestsEventArgs args)
     {
+        ValidateArg.NotNull(args, nameof(args));
         CheckDisposed();
 
-        SafeInvokeAsync(DiscoveredTests, args, 0, "InternalTestLoggerEvents.SendDiscoveredTests");
+        SafeInvokeAsync(() => DiscoveredTests, args, 0, "InternalTestLoggerEvents.SendDiscoveredTests");
     }
 
     /// <summary>
     /// Raises discovery complete event to the enabled loggers.
     /// </summary>
     /// <param name="args"> Arguments to be raised. </param>
-    internal void RaiseDiscoveryComplete(DiscoveryCompleteEventArgs args!!)
+    internal void RaiseDiscoveryComplete(DiscoveryCompleteEventArgs args)
     {
+        ValidateArg.NotNull(args, nameof(args));
         CheckDisposed();
 
         // Sending 0 size as this event is not expected to contain any data.
-        SafeInvokeAsync(DiscoveryComplete, args, 0, "InternalTestLoggerEvents.SendDiscoveryComplete");
+        SafeInvokeAsync(() => DiscoveryComplete, args, 0, "InternalTestLoggerEvents.SendDiscoveryComplete");
 
         // Wait for the loggers to finish processing the messages for the run.
         _loggerEventQueue.Flush();
@@ -257,12 +264,13 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Raises test run complete to the enabled loggers
     /// </summary>
     /// <param name="args"> Arguments to be raised </param>
-    internal void RaiseTestRunComplete(TestRunCompleteEventArgs args!!)
+    internal void RaiseTestRunComplete(TestRunCompleteEventArgs args)
     {
+        ValidateArg.NotNull(args, nameof(args));
         CheckDisposed();
 
         // Size is being send as 0. (It is good to send the size as the job queue uses it)
-        SafeInvokeAsync(TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
+        SafeInvokeAsync(() => TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
 
         // Wait for the loggers to finish processing the messages for the run.
         _loggerEventQueue.Flush();
@@ -286,7 +294,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
         var args = new TestRunCompleteEventArgs(stats, isCanceled, isAborted, error, attachmentSet, invokedDataCollectors, elapsedTime);
 
         // Sending 0 size as this event is not expected to contain any data.
-        SafeInvokeAsync(TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
+        SafeInvokeAsync(() => TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
 
         // Wait for the loggers to finish processing the messages for the run.
         _loggerEventQueue.Flush();
@@ -298,7 +306,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     private void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
     {
         // Broadcast the message to the loggers.
-        SafeInvokeAsync(TestRunMessage, e, 0, "InternalTestLoggerEvents.SendMessage");
+        SafeInvokeAsync(() => TestRunMessage, e, 0, "InternalTestLoggerEvents.SendMessage");
     }
 
     /// <summary>
@@ -306,16 +314,34 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// ensuring that each handler is invoked even if one throws.
     /// The actual calling of the subscribers is done on a background thread.
     /// </summary>
-    private void SafeInvokeAsync(MulticastDelegate eventHandlers, EventArgs args!!, int size, string traceDisplayName)
+    private void SafeInvokeAsync(Func<MulticastDelegate> eventHandlersFactory, EventArgs args, int size, string traceDisplayName)
     {
-        // When there are no subscribers, don't bother creating an empty task on the queue.
-        if (eventHandlers == null)
+        // If you are wondering why this is taking a Func<MulticastDelegate> rather than just a MulticastDelegate it is because
+        // taking just that will capture only the subscribers that were present at the time we passed the delegate into this
+        // method. Which means that if there were no subscribers we will capture null, and later when the queue is unpaused
+        // we won't call any logger that subscribed while the queue was paused.
+
+        ValidateArg.NotNull(eventHandlersFactory, nameof(eventHandlersFactory));
+        ValidateArg.NotNull(args, nameof(args));
+
+        // When the logger event queue is paused we want to enqueue the work because maybe there are no
+        // loggers yet, and there are maybe errors that the loggers should report once they subscribe.
+        // When the queue is running, don't bother adding tasks to the queue when there are no subscribers
+        // because there is very slim chance that a new logger will be added in the few milliseconds that will
+        // pass until we process the task, and it just puts pressure on the queue. If this proves to be a problem
+        // we have a race condition, and that side should pause the queue while it adds all the loggers and then resume.
+        if (!_loggerEventQueue.IsPaused && eventHandlersFactory() == null)
         {
             return;
         }
 
         // Invoke the handlers on a background thread.
-        _loggerEventQueue.QueueJob(() => eventHandlers?.SafeInvoke(this, args, traceDisplayName), size);
+        _loggerEventQueue.QueueJob(
+            () =>
+            {
+                var eventHandlers = eventHandlersFactory();
+                eventHandlers?.SafeInvoke(this, args, traceDisplayName);
+            }, size);
     }
 
     /// <summary>

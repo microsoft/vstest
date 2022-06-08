@@ -33,7 +33,7 @@ public interface IExecutionManager
     /// <param name="testExecutionContext"> The test Execution Context. </param>
     /// <param name="testCaseEvents"> EventHandler for handling test cases level events from Engine. </param>
     /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
-    void StartTestRun(Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEvents, ITestRunEventsHandler eventHandler);
+    void StartTestRun(Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEvents, IInternalTestRunEventsHandler eventHandler);
 
     /// <summary>
     /// Starts the test run with tests.
@@ -46,17 +46,17 @@ public interface IExecutionManager
     /// <param name="testExecutionContext"> The test Execution Context. </param>
     /// /// <param name="testCaseEvents"> EventHandler for handling test cases level events from Engine. </param>
     /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
-    void StartTestRun(IEnumerable<TestCase> tests, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEvents, ITestRunEventsHandler eventHandler);
+    void StartTestRun(IEnumerable<TestCase> tests, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEvents, IInternalTestRunEventsHandler eventHandler);
 
     /// <summary>
     /// Cancel the test execution.
     /// </summary>
     /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
-    void Cancel(ITestRunEventsHandler testRunEventsHandler);
+    void Cancel(IInternalTestRunEventsHandler testRunEventsHandler);
 
     /// <summary>
     /// Aborts the test execution.
     /// </summary>
     /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
-    void Abort(ITestRunEventsHandler testRunEventsHandler);
+    void Abort(IInternalTestRunEventsHandler testRunEventsHandler);
 }

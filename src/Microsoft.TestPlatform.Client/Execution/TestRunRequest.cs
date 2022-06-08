@@ -28,7 +28,7 @@ using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Res
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.Execution;
 
-public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
+public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 {
     /// <summary>
     /// Specifies whether the run is disposed or not
@@ -355,8 +355,10 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     /// <summary>
     /// Invoked when test run is complete
     /// </summary>
-    public void HandleTestRunComplete(TestRunCompleteEventArgs runCompleteArgs!!, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
+    public void HandleTestRunComplete(TestRunCompleteEventArgs runCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
     {
+        ValidateArg.NotNull(runCompleteArgs, nameof(runCompleteArgs));
+
         bool isAborted = runCompleteArgs.IsAborted;
         bool isCanceled = runCompleteArgs.IsCanceled;
 
@@ -660,10 +662,14 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     }
 
     /// <inheritdoc />
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
     {
-        return TestRunCriteria.TestHostLauncher is ITestHostLauncher2 launcher
-               && launcher.AttachDebuggerToProcess(pid);
+        return TestRunCriteria.TestHostLauncher switch
+        {
+            ITestHostLauncher3 launcher3 => launcher3.AttachDebuggerToProcess(attachDebuggerInfo, CancellationToken.None),
+            ITestHostLauncher2 launcher2 => launcher2.AttachDebuggerToProcess(attachDebuggerInfo.ProcessId),
+            _ => false
+        };
     }
 
     /// <summary>

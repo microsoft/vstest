@@ -61,8 +61,10 @@ internal class FakeTestHostResponsesBuilder
         return this;
     }
 
-    internal FakeTestHostResponsesBuilder StartTestExecutionWithSources(List<List<TestResult>> testResultBatches!!)
+    internal FakeTestHostResponsesBuilder StartTestExecutionWithSources(List<List<TestResult>> testResultBatches)
     {
+        ValidateArg.NotNull(testResultBatches, nameof(testResultBatches));
+
         List<FakeMessage> messages;
         if (testResultBatches.Count != 0)
         {

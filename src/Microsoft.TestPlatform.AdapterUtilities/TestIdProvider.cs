@@ -4,8 +4,6 @@
 using System;
 using System.Text;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AdapterUtilities;
 
 public class TestIdProvider
@@ -16,7 +14,7 @@ public class TestIdProvider
     internal const int DigestBytes = DigestBits / 8;
 
     private Guid _id = Guid.Empty;
-    private byte[] _hash;
+    private byte[]? _hash;
     private byte[] _lastBlock = new byte[BlockBytes];
     private int _position;
 

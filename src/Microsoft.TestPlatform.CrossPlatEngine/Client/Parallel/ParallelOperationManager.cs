@@ -65,14 +65,15 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
     }
 
     public void StartWork(
-        List<ProviderSpecificWorkload<TWorkload>> workloads!!,
-        TEventHandler eventHandler!!,
-        Func<TEventHandler, TManager, TEventHandler> getEventHandler!!,
-        Action<TManager, TEventHandler, TWorkload> runWorkload!!)
+        List<ProviderSpecificWorkload<TWorkload>> workloads,
+        TEventHandler eventHandler,
+        Func<TEventHandler, TManager, TEventHandler> getEventHandler,
+        Action<TManager, TEventHandler, TWorkload> runWorkload)
     {
-        _eventHandler = eventHandler;
-        _getEventHandler = getEventHandler;
-        _runWorkload = runWorkload;
+        _ = workloads ?? throw new ArgumentNullException(nameof(workloads));
+        _eventHandler = eventHandler ?? throw new ArgumentNullException(nameof(eventHandler));
+        _getEventHandler = getEventHandler ?? throw new ArgumentNullException(nameof(getEventHandler));
+        _runWorkload = runWorkload ?? throw new ArgumentNullException(nameof(runWorkload));
 
         _workloads.AddRange(workloads);
 
@@ -149,7 +150,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         {
             try
             {
-                _runWorkload(pair.Slot.Manager!, pair.Slot.EventHandler!, pair.Workload.Work);
+                _runWorkload(pair.Slot.Manager!, pair.Slot.EventHandler!, pair.Workload.Work!);
             }
             finally
             {
@@ -162,8 +163,9 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         return workToRun.Count > 0;
     }
 
-    public bool RunNextWork(TManager completedManager!!)
+    public bool RunNextWork(TManager completedManager)
     {
+        ValidateArg.NotNull(completedManager, nameof(completedManager));
         ClearCompletedSlot(completedManager);
         return RunWorkInParallel();
     }

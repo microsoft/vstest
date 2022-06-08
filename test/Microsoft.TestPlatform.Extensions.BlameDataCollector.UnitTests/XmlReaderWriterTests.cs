@@ -56,7 +56,7 @@ public class XmlReaderWriterTests
         _testCaseList.Add(_blameTestObject.Id);
         _testObjectDictionary.Add(_blameTestObject.Id, _blameTestObject);
 
-        Assert.ThrowsException<ArgumentNullException>(() => _xmlReaderWriter.WriteTestSequence(_testCaseList, _testObjectDictionary, null));
+        Assert.ThrowsException<ArgumentNullException>(() => _xmlReaderWriter.WriteTestSequence(_testCaseList, _testObjectDictionary, null!));
     }
 
     /// <summary>
@@ -77,7 +77,7 @@ public class XmlReaderWriterTests
     [TestMethod]
     public void ReadTestSequenceShouldThrowExceptionIfFilePathIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _xmlReaderWriter.ReadTestSequence(null));
+        Assert.ThrowsException<ArgumentNullException>(() => _xmlReaderWriter.ReadTestSequence(null!));
     }
 
     /// <summary>

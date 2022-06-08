@@ -5,8 +5,6 @@ using System.Runtime.Versioning;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
@@ -17,7 +15,7 @@ internal interface IAssemblyMetadataProvider
     /// <summary>
     /// Determines FrameworkName from filePath.
     /// </summary>
-    FrameworkName GetFrameWork(string filePath);
+    FrameworkName GetFrameworkName(string filePath);
 
     /// <summary>
     /// Determines Architecture from filePath.

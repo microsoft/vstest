@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
@@ -27,8 +25,11 @@ public static class MSTestSettingsUtilities
     /// </param>
     /// <param name="defaultRunSettings"> Input RunSettings document to which settings file need to be imported. </param>
     /// <returns> Updated RunSetting Xml document with imported settings. </returns>
-    public static XmlDocument Import(string settingsFile!!, XmlDocument defaultRunSettings!!)
+    public static XmlDocument Import(string settingsFile, XmlDocument defaultRunSettings)
     {
+        ValidateArg.NotNull(settingsFile, nameof(settingsFile));
+        ValidateArg.NotNull(defaultRunSettings, nameof(defaultRunSettings));
+
         if (IsLegacyTestSettingsFile(settingsFile) == false)
         {
             throw new XmlException(string.Format(CultureInfo.CurrentCulture, UtilitiesResources.UnExpectedSettingsFile));
@@ -57,7 +58,7 @@ public static class MSTestSettingsUtilities
         return defaultRunSettings;
     }
 
-    public static bool IsLegacyTestSettingsFile(string settingsFile)
+    public static bool IsLegacyTestSettingsFile(string? settingsFile)
     {
         return string.Equals(Path.GetExtension(settingsFile), ".testSettings", StringComparison.OrdinalIgnoreCase)
             || string.Equals(Path.GetExtension(settingsFile), ".testrunConfig", StringComparison.OrdinalIgnoreCase)

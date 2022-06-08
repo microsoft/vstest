@@ -6,8 +6,6 @@
 using System;
 using System.Diagnostics;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 public partial interface IPlatformEqtTrace
@@ -17,7 +15,7 @@ public partial interface IPlatformEqtTrace
     /// If calling domain, doesn't have tracing enabled nothing is done.
     /// </summary>
     /// <param name="childDomain">Child <c>AppDomain</c>.</param>
-    void SetupRemoteEqtTraceListeners(AppDomain childDomain);
+    void SetupRemoteEqtTraceListeners(AppDomain? childDomain);
 
     /// <summary>
     /// Setup a custom trace listener instead of default trace listener created by test platform.
@@ -26,7 +24,7 @@ public partial interface IPlatformEqtTrace
     /// <param name="listener">
     /// The listener.
     /// </param>
-    void SetupListener(TraceListener listener);
+    void SetupListener(TraceListener? listener);
 }
 
 #endif

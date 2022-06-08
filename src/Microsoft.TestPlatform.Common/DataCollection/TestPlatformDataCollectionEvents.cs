@@ -77,8 +77,10 @@ internal sealed class TestPlatformDataCollectionEvents : DataCollectionEvents
     /// <param name="e">
     /// Contains the event data
     /// </param>
-    internal void RaiseEvent(DataCollectionEventArgs e!!)
+    internal void RaiseEvent(DataCollectionEventArgs e)
     {
+        ValidateArg.NotNull(e, nameof(e));
+
         if (_eventArgsToEventInvokerMap.TryGetValue(e.GetType(), out var onEvent))
         {
             onEvent(e);

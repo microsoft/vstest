@@ -46,36 +46,16 @@ public sealed class TestCase : TestObject
     /// <param name="source">
     /// Test container source from which the test is discovered.
     /// </param>
-    public TestCase(string fullyQualifiedName, Uri executorUri!!, string source)
+    public TestCase(string fullyQualifiedName, Uri executorUri, string source)
     {
         ValidateArg.NotNullOrEmpty(fullyQualifiedName, nameof(fullyQualifiedName));
         ValidateArg.NotNullOrEmpty(source, nameof(source));
 
         FullyQualifiedName = fullyQualifiedName;
-        ExecutorUri = executorUri;
+        ExecutorUri = executorUri ?? throw new ArgumentNullException(nameof(executorUri));
         Source = source;
         LineNumber = -1;
     }
-
-    [DataMember]
-    public string Property1 { get; set; }
-
-    [DataMember]
-    public string Property2 { get; set; }
-
-    [DataMember]
-    public string Property3 { get; set; }
-
-
-    [DataMember]
-    public string Property4 { get; set; }
-
-    [DataMember]
-    public string Property5 { get; set; }
-
-    [DataMember]
-    public Dictionary<string, string> PropertyBag { get; set; }
-
     /// <summary>
     /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
     /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
@@ -248,8 +228,9 @@ public sealed class TestCase : TestObject
     /// Return TestProperty's value
     /// </summary>
     /// <returns></returns>
-    protected override object ProtectedGetPropertyValue(TestProperty property!!, object defaultValue)
+    protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
     {
+        ValidateArg.NotNull(property, nameof(property));
         return property.Id switch
         {
             "TestCase.CodeFilePath" => CodeFilePath,
@@ -267,8 +248,9 @@ public sealed class TestCase : TestObject
     /// <summary>
     /// Set TestProperty's value
     /// </summary>
-    protected override void ProtectedSetPropertyValue(TestProperty property!!, object value)
+    protected override void ProtectedSetPropertyValue(TestProperty property, object value)
     {
+        ValidateArg.NotNull(property, nameof(property));
         switch (property.Id)
         {
             case "TestCase.CodeFilePath":
