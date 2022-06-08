@@ -8,8 +8,6 @@ using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc />
@@ -17,42 +15,23 @@ public class PlatformEnvironment : IEnvironment
 {
     /// <inheritdoc />
     public PlatformArchitecture Architecture
-    {
-        get
+        => RuntimeInformation.OSArchitecture switch
         {
-            switch (RuntimeInformation.OSArchitecture)
-            {
-                case System.Runtime.InteropServices.Architecture.X86:
-                    return PlatformArchitecture.X86;
-                case System.Runtime.InteropServices.Architecture.X64:
-                    return PlatformArchitecture.X64;
-                case System.Runtime.InteropServices.Architecture.Arm:
-                    return PlatformArchitecture.ARM;
-                case System.Runtime.InteropServices.Architecture.Arm64:
-                    return PlatformArchitecture.ARM64;
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-    }
+            System.Runtime.InteropServices.Architecture.X86 => PlatformArchitecture.X86,
+            System.Runtime.InteropServices.Architecture.X64 => PlatformArchitecture.X64,
+            System.Runtime.InteropServices.Architecture.Arm => PlatformArchitecture.ARM,
+            System.Runtime.InteropServices.Architecture.Arm64 => PlatformArchitecture.ARM64,
+            _ => throw new NotSupportedException(),
+        };
 
     /// <inheritdoc />
     public PlatformOperatingSystem OperatingSystem
-    {
-        get
-        {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? PlatformOperatingSystem.Windows : PlatformOperatingSystem.Unix;
-        }
-    }
+        => RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? PlatformOperatingSystem.Windows
+            : PlatformOperatingSystem.Unix;
 
     /// <inheritdoc />
-    public string OperatingSystemVersion
-    {
-        get
-        {
-            return RuntimeInformation.OSDescription;
-        }
-    }
+    public string OperatingSystemVersion => RuntimeInformation.OSDescription;
 
     /// <inheritdoc />
     public void Exit(int exitcode)

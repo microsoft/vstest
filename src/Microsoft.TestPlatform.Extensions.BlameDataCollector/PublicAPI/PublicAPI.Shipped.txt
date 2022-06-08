@@ -72,7 +72,7 @@ Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.AttachToTarg
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.DetachFromTargetProcess(int targetProcessId) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.Dump(int processId, string! outputDirectory, Microsoft.TestPlatform.Extensions.BlameDataCollector.DumpTypeOption dumpType) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.GetDumpFiles(bool processCrashed) -> System.Collections.Generic.IEnumerable<string!>!
-Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.OutputReceivedCallback.get -> System.Action<object!, string!>!
+Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.OutputReceivedCallback.get -> System.Action<object?, string!>!
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.ProcDumpDumper() -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.ProcDumpDumper(Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper! processHelper, Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper! fileHelper, Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment! environment, Microsoft.TestPlatform.Extensions.BlameDataCollector.INativeMethodsHelper? nativeMethodsHelper) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.WaitForDumpToFinish() -> void

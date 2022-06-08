@@ -6,8 +6,6 @@
 using System;
 using System.Reflection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 public static class PlatformAssemblyExtensions

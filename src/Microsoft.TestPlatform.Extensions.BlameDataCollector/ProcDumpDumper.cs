@@ -48,7 +48,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         _environment = environment;
     }
 
-    protected Action<object, string> OutputReceivedCallback => (process, data) =>
+    protected Action<object?, string> OutputReceivedCallback => (process, data) =>
         // useful for visibility when debugging this tool
         // Console.ForegroundColor = ConsoleColor.Cyan;
         // Console.WriteLine(data);
