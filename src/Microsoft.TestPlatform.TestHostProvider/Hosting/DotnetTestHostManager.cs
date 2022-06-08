@@ -556,12 +556,15 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         const string dotnetRoot = "DOTNET_ROOT";
         string vstestDotnetRootEnvName = $"{prefix}{dotnetRoot}(x86)";
 
+        // Check if VSTEST_WINAPPHOST_DOTNET_ROOT(x86) is set, if not then looks for VSTEST_WINAPPHOST_DOTNET_ROOT.
+        // If none of these variables is set we exit as we have nothing to forward.
         var vstestDotnetRootEnvValue = _environmentVariableHelper.GetEnvironmentVariable(vstestDotnetRootEnvName);
         if (vstestDotnetRootEnvValue is null)
         {
             vstestDotnetRootEnvName = $"{prefix}{dotnetRoot}";
             vstestDotnetRootEnvValue = _environmentVariableHelper.GetEnvironmentVariable(vstestDotnetRootEnvName);
 
+            // None of the forwarding environment variables are set so exit.
             if (vstestDotnetRootEnvValue is null)
             {
                 EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Prefix '{prefix}*' not found in env variables");
@@ -569,9 +572,26 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             }
         }
 
-        string dotnetRootEnvName = Version.Parse(_targetFramework.Version) >= Version6_0
-            ? $"{dotnetRoot}_{_processHelper.GetCurrentProcessArchitecture().ToString().ToUpperInvariant()}"
-            : vstestDotnetRootEnvName.Replace(prefix, string.Empty);
+        // For .NET 6.0 onward, the DOTNET_ROOT* environment variable to set was changed.
+        // This implementation is based on the logic defined in SDK:
+        // https://github.com/dotnet/sdk/blob/c3f8d746f4d5cd87f462d711a3caa7a4f6621826/src/Cli/dotnet/commands/dotnet-run/RunCommand.cs#L264-L279
+        string dotnetRootEnvName;
+        if (Version.Parse(_targetFramework.Version) >= Version6_0)
+        {
+            dotnetRootEnvName = $"{dotnetRoot}_{_processHelper.GetCurrentProcessArchitecture().ToString().ToUpperInvariant()}";
+
+            // SDK side of TP is not checking for the .NET6.0+ environment variables so we want to make sure we
+            // are not overriding user definition.
+            if (_environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName) is not null)
+            {
+                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{vstestDotnetRootEnvName}' in env variables but also found '{dotnetRootEnvName}'. Skipping forwarding.");
+                return;
+            }
+        }
+        else
+        {
+            dotnetRootEnvName = vstestDotnetRootEnvName.Replace(prefix, string.Empty);
+        }
 
         EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{vstestDotnetRootEnvName}' in env variables, value '{vstestDotnetRootEnvValue}', forwarding to '{dotnetRootEnvName}' (target framework is {_targetFramework.Name}, Version={_targetFramework.Version}).");
         startInfo.EnvironmentVariables.Add(dotnetRootEnvName, vstestDotnetRootEnvValue);

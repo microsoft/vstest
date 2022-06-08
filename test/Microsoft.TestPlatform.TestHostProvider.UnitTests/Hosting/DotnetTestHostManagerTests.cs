@@ -1087,6 +1087,43 @@ public class DotnetTestHostManagerTests
         Assert.AreEqual(envVarValue, actualEnvVarValue);
     }
 
+    [TestMethod]
+    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT(x86)", PlatformArchitecture.X86)]
+    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT(x86)", PlatformArchitecture.X64)]
+    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT(x86)", PlatformArchitecture.ARM64)]
+    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT", PlatformArchitecture.X86)]
+    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT", PlatformArchitecture.X64)]
+    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT", PlatformArchitecture.ARM64)]
+    public void ForwardDotnetRootEnvironmentVariableWhenTargetFrameworkIsGreaterOrEqualsToNet6DoesNotOverrideEnvVar(string envVarName, PlatformArchitecture platformArchitecture)
+    {
+        // Arrange
+        const string expectedEnvVarValue = "c:\\SomePath";
+        const string nonForwardedEnvVarValue = "C:\\SomeOtherPath";
+        var expectedForwardedEnvVarName = $"DOTNET_ROOT_{platformArchitecture.ToString().ToUpperInvariant()}";
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable(envVarName)).Returns(expectedEnvVarValue);
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable(expectedForwardedEnvVarName)).Returns(nonForwardedEnvVarValue);
+        _mockProcessHelper.Setup(x => x.GetCurrentProcessArchitecture()).Returns(platformArchitecture);
+        string runSettingsXml = """
+            <RunSettings>
+                <RunConfiguration>
+                    <TargetFrameworkVersion>net6.0</TargetFrameworkVersion>
+                </RunConfiguration>
+            </RunSettings>
+            """;
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, runSettingsXml);
+
+        var startInfo = new TestProcessStartInfo { EnvironmentVariables = new Dictionary<string, string>() };
+        // Sanity check
+        Assert.AreEqual(0, startInfo.EnvironmentVariables.Count);
+
+        // Act
+        _dotnetHostManager.ForwardDotnetRootEnvironmentVariable(startInfo);
+
+        // Assert
+        Assert.AreEqual(0, startInfo.EnvironmentVariables.Count);
+    }
+
     private void DotnetHostManagerExitCodeTesterHostExited(object? sender, HostProviderEventArgs e)
     {
         _errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
