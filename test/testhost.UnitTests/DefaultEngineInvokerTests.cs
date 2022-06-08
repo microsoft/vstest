@@ -90,7 +90,7 @@ public class DefaultEngineInvokerTests
     {
         _engineInvoker.Invoke(ArgsDictionary);
 
-        _mockProcessHelper.Verify(h => h.SetExitCallback(ParentProcessId, It.IsAny<Action<object>>()));
+        _mockProcessHelper.Verify(h => h.SetExitCallback(ParentProcessId, It.IsAny<Action<object?>>()));
     }
 
     [TestMethod]
