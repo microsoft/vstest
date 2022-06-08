@@ -23,6 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 public partial class ProcessHelper : IProcessHelper
 {
     private static readonly string Arm = "arm";
+    private readonly Process _currentProcess = Process.GetCurrentProcess();
 
     /// <inheritdoc/>
     public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallBack)
@@ -139,7 +140,7 @@ public partial class ProcessHelper : IProcessHelper
     /// <inheritdoc/>
     public string GetCurrentProcessFileName()
     {
-        return Process.GetCurrentProcess().MainModule.FileName;
+        return _currentProcess.MainModule.FileName;
     }
 
     /// <inheritdoc/>
@@ -151,12 +152,17 @@ public partial class ProcessHelper : IProcessHelper
     /// <inheritdoc/>
     public int GetCurrentProcessId()
     {
-        return Process.GetCurrentProcess().Id;
+        return _currentProcess.Id;
     }
 
     /// <inheritdoc/>
     public string GetProcessName(int processId)
     {
+        if (processId == _currentProcess.Id)
+        {
+            return _currentProcess.ProcessName;
+        }
+
         return Process.GetProcessById(processId).ProcessName;
     }
 
@@ -184,7 +190,7 @@ public partial class ProcessHelper : IProcessHelper
     {
         try
         {
-            var process = Process.GetProcessById(processId);
+            var process = processId == _currentProcess.Id ? _currentProcess : Process.GetProcessById(processId);
             process.EnableRaisingEvents = true;
             process.Exited += (sender, args) => callbackAction?.Invoke(sender);
         }
