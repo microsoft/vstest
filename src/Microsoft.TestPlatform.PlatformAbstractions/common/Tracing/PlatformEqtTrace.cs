@@ -9,6 +9,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 
+using Microsoft.TestPlatform.PlatformAbstractions;
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>

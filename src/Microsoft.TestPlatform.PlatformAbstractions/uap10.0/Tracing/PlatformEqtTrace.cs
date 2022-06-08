@@ -7,6 +7,8 @@ using System;
 using System.Diagnostics.Tracing;
 using System.IO;
 
+using Microsoft.TestPlatform.PlatformAbstractions;
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
