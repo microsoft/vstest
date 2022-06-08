@@ -37,11 +37,11 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     private string? _outputFilePrefix;
 
     public ProcDumpDumper()
-        : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), new NativeMethodsHelper())
+        : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment())
     {
     }
 
-    public ProcDumpDumper(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, INativeMethodsHelper? nativeMethodsHelper)
+    public ProcDumpDumper(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment)
     {
         _processHelper = processHelper;
         _fileHelper = fileHelper;
