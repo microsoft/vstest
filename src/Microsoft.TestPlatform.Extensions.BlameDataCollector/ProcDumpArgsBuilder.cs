@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using Microsoft.VisualStudio.TestPlatform;
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 public class ProcDumpArgsBuilder : IProcDumpArgsBuilder

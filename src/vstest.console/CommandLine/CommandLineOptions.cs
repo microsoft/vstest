@@ -170,7 +170,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Specifies whether the target device has a Windows Phone context or not
     /// </summary>
-    public bool HasPhoneContext => !StringUtils.IsNullOrEmpty(TargetDevice);
+    public bool HasPhoneContext => !TargetDevice.IsNullOrEmpty();
 
     public bool TestAdapterPathsSet => (TestAdapterPath?.Length ?? 0) != 0;
 
