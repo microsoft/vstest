@@ -40,7 +40,7 @@ public partial class ProcessHelper : IProcessHelper
         if (_currentProcess.Id == processId)
         {
             // If we already cached the current process architecture, no need to figure it out again.
-            if (_currentProcessArchitecture != null)
+            if (_currentProcessArchitecture is not null)
             {
                 return _currentProcessArchitecture.Value;
             }
