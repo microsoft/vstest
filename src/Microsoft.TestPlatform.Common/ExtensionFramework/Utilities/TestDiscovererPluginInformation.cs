@@ -36,6 +36,17 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
     }
 
     /// <summary>
+    /// Gets data value identifying the test plugin
+    /// </summary>
+    public override string IdentifierData
+    {
+        get
+        {
+            return DefaultExecutorUri;
+        }
+    }
+
+    /// <summary>
     /// Metadata for the test plugin
     /// </summary>
     public override ICollection<Object> Metadata
