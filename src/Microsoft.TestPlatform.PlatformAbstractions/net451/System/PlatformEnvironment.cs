@@ -14,13 +14,20 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 /// <inheritdoc />
 public class PlatformEnvironment : IEnvironment
 {
+    private PlatformArchitecture? _architecture;
+
     /// <inheritdoc />
     public PlatformArchitecture Architecture
-        => Environment.Is64BitOperatingSystem
-            ? IsArm64()
-                ? PlatformArchitecture.ARM64
-                : PlatformArchitecture.X64
-            : PlatformArchitecture.X86;
+    {
+        get
+        {
+            return _architecture ??= Environment.Is64BitOperatingSystem
+                ? IsArm64()
+                    ? PlatformArchitecture.ARM64
+                    : PlatformArchitecture.X64
+                : PlatformArchitecture.X86;
+        }
+    }
 
     private static bool IsArm64()
     {
