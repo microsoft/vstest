@@ -278,9 +278,9 @@ public class IntegrationTestBase
     /// <param name="runnerFramework">Runner Framework</param>
     /// <param name="framework">Framework for which Tests are not supported</param>
     /// <param name="message">Message to be shown</param>
-    public void ExecuteNotSupportedRunnerFrameworkTests(string? runnerFramework, string framework, string message)
+    public void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
     {
-        if (runnerFramework?.StartsWith(framework) == true)
+        if (runnerFramework.StartsWith(framework))
         {
             Assert.Inconclusive(message);
         }
