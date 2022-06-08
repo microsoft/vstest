@@ -97,15 +97,15 @@ public partial class ProcessHelper : IProcessHelper
             // to the test container) and the old PlatformAbstractions doesn't contain the methods expected by the new ObjectModel throwing
             // a MissedMethodException.
 
+            if (!Environment.Is64BitOperatingSystem)
+            {
+                // When we know this is not 64-bit operating system, then all processes are running as 32-bit, both
+                // the current process and other processes.
+                return PlatformArchitecture.X86;
+            }
+
             try
             {
-                if (!Environment.Is64BitOperatingSystem)
-                {
-                    // When we know this is not 64-bit operating system, then all processes are running as 32-bit, both
-                    // the current process and other processes.
-                    return PlatformArchitecture.X86;
-                }
-
                 var isWow64Process = NativeMethods.IsWow64Process(process.Handle, out var isWow64);
                 if (!isWow64Process)
                 {
@@ -120,7 +120,8 @@ public partial class ProcessHelper : IProcessHelper
             }
             catch
             {
-                // Do nothing we cannot log errors here.
+                // We are on 64-bit system, let's assume x64 when we fail to determine the value.
+                return PlatformArchitecture.X64;
             }
         }
     }
