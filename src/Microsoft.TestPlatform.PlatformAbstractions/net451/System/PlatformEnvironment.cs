@@ -9,8 +9,6 @@ using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc />
@@ -73,13 +71,7 @@ public class PlatformEnvironment : IEnvironment
     }
 
     /// <inheritdoc />
-    public string OperatingSystemVersion
-    {
-        get
-        {
-            return Environment.OSVersion.ToString();
-        }
-    }
+    public string OperatingSystemVersion => Environment.OSVersion.ToString();
 
     /// <inheritdoc />
     public void Exit(int exitcode)

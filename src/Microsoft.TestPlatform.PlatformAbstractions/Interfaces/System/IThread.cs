@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 public interface IThread
@@ -16,5 +14,5 @@ public interface IThread
     /// <param name="apartmentState">The apartment state.</param>
     /// <param name="waitForCompletion"> True for running in Sync, False for running in Async</param>
     /// <exception cref="ThreadApartmentStateNotSupportedException"> When thread apartment state not supported for platform. </exception>>
-    void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion);
+    void Run(Action? action, PlatformApartmentState apartmentState, bool waitForCompletion);
 }

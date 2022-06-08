@@ -5,8 +5,6 @@
 
 using System.Diagnostics;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 public static class ProcessStartInfoExtensions
@@ -17,7 +15,7 @@ public static class ProcessStartInfoExtensions
     /// <param name="startInfo">The process start info</param>
     /// <param name="name">Environment Variable name. </param>
     /// <param name="value">Environment Variable value.</param>
-    public static void AddEnvironmentVariable(this ProcessStartInfo startInfo, string name, string value)
+    public static void AddEnvironmentVariable(this ProcessStartInfo startInfo, string name, string? value)
     {
         startInfo.EnvironmentVariables[name] = value;
     }

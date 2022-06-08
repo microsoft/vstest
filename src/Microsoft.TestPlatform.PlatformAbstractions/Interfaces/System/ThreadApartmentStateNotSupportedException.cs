@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <summary>
@@ -26,7 +24,7 @@ public class ThreadApartmentStateNotSupportedException : Exception
     /// Initializes with the message.
     /// </summary>
     /// <param name="message">Message for the exception.</param>
-    public ThreadApartmentStateNotSupportedException(string message)
+    public ThreadApartmentStateNotSupportedException(string? message)
         : base(message)
     {
     }
@@ -37,7 +35,7 @@ public class ThreadApartmentStateNotSupportedException : Exception
     /// </summary>
     /// <param name="message">Message for the exception.</param>
     /// <param name="innerException">The inner exception.</param>
-    public ThreadApartmentStateNotSupportedException(string message, Exception innerException)
+    public ThreadApartmentStateNotSupportedException(string? message, Exception? innerException)
         : base(message, innerException)
     {
     }

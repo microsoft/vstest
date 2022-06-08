@@ -1039,10 +1039,12 @@ Global
 		src\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems*{61f7f446-9ef3-4768-b33a-4d75f60e1059}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems*{65a25d6e-c9cc-4f45-8925-04087ac82634}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems*{68adc720-316e-4895-9f8e-c3ccadd262be}*SharedItemsImports = 5
+		src\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems*{6f5ec38c-4a11-40d3-827c-f607b90beff0}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{71cb42ff-e750-4a3b-9c3a-ac938853cc89}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems*{76d4bb7e-d981-42d5-be96-6fad8def9a4a}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{7f26eda3-c8c4-4b7f-a9b6-d278c2f40a13}*SharedItemsImports = 13
 		src\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems*{9df3bc3c-2a53-46e7-9291-40728ace5f82}*SharedItemsImports = 13
+		src\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems*{cae652af-6801-425e-aaf3-ab20de7df88e}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Nullability\Microsoft.TestPlatform.Nullability.projitems*{fbf74c8f-695c-4967-84ac-358eefb1376d}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
