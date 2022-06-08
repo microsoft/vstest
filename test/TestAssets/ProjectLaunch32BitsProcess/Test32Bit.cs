@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -32,13 +33,11 @@ public class Test32Bit
 
         Assert.IsTrue(string.IsNullOrEmpty(stderr),
             $"There was some error in process run: {stderr}");
-        Assert.IsTrue(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_ROOT")),
-            "Env var DOTNET_ROOT was found.");
-        Assert.IsTrue(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_ROOT(x86)")),
-            "Env var DOTNET_ROOT(x86) was found.");
-        Assert.IsTrue(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_ROOT_X86")),
-            "Env var DOTNET_ROOT_X86 was found.");
-        Assert.IsFalse(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_ROOT_X64")),
-            "Env var DOTNET_ROOT_X64 was not found.");
+
+        var expectedEnvVarName = Environment.GetEnvironmentVariable("EXPECTED_ENV_VAR_NAME");
+        Assert.IsNotNull(expectedEnvVarName);
+        var expectedEnvVarValue = Environment.GetEnvironmentVariable("EXPECTED_ENV_VAR_VALUE");
+        Assert.IsNotNull(expectedEnvVarValue);
+        Assert.AreEqual(expectedEnvVarValue, Environment.GetEnvironmentVariable(expectedEnvVarName));
     }
 }

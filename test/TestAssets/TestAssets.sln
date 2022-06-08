@@ -128,7 +128,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DOTNET_ROOT", "DOTNET_ROOT"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProcess32", "TestProcess32\TestProcess32.csproj", "{4FA80E2C-B3D4-4A6B-99D2-12F95F2C0506}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Net6Launches32BitsProcess", "Net6Launches32BitsProcess\Net6Launches32BitsProcess.csproj", "{A0F37C16-FB73-4538-8DAF-EBF6EB3251FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectLaunch32BitsProcess", "ProjectLaunch32BitsProcess\ProjectLaunch32BitsProcess.csproj", "{A0F37C16-FB73-4538-8DAF-EBF6EB3251FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

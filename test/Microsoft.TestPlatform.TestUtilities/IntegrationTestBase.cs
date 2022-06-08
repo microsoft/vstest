@@ -193,7 +193,7 @@ public class IntegrationTestBase
     /// Invokes our local copy of dotnet that is patched with artifacts from the build with specified arguments.
     /// </summary>
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
-    public void InvokeDotnetTest(string arguments, Dictionary<string, string>? environmentVariables = null)
+    public void InvokeDotnetTest(string arguments, Dictionary<string, string>? environmentVariables = null, bool useDotnetFromTools = false)
     {
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
 
@@ -208,7 +208,7 @@ public class IntegrationTestBase
         // https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestForwardingApp.cs#L30-L39
         debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
 
-        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
+        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables, useDotnetFromTools);
         FormatStandardOutCome();
     }
 
@@ -762,7 +762,7 @@ public class IntegrationTestBase
     /// <param name="stdError"></param>
     /// <param name="exitCode"></param>
     private void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode,
-        Dictionary<string, string>? environmentVariables = null)
+        Dictionary<string, string>? environmentVariables = null, bool useDotnetFromTools = false)
     {
         if (environmentVariables is null)
         {
@@ -772,7 +772,7 @@ public class IntegrationTestBase
         environmentVariables["DOTNET_MULTILEVEL_LOOKUP"] = "0";
 
         var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
-        var patchedDotnetPath = Path.Combine(_testEnvironment.TestArtifactsDirectory, executablePath);
+        var patchedDotnetPath = Path.Combine(useDotnetFromTools ? _testEnvironment.ToolsDirectory : _testEnvironment.TestArtifactsDirectory, executablePath);
         ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
     }
 
