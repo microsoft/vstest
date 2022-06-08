@@ -60,34 +60,9 @@ namespace PerfyPassing
             IMessageLogger _3, ITestCaseDiscoverySink discoverySink)
         {
             var location = typeof(Perfy).Assembly.Location;
-            var tps = new List<TestProperty>();
-            Func<object, bool> validator = (object o) => !string.IsNullOrWhiteSpace(o as string);
-            //foreach (var i in Enumerable.Range(1, 5))
-            //{
-            //    tps.Add(TestProperty.Register($"Property{i}", $"ManagedType{i}", $"Category{i}", $"Description{i}", typeof(string), null, TestPropertyAttributes.Hidden, typeof(TestCase)));
-            //}
-
             for (var i = 0; i < Count; i++)
             {
                 var tc = new TestCase($"Test{i}", Uri, location);
-                var dict = new Dictionary<string, string>
-                {
-                    ["Property1"] = "Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.",
-                    ["Property2"] = "Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.",
-                    ["Property3"] = "Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.",
-                    ["Property4"] = "Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.",
-                    ["Property5"] = "Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.",
-                };
-                tc.PropertyBag = dict;
-                //tc.Property1 = "Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.";
-                //tc.Property2 = "Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.";
-                //tc.Property3 = "Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.";
-                //tc.Property4 = "Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.";
-                //tc.Property5 = "Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.Jak krtecek ke kalhotkam prisel.";
-                foreach (var tp in tps)
-                {
-                    tc.SetPropertyValue(tp, "Jak krtecek ke kalhotkam prisel.");
-                }
                 discoverySink.SendTestCase(tc);
             }
         }
