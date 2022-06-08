@@ -7,7 +7,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
