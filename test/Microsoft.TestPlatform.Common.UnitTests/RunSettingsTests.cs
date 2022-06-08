@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests;
 
 [TestClass]
@@ -160,7 +158,7 @@ public class RunSettingsTests
         // Also validate that the settings provider gets the right subtree.
         Assert.AreEqual(
             "<RunConfiguration><Architecture>x86</Architecture></RunConfiguration>",
-            (settingsProvider as RunConfigurationSettingsProvider).SettingsTree);
+            ((RunConfigurationSettingsProvider)settingsProvider).SettingsTree);
     }
 
     [TestMethod]
@@ -178,22 +176,22 @@ public class RunSettingsTests
         Assert.IsTrue(rcSettingsProvider is RunConfigurationSettingsProvider);
         Assert.AreEqual(
             "<RunConfiguration><Architecture>x86</Architecture></RunConfiguration>",
-            (rcSettingsProvider as RunConfigurationSettingsProvider).SettingsTree);
+            ((RunConfigurationSettingsProvider)rcSettingsProvider).SettingsTree);
 
         Assert.IsNotNull(mstestSettingsProvider);
         Assert.IsTrue(mstestSettingsProvider is MsTestSettingsProvider);
         Assert.AreEqual(
             "<MSTest><NoAppDomain>true</NoAppDomain></MSTest>",
-            (mstestSettingsProvider as MsTestSettingsProvider).SettingsTree);
+            ((MsTestSettingsProvider)mstestSettingsProvider).SettingsTree);
     }
 
     [TestMethod]
     public void InitializeSettingsProvidersShouldWarnOfDuplicateSettings()
     {
-        string receivedWarningMessage = null;
+        string? receivedWarningMessage = null;
 
         TestPluginCacheHelper.SetupMockExtensions(typeof(RunSettingsTests));
-        TestSessionMessageLogger.Instance.TestRunMessage += (object sender, TestRunMessageEventArgs e) => receivedWarningMessage = e.Message;
+        TestSessionMessageLogger.Instance.TestRunMessage += (object? sender, TestRunMessageEventArgs e) => receivedWarningMessage = e.Message;
 
         var runSettings = new RunSettings();
         runSettings.InitializeSettingsProviders(GetRunSettingsWithDuplicateSettingsNodes());
@@ -229,14 +227,14 @@ public class RunSettingsTests
 
     #region Private methods
 
-    private string GetEmptyRunSettings()
+    private static string GetEmptyRunSettings()
     {
         return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <RunSettings>
 </RunSettings>";
     }
 
-    private string GetRunSettingsWithUndefinedSettingsNodes()
+    private static string GetRunSettingsWithUndefinedSettingsNodes()
     {
         return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <RunSettings>
@@ -246,7 +244,7 @@ public class RunSettingsTests
 </RunSettings>";
     }
 
-    private string GetRunSettingsWithBadSettingsNodes()
+    private static string GetRunSettingsWithBadSettingsNodes()
     {
         return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <RunSettings>
@@ -256,7 +254,7 @@ public class RunSettingsTests
 </RunSettings>";
     }
 
-    private string GetRunSettingsWithRunConfigurationNode()
+    private static string GetRunSettingsWithRunConfigurationNode()
     {
         return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <RunSettings>
@@ -266,7 +264,7 @@ public class RunSettingsTests
 </RunSettings>";
     }
 
-    private string GetRunSettingsWithRunConfigurationAndMsTestNode()
+    private static string GetRunSettingsWithRunConfigurationAndMsTestNode()
     {
         return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <RunSettings>
@@ -279,7 +277,7 @@ public class RunSettingsTests
 </RunSettings>";
     }
 
-    private string GetRunSettingsWithDuplicateSettingsNodes()
+    private static string GetRunSettingsWithDuplicateSettingsNodes()
     {
         return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <RunSettings>
@@ -290,7 +288,7 @@ public class RunSettingsTests
 </RunSettings>";
     }
 
-    private string GetInvalidRunSettings()
+    private static string GetInvalidRunSettings()
     {
         return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <RunSettings>
@@ -304,7 +302,7 @@ public class RunSettingsTests
     [SettingsName("RunConfiguration")]
     private class RunConfigurationSettingsProvider : ISettingsProvider
     {
-        public string SettingsTree { get; set; }
+        public string? SettingsTree { get; set; }
 
         public void Load(XmlReader reader)
         {
@@ -316,7 +314,7 @@ public class RunSettingsTests
     [SettingsName("MSTest")]
     private class MsTestSettingsProvider : ISettingsProvider
     {
-        public string SettingsTree { get; set; }
+        public string? SettingsTree { get; set; }
 
         public void Load(XmlReader reader)
         {

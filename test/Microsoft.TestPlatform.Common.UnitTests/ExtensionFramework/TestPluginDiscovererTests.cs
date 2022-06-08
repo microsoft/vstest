@@ -21,8 +21,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MSTest.TestFramework.AssertExtensions;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 
 [TestClass]
