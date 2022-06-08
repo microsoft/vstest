@@ -26,8 +26,6 @@ using vstest.console.Internal;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal;
 
 [TestClass]
