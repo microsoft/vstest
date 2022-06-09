@@ -51,9 +51,9 @@ internal class FakeProcess
         };
     }
 
-    internal static FakeProcess EnsureFakeProcess(object process)
+    internal static FakeProcess? EnsureFakeProcess(object? process)
     {
-        return (FakeProcess)process;
+        return process as FakeProcess;
     }
 
     internal void SetId(int id)

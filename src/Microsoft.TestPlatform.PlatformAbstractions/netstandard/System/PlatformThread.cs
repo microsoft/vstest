@@ -7,15 +7,13 @@ using System;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc />
 public class PlatformThread : IThread
 {
     /// <inheritdoc />
-    public void Run(Action action, PlatformApartmentState platformApartmentState, bool waitForCompletion)
+    public void Run(Action? action, PlatformApartmentState platformApartmentState, bool waitForCompletion)
     {
         throw new NotImplementedException();
     }

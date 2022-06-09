@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-#nullable disable
+using Microsoft.TestPlatform.PlatformAbstractions;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -32,7 +32,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
         int rollSizeKB)
         : base(OpenTextWriter(fileName), name)
     {
-        if (string.IsNullOrWhiteSpace(fileName))
+        if (fileName.IsNullOrWhiteSpace())
         {
             throw new ArgumentException("fileName was null or whitespace", nameof(fileName));
         }
@@ -89,7 +89,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {
-        RollingHelper?.Dispose();
+        RollingHelper.Dispose();
 
         base.Dispose(disposing);
     }
@@ -127,7 +127,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// The original stream writer from the base trace listener will be replaced with
         /// this listener.
         /// </summary>
-        private TallyKeepingFileStreamWriter _managedWriter;
+        private TallyKeepingFileStreamWriter? _managedWriter;
         private bool _lastRollFailed;
         private readonly Stopwatch _sinceLastRoll = Stopwatch.StartNew();
         private readonly long _failedRollTimeout = TimeSpan.FromMinutes(1).Ticks;

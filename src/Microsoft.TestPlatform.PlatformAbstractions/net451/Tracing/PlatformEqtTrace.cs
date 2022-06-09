@@ -6,7 +6,7 @@
 using System;
 using System.Diagnostics;
 
-#nullable disable
+using Microsoft.TestPlatform.PlatformAbstractions;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -30,40 +30,42 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     /// If calling domain, doesn't have tracing enabled nothing is done.
     /// </summary>
     /// <param name="childDomain">Child <c>AppDomain</c>.</param>
-    public void SetupRemoteEqtTraceListeners(AppDomain childDomain)
+    public void SetupRemoteEqtTraceListeners(AppDomain? childDomain)
     {
         Debug.Assert(childDomain != null, "domain");
-        if (childDomain != null)
+        if (childDomain == null)
         {
-            RemoteEqtTrace remoteEqtTrace = (RemoteEqtTrace)childDomain.CreateInstanceFromAndUnwrap(
-                typeof(RemoteEqtTrace).Assembly.Location,
-                typeof(RemoteEqtTrace).FullName);
+            return;
+        }
 
-            if (!Equals(TraceLevel, TraceLevel.Off))
+        RemoteEqtTrace remoteEqtTrace = (RemoteEqtTrace)childDomain.CreateInstanceFromAndUnwrap(
+            typeof(RemoteEqtTrace).Assembly.Location,
+            typeof(RemoteEqtTrace).FullName);
+
+        if (!Equals(TraceLevel, TraceLevel.Off))
+        {
+            remoteEqtTrace.TraceLevel = TraceLevel;
+
+            TraceListener? tptListner = null;
+            foreach (TraceListener listener in Trace.Listeners)
             {
-                remoteEqtTrace.TraceLevel = TraceLevel;
-
-                TraceListener tptListner = null;
-                foreach (TraceListener listener in Trace.Listeners)
+                if (string.Equals(listener.Name, ListenerName, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (string.Equals(listener.Name, ListenerName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        Debug.Assert(tptListner == null, "Multiple TptListeners found.");
-                        tptListner = listener;
-                    }
+                    TPDebug.Assert(tptListner == null, "Multiple TptListeners found.");
+                    tptListner = listener;
                 }
+            }
 
-                remoteEqtTrace.SetupRemoteListeners(tptListner);
-            }
-            else
-            {
-                DoNotInitialize = true;
-            }
+            remoteEqtTrace.SetupRemoteListeners(tptListner);
+        }
+        else
+        {
+            DoNotInitialize = true;
         }
     }
 
     /// <inheritdoc/>
-    public void SetupListener(TraceListener listener)
+    public void SetupListener(TraceListener? listener)
     {
         lock (IsInitializationLock)
         {

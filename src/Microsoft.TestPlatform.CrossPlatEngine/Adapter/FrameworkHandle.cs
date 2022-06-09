@@ -12,7 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
@@ -75,7 +74,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     public int LaunchProcessWithDebuggerAttached(string filePath, string workingDirectory, string arguments, IDictionary<string, string> environmentVariables)
     {
         // If an adapter attempts to launch a process after the run is complete (=> this object is disposed)
-        // throw an error. 
+        // throw an error.
         if (_isDisposed)
         {
             throw new ObjectDisposedException("IFrameworkHandle");

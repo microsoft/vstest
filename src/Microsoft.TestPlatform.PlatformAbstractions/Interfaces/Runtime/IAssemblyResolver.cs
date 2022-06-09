@@ -4,8 +4,6 @@
 using System;
 using System.Reflection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 /// <summary>
@@ -16,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 /// <returns>The assembly that resolves the type, assembly, or resource; or null if the assembly
 /// cannot be resolved.
 /// </returns>
-public delegate Assembly AssemblyResolveEventHandler(object sender, AssemblyResolveEventArgs args);
+public delegate Assembly AssemblyResolveEventHandler(object? sender, AssemblyResolveEventArgs? args);
 
 /// <summary>
 /// The AssemblyResolver interface.
@@ -26,7 +24,7 @@ public interface IAssemblyResolver : IDisposable
     /// <summary>
     /// Occurs when the resolution of an assembly fails
     /// </summary>
-    event AssemblyResolveEventHandler AssemblyResolve;
+    event AssemblyResolveEventHandler? AssemblyResolve;
 }
 
 /// <summary>

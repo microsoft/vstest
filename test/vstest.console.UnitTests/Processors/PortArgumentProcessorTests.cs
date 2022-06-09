@@ -125,7 +125,7 @@ public class PortArgumentProcessorTests
 
         _executor.Initialize(port.ToString());
 
-        _mockProcessHelper.Verify(ph => ph.SetExitCallback(processId, It.IsAny<Action<object>>()), Times.Once);
+        _mockProcessHelper.Verify(ph => ph.SetExitCallback(processId, It.IsAny<Action<object?>>()), Times.Once);
     }
 
     [TestMethod]

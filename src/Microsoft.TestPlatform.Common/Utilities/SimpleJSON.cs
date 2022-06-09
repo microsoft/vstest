@@ -2,32 +2,32 @@
 /* * * * *
  * A simple JSON Parser / builder
  * ------------------------------
- * 
+ *
  * It mainly has been written as a simple JSON parser. It can build a JSON string
  * from the node-tree, or generate a node tree from any valid JSON string.
- * 
- * Written by Bunny83 
+ *
+ * Written by Bunny83
  * 2012-06-09
- * 
+ *
  * Original link for this code: https://github.com/Bunny83/SimpleJSON
  * Modified in order to fix analyzer errors.
- * 
+ *
  * Changelog now external. See Changelog.txt
- * 
+ *
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2012-2019 Markus Göbel (Bunny83)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,7 +35,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- * 
+ *
  * * * * */
 #pragma warning restore IDE0073 // The file header does not match the required text
 
@@ -46,7 +46,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using Microsoft.VisualStudio.TestPlatform;
+using Microsoft.VisualStudio.TestPlatform.Common;
 
 #nullable disable
 
@@ -312,7 +312,7 @@ internal abstract partial class JSONNode
     {
         get
         {
-            return bool.TryParse(Value, out bool v) ? v : !StringUtils.IsNullOrEmpty(Value);
+            return bool.TryParse(Value, out bool v) ? v : !Value.IsNullOrEmpty();
         }
         set
         {

@@ -9,21 +9,19 @@ using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 public class PlatformThread : IThread
 {
     /// <inheritdoc/>
-    public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
+    public void Run(Action? action, PlatformApartmentState apartmentState, bool waitForCompletion)
     {
         if (action == null)
         {
             return;
         }
 
-        Exception exThrown = null;
+        Exception? exThrown = null;
         var thread = new Thread(() =>
         {
             try
