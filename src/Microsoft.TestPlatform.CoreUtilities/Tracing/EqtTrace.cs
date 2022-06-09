@@ -162,7 +162,7 @@ public static class EqtTrace
     public static bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel)
     {
         // Remove extra quotes if we get them passed on the parameter,
-        // System.IO.File does not ingore them when checking the file existence.
+        // System.IO.File does not ignore them when checking the file existence.
         customLogFile = customLogFile?.Trim('"');
         if (!TraceImpl.InitializeTrace(customLogFile, traceLevel))
         {

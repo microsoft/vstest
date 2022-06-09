@@ -167,20 +167,6 @@ public class EnableDiagArgumentProcessorTests
         _mockFileHelper.Verify(fh => fh.CreateDirectory(It.IsAny<string>()), Times.Never);
     }
 
-    [TestMethod]
-    public void EnableDiagArgumentProcessorExecutorShouldDisableVerboseLoggingIfEqtTraceThowException()
-    {
-        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath))).Returns(true);
-        _diagProcessor.Executor!.Value.Initialize(_dummyFilePath);
-
-        Assert.IsFalse(EqtTrace.IsVerboseEnabled);
-#if NETFRAMEWORK
-        EqtTrace.TraceLevel = TraceLevel.Off;
-#else
-        EqtTrace.TraceLevel = PlatformTraceLevel.Off;
-#endif
-    }
-
     private class TestableEnableDiagArgumentProcessor : EnableDiagArgumentProcessor
     {
         /// <inheritdoc/>
