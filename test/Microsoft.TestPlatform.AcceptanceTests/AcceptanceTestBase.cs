@@ -187,27 +187,4 @@ public class AcceptanceTestBase : IntegrationTestBase
 
         return Path.Combine(TempDirectory.Path, assetName);
     }
-
-    protected string GetIsolatedTestDllForFramework(string assetName, string targetFramework)
-    {
-        var testDllPath = GetTestDllForFramework(assetName, targetFramework);
-        CopyFilesRecursively(Path.GetDirectoryName(testDllPath), "*", TempDirectory.Path);
-        return Path.Combine(TempDirectory.Path, Path.GetFileName(testDllPath));
-    }
-
-    private static void CopyFilesRecursively(string sourceDirectory, string searchPattern, string targetDirectory)
-    {
-        foreach (var subDirectory in Directory.EnumerateDirectories(sourceDirectory))
-        {
-            var directoryName = Path.GetFileName(subDirectory);
-            var newTargetDirectory = Path.Combine(targetDirectory, directoryName);
-            Directory.CreateDirectory(newTargetDirectory);
-            CopyFilesRecursively(subDirectory, searchPattern, newTargetDirectory);
-        }
-
-        foreach (var file in Directory.EnumerateFiles(sourceDirectory, searchPattern))
-        {
-            File.Copy(file, Path.Combine(targetDirectory, Path.GetFileName(file)));
-        }
-    }
 }
