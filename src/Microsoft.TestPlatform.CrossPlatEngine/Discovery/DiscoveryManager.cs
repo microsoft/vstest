@@ -61,10 +61,10 @@ public class DiscoveryManager : IDiscoveryManager
     /// </param>
     protected DiscoveryManager(IRequestData requestData, ITestPlatformEventSource testPlatformEventSource)
     {
+        _requestData = requestData ?? throw new ArgumentNullException(nameof(requestData));
         _sessionMessageLogger = TestSessionMessageLogger.Instance;
         _sessionMessageLogger.TestRunMessage += TestSessionMessageHandler;
         _testPlatformEventSource = testPlatformEventSource;
-        _requestData = requestData;
     }
 
     /// <summary>
@@ -73,6 +73,9 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
     public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestDiscoveryEventsHandler2 eventHandler)
     {
+        // Clear the request data metrics left over from a potential previous run.
+        _requestData.MetricsCollection?.Metrics?.Clear();
+
         _testPlatformEventSource.AdapterSearchStart();
         _testDiscoveryEventsHandler = eventHandler;
         if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())
@@ -120,11 +123,9 @@ public class DiscoveryManager : IDiscoveryManager
             // If there are sources to discover
             if (verifiedExtensionSourceMap.Any())
             {
-                new DiscovererEnumerator(_requestData, discoveryResultCache, _cancellationTokenSource.Token).LoadTests(
-                    verifiedExtensionSourceMap,
-                    RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
-                    discoveryCriteria.TestCaseFilter,
-                    _sessionMessageLogger);
+                var runSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings);
+                var discovererEnumerator = new DiscovererEnumerator(_requestData, discoveryResultCache, _cancellationTokenSource.Token);
+                discovererEnumerator.LoadTests(verifiedExtensionSourceMap, runSettings, discoveryCriteria.TestCaseFilter, _sessionMessageLogger);
             }
         }
         finally

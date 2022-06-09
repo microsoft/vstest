@@ -7,8 +7,6 @@ using System.Runtime.Serialization;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
 
 /// <summary>
@@ -20,7 +18,7 @@ public class TestResult
     /// <summary>
     /// Fully qualified name of the Test Result.
     /// </summary>
-    [DataMember] public string FullyQualifiedName { get; set; }
+    [DataMember] public string? FullyQualifiedName { get; set; }
 
     /// <summary>
     /// Unique identifier for test result
@@ -30,17 +28,17 @@ public class TestResult
     /// <summary>
     /// Display Name for the particular Test Result
     /// </summary>
-    [DataMember] public string DisplayName { get; set; }
+    [DataMember] public string? DisplayName { get; set; }
 
     /// <summary>
     /// The error stack trace of the Test Result.
     /// </summary>
-    [DataMember] public string ErrorStackTrace { get; set; }
+    [DataMember] public string? ErrorStackTrace { get; set; }
 
     /// <summary>
     /// Error message of the Test Result.
     /// </summary>
-    [DataMember] public string ErrorMessage { get; set; }
+    [DataMember] public string? ErrorMessage { get; set; }
 
     /// <summary>
     /// Enum that determines the outcome of the test case
@@ -50,10 +48,10 @@ public class TestResult
     /// <summary>
     /// Total timespan of the TestResult
     /// </summary>
-    [DataMember] public string Duration { get; set; }
+    [DataMember] public string? Duration { get; set; }
 
     /// <summary>
     /// The list of TestResults that are children to the current Test Result.
     /// </summary>
-    [DataMember] public List<TestResult> InnerTestResults { get; set; }
+    [DataMember] public List<TestResult>? InnerTestResults { get; set; }
 }

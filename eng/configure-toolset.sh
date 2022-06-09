@@ -21,6 +21,8 @@ function Test-FilesUseTelemetryOutput {
         'eng/common/native/install-cmake.sh'
         'eng/common/cross/arm/tizen-fetch.sh'
         'eng/common/cross/arm/tizen-build-rootfs.sh'
+        'eng/common/cross/x86/tizen-fetch.sh'
+        'eng/common/cross/x86/tizen-build-rootfs.sh'
     )
 
     local file_list=`grep --files-without-match --dereference-recursive --include=*.sh "Write-PipelineTelemetryError" $scriptroot`

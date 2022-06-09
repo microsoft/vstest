@@ -228,8 +228,8 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestMessageEventHandler.
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestMessageEventHandler.HandleRawMessage(string rawMessage) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.ClearExtensions() -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.CreateDiscoveryRequest(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria discoveryCriteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions options) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IDiscoveryRequest
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.CreateTestRunRequest(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCriteria testRunCriteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions options) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunRequest
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.CreateDiscoveryRequest(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria discoveryCriteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions options, System.Collections.Generic.Dictionary<string, Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail> sourceToSourceDetailMap) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IDiscoveryRequest
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.CreateTestRunRequest(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCriteria testRunCriteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions options, System.Collections.Generic.Dictionary<string, Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail> sourceToSourceDetailMap) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunRequest
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.UpdateExtensions(System.Collections.Generic.IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatformCapabilities
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatformCapabilities.TestPlatformType.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformType
@@ -893,7 +893,7 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.TestSes
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.TestSessionInfo.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryRequestPayload.TestSessionInfo.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryRequestPayload.TestSessionInfo.set -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.StartTestSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StartTestSessionCriteria criteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler eventsHandler) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.StartTestSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StartTestSessionCriteria criteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler eventsHandler, System.Collections.Generic.Dictionary<string, Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail> sourceToSourceDetailMap) -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler.HandleStartTestSessionComplete(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StartTestSessionCompleteEventArgs eventArgs) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler.HandleStopTestSessionComplete(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StopTestSessionCompleteEventArgs eventArgs) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionAckPayload.EventArgs.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StartTestSessionCompleteEventArgs
@@ -928,3 +928,29 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.DiscoveredExtensions.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.IsAborted.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.TotalCount.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.Architecture.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.Framework.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Framework
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.Source.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.SourceDetail() -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.AttachDebuggerInfo() -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.ProcessId.get -> int
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.ProcessId.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.TargetFramework.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.TargetFramework.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.ITestHostLauncher3
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IInternalTestRunEventsHandler
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IInternalTestRunEventsHandler.AttachDebuggerToProcess(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo attachDebuggerInfo) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IInternalTestRunEventsHandler.HandleTestRunComplete(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs testRunCompleteArgs, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunChangedEventArgs lastChunkArgs, System.Collections.Generic.ICollection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet> runContextAttachments, System.Collections.Generic.ICollection<string> executorUris) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IInternalTestRunEventsHandler.HandleTestRunStatsChange(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunChangedEventArgs testRunChangedArgs) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IInternalTestRunEventsHandler.LaunchProcessWithDebuggerAttached(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessStartInfo testProcessStartInfo) -> int
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.ITestHostLauncher3.AttachDebuggerToProcess(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo attachDebuggerInfo, System.Threading.CancellationToken cancellationToken) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload.EditorAttachDebuggerPayload() -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload.ProcessID.get -> int
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload.ProcessID.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload.TargetFramework.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload.TargetFramework.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessAttachDebuggerPayload.TargetFramework.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessAttachDebuggerPayload.TargetFramework.set -> void

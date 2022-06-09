@@ -7,14 +7,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
+using Microsoft.VisualStudio.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
@@ -29,29 +28,27 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     private readonly IProcessHelper _processHelper;
     private readonly IFileHelper _fileHelper;
     private readonly IEnvironment _environment;
-    private Process _procDumpProcess;
-    private string _tempDirectory;
-    private string _dumpFileName;
-    private readonly INativeMethodsHelper _nativeMethodsHelper;
+    private Process? _procDumpProcess;
+    private string? _tempDirectory;
+    private string? _dumpFileName;
     private bool _collectAlways;
-    private string _outputDirectory;
-    private Process _process;
-    private string _outputFilePrefix;
+    private string? _outputDirectory;
+    private Process? _process;
+    private string? _outputFilePrefix;
 
     public ProcDumpDumper()
         : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), new NativeMethodsHelper())
     {
     }
 
-    public ProcDumpDumper(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, INativeMethodsHelper nativeMethodsHelper)
+    public ProcDumpDumper(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, INativeMethodsHelper? nativeMethodsHelper)
     {
         _processHelper = processHelper;
         _fileHelper = fileHelper;
         _environment = environment;
-        _nativeMethodsHelper = nativeMethodsHelper;
     }
 
-    protected Action<object, string> OutputReceivedCallback => (process, data) =>
+    protected Action<object?, string> OutputReceivedCallback => (process, data) =>
         // useful for visibility when debugging this tool
         // Console.ForegroundColor = ConsoleColor.Cyan;
         // Console.WriteLine(data);
@@ -105,14 +102,14 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
             isFullDump: dumpType == DumpTypeOption.Full);
 
         EqtTrace.Info($"ProcDumpDumper.AttachToTargetProcess: Running ProcDump with arguments: '{procDumpArgs}'.");
-        _procDumpProcess = _processHelper.LaunchProcess(
+        _procDumpProcess = (Process)_processHelper.LaunchProcess(
             procDumpPath,
             procDumpArgs,
             _tempDirectory,
             null,
             null,
             null,
-            OutputReceivedCallback) as Process;
+            OutputReceivedCallback);
 
         EqtTrace.Info($"ProcDumpDumper.AttachToTargetProcess: ProcDump started as process with id '{_procDumpProcess.Id}'.");
     }
@@ -224,14 +221,14 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
             isFullDump: dumpType == DumpTypeOption.Full);
 
         EqtTrace.Info($"ProcDumpDumper.Dump: Running ProcDump with arguments: '{procDumpArgs}'.");
-        var procDumpProcess = _processHelper.LaunchProcess(
+        var procDumpProcess = (Process)_processHelper.LaunchProcess(
             procDumpPath,
             procDumpArgs,
             tempDirectory,
             null,
             null,
             null,
-            OutputReceivedCallback) as Process;
+            OutputReceivedCallback);
 
         EqtTrace.Info($"ProcDumpDumper.Dump: ProcDump started as process with id '{procDumpProcess.Id}'.");
 
@@ -254,7 +251,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     {
         var procdumpDirectory = Environment.GetEnvironmentVariable("PROCDUMP_PATH");
         var searchPath = false;
-        if (string.IsNullOrWhiteSpace(procdumpDirectory))
+        if (procdumpDirectory.IsNullOrWhiteSpace())
         {
             EqtTrace.Verbose("ProcDumpDumper.GetProcDumpExecutable: PROCDUMP_PATH env variable is empty will try to run ProcDump from PATH.");
             searchPath = true;

@@ -11,8 +11,6 @@ using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
 /// <summary>

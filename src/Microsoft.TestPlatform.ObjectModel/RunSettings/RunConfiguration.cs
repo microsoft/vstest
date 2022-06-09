@@ -557,8 +557,9 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     /// <param name="reader">XmlReader having run configuration node.</param>
     /// <returns></returns>
-    public static RunConfiguration FromXml(XmlReader reader!!)
+    public static RunConfiguration FromXml(XmlReader reader)
     {
+        ValidateArg.NotNull(reader, nameof(reader));
         var runConfiguration = new RunConfiguration();
         var empty = reader.IsEmptyElement;
 
@@ -571,6 +572,7 @@ public class RunConfiguration : TestRunSettings
             while (reader.NodeType == XmlNodeType.Element)
             {
                 string elementName = reader.Name;
+                // TODO: make run settings nodes case insensitive?
                 switch (elementName)
                 {
                     case "ResultsDirectory":

@@ -7,13 +7,11 @@ using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 internal class NetClientCrashDumper : ICrashDumper
 {
-    private string _outputDirectory;
+    private string? _outputDirectory;
     private readonly IFileHelper _fileHelper;
 
     public NetClientCrashDumper(IFileHelper fileHelper)

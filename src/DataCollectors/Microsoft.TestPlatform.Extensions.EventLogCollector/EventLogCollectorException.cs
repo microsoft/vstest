@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
 /// <summary>
@@ -17,7 +15,7 @@ internal class EventLogCollectorException : Exception
     /// </summary>
     /// <param name="localizedMessage">the localized exception message</param>
     /// <param name="innerException">the inner exception</param>
-    public EventLogCollectorException(string localizedMessage, Exception innerException)
+    public EventLogCollectorException(string? localizedMessage, Exception? innerException)
         : base(localizedMessage, innerException)
     {
     }

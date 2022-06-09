@@ -117,7 +117,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardOutput = true,
-            RedirectStandardError = true
+            RedirectStandardError = true,
         };
 
         EqtTrace.Verbose("VsTestCommandLineWrapper.StartProcess: Process Start Info {0} {1}", info.FileName, info.Arguments);

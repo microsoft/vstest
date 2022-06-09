@@ -250,7 +250,7 @@ public class IntegrationTestBase
                 environmentVariables["VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS"] = "1";
             }
 
-            if (_testEnvironment.DebugInfo.NoDefaultBreakpoints)
+            if (!_testEnvironment.DebugInfo.DebugStopAtEntrypoint)
             {
                 environmentVariables["VSTEST_DEBUG_NOBP"] = "1";
             }
@@ -404,6 +404,11 @@ public class IntegrationTestBase
     public void StdErrorContains(string substring)
     {
         Assert.IsTrue(_standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", _standardTestError, substring);
+    }
+
+    public void StdErrorRegexIsMatch(string pattern)
+    {
+        Assert.IsTrue(Regex.IsMatch(_standardTestError, pattern), "StdErrorOutput - [{0}] did not contain expected pattern '{1}'", _standardTestError, pattern);
     }
 
     public void StdErrorDoesNotContains(string substring)

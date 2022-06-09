@@ -46,7 +46,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     private bool _handShakeSuccessful;
 
-    private int _protocolVersion = 6;
+    private int _protocolVersion = ProtocolVersioning.HighestSupportedVersion;
 
     /// <summary>
     /// Used to cancel blocking tasks associated with the vstest.console process.
@@ -459,6 +459,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         break;
 
                     case MessageType.EditorAttachDebugger:
+                    case MessageType.EditorAttachDebugger2:
                         AttachDebuggerToProcess(testHostLauncher, message);
                         break;
 
@@ -559,6 +560,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         break;
 
                     case MessageType.EditorAttachDebugger:
+                    case MessageType.EditorAttachDebugger2:
                         AttachDebuggerToProcess(testHostLauncher, message);
                         break;
 
@@ -1164,7 +1166,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 {
                     HandleCustomHostLaunch(customHostLauncher, message);
                 }
-                else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
+                else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType) || string.Equals(MessageType.EditorAttachDebugger2, message.MessageType))
                 {
                     AttachDebuggerToProcess(customHostLauncher, message);
                 }
@@ -1436,16 +1438,46 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
         try
         {
-            var pid = _dataSerializer.DeserializePayload<int>(message);
+            // Handle EditorAttachDebugger2.
+            if (message.MessageType == MessageType.EditorAttachDebugger2)
+            {
+                var attachDebuggerPayload = _dataSerializer.DeserializePayload<EditorAttachDebuggerPayload>(message);
+                switch (customHostLauncher)
+                {
+                    case ITestHostLauncher3 launcher3:
+                        ackPayload.Attached = launcher3.AttachDebuggerToProcess(new AttachDebuggerInfo { ProcessId = attachDebuggerPayload.ProcessID, TargetFramework = attachDebuggerPayload.TargetFramework }, CancellationToken.None);
+                        break;
+                    case ITestHostLauncher2 launcher2:
+                        ackPayload.Attached = launcher2.AttachDebuggerToProcess(attachDebuggerPayload.ProcessID);
+                        break;
+                    default:
+                        // TODO: Maybe we should do something, but the rest of the story is broken, so it's better to not block users.
+                        break;
+                }
+            }
 
-            ackPayload.Attached = customHostLauncher is ITestHostLauncher2 launcher
-                                  && launcher.AttachDebuggerToProcess(pid);
+            // Handle EditorAttachDebugger.
+            if (message.MessageType == MessageType.EditorAttachDebugger)
+            {
+                var pid = _dataSerializer.DeserializePayload<int>(message);
+
+                switch (customHostLauncher)
+                {
+                    case ITestHostLauncher3 launcher3:
+                        ackPayload.Attached = launcher3.AttachDebuggerToProcess(new AttachDebuggerInfo { ProcessId = pid }, CancellationToken.None);
+                        break;
+                    case ITestHostLauncher2 launcher2:
+                        ackPayload.Attached = launcher2.AttachDebuggerToProcess(pid);
+                        break;
+                    default:
+                        // TODO: Maybe we should do something, but the rest of the story is broken, so it's better to not block users.
+                        break;
+                }
+            }
         }
         catch (Exception ex)
         {
-            EqtTrace.Error(
-                "VsTestConsoleRequestSender.AttachDebuggerToProcess: Error while attaching debugger to process: {0}",
-                ex);
+            EqtTrace.Error("VsTestConsoleRequestSender.AttachDebuggerToProcess: Error while attaching debugger to process: {0}", ex);
 
             // vstest.console will send the abort message properly while cleaning up all the
             // flow, so do not abort here.

@@ -17,6 +17,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [Serializable] // Type should be serializable to allow the tree-view behavior of test discovery in Test Explorer
 public class RunnerInfo
 {
+    public int Index { get; set; }
     public string? RunnerFramework { get; set; }
     public VSTestConsoleInfo? VSTestConsoleInfo { get; set; }
     public string? TargetFramework { get; set; }
@@ -51,6 +52,7 @@ public class RunnerInfo
     {
         return string.Join(", ", new[]
         {
+            $"Row: {Index}",
             Batch != null ? $"{Batch}" : null,
             $"Runner = {RunnerFramework}",
             $"TargetFramework = {TargetFramework}",

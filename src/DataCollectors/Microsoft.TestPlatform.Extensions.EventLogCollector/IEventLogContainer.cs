@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
 /// <summary>
@@ -33,5 +31,5 @@ internal interface IEventLogContainer : IDisposable
     /// <param name="e">
     /// Contains data related to EventLog entry.
     /// </param>
-    void OnEventLogEntryWritten(object source, EntryWrittenEventArgs e);
+    void OnEventLogEntryWritten(object? source, EntryWrittenEventArgs? e);
 }

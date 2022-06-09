@@ -115,7 +115,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
         var assemblyPath = _testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
         LoadAssemblyIntoMemory(assemblyPath);
         var stopWatch = Stopwatch.StartNew();
-        var actualFx = _assemblyMetadataProvider.GetFrameWork(assemblyPath);
+        var actualFx = _assemblyMetadataProvider.GetFrameworkName(assemblyPath);
         stopWatch.Stop();
 
         if (framework.Equals("net451"))
@@ -142,7 +142,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
         var assemblyPath = $@"{_testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
         LoadAssemblyIntoMemory(assemblyPath);
         var stopWatch = Stopwatch.StartNew();
-        var fx = _assemblyMetadataProvider.GetFrameWork(assemblyPath);
+        var fx = _assemblyMetadataProvider.GetFrameworkName(assemblyPath);
         stopWatch.Stop();
 
         Console.WriteLine(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds);

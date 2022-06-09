@@ -124,9 +124,12 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     }
 
     /// <inheritdoc/>
-    public async Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
+    public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
     {
-        return await Task.Run(() => LaunchHost(testHostStartInfo, cancellationToken), cancellationToken);
+        // Do NOT offload this to thread pool using Task.Run, we already are on thread pool
+        // and this would go into a queue after all the other startup tasks. Meaning we will start
+        // testhost much later, and not immediately.
+        return Task.FromResult(LaunchHost(testHostStartInfo, cancellationToken));
     }
 
     /// <inheritdoc/>
@@ -329,8 +332,12 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <inheritdoc />
     public bool AttachDebuggerToTestHost()
     {
-        return _customTestHostLauncher is ITestHostLauncher2 launcher
-               && launcher.AttachDebuggerToProcess(_testHostProcess.Id);
+        return _customTestHostLauncher switch
+        {
+            ITestHostLauncher3 launcher3 => launcher3.AttachDebuggerToProcess(new AttachDebuggerInfo { ProcessId = _testHostProcess.Id, TargetFramework = _targetFramework.ToString() }, CancellationToken.None),
+            ITestHostLauncher2 launcher2 => launcher2.AttachDebuggerToProcess(_testHostProcess.Id),
+            _ => false,
+        };
     }
 
     /// <summary>

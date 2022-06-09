@@ -98,8 +98,11 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
         get; private set;
     }
     /// <inheritdoc/>
-    public void Initialize(SessionId id!!, string outputDirectory, IMessageSink messageSink!!)
+    public void Initialize(SessionId id, string outputDirectory, IMessageSink messageSink)
     {
+        ValidateArg.NotNull(id, nameof(id));
+        ValidateArg.NotNull(messageSink, nameof(messageSink));
+
         _messageSink = messageSink;
 
         if (outputDirectory.IsNullOrEmpty())
@@ -159,8 +162,10 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     }
 
     /// <inheritdoc/>
-    public void AddAttachment(FileTransferInformation fileTransferInfo!!, AsyncCompletedEventHandler sendFileCompletedCallback, Uri uri, string friendlyName)
+    public void AddAttachment(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler sendFileCompletedCallback, Uri uri, string friendlyName)
     {
+        ValidateArg.NotNull(fileTransferInfo, nameof(fileTransferInfo));
+
         if (SessionOutputDirectory.IsNullOrEmpty())
         {
             EqtTrace.Error("DataCollectionAttachmentManager.AddAttachment: Initialize not invoked.");

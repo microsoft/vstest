@@ -34,7 +34,7 @@ public class NetFrameworkRunner : Attribute, ITestDataSource
     public bool DebugVSTestConsole { get; set; }
     public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
-    public bool NoDefaultBreakpoints { get; set; } = true;
+    public bool DebugStopAtEntrypoint { get; set; }
 
     private readonly string _targetFrameworks;
 
@@ -60,7 +60,7 @@ public class NetFrameworkRunner : Attribute, ITestDataSource
                 DebugVSTestConsole = DebugVSTestConsole,
                 DebugTestHost = DebugTestHost,
                 DebugDataCollector = DebugDataCollector,
-                NoDefaultBreakpoints = NoDefaultBreakpoints,
+                DebugStopAtEntrypoint = DebugStopAtEntrypoint,
             };
 
             dataRows.Add(new object[] { runnerInfo });

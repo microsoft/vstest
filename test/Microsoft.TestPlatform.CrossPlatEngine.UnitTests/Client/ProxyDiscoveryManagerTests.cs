@@ -52,6 +52,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             _mockRequestData.Object,
             _mockRequestSender.Object,
             _mockTestHostManager.Object,
+            Framework.DefaultFramework,
             _discoveryDataAggregator,
             _mockDataSerializer.Object,
             _mockFileHelper.Object);
@@ -457,6 +458,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
 
         var discoveryManager = GetProxyDiscoveryManager();
         SetupChannelMessage(MessageType.StartDiscovery, MessageType.TestCasesFound, testCases);
+        SetupChannelMessage(MessageType.TestMessage, MessageType.TestMessage, string.Empty);
 
         var completePayload = new DiscoveryCompletePayload()
         {
@@ -529,7 +531,8 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
                 var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
                     testSessionInfo,
                     source,
-                    _discoveryCriteria.RunSettings);
+                    _discoveryCriteria.RunSettings,
+                    _mockRequestData.Object);
 
                 return proxyOperationManager;
             };
@@ -546,12 +549,14 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             var mockProxyOperationManager = new Mock<ProxyOperationManager>(
                 _mockRequestData.Object,
                 _mockRequestSender.Object,
-                _mockTestHostManager.Object);
+                _mockTestHostManager.Object,
+                null);
             mockTestSessionPool.Setup(
                     tsp => tsp.TryTakeProxy(
                         testSessionInfo,
                         It.IsAny<string>(),
-                        It.IsAny<string>()))
+                        It.IsAny<string>(),
+                        _mockRequestData.Object))
                 .Returns(mockProxyOperationManager.Object);
 
             testDiscoveryManager.Initialize(true);
@@ -563,7 +568,8 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
                 tsp => tsp.TryTakeProxy(
                     testSessionInfo,
                     It.IsAny<string>(),
-                    It.IsAny<string>()),
+                    It.IsAny<string>(),
+                    _mockRequestData.Object),
                 Times.Once);
         }
         finally

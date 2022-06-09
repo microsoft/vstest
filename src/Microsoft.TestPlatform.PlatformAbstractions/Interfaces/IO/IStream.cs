@@ -3,8 +3,6 @@
 
 using System.IO;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 /// <summary>

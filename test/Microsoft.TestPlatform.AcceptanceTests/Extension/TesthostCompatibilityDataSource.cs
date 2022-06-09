@@ -39,7 +39,7 @@ public class TestHostCompatibilityDataSource : TestDataSource<RunnerInfo>
     public bool DebugVSTestConsole { get; set; }
     public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
-    public bool NoDefaultBreakpoints { get; set; } = true;
+    public bool DebugStopAtEntrypoint { get; set; }
 
     public string? BeforeFeature { get; set; }
     public string? AfterFeature { get; set; }
@@ -58,7 +58,7 @@ public class TestHostCompatibilityDataSource : TestDataSource<RunnerInfo>
         _builder.DebugDataCollector = DebugDataCollector;
         _builder.DebugVSTestConsole = DebugVSTestConsole;
         _builder.DebugTestHost = DebugTestHost;
-        _builder.NoDefaultBreakpoints = NoDefaultBreakpoints;
+        _builder.DebugStopAtEntrypoint = DebugStopAtEntrypoint;
 
         var data = _builder.CreateData();
         data.ForEach(AddData);

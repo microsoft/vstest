@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using System.Collections.Generic;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 #nullable disable
 
@@ -28,8 +28,8 @@ public interface ITestEngine
     /// <returns>An IProxyDiscoveryManager object that can do discovery.</returns>
     IProxyDiscoveryManager GetDiscoveryManager(
         IRequestData requestData,
-        ITestRuntimeProvider testHostManager,
-        DiscoveryCriteria discoveryCriteria);
+        DiscoveryCriteria discoveryCriteria,
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap);
 
     /// <summary>
     /// Fetches the ExecutionManager for this engine. This manager would provide all
@@ -45,8 +45,8 @@ public interface ITestEngine
     /// <returns>An IProxyExecutionManager object that can do execution.</returns>
     IProxyExecutionManager GetExecutionManager(
         IRequestData requestData,
-        ITestRuntimeProvider testHostManager,
-        TestRunCriteria testRunCriteria);
+        TestRunCriteria testRunCriteria,
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap);
 
     /// <summary>
     /// Fetches the TestSessionManager for this engine. This manager would provide all
@@ -63,7 +63,8 @@ public interface ITestEngine
     /// <returns>An IProxyTestSessionManager object that can manage test sessions.</returns>
     IProxyTestSessionManager GetTestSessionManager(
         IRequestData requestData,
-        StartTestSessionCriteria testSessionCriteria);
+        StartTestSessionCriteria testSessionCriteria,
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap);
 
     /// <summary>
     /// Fetches the extension manager for this engine. This manager would provide extensibility

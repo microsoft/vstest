@@ -53,7 +53,7 @@ public class CollectArgumentProcessorTests
     public void GetExecuterShouldReturnCollectArgumentProcessorCapabilities()
     {
         var processor = new CollectArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is CollectArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is CollectArgumentExecutor);
     }
 
     #region CollectArgumentProcessorCapabilities tests

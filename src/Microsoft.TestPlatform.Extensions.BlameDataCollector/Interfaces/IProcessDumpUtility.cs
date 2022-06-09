@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 public interface IProcessDumpUtility
@@ -58,7 +56,7 @@ public interface IProcessDumpUtility
     /// <param name="logWarning">
     /// Callback to datacollector logger to log warning
     /// </param>
-    void StartHangBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, Action<string> logWarning = null);
+    void StartHangBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, Action<string>? logWarning = null);
 
     /// <summary>
     /// Detaches the proc dump process from the target process

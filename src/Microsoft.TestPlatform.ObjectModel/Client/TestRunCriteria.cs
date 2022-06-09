@@ -658,8 +658,9 @@ public class BaseTestRunCriteria
     /// </summary>
     ///
     /// <param name="runCriteria">Run criteria to clone.</param>
-    public BaseTestRunCriteria(BaseTestRunCriteria runCriteria!!)
+    public BaseTestRunCriteria(BaseTestRunCriteria runCriteria)
     {
+        ValidateArg.NotNull(runCriteria, nameof(runCriteria));
         FrequencyOfRunStatsChangeEvent = runCriteria.FrequencyOfRunStatsChangeEvent;
         KeepAlive = runCriteria.KeepAlive;
         TestRunSettings = runCriteria.TestRunSettings;

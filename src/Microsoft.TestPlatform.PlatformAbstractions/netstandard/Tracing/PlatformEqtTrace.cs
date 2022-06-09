@@ -6,8 +6,6 @@
 using System;
 using System.Diagnostics;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -27,7 +25,7 @@ public class PlatformEqtTrace : IPlatformEqtTrace
 {
     private PlatformTraceLevel _traceLevel = PlatformTraceLevel.Off;
 
-    public static string ErrorOnInitialization { get; set; }
+    public static string? ErrorOnInitialization { get; set; }
 
     public bool DoNotInitialize { get; set; }
 
@@ -72,7 +70,7 @@ public class PlatformEqtTrace : IPlatformEqtTrace
         return !DoNotInitialize && (int)_traceLevel >= (int)traceLevel;
     }
 
-    public string GetLogFile() => string.Empty;
+    public string? GetLogFile() => string.Empty;
 
     public void SetTraceLevel(PlatformTraceLevel value)
     {

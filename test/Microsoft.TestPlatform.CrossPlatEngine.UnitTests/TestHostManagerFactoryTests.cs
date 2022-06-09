@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,13 +21,7 @@ public class TestHostManagerFactoryTests
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
-        _testHostManagerFactory = new TestHostManagerFactory(_mockRequestData.Object);
-    }
-
-    [TestMethod]
-    public void ConstructorShouldThrowIfRequestDataIsNull()
-    {
-        Assert.ThrowsException<ArgumentNullException>(() => new TestHostManagerFactory(null));
+        _testHostManagerFactory = new TestHostManagerFactory(false);
     }
 
     [TestMethod]

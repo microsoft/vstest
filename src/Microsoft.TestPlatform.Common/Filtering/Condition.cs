@@ -89,8 +89,9 @@ internal class Condition
     /// <summary>
     /// Evaluate this condition for testObject.
     /// </summary>
-    internal bool Evaluate(Func<string, object> propertyValueProvider!!)
+    internal bool Evaluate(Func<string, object> propertyValueProvider)
     {
+        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
         var result = false;
         var multiValue = GetPropertyValue(propertyValueProvider);
         switch (Operation)
@@ -255,21 +256,14 @@ internal class Condition
     /// </summary>
     private static Operation GetOperator(string operationString)
     {
-        switch (operationString)
+        return operationString switch
         {
-            case "=":
-                return Operation.Equal;
-
-            case "!=":
-                return Operation.NotEqual;
-
-            case "~":
-                return Operation.Contains;
-
-            case "!~":
-                return Operation.NotContains;
-        }
-        throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidOperator, operationString)));
+            "=" => Operation.Equal,
+            "!=" => Operation.NotEqual,
+            "~" => Operation.Contains,
+            "!~" => Operation.NotContains,
+            _ => throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidOperator, operationString))),
+        };
     }
 
     /// <summary>

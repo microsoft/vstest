@@ -39,8 +39,10 @@ public static class MulticastDelegateUtilities
     /// <param name="sender">Sender to use when raising the event.</param>
     /// <param name="args">Arguments to provide.</param>
     /// <param name="traceDisplayName">Name to use when tracing out errors.</param>
-    public static void SafeInvoke(this Delegate delegates, object sender, object args!!, string traceDisplayName)
+    public static void SafeInvoke(this Delegate delegates, object sender, object args, string traceDisplayName)
     {
+        ValidateArg.NotNull(args, nameof(args));
+
         if (string.IsNullOrWhiteSpace(traceDisplayName))
         {
             throw new ArgumentNullException(nameof(traceDisplayName));
@@ -57,17 +59,22 @@ public static class MulticastDelegateUtilities
                 try
                 {
                     handler.DynamicInvoke(sender, args);
-                    EqtTrace.Verbose("MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, took {5} ms.",
-                            traceDisplayName,
-                            ++i,
-                            invocationList.Length,
-                            handler.GetTargetName(),
-                            handler.GetMethodName(),
-                            stopwatch.ElapsedMilliseconds);
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
+                        EqtTrace.Verbose("MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, took {5} ms.",
+                                traceDisplayName,
+                                ++i,
+                                invocationList.Length,
+                                handler.GetTargetName(),
+                                handler.GetMethodName(),
+                                stopwatch.ElapsedMilliseconds);
+                    }
                 }
                 catch (TargetInvocationException exception)
                 {
-                    EqtTrace.Error(
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error(
                         "MulticastDelegateUtilities.SafeInvoke: {0}: Invoking callback {1}/{2} for {3}.{4}, failed after {5} ms with: {6}.",
                         ++i,
                         invocationList.Length,
@@ -76,6 +83,7 @@ public static class MulticastDelegateUtilities
                         traceDisplayName,
                         stopwatch.ElapsedMilliseconds,
                         exception);
+                    }
                 }
             }
         }

@@ -324,9 +324,9 @@ public class DefaultTestHostManagerTests
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<IDictionary<string, string>>(),
-                    It.IsAny<Action<object, string>>(),
+                    It.IsAny<Action<object?, string>>(),
                     It.IsAny<Action<object>>(),
-                    It.IsAny<Action<object, string>>())).Returns(Process.GetCurrentProcess());
+                    It.IsAny<Action<object?, string>>())).Returns(Process.GetCurrentProcess());
 
         _testHostManager.Initialize(_mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X64}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
         var startInfo = _testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default);
@@ -354,7 +354,7 @@ public class DefaultTestHostManagerTests
         CancellationTokenSource cancellationTokenSource = new();
         cancellationTokenSource.Cancel();
 
-        Assert.ThrowsException<AggregateException>(() => _testableTestHostManager.LaunchTestHostAsync(GetDefaultStartInfo(), cancellationTokenSource.Token).Wait());
+        Assert.ThrowsException<OperationCanceledException>(() => _testableTestHostManager.LaunchTestHostAsync(GetDefaultStartInfo(), cancellationTokenSource.Token).Wait());
     }
 
     [TestMethod]
@@ -396,7 +396,7 @@ public class DefaultTestHostManagerTests
         mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(currentProcess.Id);
         _testHostManager.LaunchTestHostAsync(_startInfo, CancellationToken.None).Wait();
 
-        _mockProcessHelper.Verify(ph => ph.SetExitCallback(currentProcess.Id, It.IsAny<Action<object>>()));
+        _mockProcessHelper.Verify(ph => ph.SetExitCallback(currentProcess.Id, It.IsAny<Action<object?>>()));
     }
 
     [TestMethod]
@@ -532,9 +532,9 @@ public class DefaultTestHostManagerTests
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<IDictionary<string, string>>(),
-                        It.IsAny<Action<object, string>>(),
+                        It.IsAny<Action<object?, string>>(),
                         It.IsAny<Action<object>>(),
-                        It.IsAny<Action<object, string>>()))
+                        It.IsAny<Action<object?, string>>()))
             .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
                 (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
                 {
@@ -566,9 +566,9 @@ public class DefaultTestHostManagerTests
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<IDictionary<string, string>>(),
-                        It.IsAny<Action<object, string>>(),
+                        It.IsAny<Action<object?, string>>(),
                         It.IsAny<Action<object>>(),
-                        It.IsAny<Action<object, string>>()))
+                        It.IsAny<Action<object?, string>>()))
             .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
                 (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
                 {

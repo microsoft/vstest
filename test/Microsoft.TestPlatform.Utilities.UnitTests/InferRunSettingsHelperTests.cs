@@ -249,7 +249,7 @@ public class InferRunSettingsHelperTests
     {
         var settings = @"<RunSettings><RunConfiguration><DesignMode>False</DesignMode><CollectSourceInformation>False</CollectSourceInformation></RunConfiguration></RunSettings>";
 
-        var result = InferRunSettingsHelper.MakeRunsettingsCompatible(settings);
+        var result = InferRunSettingsHelper.MakeRunsettingsCompatible(settings)!;
 
         Assert.IsTrue(result.IndexOf("DesignMode", StringComparison.OrdinalIgnoreCase) < 0);
     }
@@ -272,7 +272,7 @@ public class InferRunSettingsHelperTests
                                 </RunConfiguration>
                             </RunSettings>";
 
-        var result = InferRunSettingsHelper.MakeRunsettingsCompatible(settings);
+        var result = InferRunSettingsHelper.MakeRunsettingsCompatible(settings)!;
 
         Assert.IsTrue(result.IndexOf("TargetPlatform", StringComparison.OrdinalIgnoreCase) > 0);
         Assert.IsTrue(result.IndexOf("TargetFrameworkVersion", StringComparison.OrdinalIgnoreCase) > 0);
@@ -300,8 +300,9 @@ public class InferRunSettingsHelperTests
 
         var xmlDocument = GetXmlDocument(settings);
 
-        var result = InferRunSettingsHelper.TryGetDeviceXml(xmlDocument.CreateNavigator(), out string deviceXml);
+        var result = InferRunSettingsHelper.TryGetDeviceXml(xmlDocument.CreateNavigator()!, out string? deviceXml);
         Assert.IsTrue(result);
+        Assert.IsNotNull(deviceXml);
 
         InferRunSettingsHelper.UpdateTargetDevice(xmlDocument, deviceXml);
         Assert.AreEqual(deviceXml.ToString(), GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/TargetDevice"));
@@ -547,7 +548,7 @@ public class InferRunSettingsHelperTests
                                        </RunConfiguration>
                                       </RunSettings>";
 
-        var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
+        var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml)!;
 
         Assert.AreEqual(2, envVars.Count);
         Assert.AreEqual(@"C:\temp", envVars["RANDOM_PATH"]);
@@ -566,7 +567,7 @@ public class InferRunSettingsHelperTests
                                        </RunConfiguration>
                                       </RunSettings>";
 
-        var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
+        var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml)!;
 
         Assert.AreEqual(1, envVars.Count);
         Assert.AreEqual(@"C:\temp", envVars["RANDOM_PATH"]);
@@ -582,7 +583,7 @@ public class InferRunSettingsHelperTests
                                        </RunConfiguration>
                                       </RunSettings>";
 
-        var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
+        var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml)!;
         Assert.AreEqual(0, envVars.Count);
     }
 

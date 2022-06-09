@@ -3,12 +3,10 @@
 
 using System.Threading;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
 /// <summary>
-/// Interface defining contract for custom test host implementations
+/// Interface defining contract for custom test host launcher implementation.
 /// </summary>
 public interface ITestHostLauncher2 : ITestHostLauncher
 {

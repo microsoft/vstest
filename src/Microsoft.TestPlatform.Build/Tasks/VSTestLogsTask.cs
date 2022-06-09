@@ -1,28 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
 using System;
 
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Build.Tasks;
 public class VSTestLogsTask : Task
 {
-    public string LogType
-    {
-        get;
-        set;
-    }
+    public string? LogType { get; set; }
 
-    public string ProjectFilePath
-    {
-        get;
-        set;
-    }
+    public string? ProjectFilePath { get; set; }
 
     public override bool Execute()
     {

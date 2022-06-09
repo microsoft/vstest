@@ -47,7 +47,7 @@ public class EnableCodeCoverageArgumentProcessorTests
     public void GetExecuterShouldReturnEnableCodeCoverageArgumentProcessorCapabilities()
     {
         var processor = new EnableCodeCoverageArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is EnableCodeCoverageArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is EnableCodeCoverageArgumentExecutor);
     }
 
     #region EnableCodeCoverageArgumentProcessorCapabilities tests

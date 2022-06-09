@@ -57,7 +57,7 @@ public class TestHostProviderManagerTests
     </RunSettings>";
 
         var manager = TestRuntimeProviderManager.Instance;
-        Assert.IsNotNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml));
+        Assert.IsNotNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml, null));
     }
 
     [TestMethod]
@@ -69,7 +69,7 @@ public class TestHostProviderManagerTests
             Framework.DefaultFramework.Name,
             "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
 
-        Assert.IsNotNull(TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml));
+        Assert.IsNotNull(TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null));
     }
 
     [TestMethod]
@@ -81,8 +81,8 @@ public class TestHostProviderManagerTests
             Framework.DefaultFramework.Name,
             "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
 
-        var instance1 = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
-        var instance2 = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
+        var instance1 = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
+        var instance2 = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
 
         Assert.AreNotEqual(instance1, instance2);
     }
@@ -96,7 +96,7 @@ public class TestHostProviderManagerTests
             ".NETCoreApp,Version=v1.0",
             "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
 
-        var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
+        var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
 
         Assert.AreEqual(typeof(TestableTestHostManager), testHostManager.GetType());
     }
@@ -110,7 +110,7 @@ public class TestHostProviderManagerTests
             ".NETFramework,Version=v4.5.1",
             "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
 
-        var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
+        var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
         testHostManager.Initialize(null, runSettingsXml);
         Assert.IsNotNull(testHostManager);
 
@@ -126,7 +126,7 @@ public class TestHostProviderManagerTests
             ".NETFramework,Version=v4.5.1",
             "</TargetFrameworkVersion><DisableAppDomain>true</DisableAppDomain></RunConfiguration></RunSettings> ");
 
-        var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
+        var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
         testHostManager.Initialize(null, runSettingsXml);
         Assert.IsNotNull(testHostManager);
 
@@ -146,7 +146,7 @@ public class TestHostProviderManagerTests
     </RunSettings> ";
 
         var manager = TestRuntimeProviderManager.Instance;
-        Assert.IsNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml));
+        Assert.IsNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml, null));
     }
 
     #region Implementations

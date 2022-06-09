@@ -10,8 +10,6 @@ using System.Xml.XPath;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
@@ -30,7 +28,7 @@ public class CodeCoverageRunSettingsProcessor
     /// <param name="defaultSettingsRootNode">The default settings root node.</param>
     public CodeCoverageRunSettingsProcessor(XmlNode defaultSettingsRootNode)
     {
-        _defaultSettingsRootNode = defaultSettingsRootNode ?? throw new ArgumentNullException(nameof(defaultSettingsRootNode), "Default settings root node is null.");
+        _defaultSettingsRootNode = defaultSettingsRootNode ?? throw new ArgumentNullException(nameof(defaultSettingsRootNode));
     }
 
     #region Public Interface
@@ -41,9 +39,9 @@ public class CodeCoverageRunSettingsProcessor
     /// <param name="currentSettings">The code coverage settings.</param>
     ///
     /// <returns>An updated version of the current run settings.</returns>
-    public XmlNode Process(string currentSettings)
+    public XmlNode? Process(string? currentSettings)
     {
-        if (string.IsNullOrEmpty(currentSettings))
+        if (currentSettings.IsNullOrEmpty())
         {
             return null;
         }
@@ -64,7 +62,7 @@ public class CodeCoverageRunSettingsProcessor
     /// </param>
     ///
     /// <returns>An updated version of the current run settings.</returns>
-    public XmlNode Process(XmlDocument currentSettingsDocument)
+    public XmlNode? Process(XmlDocument? currentSettingsDocument)
     {
         return currentSettingsDocument == null ? null : Process(currentSettingsDocument.DocumentElement);
     }
@@ -76,7 +74,7 @@ public class CodeCoverageRunSettingsProcessor
     /// <param name="currentSettingsRootNode">The code coverage root element.</param>
     ///
     /// <returns>An updated version of the current run settings.</returns>
-    public XmlNode Process(XmlNode currentSettingsRootNode)
+    public XmlNode? Process(XmlNode? currentSettingsRootNode)
     {
         if (currentSettingsRootNode == null)
         {
@@ -160,9 +158,9 @@ public class CodeCoverageRunSettingsProcessor
     /// <param name="pathComponents">The path components.</param>
     ///
     /// <returns>The requested node if successful, <see cref="null"/> otherwise.</returns>
-    private XmlNode SelectNodeOrAddDefaults(
+    private static XmlNode? SelectNodeOrAddDefaults(
         XmlNode currentRootNode,
-        XmlNode defaultRootNode,
+        XmlNode? defaultRootNode,
         IList<string> pathComponents)
     {
         var currentNode = currentRootNode;
@@ -217,7 +215,7 @@ public class CodeCoverageRunSettingsProcessor
     /// <returns>
     /// <see cref="true"/> if the node should be processed, <see cref="false"/> otherwise.
     /// </returns>
-    private bool ShouldProcessCurrentExclusion(XmlNode node)
+    private static bool ShouldProcessCurrentExclusion(XmlNode node)
     {
         const string attributeName = "mergeDefaults";
 
@@ -241,7 +239,7 @@ public class CodeCoverageRunSettingsProcessor
     /// </summary>
     ///
     /// <returns>A relative path built from path components.</returns>
-    private string BuildPath(IList<string> pathComponents)
+    private static string BuildPath(IList<string> pathComponents)
     {
         return string.Join("/", new[] { "." }.Concat(pathComponents));
     }
@@ -254,11 +252,11 @@ public class CodeCoverageRunSettingsProcessor
     /// <param name="path">The path used to specify the requested node.</param>
     ///
     /// <returns>The extracted node if successful, <see cref="null"/> otherwise.</returns>
-    private XmlNode ExtractNode(XmlNode node, string path)
+    private static XmlNode? ExtractNode(XmlNode? node, string path)
     {
         try
         {
-            return node.SelectSingleNode(path);
+            return node?.SelectSingleNode(path);
         }
         catch (XPathException ex)
         {
@@ -276,7 +274,7 @@ public class CodeCoverageRunSettingsProcessor
     ///
     /// <param name="currentNode">The current settings root node.</param>
     /// <param name="defaultNode">The default settings root node.</param>
-    private void MergeNodes(XmlNode currentNode, XmlNode defaultNode)
+    private static void MergeNodes(XmlNode currentNode, XmlNode? defaultNode)
     {
         var exclusionCache = new HashSet<string>();
 
@@ -284,6 +282,11 @@ public class CodeCoverageRunSettingsProcessor
         foreach (XmlNode child in currentNode.ChildNodes)
         {
             exclusionCache.Add(child.OuterXml);
+        }
+
+        if (defaultNode is null)
+        {
+            return;
         }
 
         // Iterate through default exclusions and import missing ones.

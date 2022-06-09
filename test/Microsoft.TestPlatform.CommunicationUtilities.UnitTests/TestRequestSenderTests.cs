@@ -35,7 +35,7 @@ public class TestRequestSenderTests
 
     private readonly List<string> _pathToAdditionalExtensions = new() { "Hello", "World" };
     private readonly Mock<ITestDiscoveryEventsHandler2> _mockDiscoveryEventsHandler;
-    private readonly Mock<ITestRunEventsHandler> _mockExecutionEventsHandler;
+    private readonly Mock<IInternalTestRunEventsHandler> _mockExecutionEventsHandler;
     private readonly TestRunCriteriaWithSources _testRunCriteriaWithSources;
     private TestHostConnectionInfo _connectionInfo;
     private readonly ITestRequestSender _testRequestSender;
@@ -56,7 +56,7 @@ public class TestRequestSenderTests
 
         _connectedEventArgs = new ConnectedEventArgs(_mockChannel.Object);
         _mockDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
-        _mockExecutionEventsHandler = new Mock<ITestRunEventsHandler>();
+        _mockExecutionEventsHandler = new Mock<IInternalTestRunEventsHandler>();
         _testRunCriteriaWithSources = new TestRunCriteriaWithSources(new Dictionary<string, IEnumerable<string>>(), "runsettings", null, null);
     }
 

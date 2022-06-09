@@ -119,6 +119,9 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
             if (DiscoveryInProgress)
             {
+                // TODO: COMPAT: This should not check the default protocol config, that is vstest.console maximum protocol version, not the
+                // version we negotiated with testhost. Instead this should be handled by the proxy discovery manager, based on the protocol
+                // version it has.
                 // If testhost has old version, we should use old cancel logic
                 // to be consistent and not create regression issues
                 if (Constants.DefaultProtocolConfig.Version < Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport)
@@ -256,7 +259,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 // and then we write again here. We should refactor this code and write only once.
                 discoveryCompleteEventArgs.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
                     discoveryCompleteEventArgs.DiscoveredExtensions,
-                    TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
+                    TestPluginCache.Instance.TestExtensions?.GetCachedExtensions());
 
                 if (RequestData.IsTelemetryOptedIn)
                 {
@@ -436,7 +439,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 // would probably mean a performance hit.
                 discoveryCompletePayload.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
                     discoveryCompletePayload.DiscoveredExtensions,
-                    TestPluginCache.Instance.TestExtensions.GetCachedExtensions());
+                    TestPluginCache.Instance.TestExtensions?.GetCachedExtensions());
 
                 // Write extensions to telemetry data.
                 TestExtensions.AddExtensionTelemetry(

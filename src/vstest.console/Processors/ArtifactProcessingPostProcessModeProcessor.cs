@@ -35,7 +35,7 @@ internal class ArtifactProcessingPostProcessModeProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new ArtifactProcessingPostProcessModeProcessorExecutor(CommandLineOptions.Instance,
@@ -74,10 +74,10 @@ internal class ArtifactProcessingPostProcessModeProcessorExecutor : IArgumentExe
     private readonly CommandLineOptions _commandLineOptions;
     private readonly IArtifactProcessingManager _artifactProcessingManage;
 
-    public ArtifactProcessingPostProcessModeProcessorExecutor(CommandLineOptions options!!, IArtifactProcessingManager artifactProcessingManager!!)
+    public ArtifactProcessingPostProcessModeProcessorExecutor(CommandLineOptions options, IArtifactProcessingManager artifactProcessingManager)
     {
-        _commandLineOptions = options;
-        _artifactProcessingManage = artifactProcessingManager; ;
+        _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
+        _artifactProcessingManage = artifactProcessingManager ?? throw new ArgumentNullException(nameof(artifactProcessingManager));
     }
 
     public void Initialize(string? _)

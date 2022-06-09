@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 
 /// <summary>
@@ -17,7 +15,7 @@ public class NoOpMetricsPublisher : IMetricsPublisher
     /// </summary>
     /// <param name="eventName"></param>
     /// <param name="metrics"></param>
-    public void PublishMetrics(string eventName, IDictionary<string, object> metrics)
+    public void PublishMetrics(string eventName, IDictionary<string, object?> metrics)
     {
         // No Operation
     }

@@ -2,18 +2,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Security;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -27,10 +24,8 @@ internal class ResultsDirectoryArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/ResultsDirectory";
 
-    private const string RunSettingsPath = "RunConfiguration.ResultsDirectory";
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -42,7 +37,7 @@ internal class ResultsDirectoryArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
@@ -90,8 +85,8 @@ internal class ResultsDirectoryArgumentExecutor : IArgumentExecutor
     /// <param name="testPlatform">The test platform</param>
     public ResultsDirectoryArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
     {
-        Contract.Requires(options != null);
-        Contract.Requires(runSettingsManager != null);
+        ValidateArg.NotNull(options, nameof(options));
+        ValidateArg.NotNull(runSettingsManager, nameof(runSettingsManager));
 
         _commandLineOptions = options;
         _runSettingsManager = runSettingsManager;
@@ -104,9 +99,9 @@ internal class ResultsDirectoryArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        if (string.IsNullOrWhiteSpace(argument))
+        if (argument.IsNullOrWhiteSpace())
         {
             throw new CommandLineException(CommandLineResources.ResultsDirectoryValueRequired);
         }

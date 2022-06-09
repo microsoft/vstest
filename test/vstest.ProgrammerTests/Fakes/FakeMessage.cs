@@ -50,4 +50,9 @@ internal sealed class FakeMessage<T> : FakeMessage
     /// Version of the message to allow the internal serializer to choose the correct serialization strategy.
     /// </summary>
     public int Version { get; }
+
+    public override string ToString()
+    {
+        return $"{MessageType} {{{Payload}}}";
+    }
 }

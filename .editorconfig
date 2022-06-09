@@ -198,7 +198,7 @@ dotnet_diagnostic.CA1834.severity = warning # not default, increased severity to
 
 # IDE0190: Null check can be simplified
 # Keep this in sync with the related C# rule: csharp_style_prefer_parameter_null_checking
-dotnet_diagnostic.IDE0190.severity = warning # not default, increased severity to ensure it is applied
+dotnet_diagnostic.IDE0190.severity = silent # not default, disabled as feature is no longer supported
 
 # CA1840: Use 'Environment.CurrentManagedThreadId'
 dotnet_diagnostic.CA1840.severity = warning # not default, increased severity to ensure it is applied
@@ -264,7 +264,7 @@ csharp_using_directive_placement = outside_namespace:warning
 
 # IDE0190: Null check can be simplified
 # Keep this in sync with the related .NET rule: IDE0190
-csharp_style_prefer_parameter_null_checking = true # not default, increased severity to ensure it is applied
+csharp_style_prefer_parameter_null_checking = false # not default, disabled as no longer supported
 
 #### .NET Formatting Rules ####
 

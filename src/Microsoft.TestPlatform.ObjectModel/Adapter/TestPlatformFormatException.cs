@@ -61,7 +61,7 @@ public class TestPlatformFormatException : Exception
     /// <summary>
     /// Serialization constructor.
     /// </summary>
-    protected TestPlatformFormatException(SerializationInfo info!!, StreamingContext context)
+    protected TestPlatformFormatException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {
         // Save the basic properties.
@@ -84,7 +84,7 @@ public class TestPlatformFormatException : Exception
     /// </summary>
     /// <param name="info">Serialization info to add to</param>
     /// <param name="context">not used</param>
-    public override void GetObjectData(SerializationInfo info!!, StreamingContext context)
+    public override void GetObjectData(SerializationInfo info, StreamingContext context)
     {
         base.GetObjectData(info, context);
         info.AddValue("FilterValue", FilterValue);
