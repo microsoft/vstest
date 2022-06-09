@@ -661,6 +661,8 @@
     <file src="$FakesPackageDir$\Instrumentation\x86\FakesInstrumentationProfiler_x86.config" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\x86\FakesInstrumentationProfiler_x86.config" />
     <file src="$FakesPackageDir$\Instrumentation\x64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\x64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" />
     <file src="$FakesPackageDir$\Instrumentation\x64\FakesInstrumentationProfiler_x64.config" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\x64\FakesInstrumentationProfiler_x64.config" />
+    <file src="$FakesPackageDir$\Instrumentation\arm64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\arm64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" />
+    <file src="$FakesPackageDir$\Instrumentation\arm64\FakesInstrumentationProfiler_arm64.config" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\arm64\FakesInstrumentationProfiler_arm64.config" />
 
     <file src="Microsoft.CodeCoverage\InstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll" target="tools\net451\Common7\IDE\CommonExtensions\Platform\InstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll" />
     <file src="Microsoft.CodeCoverage\InstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll" target="tools\net451\Common7\IDE\CommonExtensions\Platform\InstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll" />
