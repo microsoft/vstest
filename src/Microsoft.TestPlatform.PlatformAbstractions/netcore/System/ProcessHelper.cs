@@ -18,7 +18,7 @@ public partial class ProcessHelper : IProcessHelper
     /// <inheritdoc/>
     public string GetCurrentProcessLocation()
     {
-        return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        return Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
     }
 
     /// <inheritdoc/>

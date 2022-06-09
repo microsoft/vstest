@@ -104,7 +104,7 @@ public class DotnetTestHostManagerTests
     [TestMethod]
     public void GetTestHostProcessStartInfoShouldThrowIfSourceIsNull()
     {
-        Action action = () => _dotnetHostManager.GetTestHostProcessStartInfo(null, null, _defaultConnectionInfo);
+        Action action = () => _dotnetHostManager.GetTestHostProcessStartInfo(null!, null, _defaultConnectionInfo);
 
         Assert.ThrowsException<ArgumentNullException>(action);
     }
@@ -1015,9 +1015,9 @@ public class DotnetTestHostManagerTests
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<IDictionary<string, string>>(),
-                        It.IsAny<Action<object?, string>>(),
-                        It.IsAny<Action<object>>(),
-                        It.IsAny<Action<object?, string>>()))
+                        It.IsAny<Action<object?, string?>>(),
+                        It.IsAny<Action<object?>>(),
+                        It.IsAny<Action<object?, string?>>()))
             .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
                 (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
                 {
@@ -1039,9 +1039,9 @@ public class DotnetTestHostManagerTests
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<IDictionary<string, string>>(),
-                        It.IsAny<Action<object?, string>>(),
-                        It.IsAny<Action<object>>(),
-                        It.IsAny<Action<object?, string>>()))
+                        It.IsAny<Action<object?, string?>>(),
+                        It.IsAny<Action<object?>>(),
+                        It.IsAny<Action<object?, string?>>()))
             .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
                 (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
                 {

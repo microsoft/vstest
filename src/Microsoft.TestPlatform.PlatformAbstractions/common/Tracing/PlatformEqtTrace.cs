@@ -338,7 +338,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
             }
 
             using var process = Process.GetCurrentProcess();
-            string runnerLogFileName = $"{Path.GetFileNameWithoutExtension(process.MainModule.FileName)}_{process.Id}.{DateTime.Now:yy-MM-dd_HH-mm-ss_fffff}.diag";
+            string runnerLogFileName = $"{Path.GetFileNameWithoutExtension(process.MainModule!.FileName)}_{process.Id}.{DateTime.Now:yy-MM-dd_HH-mm-ss_fffff}.diag";
             string logsDirectory = Path.GetTempPath();
 
             // Set the trace level and add the trace listener

@@ -17,13 +17,13 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 public partial class ProcessHelper : IProcessHelper
 {
     /// <inheritdoc/>
-    public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string>? envVariables, Action<object?, string>? errorCallback, Action<object>? exitCallBack, Action<object?, string>? outputCallBack)
+    public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public string GetCurrentProcessFileName()
+    public string? GetCurrentProcessFileName()
     {
         throw new NotImplementedException();
     }
@@ -35,7 +35,7 @@ public partial class ProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc/>
-    public string GetTestEngineDirectory()
+    public string? GetTestEngineDirectory()
     {
         throw new NotImplementedException();
     }

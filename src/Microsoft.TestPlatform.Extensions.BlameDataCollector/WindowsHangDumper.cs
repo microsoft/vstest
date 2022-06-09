@@ -26,7 +26,7 @@ internal class WindowsHangDumper : IHangDumper
         _processHelper = processHelper;
     }
 
-    private static Action<object?, string> OutputReceivedCallback => (process, data) =>
+    private static Action<object?, string?> OutputReceivedCallback => (process, data) =>
         // useful for visibility when debugging this tool
         // Console.ForegroundColor = ConsoleColor.Cyan;
         // Console.WriteLine(data);
