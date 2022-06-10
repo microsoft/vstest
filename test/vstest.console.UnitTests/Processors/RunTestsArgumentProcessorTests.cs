@@ -281,22 +281,12 @@ public class RunTestsArgumentProcessorTests
 
     public static void SetupMockExtensions()
     {
-        SetupMockExtensions(() => { });
-    }
-
-    public static void SetupMockExtensions(Action callback)
-    {
-        SetupMockExtensions(new string[] { typeof(RunTestsArgumentProcessorTests).GetTypeInfo().Assembly.Location, typeof(ConsoleLogger).GetTypeInfo().Assembly.Location }, callback);
-    }
-
-    public static void SetupMockExtensions(string[] extensions, Action callback)
-    {
         // Setup mocks.
         var mockFileHelper = new Mock<IFileHelper>();
         mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
         mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, new[] { ".dll" }))
-            .Callback(callback)
-            .Returns(extensions);
+            .Callback(() => { })
+            .Returns(new string[] { typeof(RunTestsArgumentProcessorTests).GetTypeInfo().Assembly.Location, typeof(ConsoleLogger).GetTypeInfo().Assembly.Location });
 
         var testableTestPluginCache = new TestableTestPluginCache();
 
