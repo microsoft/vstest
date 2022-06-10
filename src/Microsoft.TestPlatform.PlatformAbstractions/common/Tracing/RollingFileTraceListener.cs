@@ -406,10 +406,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
         public override void Write(char[]? buffer)
         {
             base.Write(buffer);
-            if (buffer is not null)
-            {
-                Tally += Encoding.GetByteCount(buffer);
-            }
+            Tally += (buffer is not null) ? Encoding.GetByteCount(buffer) : 0;
         }
 
         /// <summary>
@@ -468,10 +465,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
         public override void Write(string? value)
         {
             base.Write(value);
-            if (value is not null)
-            {
-                Tally += Encoding.GetByteCount(value);
-            }
+            Tally += (value is not null) ? Encoding.GetByteCount(value) : 0;
         }
     }
 }
