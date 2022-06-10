@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.Logging;
 
 /// <summary>
@@ -155,9 +153,9 @@ public class TestHostProviderManagerTests
     [FriendlyName("DesktopTestHost")]
     private class CustomTestHost : ITestRuntimeProvider
     {
-        public event EventHandler<HostProviderEventArgs> HostLaunched;
+        public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
-        public event EventHandler<HostProviderEventArgs> HostExited;
+        public event EventHandler<HostProviderEventArgs>? HostExited;
 
         public bool Shared { get; private set; }
 
@@ -200,12 +198,12 @@ public class TestHostProviderManagerTests
 
         public void OnHostExited(HostProviderEventArgs _)
         {
-            HostExited.Invoke(this, new HostProviderEventArgs("Error"));
+            HostExited?.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
         public void OnHostLaunched(HostProviderEventArgs _)
         {
-            HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
+            HostLaunched?.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
@@ -228,9 +226,9 @@ public class TestHostProviderManagerTests
     [FriendlyName("NetCoreTestHost")]
     private class TestableTestHostManager : ITestRuntimeProvider
     {
-        public event EventHandler<HostProviderEventArgs> HostLaunched;
+        public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
-        public event EventHandler<HostProviderEventArgs> HostExited;
+        public event EventHandler<HostProviderEventArgs>? HostExited;
 
         public bool Shared { get; private set; }
 
@@ -268,12 +266,12 @@ public class TestHostProviderManagerTests
 
         public void OnHostExited(HostProviderEventArgs _)
         {
-            HostExited.Invoke(this, new HostProviderEventArgs("Error"));
+            HostExited?.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
         public void OnHostLaunched(HostProviderEventArgs _)
         {
-            HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
+            HostLaunched?.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
         public void SetCustomLauncher(ITestHostLauncher customLauncher)

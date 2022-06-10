@@ -14,18 +14,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Common.UnitTests.Logging;
 
 [TestClass]
 public class InternalTestLoggerEventsBehaviors
 {
-    private TestSessionMessageLogger _testSessionMessageLogger;
-    private InternalTestLoggerEvents _loggerEvents;
+    private readonly TestSessionMessageLogger _testSessionMessageLogger;
+    private readonly InternalTestLoggerEvents _loggerEvents;
 
-    [TestInitialize]
-    public void Initialize()
+    public InternalTestLoggerEventsBehaviors()
     {
         _testSessionMessageLogger = TestSessionMessageLogger.Instance;
         _loggerEvents = new InternalTestLoggerEvents(_testSessionMessageLogger);
@@ -50,7 +47,7 @@ public class InternalTestLoggerEventsBehaviors
     {
         EventWaitHandle waitHandle = new AutoResetEvent(false);
         bool testMessageReceived = false;
-        TestRunMessageEventArgs eventArgs = null;
+        TestRunMessageEventArgs? eventArgs = null;
         var message = "This is the test message";
 
         // Register for the test message event.
@@ -79,7 +76,7 @@ public class InternalTestLoggerEventsBehaviors
     {
         EventWaitHandle waitHandle = new AutoResetEvent(false);
         bool testResultReceived = false;
-        TestResultEventArgs eventArgs = null;
+        TestResultEventArgs? eventArgs = null;
         var result = new TestResult(new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName"));
 
         // Register for the test result event.
@@ -118,7 +115,7 @@ public class InternalTestLoggerEventsBehaviors
     public void CompleteTestRunShouldInvokeRegisteredEventHandler()
     {
         bool testRunCompleteReceived = false;
-        TestRunCompleteEventArgs eventArgs = null;
+        TestRunCompleteEventArgs? eventArgs = null;
 
         EventWaitHandle waitHandle = new AutoResetEvent(false);
 
@@ -266,7 +263,7 @@ public class InternalTestLoggerEventsBehaviors
     public void RaiseDiscoveredTestsShouldInvokeRegisteredEventHandler()
     {
         bool discoveredTestsReceived = false;
-        DiscoveredTestsEventArgs receivedEventArgs = null;
+        DiscoveredTestsEventArgs? receivedEventArgs = null;
         EventWaitHandle waitHandle = new AutoResetEvent(false);
 
         List<TestCase> testCases = new() { new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName") };
@@ -332,7 +329,7 @@ public class InternalTestLoggerEventsBehaviors
     public void RaiseDiscoveryStartShouldInvokeRegisteredEventHandler()
     {
         bool discoveryStartReceived = false;
-        DiscoveryStartEventArgs receivedEventArgs = null;
+        DiscoveryStartEventArgs? receivedEventArgs = null;
         EventWaitHandle waitHandle = new AutoResetEvent(false);
 
         DiscoveryCriteria discoveryCriteria = new() { TestCaseFilter = "Name=Test1" };
@@ -365,7 +362,7 @@ public class InternalTestLoggerEventsBehaviors
     public void RaiseDiscoveryCompleteShouldInvokeRegisteredEventHandler()
     {
         bool discoveryCompleteReceived = false;
-        DiscoveryCompleteEventArgs receivedEventArgs = null;
+        DiscoveryCompleteEventArgs? receivedEventArgs = null;
         EventWaitHandle waitHandle = new AutoResetEvent(false);
 
         DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new(2, false);
@@ -440,7 +437,7 @@ public class InternalTestLoggerEventsBehaviors
     public void RaiseTestRunStartShouldInvokeRegisteredEventHandler()
     {
         bool testRunStartReceived = false;
-        TestRunStartEventArgs receivedEventArgs = null;
+        TestRunStartEventArgs? receivedEventArgs = null;
         EventWaitHandle waitHandle = new AutoResetEvent(false);
 
         TestRunCriteria testRunCriteria = new(new List<string> { @"x:dummy\foo.dll" }, 10, false, string.Empty, TimeSpan.MaxValue, null, "Name=Test1", null);
@@ -473,7 +470,7 @@ public class InternalTestLoggerEventsBehaviors
     public void RaiseDiscoveryMessageShouldInvokeRegisteredEventHandler()
     {
         bool discoveryMessageReceived = false;
-        TestRunMessageEventArgs receivedEventArgs = null;
+        TestRunMessageEventArgs? receivedEventArgs = null;
         EventWaitHandle waitHandle = new AutoResetEvent(false);
 
         string message = "This is the test message";

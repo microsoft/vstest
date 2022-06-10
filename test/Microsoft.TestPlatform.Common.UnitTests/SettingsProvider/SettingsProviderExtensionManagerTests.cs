@@ -17,8 +17,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.SettingsProvider;
 
 [TestClass]
@@ -182,7 +180,7 @@ public class SettingsProviderExtensionManagerTests
 
     #region private methods
 
-    private IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> GetMockExtensions(params string[] settingNames)
+    private static IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> GetMockExtensions(params string[] settingNames)
     {
         var settingsList = new List<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();
 
