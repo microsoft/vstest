@@ -487,14 +487,26 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             return false;
         }
 
-        _testHostProcess.PriorityClass =
-            _environmentVariableHelper.GetEnvironmentVariable("VSTEST_HOST_PRIORITY") is { } processPriorityString
-            && Enum.TryParse<ProcessPriorityClass>(processPriorityString, out var processPriority)
-                ? processPriority
-                : ProcessPriorityClass.BelowNormal;
-
+        SetProcessPriority(_testHostProcess, _environmentVariableHelper);
         OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
+
         return true;
+    }
+
+    internal static void SetProcessPriority(Process testHostProcess, IEnvironmentVariableHelper environmentVariableHelper)
+    {
+        ProcessPriorityClass testHostPriority = ProcessPriorityClass.BelowNormal;
+        try
+        {
+            testHostPriority = environmentVariableHelper.GetEnvironmentVariableAsEnum("VSTEST_HOST_PRIORITY", testHostPriority);
+            testHostProcess.PriorityClass = testHostPriority;
+            EqtTrace.Verbose("Setting test host process priority to {0}", testHostProcess.PriorityClass);
+        }
+        // Setting the process Priority can fail with Win32Exception, NotSupportedException or InvalidOperationException.
+        catch (Exception ex)
+        {
+            EqtTrace.Error("Failed to set test host process priority to {0}. Exception: {1}", testHostPriority, ex);
+        }
     }
 
     private string GetUwpSources(string uwpSource)

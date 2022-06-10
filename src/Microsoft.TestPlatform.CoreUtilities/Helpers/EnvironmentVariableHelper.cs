@@ -13,8 +13,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 
 internal class EnvironmentVariableHelper : IEnvironmentVariableHelper
 {
+    /// <inheritdoc />
     public string GetEnvironmentVariable(string variable)
         => Environment.GetEnvironmentVariable(variable);
+
+    /// <inheritdoc />
+    // TODO: This helper won't be needed when we will stop support for .NET Standard 1.3 and UWP
+    public TEnum GetEnvironmentVariableAsEnum<TEnum>(string variable, TEnum defaultValue = default) where TEnum : Enum
+    => Environment.GetEnvironmentVariable(variable) is string value && !string.IsNullOrEmpty(value)
+        ? (TEnum)Enum.Parse(typeof(TEnum), value)
+        : defaultValue;
+
+    /// <inheritdoc />
+    public T GetEnvironmentVariable<T>(string variable, T defaultValue = default) where T : IConvertible
+        => Environment.GetEnvironmentVariable(variable) is string value && !string.IsNullOrEmpty(value)
+            ? ConvertToType<T>(value)
+            : defaultValue;
+
+    private static T ConvertToType<T>(string input)
+    {
+        var targetType = typeof(T);
+        var conversionType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+
+#if !WINDOWS_UWP && !NETSTANDARD1_3
+        if (conversionType.IsEnum)
+        {
+            return (T)Enum.Parse(conversionType, input);
+        }
+#endif
+
+        return (T)Convert.ChangeType(input, conversionType);
+    }
 }
 
 #endif

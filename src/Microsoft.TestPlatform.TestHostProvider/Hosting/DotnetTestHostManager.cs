@@ -693,12 +693,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             return false;
         }
 
-        _testHostProcess.PriorityClass =
-            _environmentVariableHelper.GetEnvironmentVariable("VSTEST_HOST_PRIORITY") is { } processPriorityString
-            && Enum.TryParse<ProcessPriorityClass>(processPriorityString, out var processPriority)
-                ? processPriority
-                : ProcessPriorityClass.BelowNormal;
-
+        DefaultTestHostManager.SetProcessPriority(_testHostProcess, _environmentVariableHelper);
         OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
         return true;
     }
