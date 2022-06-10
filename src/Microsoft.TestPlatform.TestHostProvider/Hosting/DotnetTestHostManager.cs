@@ -688,9 +688,19 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             _processHelper.SetExitCallback(processId, ExitCallBack);
         }
 
-        OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
+        if (_testHostProcess is null)
+        {
+            return false;
+        }
 
-        return _testHostProcess != null;
+        _testHostProcess.PriorityClass =
+            _environmentVariableHelper.GetEnvironmentVariable("VSTEST_HOST_PRIORITY") is { } processPriorityString
+            && Enum.TryParse<ProcessPriorityClass>(processPriorityString, out var processPriority)
+                ? processPriority
+                : ProcessPriorityClass.BelowNormal;
+
+        OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
+        return true;
     }
 
     private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)
