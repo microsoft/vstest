@@ -4,8 +4,6 @@
 using System;
 using System.IO;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator;
 
 /// <summary>
@@ -20,9 +18,9 @@ public class PathResolver
     /// </summary>
     /// <param name="args">User inputs</param>
     /// <returns>New file path to create</returns>
-    public string GetTargetPath(string[] args)
+    public string? GetTargetPath(string[] args)
     {
-        string newFilePath = null;
+        string? newFilePath = null;
         if (args.Length < 1 || !Path.IsPathRooted(args[0]))
         {
             return newFilePath;
