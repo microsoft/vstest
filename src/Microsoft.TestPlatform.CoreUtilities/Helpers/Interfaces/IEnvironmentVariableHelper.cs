@@ -23,17 +23,5 @@ internal interface IEnvironmentVariableHelper
     /// <param name="variable">The name of the environment variable.</param>
     /// <param name="defaultValue">The default value to return if the environment variable is not found.</param>
     /// <returns></returns>
-    TEnum GetEnvironmentVariableAsEnum<TEnum>(string variable, TEnum defaultValue = default) where TEnum : Enum;
-
-#if !NETSTANDARD1_0
-    /// <summary>
-    /// Retrieves the value of an environment variable from the current process and convert it to the given type.
-    /// For .NET Standard 1.3 and UWP/UAP, this helper does not support enums, instead use <see cref="GetEnvironmentVariableAsEnum"/>.
-    /// </summary>
-    /// <typeparam name="T">The type used for conversion.</typeparam>
-    /// <param name="variable">The name of the environment variable.</param>
-    /// <param name="defaultValue">The default value to return if the environment variable is not found.</param>
-    /// <returns></returns>
-    T GetEnvironmentVariable<T>(string variable, T defaultValue = default) where T : IConvertible;
-#endif
+    TEnum GetEnvironmentVariableAsEnum<TEnum>(string variable, TEnum defaultValue = default) where TEnum : struct, Enum;
 }

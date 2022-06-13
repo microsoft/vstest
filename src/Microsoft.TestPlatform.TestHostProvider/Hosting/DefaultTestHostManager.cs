@@ -498,7 +498,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         ProcessPriorityClass testHostPriority = ProcessPriorityClass.BelowNormal;
         try
         {
-            testHostPriority = environmentVariableHelper.GetEnvironmentVariableAsEnum("VSTEST_HOST_PRIORITY", testHostPriority);
+            testHostPriority = environmentVariableHelper.GetEnvironmentVariableAsEnum("VSTEST_HOST_INTERNAL_PRIORITY", testHostPriority);
             testHostProcess.PriorityClass = testHostPriority;
             EqtTrace.Verbose("Setting test host process priority to {0}", testHostProcess.PriorityClass);
         }
