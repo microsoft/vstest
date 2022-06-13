@@ -23,6 +23,7 @@ public class Test32Bit
         // 1. Build project
         // 2. Set $env:DOTNET_ROOT_ENV_VAR_NAME = "DOTNET_ROOT(x86)"
         // 3. Set $env:DOTNET_ROOT_ENV_VAR_VALUE to a 32bits dotnet installation directory for the matching TFM
+        //    (e.g. C:\src\vstest\tools\dotnet_x86)
         // 4. Add a global.json pinning the .NET version to 5 or 6
         // 5. Run 'dotnet test ./bin/<Config>/<Pinned_TFM>/ProjectLaunch32BitsProcess.dll'
         // 6. Test should be succesful
@@ -31,6 +32,10 @@ public class Test32Bit
         // 8. Repeat steps 2 to 5 with $env:DOTNET_ROOT_ENV_VAR_NAME = "DOTNET_ROOT_X86".
         //    This should work for .NET 6 but fail for .NET 5 (if you don't have a global .NET 5 SDK installed),
         //    as this new variable is not understood by the .NET 5 detection algorithm.
+        // Debugging tips:
+        // Use the following environment variables to understand how is .NET being resolved.
+        // COREHOST_TRACE = 1
+        // COREHOST_TRACEFILE = "C:\fxr.tx"
         var process = new Process();
         process.StartInfo = new ProcessStartInfo
         {
@@ -46,6 +51,9 @@ public class Test32Bit
         // Set the DOTNET_ROOT* env variable so that the 32bits process can locate dotnet
         // even if there is no global installation.
         process.StartInfo.EnvironmentVariables[envVarName] = envVarValue;
+        process.StartInfo.EnvironmentVariables["DOTNET_ROOT_ENV_VAR_NAME"] = envVarName;
+        // Ensure multi-level lookup is disabled so that we don't fallback to machine-wide installation
+        process.StartInfo.EnvironmentVariables["DOTNET_MULTILEVEL_LOOKUP"] = "0";
 
         process.Start();
         var stderr = process.StandardError.ReadToEnd();

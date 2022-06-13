@@ -582,9 +582,9 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
             // SDK side of TP is not checking for the .NET6.0+ environment variables so we want to make sure we
             // are not overriding user definition.
-            if (_environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName) is not null)
+            if (_environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName) is string dotnetRootEnvValue)
             {
-                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{vstestDotnetRootEnvName}' in env variables but also found '{dotnetRootEnvName}'. Skipping forwarding.");
+                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{vstestDotnetRootEnvName}' in env variables but also found '{dotnetRootEnvName}' with value '{dotnetRootEnvValue}'. Skipping forwarding.");
                 return;
             }
         }
