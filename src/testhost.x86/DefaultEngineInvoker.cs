@@ -240,8 +240,8 @@ internal class DefaultEngineInvoker :
         EqtTrace.Info("DefaultEngineInvoker.GetConnectionInfo: Initialize communication on endpoint address: '{0}'", endpoint);
 
         var connectionRole = ConnectionRole.Client;
-        string role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
-        if (!string.IsNullOrWhiteSpace(role) && string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
+        string? role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
+        if (string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
         {
             connectionRole = ConnectionRole.Host;
         }

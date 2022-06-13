@@ -41,7 +41,7 @@ public class PlatformEqtTrace : IPlatformEqtTrace
         Debug.WriteLine($"[{level}] {message}");
     }
 
-    public bool InitializeVerboseTrace(string customLogFile)
+    public bool InitializeVerboseTrace(string? customLogFile)
     {
 #if DEBUG
         // We don't have access to System.Diagnostics.Trace on netstandard1.3
@@ -52,7 +52,7 @@ public class PlatformEqtTrace : IPlatformEqtTrace
 #endif
     }
 
-    public bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel)
+    public bool InitializeTrace(string? customLogFile, PlatformTraceLevel traceLevel)
     {
         _traceLevel = traceLevel;
 

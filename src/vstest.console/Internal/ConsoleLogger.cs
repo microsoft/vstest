@@ -233,6 +233,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// </summary>
     private static void PrintTimeSpan(TimeSpan timeSpan)
     {
+        TPDebug.Assert(Output is not null, "ConsoleLogger.Output is null");
+
         if (timeSpan.TotalDays >= 1)
         {
             Output.Information(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, timeSpan.TotalDays, CommandLineResources.Days));
@@ -430,6 +432,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     {
         ValidateArg.NotNull(sender, nameof(sender));
         ValidateArg.NotNull(e, nameof(e));
+        TPDebug.Assert(Output is not null, "ConsoleLogger.Output is null");
 
         switch (e.Level)
         {

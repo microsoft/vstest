@@ -11,8 +11,6 @@ using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 /// <summary>

@@ -10,9 +10,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
 /// !!!NEVER USE A FLAG TO ENABLE FUNCTIONALITY!!!
-/// 
+///
 /// The reasoning is:
-/// 
+///
 /// * New version will automatically ship with the feature enabled. There is no action needed to be done just before release.
 /// * Anyone interested in the new feature will get it automatically by grabbing our preview.
 /// * Anyone who needs more time before using the new feature can disable it in the released package.
