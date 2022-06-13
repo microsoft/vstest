@@ -9,9 +9,9 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
-#nullable disable
+using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
@@ -191,7 +191,7 @@ internal class TrxFileHelper
         string[] pathTokens = path.Split(delimiters);
         string[] basePathTokens = basePath.Split(delimiters);
 
-        Debug.Assert(pathTokens.Length > 0 && basePathTokens.Length > 0);
+        TPDebug.Assert(pathTokens.Length > 0 && basePathTokens.Length > 0);
         int max = Math.Min(pathTokens.Length, basePathTokens.Length);
 
         // Skip all of the empty tokens that result from things like "\dir1"
@@ -265,7 +265,7 @@ internal class TrxFileHelper
     /// </returns>
     private static bool IsReservedFileName(string fileName)
     {
-        Debug.Assert(!string.IsNullOrEmpty(fileName), "FileHelper.IsReservedFileName: the argument is null or empty string!");
+        TPDebug.Assert(!string.IsNullOrEmpty(fileName), "FileHelper.IsReservedFileName: the argument is null or empty string!");
         if (string.IsNullOrEmpty(fileName))
         {
             return false;
@@ -304,9 +304,9 @@ internal class TrxFileHelper
         string originalName,
         IterationHelper helper)
     {
-        Debug.Assert(!string.IsNullOrEmpty(baseDirectoryName), "baseDirectoryname is null");
-        Debug.Assert(!string.IsNullOrEmpty(originalName), "originalName is Null");
-        Debug.Assert(helper != null, "helper is null");
+        TPDebug.Assert(!baseDirectoryName.IsNullOrEmpty(), "baseDirectoryname is null");
+        TPDebug.Assert(!originalName.IsNullOrEmpty(), "originalName is Null");
+        TPDebug.Assert(helper != null, "helper is null");
 
         uint iteration = 0;
         do
@@ -342,7 +342,7 @@ internal class TrxFileHelper
         /// </returns>
         internal static string FormatIteration(string baseName, uint iteration)
         {
-            Debug.Assert(!string.IsNullOrEmpty(baseName), "basename is null");
+            TPDebug.Assert(!string.IsNullOrEmpty(baseName), "basename is null");
 
             var tryMe = string.Format(
                 CultureInfo.InvariantCulture,
@@ -372,7 +372,7 @@ internal class TrxFileHelper
 
         internal override string NextIteration(string baseName, uint iteration)
         {
-            Debug.Assert(!string.IsNullOrEmpty(baseName), "baseName is null");
+            TPDebug.Assert(!string.IsNullOrEmpty(baseName), "baseName is null");
 
             string withoutExtensionName = Path.GetFileNameWithoutExtension(baseName);
             string tryMe = FormatIteration(withoutExtensionName, iteration);
@@ -386,7 +386,7 @@ internal class TrxFileHelper
 
         internal override bool IsValidIteration(string path)
         {
-            Debug.Assert(!string.IsNullOrEmpty(path), "path is null");
+            TPDebug.Assert(!string.IsNullOrEmpty(path), "path is null");
 
             if (File.Exists(path) || Directory.Exists(path))
             {

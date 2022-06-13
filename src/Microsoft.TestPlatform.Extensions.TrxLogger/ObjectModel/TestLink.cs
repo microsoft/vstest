@@ -5,10 +5,7 @@ using System;
 using System.Globalization;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
@@ -50,7 +47,7 @@ internal sealed class TestLink : IXmlTestStore
     /// <summary>
     /// Whether this Link is equal to other Link. Compares by Id.
     /// </summary>
-    public override bool Equals(object other)
+    public override bool Equals(object? other)
     {
         return other is TestLink link && Id.Equals(link.Id);
     }
@@ -89,7 +86,7 @@ internal sealed class TestLink : IXmlTestStore
             Storage ?? "(null)");
     }
 
-    public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
+    public void Save(System.Xml.XmlElement element, XmlTestStoreParameters? parameters)
     {
         XmlPersistence h = new();
         h.SaveGuid(element, "@id", Id);

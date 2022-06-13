@@ -3,11 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
@@ -18,7 +16,7 @@ internal sealed class TestEntry : IXmlTestStore
 {
     private readonly TestId _testId;
     private readonly TestListCategoryId _categoryId;
-    private List<TestEntry> _testEntries;
+    private List<TestEntry>? _testEntries;
 
     /// <summary>
     /// Constructor.
@@ -65,7 +63,7 @@ internal sealed class TestEntry : IXmlTestStore
     /// <returns>
     /// The <see cref="bool"/>.
     /// </returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is not TestEntry e)
         {
@@ -77,8 +75,8 @@ internal sealed class TestEntry : IXmlTestStore
             return false;
         }
 
-        Debug.Assert(Equals(_testId, e._testId));
-        Debug.Assert(Equals(_categoryId, e._categoryId));
+        TPDebug.Assert(Equals(_testId, e._testId));
+        TPDebug.Assert(Equals(_categoryId, e._categoryId));
         return true;
     }
 
@@ -105,7 +103,7 @@ internal sealed class TestEntry : IXmlTestStore
     /// <param name="parameters">
     /// The parameters.
     /// </param>
-    public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
+    public void Save(System.Xml.XmlElement element, XmlTestStoreParameters? parameters)
     {
         XmlPersistence helper = new();
         helper.SaveSingleFields(element, this, parameters);

@@ -4,8 +4,6 @@
 using System;
 using System.Globalization;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
@@ -52,7 +50,7 @@ internal sealed class TestExecId
     /// <returns>
     /// The <see cref="bool"/>.
     /// </returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is TestExecId id && Id.Equals(id.Id);
     }

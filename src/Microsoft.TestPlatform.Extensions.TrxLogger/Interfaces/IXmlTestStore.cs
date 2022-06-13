@@ -3,8 +3,6 @@
 
 using System.Xml;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
@@ -18,5 +16,5 @@ internal interface IXmlTestStore
     /// </summary>
     /// <param name="element"> XmlElement element </param>
     /// <param name="parameters"> XmlTestStoreParameters parameters</param>
-    void Save(XmlElement element, XmlTestStoreParameters parameters);
+    void Save(XmlElement element, XmlTestStoreParameters? parameters);
 }

@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger</AssemblyName>
-    <TargetFrameworks>net6.0;netstandard2.0;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
@@ -64,8 +64,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="NullableHelpers.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>NullableHelpers.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
     </None>
   </ItemGroup>
   <ItemGroup>
