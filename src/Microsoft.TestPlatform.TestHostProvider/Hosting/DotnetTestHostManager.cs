@@ -688,9 +688,14 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             _processHelper.SetExitCallback(processId, ExitCallBack);
         }
 
-        OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
+        if (_testHostProcess is null)
+        {
+            return false;
+        }
 
-        return _testHostProcess != null;
+        DefaultTestHostManager.SetProcessPriority(_testHostProcess, _environmentVariableHelper);
+        OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
+        return true;
     }
 
     private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)

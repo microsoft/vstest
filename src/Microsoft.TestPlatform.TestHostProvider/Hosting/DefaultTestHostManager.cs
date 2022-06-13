@@ -17,6 +17,7 @@ using System.Xml.Linq;
 using Microsoft.TestPlatform.TestHostProvider.Hosting;
 using Microsoft.TestPlatform.TestHostProvider.Resources;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider;
@@ -57,6 +58,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private readonly IFileHelper _fileHelper;
     private readonly IEnvironment _environment;
     private readonly IDotnetHostHelper _dotnetHostHelper;
+    private readonly IEnvironmentVariableHelper _environmentVariableHelper;
 
     private ITestHostLauncher _customTestHostLauncher;
     private Process _testHostProcess;
@@ -68,7 +70,12 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
     /// </summary>
     public DefaultTestHostManager()
-        : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), new DotnetHostHelper())
+        : this(
+            new ProcessHelper(),
+            new FileHelper(),
+            new DotnetHostHelper(),
+            new PlatformEnvironment(),
+            new EnvironmentVariableHelper())
     {
     }
 
@@ -79,12 +86,18 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <param name="fileHelper">File helper instance.</param>
     /// <param name="environment">Instance of platform environment.</param>
     /// <param name="dotnetHostHelper">Instance of dotnet host helper.</param>
-    internal DefaultTestHostManager(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, IDotnetHostHelper dotnetHostHelper)
+    internal DefaultTestHostManager(
+        IProcessHelper processHelper,
+        IFileHelper fileHelper,
+        IDotnetHostHelper dotnetHostHelper,
+        IEnvironment environment,
+        IEnvironmentVariableHelper environmentVariableHelper)
     {
         _processHelper = processHelper;
         _fileHelper = fileHelper;
-        _environment = environment;
         _dotnetHostHelper = dotnetHostHelper;
+        _environment = environment;
+        _environmentVariableHelper = environmentVariableHelper;
     }
 
     /// <inheritdoc/>
@@ -469,8 +482,31 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             _processHelper.SetExitCallback(processId, ExitCallBack);
         }
 
+        if (_testHostProcess is null)
+        {
+            return false;
+        }
+
+        SetProcessPriority(_testHostProcess, _environmentVariableHelper);
         OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
-        return _testHostProcess != null;
+
+        return true;
+    }
+
+    internal static void SetProcessPriority(Process testHostProcess, IEnvironmentVariableHelper environmentVariableHelper)
+    {
+        ProcessPriorityClass testHostPriority = ProcessPriorityClass.BelowNormal;
+        try
+        {
+            testHostPriority = environmentVariableHelper.GetEnvironmentVariableAsEnum("VSTEST_HOST_INTERNAL_PRIORITY", testHostPriority);
+            testHostProcess.PriorityClass = testHostPriority;
+            EqtTrace.Verbose("Setting test host process priority to {0}", testHostProcess.PriorityClass);
+        }
+        // Setting the process Priority can fail with Win32Exception, NotSupportedException or InvalidOperationException.
+        catch (Exception ex)
+        {
+            EqtTrace.Error("Failed to set test host process priority to {0}. Exception: {1}", testHostPriority, ex);
+        }
     }
 
     private string GetUwpSources(string uwpSource)
