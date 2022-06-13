@@ -37,7 +37,7 @@ public class AssemblyResolveEventArgs : EventArgs
     /// name of the item to resolve.
     /// </summary>
     /// <param name="name">The Full name of an assembly to resolve.</param>
-    public AssemblyResolveEventArgs(string name)
+    public AssemblyResolveEventArgs(string? name)
     {
         Name = name;
     }
@@ -45,5 +45,5 @@ public class AssemblyResolveEventArgs : EventArgs
     /// <summary>
     /// Gets or sets the name of the item to resolve.
     /// </summary>
-    public string Name { get; set; }
+    public string? Name { get; set; }
 }

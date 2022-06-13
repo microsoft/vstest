@@ -39,10 +39,10 @@ internal class ProcessDumpUtility : IProcessDumpUtility
         _crashDumperFactory = crashDumperFactory;
     }
 
-    protected Action<object, string> OutputReceivedCallback => (process, data) =>
+    protected Action<object?, string?> OutputReceivedCallback => (process, data) =>
         // Log all standard output message of procdump in diag files.
         // Otherwise they end up coming on console in pipleine.
-        EqtTrace.Info("ProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: " + data);
+        EqtTrace.Info($"ProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: {data ?? "<null>"}");
 
     /// <inheritdoc/>
     public IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed)

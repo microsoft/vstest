@@ -25,8 +25,8 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel.Off = 0 -> Mi
 Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel.Verbose = 4 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel
 Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel.Warning = 2 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.AssemblyResolveEventArgs
-Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.AssemblyResolveEventArgs.AssemblyResolveEventArgs(string! name) -> void
-Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.AssemblyResolveEventArgs.Name.get -> string!
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.AssemblyResolveEventArgs.AssemblyResolveEventArgs(string? name) -> void
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.AssemblyResolveEventArgs.Name.get -> string?
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.AssemblyResolveEventArgs.Name.set -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.AssemblyResolveEventHandler
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IAssemblyLoadContext
@@ -42,15 +42,15 @@ Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment.OperatingSystemVersion.get -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetCurrentProcessArchitecture() -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
-Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetCurrentProcessFileName() -> string!
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetCurrentProcessFileName() -> string?
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetCurrentProcessId() -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetCurrentProcessLocation() -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetNativeDllDirectory() -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessHandle(int processId) -> System.IntPtr
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessId(object? process) -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessName(int processId) -> string!
-Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetTestEngineDirectory() -> string!
-Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.LaunchProcess(string! processPath, string! arguments, string! workingDirectory, System.Collections.Generic.IDictionary<string!, string!>? envVariables, System.Action<object?, string!>? errorCallback, System.Action<object!>? exitCallBack, System.Action<object?, string!>? outputCallBack) -> object!
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetTestEngineDirectory() -> string?
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.LaunchProcess(string! processPath, string! arguments, string! workingDirectory, System.Collections.Generic.IDictionary<string!, string!>? envVariables, System.Action<object?, string?>? errorCallback, System.Action<object?>? exitCallBack, System.Action<object?, string?>? outputCallBack) -> object!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.SetExitCallback(int processId, System.Action<object?>? callbackAction) -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.TerminateProcess(object? process) -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.TryGetExitCode(object? process, out int exitCode) -> bool
@@ -95,14 +95,14 @@ Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformThread
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformThread.PlatformThread() -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetCurrentProcessArchitecture() -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
-Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetCurrentProcessFileName() -> string!
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetCurrentProcessFileName() -> string?
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetCurrentProcessId() -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetCurrentProcessLocation() -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetNativeDllDirectory() -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessHandle(int processId) -> System.IntPtr
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessId(object? process) -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessName(int processId) -> string!
-Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetTestEngineDirectory() -> string!
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetTestEngineDirectory() -> string?
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.ProcessHelper() -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.TerminateProcess(object? process) -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.TryGetExitCode(object? process, out int exitCode) -> bool

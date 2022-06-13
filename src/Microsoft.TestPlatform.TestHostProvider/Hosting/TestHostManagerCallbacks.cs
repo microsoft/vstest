@@ -10,13 +10,11 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.TestHostProvider.Hosting;
 
 internal class TestHostManagerCallbacks
 {
-    public static void ErrorReceivedCallback(StringBuilder testHostProcessStdError, string data)
+    public static void ErrorReceivedCallback(StringBuilder testHostProcessStdError, string? data)
     {
         // Log all standard error message because on too much data we ignore starting part.
         // This is helpful in abnormal failure of testhost.
@@ -27,7 +25,7 @@ internal class TestHostManagerCallbacks
 
     public static void ExitCallBack(
         IProcessHelper processHelper,
-        object process,
+        object? process,
         StringBuilder testHostProcessStdError,
         Action<HostProviderEventArgs> onHostExited)
     {
@@ -39,7 +37,10 @@ internal class TestHostManagerCallbacks
         int procId = -1;
         try
         {
-            procId = (process as Process).Id;
+            if (process is Process p)
+            {
+                procId = p.Id;
+            }
         }
         catch (InvalidOperationException ex)
         {
