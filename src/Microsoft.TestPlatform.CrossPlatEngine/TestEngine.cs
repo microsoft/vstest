@@ -35,25 +35,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 public class TestEngine : ITestEngine
 {
     private readonly ITestRuntimeProviderManager _testHostProviderManager;
-    private ITestExtensionManager _testExtensionManager;
     private readonly IProcessHelper _processHelper;
+    private readonly IEnvironment _environment;
 
-    public TestEngine() : this(TestRuntimeProviderManager.Instance, new ProcessHelper())
+    private ITestExtensionManager _testExtensionManager;
+
+    public TestEngine()
+        : this(TestRuntimeProviderManager.Instance, new ProcessHelper())
     {
     }
 
     protected internal TestEngine(
         TestRuntimeProviderManager testHostProviderManager,
-        IProcessHelper processHelper) : this((ITestRuntimeProviderManager)testHostProviderManager, processHelper)
+        IProcessHelper processHelper)
+        : this(testHostProviderManager, processHelper, new PlatformEnvironment())
     {
     }
 
     internal TestEngine(
         ITestRuntimeProviderManager testHostProviderManager,
-        IProcessHelper processHelper)
+        IProcessHelper processHelper,
+        IEnvironment environment)
     {
         _testHostProviderManager = testHostProviderManager;
         _processHelper = processHelper;
+        _environment = environment;
     }
 
     #region ITestEngine implementation
@@ -492,8 +498,7 @@ public class TestEngine : ITestEngine
             // Check the user parallel setting.
             int userParallelSetting = RunSettingsUtilities.GetMaxCpuCount(runSettings);
             parallelLevelToUse = userParallelSetting == 0
-                // TODO: use environment helper so we can control this from tests.
-                ? Environment.ProcessorCount
+                ? _environment.ProcessorCount
                 : userParallelSetting;
             var enableParallel = parallelLevelToUse > 1;
 

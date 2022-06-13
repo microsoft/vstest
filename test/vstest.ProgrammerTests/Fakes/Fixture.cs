@@ -107,7 +107,7 @@ internal class Fixture : IDisposable
             throw new InvalidOperationException("There are runtime providers registered for FakeTestRuntimeProviderManager.");
 
 
-        TestEngine = new TestEngine(TestRuntimeProviderManager, ProcessHelper);
+        TestEngine = new TestEngine(TestRuntimeProviderManager, ProcessHelper, Environment);
         TestPlatform = new TestPlatform(TestEngine, FileHelper, TestRuntimeProviderManager);
 
         TestRunResultAggregator = new TestRunResultAggregator();

@@ -36,6 +36,7 @@ Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IAssemblyRes
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IAssemblyResolver.AssemblyResolve -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.AssemblyResolveEventHandler?
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment.Architecture.get -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment.ProcessorCount.get -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment.Exit(int exitcode) -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment.GetCurrentManagedThreadId() -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment.OperatingSystem.get -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformOperatingSystem
@@ -79,6 +80,7 @@ Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyResolve
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyResolver.PlatformAssemblyResolver() -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformEnvironment
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformEnvironment.Architecture.get -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformEnvironment.ProcessorCount.get -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformEnvironment.Exit(int exitcode) -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformEnvironment.GetCurrentManagedThreadId() -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformEnvironment.OperatingSystem.get -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformOperatingSystem
