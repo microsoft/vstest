@@ -553,6 +553,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
     internal /* for testing purposes */ void ForwardDotnetRootEnvironmentVariable(TestProcessStartInfo startInfo)
     {
+        TPDebug.Assert(_targetFramework is not null, "Initialize must have been called before this method.");
         const string prefix = "VSTEST_WINAPPHOST_";
         const string dotnetRoot = "DOTNET_ROOT";
         string vstestDotnetRootEnvName = $"{prefix}{dotnetRoot}(x86)";
