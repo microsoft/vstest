@@ -11,8 +11,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 internal sealed class FileEventListener : EventListener
@@ -20,12 +18,12 @@ internal sealed class FileEventListener : EventListener
     /// <summary>
     /// Storage file to be used to write logs
     /// </summary>
-    private FileStream _fileStream;
+    private readonly FileStream _fileStream;
 
     /// <summary>
     /// StreamWriter to write logs to file
     /// </summary>
-    private StreamWriter _streamWriter;
+    private readonly StreamWriter _streamWriter;
 
     /// <summary>
     /// Name of the current log file
@@ -43,7 +41,11 @@ internal sealed class FileEventListener : EventListener
     {
         _fileName = name;
 
-        AssignLocalFile();
+        _fileStream = new FileStream(_fileName, FileMode.Append | FileMode.OpenOrCreate);
+        _streamWriter = new StreamWriter(_fileStream)
+        {
+            AutoFlush = true
+        };
     }
 
     protected override void OnEventWritten(EventWrittenEventArgs eventData)
@@ -62,15 +64,6 @@ internal sealed class FileEventListener : EventListener
         lines.Add(newFormatedLine);
 
         WriteToFile(lines);
-    }
-
-    private void AssignLocalFile()
-    {
-        _fileStream = new FileStream(_fileName, FileMode.Append | FileMode.OpenOrCreate);
-        _streamWriter = new StreamWriter(_fileStream)
-        {
-            AutoFlush = true
-        };
     }
 
     private async void WriteToFile(IEnumerable<string> lines)

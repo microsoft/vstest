@@ -36,11 +36,13 @@ public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
         IRequestData requestData,
         ITestRequestSender requestSender,
         ITestRuntimeProvider testHostManager,
+        Framework testHostManagerFramework,
         IProxyDataCollectionManager proxyDataCollectionManager)
         : base(
             requestData,
             requestSender,
-            testHostManager)
+            testHostManager,
+            testHostManagerFramework)
     {
         ProxyDataCollectionManager = proxyDataCollectionManager;
         DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();

@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.Logging;
 
 /// <summary>
@@ -57,7 +55,7 @@ public class TestHostProviderManagerTests
     </RunSettings>";
 
         var manager = TestRuntimeProviderManager.Instance;
-        Assert.IsNotNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml));
+        Assert.IsNotNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml, null));
     }
 
     [TestMethod]
@@ -69,7 +67,7 @@ public class TestHostProviderManagerTests
             Framework.DefaultFramework.Name,
             "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
 
-        Assert.IsNotNull(TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml));
+        Assert.IsNotNull(TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null));
     }
 
     [TestMethod]
@@ -81,8 +79,8 @@ public class TestHostProviderManagerTests
             Framework.DefaultFramework.Name,
             "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
 
-        var instance1 = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
-        var instance2 = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
+        var instance1 = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
+        var instance2 = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
 
         Assert.AreNotEqual(instance1, instance2);
     }
@@ -96,7 +94,7 @@ public class TestHostProviderManagerTests
             ".NETCoreApp,Version=v1.0",
             "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
 
-        var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
+        var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
 
         Assert.AreEqual(typeof(TestableTestHostManager), testHostManager.GetType());
     }
@@ -110,7 +108,7 @@ public class TestHostProviderManagerTests
             ".NETFramework,Version=v4.5.1",
             "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
 
-        var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
+        var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
         testHostManager.Initialize(null, runSettingsXml);
         Assert.IsNotNull(testHostManager);
 
@@ -126,7 +124,7 @@ public class TestHostProviderManagerTests
             ".NETFramework,Version=v4.5.1",
             "</TargetFrameworkVersion><DisableAppDomain>true</DisableAppDomain></RunConfiguration></RunSettings> ");
 
-        var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
+        var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
         testHostManager.Initialize(null, runSettingsXml);
         Assert.IsNotNull(testHostManager);
 
@@ -146,7 +144,7 @@ public class TestHostProviderManagerTests
     </RunSettings> ";
 
         var manager = TestRuntimeProviderManager.Instance;
-        Assert.IsNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml));
+        Assert.IsNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml, null));
     }
 
     #region Implementations
@@ -155,9 +153,9 @@ public class TestHostProviderManagerTests
     [FriendlyName("DesktopTestHost")]
     private class CustomTestHost : ITestRuntimeProvider
     {
-        public event EventHandler<HostProviderEventArgs> HostLaunched;
+        public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
-        public event EventHandler<HostProviderEventArgs> HostExited;
+        public event EventHandler<HostProviderEventArgs>? HostExited;
 
         public bool Shared { get; private set; }
 
@@ -200,12 +198,12 @@ public class TestHostProviderManagerTests
 
         public void OnHostExited(HostProviderEventArgs _)
         {
-            HostExited.Invoke(this, new HostProviderEventArgs("Error"));
+            HostExited?.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
         public void OnHostLaunched(HostProviderEventArgs _)
         {
-            HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
+            HostLaunched?.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
@@ -228,9 +226,9 @@ public class TestHostProviderManagerTests
     [FriendlyName("NetCoreTestHost")]
     private class TestableTestHostManager : ITestRuntimeProvider
     {
-        public event EventHandler<HostProviderEventArgs> HostLaunched;
+        public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
-        public event EventHandler<HostProviderEventArgs> HostExited;
+        public event EventHandler<HostProviderEventArgs>? HostExited;
 
         public bool Shared { get; private set; }
 
@@ -268,12 +266,12 @@ public class TestHostProviderManagerTests
 
         public void OnHostExited(HostProviderEventArgs _)
         {
-            HostExited.Invoke(this, new HostProviderEventArgs("Error"));
+            HostExited?.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
         public void OnHostLaunched(HostProviderEventArgs _)
         {
-            HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
+            HostLaunched?.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
         public void SetCustomLauncher(ITestHostLauncher customLauncher)

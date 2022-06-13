@@ -2,17 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -30,11 +26,10 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
     /// The name of the command line argument that the EnvironmentArgumentProcessor handles.
     /// </summary>
     public const string CommandName = "/Environment";
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
-    private Lazy<IArgumentExecutor> _executor;
-
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new ArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, ConsoleOutput.Instance));
@@ -85,13 +80,12 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
         /// <param name="argument">
         /// Environment variable to set.
         /// </param>
-        public void Initialize(string argument)
+        public void Initialize(string? argument)
         {
-            Contract.Assert(!string.IsNullOrWhiteSpace(argument));
-            Contract.Assert(_output != null);
-            Contract.Assert(_commandLineOptions != null);
-            Contract.Assert(!string.IsNullOrWhiteSpace(_runSettingsProvider.ActiveRunSettings.SettingsXml));
-            Contract.EndContractBlock();
+            TPDebug.Assert(!StringUtils.IsNullOrWhiteSpace(argument));
+            TPDebug.Assert(_output != null);
+            TPDebug.Assert(_commandLineOptions != null);
+            TPDebug.Assert(!StringUtils.IsNullOrWhiteSpace(_runSettingsProvider.ActiveRunSettings.SettingsXml));
 
             var key = argument;
             var value = string.Empty;

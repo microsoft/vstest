@@ -8,9 +8,9 @@
         <target state="translated">パラメーターを null または空にすることはできません。</target>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
-        <source>Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.</source>
+        <source>Test run detected DLL(s) which would use different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.</source>
         <note></note>
-        <target state="translated">テストの実行で、別のフレームワークとプラットフォームのバージョン用にビルドされた DLL が検出されました。以下の DLL は、現在の設定と一致しません。現在のフレームワーク: {0}、プラットフォーム: {1}。{2}これらの設定を管理することについて詳しくは、{3} にアクセスしてください。</target>
+        <target state="translated">テストの実行で、別のフレームワークとプラットフォームのバージョンを使用する DLL が検出されました。以下の DLL は、現在の設定と一致しません。現在のフレームワーク: {0}、プラットフォーム: {1}。{2}これらの設定の管理について詳しくは、{3} にアクセスしてください。</target>
       </trans-unit>
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
@@ -23,8 +23,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="SourceIncompatible">
-        <source>{0} is built for Framework {1} and Platform {2}.</source>
-        <target state="translated">{0} はフレームワーク {1} およびプラットフォーム {2} 向けにビルドされます。</target>
+        <source>{0} would use Framework {1} and Platform {2}.</source>
+        <target state="translated">{0} では、フレームワーク {1} と プラットフォーム {2} が使用されます。</target>
         <note></note>
       </trans-unit>
     </body>

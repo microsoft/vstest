@@ -5,8 +5,6 @@ using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector;
 
 /// <summary>
@@ -20,7 +18,7 @@ public class Program
     /// <param name="args">
     /// The args.
     /// </param>
-    public static void Main(string[] args)
+    public static void Main(string[]? args)
     {
         try
         {

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
@@ -28,35 +27,35 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 {
     private const int DefaultInactivityTimeInMinutes = 60;
 
-    private DataCollectionSink _dataCollectionSink;
-    private DataCollectionEnvironmentContext _context;
-    private DataCollectionEvents _events;
-    private DataCollectionLogger _logger;
+    private DataCollectionSink? _dataCollectionSink;
+    private DataCollectionEnvironmentContext? _context;
+    private DataCollectionEvents? _events;
+    private DataCollectionLogger? _logger;
     private readonly IProcessDumpUtility _processDumpUtility;
-    private List<Guid> _testSequence;
-    private Dictionary<Guid, BlameTestObject> _testObjectDictionary;
+    private List<Guid>? _testSequence;
+    private Dictionary<Guid, BlameTestObject>? _testObjectDictionary;
     private readonly IBlameReaderWriter _blameReaderWriter;
     private readonly IFileHelper _fileHelper;
-    private XmlElement _configurationElement;
+    private XmlElement? _configurationElement;
     private int _testStartCount;
     private int _testEndCount;
     private bool _collectProcessDumpOnCrash;
     private bool _collectProcessDumpOnHang;
     private bool _collectDumpAlways;
-    private string _attachmentGuid;
+    private string? _attachmentGuid;
 
     private CrashDumpType _crashDumpType;
     private HangDumpType? _hangDumpType;
 
     private bool _inactivityTimerAlreadyFired;
-    private IInactivityTimer _inactivityTimer;
+    private IInactivityTimer? _inactivityTimer;
     private TimeSpan _inactivityTimespan = TimeSpan.FromMinutes(DefaultInactivityTimeInMinutes);
 
     private int _testHostProcessId;
-    private string _targetFramework;
+    private string? _targetFramework;
     private readonly List<KeyValuePair<string, string>> _environmentVariables = new();
     private bool _uploadDumpFiles;
-    private string _tempDirectory;
+    private string? _tempDirectory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BlameCollector"/> class.
@@ -85,7 +84,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     internal BlameCollector(
         IBlameReaderWriter blameReaderWriter,
         IProcessDumpUtility processDumpUtility,
-        IInactivityTimer inactivityTimer,
+        IInactivityTimer? inactivityTimer,
         IFileHelper fileHelper)
     {
         _blameReaderWriter = blameReaderWriter;
@@ -111,11 +110,12 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// <param name="dataSink">A data collection sink for data transfer</param>
     /// <param name="logger">Data Collection Logger to send messages to the client </param>
     /// <param name="environmentContext">Context of data collector environment</param>
+    [MemberNotNull(nameof(_events), nameof(_dataCollectionSink), nameof(_context), nameof(_testSequence), nameof(_testObjectDictionary), nameof(_logger))]
     public override void Initialize(
-        XmlElement configurationElement,
+        XmlElement? configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
-        DataCollectionLogger logger!!,
+        DataCollectionLogger logger,
         DataCollectionEnvironmentContext environmentContext)
     {
         _events = events;
@@ -124,7 +124,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         _configurationElement = configurationElement;
         _testSequence = new List<Guid>();
         _testObjectDictionary = new Dictionary<Guid, BlameTestObject>();
-        _logger = logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         // Subscribing to events
         _events.TestHostLaunched += TestHostLaunchedHandler;
@@ -139,7 +139,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
             if (_collectProcessDumpOnCrash)
             {
-                ValidateAndAddCrashProcessDumpParameters(collectDumpNode);
+                ValidateAndAddCrashProcessDumpParameters(collectDumpNode!);
 
                 // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
@@ -161,11 +161,11 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                 // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
 
-                ValidateAndAddHangProcessDumpParameters(collectHangBasedDumpNode);
+                ValidateAndAddHangProcessDumpParameters(collectHangBasedDumpNode!);
             }
 
             var tfm = _configurationElement[Constants.TargetFramework]?.InnerText;
-            if (!string.IsNullOrWhiteSpace(tfm))
+            if (!tfm.IsNullOrWhiteSpace())
             {
                 _targetFramework = tfm;
             }
@@ -188,6 +188,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// </summary>
     private void CollectDumpAndAbortTesthost()
     {
+        TPDebug.Assert(_logger != null && _context != null && _targetFramework != null && _dataCollectionSink != null, "Initialize must be called before calling this method");
         _inactivityTimerAlreadyFired = true;
 
         string value;
@@ -212,7 +213,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         try
         {
             EqtTrace.Verbose("Calling dispose on Inactivity timer.");
-            _inactivityTimer.Dispose();
+            _inactivityTimer?.Dispose();
         }
         catch
         {
@@ -252,7 +253,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                     {
                         try
                         {
-                            if (!string.IsNullOrEmpty(dumpFile))
+                            if (!dumpFile.IsNullOrEmpty())
                             {
                                 var fileTransferInformation = new FileTransferInformation(_context.SessionDataCollectionContext, dumpFile, true, _fileHelper);
                                 _dataCollectionSink.SendFileAsync(fileTransferInformation);
@@ -303,6 +304,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
     private void ValidateAndAddCrashProcessDumpParameters(XmlElement collectDumpNode)
     {
+        TPDebug.Assert(_logger != null && _context != null, "Initialize must be called before calling this method");
         foreach (XmlAttribute blameAttribute in collectDumpNode.Attributes)
         {
             switch (blameAttribute)
@@ -346,13 +348,14 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
     private void ValidateAndAddHangProcessDumpParameters(XmlElement collectDumpNode)
     {
+        TPDebug.Assert(_logger != null && _context != null, "Initialize must be called before calling this method");
         foreach (XmlAttribute blameAttribute in collectDumpNode.Attributes)
         {
             switch (blameAttribute)
             {
                 case XmlAttribute attribute when string.Equals(attribute.Name, Constants.TestTimeout, StringComparison.OrdinalIgnoreCase):
 
-                    if (!string.IsNullOrWhiteSpace(attribute.Value) && TimeSpanParser.TryParse(attribute.Value, out var timeout))
+                    if (!attribute.Value.IsNullOrWhiteSpace() && TimeSpanParser.TryParse(attribute.Value, out var timeout))
                     {
                         _inactivityTimespan = timeout;
                     }
@@ -406,8 +409,9 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// </summary>
     /// <param name="sender">Sender</param>
     /// <param name="e">TestCaseStartEventArgs</param>
-    private void EventsTestCaseStart(object sender, TestCaseStartEventArgs e)
+    private void EventsTestCaseStart(object? sender, TestCaseStartEventArgs e)
     {
+        TPDebug.Assert(_testSequence != null && _testObjectDictionary != null, "Initialize must be called before calling this method");
         ResetInactivityTimer();
 
         EqtTrace.Info("Blame Collector : Test Case Start");
@@ -429,8 +433,9 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// </summary>
     /// <param name="sender">Sender</param>
     /// <param name="e">TestCaseEndEventArgs</param>
-    private void EventsTestCaseEnd(object sender, TestCaseEndEventArgs e)
+    private void EventsTestCaseEnd(object? sender, TestCaseEndEventArgs e)
     {
+        TPDebug.Assert(_testObjectDictionary != null, "Initialize must be called before calling this method");
         ResetInactivityTimer();
 
         EqtTrace.Info("Blame Collector: Test Case End");
@@ -449,8 +454,9 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// </summary>
     /// <param name="sender">Sender</param>
     /// <param name="args">SessionEndEventArgs</param>
-    private void SessionEndedHandler(object sender, SessionEndEventArgs args)
+    private void SessionEndedHandler(object? sender, SessionEndEventArgs args)
     {
+        TPDebug.Assert(_testSequence != null && _testObjectDictionary != null && _context != null && _dataCollectionSink != null && _logger != null, "Initialize must be called before calling this method");
         ResetInactivityTimer();
 
         EqtTrace.Info("Blame Collector: Session End");
@@ -484,7 +490,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                     var dumpFiles = _processDumpUtility.GetDumpFiles(warnOnNoDumpFiles: _collectDumpAlways, processCrashedWhenRunningTests);
                     foreach (var dumpFile in dumpFiles)
                     {
-                        if (!string.IsNullOrEmpty(dumpFile))
+                        if (!dumpFile.IsNullOrEmpty())
                         {
                             try
                             {
@@ -537,6 +543,8 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             return;
         }
 
+        TPDebug.Assert(_logger != null && _context != null && _targetFramework != null, "Initialize must be called before calling this method");
+
         try
         {
             var dumpDirectory = GetDumpDirectory();
@@ -568,7 +576,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         EqtTrace.Verbose("Reset the inactivity timer since an event was received.");
         try
         {
-            _inactivityTimer.ResetTimer(_inactivityTimespan);
+            _inactivityTimer?.ResetTimer(_inactivityTimespan);
         }
         catch (Exception e)
         {
@@ -581,6 +589,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// </summary>
     private void DeregisterEvents()
     {
+        TPDebug.Assert(_events != null, "Initialize must be called before calling this method");
         _events.SessionEnd -= SessionEndedHandler;
         _events.TestCaseStart -= EventsTestCaseStart;
         _events.TestCaseEnd -= EventsTestCaseEnd;
@@ -588,7 +597,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
     private string GetTempDirectory()
     {
-        if (string.IsNullOrWhiteSpace(_tempDirectory))
+        if (_tempDirectory.IsNullOrWhiteSpace())
         {
             // DUMP_TEMP_PATH will be used as temporary storage location
             // for the dumps, this won't affect the dump uploads. Just the place where
@@ -608,12 +617,14 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
     private string GetDumpDirectory()
     {
+        TPDebug.Assert(_logger != null && _context != null, "Initialize must be called before calling this method");
+
         // Using a custom dump path for scenarios where we want to upload the
         // dump files ourselves, such as when running in Helix.
         // This will save into the directory specified via VSTEST_DUMP_PATH, and
         //  skip uploading dumps via attachments.
         var dumpDirectoryOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_PATH");
-        var dumpDirectoryOverrideHasValue = !string.IsNullOrWhiteSpace(dumpDirectoryOverride);
+        var dumpDirectoryOverrideHasValue = !dumpDirectoryOverride.IsNullOrWhiteSpace();
         _uploadDumpFiles = !dumpDirectoryOverrideHasValue;
 
         var dumpDirectory = dumpDirectoryOverrideHasValue ? dumpDirectoryOverride : GetTempDirectory();

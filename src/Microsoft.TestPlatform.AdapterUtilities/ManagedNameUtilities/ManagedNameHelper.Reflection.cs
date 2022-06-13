@@ -11,8 +11,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
 
 public static partial class ManagedNameHelper
@@ -82,14 +80,20 @@ public static partial class ManagedNameHelper
     /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in
     /// <see href="https://github.com/microsoft/vstest-docs/blob/main/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
     /// </remarks>
-    public static void GetManagedName(MethodBase method!!, out string managedTypeName, out string managedMethodName, out string[] hierarchyValues)
+    public static void GetManagedName(MethodBase method, out string managedTypeName, out string managedMethodName, out string[] hierarchyValues)
     {
+        _ = method ?? throw new ArgumentNullException(nameof(method));
+
         if (!ReflectionHelpers.IsMethod(method))
         {
+            // TODO: @Haplois, exception expects a message and not a param name.
             throw new NotSupportedException(nameof(method));
         }
 
-        var semanticType = ReflectionHelpers.GetReflectedType(method);
+        var semanticType = ReflectionHelpers.GetReflectedType(method)
+            // TODO: @Haplois, exception expects a message and not a param name.
+            ?? throw new NotSupportedException(nameof(method));
+
         if (ReflectionHelpers.IsGenericType(semanticType))
         {
             // The type might have some of its generic parameters specified, so make
@@ -101,7 +105,7 @@ public static partial class ManagedNameHelper
             // a new method reference using the open form of the reflected type. The intent is
             // to strip all generic type parameters.
             var methodHandle = ReflectionHelpers.GetMethodHandle(method);
-            method = MethodBase.GetMethodFromHandle(methodHandle, semanticType.TypeHandle);
+            method = MethodBase.GetMethodFromHandle(methodHandle, semanticType.TypeHandle)!;
         }
 
         if (method.IsGenericMethod)
@@ -116,6 +120,11 @@ public static partial class ManagedNameHelper
 
         // Namespace and Type Name (with arity designation)
         var hierarchyPos = AppendTypeString(typeBuilder, semanticType, closedType: false);
+        if (hierarchyPos is null || hierarchyPos.Length != HierarchyConstants.Levels.TotalLevelCount)
+        {
+            // TODO: @Haplois, exception expects a message and not a param name.
+            throw new NotSupportedException(nameof(method));
+        }
 
         // Method Name with method arity
         var arity = method.GetGenericArguments().Length;
@@ -142,10 +151,11 @@ public static partial class ManagedNameHelper
 
         managedTypeName = typeBuilder.ToString();
         managedMethodName = methodBuilder.ToString();
-        hierarchyValues = new[] {
-                managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]),
-                managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1),
-            };
+        hierarchyValues = new[]
+        {
+            managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]),
+            managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1),
+        };
     }
 
     /// <summary>
@@ -176,7 +186,7 @@ public static partial class ManagedNameHelper
     /// </remarks>
     public static MethodBase GetMethod(Assembly assembly, string managedTypeName, string managedMethodName)
     {
-        Type type;
+        Type? type;
 
         var parsedManagedTypeName = ReflectionHelpers.ParseEscapedString(managedTypeName);
 
@@ -199,14 +209,10 @@ public static partial class ManagedNameHelper
             throw new InvalidManagedNameException(message);
         }
 
-        MethodInfo method = null;
+        MethodInfo? method = null;
         ManagedNameParser.ParseManagedMethodName(managedMethodName, out var methodName, out var methodArity, out var parameterTypes);
 
-#if NET20 || NET35
-        if (!IsNullOrWhiteSpace(methodName))
-#else
         if (!string.IsNullOrWhiteSpace(methodName))
-#endif
         {
             method = FindMethod(type, methodName, methodArity, parameterTypes);
         }
@@ -220,12 +226,11 @@ public static partial class ManagedNameHelper
         return method;
     }
 
-    private static MethodInfo FindMethod(Type type, string methodName, int methodArity, string[] parameterTypes)
+    private static MethodInfo? FindMethod(Type type, string methodName, int methodArity, string[]? parameterTypes)
     {
-        bool Filter(MemberInfo mbr, object param)
+        bool Filter(MemberInfo mbr, object? param)
         {
-            var method = mbr as MethodInfo;
-            if (method.Name != methodName || method.GetGenericArguments().Length != methodArity)
+            if (mbr is not MethodInfo method || method.Name != methodName || method.GetGenericArguments().Length != methodArity)
             {
                 return false;
             }
@@ -260,17 +265,17 @@ public static partial class ManagedNameHelper
         methods = type.GetRuntimeMethods().Where(m => Filter(m, null)).ToArray();
 #endif
 
-#if NET20
-        return (MethodInfo)SingleOrDefault(methods);
-#else
-        return (MethodInfo)methods.SingleOrDefault();
-#endif
+        return (MethodInfo?)methods.SingleOrDefault();
     }
 
-    private static int[] AppendTypeString(StringBuilder b, Type type, bool closedType)
+    private static int[]? AppendTypeString(StringBuilder b, Type? type, bool closedType)
     {
-        int[] hierarchies = null;
+        if (type is null)
+        {
+            return null;
+        }
 
+        int[]? hierarchies = null;
         if (type.IsArray)
         {
             hierarchies = AppendTypeString(b, type.GetElementType(), closedType);
@@ -311,8 +316,13 @@ public static partial class ManagedNameHelper
         return hierarchies;
     }
 
-    private static void AppendNamespace(StringBuilder b, string namespaceString)
+    private static void AppendNamespace(StringBuilder b, string? namespaceString)
     {
+        if (namespaceString is null)
+        {
+            return;
+        }
+
         int start = 0;
         bool shouldEscape = false;
 
@@ -402,8 +412,13 @@ public static partial class ManagedNameHelper
         b.Append('\'');
     }
 
-    private static int AppendNestedTypeName(StringBuilder b, Type type)
+    private static int AppendNestedTypeName(StringBuilder b, Type? type)
     {
+        if (type is null)
+        {
+            return 0;
+        }
+
         var outerArity = 0;
         if (type.IsNested)
         {
@@ -502,62 +517,4 @@ public static partial class ManagedNameHelper
         AppendTypeString(builder, type, closedType);
         return builder.ToString();
     }
-
-#if NET20
-    // the method is mostly copied from
-    // https://github.com/dotnet/runtime/blob/c0840723b382bcfa67b35839af8572fcd38f1d13/src/libraries/System.Linq/src/System/Linq/Single.cs#L86
-    public static TSource SingleOrDefault<TSource>(System.Collections.Generic.IEnumerable<TSource> source)
-    {
-        if (source == null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
-
-        if (source is System.Collections.Generic.IList<TSource> list)
-        {
-            switch (list.Count)
-            {
-                case 0:
-                    return default;
-                case 1:
-                    return list[0];
-            }
-        }
-        else
-        {
-            using (System.Collections.Generic.IEnumerator<TSource> e = source.GetEnumerator())
-            {
-                if (!e.MoveNext())
-                {
-                    return default;
-                }
-
-                TSource result = e.Current;
-                if (!e.MoveNext())
-                {
-                    return result;
-                }
-            }
-        }
-
-        throw new InvalidOperationException("MoreThanOneElement");
-    }
-#endif
-
-#if NET20 || NET35
-    public static bool IsNullOrWhiteSpace(string value)
-    {
-        if (value is null) return true;
-
-        for (int i = 0; i < value.Length; i++)
-        {
-            if (!char.IsWhiteSpace(value[i]))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-#endif
 }

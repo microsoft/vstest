@@ -13,7 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.Client.Execution;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
-using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -26,8 +25,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Client;
 
@@ -71,34 +68,29 @@ internal class TestPlatform : ITestPlatform
         IFileHelper filehelper,
         ITestRuntimeProviderManager testHostProviderManager)
     {
-        TestEngine = testEngine;
+        _testEngine = testEngine;
         _fileHelper = filehelper;
         _testHostProviderManager = testHostProviderManager;
     }
 
-    /// <summary>
-    /// Gets or sets the test engine instance.
-    /// </summary>
-    private ITestEngine TestEngine { get; set; }
+    private readonly ITestEngine _testEngine;
 
     /// <inheritdoc/>
     public IDiscoveryRequest CreateDiscoveryRequest(
         IRequestData requestData,
-        DiscoveryCriteria discoveryCriteria!!,
-        TestPlatformOptions options)
+        DiscoveryCriteria discoveryCriteria,
+        TestPlatformOptions? options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
+        ValidateArg.NotNull(discoveryCriteria, nameof(discoveryCriteria));
+
         PopulateExtensions(discoveryCriteria.RunSettings, discoveryCriteria.Sources);
 
         // Initialize loggers.
-        ITestLoggerManager loggerManager = TestEngine.GetLoggerManager(requestData);
+        ITestLoggerManager loggerManager = _testEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(discoveryCriteria.RunSettings);
 
-        ITestRuntimeProvider testHostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
-        TestPlatform.ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
-
-        testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
-
-        IProxyDiscoveryManager discoveryManager = TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
+        IProxyDiscoveryManager discoveryManager = _testEngine.GetDiscoveryManager(requestData, discoveryCriteria, sourceToSourceDetailMap);
         discoveryManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager, loggerManager);
@@ -107,33 +99,20 @@ internal class TestPlatform : ITestPlatform
     /// <inheritdoc/>
     public ITestRunRequest CreateTestRunRequest(
         IRequestData requestData,
-        TestRunCriteria testRunCriteria!!,
-        TestPlatformOptions options)
+        TestRunCriteria testRunCriteria,
+        TestPlatformOptions? options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
+        ValidateArg.NotNull(testRunCriteria, nameof(testRunCriteria));
+
         IEnumerable<string> sources = GetSources(testRunCriteria);
         PopulateExtensions(testRunCriteria.TestRunSettings, sources);
 
         // Initialize loggers.
-        ITestLoggerManager loggerManager = TestEngine.GetLoggerManager(requestData);
+        ITestLoggerManager loggerManager = _testEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(testRunCriteria.TestRunSettings);
 
-        // TODO: PERF: this will create a testhost manager, and then it will pass that to GetExecutionManager, where it will
-        // be used only when we will run in-process. If we don't run in process, we will throw away the manager we just
-        // created and let the proxy parallel callbacks to create a new one. This seems to be very easy to move to the GetExecutionManager,
-        // and safe as well, so we create the manager only once.
-        // TODO: Of course TestEngine.GetExecutionManager is public api...
-        ITestRuntimeProvider testHostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
-        TestPlatform.ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
-
-        testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
-
-        // NOTE: The custom launcher should not be set when we have test session info available.
-        if (testRunCriteria.TestHostLauncher != null)
-        {
-            testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
-        }
-
-        IProxyExecutionManager executionManager = TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria);
+        IProxyExecutionManager executionManager = _testEngine.GetExecutionManager(requestData, testRunCriteria, sourceToSourceDetailMap);
         executionManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
@@ -142,9 +121,12 @@ internal class TestPlatform : ITestPlatform
     /// <inheritdoc/>
     public bool StartTestSession(
         IRequestData requestData,
-        StartTestSessionCriteria testSessionCriteria!!,
-        ITestSessionEventsHandler eventsHandler)
+        StartTestSessionCriteria testSessionCriteria,
+        ITestSessionEventsHandler eventsHandler,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
+        ValidateArg.NotNull(testSessionCriteria, nameof(testSessionCriteria));
+
         RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
         TestAdapterLoadingStrategy strategy = runConfiguration.TestAdapterLoadingStrategy;
 
@@ -155,7 +137,7 @@ internal class TestPlatform : ITestPlatform
             return false;
         }
 
-        IProxyTestSessionManager testSessionManager = TestEngine.GetTestSessionManager(requestData, testSessionCriteria);
+        IProxyTestSessionManager? testSessionManager = _testEngine.GetTestSessionManager(requestData, testSessionCriteria, sourceToSourceDetailMap);
         if (testSessionManager == null)
         {
             // The test session manager is null because the combination of runsettings and
@@ -197,17 +179,17 @@ internal class TestPlatform : ITestPlatform
         IEnumerable<string> pathToAdditionalExtensions,
         bool skipExtensionFilters)
     {
-        TestEngine.GetExtensionManager().UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
+        _testEngine.GetExtensionManager().UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
     }
 
     /// <inheritdoc/>
     public void ClearExtensions()
     {
-        TestEngine.GetExtensionManager().ClearExtensions();
+        _testEngine.GetExtensionManager().ClearExtensions();
     }
 
     private static void ThrowExceptionIfTestHostManagerIsNull(
-        ITestRuntimeProvider testHostManager,
+        ITestRuntimeProvider? testHostManager,
         string settingsXml)
     {
         if (testHostManager == null)
@@ -381,7 +363,7 @@ internal class TestPlatform : ITestPlatform
 
     private static IEnumerable<string> ExpandAdaptersWithDefaultStrategy(string path, IFileHelper fileHelper)
     {
-        // This is the legacy behavior, please do not modify this method unless you're sure of 
+        // This is the legacy behavior, please do not modify this method unless you're sure of
         // side effect when running tests with legacy adapters.
         if (!fileHelper.DirectoryExists(path))
         {

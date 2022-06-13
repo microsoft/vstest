@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -138,6 +139,66 @@ public class CustomTestHostTests : AcceptanceTestBase
         customTestHostLauncher.LaunchProcessProcessId.Should().NotBeNull("we should launch some real process and save the pid of it");
     }
 
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [TestCategory("Feature")]
+    [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM)]
+    public void RunAllTestsWithMixedTFMsWillProvideAdditionalInformationToTheDebugger(RunnerInfo runnerInfo)
+    {
+        // Arrange
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        var runEventHandler = new RunEventHandler();
+        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
+        var netDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
+        var testHostLauncher = new TestHostLauncherV3();
+
+        // Act
+        // We have no preference around what TFM is used. It will be autodetected.
+        var runsettingsXml = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+        vstestConsoleWrapper.RunTestsWithCustomTestHost(new[] { netFrameworkDll, netDll }, runsettingsXml, runEventHandler, testHostLauncher);
+
+        // Assert
+        runEventHandler.Errors.Should().BeEmpty();
+        testHostLauncher.AttachDebuggerInfos.Should().HaveCount(2);
+        var targetFrameworks = testHostLauncher.AttachDebuggerInfos.Select(i => i.TargetFramework).ToList();
+        targetFrameworks.Should().OnlyContain(tfm => tfm.StartsWith(".NETFramework") || tfm.StartsWith(".NET "));
+
+        runEventHandler.TestResults.Should().HaveCount(6, "we run all tests from both assemblies");
+    }
+
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [TestCategory("BackwardCompatibilityWithRunner")]
+    // "Just row" used here because mstest does not cooperate with older versions of vstest.console correctly, so we test with just the single version available
+    // before the multi tfm feature.
+    [RunnerCompatibilityDataSource(BeforeFeature = Features.MULTI_TFM, JustRow = 0)]
+    public void RunAllTestsCallsBackToTestHostLauncherV3EvenWhenRunnerDoesNotSupportMultiTfmOrTheNewAttachDebugger2MessageYet(RunnerInfo runnerInfo)
+    {
+        // Arrange
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        var runEventHandler = new RunEventHandler();
+        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
+        var netDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
+        var testHostLauncher = new TestHostLauncherV3();
+
+        // Act
+        // We have no preference around what TFM is used. It will be autodetected.
+        var runsettingsXml = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+        vstestConsoleWrapper.RunTestsWithCustomTestHost(new[] { netFrameworkDll, netDll }, runsettingsXml, runEventHandler, testHostLauncher);
+
+        // Assert
+        runEventHandler.Errors.Should().BeEmpty();
+        testHostLauncher.AttachDebuggerInfos.Should().HaveCount(1);
+        var pid = testHostLauncher.AttachDebuggerInfos.Select(i => i.ProcessId).Single();
+        pid.Should().NotBe(0);
+
+        runEventHandler.TestResults.Should().HaveCount(3, "we run all tests from just one of the assemblies, because the runner does not support multi tfm");
+    }
+
     private static void EnsureTestsRunWithoutErrors(RunEventHandler runEventHandler, int passed, int failed, int skipped)
     {
         runEventHandler.Errors.Should().BeEmpty();
@@ -198,4 +259,49 @@ public class CustomTestHostTests : AcceptanceTestBase
             return true;
         }
     }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    private class TestHostLauncherV3 : ITestHostLauncher3
+    {
+        public bool IsDebug => true;
+
+        public List<AttachDebuggerInfo> AttachDebuggerInfos { get; } = new();
+
+        public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken)
+        {
+            AttachDebuggerInfos.Add(attachDebuggerInfo);
+
+            return true;
+        }
+
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            return AttachDebuggerToProcess(new AttachDebuggerInfo
+            {
+                ProcessId = pid,
+                TargetFramework = null,
+            }, CancellationToken.None);
+        }
+
+        public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
+        {
+            return AttachDebuggerToProcess(new AttachDebuggerInfo
+            {
+                ProcessId = pid,
+                TargetFramework = null,
+            }, CancellationToken.None);
+        }
+
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
+        {
+            return -1;
+        }
+
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken)
+        {
+            return -1;
+        }
+    }
 }
+#pragma warning restore CS0618 // Type or member is obsolete
+

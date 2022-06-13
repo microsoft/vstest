@@ -59,9 +59,9 @@ internal class PortablePdbReader : IDisposable
     /// path that is in the dll metadata.
     /// </summary>
     /// <param name="metadataReaderProvider"></param>
-    public PortablePdbReader(MetadataReaderProvider metadataReaderProvider!!)
+    public PortablePdbReader(MetadataReaderProvider metadataReaderProvider)
     {
-        _provider = metadataReaderProvider;
+        _provider = metadataReaderProvider ?? throw new ArgumentNullException(nameof(metadataReaderProvider));
         _reader = _provider.GetMetadataReader();
     }
 

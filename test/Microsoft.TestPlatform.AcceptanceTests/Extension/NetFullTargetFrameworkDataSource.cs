@@ -45,7 +45,7 @@ public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
     public bool DebugVSTestConsole { get; set; }
     public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
-    public bool NoDefaultBreakpoints { get; set; } = true;
+    public bool DebugStopAtEntrypoint { get; set; }
 
     public IEnumerable<object[]> GetData(MethodInfo methodInfo)
     {
@@ -64,7 +64,7 @@ public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
                 DebugVSTestConsole = DebugVSTestConsole,
                 DebugTestHost = DebugTestHost,
                 DebugDataCollector = DebugDataCollector,
-                NoDefaultBreakpoints = NoDefaultBreakpoints,
+                DebugStopAtEntrypoint = DebugStopAtEntrypoint,
             };
             dataRows.Add(new object[] { runnerInfo });
         }
@@ -84,7 +84,7 @@ public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
                     DebugVSTestConsole = DebugVSTestConsole,
                     DebugTestHost = DebugTestHost,
                     DebugDataCollector = DebugDataCollector,
-                    NoDefaultBreakpoints = NoDefaultBreakpoints,
+                    DebugStopAtEntrypoint = DebugStopAtEntrypoint,
                 };
                 dataRows.Add(new object[] { runnerInfo });
             }
@@ -102,7 +102,7 @@ public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
                     DebugVSTestConsole = DebugVSTestConsole,
                     DebugTestHost = DebugTestHost,
                     DebugDataCollector = DebugDataCollector,
-                    NoDefaultBreakpoints = NoDefaultBreakpoints,
+                    DebugStopAtEntrypoint = DebugStopAtEntrypoint,
                 };
                 dataRows.Add(new object[] { runnerInfo });
             }

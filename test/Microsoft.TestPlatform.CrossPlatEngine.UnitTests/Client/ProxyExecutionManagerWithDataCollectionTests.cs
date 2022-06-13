@@ -58,10 +58,10 @@ public class ProxyExecutionManagerWithDataCollectionTests
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockFileHelper = new Mock<IFileHelper>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
-        _testExecutionManager = new ProxyExecutionManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, _mockDataSerializer.Object, _mockFileHelper.Object);
+        _testExecutionManager = new ProxyExecutionManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, Framework.DefaultFramework, _mockDataSerializer.Object, _mockFileHelper.Object);
         _mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
         _mockProcessHelper = new Mock<IProcessHelper>();
-        _proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, _mockDataCollectionManager.Object);
+        _proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, Framework.DefaultFramework, _mockDataCollectionManager.Object);
     }
 
     [TestMethod]
@@ -102,7 +102,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
         var mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
         var proxyDataCollectonManager = new ProxyDataCollectionManager(_mockRequestData.Object, string.Empty, testSources, mockRequestSender.Object, _mockProcessHelper.Object, mockDataCollectionLauncher.Object);
 
-        var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, proxyDataCollectonManager);
+        var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, Framework.DefaultFramework, proxyDataCollectonManager);
         proxyExecutionManager.Initialize(false);
         Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.Messages);
         Assert.AreEqual(TestMessageLevel.Error, proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item1);
@@ -167,11 +167,11 @@ public class ProxyExecutionManagerWithDataCollectionTests
     public void LaunchProcessWithDebuggerAttachedShouldUpdateEnvironmentVariables()
     {
         // Setup
-        var mockRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
         TestProcessStartInfo launchedStartInfo = null;
         mockRunEventsHandler.Setup(runHandler => runHandler.LaunchProcessWithDebuggerAttached(It.IsAny<TestProcessStartInfo>())).Callback
             ((TestProcessStartInfo startInfo) => launchedStartInfo = startInfo);
-        var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, _mockDataCollectionManager.Object);
+        var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, Framework.DefaultFramework, _mockDataCollectionManager.Object);
         var mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
         var testProcessStartInfo = new TestProcessStartInfo
         {
@@ -198,7 +198,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
     [TestMethod]
     public void TestHostManagerHostLaunchedTriggerShouldSendTestHostLaunchedEvent()
     {
-        var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, _mockDataCollectionManager.Object);
+        var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, Framework.DefaultFramework, _mockDataCollectionManager.Object);
 
         _mockTestHostManager.Raise(x => x.HostLaunched += null, new HostProviderEventArgs("launched", 0, 1234));
 
@@ -208,11 +208,11 @@ public class ProxyExecutionManagerWithDataCollectionTests
 
 internal class TestableProxyExecutionManagerWithDataCollection : ProxyExecutionManagerWithDataCollection
 {
-    public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(new RequestData { MetricsCollection = new NoOpMetricsCollection() }, testRequestSender, testHostManager, proxyDataCollectionManager)
+    public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(new RequestData { MetricsCollection = new NoOpMetricsCollection() }, testRequestSender, testHostManager, Framework.DefaultFramework, proxyDataCollectionManager)
     {
     }
 
-    public TestableProxyExecutionManagerWithDataCollection(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(requestData, testRequestSender, testHostManager, proxyDataCollectionManager)
+    public TestableProxyExecutionManagerWithDataCollection(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(requestData, testRequestSender, testHostManager, Framework.DefaultFramework, proxyDataCollectionManager)
     {
     }
 

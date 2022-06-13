@@ -5,14 +5,14 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AttachVS;
 
 internal class Program
 {
     static void Main(string[] args)
     {
+        _ = args ?? throw new ArgumentNullException(nameof(args));
+
         Trace.Listeners.Add(new ConsoleTraceListener());
 
         int? pid = ParsePid(args, position: 0);

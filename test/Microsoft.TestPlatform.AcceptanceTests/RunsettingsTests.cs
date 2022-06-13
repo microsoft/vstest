@@ -29,8 +29,9 @@ public class RunsettingsTests : AcceptanceTestBase
         var targetPlatform = "x86";
         var testhostProcessName = new[] { "testhost.x86" };
 
-        // We pass 2 dlls in RunTestWithRunSettings, for .NET Framework they run in
-        // 1 hosts because that host is Shared.
+        // We pass 2 dlls in RunTestWithRunSettings, and MaxCpuCount=1 should win,
+        // we should see 1 testhost for .NET Framework (we share the host there),
+        // and 2 testhosts for .NET, because we don't share hosts there for non-parallel run.
         var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
 
         // passing parallel
@@ -69,8 +70,9 @@ public class RunsettingsTests : AcceptanceTestBase
         var targetPlatform = "x86";
         var testhostProcessName = new[] { "testhost.x86" };
 
-        // We pass 2 dlls in RunTestWithRunSettings, for .NET Framework they run in
-        // 1 hosts because that host is Shared.
+        // We pass 2 dlls in RunTestWithRunSettings, and MaxCpuCount=1 should win,
+        // we should see 1 testhost for .NET Framework (we share the host there),
+        // and 2 testhosts for .NET, because we don't share hosts there for non-parallel run.
         var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
 
         // Pass parallel
@@ -105,8 +107,9 @@ public class RunsettingsTests : AcceptanceTestBase
 
         var testhostProcessName = new[] { "testhost.x86" };
 
-        // We pass 2 dlls in RunTestWithRunSettings, for .NET Framework they run in
-        // 1 hosts because that host is Shared.
+        // We pass 2 dlls in RunTestWithRunSettings, and MaxCpuCount=1 should win,
+        // we should see 1 testhost for .NET Framework (we share the host there),
+        // and 2 testhosts for .NET, because we don't share hosts there for non-parallel run.
         var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
 
         // passing different platform
@@ -134,8 +137,9 @@ public class RunsettingsTests : AcceptanceTestBase
         var targetPlatform = "x86";
         var testhostProcessNames = new[] { "testhost.x86" };
 
-        // We pass 2 dlls in RunTestWithRunSettings, for .NET Framework they run in
-        // 1 hosts because that host is Shared.
+        // We pass 2 dlls in RunTestWithRunSettings, and MaxCpuCount=1 should win,
+        // we should see 1 testhost for .NET Framework (we share the host there),
+        // and 2 testhosts for .NET, because we don't share hosts there for non-parallel run.
         var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
 
         var runConfigurationDictionary = new Dictionary<string, string>
@@ -158,8 +162,9 @@ public class RunsettingsTests : AcceptanceTestBase
         var targetPlatform = "x86";
         var testhostProcessName = new[] { "testhost.x86" };
 
-        // We pass 2 dlls in RunTestWithRunSettings, for .NET Framework they run in
-        // 1 hosts because that host is Shared.
+        // We pass 2 dlls in RunTestWithRunSettings, and MaxCpuCount=1 should win,
+        // we should see 1 testhost for .NET Framework (we share the host there),
+        // and 2 testhosts for .NET, because we don't share hosts there for non-parallel run.
         var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
 
         var runSettingsArgs = string.Join(
@@ -185,8 +190,9 @@ public class RunsettingsTests : AcceptanceTestBase
         var targetPlatform = "x86";
         var testhostProcessName = new[] { "testhost.x86" };
 
-        // We pass 2 dlls in RunTestWithRunSettings, for .NET Framework they run in
-        // 1 hosts because that host is Shared.
+        // We pass 2 dlls in RunTestWithRunSettings, and MaxCpuCount=1 should win,
+        // we should see 1 testhost for .NET Framework (we share the host there),
+        // and 2 testhosts for .NET, because we don't share hosts there for non-parallel run.
         var expectedNumOfProcessCreated = runnerInfo.IsNetFrameworkTarget ? 1 : 2;
 
         var runConfigurationDictionary = new Dictionary<string, string>

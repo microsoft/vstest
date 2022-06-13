@@ -45,11 +45,13 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
         IRequestData requestData,
         ITestRequestSender requestSender,
         ITestRuntimeProvider testHostManager,
+        Framework testHostManagerFramework,
         IProxyDataCollectionManager proxyDataCollectionManager)
         : base(
             requestData,
             requestSender,
-            testHostManager)
+            testHostManager,
+            testHostManagerFramework)
     {
         ProxyDataCollectionManager = proxyDataCollectionManager;
         DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
@@ -122,7 +124,7 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
     /// <param name="testRunCriteria"> The settings/options for the test run. </param>
     /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
     /// <returns> The process id of the runner executing tests. </returns>
-    public override int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
+    public override int StartTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler)
     {
         var currentEventHandler = eventHandler;
         if (ProxyDataCollectionManager != null)

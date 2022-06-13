@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 public interface IBlameReaderWriter

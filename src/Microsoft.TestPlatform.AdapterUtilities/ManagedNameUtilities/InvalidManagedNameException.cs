@@ -7,8 +7,6 @@ using System;
 using System.Runtime.Serialization;
 #endif
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
 
 #if !NETSTANDARD1_0 && !WINDOWS_UWP

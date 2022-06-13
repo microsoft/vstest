@@ -35,7 +35,6 @@ public static class ValidateArg
     /// </returns>
     [DebuggerStepThrough]
     public static T NotNull<T>([ValidatedNotNull] T arg, string parameterName)
-        where T : class
     {
         return arg ?? throw new ArgumentNullException(parameterName);
     }

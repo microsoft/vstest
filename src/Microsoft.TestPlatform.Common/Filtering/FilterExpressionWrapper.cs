@@ -119,8 +119,10 @@ public class FilterExpressionWrapper
     /// <summary>
     /// Evaluate filterExpression with given propertyValueProvider.
     /// </summary>
-    public bool Evaluate(Func<string, Object> propertyValueProvider!!)
+    public bool Evaluate(Func<string, object> propertyValueProvider)
     {
+        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
+
         return UseFastFilter
             ? FastFilter.Evaluate(propertyValueProvider)
             : _filterExpression != null && _filterExpression.Evaluate(propertyValueProvider);

@@ -34,7 +34,7 @@ public class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo>
     public bool DebugVSTestConsole { get; set; }
     public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
-    public bool NoDefaultBreakpoints { get; set; } = true;
+    public bool DebugStopAtEntrypoint { get; set; }
 
     /// <summary>
     /// Add run for in-process using the selected .NET Framework runners, and and all selected adapters.
@@ -70,7 +70,7 @@ public class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo>
         _builder.DebugDataCollector = DebugDataCollector;
         _builder.DebugVSTestConsole = DebugVSTestConsole;
         _builder.DebugTestHost = DebugTestHost;
-        _builder.NoDefaultBreakpoints = NoDefaultBreakpoints;
+        _builder.DebugStopAtEntrypoint = DebugStopAtEntrypoint;
 
         var data = _builder.CreateData();
         data.ForEach(AddData);

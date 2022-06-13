@@ -41,7 +41,7 @@ public class PortArgumentProcessorTests
     public void GetExecutorShouldReturnPortArgumentProcessorCapabilities()
     {
         var processor = new PortArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is PortArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is PortArgumentExecutor);
     }
 
     #region PortArgumentProcessorCapabilitiesTests
@@ -125,7 +125,7 @@ public class PortArgumentProcessorTests
 
         _executor.Initialize(port.ToString());
 
-        _mockProcessHelper.Verify(ph => ph.SetExitCallback(processId, It.IsAny<Action<object>>()), Times.Once);
+        _mockProcessHelper.Verify(ph => ph.SetExitCallback(processId, It.IsAny<Action<object?>>()), Times.Once);
     }
 
     [TestMethod]

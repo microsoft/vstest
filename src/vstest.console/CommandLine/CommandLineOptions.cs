@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 
@@ -14,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using vstest.console.Internal;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
@@ -44,13 +43,13 @@ internal class CommandLineOptions
     /// </summary>
     private readonly TimeSpan _defaultRetrievalTimeout = new(0, 0, 0, 1, 500);
 
-    private static CommandLineOptions s_instance;
+    private static CommandLineOptions? s_instance;
 
     private List<string> _sources = new();
 
     private Architecture _architecture;
 
-    private Framework _frameworkVersion;
+    private Framework? _frameworkVersion;
 
     /// <summary>
     /// Gets the instance.
@@ -111,7 +110,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Path to the custom test adapters.
     /// </summary>
-    public string[] TestAdapterPath { get; set; }
+    public string[]? TestAdapterPath { get; set; }
 
     /// <summary>
     /// Test adapter loading strategy.
@@ -131,17 +130,17 @@ internal class CommandLineOptions
     /// <summary>
     /// Configuration the project is built for e.g. Debug/Release
     /// </summary>
-    public string Configuration { get; set; }
+    public string? Configuration { get; set; }
 
     /// <summary>
     /// Directory containing the temporary outputs
     /// </summary>
-    public string BuildBasePath { get; set; }
+    public string? BuildBasePath { get; set; }
 
     /// <summary>
     /// Directory containing the binaries to run
     /// </summary>
-    public string Output { get; set; }
+    public string? Output { get; set; }
 
     /// <summary>
     /// Specifies the frequency of the runStats/discoveredTests event
@@ -156,22 +155,22 @@ internal class CommandLineOptions
     /// <summary>
     /// Test case filter value for run with sources.
     /// </summary>
-    public string TestCaseFilterValue { get; set; }
+    public string? TestCaseFilterValue { get; set; }
 
     /// <summary>
     /// Target Path used by ListFullyQualifiedTests option
     /// </summary>
-    public string ListTestsTargetPath { get; set; }
+    public string? ListTestsTargetPath { get; set; }
 
     /// <summary>
     /// Specifies the Target Device
     /// </summary>
-    public string TargetDevice { get; set; }
+    public string? TargetDevice { get; set; }
 
     /// <summary>
     /// Specifies whether the target device has a Windows Phone context or not
     /// </summary>
-    public bool HasPhoneContext => !string.IsNullOrEmpty(TargetDevice);
+    public bool HasPhoneContext => !TargetDevice.IsNullOrEmpty();
 
     public bool TestAdapterPathsSet => (TestAdapterPath?.Length ?? 0) != 0;
 
@@ -224,7 +223,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Gets or sets the target Framework version for test run.
     /// </summary>
-    internal Framework TargetFrameworkVersion
+    internal Framework? TargetFrameworkVersion
     {
         get
         {
@@ -240,17 +239,18 @@ internal class CommandLineOptions
     /// <summary>
     /// Gets a value indicating whether /Framework has been specified on command line or not.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(TargetFrameworkVersion))]
     internal bool FrameworkVersionSpecified { get; private set; }
 
     /// <summary>
     /// Gets or sets the results directory for test run.
     /// </summary>
-    internal string ResultsDirectory { get; set; }
+    internal string? ResultsDirectory { get; set; }
 
     /// <summary>
     /// Gets or sets the /setting switch value. i.e path to settings file.
     /// </summary>
-    internal string SettingsFile { get; set; }
+    internal string? SettingsFile { get; set; }
 
     /// <summary>
     /// Gets or sets the /ArtifactsProcessingMode value.
@@ -260,7 +260,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Gets or sets the /TestSessionCorrelationId value.
     /// </summary>
-    internal string TestSessionCorrelationId { get; set; }
+    internal string? TestSessionCorrelationId { get; set; }
 
     /// <summary>
     /// Adds a source file to look for tests in.
@@ -268,7 +268,7 @@ internal class CommandLineOptions
     /// <param name="source">Path to source file to look for tests in.</param>
     public void AddSource(string source)
     {
-        if (string.IsNullOrWhiteSpace(source))
+        if (source.IsNullOrWhiteSpace())
         {
             throw new TestSourceException(CommandLineResources.CannotBeNullOrEmpty);
         }

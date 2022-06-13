@@ -8,9 +8,9 @@
         <target state="translated">Le paramètre ne peut pas avoir une valeur null ou être vide.</target>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
-        <source>Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.</source>
+        <source>Test run detected DLL(s) which would use different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.</source>
         <note></note>
-        <target state="translated">La série de tests a détecté une ou plusieurs DLL qui ont été générées pour d'autres versions de framework et de plateforme. La ou les DLL suivantes ne correspondent pas aux paramètres actuels : framework {0} et plateforme {1}.{2}Accédez à {3} pour plus d'informations sur la gestion de ces paramètres.</target>
+        <target state="translated">La série de tests a détecté une ou plusieurs DLL qui utiliseraient d'autres versions de framework et de plateforme. La ou les DLL suivantes ne correspondent pas aux paramètres actuels : framework {0} et plateforme {1}.{2}Accédez à {3} pour plus d'informations sur la gestion de ces paramètres.</target>
       </trans-unit>
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
@@ -23,8 +23,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="SourceIncompatible">
-        <source>{0} is built for Framework {1} and Platform {2}.</source>
-        <target state="translated">{0} est généré pour le framework {1} et la plateforme {2}.</target>
+        <source>{0} would use Framework {1} and Platform {2}.</source>
+        <target state="translated">{0} utiliserait framework {1} et {2} plateforme.</target>
         <note></note>
       </trans-unit>
     </body>

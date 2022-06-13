@@ -8,8 +8,6 @@ using System.Diagnostics;
 using Microsoft.TestPlatform.Build.Trace;
 using Microsoft.TestPlatform.Build.Utils;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Build.Tasks;
 
 public class VSTestForwardingApp
@@ -58,7 +56,7 @@ public class VSTestForwardingApp
         }
         catch (ArgumentException ex)
         {
-            Tracing.Trace(string.Format("VSTest: Killing process throws ArgumentException with the following message {0}. It may be that process is not running", ex));
+            Tracing.Trace($"VSTest: Killing process throws ArgumentException with the following message {ex}. It may be that process is not running");
         }
     }
 }

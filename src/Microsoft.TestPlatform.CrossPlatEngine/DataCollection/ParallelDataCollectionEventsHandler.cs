@@ -23,7 +23,7 @@ internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
 
     public ParallelDataCollectionEventsHandler(IRequestData requestData,
         IProxyExecutionManager proxyExecutionManager,
-        ITestRunEventsHandler actualRunEventsHandler,
+        IInternalTestRunEventsHandler actualRunEventsHandler,
         IParallelProxyExecutionManager parallelProxyExecutionManager,
         ParallelRunDataAggregator runDataAggregator,
         ITestRunAttachmentsProcessingManager attachmentsProcessingManager,
@@ -36,7 +36,7 @@ internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
 
     internal ParallelDataCollectionEventsHandler(IRequestData requestData,
         IProxyExecutionManager proxyExecutionManager,
-        ITestRunEventsHandler actualRunEventsHandler,
+        IInternalTestRunEventsHandler actualRunEventsHandler,
         IParallelProxyExecutionManager parallelProxyExecutionManager,
         ParallelRunDataAggregator runDataAggregator,
         IDataSerializer dataSerializer) :

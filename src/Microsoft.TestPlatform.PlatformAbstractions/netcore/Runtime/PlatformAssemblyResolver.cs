@@ -9,8 +9,6 @@ using System.Runtime.Loader;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc/>
@@ -36,7 +34,7 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     }
 
     /// <inheritdoc/>
-    public event AssemblyResolveEventHandler AssemblyResolve;
+    public event AssemblyResolveEventHandler? AssemblyResolve;
 
     public void Dispose()
     {
@@ -72,9 +70,9 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     /// <returns>
     /// The <see cref="Assembly"/>.
     /// </returns>
-    private Assembly AssemblyResolverEvent(object sender, object eventArgs)
+    private Assembly? AssemblyResolverEvent(object sender, object eventArgs)
     {
-        return eventArgs is not AssemblyName args ? null : AssemblyResolve(this, new AssemblyResolveEventArgs(args.Name));
+        return eventArgs is not AssemblyName args ? null : AssemblyResolve?.Invoke(this, new AssemblyResolveEventArgs(args.Name));
     }
 }
 

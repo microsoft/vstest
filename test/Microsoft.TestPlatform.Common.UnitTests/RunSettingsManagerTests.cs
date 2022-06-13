@@ -6,8 +6,6 @@ using System;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests;
 
 [TestClass]

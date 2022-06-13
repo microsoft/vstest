@@ -154,11 +154,12 @@ internal class DataCollectionManager : IDataCollectionManager
     }
 
     /// <inheritdoc/>
-    public IDictionary<string, string> InitializeDataCollectors(string settingsXml!!)
+    public IDictionary<string, string> InitializeDataCollectors(string settingsXml)
     {
+        ValidateArg.NotNull(settingsXml, nameof(settingsXml));
         if (settingsXml.IsNullOrEmpty())
         {
-            EqtTrace.Info("DataCollectionManager.InitializeDataCollectors : Runsettings is null or empty.");
+            EqtTrace.Info("DataCollectionManager.InitializeDataCollectors: Runsettings is null or empty.");
         }
 
         var sessionId = new SessionId(Guid.NewGuid());
@@ -585,8 +586,9 @@ internal class DataCollectionManager : IDataCollectionManager
     /// know when all plugins have completed processing the event
     /// </summary>
     /// <param name="args">The context information for the event</param>
-    private void SendEvent(DataCollectionEventArgs args!!)
+    private void SendEvent(DataCollectionEventArgs args)
     {
+        ValidateArg.NotNull(args, nameof(args));
         if (!_isDataCollectionEnabled)
         {
             EqtTrace.Error("DataCollectionManger:SendEvent: SendEvent called when no collection is enabled.");

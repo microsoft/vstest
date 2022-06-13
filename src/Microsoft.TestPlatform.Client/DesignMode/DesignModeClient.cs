@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Threading;
@@ -18,6 +19,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -25,12 +27,12 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 
 /// <summary>
-/// The design mode client.
+/// The design mode client, which listens inside of vstest.console when we are running in server mode (e.g. under an IDE like VS), and proceses
+/// the incoming requests. See <see cref="ProcessRequests"/> for how the requests are received, and for example <see cref="StartTestRun"/>
+/// for how a single request is handled, and a result is sent back to the IDE or other consumer.
 /// </summary>
 public class DesignModeClient : IDesignModeClient
 {
@@ -42,9 +44,9 @@ public class DesignModeClient : IDesignModeClient
     private readonly TestSessionMessageLogger _testSessionMessageLogger;
     private readonly object _lockObject = new();
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
-    protected Action<Message> onCustomTestHostLaunchAckReceived;
+    protected Action<Message>? onCustomTestHostLaunchAckReceived;
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
-    protected Action<Message> onAttachDebuggerAckRecieved;
+    protected Action<Message>? onAttachDebuggerAckRecieved;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DesignModeClient"/> class.
@@ -78,11 +80,12 @@ public class DesignModeClient : IDesignModeClient
     /// <summary>
     /// Property exposing the Instance
     /// </summary>
-    public static IDesignModeClient Instance { get; private set; }
+    public static IDesignModeClient? Instance { get; private set; }
 
     /// <summary>
     /// Initializes DesignMode
     /// </summary>
+    [MemberNotNull(nameof(Instance))]
     public static void Initialize()
     {
         Instance = new DesignModeClient();
@@ -99,7 +102,7 @@ public class DesignModeClient : IDesignModeClient
     /// </param>
     public void ConnectToClientAndProcessRequests(int port, ITestRequestManager testRequestManager)
     {
-        EqtTrace.Info("Trying to connect to server on port : {0}", port);
+        EqtTrace.Info("Trying to connect to server on port: {0}", port);
         _communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
 
         var connectionTimeoutInSecs = EnvironmentHelper.GetConnectionTimeout();
@@ -112,7 +115,7 @@ public class DesignModeClient : IDesignModeClient
         }
         else
         {
-            EqtTrace.Error("DesignModeClient : ConnectToClientAndProcessRequests : Client timed out while connecting to the server.");
+            EqtTrace.Error("DesignModeClient.ConnectToClientAndProcessRequests: Client timed out while connecting to the server.");
             Dispose();
             throw new TimeoutException(
                 string.Format(
@@ -132,7 +135,7 @@ public class DesignModeClient : IDesignModeClient
         // this should end the "ProcessRequests" loop with an exception
         Dispose();
 
-        EqtTrace.Info("DesignModeClient: Parent process exited, Exiting myself..");
+        EqtTrace.Info("DesignModeClient.HandleParentProcessExit: Parent process exited, Exiting myself...");
 
         _platformEnvironment.Exit(1);
     }
@@ -300,7 +303,7 @@ public class DesignModeClient : IDesignModeClient
         lock (_lockObject)
         {
             var waitHandle = new AutoResetEvent(false);
-            Message ackMessage = null;
+            Message? ackMessage = null;
             onCustomTestHostLaunchAckReceived = (ackRawMessage) =>
             {
                 ackMessage = ackRawMessage;
@@ -327,7 +330,7 @@ public class DesignModeClient : IDesignModeClient
     }
 
     /// <inheritdoc/>
-    public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo, CancellationToken cancellationToken)
     {
         // If an attach request is issued but there is no support for attaching on the other
         // side of the communication channel, we simply return and let the caller know the
@@ -340,14 +343,31 @@ public class DesignModeClient : IDesignModeClient
         lock (_lockObject)
         {
             var waitHandle = new AutoResetEvent(false);
-            Message ackMessage = null;
+            Message? ackMessage = null;
             onAttachDebuggerAckRecieved = (ackRawMessage) =>
             {
                 ackMessage = ackRawMessage;
                 waitHandle.Set();
             };
 
-            _communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid, _protocolConfig.Version);
+            // TODO: formalize this so we can the deprecation version from the message data, and automatically switch
+            // to the new message, including type safety, where we determine T from the payload. And maybe give SendMessage
+            // a type of T as well to prevent some more mistakes.
+            if (_protocolConfig.Version < 7)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                _communicationManager.SendMessage(MessageType.EditorAttachDebugger, attachDebuggerInfo.ProcessId, _protocolConfig.Version);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+            else
+            {
+                var payload = new EditorAttachDebuggerPayload
+                {
+                    TargetFramework = attachDebuggerInfo.TargetFramework?.ToString(),
+                    ProcessID = attachDebuggerInfo.ProcessId,
+                };
+                _communicationManager.SendMessage(MessageType.EditorAttachDebugger2, payload);
+            }
 
             WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 
@@ -374,7 +394,7 @@ public class DesignModeClient : IDesignModeClient
     }
 
     /// <inheritdoc />
-    public void SendTestMessage(TestMessageLevel level, string message)
+    public void SendTestMessage(TestMessageLevel level, string? message)
     {
         var payload = new TestMessagePayload { MessageLevel = level, Message = message };
         _communicationManager.SendMessage(MessageType.TestMessage, payload);
@@ -385,7 +405,7 @@ public class DesignModeClient : IDesignModeClient
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
+    public void TestRunMessageHandler(object? sender, TestRunMessageEventArgs e)
     {
         // save into trace log and send the message to the IDE
         //
@@ -420,41 +440,40 @@ public class DesignModeClient : IDesignModeClient
 
     private void StartTestRun(TestRunRequestPayload testRunPayload, ITestRequestManager testRequestManager, bool shouldLaunchTesthost)
     {
-        Task.Run(
-            () =>
+        Task.Run(() =>
+        {
+            try
             {
-                try
+                testRequestManager.ResetOptions();
+
+                // We must avoid re-launching the test host if the test run payload already
+                // contains test session info. Test session info being present is an indicative
+                // of an already running test host spawned by a start test session call.
+                var customLauncher =
+                    shouldLaunchTesthost && testRunPayload.TestSessionInfo == null
+                        ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(
+                            this,
+                            testRunPayload.DebuggingEnabled)
+                        : null;
+
+                testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), _protocolConfig);
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
+
+                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
+                _communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+                var runCompletePayload = new TestRunCompletePayload()
                 {
-                    testRequestManager.ResetOptions();
+                    TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue),
+                    LastRunTests = null
+                };
 
-                    // We must avoid re-launching the test host if the test run payload already
-                    // contains test session info. Test session info being present is an indicative
-                    // of an already running test host spawned by a start test session call.
-                    var customLauncher =
-                        shouldLaunchTesthost && testRunPayload.TestSessionInfo == null
-                            ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(
-                                this,
-                                testRunPayload.DebuggingEnabled)
-                            : null;
-
-                    testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), _protocolConfig);
-                }
-                catch (Exception ex)
-                {
-                    EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
-
-                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
-                    _communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
-                    var runCompletePayload = new TestRunCompletePayload()
-                    {
-                        TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue),
-                        LastRunTests = null
-                    };
-
-                    // Send run complete to translation layer
-                    _communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
-                }
-            });
+                // Send run complete to translation layer
+                _communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
+            }
+        });
     }
 
     private void StartDiscovery(DiscoveryRequestPayload discoveryRequestPayload, ITestRequestManager testRequestManager)

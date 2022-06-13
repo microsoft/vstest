@@ -37,7 +37,7 @@ public class TestSourceArgumentProcessorTests
     public void GetExecuterShouldReturnTestSourceArgumentProcessorCapabilities()
     {
         TestSourceArgumentProcessor processor = new();
-        Assert.IsTrue(processor.Executor.Value is TestSourceArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is TestSourceArgumentExecutor);
     }
 
     #region TestSourceArgumentProcessorCapabilitiesTests

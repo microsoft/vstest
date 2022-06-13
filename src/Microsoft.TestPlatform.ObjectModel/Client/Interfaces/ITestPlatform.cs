@@ -16,7 +16,7 @@ public interface ITestPlatform : IDisposable
     /// <summary>
     /// Updates the extensions to be used by the test service.
     /// </summary>
-    /// 
+    ///
     /// <param name="pathToAdditionalExtensions">
     /// Specifies the path to unit test extensions. If no additional extension is available,
     /// then specify null or empty list.
@@ -36,35 +36,37 @@ public interface ITestPlatform : IDisposable
     /// <summary>
     /// Creates a discovery request.
     /// </summary>
-    /// 
+    ///
     /// <param name="requestData">Providing common services and data for discovery.</param>
     /// <param name="discoveryCriteria">Specifies the discovery parameters.</param>
     /// <param name="options">Test platform options.</param>
-    /// 
+    ///
     /// <returns>A DiscoveryRequest object.</returns>
     IDiscoveryRequest CreateDiscoveryRequest(
         IRequestData requestData,
         DiscoveryCriteria discoveryCriteria,
-        TestPlatformOptions options);
+        TestPlatformOptions options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
 
     /// <summary>
     /// Creates a test run request.
     /// </summary>
-    /// 
+    ///
     /// <param name="requestData">Providing common services and data for execution.</param>
     /// <param name="testRunCriteria">Specifies the test run criteria.</param>
     /// <param name="options">Test platform options.</param>
-    /// 
+    ///
     /// <returns>A RunRequest object.</returns>
     ITestRunRequest CreateTestRunRequest(
         IRequestData requestData,
         TestRunCriteria testRunCriteria,
-        TestPlatformOptions options);
+        TestPlatformOptions options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
 
     /// <summary>
     /// Starts a test session.
     /// </summary>
-    /// 
+    ///
     /// <param name="requestData">
     /// Providing common services and data for test session start.
     /// </param>
@@ -75,5 +77,6 @@ public interface ITestPlatform : IDisposable
     bool StartTestSession(
         IRequestData requestData,
         StartTestSessionCriteria criteria,
-        ITestSessionEventsHandler eventsHandler);
+        ITestSessionEventsHandler eventsHandler,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
 }

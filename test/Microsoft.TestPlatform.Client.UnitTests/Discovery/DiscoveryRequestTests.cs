@@ -19,8 +19,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery;
 
 [TestClass]
@@ -211,7 +209,7 @@ public class DiscoveryRequestTests
     public void HandleRawMessageShouldHandleRawMessage()
     {
         bool onDiscoveryCompleteInvoked = false;
-        _discoveryRequest.OnRawMessageReceived += (object sender, string e) => onDiscoveryCompleteInvoked = true;
+        _discoveryRequest.OnRawMessageReceived += (object? sender, string e) => onDiscoveryCompleteInvoked = true;
 
         _discoveryRequest.HandleRawMessage(string.Empty);
 
@@ -223,7 +221,7 @@ public class DiscoveryRequestTests
     {
         bool onDiscoveryCompleteInvoked = true;
         _mockRequestData.Setup(x => x.IsTelemetryOptedIn).Returns(true);
-        _discoveryRequest.OnRawMessageReceived += (object sender, string e) => onDiscoveryCompleteInvoked = true;
+        _discoveryRequest.OnRawMessageReceived += (object? sender, string e) => onDiscoveryCompleteInvoked = true;
 
         _mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
             .Returns(new Message() { MessageType = MessageType.DiscoveryComplete });

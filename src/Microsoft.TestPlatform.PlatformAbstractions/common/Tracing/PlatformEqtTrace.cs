@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 
-#nullable disable
+using Microsoft.TestPlatform.PlatformAbstractions;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -83,7 +83,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
 
     private static readonly object LockObject = new();
 
-    private static TraceSource s_traceSource;
+    private static TraceSource? s_traceSource;
 
     /// <summary>
     /// Specifies whether the trace is initialized or not
@@ -98,7 +98,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     private static int s_traceFileSize;
     private static readonly int DefaultTraceFileSize = 10240; // 10Mb.
 
-    public static string LogFile
+    public static string? LogFile
     {
         get;
         private set;
@@ -127,7 +127,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         }
     }
 
-    public static string ErrorOnInitialization
+    public static string? ErrorOnInitialization
     {
         get;
         set;
@@ -208,7 +208,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     }
 
     /// <inheritdoc/>
-    public string GetLogFile()
+    public string? GetLogFile()
     {
         return LogFile;
     }
@@ -282,7 +282,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     /// Setup trace listeners. It should be called when setting trace listener for child domain.
     /// </summary>
     /// <param name="listener">New listener.</param>
-    internal static void SetupRemoteListeners(TraceListener listener)
+    internal static void SetupRemoteListeners(TraceListener? listener)
     {
         lock (IsInitializationLock)
         {
@@ -369,6 +369,12 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
                     runnerLogFileName = LogFile;
                 }
 
+                var runnerLogFileInfo = new FileInfo(runnerLogFileName);
+                if (!Directory.Exists(runnerLogFileInfo.DirectoryName))
+                {
+                    Directory.CreateDirectory(runnerLogFileInfo.DirectoryName);
+                }
+
                 Source.Listeners.Add(new RollingFileTraceListener(runnerLogFileName, ListenerName, s_traceFileSize));
             }
             catch (Exception e)
@@ -391,7 +397,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     {
         try
         {
-            string processName = null;
+            string? processName = null;
 
             string[] args = Environment.GetCommandLineArgs();
 
@@ -404,7 +410,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
 
             // If we still have not got process name from command line - use the slow way.
             // This should never happen unless the process is called from execv with empty cmdline.
-            if (string.IsNullOrEmpty(processName))
+            if (processName.IsNullOrEmpty())
             {
                 Debug.Fail("Could not get process name from command line, will try to use the slow way.");
                 using var process = Process.GetCurrentProcess();

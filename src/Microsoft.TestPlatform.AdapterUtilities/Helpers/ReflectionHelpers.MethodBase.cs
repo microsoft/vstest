@@ -4,8 +4,6 @@
 using System;
 using System.Reflection;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 internal static partial class ReflectionHelpers
@@ -33,7 +31,7 @@ internal static partial class ReflectionHelpers
 #endif
     }
 
-    internal static Type GetReflectedType(MethodBase method)
+    internal static Type? GetReflectedType(MethodBase method)
     {
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
         return method.ReflectedType;

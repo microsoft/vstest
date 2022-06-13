@@ -7,8 +7,8 @@ namespace Intent;
 
 public interface IRunLogger
 {
-    void WriteTestPassed(MethodInfo m);
-    void WriteTestInconclusive(MethodInfo m);
-    void WriteTestFailure(MethodInfo m, Exception ex);
+    void WriteTestPassed(MethodInfo m, TimeSpan t);
+    void WriteTestFailure(MethodInfo m, Exception ex, TimeSpan t);
     void WriteFrameworkError(Exception ex);
+    void WriteSummary(int passed, List<(MethodInfo method, Exception exception, TimeSpan time)> failures, TimeSpan duration);
 }

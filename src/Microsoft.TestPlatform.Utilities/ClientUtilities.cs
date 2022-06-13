@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Xml;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
@@ -23,12 +23,10 @@ public static class ClientUtilities
     /// </summary>
     /// <param name="xmlDocument">Xml Document containing Runsettings xml</param>
     /// <param name="path">Path of the .runsettings xml file</param>
-    public static void FixRelativePathsInRunSettings(XmlDocument xmlDocument!!, string path)
+    public static void FixRelativePathsInRunSettings(XmlDocument xmlDocument, string path)
     {
-        if (string.IsNullOrEmpty(path))
-        {
-            throw new ArgumentNullException(nameof(path));
-        }
+        ValidateArg.NotNull(xmlDocument, nameof(xmlDocument));
+        ValidateArg.NotNullOrEmpty(path, nameof(path));
 
         string root = Path.GetDirectoryName(path);
 
@@ -59,7 +57,7 @@ public static class ClientUtilities
         string fileName = node.InnerXml;
         fileName = Environment.ExpandEnvironmentVariables(fileName);
 
-        if (!string.IsNullOrEmpty(fileName)
+        if (!fileName.IsNullOrEmpty()
             && !Path.IsPathRooted(fileName))
         {
             // We have a relative file path...

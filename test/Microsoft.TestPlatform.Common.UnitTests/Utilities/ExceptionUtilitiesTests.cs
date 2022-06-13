@@ -6,8 +6,6 @@ using System;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.Utilities;
 
 [TestClass]
@@ -48,7 +46,7 @@ public class ExceptionUtilitiesTests
         StringAssert.Contains(message, "ExceptionUtilitiesTests.GetExceptionWithStackTrace");
     }
 
-    private Exception GetExceptionWithStackTrace()
+    private static Exception GetExceptionWithStackTrace()
     {
         try
         {

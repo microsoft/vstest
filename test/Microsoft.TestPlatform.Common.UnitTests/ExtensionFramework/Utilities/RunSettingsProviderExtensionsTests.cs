@@ -10,17 +10,14 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities;
 
 [TestClass]
 public class RunSettingsProviderExtensionsTests
 {
-    private IRunSettingsProvider _runSettingsProvider;
+    private readonly IRunSettingsProvider _runSettingsProvider;
 
-    [TestInitialize]
-    public void Init()
+    public RunSettingsProviderExtensionsTests()
     {
         _runSettingsProvider = new TestableRunSettingsProvider();
     }
@@ -306,7 +303,7 @@ public class RunSettingsProviderExtensionsTests
 
     private class TestableRunSettingsProvider : IRunSettingsProvider
     {
-        public RunSettings ActiveRunSettings { get; set; }
+        public RunSettings? ActiveRunSettings { get; set; }
 
         public void SetActiveRunSettings(RunSettings runSettings)
         {

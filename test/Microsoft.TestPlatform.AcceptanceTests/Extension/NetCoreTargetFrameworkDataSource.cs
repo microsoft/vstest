@@ -51,7 +51,7 @@ public class NetCoreTargetFrameworkDataSource : Attribute, ITestDataSource
     public bool DebugVSTestConsole { get; set; }
     public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
-    public bool NoDefaultBreakpoints { get; set; } = true;
+    public bool DebugStopAtEntrypoint { get; set; }
 
     private void AddRunnerDataRow(List<object[]> dataRows, string runnerFramework, string targetFramework)
     {
@@ -66,7 +66,7 @@ public class NetCoreTargetFrameworkDataSource : Attribute, ITestDataSource
             DebugDataCollector = DebugDataCollector,
             DebugTestHost = DebugTestHost,
             DebugVSTestConsole = DebugVSTestConsole,
-            NoDefaultBreakpoints = NoDefaultBreakpoints,
+            DebugStopAtEntrypoint = DebugStopAtEntrypoint,
         };
         dataRows.Add(new object[] { runnerInfo });
     }

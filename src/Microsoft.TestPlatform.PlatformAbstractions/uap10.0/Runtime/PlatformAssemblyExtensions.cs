@@ -7,8 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <summary>

@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+using FluentAssertions;
 
 using static TestPlatform.CrossPlatEngine.UnitTests.Execution.RunTestsWithSourcesTests;
 
@@ -106,6 +107,38 @@ public class ExecutionManagerTests
     }
 
     [TestMethod]
+    public void InitializeShouldClearMetricsCollection()
+    {
+        var metricsCollection = new MetricsCollection();
+
+        metricsCollection.Add("metric", "value");
+        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(metricsCollection);
+        _mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
+
+        var discoveryManager = new ExecutionManager(_mockRequestData.Object);
+
+        metricsCollection.Metrics.Should().ContainKey("metric");
+        discoveryManager.Initialize(null, new Mock<ITestDiscoveryEventsHandler2>().Object);
+        metricsCollection.Metrics.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void InitializeShouldNotFailIfMetricsFieldIsNull()
+    {
+        var mockRequestData = new Mock<IRequestData>();
+        var mockMetricsCollection = new Mock<IMetricsCollection>();
+
+        mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+        mockRequestData.Object.MetricsCollection.Metrics.Should().BeNull();
+
+        var action = () => (new ExecutionManager(mockRequestData.Object))
+            .Initialize(null, new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+        action.Should().NotThrow();
+    }
+
+    [TestMethod]
     public void StartTestRunShouldRunTestsInTheProvidedSources()
     {
         var assemblyLocation = typeof(ExecutionManagerTests).GetTypeInfo().Assembly.Location;
@@ -121,7 +154,7 @@ public class ExecutionManagerTests
             { assemblyLocation, new List<string> { assemblyLocation } }
         };
 
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         var isExecutorCalled = false;
         RunTestWithSourcesExecutor.RunTestsWithSourcesCallback = (s, rc, fh) =>
@@ -159,7 +192,7 @@ public class ExecutionManagerTests
             new TestCase("A.C.M1", new Uri(RunTestsWithSourcesTestsExecutorUri), assemblyLocation)
         };
 
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         var isExecutorCalled = false;
         RunTestWithSourcesExecutor.RunTestsWithTestsCallback = (s, rc, fh) =>
@@ -192,7 +225,7 @@ public class ExecutionManagerTests
     [TestMethod]
     public void StartTestRunShouldAbortTheRunIfAnyExceptionComesForTheProvidedTests()
     {
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         // Call StartTestRun with faulty runsettings so that it will throw exception
         _executionManager.StartTestRun(new List<TestCase>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", _testExecutionContext, null, mockTestRunEventsHandler.Object);
@@ -205,7 +238,7 @@ public class ExecutionManagerTests
     [TestMethod]
     public void StartTestRunShouldAbortTheRunIfAnyExceptionComesForTheProvidedSources()
     {
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         // Call StartTestRun with faulty runsettings so that it will throw exception
         _executionManager.StartTestRun(new Dictionary<string, IEnumerable<string>>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", _testExecutionContext, null, mockTestRunEventsHandler.Object);

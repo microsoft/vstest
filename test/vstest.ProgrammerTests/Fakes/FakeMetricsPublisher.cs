@@ -19,7 +19,7 @@ internal class FakeMetricsPublisher : IMetricsPublisher
         // do nothing
     }
 
-    public void PublishMetrics(string eventName, IDictionary<string, object> metrics)
+    public void PublishMetrics(string eventName, IDictionary<string, object?> metrics)
     {
         // TODO: does nothing but probably should
     }

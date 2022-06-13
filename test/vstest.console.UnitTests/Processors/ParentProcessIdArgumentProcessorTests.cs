@@ -22,7 +22,7 @@ public class ParentProcessIdArgumentProcessorTests
     public void GetExecutorShouldReturnParentProcessIdArgumentProcessorCapabilities()
     {
         var processor = new ParentProcessIdArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is ParentProcessIdArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is ParentProcessIdArgumentExecutor);
     }
 
     [TestMethod]

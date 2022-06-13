@@ -51,9 +51,9 @@ internal class FakeProcess
         };
     }
 
-    internal static FakeProcess EnsureFakeProcess(object process)
+    internal static FakeProcess? EnsureFakeProcess(object? process)
     {
-        return (FakeProcess)process;
+        return process as FakeProcess;
     }
 
     internal void SetId(int id)
@@ -85,5 +85,15 @@ internal class FakeProcess
         {
             ExitCallback(this);
         }
+    }
+
+    public override string ToString()
+    {
+        var state = !Started
+            ? "not started"
+            : !Exited
+                ? "running"
+                : "exited";
+        return $"{(Id != default ? Id : "<no id>")} {Name ?? "<no name>"} {state}";
     }
 }

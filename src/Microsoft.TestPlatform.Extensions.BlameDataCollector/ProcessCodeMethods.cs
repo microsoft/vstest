@@ -11,8 +11,6 @@ using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 /// <summary>
@@ -94,7 +92,7 @@ internal static class ProcessCodeMethods
             ps.BeginOutputReadLine();
             ps.WaitForExit(5_000);
 
-            if (!string.IsNullOrWhiteSpace(err.ToString()))
+            if (!err.ToString().IsNullOrWhiteSpace())
             {
                 EqtTrace.Verbose($"ProcessCodeMethods.SuspendLinuxMacOs: Error suspending process {process.Id} - {process.ProcessName}, {err}.");
             }
@@ -184,9 +182,9 @@ internal static class ProcessCodeMethods
             var o = output.ToString();
             var parent = int.TryParse(o.Trim(), out var ppid) ? ppid : InvalidProcessId;
 
-            if (!string.IsNullOrWhiteSpace(err.ToString()))
+            if (err.ToString() is string error && !error.IsNullOrWhiteSpace())
             {
-                EqtTrace.Verbose($"ProcessCodeMethods.GetParentPidMacOs: Error getting parent of process {process.Id} - {process.ProcessName}, {err}.");
+                EqtTrace.Verbose($"ProcessCodeMethods.GetParentPidMacOs: Error getting parent of process {process.Id} - {process.ProcessName}, {error}.");
             }
 
             return parent;
@@ -207,12 +205,12 @@ internal static class ProcessCodeMethods
         }
 
         // only take children that are newer than the parent, because process ids (PIDs) get recycled
-        var children = acc.Where(p => p.ParentId == parent.Id && p.Process.StartTime > parent.StartTime).ToList();
+        var children = acc.Where(p => p.ParentId == parent.Id && p.Process?.StartTime > parent.StartTime).ToList();
 
         foreach (var child in children)
         {
             child.Level = level;
-            ResolveChildren(child.Process, acc, level + 1, limit);
+            ResolveChildren(child.Process!, acc, level + 1, limit);
         }
     }
 

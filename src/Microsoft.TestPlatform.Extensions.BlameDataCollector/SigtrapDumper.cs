@@ -3,8 +3,6 @@
 
 using System.Diagnostics;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 internal class SigtrapDumper : IHangDumper

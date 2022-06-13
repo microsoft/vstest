@@ -23,8 +23,6 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector;
 
 public class DataCollectorMain
@@ -70,7 +68,7 @@ public class DataCollectorMain
         _requestHandler = requestHandler;
     }
 
-    public void Run(string[] args)
+    public void Run(string[]? args)
     {
         DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS");
         DebuggerBreakpoint.WaitForDebugger("VSTEST_DATACOLLECTOR_DEBUG");
@@ -112,7 +110,7 @@ public class DataCollectorMain
 
         UiLanguageOverride.SetCultureSpecifiedByUser();
 
-        EqtTrace.Info("DataCollectorMain.Run: Starting data collector run with args: {0}", string.Join(",", args));
+        EqtTrace.Info("DataCollectorMain.Run: Starting data collector run with args: {0}", args != null ? string.Join(",", args) : "null");
 
         // Attach to exit of parent process
         var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessArgument);

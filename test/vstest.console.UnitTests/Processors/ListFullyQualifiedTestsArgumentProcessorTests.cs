@@ -80,7 +80,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
         _mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
         _mockAssemblyMetadataProvider = new Mock<IAssemblyMetadataProvider>();
         _mockAssemblyMetadataProvider.Setup(x => x.GetArchitecture(It.IsAny<string>())).Returns(Architecture.X64);
-        _mockAssemblyMetadataProvider.Setup(x => x.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework40));
+        _mockAssemblyMetadataProvider.Setup(x => x.GetFrameworkName(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework40));
         _inferHelper = new InferHelper(_mockAssemblyMetadataProvider.Object);
         _mockProcessHelper = new Mock<IProcessHelper>();
         _mockAttachmentsProcessingManager = new Mock<ITestRunAttachmentsProcessingManager>();
@@ -104,7 +104,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
     public void GetExecuterShouldReturnListFullyQualifiedTestsArgumentProcessorCapabilities()
     {
         var processor = new ListFullyQualifiedTestsArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is ListFullyQualifiedTestsArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is ListFullyQualifiedTestsArgumentExecutor);
     }
 
     #region ListTestsArgumentProcessorCapabilitiesTests
@@ -156,7 +156,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
         mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Throws(new TestPlatformException("DummyTestPlatformException"));
-        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockDiscoveryRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions(true);
 
@@ -174,7 +174,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
         mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Throws(new SettingsException("DummySettingsException"));
-        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockDiscoveryRequest.Object);
         ResetAndAddSourceToCommandLineOptions(true);
 
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _mockEnvironment.Object);
@@ -191,7 +191,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
         mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Throws(new InvalidOperationException("DummyInvalidOperationException"));
-        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockDiscoveryRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions(true);
 
@@ -210,7 +210,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
         mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Throws(new Exception("DummyException"));
-        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockDiscoveryRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions(true);
 
@@ -300,7 +300,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
         list.Add(t2);
 
         mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
-        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockDiscoveryRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions(legitPath);
         var cmdOptions = CommandLineOptions.Instance;
@@ -320,7 +320,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
             new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2")
         };
         mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
-        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockDiscoveryRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions(legitPath);
 

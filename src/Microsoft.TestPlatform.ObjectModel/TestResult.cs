@@ -23,9 +23,9 @@ public sealed class TestResult : TestObject
     /// Initializes a new instance of the <see cref="TestResult"/> class.
     /// </summary>
     /// <param name="testCase">The test case the result is for.</param>
-    public TestResult(TestCase testCase!!)
+    public TestResult(TestCase testCase)
     {
-        TestCase = testCase;
+        TestCase = testCase ?? throw new ArgumentNullException(nameof(testCase));
         Messages = new Collection<TestResultMessage>();
         Attachments = new Collection<AttachmentSet>();
 
@@ -172,36 +172,29 @@ public sealed class TestResult : TestObject
     /// Return TestProperty's value
     /// </summary>
     /// <returns></returns>
-    protected override object ProtectedGetPropertyValue(TestProperty property!!, object defaultValue)
+    protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
     {
-        switch (property.Id)
+        ValidateArg.NotNull(property, nameof(property));
+        return property.Id switch
         {
-            case "TestResult.ComputerName":
-                return ComputerName;
-            case "TestResult.DisplayName":
-                return DisplayName;
-            case "TestResult.Duration":
-                return Duration;
-            case "TestResult.EndTime":
-                return EndTime;
-            case "TestResult.ErrorMessage":
-                return ErrorMessage;
-            case "TestResult.ErrorStackTrace":
-                return ErrorStackTrace;
-            case "TestResult.Outcome":
-                return Outcome;
-            case "TestResult.StartTime":
-                return StartTime;
-        }
-
-        return base.ProtectedGetPropertyValue(property, defaultValue);
+            "TestResult.ComputerName" => ComputerName,
+            "TestResult.DisplayName" => DisplayName,
+            "TestResult.Duration" => Duration,
+            "TestResult.EndTime" => EndTime,
+            "TestResult.ErrorMessage" => ErrorMessage,
+            "TestResult.ErrorStackTrace" => ErrorStackTrace,
+            "TestResult.Outcome" => Outcome,
+            "TestResult.StartTime" => StartTime,
+            _ => base.ProtectedGetPropertyValue(property, defaultValue),
+        };
     }
 
     /// <summary>
     /// Set TestProperty's value
     /// </summary>
-    protected override void ProtectedSetPropertyValue(TestProperty property!!, object value)
+    protected override void ProtectedSetPropertyValue(TestProperty property, object value)
     {
+        ValidateArg.NotNull(property, nameof(property));
         switch (property.Id)
         {
             case "TestResult.ComputerName":
