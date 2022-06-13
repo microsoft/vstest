@@ -16,6 +16,8 @@ internal class FakeEnvironment : IEnvironment
 
     public string OperatingSystemVersion => _environment.OperatingSystemVersion;
 
+    public int ProcessorCount => _environment.ProcessorCount;
+
     public void Exit(int exitcode) => _environment.Exit(exitcode);
 
     public int GetCurrentManagedThreadId() => _environment.GetCurrentManagedThreadId();

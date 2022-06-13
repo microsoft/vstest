@@ -57,6 +57,9 @@ public class PlatformEnvironment : IEnvironment
     }
 
     /// <inheritdoc />
+    public int ProcessorCount => Environment.ProcessorCount;
+
+    /// <inheritdoc />
     public void Exit(int exitcode)
     {
         Environment.Exit(exitcode);
