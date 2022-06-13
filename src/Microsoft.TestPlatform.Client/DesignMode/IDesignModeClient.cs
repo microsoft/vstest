@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 
 /// <summary>
@@ -56,5 +54,5 @@ public interface IDesignModeClient : IDisposable
     /// </summary>
     /// <param name="level">Level for the message</param>
     /// <param name="message">Actual message string</param>
-    void SendTestMessage(TestMessageLevel level, string message);
+    void SendTestMessage(TestMessageLevel level, string? message);
 }
