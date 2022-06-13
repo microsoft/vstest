@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -510,14 +509,7 @@ public class TestEngine : ITestEngine
             // A negative value is used to indicate that the value should be used as a percentage of the number of cores.
             if (parallelLevelToUse < 0)
             {
-                Debug.Assert(parallelLevelToUse > -100, "Parallel level should be above -100 (i.e. 100% of cores)");
-                parallelLevelToUse = (int)Math.Round((double)-parallelLevelToUse * _environment.ProcessorCount / 100.0);
-
-                // If the value is equal to 0, set it to 1 as 0 is used to mean all cores (i.e. 100%).
-                if (parallelLevelToUse == 0)
-                {
-                    parallelLevelToUse = 1;
-                }
+                parallelLevelToUse = (int)Math.Max(1, Math.Round((double)-parallelLevelToUse * _environment.ProcessorCount / 100.0, MidpointRounding.AwayFromZero));
             }
 
             var enableParallel = parallelLevelToUse > 1;
