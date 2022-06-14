@@ -34,4 +34,7 @@ public interface IEnvironment
     /// </summary>
     /// <returns>Returns the thread Id</returns>
     int GetCurrentManagedThreadId();
+
+    /// <inheritdoc cref="System.Environment.ProcessorCount"/>
+    int ProcessorCount { get; }
 }

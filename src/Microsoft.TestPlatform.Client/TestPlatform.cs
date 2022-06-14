@@ -26,8 +26,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client;
 
 /// <summary>
@@ -81,7 +79,7 @@ internal class TestPlatform : ITestPlatform
     public IDiscoveryRequest CreateDiscoveryRequest(
         IRequestData requestData,
         DiscoveryCriteria discoveryCriteria,
-        TestPlatformOptions options,
+        TestPlatformOptions? options,
         Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
         ValidateArg.NotNull(discoveryCriteria, nameof(discoveryCriteria));
@@ -102,7 +100,7 @@ internal class TestPlatform : ITestPlatform
     public ITestRunRequest CreateTestRunRequest(
         IRequestData requestData,
         TestRunCriteria testRunCriteria,
-        TestPlatformOptions options,
+        TestPlatformOptions? options,
         Dictionary<string, SourceDetail> sourceToSourceDetailMap)
     {
         ValidateArg.NotNull(testRunCriteria, nameof(testRunCriteria));
@@ -139,7 +137,7 @@ internal class TestPlatform : ITestPlatform
             return false;
         }
 
-        IProxyTestSessionManager testSessionManager = _testEngine.GetTestSessionManager(requestData, testSessionCriteria, sourceToSourceDetailMap);
+        IProxyTestSessionManager? testSessionManager = _testEngine.GetTestSessionManager(requestData, testSessionCriteria, sourceToSourceDetailMap);
         if (testSessionManager == null)
         {
             // The test session manager is null because the combination of runsettings and
@@ -191,7 +189,7 @@ internal class TestPlatform : ITestPlatform
     }
 
     private static void ThrowExceptionIfTestHostManagerIsNull(
-        ITestRuntimeProvider testHostManager,
+        ITestRuntimeProvider? testHostManager,
         string settingsXml)
     {
         if (testHostManager == null)

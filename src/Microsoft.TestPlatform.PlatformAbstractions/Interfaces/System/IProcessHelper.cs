@@ -22,13 +22,13 @@ public interface IProcessHelper
     /// <param name="exitCallBack">Call back for on process exit</param>
     /// <param name="outputCallback">Call back for on process output</param>
     /// <returns>The process created.</returns>
-    object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string>? envVariables, Action<object?, string>? errorCallback, Action<object>? exitCallBack, Action<object?, string>? outputCallBack);
+    object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack);
 
     /// <summary>
     /// Gets the current process file path.
     /// </summary>
     /// <returns>The current process file path.</returns>
-    string GetCurrentProcessFileName();
+    string? GetCurrentProcessFileName();
 
     /// <summary>
     /// Gets the current process location.
@@ -40,7 +40,7 @@ public interface IProcessHelper
     /// Gets the location of test engine.
     /// </summary>
     /// <returns>Location of test engine.</returns>
-    string GetTestEngineDirectory();
+    string? GetTestEngineDirectory();
 
     /// <summary>
     /// Gets the location of native dll's, depending on current process architecture..
