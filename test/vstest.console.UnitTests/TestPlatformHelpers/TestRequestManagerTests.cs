@@ -90,9 +90,9 @@ public class TestRequestManagerTests
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
             _mockEnvironment.Object);
-        _mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()))
+        _mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Returns(_mockDiscoveryRequest.Object);
-        _mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()))
+        _mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Returns(_mockRunRequest.Object);
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.X86);
@@ -167,7 +167,7 @@ public class TestRequestManagerTests
 
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualDiscoveryCriteria = discoveryCriteria).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
@@ -186,7 +186,7 @@ public class TestRequestManagerTests
         var createDiscoveryRequestCalled = 0;
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) =>
             {
                 createDiscoveryRequestCalled++;
@@ -241,7 +241,7 @@ public class TestRequestManagerTests
 
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
@@ -293,7 +293,7 @@ public class TestRequestManagerTests
 
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager = new TestRequestManager(
@@ -343,7 +343,7 @@ public class TestRequestManagerTests
 
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager = new TestRequestManager(
@@ -387,7 +387,7 @@ public class TestRequestManagerTests
 
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager = new TestRequestManager(
@@ -431,7 +431,7 @@ public class TestRequestManagerTests
 
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager = new TestRequestManager(
@@ -475,7 +475,7 @@ public class TestRequestManagerTests
 
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager = new TestRequestManager(
@@ -531,7 +531,7 @@ public class TestRequestManagerTests
 
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager = new TestRequestManager(
@@ -578,7 +578,7 @@ public class TestRequestManagerTests
 
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager = new TestRequestManager(
@@ -625,7 +625,7 @@ public class TestRequestManagerTests
 
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager = new TestRequestManager(
@@ -671,7 +671,7 @@ public class TestRequestManagerTests
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualDiscoveryCriteria = discoveryCriteria).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
@@ -705,7 +705,7 @@ public class TestRequestManagerTests
             .Returns(new FrameworkName(Constants.DotNetFramework451));
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualDiscoveryCriteria = discoveryCriteria).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
@@ -737,7 +737,7 @@ public class TestRequestManagerTests
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualDiscoveryCriteria = discoveryCriteria).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
@@ -773,7 +773,7 @@ public class TestRequestManagerTests
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
         _mockTestPlatform
-            .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()))
+            .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Callback(
                 (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualDiscoveryCriteria = discoveryCriteria).Returns(mockDiscoveryRequest.Object);
 
@@ -855,7 +855,7 @@ public class TestRequestManagerTests
 
         TestRunCriteria? actualTestRunCriteria = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
@@ -879,7 +879,7 @@ public class TestRequestManagerTests
 
         TestRunCriteria? actualTestRunCriteria = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockDiscoveryRequest.Object);
         _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework35));
 
@@ -904,7 +904,7 @@ public class TestRequestManagerTests
         var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         // Act.
@@ -928,7 +928,7 @@ public class TestRequestManagerTests
         var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager = new TestRequestManager(
@@ -993,7 +993,7 @@ public class TestRequestManagerTests
         var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager = new TestRequestManager(
@@ -1041,7 +1041,7 @@ public class TestRequestManagerTests
         var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager = new TestRequestManager(
@@ -1087,7 +1087,7 @@ public class TestRequestManagerTests
         var mockProtocolConfig = new ProtocolConfig { Version = 6 };
         IRequestData? actualRequestData = null;
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         _testRequestManager = new TestRequestManager(
@@ -1127,7 +1127,7 @@ public class TestRequestManagerTests
         var createRunRequestCalled = 0;
         TestRunCriteria? observedCriteria = null;
         var mockRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) =>
             {
                 createRunRequestCalled++;
@@ -1185,7 +1185,7 @@ public class TestRequestManagerTests
         };
 
         var mockRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()))
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Returns(mockRunRequest.Object);
 
         var mockRunEventsRegistrar1 = new Mock<ITestRunEventsRegistrar>();
@@ -1324,11 +1324,11 @@ public class TestRequestManagerTests
 
         var designmode = $"<DesignMode>{designModeValue}</DesignMode>";
         _mockTestPlatform.Verify(
-            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()));
+            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
 
         var collectSourceInformation = $"<CollectSourceInformation>{designModeValue}</CollectSourceInformation>";
         _mockTestPlatform.Verify(
-            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(collectSourceInformation)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()));
+            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(collectSourceInformation)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
     [TestMethod]
@@ -1342,7 +1342,7 @@ public class TestRequestManagerTests
 
         var designmode = "<DesignMode>False</DesignMode>";
         _mockTestPlatform.Verify(
-            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()));
+            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
     [DataTestMethod]
@@ -1362,7 +1362,7 @@ public class TestRequestManagerTests
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         var designmode = $"<DesignMode>{designModeValue}</DesignMode>";
-        _mockTestPlatform.Verify(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.Is<TestRunCriteria>(rc => rc.TestRunSettings.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()));
+        _mockTestPlatform.Verify(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.Is<TestRunCriteria>(rc => rc.TestRunSettings.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
     [DataTestMethod]
@@ -1377,7 +1377,7 @@ public class TestRequestManagerTests
 
         var collectSourceInformation = $"<CollectSourceInformation>{val}</CollectSourceInformation>";
         _mockTestPlatform.Verify(
-            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(collectSourceInformation)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()));
+            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(collectSourceInformation)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
     [TestMethod]
@@ -1401,7 +1401,7 @@ public class TestRequestManagerTests
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
@@ -1438,7 +1438,7 @@ public class TestRequestManagerTests
             .Returns(new FrameworkName(Constants.DotNetFramework451));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
@@ -1479,7 +1479,7 @@ public class TestRequestManagerTests
             .Returns(new FrameworkName(Constants.DotNetFramework451));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
@@ -1513,7 +1513,7 @@ public class TestRequestManagerTests
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
@@ -1551,7 +1551,7 @@ public class TestRequestManagerTests
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
@@ -1593,7 +1593,7 @@ public class TestRequestManagerTests
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
@@ -1728,7 +1728,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = false;
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
@@ -1767,7 +1767,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
@@ -1807,7 +1807,7 @@ public class TestRequestManagerTests
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
         _mockTestPlatform
-            .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()))
+            .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Callback(
                 (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualDiscoveryCriteria = discoveryCriteria).Returns(mockDiscoveryRequest.Object);
 
@@ -1841,7 +1841,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = false;
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
@@ -1865,7 +1865,7 @@ public class TestRequestManagerTests
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
         _mockTestPlatform
-            .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()))
+            .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Callback(
                 (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualDiscoveryCriteria = discoveryCriteria).Returns(mockDiscoveryRequest.Object);
 
@@ -1897,7 +1897,7 @@ public class TestRequestManagerTests
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
         _mockTestPlatform
-            .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()))
+            .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Callback(
                 (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualDiscoveryCriteria = discoveryCriteria).Returns(mockDiscoveryRequest.Object);
 
@@ -1939,7 +1939,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = false;
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
@@ -1988,7 +1988,7 @@ public class TestRequestManagerTests
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
         _mockTestPlatform
-            .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()))
+            .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Callback(
                 (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualDiscoveryCriteria = discoveryCriteria).Returns(mockDiscoveryRequest.Object);
 
@@ -2040,7 +2040,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = false;
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
@@ -2089,7 +2089,7 @@ public class TestRequestManagerTests
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
         _mockTestPlatform
-            .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()))
+            .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Callback(
                 (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualDiscoveryCriteria = discoveryCriteria).Returns(mockDiscoveryRequest.Object);
 
@@ -2225,7 +2225,7 @@ public class TestRequestManagerTests
                     It.IsAny<IRequestData>(),
                     It.IsAny<StartTestSessionCriteria>(),
                     It.IsAny<ITestSessionEventsHandler>(),
-                    It.IsAny<Dictionary<string, SourceDetail>>()))
+                    It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Returns(true)
             .Callback(
                 (IRequestData rd, StartTestSessionCriteria _, ITestSessionEventsHandler _, Dictionary<string, SourceDetail> _) => Assert.IsTrue(rd.IsTelemetryOptedIn));
@@ -2272,7 +2272,7 @@ public class TestRequestManagerTests
                     It.IsAny<IRequestData>(),
                     It.IsAny<StartTestSessionCriteria>(),
                     It.IsAny<ITestSessionEventsHandler>(),
-                    It.IsAny<Dictionary<string, SourceDetail>>()))
+                    It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Returns(true)
             .Callback(
                 (IRequestData _, StartTestSessionCriteria criteria, ITestSessionEventsHandler _, Dictionary<string, SourceDetail> _) =>
@@ -2343,7 +2343,7 @@ public class TestRequestManagerTests
                     It.IsAny<IRequestData>(),
                     It.IsAny<StartTestSessionCriteria>(),
                     It.IsAny<ITestSessionEventsHandler>(),
-                    It.IsAny<Dictionary<string, SourceDetail>>()))
+                    It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Returns(true);
 
         _testRequestManager.StartTestSession(
@@ -2535,7 +2535,7 @@ public class TestRequestManagerTests
         var createRunRequestCalled = 0;
         TestRunCriteria? observedCriteria = null;
         var mockRunRequest = new Mock<ITestRunRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) =>
             {
                 createRunRequestCalled++;
@@ -2560,7 +2560,7 @@ public class TestRequestManagerTests
 
         DiscoveryCriteria? observedCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Callback(
             (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => observedCriteria = discoveryCriteria).Returns(mockDiscoveryRequest.Object);
 
         mockDiscoveryRequest.Setup(mr => mr.DiscoverAsync()).Throws(exception);

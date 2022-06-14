@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 #nullable disable
 
@@ -37,17 +38,17 @@ public class DiscoveryCompletePayload
     /// <summary>
     /// Gets or sets list of sources which were fully discovered.
     /// </summary>
-    public IList<string> FullyDiscoveredSources { get; set; } = new List<string>();
+    public IList<DiscoveredSource> FullyDiscoveredSources { get; set; } = new List<DiscoveredSource>();
 
     /// <summary>
     /// Gets or sets list of sources which were partially discovered (started discover tests, but then discovery aborted).
     /// </summary>
-    public IList<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
+    public IList<DiscoveredSource> PartiallyDiscoveredSources { get; set; } = new List<DiscoveredSource>();
 
     /// <summary>
     /// Gets or sets list of sources which were not discovered at all.
     /// </summary>
-    public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
+    public IList<DiscoveredSource> NotDiscoveredSources { get; set; } = new List<DiscoveredSource>();
 
     /// <summary>
     /// Gets or sets the collection of discovered extensions.

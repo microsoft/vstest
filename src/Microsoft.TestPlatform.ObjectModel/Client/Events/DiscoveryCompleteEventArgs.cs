@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 
 #nullable disable
@@ -50,23 +51,41 @@ public class DiscoveryCompleteEventArgs : EventArgs
     /// Gets the list of sources which were fully discovered.
     /// </summary>
     [DataMember]
-    public IList<string> FullyDiscoveredSources { get; set; } = new List<string>();
+    public IList<DiscoveredSource> FullyDiscoveredSources { get; set; } = new List<DiscoveredSource>();
 
     /// <summary>
     /// Gets the list of sources which were partially discovered (started discover tests, but then discovery aborted).
     /// </summary>
     [DataMember]
-    public IList<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
+    public IList<DiscoveredSource> PartiallyDiscoveredSources { get; set; } = new List<DiscoveredSource>();
+
+    /// <summary>
+    ///  Gets a list of sources that were skipped during discovery.
+    /// </summary>
+    [DataMember]
+    public IList<DiscoveredSource> SkippedDiscoveredSources { get; set; } = new List<DiscoveredSource>();
 
     /// <summary>
     /// Gets the list of sources which were not discovered at all.
     /// </summary>
     [DataMember]
-    public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
+    public IList<DiscoveredSource> NotDiscoveredSources { get; set; } = new List<DiscoveredSource>();
 
     /// <summary>
     /// Gets or sets the collection of discovered extensions.
     /// </summary>
     [DataMember]
     public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; set; } = new();
+}
+
+
+public class DiscoveredSource
+{
+    [DataMember]
+    public string Source { get; set; }
+
+    public static List<DiscoveredSource> ToDiscoveredSources(List<string> sources)
+    {
+        return sources.Select(source => new DiscoveredSource { Source = source }).ToList();
+    }
 }

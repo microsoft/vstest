@@ -434,7 +434,7 @@ public class VsTestConsoleRequestSenderTests
 
         var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
-        List<string> sources = new() { "1.dll" };
+        List<string> sources = new() {   "1.dll" };
 
         var testCase = new TestCase("hello", new Uri("world://how"), source: sources[0]);
         var testsFound = new Message()
@@ -443,7 +443,8 @@ public class VsTestConsoleRequestSenderTests
             Payload = JToken.FromObject(new List<TestCase>() { testCase })
         };
 
-        var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = null, IsAborted = false, FullyDiscoveredSources = sources };
+        var discoveredSources = sources.Select(source => new DiscoveredSource { Source = source }).ToList();
+        var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = null, IsAborted = false, FullyDiscoveredSources = discoveredSources };
         var discoveryComplete = new Message()
         {
             MessageType = MessageType.DiscoveryComplete,
@@ -483,7 +484,8 @@ public class VsTestConsoleRequestSenderTests
             Payload = JToken.FromObject(new List<TestCase>() { testCase })
         };
 
-        var payload = new DiscoveryCompletePayload() { TotalTests = -1, LastDiscoveredTests = null, IsAborted = true, FullyDiscoveredSources = sources };
+        var discoveredSources = sources.Select(source => new DiscoveredSource { Source = source }).ToList();
+        var payload = new DiscoveryCompletePayload() { TotalTests = -1, LastDiscoveredTests = null, IsAborted = true, FullyDiscoveredSources = discoveredSources };
         var discoveryComplete = new Message()
         {
             MessageType = MessageType.DiscoveryComplete,

@@ -163,9 +163,9 @@ internal class Program
                 ? "\t" + string.Join("\n\t", testCases.Select(r => r.Source + " " + r.DisplayName))
                 : "\t<empty>";
 
-        private static string WriteSources(IEnumerable<string> sources)
-            => sources?.Any() == true
-                ? "\t" + string.Join("\n\t", sources)
+        private static string WriteSources(IEnumerable<DiscoveredSource> sources)
+            => sources?.Select(s => s.Source).Any() == true
+                ? "\t" + string.Join("\n\t", sources.Select(s => s.Source))
                 : "\t<empty>";
     }
 
