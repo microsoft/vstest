@@ -180,6 +180,7 @@ public class DesignModeClient : IDesignModeClient
                     case MessageType.StartTestSession:
                         {
                             var testSessionPayload = _communicationManager.DeserializePayload<StartTestSessionPayload>(message);
+                            TPDebug.Assert(testSessionPayload is not null, "testSessionPayload is null");
                             StartTestSession(testSessionPayload, testRequestManager);
                             break;
                         }
@@ -187,6 +188,7 @@ public class DesignModeClient : IDesignModeClient
                     case MessageType.StopTestSession:
                         {
                             var testSessionPayload = _communicationManager.DeserializePayload<StopTestSessionPayload>(message);
+                            TPDebug.Assert(testSessionPayload is not null, "testSessionPayload is null");
                             StopTestSession(testSessionPayload, testRequestManager);
                             break;
                         }
@@ -194,6 +196,7 @@ public class DesignModeClient : IDesignModeClient
                     case MessageType.StartDiscovery:
                         {
                             var discoveryPayload = _dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message);
+                            TPDebug.Assert(discoveryPayload is not null, "discoveryPayload is null");
                             StartDiscovery(discoveryPayload, testRequestManager);
                             break;
                         }

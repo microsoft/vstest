@@ -364,7 +364,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         if (MessageType.DiscoveryComplete.Equals(message?.MessageType))
         {
-            var discoveryCompletePayload = _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+            var discoveryCompletePayload = _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message!);
             rawMessage = UpdateRawMessageWithTelemetryInfo(discoveryCompletePayload, message) ?? rawMessage;
             HandleLoggerManagerDiscoveryComplete(discoveryCompletePayload);
         }

@@ -535,7 +535,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         if (MessageType.ExecutionComplete.Equals(message?.MessageType))
         {
-            var testRunCompletePayload = _dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+            var testRunCompletePayload = _dataSerializer.DeserializePayload<TestRunCompletePayload>(message!);
             rawMessage = UpdateRawMessageWithTelemetryInfo(testRunCompletePayload, message) ?? rawMessage;
             HandleLoggerManagerTestRunComplete(testRunCompletePayload);
         }
