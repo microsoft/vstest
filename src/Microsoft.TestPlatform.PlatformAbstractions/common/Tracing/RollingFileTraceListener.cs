@@ -68,7 +68,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
     /// Writes the trace messages to the file.
     /// </summary>
     /// <param name="message">Trace message string</param>
-    public override void WriteLine(string message)
+    public override void WriteLine(string? message)
     {
         RollingHelper.RollIfNecessary();
         base.WriteLine(message);
@@ -175,10 +175,10 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// <param name="rollDateTime">The roll date.</param>
         public void PerformRoll(DateTime rollDateTime)
         {
-            string actualFileName = ((FileStream)((StreamWriter)_owner.Writer).BaseStream).Name;
+            string actualFileName = ((FileStream)((StreamWriter)_owner.Writer!).BaseStream).Name;
 
             // calculate archive name
-            string directory = Path.GetDirectoryName(actualFileName);
+            string directory = Path.GetDirectoryName(actualFileName)!;
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(actualFileName);
             string extension = Path.GetExtension(actualFileName);
 
@@ -403,10 +403,10 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// An I/O error occurs.
         /// </exception>
         /// <filterpriority>1</filterpriority>
-        public override void Write(char[] buffer)
+        public override void Write(char[]? buffer)
         {
             base.Write(buffer);
-            Tally += Encoding.GetByteCount(buffer);
+            Tally += (buffer is not null) ? Encoding.GetByteCount(buffer) : 0;
         }
 
         /// <summary>
@@ -462,10 +462,10 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// An I/O error occurs.
         /// </exception>
         /// <filterpriority>1</filterpriority>
-        public override void Write(string value)
+        public override void Write(string? value)
         {
             base.Write(value);
-            Tally += Encoding.GetByteCount(value);
+            Tally += (value is not null) ? Encoding.GetByteCount(value) : 0;
         }
     }
 }

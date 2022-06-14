@@ -4,8 +4,6 @@
 using System.IO;
 using System.Xml.Linq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider;
 
 /// <summary> Wrapper for an appx manifest file. </summary>
@@ -16,17 +14,17 @@ internal static class AppxManifestFile
     /// AppxManifest filePath
     /// </param>
     /// <returns>ExecutableName</returns>
-    public static string GetApplicationExecutableName(string filePath)
+    public static string? GetApplicationExecutableName(string filePath)
     {
         if (File.Exists(filePath))
         {
             var doc = XDocument.Load(filePath);
-            var ns = doc.Root.Name.Namespace;
+            var ns = doc.Root!.Name.Namespace;
 
-            return doc.Element(ns + "Package").
-                Element(ns + "Applications").
-                Element(ns + "Application").
-                Attribute("Executable").Value;
+            return doc.Element(ns + "Package")!.
+                Element(ns + "Applications")!.
+                Element(ns + "Application")!.
+                Attribute("Executable")!.Value;
         }
 
         return null;

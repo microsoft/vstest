@@ -17,17 +17,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class InProcessProxyDiscoveryManagerTests
 {
-    private Mock<ITestHostManagerFactory> _mockTestHostManagerFactory;
+    private readonly Mock<ITestHostManagerFactory> _mockTestHostManagerFactory;
     private InProcessProxyDiscoveryManager _inProcessProxyDiscoveryManager;
-    private Mock<IDiscoveryManager> _mockDiscoveryManager;
-    private Mock<ITestRuntimeProvider> _mockTestHostManager;
+    private readonly Mock<IDiscoveryManager> _mockDiscoveryManager;
+    private readonly Mock<ITestRuntimeProvider> _mockTestHostManager;
 
     public InProcessProxyDiscoveryManagerTests()
     {
@@ -36,15 +34,6 @@ public class InProcessProxyDiscoveryManagerTests
         _mockTestHostManager = new Mock<ITestRuntimeProvider>();
         _mockTestHostManagerFactory.Setup(o => o.GetDiscoveryManager()).Returns(_mockDiscoveryManager.Object);
         _inProcessProxyDiscoveryManager = new InProcessProxyDiscoveryManager(_mockTestHostManager.Object, _mockTestHostManagerFactory.Object);
-    }
-
-    [TestCleanup]
-    public void TestCleanup()
-    {
-        _mockDiscoveryManager = null;
-        _mockTestHostManagerFactory = null;
-        _inProcessProxyDiscoveryManager = null;
-        _mockTestHostManager = null;
     }
 
     [TestMethod]

@@ -40,6 +40,9 @@ public class PlatformEnvironment : IEnvironment
     }
 
     /// <inheritdoc />
+    public int ProcessorCount => throw new NotImplementedException();
+
+    /// <inheritdoc />
     public void Exit(int exitcode)
     {
         throw new NotImplementedException();
