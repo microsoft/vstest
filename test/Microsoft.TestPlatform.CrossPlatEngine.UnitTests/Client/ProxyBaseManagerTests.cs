@@ -48,7 +48,7 @@ public class ProxyBaseManagerTests
         _discoveryDataAggregator = new();
 
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new Mock<IMetricsCollection>().Object);
-        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(null)).Returns(new Message());
+        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(null!)).Returns(new Message());
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(string.Empty)).Returns(new Message());
         _mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
         _mockTestHostManager.Setup(
@@ -90,7 +90,7 @@ public class ProxyBaseManagerTests
         _mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>())).Returns(messageType);
         _mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>(), It.IsAny<int>())).Returns(messageType);
         _mockDataSerializer.Setup(ds => ds.DeserializeMessage(It.Is<string>(s => s.Equals(messageType)))).Returns(new Message { MessageType = returnMessageType });
-        _mockDataSerializer.Setup(ds => ds.DeserializePayload<TPayload>(It.Is<Message>(m => m.MessageType.Equals(messageType)))).Returns(returnPayload);
+        _mockDataSerializer.Setup(ds => ds.DeserializePayload<TPayload>(It.Is<Message>(m => string.Equals(m.MessageType, messageType)))).Returns(returnPayload);
     }
 
     public void RaiseMessageReceived(string data)

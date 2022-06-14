@@ -93,7 +93,7 @@ public class DataCollectionTestCaseEventHandlerTests
     [TestMethod]
     public void CloseShouldNotThrowExceptionIfCommunicationManagerIsNull()
     {
-        var requestHandler = new DataCollectionTestCaseEventHandler(_messageSink.Object, null, new Mock<IDataCollectionManager>().Object, _dataSerializer.Object);
+        var requestHandler = new DataCollectionTestCaseEventHandler(_messageSink.Object, null!, new Mock<IDataCollectionManager>().Object, _dataSerializer.Object);
 
         requestHandler.Close();
 

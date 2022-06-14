@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 
 /// <summary>
@@ -41,7 +39,7 @@ public class TestCaseConverter : JsonConverter
 
                 // Let the null values be passed in as null data
                 var token = property["Value"];
-                string propertyData = null;
+                string? propertyData = null;
                 if (token.Type != JTokenType.Null)
                 {
                     // If the property is already a string. No need to convert again.
@@ -89,7 +87,7 @@ public class TestCaseConverter : JsonConverter
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         // P2 to P1
-        var testCase = value as TestCase;
+        var testCase = (TestCase)value;
 
         writer.WriteStartObject();
         writer.WritePropertyName("Properties");

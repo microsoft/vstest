@@ -133,7 +133,7 @@ internal class TestRequestManager : ITestRequestManager
 
     /// <inheritdoc />
     public void InitializeExtensions(
-        IEnumerable<string> pathToAdditionalExtensions,
+        IEnumerable<string>? pathToAdditionalExtensions,
         bool skipExtensionFilters)
     {
         // It is possible for an Editor/IDE to keep running the runner in design mode for long

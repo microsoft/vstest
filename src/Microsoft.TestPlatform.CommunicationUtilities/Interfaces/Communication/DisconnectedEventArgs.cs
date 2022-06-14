@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 /// <summary>
@@ -15,5 +13,5 @@ public class DisconnectedEventArgs : EventArgs
     /// <summary>
     /// Gets or sets if there's an error on disconnection.
     /// </summary>
-    public Exception Error { get; set; }
+    public Exception? Error { get; set; }
 }

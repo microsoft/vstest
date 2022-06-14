@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 using Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
+using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -158,7 +159,7 @@ public class DesignModeClient : IDesignModeClient
 
                 EqtTrace.Info("DesignModeClient.ProcessRequests: Processing Message: {0}", message);
 
-                switch (message.MessageType)
+                switch (message?.MessageType)
                 {
                     case MessageType.VersionCheck:
                         {
@@ -179,6 +180,7 @@ public class DesignModeClient : IDesignModeClient
                     case MessageType.StartTestSession:
                         {
                             var testSessionPayload = _communicationManager.DeserializePayload<StartTestSessionPayload>(message);
+                            TPDebug.Assert(testSessionPayload is not null, "testSessionPayload is null");
                             StartTestSession(testSessionPayload, testRequestManager);
                             break;
                         }
@@ -186,6 +188,7 @@ public class DesignModeClient : IDesignModeClient
                     case MessageType.StopTestSession:
                         {
                             var testSessionPayload = _communicationManager.DeserializePayload<StopTestSessionPayload>(message);
+                            TPDebug.Assert(testSessionPayload is not null, "testSessionPayload is null");
                             StopTestSession(testSessionPayload, testRequestManager);
                             break;
                         }
@@ -193,6 +196,7 @@ public class DesignModeClient : IDesignModeClient
                     case MessageType.StartDiscovery:
                         {
                             var discoveryPayload = _dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message);
+                            TPDebug.Assert(discoveryPayload is not null, "discoveryPayload is null");
                             StartDiscovery(discoveryPayload, testRequestManager);
                             break;
                         }
@@ -203,6 +207,7 @@ public class DesignModeClient : IDesignModeClient
                             var testRunPayload =
                                 _communicationManager.DeserializePayload<TestRunRequestPayload>(
                                     message);
+                            TPDebug.Assert(testRunPayload is not null, "testRunPayload is null");
                             StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: true);
                             break;
                         }
@@ -213,6 +218,7 @@ public class DesignModeClient : IDesignModeClient
                             var testRunPayload =
                                 _communicationManager.DeserializePayload<TestRunRequestPayload>(
                                     message);
+                            TPDebug.Assert(testRunPayload is not null, "testRunPayload is null");
                             StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: false);
                             break;
                         }
@@ -221,6 +227,7 @@ public class DesignModeClient : IDesignModeClient
                         {
                             var testRunAttachmentsProcessingPayload =
                                 _communicationManager.DeserializePayload<TestRunAttachmentsProcessingPayload>(message);
+                            TPDebug.Assert(testRunAttachmentsProcessingPayload is not null, "testRunAttachmentsProcessingPayload is null");
                             StartTestRunAttachmentsProcessing(testRunAttachmentsProcessingPayload, testRequestManager);
                             break;
                         }
@@ -323,7 +330,9 @@ public class DesignModeClient : IDesignModeClient
 
             onCustomTestHostLaunchAckReceived = null;
 
+            TPDebug.Assert(ackMessage is not null, "ackMessage is null");
             var ackPayload = _dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
+            TPDebug.Assert(ackPayload is not null, "ackPayload is null");
 
             return ackPayload.HostProcessId > 0 ? ackPayload.HostProcessId : throw new TestPlatformException(ackPayload.ErrorMessage);
         }
@@ -344,7 +353,7 @@ public class DesignModeClient : IDesignModeClient
         {
             var waitHandle = new AutoResetEvent(false);
             Message? ackMessage = null;
-            onAttachDebuggerAckRecieved = (ackRawMessage) =>
+            onAttachDebuggerAckRecieved = ackRawMessage =>
             {
                 ackMessage = ackRawMessage;
                 waitHandle.Set();
@@ -355,9 +364,7 @@ public class DesignModeClient : IDesignModeClient
             // a type of T as well to prevent some more mistakes.
             if (_protocolConfig.Version < 7)
             {
-#pragma warning disable CS0618 // Type or member is obsolete
                 _communicationManager.SendMessage(MessageType.EditorAttachDebugger, attachDebuggerInfo.ProcessId, _protocolConfig.Version);
-#pragma warning restore CS0618 // Type or member is obsolete
             }
             else
             {
@@ -374,7 +381,9 @@ public class DesignModeClient : IDesignModeClient
             cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
             onAttachDebuggerAckRecieved = null;
 
+            TPDebug.Assert(ackMessage is not null, "ackMessage is null");
             var ackPayload = _dataSerializer.DeserializePayload<EditorAttachDebuggerAckPayload>(ackMessage);
+            TPDebug.Assert(ackPayload is not null, "ackPayload is null");
             if (!ackPayload.Attached)
             {
                 EqtTrace.Warning($"DesignModeClient.AttachDebuggerToProcess: Attaching to process failed: {ackPayload.ErrorMessage}");

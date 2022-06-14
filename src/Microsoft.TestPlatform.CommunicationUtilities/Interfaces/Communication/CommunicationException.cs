@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 /// <summary>
@@ -24,7 +22,7 @@ public class CommunicationException : Exception
     /// message.
     /// </summary>
     /// <param name="message">Message describing the error.</param>
-    public CommunicationException(string message)
+    public CommunicationException(string? message)
         : base(message)
     {
     }
@@ -35,7 +33,7 @@ public class CommunicationException : Exception
     /// </summary>
     /// <param name="message">Message describing the error.</param>
     /// <param name="inner">Inner exception.</param>
-    public CommunicationException(string message, Exception inner)
+    public CommunicationException(string? message, Exception? inner)
         : base(message, inner)
     {
     }

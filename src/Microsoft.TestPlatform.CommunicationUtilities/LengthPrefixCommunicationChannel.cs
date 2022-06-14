@@ -7,14 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
@@ -42,7 +37,7 @@ public class LengthPrefixCommunicationChannel : ICommunicationChannel
     }
 
     /// <inheritdoc />
-    public event EventHandler<MessageReceivedEventArgs> MessageReceived;
+    public event EventHandler<MessageReceivedEventArgs>? MessageReceived;
 
     /// <inheritdoc />
     public Task Send(string data)

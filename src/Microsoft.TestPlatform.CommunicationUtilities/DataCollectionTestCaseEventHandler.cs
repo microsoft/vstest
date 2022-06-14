@@ -13,8 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 
 /// <summary>
@@ -76,7 +74,7 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
         do
         {
             var message = _communicationManager.ReceiveMessage();
-            switch (message.MessageType)
+            switch (message?.MessageType)
             {
                 case MessageType.DataCollectionTestStart:
                     EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case starting.");
@@ -139,7 +137,7 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
                     break;
 
                 default:
-                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Invalid Message type '{0}'", message.MessageType);
+                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Invalid Message type '{0}'", message?.MessageType);
 
                     break;
             }

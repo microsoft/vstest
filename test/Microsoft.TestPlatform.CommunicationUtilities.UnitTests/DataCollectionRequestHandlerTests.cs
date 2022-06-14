@@ -76,13 +76,13 @@ public class DataCollectionRequestHandlerTests
     [TestMethod]
     public void CreateInstanceShouldThrowExceptionIfInstanceCommunicationManagerIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(null, _mockMessageSink.Object));
+        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(null!, _mockMessageSink.Object));
     }
 
     [TestMethod]
     public void CreateInstanceShouldThrowExceptinIfInstanceMessageSinkIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(_mockCommunicationManager.Object, null));
+        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(_mockCommunicationManager.Object, null!));
     }
 
     [TestMethod]

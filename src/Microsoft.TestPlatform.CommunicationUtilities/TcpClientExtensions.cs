@@ -9,10 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
@@ -24,10 +21,10 @@ internal static class TcpClientExtensions
     internal static Task MessageLoopAsync(
         this TcpClient client,
         ICommunicationChannel channel,
-        Action<Exception> errorHandler,
+        Action<Exception?> errorHandler,
         CancellationToken cancellationToken)
     {
-        Exception error = null;
+        Exception? error = null;
 
         var remoteEndPoint = string.Empty;
         var localEndPoint = string.Empty;

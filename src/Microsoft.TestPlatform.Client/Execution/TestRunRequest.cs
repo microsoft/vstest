@@ -537,7 +537,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         if (string.Equals(message?.MessageType, MessageType.ExecutionComplete))
         {
-            var testRunCompletePayload = _dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+            var testRunCompletePayload = _dataSerializer.DeserializePayload<TestRunCompletePayload>(message!);
             rawMessage = UpdateRawMessageWithTelemetryInfo(testRunCompletePayload, message) ?? rawMessage;
             HandleLoggerManagerTestRunComplete(testRunCompletePayload);
         }
@@ -549,7 +549,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// Handles LoggerManager's TestRunComplete.
     /// </summary>
     /// <param name="testRunCompletePayload">TestRun complete payload.</param>
-    private void HandleLoggerManagerTestRunComplete(TestRunCompletePayload testRunCompletePayload)
+    private void HandleLoggerManagerTestRunComplete(TestRunCompletePayload? testRunCompletePayload)
     {
         if (!LoggerManager.LoggersInitialized || testRunCompletePayload == null)
         {
@@ -567,7 +567,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         // Send test run complete to logger manager.
         TestRunCompleteEventArgs testRunCompleteArgs =
             new(
-                testRunCompletePayload.TestRunCompleteArgs.TestRunStatistics,
+                testRunCompletePayload.TestRunCompleteArgs!.TestRunStatistics,
                 testRunCompletePayload.TestRunCompleteArgs.IsCanceled,
                 testRunCompletePayload.TestRunCompleteArgs.IsAborted,
                 testRunCompletePayload.TestRunCompleteArgs.Error,

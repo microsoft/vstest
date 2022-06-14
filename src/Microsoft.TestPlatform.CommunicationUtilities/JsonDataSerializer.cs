@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -11,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
@@ -20,20 +19,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 /// </summary>
 public class JsonDataSerializer : IDataSerializer
 {
-    private static JsonDataSerializer s_instance;
+    private static JsonDataSerializer? s_instance;
 
     private static readonly bool DisableFastJson = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION);
 
-    private static JsonSerializer s_payloadSerializer; // payload serializer for version <= 1
-    private static JsonSerializer s_payloadSerializer2; // payload serializer for version >= 2
-    private static JsonSerializerSettings s_fastJsonSettings; // serializer settings for faster json
-    private static JsonSerializerSettings s_jsonSettings; // serializer settings for serializer v1, which should use to deserialize message headers
-    private static JsonSerializer s_serializer; // generic serializer
+    private static readonly JsonSerializer s_payloadSerializer; // payload serializer for version <= 1
+    private static readonly JsonSerializer s_payloadSerializer2; // payload serializer for version >= 2
+    private static readonly JsonSerializerSettings s_fastJsonSettings; // serializer settings for faster json
+    private static readonly JsonSerializerSettings s_jsonSettings; // serializer settings for serializer v1, which should use to deserialize message headers
+    private static readonly JsonSerializer s_serializer; // generic serializer
 
-    /// <summary>
-    /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
-    /// </summary>
-    private JsonDataSerializer()
+    static JsonDataSerializer()
     {
         var jsonSettings = new JsonSerializerSettings
         {
@@ -79,6 +75,11 @@ public class JsonDataSerializer : IDataSerializer
     }
 
     /// <summary>
+    /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
+    /// </summary>
+    private JsonDataSerializer() { }
+
+    /// <summary>
     /// Gets the JSON Serializer instance.
     /// </summary>
     public static JsonDataSerializer Instance => s_instance ??= new JsonDataSerializer();
@@ -100,7 +101,7 @@ public class JsonDataSerializer : IDataSerializer
 
         // PERF: Try grabbing the version and message type from the string directly, we are pretty certain how the message is serialized
         // when the format does not match all we do is that we check if 6th character in the message is 'V'
-        if (!FastHeaderParse(rawMessage, out int version, out string messageType))
+        if (!FastHeaderParse(rawMessage, out int version, out string? messageType))
         {
             // PERF: If the fast path fails, deserialize into header object that does not have any Payload. When the message type info
             // is at the start of the message, this is also pretty fast. Again, this won't touch the payload.
@@ -125,7 +126,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="message">A <see cref="Message"/> object.</param>
     /// <typeparam name="T">Payload type.</typeparam>
     /// <returns>The deserialized payload.</returns>
-    public T DeserializePayload<T>(Message message)
+    public T? DeserializePayload<T>(Message message)
     {
         if (message.GetType() == typeof(Message))
         {
@@ -135,7 +136,7 @@ public class JsonDataSerializer : IDataSerializer
             // Unit tests also provide a Message in places where using the deserializer would actually
             // produce a VersionedMessage or VersionedMessageWithRawMessage.
             var serializerV1 = GetPayloadSerializer(null);
-            return Deserialize<T>(serializerV1, message.Payload);
+            return Deserialize<T>(serializerV1, message.Payload!);
         }
 
         var versionedMessage = (VersionedMessage)message;
@@ -145,7 +146,7 @@ public class JsonDataSerializer : IDataSerializer
         {
             // When fast json is disabled, then the message is a VersionedMessage
             // with JToken payload.
-            return Deserialize<T>(payloadSerializer, message.Payload);
+            return Deserialize<T>(payloadSerializer, message.Payload!);
         }
 
         // When fast json is enabled then the message is also a subtype of VersionedMessage, but
@@ -166,11 +167,11 @@ public class JsonDataSerializer : IDataSerializer
             // PERF: When payloadSerializer1 was resolved we need to deserialize JToken, and then deserialize that.
             // This is still better than deserializing the JToken in DeserializeMessage because here we know that the payload
             // will actually be used.
-            return Deserialize<T>(payloadSerializer, Deserialize<Message>(rawMessage).Payload);
+            return Deserialize<T>(payloadSerializer, Deserialize<Message>(rawMessage!).Payload!);
         }
     }
 
-    private bool FastHeaderParse(string rawMessage, out int version, out string messageType)
+    private static bool FastHeaderParse(string rawMessage, out int version, out string? messageType)
     {
         // PERF: This can be also done slightly better using ReadOnlySpan<char> but we don't have that available by default in .NET Framework
         // and the speed improvement does not warrant additional dependency. This is already taking just few ms for 10k messages.
@@ -205,7 +206,7 @@ public class JsonDataSerializer : IDataSerializer
 
                 var firstVersionNumberIndex = 11;
                 // The message is versioned, get the version and update the position of first quote that contains message type.
-                if (!TryGetSubstringUntilDelimiter(rawMessage, firstVersionNumberIndex, ',', maxSearchLength: 4, out string versionString, out int versionCommaIndex))
+                if (!TryGetSubstringUntilDelimiter(rawMessage, firstVersionNumberIndex, ',', maxSearchLength: 4, out string? versionString, out int versionCommaIndex))
                 {
                     return false;
                 }
@@ -231,7 +232,7 @@ public class JsonDataSerializer : IDataSerializer
 
             int messageTypeStartIndex = messageTypeStartQuoteIndex + 1;
             // "TestExecution.LaunchAdapterProcessWithDebuggerAttachedCallback" is the longest message type we currently have with 62 chars
-            if (!TryGetSubstringUntilDelimiter(rawMessage, messageTypeStartIndex, '"', maxSearchLength: 100, out string messageTypeString, out _))
+            if (!TryGetSubstringUntilDelimiter(rawMessage, messageTypeStartIndex, '"', maxSearchLength: 100, out string? messageTypeString, out _))
             {
                 return false;
             }
@@ -249,7 +250,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <summary>
     ///  Try getting substring until a given delimiter, but don't search more characters than maxSearchLength.
     /// </summary>
-    private bool TryGetSubstringUntilDelimiter(string rawMessage, int start, char character, int maxSearchLength, out string substring, out int delimiterIndex)
+    private static bool TryGetSubstringUntilDelimiter(string rawMessage, int start, char character, int maxSearchLength, out string? substring, out int delimiterIndex)
     {
         var length = rawMessage.Length;
         var searchEnd = start + maxSearchLength;
@@ -286,7 +287,7 @@ public class JsonDataSerializer : IDataSerializer
     /// </summary>
     /// <param name="messageType">Type of the message.</param>
     /// <returns>Serialized message.</returns>
-    public string SerializeMessage(string messageType)
+    public string SerializeMessage(string? messageType)
     {
         return Serialize(s_serializer, new Message { MessageType = messageType });
     }
@@ -297,7 +298,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="messageType">Type of the message.</param>
     /// <param name="payload">Payload for the message.</param>
     /// <returns>Serialized message.</returns>
-    public string SerializePayload(string messageType, object payload)
+    public string SerializePayload(string? messageType, object? payload)
     {
         return SerializePayload(messageType, payload, 1);
     }
@@ -309,7 +310,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="payload">Payload for the message.</param>
     /// <param name="version">Version for the message.</param>
     /// <returns>Serialized message.</returns>
-    public string SerializePayload(string messageType, object payload, int version)
+    public string SerializePayload(string? messageType, object? payload, int version)
     {
         var payloadSerializer = GetPayloadSerializer(version);
         // Fast json is only equivalent to the serialization that is used for protocol version 2 and upwards (or more precisely for the paths that use s_payloadSerializer2)
@@ -342,7 +343,8 @@ public class JsonDataSerializer : IDataSerializer
     }
 
     /// <inheritdoc/>
-    public T Clone<T>(T obj)
+    [return: NotNullIfNotNull(nameof(obj))]
+    public T? Clone<T>(T? obj)
     {
         if (obj == null)
         {
@@ -350,7 +352,7 @@ public class JsonDataSerializer : IDataSerializer
         }
 
         var stringObj = Serialize(obj, 2);
-        return Deserialize<T>(stringObj, 2);
+        return Deserialize<T>(stringObj, 2)!;
     }
 
     /// <summary>
@@ -360,7 +362,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="serializer">Serializer.</param>
     /// <param name="data">Data to be serialized.</param>
     /// <returns>Serialized data.</returns>
-    private string Serialize<T>(JsonSerializer serializer, T data)
+    private static string Serialize<T>(JsonSerializer serializer, T data)
     {
         using var stringWriter = new StringWriter();
         using var jsonWriter = new JsonTextWriter(stringWriter);
@@ -375,7 +377,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="serializer">Serializer.</param>
     /// <param name="data">Data to be deserialized.</param>
     /// <returns>Deserialized data.</returns>
-    private T Deserialize<T>(JsonSerializer serializer, string data)
+    private static T Deserialize<T>(JsonSerializer serializer, string data)
     {
         using var stringReader = new StringReader(data);
         using var jsonReader = new JsonTextReader(stringReader);
@@ -389,12 +391,12 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="serializer">Serializer.</param>
     /// <param name="jToken">JToken to be deserialized.</param>
     /// <returns>Deserialized data.</returns>
-    private T Deserialize<T>(JsonSerializer serializer, JToken jToken)
+    private static T Deserialize<T>(JsonSerializer serializer, JToken jToken)
     {
         return jToken.ToObject<T>(serializer);
     }
 
-    private JsonSerializer GetPayloadSerializer(int? version)
+    private static JsonSerializer GetPayloadSerializer(int? version)
     {
         if (version == null)
         {
@@ -422,7 +424,7 @@ public class JsonDataSerializer : IDataSerializer
     private class MessageHeader
     {
         public int Version { get; set; }
-        public string MessageType { get; set; }
+        public string? MessageType { get; set; }
     }
 
     /// <summary>
@@ -434,7 +436,7 @@ public class JsonDataSerializer : IDataSerializer
     /// </summary>
     private class VersionedMessageWithRawMessage : VersionedMessage
     {
-        public string RawMessage { get; set; }
+        public string? RawMessage { get; set; }
 
         public override string ToString()
         {
@@ -448,7 +450,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <typeparam name="T"></typeparam>
     private class PayloadedMessage<T>
     {
-        public T Payload { get; set; }
+        public T? Payload { get; set; }
     }
 
     /// <summary>
@@ -464,11 +466,11 @@ public class JsonDataSerializer : IDataSerializer
         /// <summary>
         /// Gets or sets the message type.
         /// </summary>
-        public string MessageType { get; set; }
+        public string? MessageType { get; set; }
 
         /// <summary>
         /// Gets or sets the payload.
         /// </summary>
-        public object Payload { get; set; }
+        public object? Payload { get; set; }
     }
 }

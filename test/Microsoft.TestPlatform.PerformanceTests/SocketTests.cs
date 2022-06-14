@@ -39,10 +39,10 @@ public class SocketTests
         server.Connected += (sender, args) =>
         {
             serverChannel = args.Channel;
-            serverChannel.MessageReceived += (channel, messageReceived) =>
+            serverChannel!.MessageReceived += (channel, messageReceived) =>
             {
                 // Keep count of bytes
-                dataReceived += messageReceived.Data.Length;
+                dataReceived += messageReceived.Data!.Length;
 
                 if (dataReceived >= 65536 * 20000)
                 {
@@ -96,7 +96,7 @@ public class SocketTests
         var dataReceived = 0;
         while (dataReceived < 65536 * 20000)
         {
-            dataReceived += server.ReceiveRawMessage().Length;
+            dataReceived += server.ReceiveRawMessage()!.Length;
         }
 
         watch.Stop();

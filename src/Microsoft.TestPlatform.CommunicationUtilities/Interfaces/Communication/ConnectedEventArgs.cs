@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 /// <summary>
@@ -39,7 +37,7 @@ public class ConnectedEventArgs : EventArgs
     /// <summary>
     /// Gets the communication channel based on this connection.
     /// </summary>
-    public ICommunicationChannel Channel { get; private set; }
+    public ICommunicationChannel? Channel { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether channel is connected or not, true if it's connected.
@@ -49,5 +47,5 @@ public class ConnectedEventArgs : EventArgs
     /// <summary>
     /// Gets the exception if it's not connected.
     /// </summary>
-    public Exception Fault { get; private set; }
+    public Exception? Fault { get; private set; }
 }

@@ -5,24 +5,20 @@ using System;
 using System.Net;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <inheritdoc/>
 public sealed class SocketTransport : ITransport
 {
+    private readonly TestHostConnectionInfo _connectionInfo;
+    private readonly ICommunicationManager _communicationManager;
+
     /// <summary>
     /// Specifies whether the resolver is disposed or not
     /// </summary>
     private bool _disposed;
-
-    private readonly TestHostConnectionInfo _connectionInfo;
-
-    private readonly ICommunicationManager _communicationManager;
 
     public SocketTransport(ICommunicationManager communicationManager, TestHostConnectionInfo connectionInfo)
     {
@@ -34,6 +30,7 @@ public sealed class SocketTransport : ITransport
     public IPEndPoint Initialize()
     {
         var endpoint = GetIpEndPoint(_connectionInfo.Endpoint);
+        TPDebug.Assert(endpoint is not null, "endpoint is null");
         switch (_connectionInfo.Role)
         {
             case ConnectionRole.Host:
@@ -47,7 +44,7 @@ public sealed class SocketTransport : ITransport
 
             case ConnectionRole.Client:
                 {
-                    _communicationManager.SetupClientAsync(GetIpEndPoint(_connectionInfo.Endpoint));
+                    _communicationManager.SetupClientAsync(endpoint);
                     return endpoint;
                 }
 
@@ -92,7 +89,7 @@ public sealed class SocketTransport : ITransport
     /// </summary>
     /// <param name="endpointAddress">Input endpoint address</param>
     /// <returns>IPEndpoint from give string</returns>
-    private IPEndPoint GetIpEndPoint(string endpointAddress)
+    private static IPEndPoint? GetIpEndPoint(string endpointAddress)
     {
         return Uri.TryCreate(string.Concat("tcp://", endpointAddress), UriKind.Absolute, out Uri uri)
             ? new IPEndPoint(IPAddress.Parse(uri.Host), uri.Port < 0 ? 0 : uri.Port)
