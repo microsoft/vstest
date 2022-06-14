@@ -83,7 +83,15 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
 
         var workloads = SplitToWorkloads(discoveryCriteria, _sourceToTestHostProviderMap);
         _availableTestSources = workloads.SelectMany(w => w.Work.Sources).Count();
-        _availableWorkloads = workloads.Count();
+        var runnableWorkloads = workloads.Where(workload => workload.HasProvider).ToList();
+        var nonRunnableWorkloads = workloads.Where(workload => !workload.HasProvider).ToList();
+        if (nonRunnableWorkloads.Count > 0)
+        {
+            // We found some sources that don't associate to any runtime provider and so they cannot run.
+            // Mark the run as aborted.
+            _dataAggregator.MarkAsAborted();
+        }
+        _availableWorkloads = runnableWorkloads.Count();
 
         EqtTrace.Verbose("ParallelProxyDiscoveryManager.DiscoverTests: Start discovery. Total sources: " + _availableTestSources);
 
@@ -95,7 +103,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         // marked as NotDiscovered.
         _dataAggregator.MarkSourcesWithStatus(discoveryCriteria.Sources, DiscoveryStatus.NotDiscovered);
 
-        _parallelOperationManager.StartWork(workloads, eventHandler, GetParallelEventHandler, DiscoverTestsOnConcurrentManager);
+        _parallelOperationManager.StartWork(runnableWorkloads, eventHandler, GetParallelEventHandler, DiscoverTestsOnConcurrentManager);
     }
 
     private ITestDiscoveryEventsHandler2 GetParallelEventHandler(ITestDiscoveryEventsHandler2 eventHandler, IProxyDiscoveryManager concurrentManager)

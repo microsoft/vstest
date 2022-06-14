@@ -46,7 +46,8 @@ public interface ITestPlatform : IDisposable
         IRequestData requestData,
         DiscoveryCriteria discoveryCriteria,
         TestPlatformOptions options,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger);
 
     /// <summary>
     /// Creates a test run request.
@@ -61,7 +62,8 @@ public interface ITestPlatform : IDisposable
         IRequestData requestData,
         TestRunCriteria testRunCriteria,
         TestPlatformOptions options,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger);
 
     /// <summary>
     /// Starts a test session.
@@ -78,5 +80,18 @@ public interface ITestPlatform : IDisposable
         IRequestData requestData,
         StartTestSessionCriteria criteria,
         ITestSessionEventsHandler eventsHandler,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger);
+}
+
+/// <summary>
+/// DO NOT use this to extend TestPlatform, it is public only because some other internal interfaces and classes are public, and will be made internal later.
+/// </summary>
+public interface IWarningLogger
+{
+    /// <summary>
+    /// Log warning message that will be shown to user.
+    /// </summary>
+    /// <param name="message">message string</param>
+    void LogWarning(string message);
 }

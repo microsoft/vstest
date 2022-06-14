@@ -94,7 +94,10 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
     public int StartTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler)
     {
         var workloads = SplitToWorkloads(testRunCriteria, _sourceToTestHostProviderMap);
-        _availableWorkloads = workloads.Count;
+        var runnableWorkloads = workloads.Where(workload => workload.HasProvider).ToList();
+        var nonRunnableWorkloads = workloads.Where(workload => !workload.HasProvider).ToList();
+
+        _availableWorkloads = runnableWorkloads.Count;
 
         EqtTrace.Verbose("ParallelProxyExecutionManager: Start execution. Total sources: " + _availableWorkloads);
 
@@ -103,8 +106,12 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
 
         // One data aggregator per parallel run
         _currentRunDataAggregator = new ParallelRunDataAggregator(testRunCriteria.TestRunSettings);
+        if (nonRunnableWorkloads.Count > 0)
+        {
+            _currentRunDataAggregator.MarkAsAborted();
+        }
 
-        _parallelOperationManager.StartWork(workloads, eventHandler, GetParallelEventHandler, StartTestRunOnConcurrentManager);
+        _parallelOperationManager.StartWork(runnableWorkloads, eventHandler, GetParallelEventHandler, StartTestRunOnConcurrentManager);
 
         // Why 1? Because this is supposed to be a processId, and that is just the default that was chosen by someone before me,
         // and maybe is checked somewhere, but I don't see it checked in our codebase.
@@ -408,6 +415,8 @@ internal class ProviderSpecificWorkload<T>
     public T Work { get; }
 
     public TestRuntimeProviderInfo Provider { get; protected set; }
+
+    public bool HasProvider => Provider.Type is not null;
 
     public ProviderSpecificWorkload(T work, TestRuntimeProviderInfo provider)
     {
