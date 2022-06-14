@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace TestPlatform.Playground;
 
 internal class Program
@@ -205,10 +203,10 @@ internal class Program
             throw new NotImplementedException();
         }
 
-        private static string WriteTests(IEnumerable<TestResult> testResults)
+        private static string WriteTests(IEnumerable<TestResult>? testResults)
             => WriteTests(testResults?.Select(t => t.TestCase));
 
-        private static string WriteTests(IEnumerable<TestCase> testCases)
+        private static string WriteTests(IEnumerable<TestCase>? testCases)
             => testCases?.Any() == true
                 ? "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName))
                 : "\t<empty>";
@@ -242,7 +240,7 @@ internal class Program
 
 internal class TestSessionHandler : ITestSessionEventsHandler
 {
-    public TestSessionInfo TestSessionInfo { get; private set; }
+    public TestSessionInfo? TestSessionInfo { get; private set; }
 
     public void HandleLogMessage(TestMessageLevel level, string message)
     {

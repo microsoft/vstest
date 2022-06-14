@@ -21,35 +21,23 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ProxyExecutionManagerWithDataCollectionTests
 {
-    private ProxyExecutionManager _testExecutionManager;
+    private readonly ProxyExecutionManager _testExecutionManager;
+    private readonly Mock<ITestRuntimeProvider> _mockTestHostManager;
+    private readonly Mock<ITestRequestSender> _mockRequestSender;
+    private readonly Mock<IProxyDataCollectionManager> _mockDataCollectionManager;
+    private readonly Mock<IProcessHelper> _mockProcessHelper;
+    private readonly ProxyExecutionManagerWithDataCollection _proxyExecutionManager;
+    private readonly Mock<IDataSerializer> _mockDataSerializer;
+    private readonly Mock<IRequestData> _mockRequestData;
+    private readonly Mock<IMetricsCollection> _mockMetricsCollection;
+    private readonly Mock<IFileHelper> _mockFileHelper;
 
-    private Mock<ITestRuntimeProvider> _mockTestHostManager;
-
-    private Mock<ITestRequestSender> _mockRequestSender;
-
-    private Mock<IProxyDataCollectionManager> _mockDataCollectionManager;
-
-    private Mock<IProcessHelper> _mockProcessHelper;
-
-    private ProxyExecutionManagerWithDataCollection _proxyExecutionManager;
-
-    private Mock<IDataSerializer> _mockDataSerializer;
-
-    private Mock<IRequestData> _mockRequestData;
-
-    private Mock<IMetricsCollection> _mockMetricsCollection;
-
-    private Mock<IFileHelper> _mockFileHelper;
-
-    [TestInitialize]
-    public void TestInit()
+    public ProxyExecutionManagerWithDataCollectionTests()
     {
         _mockTestHostManager = new Mock<ITestRuntimeProvider>();
         _mockRequestSender = new Mock<ITestRequestSender>();
@@ -168,7 +156,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
     {
         // Setup
         var mockRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
-        TestProcessStartInfo launchedStartInfo = null;
+        TestProcessStartInfo? launchedStartInfo = null;
         mockRunEventsHandler.Setup(runHandler => runHandler.LaunchProcessWithDebuggerAttached(It.IsAny<TestProcessStartInfo>())).Callback
             ((TestProcessStartInfo startInfo) => launchedStartInfo = startInfo);
         var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, Framework.DefaultFramework, _mockDataCollectionManager.Object);
