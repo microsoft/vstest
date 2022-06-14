@@ -108,7 +108,8 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         _currentRunDataAggregator = new ParallelRunDataAggregator(testRunCriteria.TestRunSettings);
         if (nonRunnableWorkloads.Count > 0)
         {
-            _currentRunDataAggregator.MarkAsAborted();
+            // TODO: in strict mode fail if we find a source that we cannot run.
+            // _currentRunDataAggregator.MarkAsAborted();
         }
 
         _parallelOperationManager.StartWork(runnableWorkloads, eventHandler, GetParallelEventHandler, StartTestRunOnConcurrentManager);

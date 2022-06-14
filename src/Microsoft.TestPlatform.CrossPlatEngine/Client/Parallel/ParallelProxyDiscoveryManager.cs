@@ -84,14 +84,8 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         var workloads = SplitToWorkloads(discoveryCriteria, _sourceToTestHostProviderMap);
         _availableTestSources = workloads.SelectMany(w => w.Work.Sources).Count();
         var runnableWorkloads = workloads.Where(workload => workload.HasProvider).ToList();
-        var nonRunnableWorkloads = workloads.Where(workload => !workload.HasProvider).ToList();
-        if (nonRunnableWorkloads.Count > 0)
-        {
-            // We found some sources that don't associate to any runtime provider and so they cannot run.
-            // Mark the run as aborted.
-            _dataAggregator.MarkAsAborted();
-        }
         _availableWorkloads = runnableWorkloads.Count();
+        var nonRunnableWorkloads = workloads.Where(workload => !workload.HasProvider).ToList();
 
         EqtTrace.Verbose("ParallelProxyDiscoveryManager.DiscoverTests: Start discovery. Total sources: " + _availableTestSources);
 
@@ -102,6 +96,16 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         // will then spawn 8 instances of this and if we now cancel, we will have 2 sources not
         // marked as NotDiscovered.
         _dataAggregator.MarkSourcesWithStatus(discoveryCriteria.Sources, DiscoveryStatus.NotDiscovered);
+
+        if (nonRunnableWorkloads.Count > 0)
+        {
+            // We found some sources that don't associate to any runtime provider and so they cannot run.
+            // Mark the sources as skipped.
+
+            _dataAggregator.MarkSourcesWithStatus(nonRunnableWorkloads.SelectMany(w => w.Work.Sources), DiscoveryStatus.SkippedDiscovery);
+            // TODO: in strict mode keep them as non-discovered, and mark the run as aborted.
+            // _dataAggregator.MarkAsAborted();
+        }
 
         _parallelOperationManager.StartWork(runnableWorkloads, eventHandler, GetParallelEventHandler, DiscoverTestsOnConcurrentManager);
     }
@@ -147,11 +151,12 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         var notDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count;
         var partiallyDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count;
         var fullyDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count;
+        var skippedCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.SkippedDiscovery).Count;
         var expectedCount = _availableTestSources;
         // When this fails, look at the _dataAggregator and look at the sources that it holds. It is possible that adapter incorrectly reports
         // the source on the testcase object. Each distinct source that will appear on TestCase will be considered a file.
-        TPDebug.Assert(notDiscoveredCount + partiallyDiscoveredCount + fullyDiscoveredCount == expectedCount,
-            $"Total count of sources ({expectedCount}) should match the count of sources with status not discovered ({notDiscoveredCount}), partially discovered ({partiallyDiscoveredCount}) and fully discovered ({fullyDiscoveredCount}).");
+        TPDebug.Assert(notDiscoveredCount + partiallyDiscoveredCount + fullyDiscoveredCount + skippedCount == expectedCount,
+            $"Total count of sources ({expectedCount}) should match the count of sources with status not discovered ({notDiscoveredCount}), partially discovered ({partiallyDiscoveredCount}), fully discovered ({fullyDiscoveredCount}) and skipped ({skippedCount}).");
 #endif
 
         var allDiscoverersCompleted = false;
