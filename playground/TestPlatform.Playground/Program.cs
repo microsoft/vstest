@@ -25,7 +25,7 @@ internal class Program
     {
         // This project references TranslationLayer, vstest.console, TestHostProvider, testhost and MSTest1 projects, to make sure
         // we build all the dependencies of that are used to run tests via VSTestConsoleWrapper. It then copies the components from
-        // their original build locations, to $(TargetDir)\vstest.console directory, and it's subfolders to create an executable
+        // their original build locations, to $(TargetDir)\vstest.console directory, and its subfolders to create an executable
         // copy of TestPlatform that is similar to what we ship.
         //
         // The copying might trigger only on re-build, if you see outdated dependencies, Rebuild this project instead of just Build.
@@ -40,14 +40,30 @@ internal class Program
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
 
-        var sourceSettings = @"
-                <RunSettings>
-                    <RunConfiguration>
-                        <InIsolation>true</InIsolation>
-                        <MaxCpuCount>0</MaxCpuCount>
-                    </RunConfiguration>
-                </RunSettings>
-            ";
+        var maxCpuCount = Environment.GetEnvironmentVariable("VSTEST_MAX_CPU_COUNT") ?? "0";
+        var sourceSettings = $$$"""
+            <RunSettings>
+                <RunConfiguration>
+           
+                    <!-- <MaxCpuCount>1</MaxCpuCount> -->
+                    <!-- <TargetPlatform>x86</TargetPlatform> -->
+                    <!-- <TargetFrameworkVersion>net472</TargetFrameworkVersion> -->
+
+                    <!-- The settings below are what VS sends by default. -->
+                    <CollectSourceInformation>False</CollectSourceInformation>
+                    <DesignMode>True</DesignMode>
+                </RunConfiguration>
+                <BoostTestInternalSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                    <VSProcessId>999999</VSProcessId>
+                </BoostTestInternalSettings>
+                <GoogleTestAdapterSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <SolutionSettings>
+                  <Settings />
+                </SolutionSettings>
+                <ProjectSettings />
+              </GoogleTestAdapterSettings>
+            </RunSettings>
+            """;
 
         var sources = new[] {
             Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
@@ -83,7 +99,7 @@ internal class Program
         {
             EnvironmentVariables = EnvironmentVariables.Variables,
             LogFilePath = Path.Combine(here, "logs", "log.txt"),
-            TraceLevel = TraceLevel.Verbose,
+            TraceLevel = TraceLevel.Off,
         };
         var options = new TestPlatformOptions
         {
@@ -112,6 +128,7 @@ internal class Program
         //r.RunTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
         var rd = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery: {discoveryDuration} ms, Run: {rd} ms, Total: {discoveryDuration + rd} ms");
+        Console.WriteLine($"Settings:\n{sourceSettings}");
     }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
