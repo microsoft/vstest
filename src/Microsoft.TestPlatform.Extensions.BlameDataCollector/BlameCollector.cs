@@ -188,7 +188,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// </summary>
     private void CollectDumpAndAbortTesthost()
     {
-        TPDebug.Assert(_logger != null && _context != null && _targetFramework != null && _dataCollectionSink != null, "Initialize must be called before calling this method");
+        TPDebug.Assert(_logger != null && _context != null && _dataCollectionSink != null, "Initialize must be called before calling this method");
         _inactivityTimerAlreadyFired = true;
 
         string value;
@@ -236,7 +236,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             {
                 Action<string> logWarning = m => _logger.LogWarning(_context.SessionDataCollectionContext, m);
                 var dumpDirectory = GetDumpDirectory();
-                _processDumpUtility.StartHangBasedProcessDump(_testHostProcessId, dumpDirectory, _hangDumpType == HangDumpType.Full, _targetFramework, logWarning);
+                _processDumpUtility.StartHangBasedProcessDump(_testHostProcessId, dumpDirectory, _hangDumpType == HangDumpType.Full, _targetFramework!, logWarning);
                 hangDumpSuccess = true;
             }
             catch (Exception ex)
@@ -543,13 +543,13 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             return;
         }
 
-        TPDebug.Assert(_logger != null && _context != null && _targetFramework != null, "Initialize must be called before calling this method");
+        TPDebug.Assert(_logger != null && _context != null, "Initialize must be called before calling this method");
 
         try
         {
             var dumpDirectory = GetDumpDirectory();
             Action<string> logWarning = m => _logger.LogWarning(_context.SessionDataCollectionContext, m);
-            _processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, dumpDirectory, _crashDumpType == CrashDumpType.Full, _targetFramework, _collectDumpAlways, logWarning);
+            _processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, dumpDirectory, _crashDumpType == CrashDumpType.Full, _targetFramework!, _collectDumpAlways, logWarning);
         }
         catch (TestPlatformException e)
         {
