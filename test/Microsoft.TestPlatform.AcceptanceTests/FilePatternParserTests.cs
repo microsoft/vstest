@@ -6,8 +6,6 @@ using System.IO;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -44,7 +42,7 @@ public class FilePatternParserTests : AcceptanceTestBase
 
         // Add one more directory to the temp path, so we can substitute it with **
         // and copy then whole directory there.
-        TempDirectory.CopyDirectory(Path.GetDirectoryName(testAssembly), Path.Combine(TempDirectory.Path, "dir1"));
+        TempDirectory.CopyDirectory(Path.GetDirectoryName(testAssembly)!, Path.Combine(TempDirectory.Path, "dir1"));
 
         // The path will end up looking like <random temp dir>\**\"*TestProj*.dll".
         var wildcardedPath = Path.Combine(TempDirectory.Path, "**", "*TestProj*.dll");

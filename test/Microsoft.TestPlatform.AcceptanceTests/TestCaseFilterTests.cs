@@ -6,8 +6,6 @@ using System.IO;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -209,7 +207,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
-        string testSettingsPath = Path.Combine(Path.GetDirectoryName(testAssemblyPath), "MstestV1UnitTestProjectTestSettings.testsettings");
+        string testSettingsPath = Path.Combine(Path.GetDirectoryName(testAssemblyPath)!, "MstestV1UnitTestProjectTestSettings.testsettings");
         arguments = string.Concat(arguments, " /listtests /TestCaseFilter:PassingTest /settings:", testSettingsPath);
 
         InvokeVsTest(arguments);
