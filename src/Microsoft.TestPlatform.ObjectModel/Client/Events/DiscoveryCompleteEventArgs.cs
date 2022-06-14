@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 
 #nullable disable
@@ -76,16 +75,4 @@ public class DiscoveryCompleteEventArgs : EventArgs
     /// </summary>
     [DataMember]
     public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; set; } = new();
-}
-
-
-public class DiscoveredSource
-{
-    [DataMember]
-    public string Source { get; set; }
-
-    public static List<DiscoveredSource> ToDiscoveredSources(List<string> sources)
-    {
-        return sources.Select(source => new DiscoveredSource { Source = source }).ToList();
-    }
 }

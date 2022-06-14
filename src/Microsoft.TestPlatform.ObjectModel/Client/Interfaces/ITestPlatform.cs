@@ -83,15 +83,3 @@ public interface ITestPlatform : IDisposable
         Dictionary<string, SourceDetail> sourceToSourceDetailMap,
         IWarningLogger warningLogger);
 }
-
-/// <summary>
-/// DO NOT use this to extend TestPlatform, it is public only because some other internal interfaces and classes are public, and will be made internal later.
-/// </summary>
-public interface IWarningLogger
-{
-    /// <summary>
-    /// Log warning message that will be shown to user.
-    /// </summary>
-    /// <param name="message">message string</param>
-    void LogWarning(string message);
-}

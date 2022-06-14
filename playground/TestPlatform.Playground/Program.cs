@@ -43,13 +43,14 @@ internal class Program
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
                         <MaxCpuCount>0</MaxCpuCount>
+<DesignMode>False</DesignMode>
                     </RunConfiguration>
                 </RunSettings>
             ";
 
         var sources = new[] {
-            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
-            Path.Combine(playground, "MSTest1", "bin", "Debug", "net5.0", "MSTest1.dll"),
+         @"S:\t\mstest-x64\bin\Debug\net472\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll",
+         @"S:\t\mstest-x64\bin\Debug\net472\mstest-x64.dll",
         };
 
         // console mode
@@ -60,7 +61,7 @@ internal class Program
             var processStartInfo = new ProcessStartInfo
             {
                 FileName = console,
-                Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile} --listtests",
+                Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile}",
                 UseShellExecute = false,
             };
             EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
@@ -105,7 +106,7 @@ internal class Program
         //// Run with test cases and without custom testhost launcher
         //r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
         //// Run with sources and custom testhost launcher
-        //r.RunTestsWithCustomTestHost(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        r.RunTestsWithCustomTestHost(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
         //// Run with sources
         //r.RunTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
         var rd = sw.ElapsedMilliseconds;

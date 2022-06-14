@@ -4,28 +4,19 @@
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-namespace Microsoft.VisualStudio.TestPlatform.Client;
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
-public class EventRegistrarToWarningLoggerAdapter : IWarningLogger
+internal class EventRegistrarToWarningLoggerAdapter : IWarningLogger
 {
     private readonly IBaseTestEventsRegistrar _testEventsRegistrar;
 
-    public EventRegistrarToWarningLoggerAdapter(IBaseTestEventsRegistrar? testEventsRegistrar)
+    public EventRegistrarToWarningLoggerAdapter(IBaseTestEventsRegistrar testEventsRegistrar)
     {
         _testEventsRegistrar = testEventsRegistrar;
     }
 
     public void LogWarning(string message)
     {
-        //TODO: Implement registrar in StartTestSession instead of passing null.
         _testEventsRegistrar.LogWarning(message);
-    }
-}
-
-public class NullWarningLogger : IWarningLogger
-{
-    public void LogWarning(string message)
-    {
-        //TODO: Implement registrar in StartTestSession instead of passing null, and stop using this class.
     }
 }
