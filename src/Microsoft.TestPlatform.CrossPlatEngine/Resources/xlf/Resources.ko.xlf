@@ -159,7 +159,7 @@
       </trans-unit>
       <trans-unit id="NoTestHostProviderFound">
         <source>No suitable test runtime provider was found for any source in this run.</source>
-        <target state="new">이 실행에 적합한 테스트 런타임 공급자를 찾지 못했습니다.</target>
+        <target state="new">No suitable test runtime provider was found for any source in this run.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="NoProxyMatchesDescription">
