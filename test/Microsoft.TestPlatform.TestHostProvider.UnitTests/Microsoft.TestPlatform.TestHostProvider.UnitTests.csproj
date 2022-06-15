@@ -13,7 +13,7 @@
     <OutputType Condition=" $(TargetFramework.StartsWith('net6')) ">Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\NullableAttributes.cs" Link="NullableAttributes.cs" />
+    <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />

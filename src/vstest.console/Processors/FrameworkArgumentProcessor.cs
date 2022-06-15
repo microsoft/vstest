@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
@@ -12,8 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -28,9 +25,8 @@ internal class FrameworkArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/Framework";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -42,7 +38,7 @@ internal class FrameworkArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
@@ -87,8 +83,8 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
     /// <param name="runSettingsManager"> The runsettings manager. </param>
     public FrameworkArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
     {
-        Contract.Requires(options != null);
-        Contract.Requires(runSettingsManager != null);
+        ValidateArg.NotNull(options, nameof(options));
+        ValidateArg.NotNull(runSettingsManager, nameof(runSettingsManager));
         _commandLineOptions = options;
         _runSettingsManager = runSettingsManager;
     }
@@ -100,9 +96,9 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        if (string.IsNullOrWhiteSpace(argument))
+        if (argument.IsNullOrWhiteSpace())
         {
             throw new CommandLineException(CommandLineResources.FrameworkVersionRequired);
         }
@@ -112,7 +108,7 @@ internal class FrameworkArgumentExecutor : IArgumentExecutor
             string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidFrameworkVersion, argument));
 
         if (_commandLineOptions.TargetFrameworkVersion != Framework.DefaultFramework
-            && !string.IsNullOrWhiteSpace(_commandLineOptions.SettingsFile)
+            && !StringUtils.IsNullOrWhiteSpace(_commandLineOptions.SettingsFile)
             && MSTestSettingsUtilities.IsLegacyTestSettingsFile(_commandLineOptions.SettingsFile))
         {
             // Legacy testsettings file support only default target framework.

@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -66,7 +66,7 @@ public static class EqtTrace
     }
 #endif
 
-    public static string LogFile
+    public static string? LogFile
     {
         get
         {
@@ -87,7 +87,7 @@ public static class EqtTrace
         }
     }
 
-    public static string ErrorOnInitialization
+    public static string? ErrorOnInitialization
     {
         get;
         set;
@@ -147,7 +147,7 @@ public static class EqtTrace
     /// <returns>
     /// The <see cref="bool"/>.
     /// </returns>
-    public static bool InitializeVerboseTrace(string customLogFile)
+    public static bool InitializeVerboseTrace(string? customLogFile)
     {
         return InitializeTrace(customLogFile, PlatformTraceLevel.Verbose);
     }
@@ -159,8 +159,11 @@ public static class EqtTrace
     /// <param name="customLogFile">Custom log file for trace messages.</param>
     /// <param name="traceLevel">Trace level.</param>
     /// <returns>Trace initialized flag.</returns>
-    public static bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel)
+    public static bool InitializeTrace(string? customLogFile, PlatformTraceLevel traceLevel)
     {
+        // Remove extra quotes if we get them passed on the parameter,
+        // System.IO.File does not ignore them when checking the file existence.
+        customLogFile = customLogFile?.Trim('"');
         if (!TraceImpl.InitializeTrace(customLogFile, traceLevel))
         {
             ErrorOnInitialization = PlatformEqtTrace.ErrorOnInitialization;
@@ -187,7 +190,7 @@ public static class EqtTrace
     /// <param name="format">The formatted error message</param>
     /// <param name="args">Arguments to the format</param>
     [Conditional("TRACE")]
-    public static void Fail(string format, params object[] args)
+    public static void Fail(string format, params object?[]? args)
     {
         string message = string.Format(CultureInfo.InvariantCulture, format, args);
 
@@ -259,7 +262,7 @@ public static class EqtTrace
     /// <param name="format">Format of error message.</param>
     /// <param name="args">Parameters for the error message.</param>
     [Conditional("TRACE")]
-    public static void Error(string format, params object[] args)
+    public static void Error(string format, params object?[] args)
     {
         Debug.Assert(format != null, "format != null");
 
@@ -277,7 +280,7 @@ public static class EqtTrace
     /// <param name="format">Message format.</param>
     /// <param name="args">Trace message format arguments.</param>
     [Conditional("TRACE")]
-    public static void ErrorUnless(bool condition, string format, params object[] args)
+    public static void ErrorUnless(bool condition, string format, params object?[] args)
     {
         ErrorIf(!condition, format, args);
     }
@@ -291,7 +294,7 @@ public static class EqtTrace
     /// <param name="format">Message format.</param>
     /// <param name="args">Trace message format arguments.</param>
     [Conditional("TRACE")]
-    public static void ErrorUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string format, params object[] args)
+    public static void ErrorUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string format, params object?[] args)
     {
         if (condition)
         {
@@ -310,7 +313,7 @@ public static class EqtTrace
     /// <param name="format">Message format.</param>
     /// <param name="args">Trace message format arguments.</param>
     [Conditional("TRACE")]
-    public static void ErrorIf(bool condition, string format, params object[] args)
+    public static void ErrorIf(bool condition, string format, params object?[] args)
     {
         if (condition)
         {
@@ -324,7 +327,7 @@ public static class EqtTrace
     /// <param name="format">The message to send to Debug.Fail and Error.</param>
     /// <param name="args">Arguments to string.Format.</param>
     [Conditional("TRACE")]
-    public static void ErrorAssert(string format, params object[] args)
+    public static void ErrorAssert(string format, params object?[] args)
     {
         Debug.Assert(format != null, "format != null");
         var message = string.Format(CultureInfo.InvariantCulture, format, args);
@@ -339,7 +342,7 @@ public static class EqtTrace
     [Conditional("TRACE")]
     public static void Error(Exception exceptionToTrace)
     {
-        Debug.Assert(exceptionToTrace != null, "exceptionToTrace != null");
+        TPDebug.Assert(exceptionToTrace != null, "exceptionToTrace != null");
 
         // Write only if tracing for error is enabled.
         // Done upfront to avoid performance hit.
@@ -414,7 +417,7 @@ public static class EqtTrace
     /// <param name="format">Format of the trace message.</param>
     /// <param name="args">Arguments for the trace message format.</param>
     [Conditional("TRACE")]
-    public static void Warning(string format, params object[] args)
+    public static void Warning(string format, params object?[] args)
     {
         Debug.Assert(format != null, "format != null");
 
@@ -432,7 +435,7 @@ public static class EqtTrace
     /// <param name="format">Format of the trace message.</param>
     /// <param name="args">Arguments for the trace message.</param>
     [Conditional("TRACE")]
-    public static void WarningIf(bool condition, string format, params object[] args)
+    public static void WarningIf(bool condition, string format, params object?[] args)
     {
         if (condition)
         {
@@ -447,7 +450,7 @@ public static class EqtTrace
     /// <param name="format">Format of trace message.</param>
     /// <param name="args">Arguments for the trace message.</param>
     [Conditional("TRACE")]
-    public static void WarningUnless(bool condition, string format, params object[] args)
+    public static void WarningUnless(bool condition, string format, params object?[] args)
     {
         WarningIf(!condition, format, args);
     }
@@ -461,7 +464,7 @@ public static class EqtTrace
     /// <param name="format">Format of the trace message.</param>
     /// <param name="args">Arguments for trace message.</param>
     [Conditional("TRACE")]
-    public static void WarningUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string format, params object[] args)
+    public static void WarningUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string format, params object?[] args)
     {
         if (condition)
         {
@@ -537,7 +540,7 @@ public static class EqtTrace
     /// <param name="format">Trace message format.</param>
     /// <param name="args">Arguments for trace format.</param>
     [Conditional("TRACE")]
-    public static void Info(string format, params object[] args)
+    public static void Info(string format, params object?[] args)
     {
         Debug.Assert(format != null, "format != null");
 
@@ -555,7 +558,7 @@ public static class EqtTrace
     /// <param name="format">Format of the trace message.</param>
     /// <param name="args">Arguments for the trace format.</param>
     [Conditional("TRACE")]
-    public static void InfoIf(bool condition, string format, params object[] args)
+    public static void InfoIf(bool condition, string format, params object?[] args)
     {
         if (condition)
         {
@@ -570,7 +573,7 @@ public static class EqtTrace
     /// <param name="format">Trace message format.</param>
     /// <param name="args">Trace message format arguments.</param>
     [Conditional("TRACE")]
-    public static void InfoUnless(bool condition, string format, params object[] args)
+    public static void InfoUnless(bool condition, string format, params object?[] args)
     {
         InfoIf(!condition, format, args);
     }
@@ -584,7 +587,7 @@ public static class EqtTrace
     /// <param name="format">Trace message format.</param>
     /// <param name="args">Trace message arguments.</param>
     [Conditional("TRACE")]
-    public static void InfoUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string format, params object[] args)
+    public static void InfoUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string format, params object?[] args)
     {
         if (condition)
         {
@@ -660,7 +663,7 @@ public static class EqtTrace
     /// <param name="format">Format of trace message.</param>
     /// <param name="args">Arguments for trace message.</param>
     [Conditional("TRACE")]
-    public static void Verbose(string format, params object[] args)
+    public static void Verbose(string format, params object?[] args)
     {
         Debug.Assert(format != null, "format != null");
 
@@ -678,7 +681,7 @@ public static class EqtTrace
     /// <param name="format">Message format.</param>
     /// <param name="args">Arguments for trace message.</param>
     [Conditional("TRACE")]
-    public static void VerboseIf(bool condition, string format, params object[] args)
+    public static void VerboseIf(bool condition, string format, params object?[] args)
     {
         if (condition)
         {
@@ -693,7 +696,7 @@ public static class EqtTrace
     /// <param name="format">Format for the trace message.</param>
     /// <param name="args">Trace message arguments.</param>
     [Conditional("TRACE")]
-    public static void VerboseUnless(bool condition, string format, params object[] args)
+    public static void VerboseUnless(bool condition, string format, params object?[] args)
     {
         VerboseIf(!condition, format, args);
     }
@@ -707,7 +710,7 @@ public static class EqtTrace
     /// <param name="format">Format of the trace message.</param>
     /// <param name="args">Arguments for the trace message format.</param>
     [Conditional("TRACE")]
-    public static void VerboseUnlessAlterTrace(bool condition, PlatformTraceLevel level, string format, params object[] args)
+    public static void VerboseUnlessAlterTrace(bool condition, PlatformTraceLevel level, string format, params object?[] args)
     {
         if (condition)
         {
@@ -812,7 +815,7 @@ public static class EqtTrace
         }
     }
 
-    private static void WriteAtLevel(PlatformTraceLevel level, string format, params object[] args)
+    private static void WriteAtLevel(PlatformTraceLevel level, string format, params object?[] args)
     {
         Debug.Assert(format != null, "format != null");
         WriteAtLevel(level, string.Format(CultureInfo.InvariantCulture, format, args));

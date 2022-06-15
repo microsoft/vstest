@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Build.Trace;
 
 public static class Tracing

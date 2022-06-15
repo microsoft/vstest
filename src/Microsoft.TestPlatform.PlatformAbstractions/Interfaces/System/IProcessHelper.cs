@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 /// <summary>
@@ -24,13 +22,13 @@ public interface IProcessHelper
     /// <param name="exitCallBack">Call back for on process exit</param>
     /// <param name="outputCallback">Call back for on process output</param>
     /// <returns>The process created.</returns>
-    object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallback);
+    object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack);
 
     /// <summary>
     /// Gets the current process file path.
     /// </summary>
     /// <returns>The current process file path.</returns>
-    string GetCurrentProcessFileName();
+    string? GetCurrentProcessFileName();
 
     /// <summary>
     /// Gets the current process location.
@@ -42,7 +40,7 @@ public interface IProcessHelper
     /// Gets the location of test engine.
     /// </summary>
     /// <returns>Location of test engine.</returns>
-    string GetTestEngineDirectory();
+    string? GetTestEngineDirectory();
 
     /// <summary>
     /// Gets the location of native dll's, depending on current process architecture..
@@ -73,7 +71,7 @@ public interface IProcessHelper
     /// </summary>
     /// <param name="process">process parameter</param>
     /// <returns>process id.</returns>
-    int GetProcessId(object process);
+    int GetProcessId(object? process);
 
     /// <summary>
     /// Gets the process name for given process id.
@@ -88,7 +86,7 @@ public interface IProcessHelper
     /// <param name="process">process parameter</param>
     /// <param name="exitCode">return value of exitCode</param>
     /// <returns>False if process has not exited, True otherwise</returns>
-    bool TryGetExitCode(object process, out int exitCode);
+    bool TryGetExitCode(object? process, out int exitCode);
 
     /// <summary>
     /// Sets the process exit callback.
@@ -99,19 +97,19 @@ public interface IProcessHelper
     /// <param name="callbackAction">
     /// Callback on process exit.
     /// </param>
-    void SetExitCallback(int processId, Action<object> callbackAction);
+    void SetExitCallback(int processId, Action<object?>? callbackAction);
 
     /// <summary>
     /// Terminates a process.
     /// </summary>
     /// <param name="process">Reference of process to terminate.</param>
-    void TerminateProcess(object process);
+    void TerminateProcess(object? process);
 
     /// <summary>
     /// Wait for process to exit
     /// </summary>
     /// <param name="process">Reference to process</param>
-    void WaitForProcessExit(object process);
+    void WaitForProcessExit(object? process);
 
     /// <summary>
     /// Gets the process handle for given process Id.

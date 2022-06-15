@@ -9,19 +9,19 @@ using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc />
 public class PlatformEnvironment : IEnvironment
 {
+    private PlatformArchitecture? _architecture;
+
     /// <inheritdoc />
     public PlatformArchitecture Architecture
     {
         get
         {
-            return Environment.Is64BitOperatingSystem
+            return _architecture ??= Environment.Is64BitOperatingSystem
                 ? IsArm64()
                     ? PlatformArchitecture.ARM64
                     : PlatformArchitecture.X64
@@ -71,13 +71,10 @@ public class PlatformEnvironment : IEnvironment
     }
 
     /// <inheritdoc />
-    public string OperatingSystemVersion
-    {
-        get
-        {
-            return Environment.OSVersion.ToString();
-        }
-    }
+    public string OperatingSystemVersion => Environment.OSVersion.ToString();
+
+    /// <inheritdoc />
+    public int ProcessorCount => Environment.ProcessorCount;
 
     /// <inheritdoc />
     public void Exit(int exitcode)

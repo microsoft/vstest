@@ -15,15 +15,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ProxyTestSessionManagerTests
 {
     private readonly IList<string> _fakeTestSources = new List<string>() { @"C:\temp\FakeTestAsset.dll" };
-    private Dictionary<string, TestRuntimeProviderInfo> _fakeTestSourcesToRuntimeProviderMap;
+    private readonly Dictionary<string, TestRuntimeProviderInfo> _fakeTestSourcesToRuntimeProviderMap;
     private readonly IList<string> _fakeTestMultipleSources = new List<string>() {
         @"C:\temp\FakeTestAsset1.dll",
         @"C:\temp\FakeTestAsset2.dll",
@@ -72,12 +70,11 @@ public class ProxyTestSessionManagerTests
             </RunSettings>";
     private readonly string _fakeRunSettings = "FakeRunSettings";
     private readonly ProtocolConfig _protocolConfig = new() { Version = 1 };
-    private Mock<ITestSessionEventsHandler> _mockEventsHandler;
-    private Mock<IRequestData> _mockRequestData;
-    private Mock<IMetricsCollection> _mockMetricsCollection;
+    private readonly Mock<ITestSessionEventsHandler> _mockEventsHandler;
+    private readonly Mock<IRequestData> _mockRequestData;
+    private readonly Mock<IMetricsCollection> _mockMetricsCollection;
 
-    [TestInitialize]
-    public void TestInitialize()
+    public ProxyTestSessionManagerTests()
     {
         TestSessionPool.Instance = null;
 
@@ -125,7 +122,7 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void StartSessionShouldSucceedIfCalledOnlyOnce()
     {
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
@@ -156,7 +153,7 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void StartSessionShouldSucceedWhenCalledWithMultipleSources()
     {
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
@@ -178,7 +175,7 @@ public class ProxyTestSessionManagerTests
     public void StartSessionShouldFailIfProxyCreatorIsNull()
     {
         var testSessionCriteria = CreateTestSession(_fakeTestSources, _fakeRunSettings);
-        var proxyManager = CreateProxy(testSessionCriteria, null);
+        var proxyManager = CreateProxy(testSessionCriteria, null!);
 
         Assert.IsFalse(proxyManager.StartSession(_mockEventsHandler.Object, _mockRequestData.Object));
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
@@ -189,7 +186,7 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void StartSessionShouldFailIfSetupChannelReturnsFalse()
     {
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(false);
         mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
@@ -212,7 +209,7 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void StartSessionShouldFailIfSetupChannelThrowsException()
     {
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Throws(new TestPlatformException("Dummy exception."));
         mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
@@ -240,7 +237,7 @@ public class ProxyTestSessionManagerTests
             .Returns(false);
         TestSessionPool.Instance = mockTestSessionPool.Object;
 
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
         mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
@@ -263,7 +260,7 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void StopSessionShouldSucceedIfCalledOnlyOnce()
     {
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
         mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
@@ -299,7 +296,7 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void StopSessionShouldSucceedWhenCalledWithMultipleSources()
     {
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
         mockProxyOperationManager.Setup(pom => pom.Close()).Callback(() => { });
@@ -328,7 +325,7 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void DequeueProxyShouldSucceedIfIdentificationCriteriaAreMet()
     {
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
@@ -370,7 +367,7 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void DequeueProxyTwoConsecutiveTimesWithEnqueueShouldBeSuccessful()
     {
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
@@ -405,7 +402,7 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void DequeueProxyShouldFailIfRunSettingsMatchingFails()
     {
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
@@ -431,7 +428,7 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void DequeueProxyShouldFailIfRunSettingsMatchingFailsFor2EnvVariables()
     {
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
@@ -457,7 +454,7 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void DequeueProxyShouldFailIfRunSettingsMatchingFailsForDataCollectors()
     {
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 
@@ -483,7 +480,7 @@ public class ProxyTestSessionManagerTests
     [TestMethod]
     public void EnqueueProxyShouldSucceedIfIdentificationCriteriaAreMet()
     {
-        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null);
+        var mockProxyOperationManager = new Mock<ProxyOperationManager>(null, null, null, null);
         mockProxyOperationManager.Setup(pom => pom.SetupChannel(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
             .Returns(true);
 

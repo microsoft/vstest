@@ -67,7 +67,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyTestSessionManager"/> class.
     /// </summary>
-    /// 
+    ///
     /// <param name="criteria">The test session criteria.</param>
     /// <param name="maxTesthostCount">The testhost count.</param>
     /// <param name="proxyCreator">The proxy creator.</param>
@@ -226,10 +226,10 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     /// <summary>
     /// Dequeues a proxy to be used either by discovery or execution.
     /// </summary>
-    /// 
+    ///
     /// <param name="source">The source to be associated to this proxy.</param>
     /// <param name="runSettings">The run settings.</param>
-    /// 
+    ///
     /// <returns>The dequeued proxy.</returns>
     public virtual ProxyOperationManager DequeueProxy(string source, string runSettings)
     {
@@ -272,9 +272,9 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     /// <summary>
     /// Enqueues a proxy back once discovery or executions is done with it.
     /// </summary>
-    /// 
+    ///
     /// <param name="proxyId">The id of the proxy to be re-enqueued.</param>
-    /// 
+    ///
     /// <returns>True if the operation succeeded, false otherwise.</returns>
     public virtual bool EnqueueProxy(int proxyId)
     {
@@ -430,7 +430,7 @@ internal class ProxyOperationManagerContainer
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyOperationManagerContainer"/> class.
     /// </summary>
-    /// 
+    ///
     /// <param name="proxy">The proxy.</param>
     /// <param name="available">A flag indicating if the proxy is available to do work.</param>
     public ProxyOperationManagerContainer(ProxyOperationManager proxy, bool available)

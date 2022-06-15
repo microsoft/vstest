@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 /// <summary>
@@ -36,4 +34,7 @@ public interface IEnvironment
     /// </summary>
     /// <returns>Returns the thread Id</returns>
     int GetCurrentManagedThreadId();
+
+    /// <inheritdoc cref="System.Environment.ProcessorCount"/>
+    int ProcessorCount { get; }
 }

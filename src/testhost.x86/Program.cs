@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+#if NETFRAMEWORK
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+#endif
 using Microsoft.VisualStudio.TestPlatform.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -60,12 +63,12 @@ public class Program
         GetEngineInvoker(argsDictionary).Invoke(argsDictionary);
     }
 
-    private static IEngineInvoker GetEngineInvoker(IDictionary<string, string> argsDictionary)
+    private static IEngineInvoker GetEngineInvoker(IDictionary<string, string?> argsDictionary)
     {
         IEngineInvoker? invoker = null;
 #if NETFRAMEWORK
         // If Args contains test source argument, invoker Engine in new appdomain
-        if (argsDictionary.TryGetValue(TestSourceArgumentString, out var testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))
+        if (argsDictionary.TryGetValue(TestSourceArgumentString, out var testSourcePath) && !testSourcePath.IsNullOrWhiteSpace())
         {
             // remove the test source arg from dictionary
             argsDictionary.Remove(TestSourceArgumentString);

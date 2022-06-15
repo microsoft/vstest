@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 #pragma warning disable IDE1006 // Naming Styles
 namespace vstest.console.Internal;
 #pragma warning restore IDE1006 // Naming Styles

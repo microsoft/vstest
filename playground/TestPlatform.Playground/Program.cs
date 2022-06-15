@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace TestPlatform.Playground;
 
 internal class Program
@@ -36,20 +34,9 @@ internal class Program
 
         var thisAssemblyPath = Assembly.GetEntryAssembly().Location;
         var here = Path.GetDirectoryName(thisAssemblyPath);
-        //var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
+        var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
-
-        var discoverySettings = $@"
-                <RunSettings>
-                    <RunConfiguration>
-                        <InIsolation>true</InIsolation>
-                        <MaxCpuCount>0</MaxCpuCount>
-<DisableAppDomain>False</DisableAppDomain>
-<BatchSize>10</BatchSize>
-                    </RunConfiguration>
-                </RunSettings>
-            ";
 
         var sourceSettings = @"
                 <RunSettings>
@@ -61,96 +48,68 @@ internal class Program
             ";
 
         var sources = new[] {
-
-          // @"C:\t\TestProject13_\TestProject1\bin\Debug\net48\TestProject1.dll",
-
-           // @"C:\t\TestProject13_for_mstest\TestProject1\bin\Debug\net48\TestProject1.dll",
-
-             // @"C:\t\TestProject13_for_mstest\TestProject5\bin\Debug\net472\TestProject5.dll",
-//@"C:\t\TestProject13_for_mstest\TestProject6\bin\Debug\net472\TestProject6.dll"
-
-
-////            // net6
-        @"C:\t\ParallelDiscovery2\ReproNetCore\Test1\bin\Debug\net6.0\Test1.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test7\bin\Debug\net6.0\Test7.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test2\bin\Debug\net6.0\Test2.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test6\bin\Debug\net6.0\Test6.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test8\bin\Debug\net6.0\Test8.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test5\bin\Debug\net6.0\Test5.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test3\bin\Debug\net6.0\Test3.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test4\bin\Debug\net6.0\Test4.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test10\bin\Debug\net6.0\Test10.dll",
-@"C:\t\ParallelDiscovery2\ReproNetCore\Test9\bin\Debug\net6.0\Test9.dll",
-
-        //// netfx
-         @"C:\t\ParallelDiscovery2\ReproNetFx\Project4\bin\Debug\net472\Project4.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project1\bin\Debug\net472\Project1.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project2\bin\Debug\net472\Project2.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project3\bin\Debug\net472\Project3.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project9\bin\Debug\net472\Project9.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project10\bin\Debug\net472\Project10.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project5\bin\Debug\net472\Project5.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project8\bin\Debug\net472\Project8.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project7\bin\Debug\net472\Project7.dll",
-               @"C:\t\ParallelDiscovery2\ReproNetFx\Project6\bin\Debug\net472\Project6.dll",
-
-        
-        //// mix
-@"C:\t\MultipleTfmAndArch\Tst1\bin\Debug\net472\win7-x86\Tst1.dll",
-@"C:\t\MultipleTfmAndArch\Tst1\bin\Debug\net48\win7-x86\Tst1.dll",
-@"C:\t\MultipleTfmAndArch\Tst3\bin\Debug\net48\win7-x86\Tst3.dll",
-@"C:\t\MultipleTfmAndArch\Tst1\bin\Debug\net5.0\win7-x86\Tst1.dll",
-@"C:\t\MultipleTfmAndArch\Tst2\bin\Debug\net472\win7-x64\Tst2.dll",
-@"C:\t\MultipleTfmAndArch\Tst3\bin\Debug\net472\win7-x86\Tst3.dll",
-@"C:\t\MultipleTfmAndArch\Tst2\bin\Debug\net48\win7-x64\Tst2.dll",
-@"C:\t\MultipleTfmAndArch\Tst2\bin\Debug\netcoreapp3.1\win7-x64\Tst2.dll",
-@"C:\t\MultipleTfmAndArch\Tst3\bin\Debug\netcoreapp3.1\win7-x86\Tst3.dll",
-@"C:\t\MultipleTfmAndArch\Tst2\bin\Debug\net5.0\win7-x64\Tst2.dll",
-@"C:\t\MultipleTfmAndArch\Tst3\bin\Debug\net5.0\win7-x86\Tst3.dll",
-@"C:\t\MultipleTfmAndArch\Tst1\bin\Debug\netcoreapp3.1\win7-x86\Tst1.dll",
-
+            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
+            Path.Combine(playground, "MSTest1", "bin", "Debug", "net5.0", "MSTest1.dll"),
         };
-        //// console mode
-        //var settingsFile = Path.GetTempFileName();
-        //try
-        //{
-        //    File.WriteAllText(settingsFile, sourceSettings);
-        //    var process = Process.Start(console, string.Join(" ", sources) + " --settings:" + settingsFile + " --listtests");
-        //    var cmd = console + "\n\n" + string.Join(" ", sources) + " --settings:" + settingsFile + " --listtests";
-        //    var swc = Stopwatch.StartNew();
-        //    process.WaitForExit();
-        //    if (process.ExitCode != 0)
-        //    {
-        //        throw new Exception($"Process failed with {process.ExitCode}");
-        //    }
-        //    Console.WriteLine($"Done in {swc.ElapsedMilliseconds} ms");
-        //}
-        //finally
-        //{
-        //    try { File.Delete(settingsFile); } catch { }
-        //}
+
+        // console mode
+        var settingsFile = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(settingsFile, sourceSettings);
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = console,
+                Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile} --listtests",
+                UseShellExecute = false,
+            };
+            EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
+            var process = Process.Start(processStartInfo);
+            process.WaitForExit();
+            if (process.ExitCode != 0)
+            {
+                throw new Exception($"Process failed with {process.ExitCode}");
+            }
+        }
+        finally
+        {
+            try { File.Delete(settingsFile); } catch { }
+        }
 
         // design mode
         var consoleOptions = new ConsoleParameters
         {
+            EnvironmentVariables = EnvironmentVariables.Variables,
             LogFilePath = Path.Combine(here, "logs", "log.txt"),
-            TraceLevel = TraceLevel.Off,
+            TraceLevel = TraceLevel.Verbose,
         };
-        var options = new TestPlatformOptions();
+        var options = new TestPlatformOptions
+        {
+            CollectMetrics = true,
+        };
         var r = new VsTestConsoleWrapper(console, consoleOptions);
         var sessionHandler = new TestSessionHandler();
 #pragma warning disable CS0618 // Type or member is obsolete
-        //    r.StartTestSession(sources, sourceSettings, sessionHandler);
+        //// TestSessions
+        // r.StartTestSession(sources, sourceSettings, sessionHandler);
 #pragma warning restore CS0618 // Type or member is obsolete
         var discoveryHandler = new PlaygroundTestDiscoveryHandler();
         var sw = Stopwatch.StartNew();
-        r.DiscoverTests(sources, discoverySettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
-        var dd = sw.ElapsedMilliseconds;
-        Console.WriteLine($"Discovery done in {sw.ElapsedMilliseconds} ms");
+        // Discovery
+        r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        var discoveryDuration = sw.ElapsedMilliseconds;
+        Console.WriteLine($"Discovery done in {discoveryDuration} ms");
         sw.Restart();
+        // Run with test cases and custom testhost launcher
         r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        //// Run with test cases and without custom testhost launcher
+        //r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
+        //// Run with sources and custom testhost launcher
+        //r.RunTestsWithCustomTestHost(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        //// Run with sources
+        //r.RunTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
         var rd = sw.ElapsedMilliseconds;
-        Console.WriteLine($"Discovery: {dd} ms, Run: {rd} ms, Total: {dd + rd} ms");
+        Console.WriteLine($"Discovery: {discoveryDuration} ms, Run: {rd} ms, Total: {discoveryDuration + rd} ms");
     }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
@@ -244,10 +203,10 @@ internal class Program
             throw new NotImplementedException();
         }
 
-        private static string WriteTests(IEnumerable<TestResult> testResults)
+        private static string WriteTests(IEnumerable<TestResult>? testResults)
             => WriteTests(testResults?.Select(t => t.TestCase));
 
-        private static string WriteTests(IEnumerable<TestCase> testCases)
+        private static string WriteTests(IEnumerable<TestCase>? testCases)
             => testCases?.Any() == true
                 ? "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName))
                 : "\t<empty>";
@@ -281,7 +240,7 @@ internal class Program
 
 internal class TestSessionHandler : ITestSessionEventsHandler
 {
-    public TestSessionInfo TestSessionInfo { get; private set; }
+    public TestSessionInfo? TestSessionInfo { get; private set; }
 
     public void HandleLogMessage(TestMessageLevel level, string message)
     {

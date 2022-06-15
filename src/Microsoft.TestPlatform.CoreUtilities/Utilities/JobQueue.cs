@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
@@ -25,7 +23,7 @@ public class JobQueue<T> : IDisposable
     /// <summary>
     /// Handler which processes the individual jobs.
     /// </summary>
-    private readonly Action<T> _processJob;
+    private readonly Action<T?> _processJob;
 
     /// <summary>
     /// Name used when displaying information or reporting errors about this queue.
@@ -85,6 +83,12 @@ public class JobQueue<T> : IDisposable
     private readonly Action<string> _exceptionLogger;
 
     /// <summary>
+    /// True when the job queue is paused. Don't use this for synchronization,
+    /// it is not super thread-safe. Just use it to see if the queue was started already.
+    /// </summary>
+    public bool IsPaused { get; private set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="JobQueue{T}"/> class.
     /// </summary>
     /// <param name="processJob">Action to handle the processing of the job.</param>
@@ -93,7 +97,7 @@ public class JobQueue<T> : IDisposable
     /// <param name="maxQueueSize">The max Queue Size.</param>
     /// <param name="enableBounds">The enable Bounds.</param>
     /// <param name="exceptionLogger">The exception Logger.</param>
-    public JobQueue(Action<T> processJob, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
+    public JobQueue(Action<T?> processJob, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
     {
         _processJob = processJob ?? throw new ArgumentNullException(nameof(processJob));
 
@@ -128,7 +132,7 @@ public class JobQueue<T> : IDisposable
         _exceptionLogger = exceptionLogger;
 
         // Setup the background thread to process the jobs.
-        _backgroundJobProcessor = new Task(() => BackgroundJobProcessor(), TaskCreationOptions.LongRunning);
+        _backgroundJobProcessor = new Task(() => BackgroundJobProcessor(_displayName), TaskCreationOptions.LongRunning);
         _backgroundJobProcessor.Start();
     }
 
@@ -155,6 +159,7 @@ public class JobQueue<T> : IDisposable
         CheckDisposed();
 
         // Do not allow any jobs to be processed.
+        IsPaused = true;
         _queueProcessing.Reset();
     }
 
@@ -167,6 +172,7 @@ public class JobQueue<T> : IDisposable
 
         // Resume processing of jobs.
         _queueProcessing.Set();
+        IsPaused = false;
     }
 
     /// <summary>
@@ -275,8 +281,11 @@ public class JobQueue<T> : IDisposable
     /// <summary>
     /// Method which processes the jobs on the background thread.
     /// </summary>
-    private void BackgroundJobProcessor()
+    private void BackgroundJobProcessor(string threadName)
     {
+#if DEBUG && (NETFRAMEWORK || NET || NETSTANDARD2_0_OR_GREATER)
+        Thread.CurrentThread.Name = threadName;
+#endif
         bool shutdown = false;
 
         do
@@ -336,7 +345,7 @@ public class JobQueue<T> : IDisposable
     /// Executes the process job handler and logs any exceptions which occur.
     /// </summary>
     /// <param name="job">Job to be executed.</param>
-    private void SafeProcessJob(T job)
+    private void SafeProcessJob(T? job)
     {
         try
         {

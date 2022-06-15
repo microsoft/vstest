@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-#nullable disable
+using Microsoft.TestPlatform.PlatformAbstractions;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -32,7 +32,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
         int rollSizeKB)
         : base(OpenTextWriter(fileName), name)
     {
-        if (string.IsNullOrWhiteSpace(fileName))
+        if (fileName.IsNullOrWhiteSpace())
         {
             throw new ArgumentException("fileName was null or whitespace", nameof(fileName));
         }
@@ -68,7 +68,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
     /// Writes the trace messages to the file.
     /// </summary>
     /// <param name="message">Trace message string</param>
-    public override void WriteLine(string message)
+    public override void WriteLine(string? message)
     {
         RollingHelper.RollIfNecessary();
         base.WriteLine(message);
@@ -89,7 +89,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {
-        RollingHelper?.Dispose();
+        RollingHelper.Dispose();
 
         base.Dispose(disposing);
     }
@@ -127,7 +127,7 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// The original stream writer from the base trace listener will be replaced with
         /// this listener.
         /// </summary>
-        private TallyKeepingFileStreamWriter _managedWriter;
+        private TallyKeepingFileStreamWriter? _managedWriter;
         private bool _lastRollFailed;
         private readonly Stopwatch _sinceLastRoll = Stopwatch.StartNew();
         private readonly long _failedRollTimeout = TimeSpan.FromMinutes(1).Ticks;
@@ -175,10 +175,10 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// <param name="rollDateTime">The roll date.</param>
         public void PerformRoll(DateTime rollDateTime)
         {
-            string actualFileName = ((FileStream)((StreamWriter)_owner.Writer).BaseStream).Name;
+            string actualFileName = ((FileStream)((StreamWriter)_owner.Writer!).BaseStream).Name;
 
             // calculate archive name
-            string directory = Path.GetDirectoryName(actualFileName);
+            string directory = Path.GetDirectoryName(actualFileName)!;
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(actualFileName);
             string extension = Path.GetExtension(actualFileName);
 
@@ -403,10 +403,10 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// An I/O error occurs.
         /// </exception>
         /// <filterpriority>1</filterpriority>
-        public override void Write(char[] buffer)
+        public override void Write(char[]? buffer)
         {
             base.Write(buffer);
-            Tally += Encoding.GetByteCount(buffer);
+            Tally += (buffer is not null) ? Encoding.GetByteCount(buffer) : 0;
         }
 
         /// <summary>
@@ -462,10 +462,10 @@ public class RollingFileTraceListener : TextWriterTraceListener
         /// An I/O error occurs.
         /// </exception>
         /// <filterpriority>1</filterpriority>
-        public override void Write(string value)
+        public override void Write(string? value)
         {
             base.Write(value);
-            Tally += Encoding.GetByteCount(value);
+            Tally += (value is not null) ? Encoding.GetByteCount(value) : 0;
         }
     }
 }

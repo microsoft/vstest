@@ -5,8 +5,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc/>
@@ -17,7 +15,7 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     }
 
     /// <inheritdoc/>
-    public event AssemblyResolveEventHandler AssemblyResolve;
+    public event AssemblyResolveEventHandler? AssemblyResolve;
 
     public void Dispose()
     {
@@ -26,7 +24,7 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     private void DummyEventThrower()
     {
         // need to raise this event, else compiler throws error
-        AssemblyResolve(this, null);
+        AssemblyResolve?.Invoke(this, null);
     }
 }
 

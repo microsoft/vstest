@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -13,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 internal class ProcessDumpUtility : IProcessDumpUtility
@@ -23,9 +22,8 @@ internal class ProcessDumpUtility : IProcessDumpUtility
     private readonly IFileHelper _fileHelper;
     private readonly IHangDumperFactory _hangDumperFactory;
     private readonly ICrashDumperFactory _crashDumperFactory;
-    private ICrashDumper _crashDumper;
-    private string _hangDumpDirectory;
-    private string _crashDumpDirectory;
+    private ICrashDumper? _crashDumper;
+    private string? _hangDumpDirectory;
     private bool _wasHangDumped;
 
     public ProcessDumpUtility()
@@ -41,17 +39,17 @@ internal class ProcessDumpUtility : IProcessDumpUtility
         _crashDumperFactory = crashDumperFactory;
     }
 
-    protected Action<object, string> OutputReceivedCallback => (process, data) =>
+    protected Action<object?, string?> OutputReceivedCallback => (process, data) =>
         // Log all standard output message of procdump in diag files.
         // Otherwise they end up coming on console in pipleine.
-        EqtTrace.Info("ProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: " + data);
+        EqtTrace.Info($"ProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: {data ?? "<null>"}");
 
     /// <inheritdoc/>
     public IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed)
     {
         if (!_wasHangDumped)
         {
-            _crashDumper.WaitForDumpToFinish();
+            _crashDumper?.WaitForDumpToFinish();
         }
 
         // If the process was hang dumped we killed it ourselves, so it crashed when executing tests,
@@ -89,15 +87,22 @@ internal class ProcessDumpUtility : IProcessDumpUtility
     }
 
     /// <inheritdoc/>
-    public void StartHangBasedProcessDump(int processId, string tempDirectory, bool isFullDump, string targetFramework, Action<string> logWarning = null)
+    public void StartHangBasedProcessDump(int processId, string tempDirectory, bool isFullDump, string targetFramework, Action<string>? logWarning = null)
     {
         HangDump(processId, tempDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework, logWarning);
     }
 
     /// <inheritdoc/>
+    [MemberNotNull(nameof(_crashDumper))]
     public void StartTriggerBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, bool collectAlways, Action<string> logWarning)
     {
-        CrashDump(processId, testResultsDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework, collectAlways, logWarning);
+        var dumpType = isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini;
+        var processName = _processHelper.GetProcessName(processId);
+        EqtTrace.Info($"ProcessDumpUtility.CrashDump: Creating a crash dumper for process {processName} ({processId}). If crash happens, dumper will try to create '{dumpType}' dump and store it temporarily in path '{testResultsDirectory}'. Later dumps will become attachments and will be moved to TestResults directory.");
+
+        _crashDumper = _crashDumperFactory.Create(targetFramework);
+        ConsoleOutput.Instance.Information(false, $"Blame: Attaching crash dump utility to process {processName} ({processId}).");
+        _crashDumper.AttachToTargetProcess(processId, testResultsDirectory, dumpType, collectAlways, logWarning);
     }
 
     /// <inheritdoc/>
@@ -106,18 +111,7 @@ internal class ProcessDumpUtility : IProcessDumpUtility
         _crashDumper?.DetachFromTargetProcess(targetProcessId);
     }
 
-    private void CrashDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework, bool collectAlways, Action<string> logWarning)
-    {
-        var processName = _processHelper.GetProcessName(processId);
-        EqtTrace.Info($"ProcessDumpUtility.CrashDump: Creating a crash dumper for process {processName} ({processId}). If crash happens, dumper will try to create '{dumpType}' dump and store it temporarily in path '{tempDirectory}'. Later dumps will become attachments and will be moved to TestResults directory.");
-        _crashDumpDirectory = tempDirectory;
-
-        _crashDumper = _crashDumperFactory.Create(targetFramework);
-        ConsoleOutput.Instance.Information(false, $"Blame: Attaching crash dump utility to process {processName} ({processId}).");
-        _crashDumper.AttachToTargetProcess(processId, tempDirectory, dumpType, collectAlways, logWarning);
-    }
-
-    private void HangDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework, Action<string> logWarning = null)
+    private void HangDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework, Action<string>? logWarning = null)
     {
         _wasHangDumped = true;
 

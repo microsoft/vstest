@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
@@ -13,7 +11,7 @@ internal interface IArgumentProcessorCapabilities
     /// <summary>
     /// The short name of the command the ArgumentProcessor handles.  For example "/t".
     /// </summary>
-    string ShortCommandName { get; }
+    string? ShortCommandName { get; }
 
     /// <summary>
     /// The long name of the command the ArgumentProcessor handles.  For example "/tests".
@@ -50,7 +48,7 @@ internal interface IArgumentProcessorCapabilities
     /// <summary>
     /// The resource identifier for the Help Content associated with the decorated argument processor
     /// </summary>
-    string HelpContentResourceName { get; }
+    string? HelpContentResourceName { get; }
 
     /// <summary>
     /// Based on this enum, corresponding help text will be shown.

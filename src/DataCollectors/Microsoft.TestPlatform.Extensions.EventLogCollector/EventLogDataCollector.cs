@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 
-using Microsoft.VisualStudio.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -495,7 +494,7 @@ public class EventLogDataCollector : DataCollector
     private void ConfigureEventSources(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
     {
         string? eventSourcesStr = collectorNameValueConfigurationManager[EventLogConstants.SettingEventSources];
-        if (!string.IsNullOrEmpty(eventSourcesStr))
+        if (!eventSourcesStr.IsNullOrEmpty())
         {
             EventSources = ParseCommaSeparatedList(eventSourcesStr!);
             EqtTrace.Verbose(

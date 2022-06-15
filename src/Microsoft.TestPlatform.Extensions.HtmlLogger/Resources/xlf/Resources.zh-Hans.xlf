@@ -19,7 +19,7 @@
       </trans-unit>
       <trans-unit id="CannotGenerateUniqueFilePath">
         <source>Cannot generate a unique file name for name '{0}' on path '{1}'.</source>
-        <target state="new">Cannot generate a unique file name for name '{0}' on path '{1}'.</target>
+        <target state="translated">无法为路径“{1}”上的名称“{0}”生成唯一的文件名。</target>
         <note></note>
       </trans-unit>
     </body>

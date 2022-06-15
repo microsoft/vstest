@@ -6,19 +6,15 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Common.UnitTests.Logging;
 
 [TestClass]
 public class TestSessionMessageLoggerTests
 {
-    private TestSessionMessageLogger _testSessionMessageLogger;
+    private readonly TestSessionMessageLogger _testSessionMessageLogger;
+    private TestRunMessageEventArgs? _currentEventArgs;
 
-    private TestRunMessageEventArgs _currentEventArgs;
-
-    [TestInitialize]
-    public void TestInit()
+    public TestSessionMessageLoggerTests()
     {
         _testSessionMessageLogger = TestSessionMessageLogger.Instance;
     }
@@ -43,7 +39,7 @@ public class TestSessionMessageLoggerTests
         var message = "Alert";
         _testSessionMessageLogger.SendMessage(TestMessageLevel.Error, message);
 
-        Assert.AreEqual(TestMessageLevel.Error, _currentEventArgs.Level);
+        Assert.AreEqual(TestMessageLevel.Error, _currentEventArgs!.Level);
         Assert.AreEqual(message, _currentEventArgs.Message);
     }
 
@@ -56,11 +52,11 @@ public class TestSessionMessageLoggerTests
         var message = "Alert";
         _testSessionMessageLogger.SendMessage(TestMessageLevel.Error, message);
 
-        Assert.AreEqual(TestMessageLevel.Warning, _currentEventArgs.Level);
+        Assert.AreEqual(TestMessageLevel.Warning, _currentEventArgs!.Level);
         Assert.AreEqual(message, _currentEventArgs.Message);
     }
 
-    private void OnMessage(object sender, TestRunMessageEventArgs e)
+    private void OnMessage(object? sender, TestRunMessageEventArgs e)
     {
         _currentEventArgs = e;
     }

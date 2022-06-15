@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,9 +15,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
+using Microsoft.TestPlatform.TestHostProvider;
 using Microsoft.TestPlatform.TestHostProvider.Hosting;
 using Microsoft.TestPlatform.TestHostProvider.Resources;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider;
@@ -30,8 +33,6 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 
@@ -51,24 +52,30 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     // TODO: Add net481 when it is published, if it uses a new moniker.
     private static readonly ImmutableArray<string> SupportedTargetFrameworks = ImmutableArray.Create("net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48");
 
-    private Architecture _architecture;
-    private Framework _targetFramework;
     private readonly IProcessHelper _processHelper;
     private readonly IFileHelper _fileHelper;
     private readonly IEnvironment _environment;
     private readonly IDotnetHostHelper _dotnetHostHelper;
+    private readonly IEnvironmentVariableHelper _environmentVariableHelper;
 
-    private ITestHostLauncher _customTestHostLauncher;
-    private Process _testHostProcess;
-    private StringBuilder _testHostProcessStdError;
-    private IMessageLogger _messageLogger;
+    private Architecture _architecture;
+    private Framework? _targetFramework;
+    private ITestHostLauncher? _customTestHostLauncher;
+    private Process? _testHostProcess;
+    private StringBuilder? _testHostProcessStdError;
+    private IMessageLogger? _messageLogger;
     private bool _hostExitedEventRaised;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
     /// </summary>
     public DefaultTestHostManager()
-        : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), new DotnetHostHelper())
+        : this(
+            new ProcessHelper(),
+            new FileHelper(),
+            new DotnetHostHelper(),
+            new PlatformEnvironment(),
+            new EnvironmentVariableHelper())
     {
     }
 
@@ -79,19 +86,25 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <param name="fileHelper">File helper instance.</param>
     /// <param name="environment">Instance of platform environment.</param>
     /// <param name="dotnetHostHelper">Instance of dotnet host helper.</param>
-    internal DefaultTestHostManager(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, IDotnetHostHelper dotnetHostHelper)
+    internal DefaultTestHostManager(
+        IProcessHelper processHelper,
+        IFileHelper fileHelper,
+        IDotnetHostHelper dotnetHostHelper,
+        IEnvironment environment,
+        IEnvironmentVariableHelper environmentVariableHelper)
     {
         _processHelper = processHelper;
         _fileHelper = fileHelper;
-        _environment = environment;
         _dotnetHostHelper = dotnetHostHelper;
+        _environment = environment;
+        _environmentVariableHelper = environmentVariableHelper;
     }
 
     /// <inheritdoc/>
-    public event EventHandler<HostProviderEventArgs> HostLaunched;
+    public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
     /// <inheritdoc/>
-    public event EventHandler<HostProviderEventArgs> HostExited;
+    public event EventHandler<HostProviderEventArgs>? HostExited;
 
     /// <inheritdoc/>
     public bool Shared { get; private set; }
@@ -104,12 +117,20 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <summary>
     /// Gets callback on process exit
     /// </summary>
-    private Action<object> ExitCallBack => (process) => TestHostManagerCallbacks.ExitCallBack(_processHelper, process, _testHostProcessStdError, OnHostExited);
+    private Action<object?> ExitCallBack => process =>
+    {
+        TPDebug.Assert(_testHostProcessStdError is not null, "LaunchTestHostAsync must have been called before ExitCallBack");
+        TestHostManagerCallbacks.ExitCallBack(_processHelper, process, _testHostProcessStdError, OnHostExited);
+    };
 
     /// <summary>
     /// Gets callback to read from process error stream
     /// </summary>
-    private Action<object, string> ErrorReceivedCallback => (process, data) => TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, data);
+    private Action<object?, string?> ErrorReceivedCallback => (process, data) =>
+    {
+        TPDebug.Assert(_testHostProcessStdError is not null, "LaunchTestHostAsync must have been called before ErrorReceivedCallback");
+        TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, data);
+    };
 
     /// <inheritdoc/>
     public void SetCustomLauncher(ITestHostLauncher customLauncher)
@@ -135,12 +156,14 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <inheritdoc/>
     public virtual TestProcessStartInfo GetTestHostProcessStartInfo(
         IEnumerable<string> sources,
-        IDictionary<string, string> environmentVariables,
+        IDictionary<string, string>? environmentVariables,
         TestRunnerConnectionInfo connectionInfo)
     {
+        TPDebug.Assert(IsInitialized, "Initialize must have been called before GetTestHostProcessStartInfo");
+
         string testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
 
-        var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "..//");
+        var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location)!, "..//");
         var argumentsString = " " + connectionInfo.ToCommandLineOptions();
 
         // check in current location for testhost exe
@@ -157,14 +180,14 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         {
             // Not sharing the host which means we need to pass the test assembly path as argument
             // so that the test host can create an appdomain on startup (Main method) and set appbase
-            argumentsString += " --testsourcepath " + sources.FirstOrDefault().AddDoubleQuote();
+            argumentsString += " --testsourcepath " + sources.FirstOrDefault()?.AddDoubleQuote();
         }
 
         EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
 
         var launcherPath = testhostProcessPath;
         if (!_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
-            !_processHelper.GetCurrentProcessFileName().EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
+            !_processHelper.GetCurrentProcessFileName()!.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
         {
             launcherPath = _dotnetHostHelper.GetMonoPath();
             argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;
@@ -255,7 +278,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     }
 
     /// <inheritdoc/>
-    public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)
+    public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string>? sources, IEnumerable<string> extensions)
     {
         if (sources != null && sources.Any())
         {
@@ -279,7 +302,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             List<string> actualSources = new();
             foreach (var uwpSource in uwpSources)
             {
-                actualSources.Add(Path.Combine(Path.GetDirectoryName(uwpSource), GetUwpSources(uwpSource)));
+                actualSources.Add(Path.Combine(Path.GetDirectoryName(uwpSource)!, GetUwpSources(uwpSource)!));
             }
 
             return actualSources;
@@ -298,7 +321,11 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         return framework.Name.IndexOf("NETFramework", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
+    [MemberNotNullWhen(true, nameof(_messageLogger), nameof(_targetFramework))]
+    private bool IsInitialized { get; set; }
+
     /// <inheritdoc/>
+    [MemberNotNull(nameof(_messageLogger), nameof(_targetFramework))]
     public void Initialize(IMessageLogger logger, string runsettingsXml)
     {
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
@@ -310,6 +337,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         Shared = !runConfiguration.DisableAppDomain;
         _hostExitedEventRaised = false;
+        IsInitialized = true;
     }
 
     /// <inheritdoc/>
@@ -332,8 +360,14 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <inheritdoc />
     public bool AttachDebuggerToTestHost()
     {
-        return _customTestHostLauncher is ITestHostLauncher2 launcher
-               && launcher.AttachDebuggerToProcess(_testHostProcess.Id);
+        TPDebug.Assert(_targetFramework is not null && _testHostProcess is not null, "Initialize and LaunchTestHostAsync must be called before AttachDebuggerToTestHost");
+
+        return _customTestHostLauncher switch
+        {
+            ITestHostLauncher3 launcher3 => launcher3.AttachDebuggerToProcess(new AttachDebuggerInfo { ProcessId = _testHostProcess.Id, TargetFramework = _targetFramework.ToString() }, CancellationToken.None),
+            ITestHostLauncher2 launcher2 => launcher2.AttachDebuggerToProcess(_testHostProcess.Id),
+            _ => false,
+        };
     }
 
     /// <summary>
@@ -343,6 +377,8 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <returns>Filtered list of extensions</returns>
     private IEnumerable<string> FilterExtensionsBasedOnVersion(IEnumerable<string> extensions)
     {
+        TPDebug.Assert(IsInitialized, "Initialize must be called before FilterExtensionsBasedOnVersion");
+
         Dictionary<string, string> selectedExtensions = new();
         Dictionary<string, Version> highestFileVersions = new();
         Dictionary<string, Version> conflictingExtensions = new();
@@ -380,7 +416,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
                     if (!oldVersionFound)
                     {
-                        highestFileVersions.Add(extensionAssemblyName, oldVersion);
+                        highestFileVersions.Add(extensionAssemblyName, oldVersion!);
                     }
                 }
             }
@@ -415,7 +451,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <param name="e">host provider event args</param>
     private void OnHostLaunched(HostProviderEventArgs e)
     {
-        HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
+        HostLaunched?.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
     }
 
     /// <summary>
@@ -427,10 +463,11 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         if (!_hostExitedEventRaised)
         {
             _hostExitedEventRaised = true;
-            HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
+            HostExited?.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
         }
     }
 
+    [MemberNotNullWhen(true, nameof(_testHostProcess), nameof(_testHostProcessStdError))]
     private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
     {
         _testHostProcessStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
@@ -443,9 +480,8 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         // For every other workflow (e.g.: profiling) we ask the IDE to launch the custom test
         // host for us. In the profiling case this is needed because then the IDE sets some
         // additional environmental variables for us to help with probing.
-        if ((_customTestHostLauncher == null)
-            || (_customTestHostLauncher.IsDebug
-                && _customTestHostLauncher is ITestHostLauncher2))
+        if (_customTestHostLauncher == null
+            || (_customTestHostLauncher.IsDebug && _customTestHostLauncher is ITestHostLauncher2))
         {
             EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
             cancellationToken.ThrowIfCancellationRequested();
@@ -465,23 +501,46 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             _processHelper.SetExitCallback(processId, ExitCallBack);
         }
 
+        if (_testHostProcess is null)
+        {
+            return false;
+        }
+
+        SetProcessPriority(_testHostProcess, _environmentVariableHelper);
         OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
-        return _testHostProcess != null;
+
+        return true;
     }
 
-    private string GetUwpSources(string uwpSource)
+    internal static void SetProcessPriority(Process testHostProcess, IEnvironmentVariableHelper environmentVariableHelper)
+    {
+        ProcessPriorityClass testHostPriority = ProcessPriorityClass.BelowNormal;
+        try
+        {
+            testHostPriority = environmentVariableHelper.GetEnvironmentVariableAsEnum("VSTEST_HOST_INTERNAL_PRIORITY", testHostPriority);
+            testHostProcess.PriorityClass = testHostPriority;
+            EqtTrace.Verbose("Setting test host process priority to {0}", testHostProcess.PriorityClass);
+        }
+        // Setting the process Priority can fail with Win32Exception, NotSupportedException or InvalidOperationException.
+        catch (Exception ex)
+        {
+            EqtTrace.Error("Failed to set test host process priority to {0}. Exception: {1}", testHostPriority, ex);
+        }
+    }
+
+    private static string? GetUwpSources(string uwpSource)
     {
         var doc = XDocument.Load(uwpSource);
-        var ns = doc.Root.Name.Namespace;
+        var ns = doc.Root!.Name.Namespace;
 
-        string appxManifestPath = doc.Element(ns + "Project").
-            Element(ns + "ItemGroup").
-            Element(ns + "AppXManifest").
-            Attribute("Include").Value;
+        string appxManifestPath = doc.Element(ns + "Project")!.
+            Element(ns + "ItemGroup")!.
+            Element(ns + "AppXManifest")!.
+            Attribute("Include")!.Value;
 
         if (!Path.IsPathRooted(appxManifestPath))
         {
-            appxManifestPath = Path.Combine(Path.GetDirectoryName(uwpSource), appxManifestPath);
+            appxManifestPath = Path.Combine(Path.GetDirectoryName(uwpSource)!, appxManifestPath);
         }
 
         return AppxManifestFile.GetApplicationExecutableName(appxManifestPath);

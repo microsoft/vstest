@@ -60,7 +60,7 @@ function Write-Log {
         [string]
         $Level = "Success"
     )
-    
+
     if ($message)
     {
         $color = if ("Success" -eq $Level) { "Green" } else { "Red" }
@@ -104,26 +104,20 @@ function Install-DotNetCli
     Write-Log "Install-DotNetCli: Get the latest dotnet cli toolset..."
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
-    & $dotnetInstallScript -Channel 6.0 -InstallDir $dotnetInstallPath -Version $env:DOTNET_CLI_VERSION
 
-    & $dotnetInstallScript -Channel 6.0 -InstallDir "${dotnetInstallPath}_x86" -Version $env:DOTNET_CLI_VERSION -Architecture x86 -NoPath
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '2.1' -Architecture x64 -NoPath -Version '2.1.30'
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '3.1' -Architecture x64 -NoPath -Version '3.1.24'
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '5.0' -Architecture x64 -NoPath -Version '5.0.16'
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '6.0' -Architecture x64 -NoPath -Version '6.0.4'
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Channel '7.0' -Architecture x64 -NoPath -Version $env:DOTNET_CLI_VERSION
 
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '2.1.30' -Channel '2.1' -Architecture x64 -NoPath
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '2.1' -Architecture x86 -NoPath -Version '2.1.30'
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '3.1' -Architecture x86 -NoPath -Version '3.1.24'
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '5.0' -Architecture x86 -NoPath -Version '5.0.16'
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '6.0' -Architecture x86 -NoPath -Version '6.0.4'
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Channel '7.0' -Architecture x86 -NoPath -Version $env:DOTNET_CLI_VERSION
+
     $env:DOTNET_ROOT= $dotnetInstallPath
-
-    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '2.1.30' -Channel '2.1' -Architecture x86 -NoPath
-    ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
-
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '3.1.22' -Channel '3.1' -Architecture x64 -NoPath
-    $env:DOTNET_ROOT= $dotnetInstallPath
-
-    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '3.1.22' -Channel '3.1' -Architecture x86 -NoPath
-    ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
-
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '5.0.14' -Channel '5.0' -Architecture x64 -NoPath
-    $env:DOTNET_ROOT= $dotnetInstallPath
-
-    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '5.0.14' -Channel '5.0' -Architecture x86 -NoPath
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
 
     $env:DOTNET_MULTILEVEL_LOOKUP=0
@@ -266,10 +260,10 @@ public class ProcessOutputter
             AppendLine(e.Data);
 
             if (suppressOutput || e.Data == null)
-            { 
+            {
                 return;
             }
-    
+
             // These handlers can run at the same time,
             // without lock they sometimes grab the color the other
             // one set.
@@ -284,7 +278,7 @@ public class ProcessOutputter
                         // one extra space before the word, to avoid highlighting
                         // warnaserror and similar parameters that are not actual errors
                         //
-                        // The comparison is not done using the insensitive overload because that 
+                        // The comparison is not done using the insensitive overload because that
                         // is too new for PowerShell 5 compiler
                         var lineToLower = line.ToLowerInvariant();
                         Console.ForegroundColor = lineToLower.Contains(" warning")

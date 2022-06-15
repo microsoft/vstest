@@ -42,7 +42,7 @@ public class UseVsixExtensionsArgumentProcessorTests
     public void GetExecuterShouldReturnUseVsixExtensionsArgumentProcessorCapabilities()
     {
         var processor = new UseVsixExtensionsArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is UseVsixExtensionsArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is UseVsixExtensionsArgumentExecutor);
     }
 
     #region UseVsixExtensionsArgumentProcessorCapabilities tests

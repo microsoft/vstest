@@ -100,7 +100,7 @@ public class ExecutionManager : IExecutionManager
         string runSettings,
         TestExecutionContext testExecutionContext,
         ITestCaseEventsHandler testCaseEventsHandler,
-        ITestRunEventsHandler runEventsHandler)
+        IInternalTestRunEventsHandler runEventsHandler)
     {
         try
         {
@@ -136,7 +136,7 @@ public class ExecutionManager : IExecutionManager
         string runSettings,
         TestExecutionContext testExecutionContext,
         ITestCaseEventsHandler testCaseEventsHandler,
-        ITestRunEventsHandler runEventsHandler)
+        IInternalTestRunEventsHandler runEventsHandler)
     {
         try
         {
@@ -160,7 +160,7 @@ public class ExecutionManager : IExecutionManager
     /// <summary>
     /// Cancel the test execution.
     /// </summary>
-    public void Cancel(ITestRunEventsHandler testRunEventsHandler)
+    public void Cancel(IInternalTestRunEventsHandler testRunEventsHandler)
     {
         if (_activeTestRun == null)
         {
@@ -176,7 +176,7 @@ public class ExecutionManager : IExecutionManager
     /// <summary>
     /// Aborts the test execution.
     /// </summary>
-    public void Abort(ITestRunEventsHandler testRunEventsHandler)
+    public void Abort(IInternalTestRunEventsHandler testRunEventsHandler)
     {
         if (_activeTestRun == null)
         {

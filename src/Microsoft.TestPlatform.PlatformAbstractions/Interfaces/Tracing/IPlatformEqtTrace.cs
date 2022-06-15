@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -37,7 +35,7 @@ public partial interface IPlatformEqtTrace
     /// <returns>
     /// The <see cref="bool"/>.
     /// </returns>
-    bool InitializeVerboseTrace(string customLogFile);
+    bool InitializeVerboseTrace(string? customLogFile);
 
     /// <summary>
     /// Initializes the tracing with custom log file and trace level.
@@ -46,7 +44,7 @@ public partial interface IPlatformEqtTrace
     /// <param name="customLogFile">Custom log file for trace messages.</param>
     /// <param name="traceLevel">Trace level.</param>
     /// <returns>Trace initialized flag.</returns>
-    bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel);
+    bool InitializeTrace(string? customLogFile, PlatformTraceLevel traceLevel);
 
     /// <summary>
     /// Gets a value indicating if tracing is enabled for a trace level.
@@ -59,7 +57,7 @@ public partial interface IPlatformEqtTrace
     /// Gets file path for trace log file.
     /// </summary>
     /// <returns>True if tracing is enabled.</returns>
-    string GetLogFile();
+    string? GetLogFile();
 
     /// <summary>
     /// Sets platform specific trace value for tracing verbosity.

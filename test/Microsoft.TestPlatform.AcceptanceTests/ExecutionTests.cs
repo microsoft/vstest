@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 
 using TestPlatform.TestUtilities;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]

@@ -7,7 +7,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -36,25 +35,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 public class TestEngine : ITestEngine
 {
     private readonly ITestRuntimeProviderManager _testHostProviderManager;
-    private ITestExtensionManager _testExtensionManager;
     private readonly IProcessHelper _processHelper;
+    private readonly IEnvironment _environment;
 
-    public TestEngine() : this(TestRuntimeProviderManager.Instance, new ProcessHelper())
+    private ITestExtensionManager _testExtensionManager;
+
+    public TestEngine()
+        : this(TestRuntimeProviderManager.Instance, new ProcessHelper())
     {
     }
 
     protected internal TestEngine(
         TestRuntimeProviderManager testHostProviderManager,
-        IProcessHelper processHelper) : this((ITestRuntimeProviderManager)testHostProviderManager, processHelper)
+        IProcessHelper processHelper)
+        : this(testHostProviderManager, processHelper, new PlatformEnvironment())
     {
     }
 
     internal TestEngine(
         ITestRuntimeProviderManager testHostProviderManager,
-        IProcessHelper processHelper)
+        IProcessHelper processHelper,
+        IEnvironment environment)
     {
         _testHostProviderManager = testHostProviderManager;
         _processHelper = processHelper;
+        _environment = environment;
     }
 
     #region ITestEngine implementation
@@ -150,6 +155,8 @@ public class TestEngine : ITestEngine
                             requestData,
                             new TestRequestSender(requestData.ProtocolConfig, hostManager),
                             hostManager,
+                            // There is always at least one, and all of them have the same framework and architecture.
+                            runtimeProviderInfo.SourceDetails[0].Framework,
                             proxyDiscoveryManager);
                     }
 
@@ -167,6 +174,8 @@ public class TestEngine : ITestEngine
                     requestData,
                     new TestRequestSender(requestData.ProtocolConfig, hostManager),
                     hostManager,
+                    // There is always at least one, and all of them have the same framework and architecture.
+                    runtimeProviderInfo.SourceDetails[0].Framework,
                     discoveryDataAggregator);
         };
 
@@ -290,6 +299,8 @@ public class TestEngine : ITestEngine
                             requestData,
                             requestSender,
                             hostManager,
+                            // There is always at least one, and all of them have the same framework and architecture.
+                            runtimeProviderInfo.SourceDetails[0].Framework,
                             proxyExecutionManager);
                     }
 
@@ -311,6 +322,8 @@ public class TestEngine : ITestEngine
                 requestData,
                 requestSender,
                 hostManager,
+                // There is always at least one, and all of them have the same framework and architecture.
+                runtimeProviderInfo.SourceDetails[0].Framework,
                 new ProxyDataCollectionManager(
                     requestData,
                     runtimeProviderInfo.RunSettings,
@@ -318,7 +331,9 @@ public class TestEngine : ITestEngine
             : new ProxyExecutionManager(
                 requestData,
                 requestSender,
-                hostManager);
+                hostManager,
+                // There is always at least one, and all of them have the same framework and architecture.
+                runtimeProviderInfo.SourceDetails[0].Framework);
     }
 
     /// <inheritdoc/>
@@ -395,7 +410,9 @@ public class TestEngine : ITestEngine
                 : new ProxyOperationManager(
                     requestData,
                     requestSender,
-                    hostManager);
+                    hostManager,
+                    // There is always at least one, and all of them have the same framework and architecture.
+                    testRuntimeProviderInfo.SourceDetails[0].Framework);
         };
 
         // TODO: This condition should be returning the maxParallel level to avoid pre-starting way too many testhosts, because maxParallel level,
@@ -424,8 +441,9 @@ public class TestEngine : ITestEngine
             var testRuntimeProvider = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runsettingsXml, sources);
 
             // Initialize here, because Shared is picked up from the instance, and it can be set during initalization.
-            testRuntimeProvider.Initialize(TestSessionMessageLogger.Instance, runsettingsXml);
-            var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider.GetType(), testRuntimeProvider.Shared, runsettingsXml, sourceDetails: runConfiguration.ToList());
+            testRuntimeProvider?.Initialize(TestSessionMessageLogger.Instance, runsettingsXml);
+            // If the type is null, we throw in ThrowExceptionIfAnyTestHostManagerIsNullOrNoneAreFound
+            var testRuntimeProviderInfo = new TestRuntimeProviderInfo(testRuntimeProvider?.GetType(), testRuntimeProvider?.Shared ?? false, runsettingsXml, sourceDetails: runConfiguration.ToList());
 
             // Outputting the instance, because the code for in-process run uses it, and we don't want to resolve it another time.
             mostRecentlyCreatedInstance = testRuntimeProvider;
@@ -480,15 +498,21 @@ public class TestEngine : ITestEngine
             // Check the user parallel setting.
             int userParallelSetting = RunSettingsUtilities.GetMaxCpuCount(runSettings);
             parallelLevelToUse = userParallelSetting == 0
-                // TODO: use environment helper so we can control this from tests.
-                ? Environment.ProcessorCount
+                ? _environment.ProcessorCount
                 : userParallelSetting;
-            var enableParallel = parallelLevelToUse > 1;
 
             EqtTrace.Verbose(
                 "TestEngine: Initializing Parallel Execution as MaxCpuCount is set to: {0}",
                 parallelLevelToUse);
 
+            // TODO: EXPERIMENTAL FEATURE - will need to be removed or strengthen/tested.
+            // A negative value is used to indicate that the value should be used as a percentage of the number of cores.
+            if (parallelLevelToUse < 0)
+            {
+                parallelLevelToUse = (int)Math.Max(1, Math.Round((double)-parallelLevelToUse * _environment.ProcessorCount / 100.0, MidpointRounding.AwayFromZero));
+            }
+
+            var enableParallel = parallelLevelToUse > 1;
             // Verify if the number of sources is less than user setting of parallel.
             // We should use number of sources as the parallel level, if sources count is less
             // than parallel level.

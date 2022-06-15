@@ -25,7 +25,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution;
 public class RunTestsWithTestsTests
 {
     private readonly TestExecutionContext _testExecutionContext;
-    private readonly Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
+    private readonly Mock<IInternalTestRunEventsHandler> _mockTestRunEventsHandler;
     private TestableRunTestsWithTests? _runTestsInstance;
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
@@ -46,7 +46,7 @@ public class RunTestsWithTestsTests
             isDebug: false,
             testCaseFilter: null,
             filterOptions: null);
-        _mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        _mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
     }
 
     [TestMethod]
@@ -192,7 +192,7 @@ public class RunTestsWithTestsTests
     {
         public TestableRunTestsWithTests(IEnumerable<TestCase> testCases,
             string? runSettings, TestExecutionContext testExecutionContext,
-            ITestCaseEventsHandler? testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler,
+            ITestCaseEventsHandler? testCaseEventsHandler, IInternalTestRunEventsHandler testRunEventsHandler,
             IRequestData requestData)
             : base(requestData, testCases, null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler)
         {
@@ -200,7 +200,7 @@ public class RunTestsWithTestsTests
 
 
         internal TestableRunTestsWithTests(IEnumerable<TestCase> testCases, string? runSettings, TestExecutionContext testExecutionContext,
-            ITestCaseEventsHandler? testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>,
+            ITestCaseEventsHandler? testCaseEventsHandler, IInternalTestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>,
                 List<TestCase>> executorUriVsTestList, IRequestData requestData)
             : base(
                 requestData, testCases, null, runSettings, testExecutionContext,

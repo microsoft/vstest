@@ -9,8 +9,6 @@ using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.SmokeTests;
 
 [TestClass]
@@ -30,11 +28,11 @@ public class DataCollectorTestsCoverlets : IntegrationTestBase
         _testEnvironment.RunnerFramework = CoreRunnerFramework;
         var resultsDir = new TempDirectory();
 
-        string coverletAdapterPath = Path.GetDirectoryName(Directory.GetFiles(_testEnvironment.GetNugetPackage("coverlet.collector"), "coverlet.collector.dll", SearchOption.AllDirectories).Single());
+        string coverletAdapterPath = Path.GetDirectoryName(Directory.GetFiles(_testEnvironment.GetNugetPackage("coverlet.collector"), "coverlet.collector.dll", SearchOption.AllDirectories).Single())!;
         string logId = Guid.NewGuid().ToString("N");
         string assemblyPath = BuildMultipleAssemblyPath("CoverletCoverageTestProject.dll").Trim('\"');
-        string logPath = Path.Combine(Path.GetDirectoryName(assemblyPath), $"coverletcoverage.{logId}.log");
-        string logPathDirectory = Path.GetDirectoryName(logPath);
+        string logPath = Path.Combine(Path.GetDirectoryName(assemblyPath)!, $"coverletcoverage.{logId}.log");
+        string logPathDirectory = Path.GetDirectoryName(logPath)!;
         string argument = $"--collect:{"XPlat Code Coverage".AddDoubleQuote()} {PrepareArguments(assemblyPath, coverletAdapterPath, "", ".NETCoreApp,Version=v2.1", resultsDirectory: resultsDir.Path)} --diag:{logPath.AddDoubleQuote()}";
         InvokeVsTest(argument);
 

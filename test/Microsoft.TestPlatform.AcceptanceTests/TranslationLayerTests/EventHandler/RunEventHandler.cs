@@ -9,12 +9,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 /// <inheritdoc />
-public class RunEventHandler : ITestRunEventsHandler2
+public class RunEventHandler : ITestRunEventsHandler
 {
     /// <summary>
     /// Gets the test results.
@@ -34,12 +32,12 @@ public class RunEventHandler : ITestRunEventsHandler2
     /// <summary>
     /// Gets the metrics.
     /// </summary>
-    public IDictionary<string, object> Metrics { get; private set; }
+    public IDictionary<string, object>? Metrics { get; private set; }
 
     /// <summary>
     /// Gets the log message.
     /// </summary>
-    public string LogMessage { get; private set; }
+    public string? LogMessage { get; private set; }
 
     public List<string> Errors { get; set; }
 
@@ -115,11 +113,5 @@ public class RunEventHandler : ITestRunEventsHandler2
     {
         // No op
         return -1;
-    }
-
-    public virtual bool AttachDebuggerToProcess(int pid)
-    {
-        // No op
-        return true;
     }
 }

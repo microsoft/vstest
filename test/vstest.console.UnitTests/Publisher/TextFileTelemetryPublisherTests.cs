@@ -18,7 +18,7 @@ public class TextFileTelemetryPublisherTests
     public void LogToFileShouldCreateDirectoryIfNotExists()
     {
         var publishMetrics = new TextFileTelemetryPublisher();
-        var dummyDictionary = new Dictionary<string, object>();
+        var dummyDictionary = new Dictionary<string, object?>();
         var mockFileHelper = new Mock<IFileHelper>();
         mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
         dummyDictionary.Add("DummyMessage://", "DummyValue");
@@ -35,7 +35,7 @@ public class TextFileTelemetryPublisherTests
     public void LogToFileShouldWriteAllText()
     {
         var publishMetrics = new TextFileTelemetryPublisher();
-        var dummyDictionary = new Dictionary<string, object>();
+        var dummyDictionary = new Dictionary<string, object?>();
         var mockFileHelper = new Mock<IFileHelper>();
         dummyDictionary.Add("DummyMessage://", "DummyValue");
         dummyDictionary.Add("Dummy2", "DummyValue2");

@@ -26,21 +26,15 @@ using Moq;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ProxyExecutionManagerTests : ProxyBaseManagerTests
 {
     private readonly Mock<ITestRequestSender> _mockRequestSender;
-
     private readonly Mock<TestRunCriteria> _mockTestRunCriteria;
-
     private readonly Mock<IRequestData> _mockRequestData;
-
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
-
     private readonly Mock<IFileHelper> _mockFileHelper;
 
     private ProxyExecutionManager _testExecutionManager;
@@ -57,7 +51,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _mockFileHelper = new Mock<IFileHelper>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
 
-        _testExecutionManager = new ProxyExecutionManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, _mockDataSerializer.Object, _mockFileHelper.Object);
+        _testExecutionManager = new ProxyExecutionManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, Framework.DefaultFramework, _mockDataSerializer.Object, _mockFileHelper.Object);
 
         //this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(null)).Returns(new Message());
         //this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(string.Empty)).Returns(new Message());
@@ -85,7 +79,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _mockTestHostManager.Setup(hm => hm.GetTestSources(_mockTestRunCriteria.Object.Sources)).Returns(_mockTestRunCriteria.Object.Sources);
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
@@ -106,12 +100,12 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
         _mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string>());
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(testRunCriteria, mockTestRunEventsHandler.Object);
 
         _mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
-        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
+        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault()?.Source);
     }
 
     [TestMethod]
@@ -128,12 +122,12 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
         _mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string>());
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(testRunCriteria, mockTestRunEventsHandler.Object);
 
         _mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
-        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
+        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault()?.Source);
     }
 
     [TestMethod]
@@ -144,7 +138,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
 
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
 
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
@@ -253,11 +247,11 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         // Make sure TestPlugincache is refreshed.
         TestPluginCache.Instance = null;
 
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
-        _mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), It.IsAny<ITestRunEventsHandler>()), Times.Never);
+        _mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), It.IsAny<IInternalTestRunEventsHandler>()), Times.Never);
     }
 
     [TestMethod]
@@ -277,7 +271,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     public void StartTestRunShouldInitializeExtensionsWithExistingExtensionsOnly()
     {
         TestPluginCache.Instance = null;
-        TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "def.TestAdapter.dll", "xyz.TestAdapter.dll" }, false);
+        TestPluginCache.Instance!.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "def.TestAdapter.dll", "xyz.TestAdapter.dll" }, false);
         var expectedOutputPaths = new[] { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" };
 
         _mockTestHostManager.SetupGet(th => th.Shared).Returns(false);
@@ -289,7 +283,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _mockFileHelper.Setup(fh => fh.Exists("def.TestAdapter.dll")).Returns(false);
         _mockFileHelper.Setup(fh => fh.Exists("xyz.TestAdapter.dll")).Returns(true);
 
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
         _mockRequestSender.Verify(s => s.InitializeExecution(expectedOutputPaths), Times.Once);
@@ -323,7 +317,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
@@ -350,7 +344,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
             return message;
         });
 
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
@@ -377,7 +371,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
             return message;
         });
 
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
@@ -390,7 +384,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
@@ -403,7 +397,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
@@ -414,7 +408,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void StartTestRunForCancelRequestShouldHandleLogMessageWithProperErrorMessage()
     {
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
         _testExecutionManager.Cancel(mockTestRunEventsHandler.Object);
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
@@ -425,7 +419,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void StartTestRunForAnExceptionDuringLaunchOfTestShouldHandleLogMessageWithProperErrorMessage()
     {
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Throws(new Exception("DummyException"));
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
@@ -436,12 +430,12 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void StartTestRunShouldInitiateTestRunForSourcesThroughTheServer()
     {
-        TestRunCriteriaWithSources testRunCriteriaPassed = null;
+        TestRunCriteriaWithSources? testRunCriteriaPassed = null;
         _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
         _mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), _testExecutionManager))
             .Callback(
-                (TestRunCriteriaWithSources criteria, ITestRunEventsHandler sink) => testRunCriteriaPassed = criteria);
+                (TestRunCriteriaWithSources criteria, IInternalTestRunEventsHandler sink) => testRunCriteriaPassed = criteria);
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null);
 
@@ -456,12 +450,12 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void StartTestRunShouldInitiateTestRunForTestsThroughTheServer()
     {
-        TestRunCriteriaWithTests testRunCriteriaPassed = null;
+        TestRunCriteriaWithTests? testRunCriteriaPassed = null;
         _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
         _mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), _testExecutionManager))
             .Callback(
-                (TestRunCriteriaWithTests criteria, ITestRunEventsHandler sink) => testRunCriteriaPassed = criteria);
+                (TestRunCriteriaWithTests criteria, IInternalTestRunEventsHandler sink) => testRunCriteriaPassed = criteria);
         var runCriteria = new Mock<TestRunCriteria>(
             new List<TestCase> { new TestCase("A.C.M", new Uri("executor://dummy"), "source.dll") },
             10);
@@ -523,11 +517,11 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     {
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
 
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
-        _testExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
+        _testExecutionManager.Cancel(It.IsAny<IInternalTestRunEventsHandler>());
 
         _mockRequestSender.Verify(s => s.SendTestRunCancel(), Times.Never);
     }
@@ -537,11 +531,11 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     {
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
-        _testExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
+        _testExecutionManager.Abort(It.IsAny<IInternalTestRunEventsHandler>());
 
         _mockRequestSender.Verify(s => s.SendTestRunAbort(), Times.Once);
     }
@@ -551,11 +545,11 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     {
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
 
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
-        _testExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
+        _testExecutionManager.Abort(It.IsAny<IInternalTestRunEventsHandler>());
 
         _mockRequestSender.Verify(s => s.SendTestRunAbort(), Times.Never);
     }
@@ -563,7 +557,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void ExecuteTestsCloseTestHostIfRawMessageIfOfTypeExecutionComplete()
     {
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
 
@@ -591,7 +585,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void ExecuteTestsShouldNotCloseTestHostIfRawMessageIsNotOfTypeExecutionComplete()
     {
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
 
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
@@ -615,7 +609,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     public void ExecutionManagerShouldPassOnTestRunStatsChange()
     {
         _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
         var runCriteria = new Mock<TestRunCriteria>(
             new List<TestCase> { new TestCase("A.C.M", new Uri("executor://dummy"), "source.dll") },
             10);
@@ -661,7 +655,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void ExecutionManagerShouldPassOnHandleLogMessage()
     {
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
 
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
@@ -685,7 +679,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     public void ExecutionManagerShouldPassOnLaunchProcessWithDebuggerAttached()
     {
         _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
-        Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new();
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
         var runCriteria = new Mock<TestRunCriteria>(
             new List<TestCase> { new TestCase("A.C.M", new Uri("executor://dummy"), "source.dll") },
             10);
@@ -761,7 +755,8 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
             var mockProxyOperationManager = new Mock<ProxyOperationManager>(
                 _mockRequestData.Object,
                 _mockRequestSender.Object,
-                _mockTestHostManager.Object);
+                _mockTestHostManager.Object,
+                null);
             mockTestSessionPool.Setup(
                     tsp => tsp.TryTakeProxy(
                         testSessionInfo,
@@ -773,7 +768,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
             testExecutionManager.Initialize(true);
             testExecutionManager.StartTestRun(
                 _mockTestRunCriteria.Object,
-                new Mock<ITestRunEventsHandler>().Object);
+                new Mock<IInternalTestRunEventsHandler>().Object);
 
             mockTestSessionPool.Verify(
                 tsp => tsp.TryTakeProxy(
@@ -800,7 +795,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     private void InvokeAndVerifyStartTestRun(bool skipDefaultAdapters)
     {
         TestPluginCache.Instance = null;
-        TestPluginCache.Instance.DefaultExtensionPaths = new List<string> { "default1.dll", "default2.dll" };
+        TestPluginCache.Instance!.DefaultExtensionPaths = new List<string> { "default1.dll", "default2.dll" };
         TestPluginCache.Instance.UpdateExtensions(new List<string> { "filterTestAdapter.dll" }, false);
         TestPluginCache.Instance.UpdateExtensions(new List<string> { "unfilter.dll" }, true);
 
@@ -821,40 +816,4 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
             TestPluginCache.Instance = null;
         }
     }
-
-    //private void SetupReceiveRawMessageAsyncAndDeserializeMessageAndInitialize()
-    //{
-    //    var connectionInfo = new TestHostConnectionInfo
-    //    {
-    //        Endpoint = IPAddress.Loopback + ":0",
-    //        Role = ConnectionRole.Client,
-    //        Transport = Transport.Sockets
-    //    };
-    //    this.mockCommunicationEndpoint = new Mock<ICommunicationEndPoint>();
-    //    this.mockDataSerializer = new Mock<IDataSerializer>();
-    //    this.testRequestSender = new TestRequestSender(this.mockCommunicationEndpoint.Object, connectionInfo, this.mockDataSerializer.Object, this.protocolConfig, CLIENTPROCESSEXITWAIT);
-    //    this.mockCommunicationEndpoint.Setup(mc => mc.Start(connectionInfo.Endpoint)).Returns(connectionInfo.Endpoint).Callback(() =>
-    //    {
-    //        this.mockCommunicationEndpoint.Raise(
-    //            s => s.Connected += null,
-    //            this.mockCommunicationEndpoint.Object,
-    //            new ConnectedEventArgs(this.mockChannel.Object));
-    //    });
-    //    this.SetupChannelMessage(MessageType.VersionCheck, MessageType.VersionCheck, this.protocolConfig.Version);
-
-    //    this.testRequestSender.InitializeCommunication();
-
-    //    this.testExecutionManager = new ProxyExecutionManager(this.mockRequestData.Object, this.testRequestSender, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.clientConnectionTimeout);
-    //}
-
-    //private void SetupChannelMessage<TPayload>(string messageType, string returnMessageType, TPayload returnPayload)
-    //{
-    //    this.mockChannel.Setup(mc => mc.Send(It.Is<string>(s => s.Contains(messageType))))
-    //                    .Callback(() => this.mockChannel.Raise(c => c.MessageReceived += null, this.mockChannel.Object, new MessageReceivedEventArgs { Data = messageType }));
-
-    //    this.mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>())).Returns(messageType);
-    //    this.mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>(), It.IsAny<int>())).Returns(messageType);
-    //    this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(It.Is<string>(s => s.Equals(messageType)))).Returns(new Message { MessageType = returnMessageType });
-    //    this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TPayload>(It.Is<Message>(m => m.MessageType.Equals(messageType)))).Returns(returnPayload);
-    //}
 }

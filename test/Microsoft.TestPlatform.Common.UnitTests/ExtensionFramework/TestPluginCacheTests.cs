@@ -17,8 +17,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 
 [TestClass]
@@ -209,7 +207,7 @@ public class TestPluginCacheTests
     public void GetDefaultResolutionPathsShouldReturnCurrentDirectoryByDefault()
     {
         var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
-        var expectedDirectories = new List<string> { currentDirectory };
+        var expectedDirectories = new List<string> { currentDirectory! };
 
         var resolutionPaths = TestPluginCache.Instance.GetDefaultResolutionPaths();
 
@@ -220,8 +218,8 @@ public class TestPluginCacheTests
     [TestMethod]
     public void GetDefaultResolutionPathsShouldReturnAdditionalExtensionPathsDirectories()
     {
-        var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
-        var candidateDirectory = Directory.GetParent(currentDirectory).FullName;
+        var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location)!;
+        var candidateDirectory = Directory.GetParent(currentDirectory)!.FullName;
         var extensionPaths = new List<string> { Path.Combine(candidateDirectory, "foo.dll") };
 
         // Setup mocks.
@@ -271,7 +269,7 @@ public class TestPluginCacheTests
         var temp = Path.GetTempPath();
         var resolutionPaths = TestPluginCache.Instance.GetResolutionPaths($@"{temp}{Path.DirectorySeparatorChar}Idonotexist.dll").Select(p => p.Replace("/", "\\")).ToList();
 
-        var tpCommonDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
+        var tpCommonDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location)!;
         var expectedPaths = new List<string> { temp, tpCommonDirectory }.ConvertAll(p => p.Replace("/", "\\").TrimEnd('\\'));
 
         CollectionAssert.AreEqual(expectedPaths, resolutionPaths, $"Collection {string.Join(", ", resolutionPaths)}, is not equal to the expected collection {string.Join(", ", expectedPaths)}.");
@@ -284,7 +282,7 @@ public class TestPluginCacheTests
 
         var resolutionPaths = TestPluginCache.Instance.GetResolutionPaths(tpCommonlocation);
 
-        var expectedPaths = new List<string> { Path.GetDirectoryName(tpCommonlocation) };
+        var expectedPaths = new List<string> { Path.GetDirectoryName(tpCommonlocation)! };
 
         CollectionAssert.AreEqual(expectedPaths, resolutionPaths.ToList());
     }
@@ -370,7 +368,7 @@ public class TestPluginCacheTests
 
     #endregion
 
-    private void InvokeGetExtensionPaths(List<string> expectedExtensions, bool skipDefaultExtensions)
+    private static void InvokeGetExtensionPaths(List<string> expectedExtensions, bool skipDefaultExtensions)
     {
         TestPluginCache.Instance.UpdateExtensions(new[] { @"filter.dll", @"other.dll" }, false);
         TestPluginCache.Instance.UpdateExtensions(new[] { @"unfilter.dll" }, true);

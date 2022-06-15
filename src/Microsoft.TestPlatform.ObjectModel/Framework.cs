@@ -41,7 +41,7 @@ public class Framework
     public string Version { get; private set; }
 
     /// <summary>
-    /// Returns a valid framework else returns null
+    /// Returns a valid framework or null when it cannot parse it, or when given null.
     /// </summary>
     /// <param name="frameworkString">Framework name</param>
     /// <returns>A framework object</returns>

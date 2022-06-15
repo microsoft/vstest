@@ -5,8 +5,6 @@ using System;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>

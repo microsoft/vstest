@@ -9,11 +9,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+#if !NET5_0_OR_GREATER
 using System.Threading.Tasks;
+#endif
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
@@ -23,9 +23,10 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 public partial class ProcessHelper : IProcessHelper
 {
     private static readonly string Arm = "arm";
+    private readonly Process _currentProcess = Process.GetCurrentProcess();
 
     /// <inheritdoc/>
-    public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallBack)
+    public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack)
     {
         if (!File.Exists(processPath))
         {
@@ -137,13 +138,13 @@ public partial class ProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc/>
-    public string GetCurrentProcessFileName()
+    public string? GetCurrentProcessFileName()
     {
-        return Process.GetCurrentProcess().MainModule.FileName;
+        return _currentProcess.MainModule?.FileName;
     }
 
     /// <inheritdoc/>
-    public string GetTestEngineDirectory()
+    public string? GetTestEngineDirectory()
     {
         return Path.GetDirectoryName(typeof(ProcessHelper).GetTypeInfo().Assembly.Location);
     }
@@ -151,17 +152,22 @@ public partial class ProcessHelper : IProcessHelper
     /// <inheritdoc/>
     public int GetCurrentProcessId()
     {
-        return Process.GetCurrentProcess().Id;
+        return _currentProcess.Id;
     }
 
     /// <inheritdoc/>
     public string GetProcessName(int processId)
     {
+        if (processId == _currentProcess.Id)
+        {
+            return _currentProcess.ProcessName;
+        }
+
         return Process.GetProcessById(processId).ProcessName;
     }
 
     /// <inheritdoc/>
-    public bool TryGetExitCode(object process, out int exitCode)
+    public bool TryGetExitCode(object? process, out int exitCode)
     {
         try
         {
@@ -180,11 +186,11 @@ public partial class ProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc/>
-    public void SetExitCallback(int processId, Action<object> callbackAction)
+    public void SetExitCallback(int processId, Action<object?>? callbackAction)
     {
         try
         {
-            var process = Process.GetProcessById(processId);
+            var process = processId == _currentProcess.Id ? _currentProcess : Process.GetProcessById(processId);
             process.EnableRaisingEvents = true;
             process.Exited += (sender, args) => callbackAction?.Invoke(sender);
         }
@@ -197,7 +203,7 @@ public partial class ProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc/>
-    public void TerminateProcess(object process)
+    public void TerminateProcess(object? process)
     {
         try
         {
@@ -212,7 +218,7 @@ public partial class ProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc/>
-    public int GetProcessId(object process)
+    public int GetProcessId(object? process)
     {
         var proc = process as Process;
         return proc?.Id ?? -1;
@@ -228,7 +234,7 @@ public partial class ProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc/>
-    public void WaitForProcessExit(object process)
+    public void WaitForProcessExit(object? process)
     {
         if (process is Process proc && !proc.HasExited)
         {

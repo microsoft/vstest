@@ -12,9 +12,8 @@
     <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\NullableAttributes.cs" Link="NullableAttributes.cs" />
     <Compile Include="..\..\scripts\build\ExternalAssemblyVersions.cs" Link="ExternalAssemblyVersions.cs" />
-    <Compile Include="..\..\TPDebug.cs" Link="TPDebug.cs" />
+    <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
@@ -37,6 +36,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="NullableHelpers.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>NullableHelpers.tt</DependentUpon>
+    </Compile>
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -60,6 +64,15 @@
     <!-- Framework specific API -->
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="NullableHelpers.tt">
+      <LastGenOutput>NullableHelpers.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

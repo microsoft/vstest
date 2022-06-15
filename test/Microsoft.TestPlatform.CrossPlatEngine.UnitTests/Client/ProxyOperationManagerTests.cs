@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -26,8 +27,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
@@ -35,35 +34,26 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
 {
     private const int Clientprocessexitwait = 10 * 1000;
 
-    private readonly ProxyOperationManager _testOperationManager;
-
-    private readonly Mock<ITestRequestSender> _mockRequestSender;
-
-    private Mock<IProcessHelper> _mockProcessHelper;
-
-    private Mock<IRunSettingsHelper> _mockRunsettingHelper;
-
-    private Mock<IWindowsRegistryHelper> _mockWindowsRegistry;
-
-    private Mock<IEnvironmentVariableHelper> _mockEnvironmentVariableHelper;
-
-    private Mock<IFileHelper> _mockFileHelper;
-
-    private Mock<IEnvironment> _mockEnvironment;
-
-    private readonly Mock<IRequestData> _mockRequestData;
-
-    private readonly int _connectionTimeout = EnvironmentHelper.DefaultConnectionTimeout * 1000;
-
-    private readonly string _defaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
-
+    private static readonly int ConnectionTimeout = EnvironmentHelper.DefaultConnectionTimeout * 1000;
+    private static readonly string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
     private static readonly string TimoutErrorMessage =
         "vstest.console process failed to connect to testhost process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
+
+    private readonly ProxyOperationManager _testOperationManager;
+    private readonly Mock<ITestRequestSender> _mockRequestSender;
+    private readonly Mock<IRequestData> _mockRequestData;
+
+    private Mock<IProcessHelper>? _mockProcessHelper;
+    private Mock<IRunSettingsHelper>? _mockRunsettingHelper;
+    private Mock<IWindowsRegistryHelper>? _mockWindowsRegistry;
+    private Mock<IEnvironmentVariableHelper>? _mockEnvironmentVariableHelper;
+    private Mock<IFileHelper>? _mockFileHelper;
+    private Mock<IEnvironment>? _mockEnvironment;
 
     public ProxyOperationManagerTests()
     {
         _mockRequestSender = new Mock<ITestRequestSender>();
-        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(_connectionTimeout, It.IsAny<CancellationToken>())).Returns(true);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(ConnectionTimeout, It.IsAny<CancellationToken>())).Returns(true);
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new Mock<IMetricsCollection>().Object);
         _testOperationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object);
@@ -84,7 +74,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
                 th => th.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<TestRunnerConnectionInfo>()))
             .Returns(expectedStartInfo);
 
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         _mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.Is<TestProcessStartInfo>(si => si == expectedStartInfo), It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -95,7 +85,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
         EqtTrace.InitializeTrace("log.txt", PlatformTraceLevel.Verbose);
 
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         _mockTestHostManager.Verify(
             th =>
@@ -117,7 +107,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     {
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
 
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         _mockTestHostManager.Verify(
             th =>
@@ -137,7 +127,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
 #endif
 
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         _mockTestHostManager.Verify(
             th =>
@@ -150,7 +140,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void SetupChannelShouldSetupServerForCommunication()
     {
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         _mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
     }
@@ -177,7 +167,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
 
         var localTestOperationManager = new TestableProxyOperationManager(_mockRequestData.Object, testRequestSender, _mockTestHostManager.Object);
 
-        localTestOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        localTestOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         mockCommunicationServer.Verify(s => s.Start(IPAddress.Loopback.ToString() + ":0"), Times.Once);
     }
@@ -205,7 +195,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
 
         var localTestOperationManager = new TestableProxyOperationManager(_mockRequestData.Object, testRequestSender, _mockTestHostManager.Object);
 
-        localTestOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        localTestOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         mockCommunicationEndpoint.Verify(s => s.Start(It.IsAny<string>()), Times.Once);
     }
@@ -213,8 +203,8 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void SetupChannelShouldNotInitializeIfConnectionIsAlreadyInitialized()
     {
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         _mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
     }
@@ -222,18 +212,18 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void SetupChannelShouldWaitForTestHostConnection()
     {
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
-        _mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(_connectionTimeout, It.IsAny<CancellationToken>()), Times.Once);
+        _mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(ConnectionTimeout, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [TestMethod]
     public void SetupChannelShouldNotWaitForTestHostConnectionIfConnectionIsInitialized()
     {
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
-        _mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(_connectionTimeout, It.IsAny<CancellationToken>()), Times.Exactly(1));
+        _mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(ConnectionTimeout, It.IsAny<CancellationToken>()), Times.Exactly(1));
     }
 
     [TestMethod]
@@ -242,7 +232,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "100");
 
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(100000, It.IsAny<CancellationToken>())).Returns(true);
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         _mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(100000, It.IsAny<CancellationToken>()), Times.Exactly(1));
     }
@@ -251,11 +241,11 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     public void SetupChannelShouldThrowIfWaitForTestHostConnectionTimesOut()
     {
         SetupTestHostLaunched(true);
-        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(_connectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(ConnectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
 
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object);
 
-        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings)).Message;
+        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings)).Message;
         Assert.AreEqual(message, TimoutErrorMessage);
     }
 
@@ -263,13 +253,13 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     public void SetupChannelShouldThrowTestPlatformExceptionIfRequestCancelled()
     {
         SetupTestHostLaunched(true);
-        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(_connectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(ConnectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
 
         var cancellationTokenSource = new CancellationTokenSource();
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, cancellationTokenSource);
 
         cancellationTokenSource.Cancel();
-        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings)).Message;
+        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings)).Message;
         Equals("Canceling the operation as requested.", message);
     }
 
@@ -277,14 +267,14 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     public void SetupChannelShouldThrowTestPlatformExceptionIfRequestCancelledDuringLaunchOfTestHost()
     {
         SetupTestHostLaunched(true);
-        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(_connectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(ConnectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
 
         _mockTestHostManager.Setup(rs => rs.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Callback(() => Task.Run(() => throw new OperationCanceledException()));
 
         var cancellationTokenSource = new CancellationTokenSource();
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, cancellationTokenSource);
 
-        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings)).Message;
+        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings)).Message;
         Equals("Canceling the operation as requested.", message);
     }
 
@@ -292,13 +282,13 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     public void SetupChannelShouldThrowTestPlatformExceptionIfRequestCancelledPostHostLaunchDuringWaitForHandlerConnection()
     {
         SetupTestHostLaunched(true);
-        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(_connectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(ConnectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
 
         var cancellationTokenSource = new CancellationTokenSource();
         _mockTestHostManager.Setup(rs => rs.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Callback(() => cancellationTokenSource.Cancel());
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, cancellationTokenSource);
 
-        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings)).Message;
+        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings)).Message;
         Equals("Canceling the operation as requested.", message);
     }
 
@@ -306,18 +296,18 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     public void SetupChannelShouldThrowIfLaunchTestHostFails()
     {
         SetupTestHostLaunched(false);
-        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(_connectionTimeout, It.IsAny<CancellationToken>())).Returns(true);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(ConnectionTimeout, It.IsAny<CancellationToken>())).Returns(true);
 
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object);
 
-        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings)).Message;
+        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings)).Message;
         Assert.AreEqual(message, string.Format(CultureInfo.CurrentUICulture, Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources.InitializationFailed));
     }
 
     [TestMethod]
     public void SetupChannelShouldCheckVersionWithTestHost()
     {
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
         _mockRequestSender.Verify(rs => rs.CheckVersionWithTestHost(), Times.Once);
     }
 
@@ -326,7 +316,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     {
         // Make the version check fail
         _mockRequestSender.Setup(rs => rs.CheckVersionWithTestHost()).Throws(new TestPlatformException("Version check failed"));
-        Assert.ThrowsException<TestPlatformException>(() => _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings));
+        Assert.ThrowsException<TestPlatformException>(() => _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings));
     }
 
     [TestMethod]
@@ -336,7 +326,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         var testHostManager = new TestableDotnetTestHostManager(false, _mockProcessHelper.Object, _mockFileHelper.Object, _mockEnvironment.Object, _mockRunsettingHelper.Object, _mockWindowsRegistry.Object, _mockEnvironmentVariableHelper.Object);
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, testHostManager);
 
-        operationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        operationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         _mockRequestSender.Verify(rs => rs.CheckVersionWithTestHost(), Times.Never);
     }
@@ -348,7 +338,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         var testHostManager = new TestableDotnetTestHostManager(true, _mockProcessHelper.Object, _mockFileHelper.Object, _mockEnvironment.Object, _mockRunsettingHelper.Object, _mockWindowsRegistry.Object, _mockEnvironmentVariableHelper.Object);
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, testHostManager);
 
-        operationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        operationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         _mockRequestSender.Verify(rs => rs.CheckVersionWithTestHost(), Times.Once);
     }
@@ -356,8 +346,8 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     [TestMethod]
     public void CloseShouldEndSessionIfHostWasLaunched()
     {
-        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(_connectionTimeout, It.IsAny<CancellationToken>())).Returns(true);
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(ConnectionTimeout, It.IsAny<CancellationToken>())).Returns(true);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         _testOperationManager.Close();
 
@@ -384,12 +374,12 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     public void CloseShouldResetChannelInitialization()
     {
         SetupWaitForTestHostExit();
-        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(_connectionTimeout, It.IsAny<CancellationToken>())).Returns(true);
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(ConnectionTimeout, It.IsAny<CancellationToken>())).Returns(true);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         _testOperationManager.Close();
 
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
         _mockTestHostManager.Verify(th => th.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
     }
 
@@ -397,8 +387,8 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     public void CloseShouldTerminateTesthostProcessIfWaitTimesout()
     {
         // Ensure testhost start returns a dummy process id
-        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(_connectionTimeout, It.IsAny<CancellationToken>())).Returns(true);
-        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(ConnectionTimeout, It.IsAny<CancellationToken>())).Returns(true);
+        _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         _testOperationManager.Close();
 
@@ -445,7 +435,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
             .Returns(Task.FromResult(true));
 
         // Act.
-        testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         // Verify.
         Assert.IsTrue(receivedTestProcessInfo.Arguments.Contains("--telemetryoptedin true"));
@@ -468,12 +458,13 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
             .Returns(Task.FromResult(true));
 
         // Act.
-        testOperationManager.SetupChannel(Enumerable.Empty<string>(), _defaultRunSettings);
+        testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         // Verify.
         Assert.IsTrue(receivedTestProcessInfo.Arguments.Contains("--telemetryoptedin false"));
     }
 
+    [MemberNotNull(nameof(_mockProcessHelper), nameof(_mockFileHelper), nameof(_mockEnvironment), nameof(_mockRunsettingHelper), nameof(_mockWindowsRegistry), nameof(_mockEnvironmentVariableHelper))]
     private void SetUpMocksForDotNetTestHost()
     {
         _mockProcessHelper = new Mock<IProcessHelper>();
@@ -491,9 +482,9 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<IDictionary<string, string>>(),
-                        It.IsAny<Action<object, string>>(),
-                        It.IsAny<Action<object>>(),
-                        It.IsAny<Action<object, string>>()))
+                        It.IsAny<Action<object?, string?>>(),
+                        It.IsAny<Action<object?>>(),
+                        It.IsAny<Action<object?, string?>>()))
             .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
                 (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
                 {
@@ -508,7 +499,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     {
         public TestableProxyOperationManager(IRequestData requestData,
             ITestRequestSender requestSender,
-            ITestRuntimeProvider testHostManager) : base(requestData, requestSender, testHostManager)
+            ITestRuntimeProvider testHostManager) : base(requestData, requestSender, testHostManager, Framework.DefaultFramework)
         {
         }
 
@@ -516,7 +507,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
             IRequestData requestData,
             ITestRequestSender requestSender,
             ITestRuntimeProvider testHostManager,
-            CancellationTokenSource cancellationTokenSource) : base(requestData, requestSender, testHostManager)
+            CancellationTokenSource cancellationTokenSource) : base(requestData, requestSender, testHostManager, Framework.DefaultFramework)
         {
             CancellationTokenSource = cancellationTokenSource;
         }
@@ -549,7 +540,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
 
         public override TestProcessStartInfo GetTestHostProcessStartInfo(
             IEnumerable<string> sources,
-            IDictionary<string, string> environmentVariables,
+            IDictionary<string, string>? environmentVariables,
             TestRunnerConnectionInfo connectionInfo)
         {
             return new TestProcessStartInfo();

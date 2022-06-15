@@ -51,7 +51,7 @@ public class TestRequestHandlerTests
         };
 
         _jobQueue = new JobQueue<Action>(
-            action => action(),
+            action => action?.Invoke(),
             "TestHostOperationQueue",
             500,
             25000000,
@@ -246,7 +246,7 @@ public class TestRequestHandlerTests
                 It.Is<Dictionary<string, IEnumerable<string>>>(d => d.ContainsKey("mstestv2")), It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<TestExecutionContext>(), It.IsAny<ITestCaseEventsHandler>(),
-                It.IsAny<ITestRunEventsHandler>()));
+                It.IsAny<IInternalTestRunEventsHandler>()));
         SendSessionEnd();
     }
 
@@ -271,7 +271,7 @@ public class TestRequestHandlerTests
                     tcs.Any(t => t.FullyQualifiedName.Equals("N.C.M2"))), It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<TestExecutionContext>(), It.IsAny<ITestCaseEventsHandler>(),
-                It.IsAny<ITestRunEventsHandler>()));
+                It.IsAny<IInternalTestRunEventsHandler>()));
         SendSessionEnd();
     }
 
@@ -283,7 +283,7 @@ public class TestRequestHandlerTests
         ProcessRequestsAsync(_mockTestHostManagerFactory.Object);
         SendMessageOnChannel(message);
 
-        _mockExecutionManager.Verify(e => e.Cancel(It.IsAny<ITestRunEventsHandler>()));
+        _mockExecutionManager.Verify(e => e.Cancel(It.IsAny<IInternalTestRunEventsHandler>()));
         SendSessionEnd();
     }
 
@@ -307,7 +307,7 @@ public class TestRequestHandlerTests
         ProcessRequestsAsync(_mockTestHostManagerFactory.Object);
         SendMessageOnChannel(message);
 
-        _mockExecutionManager.Verify(e => e.Abort(It.IsAny<ITestRunEventsHandler>()));
+        _mockExecutionManager.Verify(e => e.Abort(It.IsAny<IInternalTestRunEventsHandler>()));
         SendSessionEnd();
     }
 
@@ -322,7 +322,7 @@ public class TestRequestHandlerTests
         _mockExecutionManager.Setup(em => em.StartTestRun(It.IsAny<IEnumerable<TestCase>>(), It.IsAny<string>(),
             It.IsAny<string>(),
             It.IsAny<TestExecutionContext>(), It.IsAny<ITestCaseEventsHandler>(),
-            It.IsAny<ITestRunEventsHandler>())).Callback(() => _requestHandler.SendExecutionComplete(It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<string>>()));
+            It.IsAny<IInternalTestRunEventsHandler>())).Callback(() => _requestHandler.SendExecutionComplete(It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<string>>()));
 
         ProcessRequestsAsync(_mockTestHostManagerFactory.Object);
         _mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.ExecutionComplete))))
@@ -343,7 +343,7 @@ public class TestRequestHandlerTests
                     tcs.Any(t => t.FullyQualifiedName.Equals("N.C.M2"))), It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<TestExecutionContext>(), It.IsAny<ITestCaseEventsHandler>(),
-                It.IsAny<ITestRunEventsHandler>()));
+                It.IsAny<IInternalTestRunEventsHandler>()));
         SendSessionEnd();
     }
 

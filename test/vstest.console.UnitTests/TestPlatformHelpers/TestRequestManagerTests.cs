@@ -96,7 +96,7 @@ public class TestRequestManagerTests
             .Returns(_mockRunRequest.Object);
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.X86);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework40));
         _mockProcessHelper.Setup(x => x.GetCurrentProcessId()).Returns(1234);
         _mockProcessHelper.Setup(x => x.GetProcessName(It.IsAny<int>())).Returns("dotnet.exe");
@@ -667,7 +667,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -677,7 +677,7 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
         Assert.IsTrue(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
@@ -701,7 +701,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.X86);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework451));
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -711,7 +711,7 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Never);
 
         Assert.IsTrue(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
@@ -733,7 +733,7 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = false;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -742,7 +742,7 @@ public class TestRequestManagerTests
 
         _testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
         Assert.IsTrue(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
@@ -768,7 +768,7 @@ public class TestRequestManagerTests
         _commandLineOptions.TargetArchitecture = Architecture.X86;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         DiscoveryCriteria? actualDiscoveryCriteria = null;
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -782,7 +782,7 @@ public class TestRequestManagerTests
 
         // we infer the architecture and framework, so we can print warning when they don't match settings.
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Once);
 
         // but we don't update the settings, to keep what user specified
         Assert.IsFalse(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
@@ -803,7 +803,7 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
         // Verify.
-        _mockMetricsPublisher.Verify(mp => mp.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, It.IsAny<IDictionary<string, object>>()), Times.Once);
+        _mockMetricsPublisher.Verify(mp => mp.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, It.IsAny<IDictionary<string, object?>>()), Times.Once);
     }
 
     [TestMethod]
@@ -816,7 +816,7 @@ public class TestRequestManagerTests
         };
 
         var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-        var mockCustomlauncher = new Mock<ITestHostLauncher>();
+        var mockCustomlauncher = new Mock<ITestHostLauncher3>();
 
         _testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, _protocolConfig);
         _testRequestManager.CancelTestRun();
@@ -832,7 +832,7 @@ public class TestRequestManagerTests
         };
 
         var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-        var mockCustomlauncher = new Mock<ITestHostLauncher>();
+        var mockCustomlauncher = new Mock<ITestHostLauncher3>();
 
         _testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, _protocolConfig);
         _testRequestManager.AbortTestRun();
@@ -858,7 +858,7 @@ public class TestRequestManagerTests
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockDiscoveryRequest.Object);
 
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
         Assert.AreEqual(15, actualTestRunCriteria!.FrequencyOfRunStatsChangeEvent);
     }
 
@@ -881,10 +881,10 @@ public class TestRequestManagerTests
         var mockDiscoveryRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockDiscoveryRequest.Object);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework35));
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework35));
 
         var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-        var mockCustomlauncher = new Mock<ITestHostLauncher>();
+        var mockCustomlauncher = new Mock<ITestHostLauncher3>();
 
         _testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, _protocolConfig);
 
@@ -908,7 +908,7 @@ public class TestRequestManagerTests
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualRequestData = requestData).Returns(mockDiscoveryRequest.Object);
 
         // Act.
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
         // Verify.
         Assert.AreEqual(6, actualRequestData!.ProtocolConfig.Version);
@@ -949,7 +949,7 @@ public class TestRequestManagerTests
         CommandLineOptions.Instance.SettingsFile = @"c://temp/.runsettings";
 
         // Act.
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
         // Verify
         Assert.IsTrue(actualRequestData!.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out var commandLineSwitches));
@@ -1008,7 +1008,7 @@ public class TestRequestManagerTests
             _mockEnvironment.Object);
 
         // Act.
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
         // Verify
         Assert.IsTrue(actualRequestData!.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.Elements", out var legacySettingsNodes));
@@ -1056,7 +1056,7 @@ public class TestRequestManagerTests
             _mockEnvironment.Object);
 
         // Act.
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
         // Verify
         Assert.IsTrue(actualRequestData!.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TestSettingsUsed, out var testSettingsUsed));
@@ -1102,7 +1102,7 @@ public class TestRequestManagerTests
             _mockEnvironment.Object);
 
         // Act.
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
         // Verify
         Assert.IsTrue(actualRequestData!.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out var targetDevice));
@@ -1135,7 +1135,7 @@ public class TestRequestManagerTests
             }).Returns(mockRunRequest.Object);
 
         var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-        var mockCustomlauncher = new Mock<ITestHostLauncher>();
+        var mockCustomlauncher = new Mock<ITestHostLauncher3>();
 
         string testCaseFilterValue = "TestFilter";
         payload.TestPlatformOptions = new TestPlatformOptions { TestCaseFilter = testCaseFilterValue };
@@ -1224,7 +1224,7 @@ public class TestRequestManagerTests
             run2Stop = sw.ElapsedMilliseconds;
         });
 
-        var mockCustomlauncher = new Mock<ITestHostLauncher>();
+        var mockCustomlauncher = new Mock<ITestHostLauncher3>();
         var task1 = Task.Run(() => _testRequestManager.RunTests(payload1, mockCustomlauncher.Object, mockRunEventsRegistrar1.Object, _protocolConfig));
         var task2 = Task.Run(() => _testRequestManager.RunTests(payload2, mockCustomlauncher.Object, mockRunEventsRegistrar2.Object, _protocolConfig));
 
@@ -1254,11 +1254,11 @@ public class TestRequestManagerTests
         };
 
         var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-        var mockCustomlauncher = new Mock<ITestHostLauncher>();
+        var mockCustomlauncher = new Mock<ITestHostLauncher3>();
 
         _testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, _protocolConfig);
 
-        _mockMetricsPublisher.Verify(mp => mp.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, It.IsAny<IDictionary<string, object>>()), Times.Once);
+        _mockMetricsPublisher.Verify(mp => mp.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, It.IsAny<IDictionary<string, object?>>()), Times.Once);
     }
 
     // TODO: add tests in design mode and executor that they are handling all the exceptions properly including printing inner exception.
@@ -1359,7 +1359,7 @@ public class TestRequestManagerTests
         };
         _commandLineOptions.IsDesignMode = designModeValue;
 
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         var designmode = $"<DesignMode>{designModeValue}</DesignMode>";
         _mockTestPlatform.Verify(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.Is<TestRunCriteria>(rc => rc.TestRunSettings.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>()));
@@ -1397,17 +1397,17 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
@@ -1434,18 +1434,18 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.X86);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework451));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         // infer them so we can print warning when dlls are not compatible with runsettings
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Once);
 
         // but don't update runsettings because we want to keep what user specified
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
@@ -1475,18 +1475,18 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.X86);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework451));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         // infer platform and framework so we can print warnings when dlls are not compatible with runsettings
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Once);
 
         // don't update it in runsettings to keep what user provided
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(targetPlatform));
@@ -1509,17 +1509,17 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = false;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
@@ -1547,18 +1547,18 @@ public class TestRequestManagerTests
 
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         // infer them so we can print warnings when the assemblies are not compatible
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Once);
 
         // but don't update them in runsettings so we keep what user specified
         Assert.IsFalse(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
@@ -1589,17 +1589,17 @@ public class TestRequestManagerTests
         _commandLineOptions.IsDesignMode = true;
         _mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>())).Callback<string>(archSources.Add)
             .Returns(Architecture.ARM);
-        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>())).Callback<string>(fxSources.Add)
+        _mockAssemblyMetadataProvider.Setup(a => a.GetFrameworkName(It.IsAny<string>())).Callback<string>(fxSources.Add)
             .Returns(new FrameworkName(Constants.DotNetFramework46));
         TestRunCriteria? actualTestRunCriteria = null;
         var mockTestRunRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
@@ -1636,7 +1636,7 @@ public class TestRequestManagerTests
 
         try
         {
-            _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+            _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
         }
         catch (SettingsException ex)
         {
@@ -1676,7 +1676,7 @@ public class TestRequestManagerTests
 
         try
         {
-            _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+            _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
         }
         catch (SettingsException ex)
         {
@@ -1708,7 +1708,7 @@ public class TestRequestManagerTests
         };
 
         _commandLineOptions.EnableCodeCoverage = true;
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
     }
 
     [TestMethod]
@@ -1731,7 +1731,7 @@ public class TestRequestManagerTests
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
 
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria!.TestRunSettings).LoggerSettingsList;
         Assert.AreEqual(1, loggerSettingsList.Count);
@@ -1769,7 +1769,7 @@ public class TestRequestManagerTests
         var mockTestRunRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria!.TestRunSettings).LoggerSettingsList;
         Assert.AreEqual(2, loggerSettingsList.Count);
@@ -1843,7 +1843,7 @@ public class TestRequestManagerTests
         var mockTestRunRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         Assert.IsFalse(actualTestRunCriteria!.TestRunSettings.Contains("LoggerRunSettings"));
     }
@@ -1941,7 +1941,7 @@ public class TestRequestManagerTests
         var mockTestRunRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria!.TestRunSettings).LoggerSettingsList;
         Assert.AreEqual(2, loggerSettingsList.Count);
@@ -2042,7 +2042,7 @@ public class TestRequestManagerTests
         var mockTestRunRequest = new Mock<ITestRunRequest>();
         _mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Callback(
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
-        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
+        _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria!.TestRunSettings).LoggerSettingsList;
         Assert.AreEqual(2, loggerSettingsList.Count);
@@ -2136,9 +2136,12 @@ public class TestRequestManagerTests
         _mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStop());
 
         _mockMetricsPublisher.Verify(p => p.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent,
-            It.Is<Dictionary<string, object>>(m => m.Count == 2 &&
-                                                   m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing) && (int)m[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing] == 5 &&
-                                                   m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsAfterProcessing) && (int)m[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing] == 1)));
+            It.Is<Dictionary<string, object?>>(m =>
+                m.Count == 2
+                && m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing)
+                && (int)m[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing]! == 5
+                && m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsAfterProcessing)
+                && (int)m[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing]! == 1)));
     }
 
     [TestMethod]
@@ -2202,7 +2205,10 @@ public class TestRequestManagerTests
         _mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStop());
 
         _mockMetricsPublisher.Verify(p => p.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent,
-            It.Is<Dictionary<string, object>>(m => m.Count == 1 && m.ContainsKey(TelemetryDataConstants.AttachmentsProcessingState) && (string)m[TelemetryDataConstants.AttachmentsProcessingState] == "Canceled")));
+            It.Is<Dictionary<string, object?>>(m =>
+                m.Count == 1
+                && m.ContainsKey(TelemetryDataConstants.AttachmentsProcessingState)
+                && (string?)m[TelemetryDataConstants.AttachmentsProcessingState] == "Canceled")));
     }
 
     [TestMethod]
@@ -2234,7 +2240,7 @@ public class TestRequestManagerTests
                     CollectMetrics = true
                 }
             },
-            new Mock<ITestHostLauncher>().Object,
+            new Mock<ITestHostLauncher3>().Object,
             new Mock<ITestSessionEventsHandler>().Object,
             _protocolConfig);
     }
@@ -2258,7 +2264,7 @@ public class TestRequestManagerTests
                 a => a.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM);
         _mockAssemblyMetadataProvider.Setup(
-                a => a.GetFrameWork(It.IsAny<string>()))
+                a => a.GetFrameworkName(It.IsAny<string>()))
             .Returns(new FrameworkName(Constants.DotNetFramework46));
 
         _mockTestPlatform.Setup(
@@ -2277,12 +2283,12 @@ public class TestRequestManagerTests
 
         _testRequestManager.StartTestSession(
             payload,
-            new Mock<ITestHostLauncher>().Object,
+            new Mock<ITestHostLauncher3>().Object,
             new Mock<ITestSessionEventsHandler>().Object,
             _protocolConfig);
 
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
-        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+        _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
     }
 
     [TestMethod]
@@ -2316,7 +2322,7 @@ public class TestRequestManagerTests
         {
             _testRequestManager.StartTestSession(
                 payload,
-                new Mock<ITestHostLauncher>().Object,
+                new Mock<ITestHostLauncher3>().Object,
                 new Mock<ITestSessionEventsHandler>().Object,
                 _protocolConfig);
         }
@@ -2348,7 +2354,7 @@ public class TestRequestManagerTests
                     CollectMetrics = true
                 }
             },
-            new Mock<ITestHostLauncher>().Object,
+            new Mock<ITestHostLauncher3>().Object,
             new Mock<ITestSessionEventsHandler>().Object,
             _protocolConfig);
 
@@ -2539,7 +2545,7 @@ public class TestRequestManagerTests
         mockRunRequest.Setup(mr => mr.ExecuteAsync()).Throws(exception);
 
         var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-        var mockCustomlauncher = new Mock<ITestHostLauncher>();
+        var mockCustomlauncher = new Mock<ITestHostLauncher3>();
 
         _testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, _protocolConfig);
     }
@@ -2560,7 +2566,7 @@ public class TestRequestManagerTests
         mockDiscoveryRequest.Setup(mr => mr.DiscoverAsync()).Throws(exception);
 
         var mockDiscoveryEventsRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
-        var mockCustomlauncher = new Mock<ITestHostLauncher>();
+        var mockCustomlauncher = new Mock<ITestHostLauncher3>();
 
         _testRequestManager.DiscoverTests(payload, mockDiscoveryEventsRegistrar.Object, _protocolConfig);
     }

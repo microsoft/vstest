@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -27,13 +28,15 @@ using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Con
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
+/// <summary>
+/// Listens inside of testhost for requests, that are sent from vstest.console. Requests are handled in <see cref="OnMessageReceived"/>
+/// and responses are sent back via various methods, for example <see cref="SendExecutionComplete"/>.
+/// </summary>
 public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestRequestHandler
 {
     private int _protocolVersion = 1;
 
-    // Must be in sync with the highest supported version in
-    // src/Microsoft.TestPlatform.CommunicationUtilities/TestRequestSender.cs file.
-    private readonly int _highestSupportedVersion = 6;
+    private readonly int _highestSupportedVersion = ProtocolVersioning.HighestSupportedVersion;
 
     private readonly IDataSerializer _dataSerializer;
     private ITestHostManagerFactory _testHostManagerFactory;
@@ -55,9 +58,6 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     string IDeploymentAwareTestRequestHandler.LocalPath { get; set; }
     string IDeploymentAwareTestRequestHandler.RemotePath { get; set; }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TestRequestHandler" />.
-    /// </summary>
     public TestRequestHandler() : this(JsonDataSerializer.Instance, new CommunicationEndpointFactory())
     {
     }
@@ -271,7 +271,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     }
 
     /// <inheritdoc />
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
     {
         // If an attach request is issued but there is no support for attaching on the other
         // side of the communication channel, we simply return and let the caller know the
@@ -292,7 +292,10 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
 
         var data = _dataSerializer.SerializePayload(
             MessageType.AttachDebugger,
-            new TestProcessAttachDebuggerPayload(pid),
+            new TestProcessAttachDebuggerPayload(attachDebuggerInfo.ProcessId)
+            {
+                TargetFramework = attachDebuggerInfo.TargetFramework.ToString(),
+            },
             _protocolVersion);
         SendData(data);
 

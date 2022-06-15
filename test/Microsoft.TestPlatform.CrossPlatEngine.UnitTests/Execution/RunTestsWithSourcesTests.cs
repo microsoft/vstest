@@ -30,7 +30,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution;
 public class RunTestsWithSourcesTests
 {
     private readonly TestExecutionContext _testExecutionContext;
-    private readonly Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
+    private readonly Mock<IInternalTestRunEventsHandler> _mockTestRunEventsHandler;
     private TestableRunTestsWithSources? _runTestsInstance;
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
@@ -50,7 +50,7 @@ public class RunTestsWithSourcesTests
             isDebug: false,
             testCaseFilter: null,
             filterOptions: null);
-        _mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        _mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
@@ -338,7 +338,7 @@ public class RunTestsWithSourcesTests
     private class TestableRunTestsWithSources : RunTestsWithSources
     {
         public TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string? runSettings,
-            TestExecutionContext testExecutionContext, ITestCaseEventsHandler? testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler,
+            TestExecutionContext testExecutionContext, ITestCaseEventsHandler? testCaseEventsHandler, IInternalTestRunEventsHandler testRunEventsHandler,
             IRequestData requestData)
             : base(requestData, adapterSourceMap, null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler)
         {
@@ -346,7 +346,7 @@ public class RunTestsWithSourcesTests
 
         internal TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string? runSettings,
             TestExecutionContext testExecutionContext,
-            ITestCaseEventsHandler? testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>,
+            ITestCaseEventsHandler? testCaseEventsHandler, IInternalTestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>,
             IEnumerable<string>> executorUriVsSourceList, IRequestData requestData)
             : base(requestData, adapterSourceMap, null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler,
                   executorUriVsSourceList)

@@ -1,12 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Diagnostics;
 using System.Xml;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
@@ -17,8 +15,8 @@ internal sealed class TestMethod : IXmlTestStore
 {
     public TestMethod(string name, string className)
     {
-        Debug.Assert(!string.IsNullOrEmpty(name), "name is null");
-        Debug.Assert(!string.IsNullOrEmpty(className), "className is null");
+        TPDebug.Assert(!name.IsNullOrEmpty(), "name is null");
+        TPDebug.Assert(!className.IsNullOrEmpty(), "className is null");
         Name = name;
         ClassName = className;
     }
@@ -49,7 +47,7 @@ internal sealed class TestMethod : IXmlTestStore
     /// <returns>
     /// The <see cref="bool"/>.
     /// </returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is TestMethod otherTestMethod && Name == otherTestMethod.Name
                                                  && ClassName == otherTestMethod.ClassName && IsValid == otherTestMethod.IsValid;
@@ -79,7 +77,7 @@ internal sealed class TestMethod : IXmlTestStore
     /// <param name="parameters">
     /// The parameter
     /// </param>
-    public void Save(XmlElement element, XmlTestStoreParameters parameters)
+    public void Save(XmlElement element, XmlTestStoreParameters? parameters)
     {
         XmlPersistence helper = new();
         helper.SaveSimpleField(element, "@className", ClassName, string.Empty);

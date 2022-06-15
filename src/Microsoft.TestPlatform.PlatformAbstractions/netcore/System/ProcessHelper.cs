@@ -11,8 +11,6 @@ using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 public partial class ProcessHelper : IProcessHelper
@@ -20,7 +18,7 @@ public partial class ProcessHelper : IProcessHelper
     /// <inheritdoc/>
     public string GetCurrentProcessLocation()
     {
-        return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        return Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
     }
 
     /// <inheritdoc/>

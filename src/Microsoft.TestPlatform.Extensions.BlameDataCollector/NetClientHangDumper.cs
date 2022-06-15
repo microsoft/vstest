@@ -10,11 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Diagnostics.NETCore.Client;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
@@ -34,7 +31,7 @@ internal class NetClientHangDumper : IHangDumper
 
                 foreach (var p in processTree.OrderBy(t => t.Level))
                 {
-                    EqtTrace.Verbose($"NetClientHangDumper.Dump: {(p.Level != 0 ? " + " : " > ")}{new string('-', p.Level)} {p.Process.Id} - {p.Process.ProcessName}");
+                    EqtTrace.Verbose($"NetClientHangDumper.Dump: {(p.Level != 0 ? " + " : " > ")}{new string('-', p.Level)} {p.Process!.Id} - {p.Process.ProcessName}");
                     ConsoleOutput.Instance.Information(false, $"Blame: {(p.Level != 0 ? " + " : " > ")}{new string('-', p.Level)} {p.Process.Id} - {p.Process.ProcessName}");
                 }
             }
@@ -58,6 +55,7 @@ internal class NetClientHangDumper : IHangDumper
         timeout.CancelAfter(TimeSpan.FromMinutes(5));
         foreach (var p in bottomUpTree)
         {
+            TPDebug.Assert(p != null);
             tasks.Add(Task.Run(
                 () =>
                 {
@@ -90,6 +88,7 @@ internal class NetClientHangDumper : IHangDumper
 
         foreach (var p in bottomUpTree)
         {
+            TPDebug.Assert(p != null);
             try
             {
                 EqtTrace.Verbose($"NetClientHangDumper.Dump: Killing process {p.Id} - {p.ProcessName}.");

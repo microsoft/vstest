@@ -10,17 +10,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using FluentAssertions;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities;
 
 [TestClass]
 public class TestExtensionsTests
 {
-    private TestExtensions _testExtensions;
+    private readonly TestExtensions _testExtensions;
 
-    [TestInitialize]
-    public void TestInit()
+    public TestExtensionsTests()
     {
         _testExtensions = new TestExtensions();
     }

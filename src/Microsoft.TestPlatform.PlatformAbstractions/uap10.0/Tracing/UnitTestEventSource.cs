@@ -5,8 +5,6 @@
 
 using System.Diagnostics.Tracing;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 internal sealed class UnitTestEventSource : EventSource

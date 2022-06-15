@@ -5,8 +5,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 /// <summary>
@@ -14,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 /// </summary>
 internal class TestRunResultAggregator
 {
-    private static TestRunResultAggregator s_instance;
+    private static TestRunResultAggregator? s_instance;
 
     /// <summary>
     /// Initializes the TestRunResultAggregator

@@ -19,23 +19,24 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ProxyBaseManagerTests
 {
     private const int Clientprocessexitwait = 10 * 1000;
-    private Mock<ICommunicationEndPoint> _mockCommunicationEndpoint;
-    private ITestRequestSender _testRequestSender;
-    readonly ProtocolConfig _protocolConfig = new() { Version = 2 };
+    private readonly ProtocolConfig _protocolConfig = new() { Version = 2 };
     private readonly Mock<IRequestData> _mockRequestData;
-    protected readonly Mock<ITestRuntimeProvider> _mockTestHostManager;
-    protected Mock<IDataSerializer> _mockDataSerializer;
-    protected Mock<ICommunicationChannel> _mockChannel;
     private readonly Mock<IFileHelper> _mockFileHelper;
     private readonly DiscoveryDataAggregator _discoveryDataAggregator;
+
+    protected readonly Mock<ITestRuntimeProvider> _mockTestHostManager;
+
+    private Mock<ICommunicationEndPoint>? _mockCommunicationEndpoint;
+    private ITestRequestSender? _testRequestSender;
+
+    protected Mock<IDataSerializer> _mockDataSerializer;
+    protected Mock<ICommunicationChannel> _mockChannel;
 
     public ProxyBaseManagerTests()
     {
@@ -71,7 +72,6 @@ public class ProxyBaseManagerTests
             Transport = Transport.Sockets
         };
         _mockCommunicationEndpoint = new Mock<ICommunicationEndPoint>();
-        _mockDataSerializer = new Mock<IDataSerializer>();
         _testRequestSender = new TestRequestSender(_mockCommunicationEndpoint.Object, connectionInfo, _mockDataSerializer.Object, _protocolConfig, Clientprocessexitwait);
         _mockCommunicationEndpoint.Setup(mc => mc.Start(connectionInfo.Endpoint)).Returns(connectionInfo.Endpoint).Callback(() => _mockCommunicationEndpoint.Raise(
             s => s.Connected += null,
@@ -106,6 +106,7 @@ public class ProxyBaseManagerTests
             _mockRequestData.Object,
             _testRequestSender,
             _mockTestHostManager.Object,
+            Framework.DefaultFramework,
             _discoveryDataAggregator,
             _mockDataSerializer.Object,
             _mockFileHelper.Object);
@@ -118,7 +119,7 @@ public class ProxyBaseManagerTests
         SetupAndInitializeTestRequestSender();
         _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
         var testExecutionManager = new ProxyExecutionManager(_mockRequestData.Object, _testRequestSender,
-            _mockTestHostManager.Object, _mockDataSerializer.Object, _mockFileHelper.Object);
+            _mockTestHostManager.Object, Framework.DefaultFramework, _mockDataSerializer.Object, _mockFileHelper.Object);
 
         return testExecutionManager;
     }

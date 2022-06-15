@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -17,8 +18,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [Serializable] // Type should be serializable to allow the tree-view behavior of test discovery in Test Explorer
 public class RunnerInfo
 {
+    public int Index { get; set; }
+    [NotNull] // Marking as NotNull because normal usage ensure this is not null and this helps avoiding bangs everywhere in the tests
     public string? RunnerFramework { get; set; }
     public VSTestConsoleInfo? VSTestConsoleInfo { get; set; }
+    [NotNull] // Marking as NotNull because normal usage ensure this is not null and this helps avoiding bangs everywhere in the tests
     public string? TargetFramework { get; set; }
     public string? InIsolationValue { get; set; }
     public DebugInfo? DebugInfo { get; set; }
@@ -51,6 +55,7 @@ public class RunnerInfo
     {
         return string.Join(", ", new[]
         {
+            $"Row: {Index}",
             Batch != null ? $"{Batch}" : null,
             $"Runner = {RunnerFramework}",
             $"TargetFramework = {TargetFramework}",

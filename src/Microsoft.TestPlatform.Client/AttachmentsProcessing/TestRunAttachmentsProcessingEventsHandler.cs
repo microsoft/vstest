@@ -9,14 +9,12 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
 
 /// <summary>
 /// The test run attachments processing events handler.
 /// </summary>
-/// 
+///
 public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProcessingEventsHandler
 {
     private readonly ICommunicationManager _communicationManager;
@@ -35,7 +33,7 @@ public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProc
     {
         EqtTrace.Info("Test run attachments processing completed.");
 
-        var payload = new TestRunAttachmentsProcessingCompletePayload()
+        var payload = new TestRunAttachmentsProcessingCompletePayload
         {
             AttachmentsProcessingCompleteEventArgs = attachmentsProcessingCompleteEventArgs,
             Attachments = lastChunk
