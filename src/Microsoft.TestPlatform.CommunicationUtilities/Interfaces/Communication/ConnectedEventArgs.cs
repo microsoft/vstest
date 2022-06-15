@@ -28,7 +28,7 @@ public class ConnectedEventArgs : EventArgs
         Connected = true;
     }
 
-    public ConnectedEventArgs(Exception faultException)
+    public ConnectedEventArgs(Exception? faultException)
     {
         Connected = false;
         Fault = faultException;

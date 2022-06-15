@@ -29,54 +29,58 @@ public class TestCaseConverter : JsonConverter
         var data = JObject.Load(reader);
         var properties = data["Properties"];
 
-        if (properties != null && properties.HasValues)
+        if (properties == null || !properties.HasValues)
         {
-            // Every class that inherits from TestObject uses a properties store for <Property, Object>
-            // key value pairs.
-            foreach (var property in properties.Values<JToken>())
+            return testCase;
+        }
+
+        // Every class that inherits from TestObject uses a properties store for <Property, Object>
+        // key value pairs.
+        foreach (var property in properties.Values<JToken>())
+        {
+            var testProperty = property["Key"].ToObject<TestProperty>(serializer);
+
+            // Let the null values be passed in as null data
+            var token = property["Value"];
+            string? propertyData = null;
+            if (token.Type != JTokenType.Null)
             {
-                var testProperty = property["Key"].ToObject<TestProperty>(serializer);
-
-                // Let the null values be passed in as null data
-                var token = property["Value"];
-                string? propertyData = null;
-                if (token.Type != JTokenType.Null)
+                // If the property is already a string. No need to convert again.
+                if (token.Type == JTokenType.String)
                 {
-                    // If the property is already a string. No need to convert again.
-                    if (token.Type == JTokenType.String)
-                    {
-                        propertyData = token.ToObject<string>(serializer);
-                    }
-                    else
-                    {
-                        // On deserialization, the value for each TestProperty is always a string. It is up
-                        // to the consumer to deserialize it further as appropriate.
-                        propertyData = token.ToString(Formatting.None).Trim('"');
-                    }
+                    propertyData = token.ToObject<string>(serializer);
                 }
-
-                switch (testProperty.Id)
+                else
                 {
-                    case "TestCase.Id":
-                        testCase.Id = Guid.Parse(propertyData); break;
-                    case "TestCase.ExecutorUri":
-                        testCase.ExecutorUri = new Uri(propertyData); break;
-                    case "TestCase.FullyQualifiedName":
-                        testCase.FullyQualifiedName = propertyData; break;
-                    case "TestCase.DisplayName":
-                        testCase.DisplayName = propertyData; break;
-                    case "TestCase.Source":
-                        testCase.Source = propertyData; break;
-                    case "TestCase.CodeFilePath":
-                        testCase.CodeFilePath = propertyData; break;
-                    case "TestCase.LineNumber":
-                        testCase.LineNumber = int.Parse(propertyData); break;
-                    default:
-                        // No need to register member properties as they get registered as part of TestCaseProperties class.
-                        testProperty = TestProperty.Register(testProperty.Id, testProperty.Label, testProperty.GetValueType(), testProperty.Attributes, typeof(TestObject));
-                        testCase.SetPropertyValue(testProperty, propertyData);
-                        break;
+                    // On deserialization, the value for each TestProperty is always a string. It is up
+                    // to the consumer to deserialize it further as appropriate.
+                    propertyData = token.ToString(Formatting.None).Trim('"');
                 }
+            }
+
+            TPDebug.Assert(propertyData is not null, "propertyData is null");
+
+            switch (testProperty.Id)
+            {
+                case "TestCase.Id":
+                    testCase.Id = Guid.Parse(propertyData); break;
+                case "TestCase.ExecutorUri":
+                    testCase.ExecutorUri = new Uri(propertyData); break;
+                case "TestCase.FullyQualifiedName":
+                    testCase.FullyQualifiedName = propertyData; break;
+                case "TestCase.DisplayName":
+                    testCase.DisplayName = propertyData; break;
+                case "TestCase.Source":
+                    testCase.Source = propertyData; break;
+                case "TestCase.CodeFilePath":
+                    testCase.CodeFilePath = propertyData; break;
+                case "TestCase.LineNumber":
+                    testCase.LineNumber = int.Parse(propertyData); break;
+                default:
+                    // No need to register member properties as they get registered as part of TestCaseProperties class.
+                    testProperty = TestProperty.Register(testProperty.Id, testProperty.Label, testProperty.GetValueType(), testProperty.Attributes, typeof(TestObject));
+                    testCase.SetPropertyValue(testProperty, propertyData);
+                    break;
             }
         }
 

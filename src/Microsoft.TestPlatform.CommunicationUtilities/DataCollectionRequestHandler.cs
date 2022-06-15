@@ -276,7 +276,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
             var datacollectorSearchPaths = new HashSet<string>();
             foreach (var source in payload.Sources)
             {
-                datacollectorSearchPaths.Add(Path.GetDirectoryName(source));
+                datacollectorSearchPaths.Add(Path.GetDirectoryName(source)!);
             }
 
             var customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(payload.SettingsXml);

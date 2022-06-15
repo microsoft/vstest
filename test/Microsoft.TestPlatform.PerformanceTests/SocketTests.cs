@@ -63,7 +63,7 @@ public class SocketTests
             serverConnected.Set();
         };
 
-        var port = server.Start(IPAddress.Loopback.ToString() + ":0");
+        var port = server.Start(IPAddress.Loopback.ToString() + ":0")!;
         client.Start(port);
 
         clientConnected.Wait();

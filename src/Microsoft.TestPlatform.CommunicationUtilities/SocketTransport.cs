@@ -91,7 +91,7 @@ public sealed class SocketTransport : ITransport
     /// <returns>IPEndpoint from give string</returns>
     private static IPEndPoint? GetIpEndPoint(string endpointAddress)
     {
-        return Uri.TryCreate(string.Concat("tcp://", endpointAddress), UriKind.Absolute, out Uri uri)
+        return Uri.TryCreate(string.Concat("tcp://", endpointAddress), UriKind.Absolute, out Uri? uri)
             ? new IPEndPoint(IPAddress.Parse(uri.Host), uri.Port < 0 ? 0 : uri.Port)
             : null;
     }

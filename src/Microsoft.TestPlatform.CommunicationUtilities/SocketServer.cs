@@ -54,7 +54,7 @@ public class SocketServer : ICommunicationEndPoint
     /// <inheritdoc />
     public event EventHandler<DisconnectedEventArgs>? Disconnected;
 
-    public string Start(string endPoint)
+    public string? Start(string endPoint)
     {
         try
         {

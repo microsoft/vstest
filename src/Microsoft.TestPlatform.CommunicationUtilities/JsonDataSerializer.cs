@@ -23,11 +23,11 @@ public class JsonDataSerializer : IDataSerializer
 
     private static readonly bool DisableFastJson = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_FASTER_JSON_SERIALIZATION);
 
-    private static readonly JsonSerializer s_payloadSerializer; // payload serializer for version <= 1
-    private static readonly JsonSerializer s_payloadSerializer2; // payload serializer for version >= 2
-    private static readonly JsonSerializerSettings s_fastJsonSettings; // serializer settings for faster json
-    private static readonly JsonSerializerSettings s_jsonSettings; // serializer settings for serializer v1, which should use to deserialize message headers
-    private static readonly JsonSerializer s_serializer; // generic serializer
+    private static readonly JsonSerializer PayloadSerializerV1; // payload serializer for version <= 1
+    private static readonly JsonSerializer PayloadSerializerV2; // payload serializer for version >= 2
+    private static readonly JsonSerializerSettings FastJsonSettings; // serializer settings for faster json
+    private static readonly JsonSerializerSettings JsonSettings; // serializer settings for serializer v1, which should use to deserialize message headers
+    private static readonly JsonSerializer Serializer; // generic serializer
 
     static JsonDataSerializer()
     {
@@ -40,14 +40,14 @@ public class JsonDataSerializer : IDataSerializer
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
         };
 
-        s_jsonSettings = jsonSettings;
+        JsonSettings = jsonSettings;
 
-        s_serializer = JsonSerializer.Create();
-        s_payloadSerializer = JsonSerializer.Create(jsonSettings);
-        s_payloadSerializer2 = JsonSerializer.Create(jsonSettings);
+        Serializer = JsonSerializer.Create();
+        PayloadSerializerV1 = JsonSerializer.Create(jsonSettings);
+        PayloadSerializerV2 = JsonSerializer.Create(jsonSettings);
 
         var contractResolver = new DefaultTestPlatformContractResolver();
-        s_fastJsonSettings = new JsonSerializerSettings
+        FastJsonSettings = new JsonSerializerSettings
         {
             DateFormatHandling = jsonSettings.DateFormatHandling,
             DateParseHandling = jsonSettings.DateParseHandling,
@@ -61,8 +61,8 @@ public class JsonDataSerializer : IDataSerializer
             ContractResolver = contractResolver,
         };
 
-        s_payloadSerializer.ContractResolver = new TestPlatformContractResolver1();
-        s_payloadSerializer2.ContractResolver = contractResolver;
+        PayloadSerializerV1.ContractResolver = new TestPlatformContractResolver1();
+        PayloadSerializerV2.ContractResolver = contractResolver;
 
 #if TRACE_JSON_SERIALIZATION
         // MemoryTraceWriter can help diagnose serialization issues. Enable it for
@@ -105,7 +105,7 @@ public class JsonDataSerializer : IDataSerializer
         {
             // PERF: If the fast path fails, deserialize into header object that does not have any Payload. When the message type info
             // is at the start of the message, this is also pretty fast. Again, this won't touch the payload.
-            MessageHeader header = JsonConvert.DeserializeObject<MessageHeader>(rawMessage, s_jsonSettings);
+            MessageHeader header = JsonConvert.DeserializeObject<MessageHeader>(rawMessage, JsonSettings);
             version = header.Version;
             messageType = header.MessageType;
         }
@@ -155,11 +155,11 @@ public class JsonDataSerializer : IDataSerializer
         var rawMessage = messageWithRawMessage.RawMessage;
 
         // The deserialized message can still have a version (0 or 1), that should use the old deserializer
-        if (payloadSerializer == s_payloadSerializer2)
+        if (payloadSerializer == PayloadSerializerV2)
         {
             // PERF: Fast path is compatibile only with protocol versions that use serializer_2,
             // and this is faster than deserializing via deserializer_2.
-            var messageWithPayload = JsonConvert.DeserializeObject<PayloadedMessage<T>>(rawMessage, s_fastJsonSettings);
+            var messageWithPayload = JsonConvert.DeserializeObject<PayloadedMessage<T>>(rawMessage, FastJsonSettings);
             return messageWithPayload.Payload;
         }
         else
@@ -289,7 +289,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializeMessage(string? messageType)
     {
-        return Serialize(s_serializer, new Message { MessageType = messageType });
+        return Serialize(Serializer, new Message { MessageType = messageType });
     }
 
     /// <summary>
@@ -313,19 +313,19 @@ public class JsonDataSerializer : IDataSerializer
     public string SerializePayload(string? messageType, object? payload, int version)
     {
         var payloadSerializer = GetPayloadSerializer(version);
-        // Fast json is only equivalent to the serialization that is used for protocol version 2 and upwards (or more precisely for the paths that use s_payloadSerializer2)
+        // Fast json is only equivalent to the serialization that is used for protocol version 2 and upwards (or more precisely for the paths that use PayloadSerializerV2)
         // so when we resolved the old serializer we should use non-fast path.
-        if (DisableFastJson || payloadSerializer == s_payloadSerializer)
+        if (DisableFastJson || payloadSerializer == PayloadSerializerV1)
         {
             var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
             return version > 1 ?
-                Serialize(s_serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
-                Serialize(s_serializer, new Message { MessageType = messageType, Payload = serializedPayload });
+                Serialize(Serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
+                Serialize(Serializer, new Message { MessageType = messageType, Payload = serializedPayload });
         }
         else
         {
-            return JsonConvert.SerializeObject(new VersionedMessageForSerialization { MessageType = messageType, Version = version, Payload = payload }, s_fastJsonSettings);
+            return JsonConvert.SerializeObject(new VersionedMessageForSerialization { MessageType = messageType, Version = version, Payload = payload }, FastJsonSettings);
         }
     }
 
@@ -410,8 +410,8 @@ public class JsonDataSerializer : IDataSerializer
             // serializer v2, we downgrade to protocol 2 when 3 would be negotiated
             // unless this is disabled by VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE
             // env variable.
-            0 or 1 or 3 => s_payloadSerializer,
-            2 or 4 or 5 or 6 or 7 => s_payloadSerializer2,
+            0 or 1 or 3 => PayloadSerializerV1,
+            2 or 4 or 5 or 6 or 7 => PayloadSerializerV2,
 
             _ => throw new NotSupportedException($"Protocol version {version} is not supported. "
                 + "Ensure it is compatible with the latest serializer or add a new one."),

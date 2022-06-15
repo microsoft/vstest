@@ -76,28 +76,29 @@ public class SocketClient : ICommunicationEndPoint
     {
         EqtTrace.Info("SocketClient.OnServerConnected: connected to server endpoint: {0}", _endPoint);
 
-        if (Connected != null)
+        if (Connected == null)
         {
-            if (connectAsyncTask.IsFaulted)
-            {
-                Connected.SafeInvoke(this, new ConnectedEventArgs(connectAsyncTask.Exception), "SocketClient: Server Failed to Connect");
-                EqtTrace.Verbose("Unable to connect to server, Exception occurred: {0}", connectAsyncTask.Exception);
-            }
-            else
-            {
-                _channel = _channelFactory(_tcpClient.GetStream());
-                Connected.SafeInvoke(this, new ConnectedEventArgs(_channel), "SocketClient: ServerConnected");
-
-                EqtTrace.Verbose("Connected to server, and starting MessageLoopAsync");
-
-                // Start the message loop
-                Task.Run(() => _tcpClient.MessageLoopAsync(
-                        _channel,
-                        StopOnError,
-                        _cancellation.Token))
-                    .ConfigureAwait(false);
-            }
+            return;
         }
+
+        if (connectAsyncTask.IsFaulted)
+        {
+            Connected.SafeInvoke(this, new ConnectedEventArgs(connectAsyncTask.Exception), "SocketClient: Server Failed to Connect");
+            EqtTrace.Verbose("Unable to connect to server, Exception occurred: {0}", connectAsyncTask.Exception);
+            return;
+        }
+
+        _channel = _channelFactory(_tcpClient.GetStream());
+        Connected.SafeInvoke(this, new ConnectedEventArgs(_channel), "SocketClient: ServerConnected");
+
+        EqtTrace.Verbose("Connected to server, and starting MessageLoopAsync");
+
+        // Start the message loop
+        Task.Run(() => _tcpClient.MessageLoopAsync(
+                _channel,
+                StopOnError,
+                _cancellation.Token))
+            .ConfigureAwait(false);
     }
 
     private void StopOnError(Exception? error)
