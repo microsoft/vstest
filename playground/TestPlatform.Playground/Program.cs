@@ -42,40 +42,39 @@ internal class Program
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
-                        <MaxCpuCount>1</MaxCpuCount>
-<DesignMode>False</DesignMode>
+                        <MaxCpuCount>0</MaxCpuCount>
                     </RunConfiguration>
                 </RunSettings>
             ";
 
         var sources = new[] {
-            @"S:\p\vstest\test\TestAssets\SimpleTestProject\bin\Debug\net451\SimpleTestProject.dll",
-            @"S:\p\vstest\test\TestAssets\SimpleTestProject2\bin\Debug\net451\SimpleTestProject2.dll"
+            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
+            Path.Combine(playground, "MSTest1", "bin", "Debug", "net5.0", "MSTest1.dll"),
         };
 
-        //// console mode
-        //var settingsFile = Path.GetTempFileName();
-        //try
-        //{
-        //    File.WriteAllText(settingsFile, sourceSettings);
-        //    var processStartInfo = new ProcessStartInfo
-        //    {
-        //        FileName = console,
-        //        Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile}",
-        //        UseShellExecute = false,
-        //    };
-        //    EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
-        //    var process = Process.Start(processStartInfo);
-        //    process.WaitForExit();
-        //    if (process.ExitCode != 0)
-        //    {
-        //        throw new Exception($"Process failed with {process.ExitCode}");
-        //    }
-        //}
-        //finally
-        //{
-        //    try { File.Delete(settingsFile); } catch { }
-        //}
+        // console mode
+        var settingsFile = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(settingsFile, sourceSettings);
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = console,
+                Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile} --listtests",
+                UseShellExecute = false,
+            };
+            EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
+            var process = Process.Start(processStartInfo);
+            process.WaitForExit();
+            if (process.ExitCode != 0)
+            {
+                throw new Exception($"Process failed with {process.ExitCode}");
+            }
+        }
+        finally
+        {
+            try { File.Delete(settingsFile); } catch { }
+        }
 
         // design mode
         var consoleOptions = new ConsoleParameters
@@ -97,16 +96,16 @@ internal class Program
         var discoveryHandler = new PlaygroundTestDiscoveryHandler();
         var sw = Stopwatch.StartNew();
         // Discovery
-         r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
         var discoveryDuration = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery done in {discoveryDuration} ms");
         sw.Restart();
         // Run with test cases and custom testhost launcher
-        //r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
         //// Run with test cases and without custom testhost launcher
         //r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
         //// Run with sources and custom testhost launcher
-        r.RunTestsWithCustomTestHost(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        //r.RunTestsWithCustomTestHost(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
         //// Run with sources
         //r.RunTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
         var rd = sw.ElapsedMilliseconds;
@@ -165,7 +164,7 @@ internal class Program
                 : "\t<empty>";
 
         private static string WriteSources(IEnumerable<DiscoveredSource> sources)
-            => sources?.Select(s => s.Source).Any() == true
+            => sources?.Any() == true
                 ? "\t" + string.Join("\n\t", sources.Select(s => s.Source))
                 : "\t<empty>";
     }

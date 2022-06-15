@@ -8,9 +8,9 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 
-internal class DiscoveredSourceHelper
+internal static class DiscoveredSourceHelper
 {
-    public static List<DiscoveredSource> ToDiscoveredSources(List<string> sources)
+    public static List<DiscoveredSource> ToDiscoveredSources(IEnumerable<string> sources)
     {
         return sources.Select(source => new DiscoveredSource { Source = source }).ToList();
     }
