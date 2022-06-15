@@ -29,11 +29,11 @@ public class FileHelper : IFileHelper
         => Directory.GetCurrentDirectory();
 
     /// <inheritdoc/>
-    public bool Exists(string path)
+    public bool Exists(string? path)
         => File.Exists(path);
 
     /// <inheritdoc/>
-    public bool DirectoryExists(string path)
+    public bool DirectoryExists(string? path)
         => Directory.Exists(path);
 
     /// <inheritdoc/>

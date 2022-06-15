@@ -2,12 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 #if !NETSTANDARD1_0
 using System.Collections.Generic;
 using System.IO;
 #endif
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -36,14 +35,14 @@ public interface IFileHelper
     /// </summary>
     /// <param name="path"> The path of file. </param>
     /// <returns>True if file exists <see cref="bool"/>.</returns>
-    bool Exists(string path);
+    bool Exists([NotNullWhen(true)] string? path);
 
     /// <summary>
     /// Exists utility to check if directory exists (case sensitive).
     /// </summary>
     /// <param name="path"> The path of file. </param>
     /// <returns>True if directory exists <see cref="bool"/>.</returns>
-    bool DirectoryExists(string path);
+    bool DirectoryExists([NotNullWhen(true)] string? path);
 
 #if !NETSTANDARD1_0
     /// <summary>

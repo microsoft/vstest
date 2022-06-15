@@ -40,10 +40,10 @@ internal class FakeFileHelper : IFileHelper
         throw new NotImplementedException();
     }
 
-    public bool DirectoryExists(string path)
+    public bool DirectoryExists(string? path)
     {
         // TODO: Check if any file has the directory in name. This will improve.
-        var directoryExists = Files.Select(f => Path.GetDirectoryName(f.Path)).Any(p => p != null && p.StartsWith(path));
+        var directoryExists = Files.Select(f => Path.GetDirectoryName(f.Path)).Any(p => p != null && p.StartsWith(path!));
         return directoryExists;
     }
 
@@ -57,7 +57,7 @@ internal class FakeFileHelper : IFileHelper
         return files;
     }
 
-    public bool Exists(string path)
+    public bool Exists(string? path)
     {
         throw new NotImplementedException();
     }

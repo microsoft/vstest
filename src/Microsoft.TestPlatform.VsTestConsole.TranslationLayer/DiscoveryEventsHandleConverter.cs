@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 /// <summary>
@@ -54,7 +52,7 @@ public class DiscoveryEventsHandleConverter : ITestDiscoveryEventsHandler2
     /// </summary>
     /// <param name="discoveryCompleteEventArgs"></param>
     /// <param name="lastChunk"></param>
-    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
     {
         _testDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs.TotalCount, lastChunk, discoveryCompleteEventArgs.IsAborted);
     }
@@ -63,7 +61,7 @@ public class DiscoveryEventsHandleConverter : ITestDiscoveryEventsHandler2
     /// Handles Discovery Tests
     /// </summary>
     /// <param name="discoveredTestCases"></param>
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+    public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
     {
         _testDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
     }

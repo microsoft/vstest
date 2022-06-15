@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
 
 /// <summary>
@@ -31,5 +29,5 @@ public interface IDotnetHostHelper
     /// <param name="targetArchitecture">Specific architecture</param>
     /// <param name="muxerPath">Path to the muxer</param>
     /// <returns>True if native muxer is found</returns>
-    bool TryGetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture, out string muxerPath);
+    bool TryGetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture, out string? muxerPath);
 }

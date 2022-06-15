@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
 /// <summary>
@@ -33,9 +31,9 @@ internal interface ITranslationLayerRequestSenderAsync : IDisposable
     /// </summary>
     Task DiscoverTestsAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
     /// <summary>
@@ -49,9 +47,9 @@ internal interface ITranslationLayerRequestSenderAsync : IDisposable
     /// </summary>
     Task StartTestRunAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler);
 
     /// <summary>
@@ -65,9 +63,9 @@ internal interface ITranslationLayerRequestSenderAsync : IDisposable
     /// </summary>
     Task StartTestRunAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler);
 
     /// <summary>
@@ -82,9 +80,9 @@ internal interface ITranslationLayerRequestSenderAsync : IDisposable
     /// </summary>
     Task StartTestRunWithCustomHostAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler,
         ITestHostLauncher customTestHostLauncher);
 
@@ -100,9 +98,9 @@ internal interface ITranslationLayerRequestSenderAsync : IDisposable
     /// </summary>
     Task StartTestRunWithCustomHostAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler,
         ITestHostLauncher customTestHostLauncher);
 
@@ -115,12 +113,12 @@ internal interface ITranslationLayerRequestSenderAsync : IDisposable
     ///     ITestSessionEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
-    Task<TestSessionInfo> StartTestSessionAsync(
+    Task<TestSessionInfo?> StartTestSessionAsync(
         IList<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler,
-        ITestHostLauncher testHostLauncher);
+        ITestHostLauncher? testHostLauncher);
 
     /// <summary>
     /// Asynchronous equivalent of <see cref="
@@ -130,15 +128,15 @@ internal interface ITranslationLayerRequestSenderAsync : IDisposable
     ///     ITestSessionEventsHandler)"/>.
     /// </summary>
     Task<bool> StopTestSessionAsync(
-        TestSessionInfo testSessionInfo,
-        TestPlatformOptions options,
+        TestSessionInfo? testSessionInfo,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler);
 
     /// <summary>
     /// Provides back all attachments to test platform for additional processing (for example
     /// merging).
     /// </summary>
-    /// 
+    ///
     /// <param name="attachments">Collection of attachments.</param>
     /// <param name="invokedDataCollectors">Collection of invoked data collectors.</param>
     /// <param name="runSettings">RunSettings configuration</param>
@@ -147,8 +145,8 @@ internal interface ITranslationLayerRequestSenderAsync : IDisposable
     /// <param name="cancellationToken">Cancellation token.</param>
     Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
-        IEnumerable<InvokedDataCollector> invokedDataCollectors,
-        string runSettings,
+        IEnumerable<InvokedDataCollector>? invokedDataCollectors,
+        string? runSettings,
         bool collectMetrics,
         ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingCompleteEventsHandler,
         CancellationToken cancellationToken);
