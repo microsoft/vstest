@@ -343,7 +343,7 @@ public class JsonDataSerializer : IDataSerializer
     }
 
     /// <inheritdoc/>
-    [return: NotNullIfNotNull(nameof(obj))]
+    [return: NotNullIfNotNull("obj")]
     public T? Clone<T>(T? obj)
     {
         if (obj == null)
