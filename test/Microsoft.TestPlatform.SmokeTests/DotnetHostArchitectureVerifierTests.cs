@@ -35,7 +35,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
         patchRuntimeConfig["runtimeOptions"]["framework"]["version"] = sdkVersion;
         File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToString());
 
-        var environmentVariables = new Dictionary<string, string>
+        var environmentVariables = new Dictionary<string, string?>
         {
             ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
             ["ExpectedArchitecture"] = architecture

@@ -4,8 +4,8 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.DoNotInitializ
 Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.DoNotInitialize.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.GetLogFile() -> string?
 Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.GetTraceLevel() -> Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel
-Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.InitializeTrace(string! customLogFile, Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel traceLevel) -> bool
-Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.InitializeVerboseTrace(string! customLogFile) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.InitializeTrace(string? customLogFile, Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel traceLevel) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.InitializeVerboseTrace(string? customLogFile) -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.SetTraceLevel(Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel value) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.ShouldTrace(Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel traceLevel) -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.WriteLine(Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel level, string! message) -> void
@@ -14,7 +14,7 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.DoNotInitialize
 Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.DoNotInitialize.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.GetLogFile() -> string?
 Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.GetTraceLevel() -> Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel
-Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.InitializeVerboseTrace(string! customLogFile) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.InitializeVerboseTrace(string? customLogFile) -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.PlatformEqtTrace() -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.SetTraceLevel(Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel value) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.ShouldTrace(Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel traceLevel) -> bool

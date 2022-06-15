@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 /// <inheritdoc />
@@ -73,16 +71,18 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
     /// </summary>
     public List<TestCase> DiscoveredTestCases { get; }
 
-    public IList<DiscoveredSource> FullyDiscoveredSources { get; private set; }
-    public IList<DiscoveredSource> PartiallyDiscoveredSources { get; private set; }
-    public IList<DiscoveredSource> NotDiscoveredSources { get; private set; }
+    public IList<string>? FullyDiscoveredSources { get; private set; }
+    public IList<string>? PartiallyDiscoveredSources { get; private set; }
+    public IList<string>? NotDiscoveredSources { get; private set; }
+
+    public IList<string>? SkippedDiscoveredSources { get; private set; }
 
     public List<TestMessage> TestMessages;
 
     /// <summary>
     /// Gets the metrics.
     /// </summary>
-    public IDictionary<string, object> Metrics { get; private set; }
+    public IDictionary<string, object>? Metrics { get; private set; }
 
     public DiscoveryEventHandler2()
     {
@@ -108,9 +108,10 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
         }
 
         Metrics = discoveryCompleteEventArgs.Metrics;
-        FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources;
-        PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources;
-        NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources;
+        FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources.Select(source => source.Source!).ToList();
+        PartiallyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources.Select(source => source.Source!).ToList();
+        NotDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources.Select(source => source.Source!).ToList();
+        SkippedDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources.Select(source => source.Source!).ToList();
     }
 
     public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)

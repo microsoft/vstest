@@ -10,8 +10,6 @@ using Microsoft.TestPlatform.TestUtilities;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 /// <summary>
@@ -34,7 +32,7 @@ public class NetCoreTargetFrameworkDataSource : Attribute, ITestDataSource
     /// <param name="useCoreRunner">To run tests with core runner(dotnet vstest.console.dll)</param>
     public NetCoreTargetFrameworkDataSource(
         bool useDesktopRunner = true,
-        // adding another runner is not necessary until we need to start building against another 
+        // adding another runner is not necessary until we need to start building against another
         // sdk, because the netcoreapp2.1 executable is forward compatible
         bool useCoreRunner = true,
         bool useNetCore21Target = true,

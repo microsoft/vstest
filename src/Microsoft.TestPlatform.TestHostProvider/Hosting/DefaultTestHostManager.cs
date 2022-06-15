@@ -180,7 +180,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         {
             // Not sharing the host which means we need to pass the test assembly path as argument
             // so that the test host can create an appdomain on startup (Main method) and set appbase
-            argumentsString += " --testsourcepath " + sources.FirstOrDefault().AddDoubleQuote();
+            argumentsString += " --testsourcepath " + sources.FirstOrDefault()?.AddDoubleQuote();
         }
 
         EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
@@ -451,7 +451,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <param name="e">host provider event args</param>
     private void OnHostLaunched(HostProviderEventArgs e)
     {
-        HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
+        HostLaunched?.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
     }
 
     /// <summary>
@@ -463,7 +463,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         if (!_hostExitedEventRaised)
         {
             _hostExitedEventRaised = true;
-            HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
+            HostExited?.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
         }
     }
 
@@ -480,9 +480,8 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         // For every other workflow (e.g.: profiling) we ask the IDE to launch the custom test
         // host for us. In the profiling case this is needed because then the IDE sets some
         // additional environmental variables for us to help with probing.
-        if ((_customTestHostLauncher == null)
-            || (_customTestHostLauncher.IsDebug
-                && _customTestHostLauncher is ITestHostLauncher2))
+        if (_customTestHostLauncher == null
+            || (_customTestHostLauncher.IsDebug && _customTestHostLauncher is ITestHostLauncher2))
         {
             EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
             cancellationToken.ThrowIfCancellationRequested();

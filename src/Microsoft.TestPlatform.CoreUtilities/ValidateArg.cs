@@ -9,8 +9,6 @@ using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>

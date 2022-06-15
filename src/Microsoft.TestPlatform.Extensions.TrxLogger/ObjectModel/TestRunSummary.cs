@@ -6,8 +6,6 @@ using System.Xml;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
@@ -137,7 +135,7 @@ internal class TestRunSummary : IXmlTestStore
     /// <param name="parameters">
     /// The parameter
     /// </param>
-    public void Save(XmlElement element, XmlTestStoreParameters parameters)
+    public void Save(XmlElement element, XmlTestStoreParameters? parameters)
     {
         XmlPersistence helper = new();
         helper.SaveSingleFields(element, this, parameters);

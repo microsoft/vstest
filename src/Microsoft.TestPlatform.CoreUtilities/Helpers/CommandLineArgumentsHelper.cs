@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 
 /// <summary>
@@ -18,9 +16,9 @@ public class CommandLineArgumentsHelper
     /// </summary>
     /// <param name="args">Command line arguments. Ex: <c>{ "--port", "12312", "--parentprocessid", "2312", "--testsourcepath", "C:\temp\1.dll" }</c></param>
     /// <returns>Dictionary of arguments keys and values.</returns>
-    public static IDictionary<string, string> GetArgumentsDictionary(string[] args)
+    public static IDictionary<string, string?> GetArgumentsDictionary(string[]? args)
     {
-        var argsDictionary = new Dictionary<string, string>();
+        var argsDictionary = new Dictionary<string, string?>();
         if (args == null)
         {
             return argsDictionary;
@@ -52,7 +50,7 @@ public class CommandLineArgumentsHelper
     /// <param name="fullname">The full name for required argument. Ex: "--port"</param>
     /// <returns>Value of the argument.</returns>
     /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
-    public static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname)
+    public static int GetIntArgFromDict(IDictionary<string, string?> argsDictionary, string fullname)
     {
         var found = TryGetIntArgFromDict(argsDictionary, fullname, out var value);
         return found ? value : 0;
@@ -65,7 +63,7 @@ public class CommandLineArgumentsHelper
     /// <param name="fullname">The full name for required argument. Ex: "--port"</param>
     /// <returns>Value of the argument.</returns>
     /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
-    public static bool TryGetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname, out int value)
+    public static bool TryGetIntArgFromDict(IDictionary<string, string?> argsDictionary, string fullname, out int value)
     {
         var found = argsDictionary.TryGetValue(fullname, out var optionValue);
         if (!found)
@@ -86,7 +84,7 @@ public class CommandLineArgumentsHelper
     /// <param name="fullname">The full name for required argument. Ex: "--port"</param>
     /// <returns>Value of the argument.</returns>
     /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
-    public static string GetStringArgFromDict(IDictionary<string, string> argsDictionary, string fullname)
+    public static string? GetStringArgFromDict(IDictionary<string, string?> argsDictionary, string fullname)
     {
         return argsDictionary.TryGetValue(fullname, out var optionValue) ? optionValue : string.Empty;
     }

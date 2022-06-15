@@ -8,8 +8,6 @@ using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
@@ -17,7 +15,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 /// </summary>
 internal class TestResultAggregation : TestResult, ITestResultAggregation
 {
-    protected List<ITestResult> _innerResults;
+    protected List<ITestResult>? _innerResults;
 
     public TestResultAggregation(
         Guid runId,
@@ -29,7 +27,8 @@ internal class TestResultAggregation : TestResult, ITestResultAggregation
         TestOutcome outcome,
         TestType testType,
         TestListCategoryId testCategoryId,
-        TrxFileHelper trxFileHelper) : base(runId, testId, executionId, parentExecutionId, resultName, computerName, outcome, testType, testCategoryId, trxFileHelper) { }
+        TrxFileHelper trxFileHelper)
+        : base(runId, testId, executionId, parentExecutionId, resultName, computerName, outcome, testType, testCategoryId, trxFileHelper) { }
 
     /// <summary>
     /// Gets the inner results.
@@ -46,7 +45,7 @@ internal class TestResultAggregation : TestResult, ITestResultAggregation
         }
     }
 
-    public override void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
+    public override void Save(System.Xml.XmlElement element, XmlTestStoreParameters? parameters)
     {
         base.Save(element, parameters);
 

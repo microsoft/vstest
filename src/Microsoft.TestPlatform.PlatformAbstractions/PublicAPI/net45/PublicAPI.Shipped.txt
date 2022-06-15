@@ -1,7 +1,7 @@
 ﻿#nullable enable
 Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.SetupListener(System.Diagnostics.TraceListener? listener) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.SetupRemoteEqtTraceListeners(System.AppDomain? childDomain) -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.InitializeTrace(string! customLogFile, Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel platformTraceLevel) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.InitializeTrace(string? customLogFile, Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel platformTraceLevel) -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.MapPlatformTraceToTrace(Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel traceLevel) -> System.Diagnostics.TraceLevel
 Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.SetupListener(System.Diagnostics.TraceListener? listener) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.SetupRemoteEqtTraceListeners(System.AppDomain? childDomain) -> void

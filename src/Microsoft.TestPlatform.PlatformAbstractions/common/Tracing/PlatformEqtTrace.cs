@@ -163,13 +163,13 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     }
 
     /// <inheritdoc/>
-    public bool InitializeVerboseTrace(string customLogFile)
+    public bool InitializeVerboseTrace(string? customLogFile)
     {
         return InitializeTrace(customLogFile, PlatformTraceLevel.Verbose);
     }
 
     /// <inheritdoc/>
-    public bool InitializeTrace(string customLogFile, PlatformTraceLevel platformTraceLevel)
+    public bool InitializeTrace(string? customLogFile, PlatformTraceLevel platformTraceLevel)
     {
         s_isInitialized = false;
 

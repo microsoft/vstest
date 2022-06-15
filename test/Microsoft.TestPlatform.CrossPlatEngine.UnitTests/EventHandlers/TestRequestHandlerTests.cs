@@ -51,7 +51,7 @@ public class TestRequestHandlerTests
         };
 
         _jobQueue = new JobQueue<Action>(
-            action => action(),
+            action => action?.Invoke(),
             "TestHostOperationQueue",
             500,
             25000000,

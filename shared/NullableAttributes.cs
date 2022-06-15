@@ -144,6 +144,8 @@ internal sealed class MemberNotNullWhenAttribute : Attribute
     public string[] Members { get; }
 }
 
+#endif
+
 /// <summary>
 /// Secret attribute that tells the CA1062 validate arguments rule that this method validates the argument is not null.
 /// </summary>
@@ -151,5 +153,3 @@ internal sealed class MemberNotNullWhenAttribute : Attribute
 internal sealed class ValidatedNotNullAttribute : Attribute
 {
 }
-
-#endif

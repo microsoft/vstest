@@ -3,14 +3,12 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 internal interface ITestResult
 {
     TestResultId Id { get; }
-    string ResultType { get; set; }
+    string? ResultType { get; set; }
     string StdOut { get; set; }
     string StdErr { get; set; }
     string DebugTrace { get; set; }

@@ -39,7 +39,7 @@ public sealed class DotnetHostHelperTest : IDisposable
         _processHelper.Setup(x => x.GetCurrentProcessArchitecture()).Returns(PlatformArchitecture.X64);
 
         // Act & Assert
-        Assert.IsTrue(dotnetHostHelper.TryGetDotnetPathByArchitecture(PlatformArchitecture.X64, out string muxerPath));
+        Assert.IsTrue(dotnetHostHelper.TryGetDotnetPathByArchitecture(PlatformArchitecture.X64, out string? muxerPath));
         Assert.AreEqual(finalMuxerPath, muxerPath);
     }
 
@@ -94,7 +94,7 @@ public sealed class DotnetHostHelperTest : IDisposable
 
         // Act & Assert
         var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
-        Assert.AreEqual(found, dotnetHostHelper.TryGetDotnetPathByArchitecture(targetArchitecture, out string muxerPath));
+        Assert.AreEqual(found, dotnetHostHelper.TryGetDotnetPathByArchitecture(targetArchitecture, out string? muxerPath));
         Assert.AreEqual(found ? envVars[envVar] : null, muxerPath);
     }
 
@@ -126,7 +126,7 @@ public sealed class DotnetHostHelperTest : IDisposable
 
         //Act & Assert
         var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
-        Assert.IsTrue(dotnetHostHelper.TryGetDotnetPathByArchitecture(targetAchitecture, out string muxerPath));
+        Assert.IsTrue(dotnetHostHelper.TryGetDotnetPathByArchitecture(targetAchitecture, out string? muxerPath));
         Assert.AreEqual(envVars[nextEnv], muxerPath);
     }
 
@@ -149,7 +149,7 @@ public sealed class DotnetHostHelperTest : IDisposable
 
         //Act & Assert
         var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
-        Assert.AreEqual(found, dotnetHostHelper.TryGetDotnetPathByArchitecture(targetArchitecture, out string muxerPath));
+        Assert.AreEqual(found, dotnetHostHelper.TryGetDotnetPathByArchitecture(targetArchitecture, out string? muxerPath));
         Assert.AreEqual(found ? dotnetMuxer : null, muxerPath);
     }
 
@@ -176,7 +176,7 @@ public sealed class DotnetHostHelperTest : IDisposable
 
         // Act & Assert
         var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
-        Assert.IsFalse(dotnetHostHelper.TryGetDotnetPathByArchitecture(PlatformArchitecture.X64, out string muxerPath));
+        Assert.IsFalse(dotnetHostHelper.TryGetDotnetPathByArchitecture(PlatformArchitecture.X64, out string? muxerPath));
     }
 
     [DataTestMethod]
@@ -206,7 +206,7 @@ public sealed class DotnetHostHelperTest : IDisposable
 
         //Act & Assert
         var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
-        Assert.AreEqual(found, dotnetHostHelper.TryGetDotnetPathByArchitecture(targetArchitecture, out string muxerPath));
+        Assert.AreEqual(found, dotnetHostHelper.TryGetDotnetPathByArchitecture(targetArchitecture, out string? muxerPath));
         Assert.AreEqual(found ? dotnetMuxer : null, muxerPath);
     }
 
@@ -232,7 +232,7 @@ public sealed class DotnetHostHelperTest : IDisposable
 
         //Act & Assert
         var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
-        Assert.AreEqual(found, dotnetHostHelper.TryGetDotnetPathByArchitecture(targetArchitecture, out string muxerPath));
+        Assert.AreEqual(found, dotnetHostHelper.TryGetDotnetPathByArchitecture(targetArchitecture, out string? muxerPath));
         Assert.AreEqual(found ? dotnetMuxer : null, muxerPath);
     }
 
@@ -262,7 +262,7 @@ public sealed class DotnetHostHelperTest : IDisposable
 
         //Act & Assert
         var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
-        Assert.AreEqual(found, dotnetHostHelper.TryGetDotnetPathByArchitecture(targetArchitecture, out string muxerPath));
+        Assert.AreEqual(found, dotnetHostHelper.TryGetDotnetPathByArchitecture(targetArchitecture, out string? muxerPath));
         Assert.AreEqual(found ? expectedMuxerPath : null, muxerPath);
     }
 
