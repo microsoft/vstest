@@ -39,7 +39,10 @@ public class TestIdProvider
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is <c>null</c>.</exception>
     public void AppendString(string str)
     {
-        _ = _hash ?? throw new InvalidOperationException(Resources.Resources.ErrorCannotAppendAfterHashCalculation);
+        if (_hash != null)
+        {
+            throw new InvalidOperationException(Resources.Resources.ErrorCannotAppendAfterHashCalculation);
+        }
         _ = str ?? throw new ArgumentNullException(nameof(str));
 
         var bytes = Encoding.Unicode.GetBytes(str);
@@ -55,7 +58,10 @@ public class TestIdProvider
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="bytes"/> is <c>null</c>.</exception>
     public void AppendBytes(byte[] bytes)
     {
-        _ = _hash ?? throw new InvalidOperationException(Resources.Resources.ErrorCannotAppendAfterHashCalculation);
+        if (_hash != null)
+        {
+            throw new InvalidOperationException(Resources.Resources.ErrorCannotAppendAfterHashCalculation);
+        }
         _ = bytes ?? throw new ArgumentNullException(nameof(bytes));
 
         if (bytes.Length == 0)
