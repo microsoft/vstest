@@ -7,8 +7,6 @@ using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 
 public class EnvironmentHelper
@@ -28,7 +26,7 @@ public class EnvironmentHelper
         var envVarValue = Environment.GetEnvironmentVariable(VstestConnectionTimeout);
 #endif
 
-        if (!string.IsNullOrEmpty(envVarValue) && int.TryParse(envVarValue, out int value) && value >= 0)
+        if (!envVarValue.IsNullOrEmpty() && int.TryParse(envVarValue, out int value) && value >= 0)
         {
             EqtTrace.Info("EnvironmentHelper.GetConnectionTimeout: {0} value set to {1}.", VstestConnectionTimeout, value);
         }

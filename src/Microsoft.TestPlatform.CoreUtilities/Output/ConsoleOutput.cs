@@ -6,8 +6,6 @@
 using System;
 using System.IO;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
@@ -16,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 public class ConsoleOutput : IOutput
 {
     private static readonly object LockObject = new();
-    private static ConsoleOutput s_consoleOutput;
+    private static ConsoleOutput? s_consoleOutput;
 
     private readonly TextWriter _standardOutput;
     private readonly TextWriter _standardError;

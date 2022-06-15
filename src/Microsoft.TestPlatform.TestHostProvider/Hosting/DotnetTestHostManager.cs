@@ -355,7 +355,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                     //
                     // If they were in the base path (where the test dll is) it would work
                     // fine, because in base folder, dotnet searches directly in that folder, but not in probing paths.
-                    var testHostProbingPath = Path.GetDirectoryName(testHostNextToRunner);
+                    var testHostProbingPath = Path.GetDirectoryName(testHostNextToRunner)!;
                     argsToAdd = " --additionalprobingpath " + testHostProbingPath.AddDoubleQuote();
                     args += argsToAdd;
                     EqtTrace.Verbose("DotnetTestHostmanager: Adding {0} in args", argsToAdd);
@@ -667,7 +667,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     /// <param name="e">host provider event args</param>
     private void OnHostLaunched(HostProviderEventArgs e)
     {
-        HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
+        HostLaunched?.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
     }
 
     /// <summary>
@@ -680,7 +680,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         {
             _hostExitedEventRaised = true;
             EqtTrace.Verbose("DotnetTestHostManager.OnHostExited: invoking OnHostExited callback");
-            HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
+            HostExited?.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
         }
         else
         {

@@ -4,8 +4,6 @@
 using System;
 using System.Text.RegularExpressions;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 public static class TimeSpanParser

@@ -17,7 +17,7 @@ public class JobQueueTests
     public void ConstructorThrowsWhenNullProcessHandlerIsProvided()
     {
         JobQueue<string>? jobQueue = null;
-        Assert.ThrowsException<ArgumentNullException>(() => jobQueue = new JobQueue<string>(null, "dp", int.MaxValue, int.MaxValue, false, (message) => { }));
+        Assert.ThrowsException<ArgumentNullException>(() => jobQueue = new JobQueue<string>(null!, "dp", int.MaxValue, int.MaxValue, false, (message) => { }));
 
         if (jobQueue != null)
         {
@@ -29,7 +29,7 @@ public class JobQueueTests
     public void ThrowsWhenNullEmptyOrWhiteSpaceDisplayNameIsProvided()
     {
         JobQueue<string>? jobQueue = null;
-        Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), null, int.MaxValue, int.MaxValue, false, (message) => { }));
+        Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), null!, int.MaxValue, int.MaxValue, false, (message) => { }));
         Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "", int.MaxValue, int.MaxValue, false, (message) => { }));
         Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "    ", int.MaxValue, int.MaxValue, false, (message) => { }));
 
@@ -69,7 +69,7 @@ public class JobQueueTests
     {
         // Setup the job process handler to keep track of the jobs.
         var jobsProcessed = new List<int>();
-        Action<string> processHandler = (job) => jobsProcessed.Add(Environment.CurrentManagedThreadId);
+        Action<string?> processHandler = job => jobsProcessed.Add(Environment.CurrentManagedThreadId);
 
         // Queue the jobs and verify they are processed on a background thread.
         using (var queue = new JobQueue<string>(processHandler, "dp", int.MaxValue, int.MaxValue, false, (message) => { }))
@@ -128,8 +128,8 @@ public class JobQueueTests
     public void OncePausedNoFurtherJobsAreProcessedUntilResumeIsCalled()
     {
         // Setup the job process handler to keep track of the jobs it is called with.
-        List<string> processedJobs = new();
-        Action<string> processHandler = (job) => processedJobs.Add(job);
+        List<string?> processedJobs = new();
+        Action<string?> processHandler = job => processedJobs.Add(job);
 
         // Queue the jobs after paused and verify they are not processed until resumed.
         using (var queue = new JobQueue<string>(processHandler, "dp", int.MaxValue, int.MaxValue, false, (message) => { }))
@@ -165,7 +165,7 @@ public class JobQueueTests
     {
         // Setup the job process handler to keep track of the jobs it has processed.
         var jobsProcessed = 0;
-        Action<string> processHandler = (job) => jobsProcessed++;
+        Action<string?> processHandler = job => jobsProcessed++;
 
         // Queue several jobs and verify they have been processed when wait returns.
         using var queue = new JobQueue<string>(processHandler, "dp", int.MaxValue, int.MaxValue, false, (message) => { });
@@ -186,10 +186,10 @@ public class JobQueueTests
 
         // process handler for the jobs in queue. It blocks on a job till the queue gets full and the handler sets the
         // event allowHandlerToProceed.
-        Action<string> processHandler = (job) =>
+        Action<string?> processHandler = job =>
         {
             allowJobProcessingHandlerToProceed.WaitOne();
-            if (job.Equals("job11", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(job, "job11", StringComparison.OrdinalIgnoreCase))
             {
                 jobProcessed.Set();
             }
@@ -240,10 +240,10 @@ public class JobQueueTests
 
         // process handler for the jobs in queue. It blocks on a job till the queue gets full and the handler sets the
         // event allowHandlerToProceed.
-        Action<string> processHandler = (job) =>
+        Action<string?> processHandler = job =>
         {
             allowJobProcessingHandlerToProceed.WaitOne();
-            if (job.Equals("job11", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(job, "job11", StringComparison.OrdinalIgnoreCase))
             {
                 jobProcessed.Set();
             }
@@ -294,10 +294,10 @@ public class JobQueueTests
 
         // process handler for the jobs in queue. It blocks on a job till the test method sets the
         // event allowHandlerToProceed.
-        Action<string> processHandler = (job) =>
+        Action<string?> processHandler = job =>
         {
             allowJobProcessingHandlerToProceed.WaitOne();
-            if (job.Equals("job5", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(job, "job5", StringComparison.OrdinalIgnoreCase))
             {
                 jobProcessed.Set();
             }
@@ -342,7 +342,7 @@ public class JobQueueTests
         var jobProcessed = new AutoResetEvent(false);
 
         // process handler for the jobs in queue.
-        Action<string> processHandler = (job) => jobProcessed.Set();
+        Action<string?> processHandler = (job) => jobProcessed.Set();
 
         using JobQueueNonBlocking queue = new(processHandler);
         // run the same thing multiple times to ensure that the queue isn't in a erroneous state after first run.
@@ -370,9 +370,9 @@ public class JobQueueTests
 
         // process handler for the jobs in queue. It blocks on a job till the test method sets the
         // event allowHandlerToProceed.
-        Action<string> processHandler = (job) =>
+        Action<string?> processHandler = job =>
         {
-            if (job.Equals("job1", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(job, "job1", StringComparison.OrdinalIgnoreCase))
                 job1Running.Set();
 
             allowJobProcessingHandlerToProceed.WaitOne();
@@ -404,7 +404,7 @@ public class JobQueueTests
     /// </summary>
     internal class JobQueueWrapper : JobQueue<string>
     {
-        public JobQueueWrapper(Action<string> processJob,
+        public JobQueueWrapper(Action<string?> processJob,
             int maxNoOfStringsQueueCanHold,
             int maxNoOfBytesQueueCanHold,
             bool isBoundsEnabled,
@@ -440,7 +440,7 @@ public class JobQueueTests
     /// </summary>
     internal class JobQueueNonBlocking : JobQueue<string>
     {
-        public JobQueueNonBlocking(Action<string> processHandler)
+        public JobQueueNonBlocking(Action<string?> processHandler)
             : base(processHandler, "foo", 1, 5, true, (message) => { })
         {
             EnteredBlockingMethod = false;
@@ -464,9 +464,9 @@ public class JobQueueTests
     /// </summary>
     /// <typeparam name="T">Type of job the handler processes.</typeparam>
     /// <returns>Job processing handler which does nothing.</returns>
-    private static Action<T> GetEmptyProcessHandler<T>()
+    private static Action<T?> GetEmptyProcessHandler<T>()
     {
-        Action<T> handler = (job) =>
+        Action<T?> handler = (job) =>
         {
         };
 
