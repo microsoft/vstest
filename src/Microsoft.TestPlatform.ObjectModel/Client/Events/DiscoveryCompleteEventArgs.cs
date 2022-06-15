@@ -50,25 +50,27 @@ public class DiscoveryCompleteEventArgs : EventArgs
     /// Gets or sets the list of sources which were fully discovered.
     /// </summary>
     [DataMember]
-    public IList<DiscoveredSource> FullyDiscoveredSources { get; set; } = new List<DiscoveredSource>();
+    public IList<string> FullyDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets or sets the list of sources which were partially discovered (started discover tests, but then discovery aborted).
     /// </summary>
     [DataMember]
-    public IList<DiscoveredSource> PartiallyDiscoveredSources { get; set; } = new List<DiscoveredSource>();
+    // Added in protocol version 6.
+    public IList<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
     ///  Gets or sets the list of sources that were skipped during discovery.
     /// </summary>
     [DataMember]
-    public IList<DiscoveredSource> SkippedDiscoveredSources { get; set; } = new List<DiscoveredSource>();
+    // Added in protocol version 7, for previous versions this is put into NotDiscoveredSources.
+    public IList<string> SkippedDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets or sets the list of sources which were not discovered at all.
     /// </summary>
     [DataMember]
-    public IList<DiscoveredSource> NotDiscoveredSources { get; set; } = new List<DiscoveredSource>();
+    public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets or sets the collection of discovered extensions.

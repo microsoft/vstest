@@ -173,9 +173,10 @@ public class DiscoveryManager : IDiscoveryManager
 
                 var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(isAborted ? -1 : totalDiscoveredTestCount, isAborted)
                 {
-                    FullyDiscoveredSources = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered)),
-                    PartiallyDiscoveredSources = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered)),
-                    NotDiscoveredSources = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered)),
+                    FullyDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
+                    PartiallyDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
+                    NotDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered),
+                    SkippedDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.SkippedDiscovery),
                     DiscoveredExtensions = TestPluginCache.Instance.TestExtensions?.GetCachedExtensions(),
                     Metrics = _requestData.MetricsCollection.Metrics,
                 };
@@ -212,9 +213,10 @@ public class DiscoveryManager : IDiscoveryManager
 
         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true)
         {
-            FullyDiscoveredSources = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered)),
-            PartiallyDiscoveredSources = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered)),
-            NotDiscoveredSources = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered)),
+            FullyDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
+            PartiallyDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
+            NotDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered),
+            SkippedDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.SkippedDiscovery),
         };
         eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
     }

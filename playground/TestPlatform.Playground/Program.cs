@@ -143,6 +143,8 @@ internal class Program
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.FullyDiscoveredSources));
             Console.WriteLine("Partially discovered:");
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.PartiallyDiscoveredSources));
+            Console.WriteLine("Skipped discovery:");
+            Console.WriteLine(WriteSources(discoveryCompleteEventArgs.SkippedDiscoveredSources));
             Console.WriteLine("Not discovered:");
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.NotDiscoveredSources));
             if (lastChunk != null) { TestCases.AddRange(lastChunk); }
@@ -163,9 +165,9 @@ internal class Program
                 ? "\t" + string.Join("\n\t", testCases.Select(r => r.Source + " " + r.DisplayName))
                 : "\t<empty>";
 
-        private static string WriteSources(IEnumerable<DiscoveredSource> sources)
+        private static string WriteSources(IEnumerable<string> sources)
             => sources?.Any() == true
-                ? "\t" + string.Join("\n\t", sources.Select(s => s.Source))
+                ? "\t" + string.Join("\n\t", sources)
                 : "\t<empty>";
     }
 

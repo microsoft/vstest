@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 #nullable disable
 
@@ -38,17 +37,22 @@ public class DiscoveryCompletePayload
     /// <summary>
     /// Gets or sets list of sources which were fully discovered.
     /// </summary>
-    public IList<DiscoveredSource> FullyDiscoveredSources { get; set; } = new List<DiscoveredSource>();
+    public IList<string> FullyDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets or sets list of sources which were partially discovered (started discover tests, but then discovery aborted).
     /// </summary>
-    public IList<DiscoveredSource> PartiallyDiscoveredSources { get; set; } = new List<DiscoveredSource>();
+    public IList<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets or sets list of sources which were not discovered at all.
     /// </summary>
-    public IList<DiscoveredSource> NotDiscoveredSources { get; set; } = new List<DiscoveredSource>();
+    public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
+
+    /// <summary>
+    /// Gets or sets list of sources which skipped in discovery on purpose, e.g. because they are known dlls that have no tests, or there is no runtime provider to run them.
+    /// </summary>
+    public IList<string> SkippedDiscoverySources { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets or sets the collection of discovered extensions.

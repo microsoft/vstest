@@ -443,8 +443,7 @@ public class VsTestConsoleRequestSenderTests
             Payload = JToken.FromObject(new List<TestCase>() { testCase })
         };
 
-        var discoveredSources = sources.Select(source => new DiscoveredSource { Source = source }).ToList();
-        var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = null, IsAborted = false, FullyDiscoveredSources = discoveredSources };
+        var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = null, IsAborted = false, FullyDiscoveredSources = sources };
         var discoveryComplete = new Message()
         {
             MessageType = MessageType.DiscoveryComplete,
@@ -484,8 +483,7 @@ public class VsTestConsoleRequestSenderTests
             Payload = JToken.FromObject(new List<TestCase>() { testCase })
         };
 
-        var discoveredSources = sources.Select(source => new DiscoveredSource { Source = source }).ToList();
-        var payload = new DiscoveryCompletePayload() { TotalTests = -1, LastDiscoveredTests = null, IsAborted = true, FullyDiscoveredSources = discoveredSources };
+        var payload = new DiscoveryCompletePayload() { TotalTests = -1, LastDiscoveredTests = null, IsAborted = true, FullyDiscoveredSources = sources };
         var discoveryComplete = new Message()
         {
             MessageType = MessageType.DiscoveryComplete,
