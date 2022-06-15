@@ -666,7 +666,7 @@ public class InferRunSettingsHelper
 
         if (incompatiblityFound)
         {
-            incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, defaultArchitecture, warnings.ToString(), MultiTargetingForwardLink);
+            incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, chosenPlatform, warnings.ToString(), MultiTargetingForwardLink);
         }
 
         return compatibleSources;

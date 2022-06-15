@@ -19,23 +19,24 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ProxyBaseManagerTests
 {
     private const int Clientprocessexitwait = 10 * 1000;
-    private Mock<ICommunicationEndPoint> _mockCommunicationEndpoint;
-    private ITestRequestSender _testRequestSender;
-    readonly ProtocolConfig _protocolConfig = new() { Version = 2 };
+    private readonly ProtocolConfig _protocolConfig = new() { Version = 2 };
     private readonly Mock<IRequestData> _mockRequestData;
-    protected readonly Mock<ITestRuntimeProvider> _mockTestHostManager;
-    protected Mock<IDataSerializer> _mockDataSerializer;
-    protected Mock<ICommunicationChannel> _mockChannel;
     private readonly Mock<IFileHelper> _mockFileHelper;
     private readonly DiscoveryDataAggregator _discoveryDataAggregator;
+
+    protected readonly Mock<ITestRuntimeProvider> _mockTestHostManager;
+
+    private Mock<ICommunicationEndPoint>? _mockCommunicationEndpoint;
+    private ITestRequestSender? _testRequestSender;
+
+    protected Mock<IDataSerializer> _mockDataSerializer;
+    protected Mock<ICommunicationChannel> _mockChannel;
 
     public ProxyBaseManagerTests()
     {
