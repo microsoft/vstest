@@ -85,6 +85,7 @@ public class TestResultConverter : JsonConverter
                 }
             }
 
+            TPDebug.Assert(propertyData is not null, "propertyData is null");
             switch (testProperty.Id)
             {
                 case "TestResult.DisplayName":
