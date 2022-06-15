@@ -143,6 +143,8 @@ internal class Program
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.FullyDiscoveredSources));
             Console.WriteLine("Partially discovered:");
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.PartiallyDiscoveredSources));
+            Console.WriteLine("Skipped discovery:");
+            Console.WriteLine(WriteSources(discoveryCompleteEventArgs.SkippedDiscoveredSources));
             Console.WriteLine("Not discovered:");
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.NotDiscoveredSources));
             if (lastChunk != null) { TestCases.AddRange(lastChunk); }

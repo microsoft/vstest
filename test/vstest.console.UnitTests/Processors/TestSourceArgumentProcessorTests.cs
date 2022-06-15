@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.IO;
 using System.Linq;
 
 using Microsoft.Extensions.FileSystemGlobbing;
@@ -81,7 +82,8 @@ public class TestSourceArgumentProcessorTests
         catch (Exception ex)
         {
             Assert.IsTrue(ex is TestSourceException);
-            Assert.AreEqual("The test source file \"" + testFilePath + "\" provided was not found.", ex.Message);
+            StringAssert.StartsWith(ex.Message, "The test source file \"");
+            StringAssert.EndsWith(ex.Message, testFilePath + "\" provided was not found.");
         }
     }
 

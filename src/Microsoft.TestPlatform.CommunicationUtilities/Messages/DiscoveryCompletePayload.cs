@@ -50,6 +50,11 @@ public class DiscoveryCompletePayload
     public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
+    /// Gets or sets list of sources which skipped in discovery on purpose, e.g. because they are known dlls that have no tests, or there is no runtime provider to run them.
+    /// </summary>
+    public IList<string> SkippedDiscoverySources { get; set; } = new List<string>();
+
+    /// <summary>
     /// Gets or sets the collection of discovered extensions.
     /// </summary>
     public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; set; } = new();

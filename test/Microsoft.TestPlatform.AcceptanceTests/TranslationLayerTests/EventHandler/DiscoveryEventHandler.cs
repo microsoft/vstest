@@ -74,6 +74,7 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
     public IList<string>? FullyDiscoveredSources { get; private set; }
     public IList<string>? PartiallyDiscoveredSources { get; private set; }
     public IList<string>? NotDiscoveredSources { get; private set; }
+    public IList<string>? SkippedDiscoveredSources { get; private set; }
 
     public List<TestMessage> TestMessages;
 
@@ -109,6 +110,7 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
         FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources;
         PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources;
         NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources;
+        SkippedDiscoveredSources = discoveryCompleteEventArgs.SkippedDiscoveredSources;
     }
 
     public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)

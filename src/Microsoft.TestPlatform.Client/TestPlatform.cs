@@ -80,7 +80,8 @@ internal class TestPlatform : ITestPlatform
         IRequestData requestData,
         DiscoveryCriteria discoveryCriteria,
         TestPlatformOptions? options,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger)
     {
         ValidateArg.NotNull(discoveryCriteria, nameof(discoveryCriteria));
 
@@ -90,7 +91,7 @@ internal class TestPlatform : ITestPlatform
         ITestLoggerManager loggerManager = _testEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(discoveryCriteria.RunSettings);
 
-        IProxyDiscoveryManager discoveryManager = _testEngine.GetDiscoveryManager(requestData, discoveryCriteria, sourceToSourceDetailMap);
+        IProxyDiscoveryManager discoveryManager = _testEngine.GetDiscoveryManager(requestData, discoveryCriteria, sourceToSourceDetailMap, warningLogger);
         discoveryManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager, loggerManager);
@@ -101,7 +102,8 @@ internal class TestPlatform : ITestPlatform
         IRequestData requestData,
         TestRunCriteria testRunCriteria,
         TestPlatformOptions? options,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger)
     {
         ValidateArg.NotNull(testRunCriteria, nameof(testRunCriteria));
 
@@ -112,7 +114,7 @@ internal class TestPlatform : ITestPlatform
         ITestLoggerManager loggerManager = _testEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(testRunCriteria.TestRunSettings);
 
-        IProxyExecutionManager executionManager = _testEngine.GetExecutionManager(requestData, testRunCriteria, sourceToSourceDetailMap);
+        IProxyExecutionManager executionManager = _testEngine.GetExecutionManager(requestData, testRunCriteria, sourceToSourceDetailMap, warningLogger);
         executionManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
@@ -123,7 +125,8 @@ internal class TestPlatform : ITestPlatform
         IRequestData requestData,
         StartTestSessionCriteria testSessionCriteria,
         ITestSessionEventsHandler eventsHandler,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger)
     {
         ValidateArg.NotNull(testSessionCriteria, nameof(testSessionCriteria));
 
@@ -137,7 +140,7 @@ internal class TestPlatform : ITestPlatform
             return false;
         }
 
-        IProxyTestSessionManager? testSessionManager = _testEngine.GetTestSessionManager(requestData, testSessionCriteria, sourceToSourceDetailMap);
+        IProxyTestSessionManager? testSessionManager = _testEngine.GetTestSessionManager(requestData, testSessionCriteria, sourceToSourceDetailMap, warningLogger);
         if (testSessionManager == null)
         {
             // The test session manager is null because the combination of runsettings and

@@ -242,6 +242,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                 FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources,
                 PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources,
                 NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources,
+                SkippedDiscoverySources = discoveryCompleteEventArgs.SkippedDiscoveredSources,
                 DiscoveredExtensions = discoveryCompleteEventArgs.DiscoveredExtensions,
             },
             _protocolVersion);
