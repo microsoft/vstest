@@ -42,40 +42,40 @@ internal class Program
                 <RunSettings>
                     <RunConfiguration>
                         <InIsolation>true</InIsolation>
-                        <MaxCpuCount>0</MaxCpuCount>
+                        <MaxCpuCount>1</MaxCpuCount>
 <DesignMode>False</DesignMode>
                     </RunConfiguration>
                 </RunSettings>
             ";
 
         var sources = new[] {
-         @"S:\t\mstest-x64\bin\Debug\net472\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll",
-         @"S:\t\mstest-x64\bin\Debug\net472\mstest-x64.dll",
+            @"S:\p\vstest\test\TestAssets\SimpleTestProject\bin\Debug\net451\SimpleTestProject.dll",
+            @"S:\p\vstest\test\TestAssets\SimpleTestProject2\bin\Debug\net451\SimpleTestProject2.dll"
         };
 
-        // console mode
-        var settingsFile = Path.GetTempFileName();
-        try
-        {
-            File.WriteAllText(settingsFile, sourceSettings);
-            var processStartInfo = new ProcessStartInfo
-            {
-                FileName = console,
-                Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile}",
-                UseShellExecute = false,
-            };
-            EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
-            var process = Process.Start(processStartInfo);
-            process.WaitForExit();
-            if (process.ExitCode != 0)
-            {
-                throw new Exception($"Process failed with {process.ExitCode}");
-            }
-        }
-        finally
-        {
-            try { File.Delete(settingsFile); } catch { }
-        }
+        //// console mode
+        //var settingsFile = Path.GetTempFileName();
+        //try
+        //{
+        //    File.WriteAllText(settingsFile, sourceSettings);
+        //    var processStartInfo = new ProcessStartInfo
+        //    {
+        //        FileName = console,
+        //        Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile}",
+        //        UseShellExecute = false,
+        //    };
+        //    EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
+        //    var process = Process.Start(processStartInfo);
+        //    process.WaitForExit();
+        //    if (process.ExitCode != 0)
+        //    {
+        //        throw new Exception($"Process failed with {process.ExitCode}");
+        //    }
+        //}
+        //finally
+        //{
+        //    try { File.Delete(settingsFile); } catch { }
+        //}
 
         // design mode
         var consoleOptions = new ConsoleParameters
@@ -97,12 +97,12 @@ internal class Program
         var discoveryHandler = new PlaygroundTestDiscoveryHandler();
         var sw = Stopwatch.StartNew();
         // Discovery
-        r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+         r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
         var discoveryDuration = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery done in {discoveryDuration} ms");
         sw.Restart();
         // Run with test cases and custom testhost launcher
-        r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        //r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
         //// Run with test cases and without custom testhost launcher
         //r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
         //// Run with sources and custom testhost launcher

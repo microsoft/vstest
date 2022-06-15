@@ -446,11 +446,12 @@ public class TestEngine : ITestEngine
 
             if (testRuntimeProvider != null)
             {
-                testRuntimeProviders.Add(new TestRuntimeProviderInfo(testRuntimeProvider.GetType(), testRuntimeProvider.Shared,
-                    runsettingsXml, sourceDetails: runConfiguration.ToList()));
-
                 // Initialize here, because Shared is picked up from the instance, and it can be set during initalization.
                 testRuntimeProvider.Initialize(TestSessionMessageLogger.Instance, runsettingsXml);
+
+                // DO NOT move this above Initialize, the intialization can set Shared, to true, and we would not capture that.
+                testRuntimeProviders.Add(new TestRuntimeProviderInfo(testRuntimeProvider.GetType(), testRuntimeProvider.Shared,
+                   runsettingsXml, sourceDetails: runConfiguration.ToList()));
 
                 // Outputting the instance, because the code for in-process run uses it, and we don't want to resolve it one more time.
                 mostRecentlyCreatedInstance = testRuntimeProvider;
