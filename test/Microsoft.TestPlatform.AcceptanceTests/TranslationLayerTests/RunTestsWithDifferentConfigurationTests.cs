@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,8 +12,6 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
@@ -25,10 +24,11 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     private const string Netcoreapp = "netcoreapp";
     private const string Message = "VsTestConsoleWrapper does not support .Net Core Runner";
 
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private TempDirectory _logsDir;
-    private RunEventHandler _runEventHandler;
+    private IVsTestConsoleWrapper? _vstestConsoleWrapper;
+    private TempDirectory? _logsDir;
+    private RunEventHandler? _runEventHandler;
 
+    [MemberNotNull(nameof(_vstestConsoleWrapper), nameof(_logsDir), nameof(_runEventHandler))]
     private void Setup()
     {
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();
@@ -52,7 +52,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
         Setup();
 
         var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
-        _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
+        _vstestConsoleWrapper.InitializeExtensions(new List<string?>() { testAdapterPath.FirstOrDefault() });
 
         _vstestConsoleWrapper.RunTests(
             GetTestAssemblies(),

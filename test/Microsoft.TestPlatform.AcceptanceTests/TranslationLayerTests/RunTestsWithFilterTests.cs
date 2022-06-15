@@ -2,14 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
@@ -19,9 +18,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 [TestClass]
 public class RunTestsWithFilterTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private RunEventHandler _runEventHandler;
+    private IVsTestConsoleWrapper? _vstestConsoleWrapper;
+    private RunEventHandler? _runEventHandler;
 
+    [MemberNotNull(nameof(_vstestConsoleWrapper), nameof(_runEventHandler))]
     private void Setup()
     {
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();
@@ -55,7 +55,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
 
         // Assert
         Assert.AreEqual(1, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(TestOutcome.Passed, _runEventHandler.TestResults.FirstOrDefault().Outcome);
+        Assert.AreEqual(TestOutcome.Passed, _runEventHandler.TestResults.First().Outcome);
     }
 
     [TestMethod]

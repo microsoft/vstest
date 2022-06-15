@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 
@@ -18,8 +19,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 /// <summary>
@@ -28,9 +27,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 [TestClass]
 public class RunTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private RunEventHandler _runEventHandler;
+    private IVsTestConsoleWrapper? _vstestConsoleWrapper;
+    private RunEventHandler? _runEventHandler;
 
+    [MemberNotNull(nameof(_vstestConsoleWrapper), nameof(_runEventHandler))]
     private void Setup()
     {
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();
@@ -146,7 +146,7 @@ public class RunTests : AcceptanceTestBase
 
         // Assert
         Assert.AreEqual(6, _runEventHandler.TestResults.Count);
-        Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
+        Assert.IsTrue(_runEventHandler.Metrics!.ContainsKey(TelemetryDataConstants.TargetDevice));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetFramework));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOS));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForRun));
@@ -170,7 +170,7 @@ public class RunTests : AcceptanceTestBase
 
         // Assert
         Assert.AreEqual(6, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(0, _runEventHandler.Metrics.Count);
+        Assert.AreEqual(0, _runEventHandler.Metrics!.Count);
     }
 
     [TestMethod]

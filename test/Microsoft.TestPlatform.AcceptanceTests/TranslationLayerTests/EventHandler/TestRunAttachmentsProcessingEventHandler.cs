@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 /// <inheritdoc />
@@ -18,14 +16,14 @@ public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProce
 {
     public List<AttachmentSet> Attachments { get; private set; }
 
-    public TestRunAttachmentsProcessingCompleteEventArgs CompleteArgs { get; private set; }
+    public TestRunAttachmentsProcessingCompleteEventArgs? CompleteArgs { get; private set; }
 
     public List<TestRunAttachmentsProcessingProgressEventArgs> ProgressArgs { get; private set; }
 
     /// <summary>
     /// Gets the log message.
     /// </summary>
-    public string LogMessage { get; private set; }
+    public string? LogMessage { get; private set; }
 
     public List<string> Errors { get; set; }
 

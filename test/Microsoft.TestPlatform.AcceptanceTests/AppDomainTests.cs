@@ -6,15 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 #if !NETFRAMEWORK
 using System.Runtime.Loader;
-
 #else
 using System.Reflection;
-
 #endif
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -46,7 +42,7 @@ public class AppDomainTests : AcceptanceTestBase
             TempDirectory.Path);
 
         // Sets the environment variables used by the test project and test data collector.
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["TEST_ASSET_APPDOMAIN_TEST_PATH"] = testAppDomainDetailFileName,
             ["TEST_ASSET_APPDOMAIN_COLLECTOR_PATH"] = dataCollectorAppDomainDetailFileName,

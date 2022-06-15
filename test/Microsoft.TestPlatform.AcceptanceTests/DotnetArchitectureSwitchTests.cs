@@ -12,8 +12,6 @@ using System.Text.RegularExpressions;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 // This tests need specific sdks to be installed on arm machine
 // >= ARM 6.0.2xx
@@ -25,7 +23,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [Ignore("Manual tests(for now). Tests in this class need some .NET SDK global installations")]
 public class DotnetArchitectureSwitchTests : AcceptanceTestBase
 {
-    private static string s_privateX64Installation;
+    private static string s_privateX64Installation = string.Empty;
 
     [ClassInitialize]
     public static void ClassInitialize(TestContext _)
@@ -38,7 +36,7 @@ public class DotnetArchitectureSwitchTests : AcceptanceTestBase
     public static void ClassCleanup()
     {
         // Remove one level up because we are targeting a sub-folder of the temp directory.
-        TempDirectory.TryRemoveDirectory(new DirectoryInfo(s_privateX64Installation).Parent.FullName);
+        TempDirectory.TryRemoveDirectory(new DirectoryInfo(s_privateX64Installation).Parent!.FullName);
     }
 
     [TestMethod]
@@ -53,7 +51,7 @@ public class DotnetArchitectureSwitchTests : AcceptanceTestBase
         var projectPath = GetProjectFullPath(projectName);
         var projectDirectory = Path.GetDirectoryName(projectPath);
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
             {
                 { "DOTNET_ROOT", null },
                 { "DOTNET_MULTILEVEL_LOOKUP", "0" }
@@ -107,7 +105,7 @@ public class DotnetArchitectureSwitchTests : AcceptanceTestBase
             return;
         }
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["DOTNET_ROOT"] = null,
             ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
@@ -170,7 +168,7 @@ public class DotnetArchitectureSwitchTests : AcceptanceTestBase
             return;
         }
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["DOTNET_ROOT"] = null,
             ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
@@ -214,7 +212,7 @@ public class DotnetArchitectureSwitchTests : AcceptanceTestBase
             return;
         }
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["DOTNET_ROOT"] = null,
             ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
@@ -275,7 +273,7 @@ public class DotnetArchitectureSwitchTests : AcceptanceTestBase
         var projectPath = GetProjectFullPath(projectName);
         var projectDirectory = Path.GetDirectoryName(projectPath);
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["DOTNET_ROOT"] = null,
             ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
