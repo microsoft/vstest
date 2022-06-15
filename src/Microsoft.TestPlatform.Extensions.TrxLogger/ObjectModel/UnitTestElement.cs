@@ -2,13 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
@@ -17,7 +15,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 /// </summary>
 internal class UnitTestElement : TestElement, IXmlTestStoreCustom
 {
-    private string _codeBase;
+    private string? _codeBase;
 
     public UnitTestElement(
         Guid id,
@@ -25,9 +23,9 @@ internal class UnitTestElement : TestElement, IXmlTestStoreCustom
         string adapter,
         TestMethod testMethod) : base(id, name, adapter)
     {
-        Debug.Assert(!string.IsNullOrEmpty(adapter), "adapter is null");
-        Debug.Assert(testMethod != null, "testMethod is null");
-        Debug.Assert(testMethod != null && testMethod.ClassName != null, "className is null");
+        TPDebug.Assert(!string.IsNullOrEmpty(adapter), "adapter is null");
+        TPDebug.Assert(testMethod != null, "testMethod is null");
+        TPDebug.Assert(testMethod != null && testMethod.ClassName != null, "className is null");
 
         TestMethod = testMethod;
     }
@@ -37,7 +35,7 @@ internal class UnitTestElement : TestElement, IXmlTestStoreCustom
         get { return Constants.UnitTestElementName; }
     }
 
-    string IXmlTestStoreCustom.NamespaceUri
+    string? IXmlTestStoreCustom.NamespaceUri
     {
         get { return null; }
     }
@@ -58,7 +56,7 @@ internal class UnitTestElement : TestElement, IXmlTestStoreCustom
     /// <summary>
     /// Gets or sets the storage.
     /// </summary>
-    public string CodeBase
+    public string? CodeBase
     {
         get { return _codeBase; }
 
@@ -78,7 +76,7 @@ internal class UnitTestElement : TestElement, IXmlTestStoreCustom
     /// <param name="parameters">
     /// The parameter
     /// </param>
-    public override void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
+    public override void Save(System.Xml.XmlElement element, XmlTestStoreParameters? parameters)
     {
         base.Save(element, parameters);
         XmlPersistence h = new();

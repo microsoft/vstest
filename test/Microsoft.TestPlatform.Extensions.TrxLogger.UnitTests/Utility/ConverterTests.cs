@@ -180,7 +180,7 @@ public class ConverterTests
         testRun.RunConfiguration = new TestRunConfiguration("Testrun 1", _trxFileHelper);
         attachmentSets[0].Attachments.Add(uriDataAttachment1);
 
-        var resultFiles = _converter.ToResultFiles(attachmentSets, testRun, @"c:\temp", null);
+        var resultFiles = _converter.ToResultFiles(attachmentSets, testRun, @"c:\temp", null!);
         Assert.IsTrue(resultFiles[0].Contains("abc.txt"));
     }
 

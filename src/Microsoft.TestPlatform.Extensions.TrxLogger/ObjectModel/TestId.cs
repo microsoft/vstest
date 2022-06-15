@@ -2,15 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+
 #region TestId
 /// <summary>
 /// Class that uniquely identifies a test.
@@ -62,9 +61,9 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// </summary>
     /// <param name="element">The XML element to save to</param>
     /// <param name="parameters">Parameters to customize the save behavior</param>
-    void IXmlTestStore.Save(XmlElement element, XmlTestStoreParameters parameters)
+    void IXmlTestStore.Save(XmlElement element, XmlTestStoreParameters? parameters)
     {
-        Debug.Assert(element != null, "element is null");
+        TPDebug.Assert(element != null, "element is null");
 
         GetIdLocation(parameters, out string idLocation);
 
@@ -81,7 +80,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// </summary>
     /// <param name="parameters">The parameters specifying the locations</param>
     /// <param name="idLocation">The test ID location</param>
-    private void GetIdLocation(XmlTestStoreParameters parameters, out string idLocation)
+    private static void GetIdLocation(XmlTestStoreParameters? parameters, out string idLocation)
     {
         // Initialize to the default ID location
         idLocation = DefaultIdLocation;
@@ -89,7 +88,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
         // If any parameters are specified, see if we need to override the defaults
         if (parameters != null)
         {
-            if (parameters.TryGetValue(IdLocationKey, out object idLocationObj))
+            if (parameters.TryGetValue(IdLocationKey, out object? idLocationObj))
             {
                 idLocation = idLocationObj as string ?? idLocation;
             }
@@ -107,7 +106,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// </summary>
     /// <param name="other">The other test ID to compare with</param>
     /// <returns>True if the test IDs are equal in value, false otherwise</returns>
-    public bool Equals(TestId other)
+    public bool Equals(TestId? other)
     {
         // Check reference equality first, as it is faster than comparing value equality when the references are equal
         return ReferenceEquals(this, other) || ValueEquals(other);
@@ -118,7 +117,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// </summary>
     /// <param name="other">The other test ID to compare with</param>
     /// <returns>True if the test IDs are equal in value, false otherwise</returns>
-    private bool ValueEquals(TestId other)
+    private bool ValueEquals(TestId? other)
     {
         // Avoid calling of "!= null", as the != operator has been overloaded.
         return other is not null && Id == other.Id;
@@ -133,7 +132,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// </summary>
     /// <param name="other">The other test ID to compare with</param>
     /// <returns>True if the test IDs are equal in value, false otherwise</returns>
-    public override bool Equals(object other)
+    public override bool Equals(object? other)
     {
         return Equals(other as TestId);
     }
@@ -157,7 +156,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// <param name="left">The test ID on the left of the operator</param>
     /// <param name="right">The test ID on the right of the operator</param>
     /// <returns>True if the test IDs are equal in value, false otherwise</returns>
-    public static bool operator ==(TestId left, TestId right)
+    public static bool operator ==(TestId? left, TestId? right)
     {
         return
             ReferenceEquals(left, right) ||
@@ -170,7 +169,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// <param name="left">The test ID on the left of the operator</param>
     /// <param name="right">The test ID on the right of the operator</param>
     /// <returns>True if the test IDs are unequal in value, false otherwise</returns>
-    public static bool operator !=(TestId left, TestId right)
+    public static bool operator !=(TestId? left, TestId? right)
     {
         return !(left == right);
     }
@@ -191,7 +190,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// 0 if this instance is equal in value to the other test ID, &lt; 0 if this instance is lesser than the other test ID,
     /// or &gt; 0 if this instance is greater than the other test ID
     /// </returns>
-    public int CompareTo(TestId other)
+    public int CompareTo(TestId? other)
     {
         return other == null ? throw new ArgumentNullException(nameof(other)) : Id.CompareTo(other.Id);
     }
@@ -208,7 +207,7 @@ internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, ICompara
     /// 0 if this instance is equal in value to the other test ID, &lt; 0 if this instance is less than the other test ID,
     /// or &gt; 0 if this instance is greater than the other test ID
     /// </returns>
-    public int CompareTo(object other)
+    public int CompareTo(object? other)
     {
         return CompareTo(other as TestId);
     }
