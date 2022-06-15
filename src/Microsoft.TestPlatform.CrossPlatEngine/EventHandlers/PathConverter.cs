@@ -44,7 +44,7 @@ internal class PathConverter : IPathConverter
         _deploymentPath = normalizedDeploymentPath;
     }
 
-    [return: NotNullIfNotNull(nameof(path))]
+    [return: NotNullIfNotNull("path")]
     public string? UpdatePath(string? path, PathConversionDirection updateDirection)
     {
         if (path == null)
