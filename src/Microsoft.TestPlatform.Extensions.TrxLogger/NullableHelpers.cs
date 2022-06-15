@@ -33,10 +33,10 @@ internal static class TPDebug
     /// <inheritdoc cref="TPDebug.Assert(bool)"/>
     [Conditional("DEBUG")]
     public static void Assert([DoesNotReturnIf(false)] bool b)
-        => TPDebug.Assert(b);
+        => Debug.Assert(b);
 
     /// <inheritdoc cref="TPDebug.Assert(bool, string)"/>
     [Conditional("DEBUG")]
     public static void Assert([DoesNotReturnIf(false)] bool b, string message)
-        => TPDebug.Assert(b, message);
+        => Debug.Assert(b, message);
 }
