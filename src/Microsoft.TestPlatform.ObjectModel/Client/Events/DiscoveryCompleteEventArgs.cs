@@ -47,25 +47,25 @@ public class DiscoveryCompleteEventArgs : EventArgs
     public IDictionary<string, object> Metrics { get; set; }
 
     /// <summary>
-    /// Gets the list of sources which were fully discovered.
+    /// Gets or sets the list of sources which were fully discovered.
     /// </summary>
     [DataMember]
     public IList<DiscoveredSource> FullyDiscoveredSources { get; set; } = new List<DiscoveredSource>();
 
     /// <summary>
-    /// Gets the list of sources which were partially discovered (started discover tests, but then discovery aborted).
+    /// Gets or sets the list of sources which were partially discovered (started discover tests, but then discovery aborted).
     /// </summary>
     [DataMember]
     public IList<DiscoveredSource> PartiallyDiscoveredSources { get; set; } = new List<DiscoveredSource>();
 
     /// <summary>
-    ///  Gets a list of sources that were skipped during discovery.
+    ///  Gets or sets the list of sources that were skipped during discovery.
     /// </summary>
     [DataMember]
     public IList<DiscoveredSource> SkippedDiscoveredSources { get; set; } = new List<DiscoveredSource>();
 
     /// <summary>
-    /// Gets the list of sources which were not discovered at all.
+    /// Gets or sets the list of sources which were not discovered at all.
     /// </summary>
     [DataMember]
     public IList<DiscoveredSource> NotDiscoveredSources { get; set; } = new List<DiscoveredSource>();

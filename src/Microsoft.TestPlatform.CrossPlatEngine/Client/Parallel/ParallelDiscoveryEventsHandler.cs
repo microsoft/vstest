@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -88,9 +87,9 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
 
         // Manager said we are ready to publish the test discovery completed and we haven't yet
         // published it.
-        var fullyDiscovered = DiscoveredSource.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
-        var partiallyDiscovered = DiscoveredSource.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
-        var notDiscovered = DiscoveredSource.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+        var fullyDiscovered = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        var partiallyDiscovered = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        var notDiscovered = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
 
         // As we immediately return results to IDE in case of aborting we need to set
         // isAborted = true and totalTests = -1

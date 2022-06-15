@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -172,9 +173,9 @@ public class DiscoveryManager : IDiscoveryManager
 
                 var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(isAborted ? -1 : totalDiscoveredTestCount, isAborted)
                 {
-                    FullyDiscoveredSources = DiscoveredSource.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered)),
-                    PartiallyDiscoveredSources = DiscoveredSource.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered)),
-                    NotDiscoveredSources = DiscoveredSource.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered)),
+                    FullyDiscoveredSources = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered)),
+                    PartiallyDiscoveredSources = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered)),
+                    NotDiscoveredSources = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered)),
                     DiscoveredExtensions = TestPluginCache.Instance.TestExtensions?.GetCachedExtensions(),
                     Metrics = _requestData.MetricsCollection.Metrics,
                 };
@@ -211,9 +212,9 @@ public class DiscoveryManager : IDiscoveryManager
 
         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true)
         {
-            FullyDiscoveredSources = DiscoveredSource.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered)),
-            PartiallyDiscoveredSources = DiscoveredSource.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered)),
-            NotDiscoveredSources = DiscoveredSource.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered)),
+            FullyDiscoveredSources = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered)),
+            PartiallyDiscoveredSources = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered)),
+            NotDiscoveredSources = DiscoveredSourceHelper.ToDiscoveredSources(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered)),
         };
         eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
     }

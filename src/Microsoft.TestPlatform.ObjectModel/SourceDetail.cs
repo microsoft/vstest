@@ -9,6 +9,5 @@ public class SourceDetail
 {
     public string Source { get; internal set; }
     public Architecture Architecture { get; internal set; }
-    public Architecture FallbackArchitecture { get; internal set; }
     public Framework Framework { get; internal set; }
 }
