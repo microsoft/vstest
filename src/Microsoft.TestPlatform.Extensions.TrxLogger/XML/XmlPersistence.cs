@@ -446,6 +446,7 @@ internal class XmlPersistence
     /// <typeparam name="V"> Generic parameter
     /// </typeparam>
     public void SaveList<V>(IList<V> list, XmlElement element, string listXmlElement, string itemLocation, string itemElementName, XmlTestStoreParameters parameters)
+        where V : notnull
     {
         if (list == null || list.Count <= 0)
         {
@@ -456,7 +457,7 @@ internal class XmlPersistence
         TPDebug.Assert(listElement != null, "EnsureLocationExists should have returned a node");
         foreach (V item in list)
         {
-            XmlElement itemXml = CreateElement(listElement, itemElementName, item!);
+            XmlElement itemXml = CreateElement(listElement, itemElementName, item);
             SaveObject(item, itemXml, itemLocation, parameters);
         }
     }

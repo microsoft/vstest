@@ -180,7 +180,6 @@ public class DesignModeClient : IDesignModeClient
                     case MessageType.StartTestSession:
                         {
                             var testSessionPayload = _communicationManager.DeserializePayload<StartTestSessionPayload>(message);
-                            TPDebug.Assert(testSessionPayload is not null, "testSessionPayload is null");
                             StartTestSession(testSessionPayload, testRequestManager);
                             break;
                         }
@@ -188,7 +187,6 @@ public class DesignModeClient : IDesignModeClient
                     case MessageType.StopTestSession:
                         {
                             var testSessionPayload = _communicationManager.DeserializePayload<StopTestSessionPayload>(message);
-                            TPDebug.Assert(testSessionPayload is not null, "testSessionPayload is null");
                             StopTestSession(testSessionPayload, testRequestManager);
                             break;
                         }
@@ -196,7 +194,6 @@ public class DesignModeClient : IDesignModeClient
                     case MessageType.StartDiscovery:
                         {
                             var discoveryPayload = _dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message);
-                            TPDebug.Assert(discoveryPayload is not null, "discoveryPayload is null");
                             StartDiscovery(discoveryPayload, testRequestManager);
                             break;
                         }
@@ -204,10 +201,7 @@ public class DesignModeClient : IDesignModeClient
                     case MessageType.GetTestRunnerProcessStartInfoForRunAll:
                     case MessageType.GetTestRunnerProcessStartInfoForRunSelected:
                         {
-                            var testRunPayload =
-                                _communicationManager.DeserializePayload<TestRunRequestPayload>(
-                                    message);
-                            TPDebug.Assert(testRunPayload is not null, "testRunPayload is null");
+                            var testRunPayload = _communicationManager.DeserializePayload<TestRunRequestPayload>(message);
                             StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: true);
                             break;
                         }
@@ -215,17 +209,14 @@ public class DesignModeClient : IDesignModeClient
                     case MessageType.TestRunAllSourcesWithDefaultHost:
                     case MessageType.TestRunSelectedTestCasesDefaultHost:
                         {
-                            var testRunPayload =
-                                _communicationManager.DeserializePayload<TestRunRequestPayload>(
-                                    message);
+                            var testRunPayload = _communicationManager.DeserializePayload<TestRunRequestPayload>(message);
                             StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: false);
                             break;
                         }
 
                     case MessageType.TestRunAttachmentsProcessingStart:
                         {
-                            var testRunAttachmentsProcessingPayload =
-                                _communicationManager.DeserializePayload<TestRunAttachmentsProcessingPayload>(message);
+                            var testRunAttachmentsProcessingPayload = _communicationManager.DeserializePayload<TestRunAttachmentsProcessingPayload>(message);
                             StartTestRunAttachmentsProcessing(testRunAttachmentsProcessingPayload, testRequestManager);
                             break;
                         }
@@ -462,6 +453,12 @@ public class DesignModeClient : IDesignModeClient
             {
                 testRequestManager.ResetOptions();
 
+                if (testRunPayload is null)
+                {
+                    OnError(null);
+                    return;
+                }
+
                 // We must avoid re-launching the test host if the test run payload already
                 // contains test session info. Test session info being present is an indicative
                 // of an already running test host spawned by a start test session call.
@@ -476,81 +473,105 @@ public class DesignModeClient : IDesignModeClient
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
-
-                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
-                _communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
-                var runCompletePayload = new TestRunCompletePayload()
-                {
-                    TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue),
-                    LastRunTests = null
-                };
-
-                // Send run complete to translation layer
-                _communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
+                OnError(ex);
             }
         });
+
+        void OnError(Exception? ex)
+        {
+            EqtTrace.Error("DesignModeClient.StartTestRun: " + ex ?? "payload was null");
+
+            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex?.ToString() };
+            _communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+            var runCompletePayload = new TestRunCompletePayload()
+            {
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue),
+                LastRunTests = null
+            };
+
+            // Send run complete to translation layer
+            _communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
+        }
     }
 
-    private void StartDiscovery(DiscoveryRequestPayload discoveryRequestPayload, ITestRequestManager testRequestManager)
+    private void StartDiscovery(DiscoveryRequestPayload? discoveryRequestPayload, ITestRequestManager testRequestManager)
     {
-        Task.Run(
-            () =>
+        Task.Run(() =>
+        {
+            try
             {
-                try
+                testRequestManager.ResetOptions();
+                if (discoveryRequestPayload is null)
                 {
-                    testRequestManager.ResetOptions();
-                    testRequestManager.DiscoverTests(discoveryRequestPayload, new DesignModeTestEventsRegistrar(this), _protocolConfig);
+                    OnError(null);
+                    return;
                 }
-                catch (Exception ex)
-                {
-                    EqtTrace.Error("DesignModeClient: Exception in StartDiscovery: " + ex);
 
-                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
-                    _communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+                testRequestManager.DiscoverTests(discoveryRequestPayload, new DesignModeTestEventsRegistrar(this), _protocolConfig);
+            }
+            catch (Exception ex)
+            {
+                OnError(ex);
+            }
+        });
 
-                    var payload = new DiscoveryCompletePayload()
-                    {
-                        IsAborted = true,
-                        LastDiscoveredTests = null,
-                        TotalTests = -1
-                    };
+        void OnError(Exception? ex)
+        {
+            EqtTrace.Error("DesignModeClient.StartDiscovery: " + ex ?? "payload is null");
 
-                    // Send run complete to translation layer
-                    _communicationManager.SendMessage(MessageType.DiscoveryComplete, payload);
-                }
-            });
+            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex?.ToString() };
+            _communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+
+            var payload = new DiscoveryCompletePayload()
+            {
+                IsAborted = true,
+                LastDiscoveredTests = null,
+                TotalTests = -1
+            };
+
+            // Send run complete to translation layer
+            _communicationManager.SendMessage(MessageType.DiscoveryComplete, payload);
+        }
     }
 
     private void StartTestRunAttachmentsProcessing(TestRunAttachmentsProcessingPayload? attachmentsProcessingPayload, ITestRequestManager testRequestManager)
     {
-        Task.Run(
-            () =>
+        Task.Run(() =>
+        {
+            try
             {
-                try
+                if (attachmentsProcessingPayload is null)
                 {
-                    // TODO: Avoid throwing/catching NRE
-                    testRequestManager.ProcessTestRunAttachments(attachmentsProcessingPayload!, new TestRunAttachmentsProcessingEventsHandler(_communicationManager), _protocolConfig);
+                    OnError(null);
+                    return;
                 }
-                catch (Exception ex)
-                {
-                    EqtTrace.Error("DesignModeClient: Exception in StartTestRunAttachmentsProcessing: " + ex);
 
-                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
-                    _communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+                testRequestManager.ProcessTestRunAttachments(attachmentsProcessingPayload, new TestRunAttachmentsProcessingEventsHandler(_communicationManager), _protocolConfig);
+            }
+            catch (Exception ex)
+            {
+                OnError(ex);
+            }
+        });
 
-                    var payload = new TestRunAttachmentsProcessingCompletePayload()
-                    {
-                        Attachments = null
-                    };
+        void OnError(Exception? ex)
+        {
+            EqtTrace.Error("DesignModeClient.StartTestRunAttachmentsProcessing: " + ex ?? "payload is null");
 
-                    // Send run complete to translation layer
-                    _communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, payload);
-                }
-            });
+            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex?.ToString() };
+            _communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+
+            var payload = new TestRunAttachmentsProcessingCompletePayload()
+            {
+                Attachments = null
+            };
+
+            // Send run complete to translation layer
+            _communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, payload);
+        }
     }
 
-    private void StartTestSession(StartTestSessionPayload payload, ITestRequestManager requestManager)
+    private void StartTestSession(StartTestSessionPayload? payload, ITestRequestManager requestManager)
     {
         Task.Run(() =>
         {
@@ -558,6 +579,12 @@ public class DesignModeClient : IDesignModeClient
 
             try
             {
+                if (payload is null)
+                {
+                    OnError(eventsHandler, null);
+                    return;
+                }
+
                 var customLauncher = payload.HasCustomHostLauncher
                     ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, payload.IsDebuggingEnabled)
                     : null;
@@ -567,15 +594,20 @@ public class DesignModeClient : IDesignModeClient
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("DesignModeClient: Exception in StartTestSession: " + ex);
-
-                eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
-                eventsHandler.HandleStartTestSessionComplete(new());
+                OnError(eventsHandler, ex);
             }
         });
+
+        static void OnError(TestSessionEventsHandler eventsHandler, Exception? ex)
+        {
+            EqtTrace.Error("DesignModeClient.StartTestSession: " + ex ?? "payload is null");
+
+            eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex?.ToString());
+            eventsHandler.HandleStartTestSessionComplete(new());
+        }
     }
 
-    private void StopTestSession(StopTestSessionPayload payload, ITestRequestManager requestManager)
+    private void StopTestSession(StopTestSessionPayload? payload, ITestRequestManager requestManager)
     {
         Task.Run(() =>
         {
@@ -584,16 +616,27 @@ public class DesignModeClient : IDesignModeClient
             try
             {
                 requestManager.ResetOptions();
+                if (payload is null)
+                {
+                    OnError(eventsHandler, null);
+                    return;
+                }
+
                 requestManager.StopTestSession(payload, eventsHandler, _protocolConfig);
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("DesignModeClient: Exception in StopTestSession: " + ex);
-
-                eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
-                eventsHandler.HandleStopTestSessionComplete(new(payload.TestSessionInfo));
+                OnError(eventsHandler, ex);
             }
         });
+
+        void OnError(TestSessionEventsHandler eventsHandler, Exception? ex)
+        {
+            EqtTrace.Error("DesignModeClient.StopTestSession: " + ex ?? "payload is null");
+
+            eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex?.ToString());
+            eventsHandler.HandleStopTestSessionComplete(new(payload?.TestSessionInfo));
+        }
     }
 
     #region IDisposable Support

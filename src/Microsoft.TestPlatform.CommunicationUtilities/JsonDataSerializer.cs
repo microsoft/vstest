@@ -136,7 +136,8 @@ public class JsonDataSerializer : IDataSerializer
             // Unit tests also provide a Message in places where using the deserializer would actually
             // produce a VersionedMessage or VersionedMessageWithRawMessage.
             var serializerV1 = GetPayloadSerializer(null);
-            return Deserialize<T>(serializerV1, message.Payload!);
+            TPDebug.Assert(message.Payload is not null, "Payload should not be null");
+            return Deserialize<T>(serializerV1, message.Payload);
         }
 
         var versionedMessage = (VersionedMessage)message;
@@ -146,7 +147,8 @@ public class JsonDataSerializer : IDataSerializer
         {
             // When fast json is disabled, then the message is a VersionedMessage
             // with JToken payload.
-            return Deserialize<T>(payloadSerializer, message.Payload!);
+            TPDebug.Assert(message.Payload is not null, "Payload should not be null");
+            return Deserialize<T>(payloadSerializer, message.Payload);
         }
 
         // When fast json is enabled then the message is also a subtype of VersionedMessage, but
@@ -167,7 +169,10 @@ public class JsonDataSerializer : IDataSerializer
             // PERF: When payloadSerializer1 was resolved we need to deserialize JToken, and then deserialize that.
             // This is still better than deserializing the JToken in DeserializeMessage because here we know that the payload
             // will actually be used.
-            return Deserialize<T>(payloadSerializer, Deserialize<Message>(rawMessage!).Payload!);
+            TPDebug.Assert(rawMessage is not null, "rawMessage should not be null");
+            var rawMessagePayload = Deserialize<Message>(rawMessage).Payload;
+            TPDebug.Assert(rawMessagePayload is not null, "rawMessagePayload should not be null");
+            return Deserialize<T>(payloadSerializer, rawMessagePayload);
         }
     }
 

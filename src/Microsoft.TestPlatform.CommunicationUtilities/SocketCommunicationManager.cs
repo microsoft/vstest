@@ -367,7 +367,7 @@ public class SocketCommunicationManager : ICommunicationManager
                     break;
                 }
 
-                if (_socket!.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead) == true)
+                if (_socket.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead) == true)
                 {
                     str = ReceiveRawMessage();
                     success = true;

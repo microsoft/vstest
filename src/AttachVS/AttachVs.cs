@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -196,13 +197,13 @@ internal class DebuggerUtility
         var parent = process;
         while (!IsVsOrNull(parent))
         {
-            parent = GetParentProcess(parent!);
+            parent = GetParentProcess(parent);
         }
 
         return parent;
     }
 
-    private static bool IsVsOrNull(Process? process)
+    private static bool IsVsOrNull([NotNullWhen(false)] Process? process)
     {
         if (process == null)
         {

@@ -567,7 +567,14 @@ public class TestRequestSender : ITestRequestSender
             discoveryEventsHandler.HandleRawMessage(rawMessage);
 
             var data = _dataSerializer.DeserializeMessage(rawMessage);
-            switch (data!.MessageType)
+            if (data is null)
+            {
+                EqtTrace.Error("TestRequestSender.OnDiscoveryMessageReceived: Deserialized message is null: {0}", rawMessage);
+                OnDiscoveryAbort(discoveryEventsHandler, null, false);
+                return;
+            }
+
+            switch (data.MessageType)
             {
                 case MessageType.TestCasesFound:
                     var testCases = _dataSerializer.DeserializePayload<IEnumerable<TestCase>>(data);
