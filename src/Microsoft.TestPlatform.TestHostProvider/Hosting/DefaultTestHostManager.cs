@@ -519,9 +519,8 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         try
         {
             if (testHostEnvironmentVariables is not null
-                && testHostEnvironmentVariables.TryGetValue("VSTEST_BACKGROUND_DISCOVERY", out var value)
-                && bool.TryParse(value, out var isBackgroundDiscoveryEnabled)
-                && isBackgroundDiscoveryEnabled)
+                && testHostEnvironmentVariables.TryGetValue("VSTEST_BACKGROUND_DISCOVERY", out var isBackgroundDiscoveryEnabled)
+                && isBackgroundDiscoveryEnabled == "1")
             {
                 testHostProcess.PriorityClass = testHostPriority;
                 EqtTrace.Verbose("Setting test host process priority to {0}", testHostProcess.PriorityClass);
