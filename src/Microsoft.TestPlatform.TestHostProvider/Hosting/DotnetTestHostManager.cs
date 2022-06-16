@@ -408,7 +408,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
             // We silently force x64 only if the target architecture is the default one and is not specified by user
             // through --arch or runsettings or -- RunConfiguration.TargetPlatform=arch
-            bool forceToX64 = SilentlyForceToX64(sourcePath) && _runsettingHelper.IsDefaultTargetArchitecture;
+            bool forceToX64 = _runsettingHelper.IsDefaultTargetArchitecture && SilentlyForceToX64(sourcePath);
             EqtTrace.Verbose($"DotnetTestHostmanager: Current process architetcure '{_processHelper.GetCurrentProcessArchitecture()}'");
             bool isSameArchitecture = IsSameArchitecture(_architecture, _processHelper.GetCurrentProcessArchitecture());
             var currentProcessPath = _processHelper.GetCurrentProcessFileName()!;
