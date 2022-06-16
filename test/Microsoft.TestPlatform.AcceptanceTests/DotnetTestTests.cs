@@ -85,7 +85,7 @@ public class DotnetTestTests : AcceptanceTestBase
         string assemblyRelativePath = @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\x64\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
         var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
 
-        InvokeDotnetTest($@"{assemblyAbsolutePath} --logger:""Console;Verbosity=normal"" --diag:log.txt");
+        InvokeDotnetTest($@"{assemblyAbsolutePath} --logger:""Console;Verbosity=normal""");
 
         ValidateSummaryStatus(1, 1, 0);
         ExitCodeEquals(1);
