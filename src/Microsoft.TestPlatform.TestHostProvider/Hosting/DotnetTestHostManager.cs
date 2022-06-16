@@ -533,18 +533,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
         bool SilentlyForceToX64(string sourcePath)
         {
-            // Scenario: dotnet test nativeArm64.dll
-            // If the dll is native and we're not running in process(vstest.console.exe)
-            // the expected target framework is ".NETCoreApp,Version=v1.0".
-            // In this case we don't want to force x64 architecture
-            using var assemblyStream = _fileHelper.GetStream(sourcePath, FileMode.Open, FileAccess.Read);
-            using var peReader = new PEReader(assemblyStream);
-            if (!peReader.HasMetadata || (peReader.PEHeaders.CorHeader?.Flags & CorFlags.ILOnly) == 0)
-            {
-                EqtTrace.Verbose($"DotnetTestHostmanager.SilentlyForceToX64: do not force x64 muxer, source {sourcePath} is native.");
-                return false;
-            }
-
             // We need to force x64 in some scenario
             // https://github.com/dotnet/sdk/blob/main/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.RuntimeIdentifierInference.targets#L140-L143
 
@@ -559,7 +547,25 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             // If we are running on win-arm64 and the TFM is < 5.0, we have to use a x64 apphost since there are no win-arm64 apphosts previous to .NET 5.0.
             return _platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows &&
                    _platformEnvironment.Architecture == PlatformArchitecture.ARM64 &&
-                   new Version(_targetFramework.Version).Major < 5;
+                   new Version(_targetFramework.Version).Major < 5 &&
+                   !IsNativeModule(sourcePath);
+        }
+
+        bool IsNativeModule(string modulePath)
+        {
+            // Scenario: dotnet test nativeArm64.dll for CppUnitTestFramework
+            // If the dll is native and we're not running in process(vstest.console.exe)
+            // the expected target framework is ".NETCoreApp,Version=v1.0".
+            // In this case we don't want to force x64 architecture
+            using var assemblyStream = _fileHelper.GetStream(sourcePath, FileMode.Open, FileAccess.Read);
+            using var peReader = new PEReader(assemblyStream);
+            if (!peReader.HasMetadata || (peReader.PEHeaders.CorHeader?.Flags & CorFlags.ILOnly) == 0)
+            {
+                EqtTrace.Verbose($"DotnetTestHostmanager.SilentlyForceToX64: do not force x64 muxer, source '{sourcePath}' is native.");
+                return true;
+            }
+
+            return false;
         }
     }
 
