@@ -9,6 +9,8 @@ using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
+using FluentAssertions;
+
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
@@ -2570,5 +2572,51 @@ public class TestRequestManagerTests
         var mockCustomlauncher = new Mock<ITestHostLauncher3>();
 
         _testRequestManager.DiscoverTests(payload, mockDiscoveryEventsRegistrar.Object, _protocolConfig);
+    }
+
+    [TestMethod]
+    [DataRow("x86")]
+    [DataRow("x64")]
+    [DataRow("arm64")]
+    public void SettingDefaultPlatformUsesItForAnyCPUSourceButNotForNonAnyCPUSource(string defaultPlatform)
+    {
+        // -- Arrange
+        var payload = new DiscoveryRequestPayload()
+        {
+            Sources = new List<string>() { "AnyCPU.dll", "x64.dll" },
+            RunSettings =
+                $@"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DefaultPlatform>{defaultPlatform}</DefaultPlatform>
+                     </RunConfiguration>
+                </RunSettings>"
+        };
+
+        Architecture expectedPlatform = (Architecture)Enum.Parse(typeof(Architecture), defaultPlatform, ignoreCase: true);
+
+        Dictionary<string, SourceDetail>? actualSourceToSourceDetailMap = null;
+        var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+
+        _mockAssemblyMetadataProvider.Setup(m => m.GetArchitecture("AnyCPU.dll")).Returns(Architecture.AnyCPU);
+        _mockAssemblyMetadataProvider.Setup(m => m.GetArchitecture("x64.dll")).Returns(Architecture.X64);
+
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
+            .Callback((IRequestData _, DiscoveryCriteria _, TestPlatformOptions _, Dictionary<string, SourceDetail> sourceToSourceDetailMap, IWarningLogger _) =>
+                // output the incoming sourceToSourceDetailMap to the variable above so we can inspect it.
+                actualSourceToSourceDetailMap = sourceToSourceDetailMap
+            ).Returns(mockDiscoveryRequest.Object);
+
+        // -- Act
+        // The substitution of architecture happens in runsettings patching which is shared for discovery and run
+        // so we can safely just test discovery.
+        _testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
+
+        actualSourceToSourceDetailMap.Should().NotBeNull();
+        // The AnyCPU dll is the architecture we provide in the default setting, rather than being determined from the
+        // current process architecture.
+        actualSourceToSourceDetailMap!["AnyCPU.dll"].Architecture.Should().Be(expectedPlatform);
+        // The dll that has a specific architecture always remains that specific architecture.
+        actualSourceToSourceDetailMap!["x64.dll"].Architecture.Should().Be(Architecture.X64);
     }
 }
