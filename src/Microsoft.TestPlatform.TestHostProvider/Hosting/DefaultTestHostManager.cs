@@ -380,7 +380,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         TPDebug.Assert(IsInitialized, "Initialize must be called before FilterExtensionsBasedOnVersion");
 
         Dictionary<string, string> selectedExtensions = new();
-        Dictionary<string, Version> highestFileVersions = new();
+        Dictionary<string, Version?> highestFileVersions = new();
         Dictionary<string, Version> conflictingExtensions = new();
 
         foreach (var extensionFullPath in extensions)

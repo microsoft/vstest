@@ -134,12 +134,10 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
         if (_configurationElement != null)
         {
-            var collectDumpNode = _configurationElement[Constants.DumpModeKey];
-            _collectProcessDumpOnCrash = collectDumpNode != null;
-
-            if (_collectProcessDumpOnCrash)
+            if (_configurationElement[Constants.DumpModeKey] is XmlElement collectDumpNode)
             {
-                ValidateAndAddCrashProcessDumpParameters(collectDumpNode!);
+                _collectProcessDumpOnCrash = true;
+                ValidateAndAddCrashProcessDumpParameters(collectDumpNode);
 
                 // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
@@ -153,15 +151,22 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                 var dumpPath = Path.Combine(dumpDirectory, $"%e_%p_%t_crashdump.dmp");
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
             }
-
-            var collectHangBasedDumpNode = _configurationElement[Constants.CollectDumpOnTestSessionHang];
-            _collectProcessDumpOnHang = collectHangBasedDumpNode != null;
-            if (_collectProcessDumpOnHang)
+            else
             {
+                _collectProcessDumpOnCrash = false;
+            }
+
+            if (_configurationElement[Constants.CollectDumpOnTestSessionHang] is XmlElement collectHangBasedDumpNode)
+            {
+                _collectProcessDumpOnHang = true;
                 // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
 
                 ValidateAndAddHangProcessDumpParameters(collectHangBasedDumpNode!);
+            }
+            else
+            {
+                _collectProcessDumpOnHang = false;
             }
 
             var tfm = _configurationElement[Constants.TargetFramework]?.InnerText;

@@ -52,7 +52,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// <summary>
     /// Tracks the time taken by each run request
     /// </summary>
-    private Stopwatch? _runRequestTimeTracker;
+    private readonly Stopwatch _runRequestTimeTracker = new();
 
     private readonly IDataSerializer _dataSerializer;
 
@@ -146,10 +146,8 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                     _timer = new Timer(OnTestSessionTimeout, null, TimeSpan.FromMilliseconds(_testSessionTimeout), TimeSpan.FromMilliseconds(0));
                 }
 
-                _runRequestTimeTracker = new Stopwatch();
-
                 // Start the stop watch for calculating the test run time taken overall
-                _runRequestTimeTracker.Start();
+                _runRequestTimeTracker.Restart();
                 var testRunStartEvent = new TestRunStartEventArgs(TestRunCriteria);
                 LoggerManager.HandleTestRunStart(testRunStartEvent);
                 OnRunStart.SafeInvoke(this, testRunStartEvent, "TestRun.TestRunStart");
@@ -383,7 +381,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
             try
             {
-                _runRequestTimeTracker?.Stop();
+                _runRequestTimeTracker.Stop();
 
                 if (lastChunkArgs != null)
                 {
@@ -401,7 +399,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                         // This is required as TMI adapter is sending attachments as List which cannot be type casted to Collection.
                         runContextAttachments != null ? new Collection<AttachmentSet>(runContextAttachments.ToList()) : null,
                         runCompleteArgs.InvokedDataCollectors,
-                        _runRequestTimeTracker!.Elapsed);
+                        _runRequestTimeTracker.Elapsed);
 
                 // Add extensions discovered by vstest.console.
                 //
@@ -535,9 +533,9 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         var message = LoggerManager.LoggersInitialized || _requestData.IsTelemetryOptedIn ?
             _dataSerializer.DeserializeMessage(rawMessage) : null;
 
-        if (string.Equals(message?.MessageType, MessageType.ExecutionComplete))
+        if (MessageType.ExecutionComplete.Equals(message?.MessageType))
         {
-            var testRunCompletePayload = _dataSerializer.DeserializePayload<TestRunCompletePayload>(message!);
+            var testRunCompletePayload = _dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
             rawMessage = UpdateRawMessageWithTelemetryInfo(testRunCompletePayload, message) ?? rawMessage;
             HandleLoggerManagerTestRunComplete(testRunCompletePayload);
         }
