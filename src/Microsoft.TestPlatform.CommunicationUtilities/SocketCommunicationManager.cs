@@ -361,8 +361,13 @@ public class SocketCommunicationManager : ICommunicationManager
         {
             try
             {
-                TPDebug.Assert(_socket is not null, "_socket is null");
-                if (_socket.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead))
+                if (_socket is null)
+                {
+                    EqtTrace.Error("SocketCommunicationManager.TryReceiveRawMessage: Socket is null");
+                    break;
+                }
+
+                if (_socket!.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead) == true)
                 {
                     str = ReceiveRawMessage();
                     success = true;
@@ -374,13 +379,13 @@ public class SocketCommunicationManager : ICommunicationManager
                     && socketException.SocketErrorCode == SocketError.TimedOut)
                 {
                     EqtTrace.Info(
-                        "SocketCommunicationManager ReceiveMessage: failed to receive message because read timeout {0}",
+                        "SocketCommunicationManager.ReceiveMessage: failed to receive message because read timeout {0}",
                         ioException);
                 }
                 else
                 {
                     EqtTrace.Error(
-                        "SocketCommunicationManager ReceiveMessage: failed to receive message {0}",
+                        "SocketCommunicationManager.ReceiveMessage: failed to receive message {0}",
                         ioException);
                     break;
                 }
@@ -388,7 +393,7 @@ public class SocketCommunicationManager : ICommunicationManager
             catch (Exception exception)
             {
                 EqtTrace.Error(
-                    "SocketCommunicationManager ReceiveMessage: failed to receive message {0}",
+                    "SocketCommunicationManager.ReceiveMessage: failed to receive message {0}",
                     exception);
                 break;
             }

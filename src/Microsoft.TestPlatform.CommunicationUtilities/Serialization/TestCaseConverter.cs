@@ -58,14 +58,12 @@ public class TestCaseConverter : JsonConverter
                 }
             }
 
-            TPDebug.Assert(propertyData is not null, "propertyData is null");
-
             switch (testProperty.Id)
             {
                 case "TestCase.Id":
-                    testCase.Id = Guid.Parse(propertyData); break;
+                    testCase.Id = Guid.Parse(propertyData!); break;
                 case "TestCase.ExecutorUri":
-                    testCase.ExecutorUri = new Uri(propertyData); break;
+                    testCase.ExecutorUri = new Uri(propertyData!); break;
                 case "TestCase.FullyQualifiedName":
                     testCase.FullyQualifiedName = propertyData; break;
                 case "TestCase.DisplayName":
@@ -75,7 +73,7 @@ public class TestCaseConverter : JsonConverter
                 case "TestCase.CodeFilePath":
                     testCase.CodeFilePath = propertyData; break;
                 case "TestCase.LineNumber":
-                    testCase.LineNumber = int.Parse(propertyData); break;
+                    testCase.LineNumber = int.Parse(propertyData!); break;
                 default:
                     // No need to register member properties as they get registered as part of TestCaseProperties class.
                     testProperty = TestProperty.Register(testProperty.Id, testProperty.Label, testProperty.GetValueType(), testProperty.Attributes, typeof(TestObject));

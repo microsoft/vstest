@@ -218,7 +218,6 @@ public class DesignModeClient : IDesignModeClient
                             var testRunPayload =
                                 _communicationManager.DeserializePayload<TestRunRequestPayload>(
                                     message);
-                            TPDebug.Assert(testRunPayload is not null, "testRunPayload is null");
                             StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: false);
                             break;
                         }
@@ -227,7 +226,6 @@ public class DesignModeClient : IDesignModeClient
                         {
                             var testRunAttachmentsProcessingPayload =
                                 _communicationManager.DeserializePayload<TestRunAttachmentsProcessingPayload>(message);
-                            TPDebug.Assert(testRunAttachmentsProcessingPayload is not null, "testRunAttachmentsProcessingPayload is null");
                             StartTestRunAttachmentsProcessing(testRunAttachmentsProcessingPayload, testRequestManager);
                             break;
                         }
@@ -279,6 +277,10 @@ public class DesignModeClient : IDesignModeClient
                     default:
                         {
                             EqtTrace.Info("DesignModeClient: Invalid Message received: {0}", message);
+                            if (message is null)
+                            {
+                                Stop();
+                            }
                             break;
                         }
                 }
@@ -286,11 +288,16 @@ public class DesignModeClient : IDesignModeClient
             catch (Exception ex)
             {
                 EqtTrace.Error("DesignModeClient: Error processing request: {0}", ex);
-                isSessionEnd = true;
-                Dispose();
+                Stop();
             }
         }
         while (!isSessionEnd);
+
+        void Stop()
+        {
+            isSessionEnd = true;
+            Dispose();
+        }
     }
 
     /// <summary>
@@ -447,7 +454,7 @@ public class DesignModeClient : IDesignModeClient
         }
     }
 
-    private void StartTestRun(TestRunRequestPayload testRunPayload, ITestRequestManager testRequestManager, bool shouldLaunchTesthost)
+    private void StartTestRun(TestRunRequestPayload? testRunPayload, ITestRequestManager testRequestManager, bool shouldLaunchTesthost)
     {
         Task.Run(() =>
         {
@@ -459,13 +466,13 @@ public class DesignModeClient : IDesignModeClient
                 // contains test session info. Test session info being present is an indicative
                 // of an already running test host spawned by a start test session call.
                 var customLauncher =
-                    shouldLaunchTesthost && testRunPayload.TestSessionInfo == null
+                    shouldLaunchTesthost && testRunPayload!.TestSessionInfo == null // TODO: Avoid throwing/catching NRE
                         ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(
                             this,
                             testRunPayload.DebuggingEnabled)
                         : null;
 
-                testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), _protocolConfig);
+                testRequestManager.RunTests(testRunPayload!, customLauncher, new DesignModeTestEventsRegistrar(this), _protocolConfig);
             }
             catch (Exception ex)
             {
@@ -515,14 +522,15 @@ public class DesignModeClient : IDesignModeClient
             });
     }
 
-    private void StartTestRunAttachmentsProcessing(TestRunAttachmentsProcessingPayload attachmentsProcessingPayload, ITestRequestManager testRequestManager)
+    private void StartTestRunAttachmentsProcessing(TestRunAttachmentsProcessingPayload? attachmentsProcessingPayload, ITestRequestManager testRequestManager)
     {
         Task.Run(
             () =>
             {
                 try
                 {
-                    testRequestManager.ProcessTestRunAttachments(attachmentsProcessingPayload, new TestRunAttachmentsProcessingEventsHandler(_communicationManager), _protocolConfig);
+                    // TODO: Avoid throwing/catching NRE
+                    testRequestManager.ProcessTestRunAttachments(attachmentsProcessingPayload!, new TestRunAttachmentsProcessingEventsHandler(_communicationManager), _protocolConfig);
                 }
                 catch (Exception ex)
                 {
