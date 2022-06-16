@@ -561,7 +561,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             using var peReader = new PEReader(assemblyStream);
             if (!peReader.HasMetadata || (peReader.PEHeaders.CorHeader?.Flags & CorFlags.ILOnly) == 0)
             {
-                EqtTrace.Verbose($"DotnetTestHostmanager.SilentlyForceToX64: do not force x64 muxer, source '{sourcePath}' is native.");
+                EqtTrace.Verbose($"DotnetTestHostmanager.IsNativeModule: Source '{sourcePath}' is native.");
                 return true;
             }
 
