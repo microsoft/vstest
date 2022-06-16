@@ -62,7 +62,7 @@ public class ParallelOperationManagerTests
         parallelOperationManager.StartWork(workloads, eventHandler, getEventHandler, runWorkload);
 
         // Assert
-        workerCounts.Should().BeEquivalentTo(3, 3, 3, 2, 1);
+        workerCounts.Should().BeEquivalentTo(new[] { 3, 3, 3, 2, 1 });
     }
 
     [TestMethod]
@@ -95,7 +95,7 @@ public class ParallelOperationManagerTests
         parallelOperationManager.StartWork(workloads, eventHandler, getEventHandler, runWorkload);
 
         // Assert
-        workerCounts.Should().BeEquivalentTo(2, 1);
+        workerCounts.Should().BeEquivalentTo(new[] { 2, 1 });
     }
 
 
@@ -131,10 +131,10 @@ public class ParallelOperationManagerTests
         parallelOperationManager.StartWork(workloads, eventHandler, getEventHandler, runWorkload);
 
         // Assert
-        workerCounts.Should().BeEquivalentTo(2, 1);
+        workerCounts.Should().BeEquivalentTo(new[] { 2, 1 });
         // We create 10 slots, because that is the max parallel level, when we observe, there are 2 workloads running,
         // and then 1 workload running, so we see 8 and 9 (10 - 2, and 10 - 1).
-        availableWorkerCounts.Should().BeEquivalentTo(8, 9);
+        availableWorkerCounts.Should().BeEquivalentTo(new[] { 8, 9 });
     }
 
     [TestMethod]
@@ -177,7 +177,7 @@ public class ParallelOperationManagerTests
         // even though we did not process workloads 4 and 5.
         // (e.g. In real life Abort was called so the handler won't call RunNextWork, because we don't want to run the remaining sources,
         // and all the sources that are currently running be aborted by calling Abort on each manager via DoActionOnAllManagers.)
-        workloadsProcessed.Should().BeEquivalentTo(1, 2, 3);
+        workloadsProcessed.Should().BeEquivalentTo(new[] { 1, 2, 3 });
     }
 
     [TestMethod]
@@ -231,7 +231,7 @@ public class ParallelOperationManagerTests
         // When we aborted workload 1 was already processed, and 2, and 3 were active.
         // We should see that the first manager did not call abort, but second and third called abort,
         // and there were no more managers created because we stopped calling next after 1 was done.
-        createdManagers.Select(manager => manager.AbortCalled).Should().BeEquivalentTo(false, true, true);
+        createdManagers.Select(manager => manager.AbortCalled).Should().BeEquivalentTo(new[] { false, true, true });
     }
 
     /// <summary>

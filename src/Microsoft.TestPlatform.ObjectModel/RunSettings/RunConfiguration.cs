@@ -236,7 +236,7 @@ public class RunConfiguration : TestRunSettings
     }
 
     /// <summary>
-    /// Gets or sets the Target platform this run is targeting. Possible values are <see cref="Architecture"/> except for AnyCPU or Default.
+    /// Gets or sets the Target platform this run is targeting. Possible values are <see cref="Architecture"/> except for AnyCPU and Default.
     /// </summary>
     public Architecture TargetPlatform
     {
@@ -253,7 +253,7 @@ public class RunConfiguration : TestRunSettings
     }
 
     /// <summary>
-    /// Gets or sets the default platform that will be used for AnyCPU sources, or non-dll sources. Possible values are <see cref="Architecture"/> except for AnyCPU or Default.
+    /// Gets or sets the default platform that will be used for AnyCPU sources, or non-dll sources. Possible values are <see cref="Architecture"/> except for AnyCPU and Default.
     /// </summary>
     public Architecture? DefaultPlatform
     {

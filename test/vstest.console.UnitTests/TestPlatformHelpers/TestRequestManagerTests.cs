@@ -2619,4 +2619,26 @@ public class TestRequestManagerTests
         // The dll that has a specific architecture always remains that specific architecture.
         actualSourceToSourceDetailMap!["x64.dll"].Architecture.Should().Be(Architecture.X64);
     }
+
+    [TestMethod]
+    public void UsingInvalidValueForDefaultPlatformSettingThrowsSettingsException()
+    {
+        var settingXml = @"
+            <RunSettings>
+                <RunConfiguration>
+                    <DefaultPlatform>WRONGPlatform</DefaultPlatform>
+                </RunConfiguration>
+            </RunSettings>";
+
+        var payload = new TestRunRequestPayload()
+        {
+            Sources = new List<string>() { "a.dll" },
+            RunSettings = settingXml
+        };
+
+        _testRequestManager
+            .Invoking(m => m.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig))
+            .Should().Throw<SettingsException>()
+            .And.Message.Should().Contain("Invalid value 'WRONGPlatform' specified for 'DefaultPlatform'.");
+    }
 }
