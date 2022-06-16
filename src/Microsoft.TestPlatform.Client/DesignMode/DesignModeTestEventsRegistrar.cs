@@ -63,3 +63,4 @@ public class DesignModeTestEventsRegistrar : ITestDiscoveryEventsRegistrar, ITes
         _designModeClient.SendTestMessage(TestMessageLevel.Warning, message);
     }
 }
+

@@ -210,4 +210,13 @@ internal class ParallelRunDataAggregator
             }
         }
     }
+
+
+    public void MarkAsAborted()
+    {
+        lock (_dataUpdateSyncObject)
+        {
+            IsAborted = true;
+        }
+    }
 }

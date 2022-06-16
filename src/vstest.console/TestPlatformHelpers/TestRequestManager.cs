@@ -226,7 +226,8 @@ internal class TestRequestManager : ITestRequestManager
                     requestData,
                     criteria,
                     discoveryPayload.TestPlatformOptions,
-                    sourceToSourceDetailMap);
+                    sourceToSourceDetailMap,
+                    new EventRegistrarToWarningLoggerAdapter(discoveryEventsRegistrar));
                 discoveryEventsRegistrar?.RegisterDiscoveryEvents(_currentDiscoveryRequest);
 
                 // Notify start of discovery start.
@@ -509,7 +510,7 @@ internal class TestRequestManager : ITestRequestManager
                     TestHostLauncher = testHostLauncher
                 };
 
-                var testSessionStarted = _testPlatform.StartTestSession(requestData, criteria, eventsHandler, sourceToSourceDetailMap);
+                var testSessionStarted = _testPlatform.StartTestSession(requestData, criteria, eventsHandler, sourceToSourceDetailMap, new NullWarningLogger());
                 if (!testSessionStarted)
                 {
                     EqtTrace.Warning("TestRequestManager.StartTestSession: Unable to start test session.");
@@ -1124,7 +1125,8 @@ internal class TestRequestManager : ITestRequestManager
                     requestData,
                     testRunCriteria,
                     options,
-                    sourceToSourceDetailMap);
+                    sourceToSourceDetailMap,
+                    new EventRegistrarToWarningLoggerAdapter(testRunEventsRegistrar));
 
                 _testRunResultAggregator.RegisterTestRunEvents(_currentTestRunRequest);
                 testRunEventsRegistrar?.RegisterTestRunEvents(_currentTestRunRequest);

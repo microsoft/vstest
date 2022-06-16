@@ -7,8 +7,6 @@ using System.Diagnostics.Tracing;
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 
 /// <inheritdoc/>

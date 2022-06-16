@@ -6,8 +6,6 @@ using System.Collections.Generic;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
@@ -27,7 +25,7 @@ internal abstract class TestElementAggregation : TestElement, ITestAggregation
         get { return _testLinks; }
     }
 
-    public override void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
+    public override void Save(System.Xml.XmlElement element, XmlTestStoreParameters? parameters)
     {
         base.Save(element, parameters);
 

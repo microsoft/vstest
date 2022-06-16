@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Xml;
 
@@ -106,6 +107,7 @@ public class IntegrationTestEnvironment
     /// Gets the target framework.
     /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
     /// </summary>
+    [NotNull]
     public string? TargetFramework { get; set; }
 
     /// <summary>

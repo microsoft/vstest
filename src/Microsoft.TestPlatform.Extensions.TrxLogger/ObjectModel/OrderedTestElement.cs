@@ -4,10 +4,7 @@
 using System;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
@@ -23,7 +20,7 @@ internal class OrderedTestElement : TestElementAggregation, IXmlTestStoreCustom
         get { return Constants.OrderedTestElementName; }
     }
 
-    string IXmlTestStoreCustom.NamespaceUri
+    string? IXmlTestStoreCustom.NamespaceUri
     {
         get { return null; }
     }

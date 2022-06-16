@@ -29,7 +29,8 @@ public interface ITestEngine
     IProxyDiscoveryManager GetDiscoveryManager(
         IRequestData requestData,
         DiscoveryCriteria discoveryCriteria,
-        IDictionary<string, SourceDetail> sourceToSourceDetailMap);
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger);
 
     /// <summary>
     /// Fetches the ExecutionManager for this engine. This manager would provide all
@@ -46,7 +47,8 @@ public interface ITestEngine
     IProxyExecutionManager GetExecutionManager(
         IRequestData requestData,
         TestRunCriteria testRunCriteria,
-        IDictionary<string, SourceDetail> sourceToSourceDetailMap);
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger);
 
     /// <summary>
     /// Fetches the TestSessionManager for this engine. This manager would provide all
@@ -64,7 +66,8 @@ public interface ITestEngine
     IProxyTestSessionManager GetTestSessionManager(
         IRequestData requestData,
         StartTestSessionCriteria testSessionCriteria,
-        IDictionary<string, SourceDetail> sourceToSourceDetailMap);
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger);
 
     /// <summary>
     /// Fetches the extension manager for this engine. This manager would provide extensibility

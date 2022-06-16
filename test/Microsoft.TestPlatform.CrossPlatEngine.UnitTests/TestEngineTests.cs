@@ -57,7 +57,7 @@ public class TestEngineTests
             ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        Assert.IsNotNull(_testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap));
+        Assert.IsNotNull(_testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object));
     }
 
 
@@ -76,7 +76,7 @@ public class TestEngineTests
             ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
         Assert.IsNotNull(discoveryManager);
         Assert.IsInstanceOfType(discoveryManager, typeof(ParallelProxyDiscoveryManager));
     }
@@ -98,7 +98,7 @@ public class TestEngineTests
 
         _mockProcessHelper.Setup(o => o.GetCurrentProcessFileName()).Returns("dotnet.exe");
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
@@ -122,7 +122,7 @@ public class TestEngineTests
             ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
@@ -146,7 +146,7 @@ public class TestEngineTests
             ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
@@ -170,7 +170,7 @@ public class TestEngineTests
             ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
@@ -194,7 +194,7 @@ public class TestEngineTests
             ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
@@ -218,7 +218,7 @@ public class TestEngineTests
             ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
@@ -245,7 +245,7 @@ public class TestEngineTests
             ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
         Assert.IsNotNull(discoveryManager);
         Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
@@ -269,7 +269,7 @@ public class TestEngineTests
             ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap);
+        var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
         Assert.IsNotNull(discoveryManager);
         Assert.IsInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
     }
@@ -284,7 +284,7 @@ public class TestEngineTests
             ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap));
+        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object));
     }
 
     [TestMethod]
@@ -296,9 +296,9 @@ public class TestEngineTests
         {
             ["1.dll"] = new SourceDetail { Source = "1.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
 
-        Assert.AreNotSame(executionManager, _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap));
+        Assert.AreNotSame(executionManager, _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object));
     }
 
     [TestMethod]
@@ -318,8 +318,8 @@ public class TestEngineTests
             ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap));
-        Assert.IsInstanceOfType(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap), typeof(ParallelProxyExecutionManager));
+        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object));
+        Assert.IsInstanceOfType(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object), typeof(ParallelProxyExecutionManager));
     }
 
     [TestMethod]
@@ -339,8 +339,8 @@ public class TestEngineTests
             ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap));
-        Assert.IsInstanceOfType(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap), typeof(ParallelProxyExecutionManager));
+        Assert.IsNotNull(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object));
+        Assert.IsInstanceOfType(_testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object), typeof(ParallelProxyExecutionManager));
     }
 
     [TestMethod]
@@ -363,7 +363,7 @@ public class TestEngineTests
             ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(executionManager);
         Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -389,7 +389,7 @@ public class TestEngineTests
             ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(executionManager);
         Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -421,7 +421,7 @@ public class TestEngineTests
             ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(executionManager);
         Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -456,7 +456,7 @@ public class TestEngineTests
             ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(executionManager);
         Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -485,7 +485,7 @@ public class TestEngineTests
             ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(executionManager);
         Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -512,7 +512,7 @@ public class TestEngineTests
             ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(executionManager);
         Assert.IsInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
@@ -544,7 +544,7 @@ public class TestEngineTests
             ["2.dll"] = new SourceDetail { Source = "2.dll", Architecture = Architecture.X86, Framework = Framework.DefaultFramework },
         };
 
-        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap);
+        var executionManager = _testEngine.GetExecutionManager(_mockRequestData.Object, testRunCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
 
         _mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, It.IsAny<object>()), Times.Once);
     }
@@ -585,7 +585,8 @@ public class TestEngineTests
         Assert.IsNotNull(_testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap));
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object));
     }
 
     [TestMethod]
@@ -606,13 +607,15 @@ public class TestEngineTests
         var testSessionManager1 = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object);
 
         Assert.AreNotSame(
             _testEngine.GetTestSessionManager(
                 _mockRequestData.Object,
                 testSessionCriteria,
-                sourceToSourceDetailMap),
+                sourceToSourceDetailMap,
+                new Mock<IWarningLogger>().Object),
             testSessionManager1);
     }
 
@@ -640,7 +643,8 @@ public class TestEngineTests
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(testSessionManager);
         Assert.IsInstanceOfType(testSessionManager, typeof(ProxyTestSessionManager));
@@ -671,7 +675,8 @@ public class TestEngineTests
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(testSessionManager);
         Assert.IsInstanceOfType(testSessionManager, typeof(ProxyTestSessionManager));
@@ -701,7 +706,8 @@ public class TestEngineTests
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(testSessionManager);
         Assert.IsInstanceOfType(testSessionManager, typeof(ProxyTestSessionManager));
@@ -731,7 +737,8 @@ public class TestEngineTests
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(testSessionManager);
         Assert.IsInstanceOfType(testSessionManager, typeof(ProxyTestSessionManager));
@@ -762,7 +769,8 @@ public class TestEngineTests
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(testSessionManager);
         Assert.IsInstanceOfType(testSessionManager, typeof(ProxyTestSessionManager));
@@ -792,7 +800,8 @@ public class TestEngineTests
         Assert.IsNull(_testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap));
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object));
     }
 
     [TestMethod]
@@ -814,7 +823,8 @@ public class TestEngineTests
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(testSessionManager);
     }
@@ -845,7 +855,8 @@ public class TestEngineTests
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(testSessionManager);
     }
@@ -877,7 +888,8 @@ public class TestEngineTests
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(testSessionManager);
     }
@@ -909,7 +921,8 @@ public class TestEngineTests
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(testSessionManager);
     }
@@ -941,7 +954,8 @@ public class TestEngineTests
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(testSessionManager);
     }
@@ -973,7 +987,8 @@ public class TestEngineTests
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(testSessionManager);
     }
@@ -1008,7 +1023,8 @@ public class TestEngineTests
         var testSessionManager = _testEngine.GetTestSessionManager(
             _mockRequestData.Object,
             testSessionCriteria,
-            sourceToSourceDetailMap);
+            sourceToSourceDetailMap,
+            new Mock<IWarningLogger>().Object);
 
         Assert.IsNotNull(testSessionManager);
     }

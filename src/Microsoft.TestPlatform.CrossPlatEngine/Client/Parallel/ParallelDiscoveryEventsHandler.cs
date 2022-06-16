@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -89,6 +90,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         var fullyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered);
         var partiallyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered);
         var notDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
+        var skippedDiscovery = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.SkippedDiscovery);
 
         // As we immediately return results to IDE in case of aborting we need to set
         // isAborted = true and totalTests = -1
@@ -131,6 +133,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             FullyDiscoveredSources = fullyDiscovered,
             PartiallyDiscoveredSources = partiallyDiscovered,
             NotDiscoveredSources = notDiscovered,
+            SkippedDiscoverySources = skippedDiscovery,
             DiscoveredExtensions = _discoveryDataAggregator.DiscoveredExtensions,
             Metrics = aggregatedDiscoveryDataMetrics,
         };
@@ -146,6 +149,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             FullyDiscoveredSources = fullyDiscovered,
             PartiallyDiscoveredSources = partiallyDiscovered,
             NotDiscoveredSources = notDiscovered,
+            SkippedDiscoveredSources = skippedDiscovery,
             DiscoveredExtensions = _discoveryDataAggregator.DiscoveredExtensions,
             Metrics = aggregatedDiscoveryDataMetrics,
         };

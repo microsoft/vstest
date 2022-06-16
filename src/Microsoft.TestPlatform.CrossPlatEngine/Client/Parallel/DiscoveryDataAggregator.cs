@@ -212,7 +212,7 @@ internal sealed class DiscoveryDataAggregator
                 (_, previousStatus) =>
                 {
                     if (previousStatus == DiscoveryStatus.FullyDiscovered && status != DiscoveryStatus.FullyDiscovered
-                        || previousStatus == DiscoveryStatus.PartiallyDiscovered && status == DiscoveryStatus.NotDiscovered)
+                        || previousStatus == DiscoveryStatus.PartiallyDiscovered && (status == DiscoveryStatus.NotDiscovered || status == DiscoveryStatus.SkippedDiscovery))
                     {
                         EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Downgrading source {source} status from '{previousStatus}' to '{status}'.");
                     }

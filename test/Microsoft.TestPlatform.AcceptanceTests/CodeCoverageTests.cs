@@ -9,8 +9,6 @@ using Microsoft.TestPlatform.TestUtilities;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 internal struct TestParameters
@@ -305,19 +303,19 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
     private void AssertSkippedMethod(XmlDocument document)
     {
-        var module = GetModuleNode(document.DocumentElement, "codecoveragetest.dll");
+        var module = GetModuleNode(document.DocumentElement!, "codecoveragetest.dll");
         Assert.IsNotNull(module);
 
-        var coverage = double.Parse(module.Attributes["block_coverage"].Value);
+        var coverage = double.Parse(module.Attributes!["block_coverage"]!.Value);
         Assert.IsTrue(coverage > ExpectedMinimalModuleCoverage);
 
         var testSignFunction = GetNode(module, "skipped_function", "TestSign()");
         Assert.IsNotNull(testSignFunction);
-        Assert.AreEqual("name_excluded", testSignFunction.Attributes["reason"].Value);
+        Assert.AreEqual("name_excluded", testSignFunction.Attributes!["reason"]!.Value);
 
         var skippedTestMethod = GetNode(module, "skipped_function", "__CxxPureMSILEntry_Test()");
         Assert.IsNotNull(skippedTestMethod);
-        Assert.AreEqual("name_excluded", skippedTestMethod.Attributes["reason"].Value);
+        Assert.AreEqual("name_excluded", skippedTestMethod.Attributes!["reason"]!.Value);
 
         var testAbsFunction = GetNode(module, "function", "TestAbs()");
         Assert.IsNotNull(testAbsFunction);
@@ -325,11 +323,11 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
     private void ValidateCoverageData(XmlDocument document, string moduleName, bool validateSourceFileNames)
     {
-        var module = GetModuleNode(document.DocumentElement, moduleName.ToLower());
+        var module = GetModuleNode(document.DocumentElement!, moduleName.ToLower());
 
         if (module == null)
         {
-            module = GetModuleNode(document.DocumentElement, moduleName);
+            module = GetModuleNode(document.DocumentElement!, moduleName);
         }
         Assert.IsNotNull(module);
 
@@ -348,9 +346,9 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         var found = false;
         var sourcesNode = module.SelectSingleNode("./source_files");
-        foreach (XmlNode node in sourcesNode.ChildNodes)
+        foreach (XmlNode node in sourcesNode!.ChildNodes)
         {
-            if (node.Attributes["path"].Value.Contains(expectedFileName))
+            if (node.Attributes!["path"]!.Value.Contains(expectedFileName))
             {
                 found = true;
                 break;

@@ -586,6 +586,7 @@ public class TestRequestSender : ITestRequestSender
                         PartiallyDiscoveredSources = payload.PartiallyDiscoveredSources,
                         NotDiscoveredSources = payload.NotDiscoveredSources,
                         DiscoveredExtensions = payload.DiscoveredExtensions,
+                        SkippedDiscoveredSources = payload.SkippedDiscoverySources,
                     };
 
                     discoveryCompleteEventArgs.Metrics = payload.Metrics;

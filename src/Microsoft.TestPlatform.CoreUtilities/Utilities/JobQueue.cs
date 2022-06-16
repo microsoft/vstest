@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
@@ -25,7 +23,7 @@ public class JobQueue<T> : IDisposable
     /// <summary>
     /// Handler which processes the individual jobs.
     /// </summary>
-    private readonly Action<T> _processJob;
+    private readonly Action<T?> _processJob;
 
     /// <summary>
     /// Name used when displaying information or reporting errors about this queue.
@@ -99,7 +97,7 @@ public class JobQueue<T> : IDisposable
     /// <param name="maxQueueSize">The max Queue Size.</param>
     /// <param name="enableBounds">The enable Bounds.</param>
     /// <param name="exceptionLogger">The exception Logger.</param>
-    public JobQueue(Action<T> processJob, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
+    public JobQueue(Action<T?> processJob, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
     {
         _processJob = processJob ?? throw new ArgumentNullException(nameof(processJob));
 
@@ -347,7 +345,7 @@ public class JobQueue<T> : IDisposable
     /// Executes the process job handler and logs any exceptions which occur.
     /// </summary>
     /// <param name="job">Job to be executed.</param>
-    private void SafeProcessJob(T job)
+    private void SafeProcessJob(T? job)
     {
         try
         {

@@ -979,6 +979,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         FullyDiscoveredSources = discoveryCompletePayload.FullyDiscoveredSources,
                         PartiallyDiscoveredSources = discoveryCompletePayload.PartiallyDiscoveredSources,
                         NotDiscoveredSources = discoveryCompletePayload.NotDiscoveredSources,
+                        SkippedDiscoveredSources = discoveryCompletePayload.SkippedDiscoverySources,
                         DiscoveredExtensions = discoveryCompletePayload.DiscoveredExtensions,
                         Metrics = discoveryCompletePayload.Metrics,
                     };
@@ -1070,6 +1071,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         FullyDiscoveredSources = discoveryCompletePayload.FullyDiscoveredSources,
                         PartiallyDiscoveredSources = discoveryCompletePayload.PartiallyDiscoveredSources,
                         NotDiscoveredSources = discoveryCompletePayload.NotDiscoveredSources,
+                        SkippedDiscoveredSources = discoveryCompletePayload.SkippedDiscoverySources,
                         DiscoveredExtensions = discoveryCompletePayload.DiscoveredExtensions,
                     };
 

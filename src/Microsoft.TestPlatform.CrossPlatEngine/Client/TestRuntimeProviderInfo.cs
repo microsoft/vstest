@@ -10,12 +10,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 public class TestRuntimeProviderInfo
 {
-    public Type Type { get; }
+    public Type? Type { get; }
     public bool Shared { get; }
     public string RunSettings { get; }
     public List<SourceDetail> SourceDetails { get; }
 
-    public TestRuntimeProviderInfo(Type type, bool shared, string runSettings, List<SourceDetail> sourceDetails)
+    public TestRuntimeProviderInfo(Type? type, bool shared, string runSettings, List<SourceDetail> sourceDetails)
     {
         Type = type;
         Shared = shared;

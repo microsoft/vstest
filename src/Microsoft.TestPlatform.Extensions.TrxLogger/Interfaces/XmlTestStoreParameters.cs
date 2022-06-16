@@ -3,16 +3,14 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
-/// Optional parameters to the persistence process. A class implementing IPersistable can 
+/// Optional parameters to the persistence process. A class implementing IPersistable can
 /// use the parameter values to alter its load/save behavior.
 /// </summary>
 /// <example>
-/// Example: a class has a summary and details fields. Details are large, so they're only 
+/// Example: a class has a summary and details fields. Details are large, so they're only
 /// saved when 'MyClass.SaveDetails' parameter is set to 'true'.
 /// </example>
 internal sealed class XmlTestStoreParameters : Dictionary<string, object>
