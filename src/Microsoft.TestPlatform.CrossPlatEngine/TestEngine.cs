@@ -522,19 +522,30 @@ public class TestEngine : ITestEngine
                 "TestEngine: Initializing Parallel Execution as MaxCpuCount is set to: {0}",
                 parallelLevelToUse);
 
-            // TODO: EXPERIMENTAL FEATURE - will need to be removed or strengthen/tested.
-            // A negative value is used to indicate that the value should be used as a percentage of the number of cores.
-            if (parallelLevelToUse < 0)
-            {
-                parallelLevelToUse = (int)Math.Max(1, Math.Round((double)-parallelLevelToUse * _environment.ProcessorCount / 100.0, MidpointRounding.AwayFromZero));
-            }
-
             var enableParallel = parallelLevelToUse > 1;
             // Verify if the number of sources is less than user setting of parallel.
             // We should use number of sources as the parallel level, if sources count is less
             // than parallel level.
             if (enableParallel)
             {
+                // In case of a background discovery we want to reduce the number of cores utilized
+                // to leave enough power for other tasks.
+                var runSettingsEnvVariables = InferRunSettingsHelper.GetEnvironmentVariables(runSettings);
+                if (runSettingsEnvVariables is not null
+                    && runSettingsEnvVariables.TryGetValue("VSTEST_BACKGROUND_DISCOVERY", out var value)
+                    && bool.TryParse(value, out var isBackgroundDiscoveryEnabled)
+                    && isBackgroundDiscoveryEnabled
+                    && userParallelSetting == 0) // If user specifies a CPU count, respect it
+                {
+                    // Dummy logic based on some observations, might need to be tweaked/improved.
+                    parallelLevelToUse = parallelLevelToUse switch
+                    {
+                        1 => 1,
+                        < 8 => (int)Math.Round(parallelLevelToUse / 2.0, MidpointRounding.AwayFromZero),
+                        _ => (int)Math.Round((double)0.75 * parallelLevelToUse / 2.0, MidpointRounding.AwayFromZero),
+                    };
+                }
+
                 parallelLevelToUse = Math.Min(sourceCount, parallelLevelToUse);
 
                 // If only one source, no need to use parallel service client.

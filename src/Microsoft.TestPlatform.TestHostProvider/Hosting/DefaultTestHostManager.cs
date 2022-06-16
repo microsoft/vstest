@@ -337,6 +337,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         Shared = !runConfiguration.DisableAppDomain;
         _hostExitedEventRaised = false;
+
         IsInitialized = true;
     }
 
@@ -506,20 +507,25 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             return false;
         }
 
-        SetProcessPriority(_testHostProcess, _environmentVariableHelper);
+        AdjustProcessPriorityBasedOnSettings(_testHostProcess, testHostStartInfo.EnvironmentVariables);
         OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
 
         return true;
     }
 
-    internal static void SetProcessPriority(Process testHostProcess, IEnvironmentVariableHelper environmentVariableHelper)
+    internal static void AdjustProcessPriorityBasedOnSettings(Process testHostProcess, IDictionary<string, string?>? testHostEnvironmentVariables)
     {
         ProcessPriorityClass testHostPriority = ProcessPriorityClass.BelowNormal;
         try
         {
-            testHostPriority = environmentVariableHelper.GetEnvironmentVariableAsEnum("VSTEST_HOST_INTERNAL_PRIORITY", testHostPriority);
-            testHostProcess.PriorityClass = testHostPriority;
-            EqtTrace.Verbose("Setting test host process priority to {0}", testHostProcess.PriorityClass);
+            if (testHostEnvironmentVariables is not null
+                && testHostEnvironmentVariables.TryGetValue("VSTEST_BACKGROUND_DISCOVERY", out var value)
+                && bool.TryParse(value, out var isBackgroundDiscoveryEnabled)
+                && isBackgroundDiscoveryEnabled)
+            {
+                testHostProcess.PriorityClass = testHostPriority;
+                EqtTrace.Verbose("Setting test host process priority to {0}", testHostProcess.PriorityClass);
+            }
         }
         // Setting the process Priority can fail with Win32Exception, NotSupportedException or InvalidOperationException.
         catch (Exception ex)

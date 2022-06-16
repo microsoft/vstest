@@ -748,7 +748,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             return false;
         }
 
-        DefaultTestHostManager.SetProcessPriority(_testHostProcess, _environmentVariableHelper);
+        DefaultTestHostManager.AdjustProcessPriorityBasedOnSettings(_testHostProcess, testHostStartInfo.EnvironmentVariables);
         OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
         return true;
     }
