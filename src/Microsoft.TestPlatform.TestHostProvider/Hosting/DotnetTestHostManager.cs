@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -260,7 +261,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
         // Try find testhost.exe (or the architecture specific version). We ship those ngened executables for Windows because they have faster startup time. We ship them only for some platforms.
         // When user specified path to dotnet.exe don't try to find the exexutable, because we will always use the testhost.dll together with their dotnet.exe.
-        // We use dotnet.exe on Windows/ARM.
         bool testHostExeFound = false;
         if (!useCustomDotnetHostpath
             && _platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
@@ -408,7 +408,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
             // We silently force x64 only if the target architecture is the default one and is not specified by user
             // through --arch or runsettings or -- RunConfiguration.TargetPlatform=arch
-            bool forceToX64 = SilentlyForceToX64() && _runsettingHelper.IsDefaultTargetArchitecture;
+            bool forceToX64 = SilentlyForceToX64(sourcePath) && _runsettingHelper.IsDefaultTargetArchitecture;
             EqtTrace.Verbose($"DotnetTestHostmanager: Current process architetcure '{_processHelper.GetCurrentProcessArchitecture()}'");
             bool isSameArchitecture = IsSameArchitecture(_architecture, _processHelper.GetCurrentProcessArchitecture());
             var currentProcessPath = _processHelper.GetCurrentProcessFileName()!;
@@ -531,8 +531,20 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 _ => throw new TestPlatformException($"Invalid target architecture '{targetArchitecture}'"),
             };
 
-        bool SilentlyForceToX64()
+        bool SilentlyForceToX64(string sourcePath)
         {
+            // Scenario: dotnet test nativeArm64.dll
+            // If the dll is native and we're not running in process(vstest.console.exe)
+            // the expected target framework is ".NETCoreApp,Version=v1.0".
+            // In this case we don't want to force x64 architecture
+            using var assemblyStream = _fileHelper.GetStream(sourcePath, FileMode.Open, FileAccess.Read);
+            using var peReader = new PEReader(assemblyStream);
+            if (!peReader.HasMetadata || (peReader.PEHeaders.CorHeader?.Flags & CorFlags.ILOnly) == 0)
+            {
+                EqtTrace.Verbose($"DotnetTestHostmanager.SilentlyForceToX64: do not force x64 muxer, source {sourcePath} is native.");
+                return false;
+            }
+
             // We need to force x64 in some scenario
             // https://github.com/dotnet/sdk/blob/main/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.RuntimeIdentifierInference.targets#L140-L143
 

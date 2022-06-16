@@ -580,7 +580,7 @@ public class TestEngine : ITestEngine
         // Return true if
         // 1) Not running in parallel;
         // 2) Data collector is not enabled;
-        // 3) Target framework is X64 or anyCpu;
+        // 3) Target platform is compatible or AnyCpu;
         // 4) DisableAppDomain is false;
         // 5) Not running in design mode;
         // 6) target framework is NETFramework (Desktop test);
