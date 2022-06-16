@@ -121,7 +121,6 @@
         <PackageReference Include="MSTest.Assert.Extensions" Version="$(MSTestAssertExtensionVersion)" />
         <PackageReference Include="Moq" Version="$(MoqVersion)" />
         <PackageReference Include="Microsoft.CodeCoverage" Version="$(MicrosoftCodeCoverageVersion)" />
-        <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsVersion)" />
       </ItemGroup>
     </When>
   </Choose>
