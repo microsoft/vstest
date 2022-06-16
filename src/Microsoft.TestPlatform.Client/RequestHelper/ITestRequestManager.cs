@@ -24,7 +24,7 @@ public interface ITestRequestManager : IDisposable
     /// <param name="pathToAdditionalExtensions">Paths to additional extensions.</param>
     /// <param name="skipExtensionFilters">Skip extension filtering by name if true.</param>
     void InitializeExtensions(
-        IEnumerable<string> pathToAdditionalExtensions,
+        IEnumerable<string>? pathToAdditionalExtensions,
         bool skipExtensionFilters);
 
     /// <summary>

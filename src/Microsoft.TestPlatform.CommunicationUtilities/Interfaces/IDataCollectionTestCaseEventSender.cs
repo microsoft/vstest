@@ -6,8 +6,6 @@ using System.Collections.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 /// <summary>
@@ -50,7 +48,7 @@ public interface IDataCollectionTestCaseEventSender
     /// <returns>
     /// The <see cref="Collection"/>Collection of TestCase attachments.
     /// </returns>
-    Collection<AttachmentSet> SendTestCaseEnd(TestCaseEndEventArgs e);
+    Collection<AttachmentSet>? SendTestCaseEnd(TestCaseEndEventArgs e);
 
     /// <summary>
     /// Sends the SessionEnd event. This is used to as a trigger to close communication channel between datacollector process and testhost process.

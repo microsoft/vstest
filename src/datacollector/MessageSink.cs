@@ -16,6 +16,6 @@ internal class MessageSink : IMessageSink
     /// <param name="args">Data collection message event args.</param>
     public void SendMessage(DataCollectionMessageEventArgs args)
     {
-        DataCollectionRequestHandler.Instance.SendDataCollectionMessage(args);
+        DataCollectionRequestHandler.Instance?.SendDataCollectionMessage(args);
     }
 }

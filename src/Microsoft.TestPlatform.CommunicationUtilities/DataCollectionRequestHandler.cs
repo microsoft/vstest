@@ -31,8 +31,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 
 /// <summary>
@@ -43,20 +41,14 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
     private static readonly object SyncObject = new();
 
     private readonly ICommunicationManager _communicationManager;
-
     private readonly IMessageSink _messageSink;
-
     private readonly IDataCollectionManager _dataCollectionManager;
-
     private readonly IDataCollectionTestCaseEventHandler _dataCollectionTestCaseEventHandler;
-
-    private Task _testCaseEventMonitorTask;
-
     private readonly IDataSerializer _dataSerializer;
-
     private readonly IFileHelper _fileHelper;
-
     private readonly IRequestData _requestData;
+
+    private Task? _testCaseEventMonitorTask;
 
     /// <summary>
     /// Use to cancel data collection test case events monitoring if test run is canceled.
@@ -131,7 +123,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
     /// <summary>
     /// Gets the singleton instance of DataCollectionRequestHandler.
     /// </summary>
-    public static DataCollectionRequestHandler Instance { get; private set; }
+    public static DataCollectionRequestHandler? Instance { get; private set; }
 
     /// <summary>
     /// Creates singleton instance of DataCollectionRequestHandler.
@@ -208,7 +200,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
 
             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests: Datacollector received message: {0}", message);
 
-            switch (message.MessageType)
+            switch (message?.MessageType)
             {
                 case MessageType.BeforeTestRunStart:
                     HandleBeforeTestRunStart(message);
@@ -221,11 +213,12 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
 
                 case MessageType.TestHostLaunched:
                     var testHostLaunchedPayload = _dataSerializer.DeserializePayload<TestHostLaunchedPayload>(message);
+                    TPDebug.Assert(testHostLaunchedPayload is not null, "testHostLaunchedPayload is null");
                     _dataCollectionManager.TestHostLaunched(testHostLaunchedPayload.ProcessId);
                     break;
 
                 default:
-                    EqtTrace.Error("DataCollectionRequestHandler.ProcessRequests : Invalid Message types: {0}", message.MessageType);
+                    EqtTrace.Error("DataCollectionRequestHandler.ProcessRequests : Invalid Message types: {0}", message?.MessageType);
                     break;
             }
         }
@@ -270,16 +263,23 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
     {
         try
         {
-            var customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(payload.SettingsXml);
+            TPDebug.Assert(payload is not null, "payload is null");
+
+            if (payload.Sources is null)
+            {
+                EqtTrace.Verbose("DataCollectionRequestHandler.AddExtensionAssemblies: No sources provided");
+                return;
+            }
 
             // In case of dotnet vstest with code coverage, data collector needs to be picked up from publish folder.
             // Therefore, adding source dll folders to search datacollectors in these.
             var datacollectorSearchPaths = new HashSet<string>();
             foreach (var source in payload.Sources)
             {
-                datacollectorSearchPaths.Add(Path.GetDirectoryName(source));
+                datacollectorSearchPaths.Add(Path.GetDirectoryName(source)!);
             }
 
+            var customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(payload.SettingsXml);
             if (customTestAdaptersPaths != null)
             {
                 datacollectorSearchPaths.UnionWith(customTestAdaptersPaths);
@@ -319,12 +319,13 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
     {
         // Initialize datacollectors and get environment variables.
         var payload = _dataSerializer.DeserializePayload<BeforeTestRunStartPayload>(message);
+        TPDebug.Assert(payload is not null, "payload is null");
         UpdateRequestData(payload.IsTelemetryOptedIn);
         AddExtensionAssemblies(payload);
 
         var envVariables = _dataCollectionManager.InitializeDataCollectors(payload.SettingsXml);
 
-        var properties = new Dictionary<string, object>
+        var properties = new Dictionary<string, object?>
         {
             { CoreUtilitiesConstants.TestSourcesKeyName, payload.Sources }
         };

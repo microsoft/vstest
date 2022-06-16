@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 /// <summary>
@@ -22,7 +20,7 @@ public class DiscoveryCompletePayload
     /// <summary>
     /// Gets or sets the last chunk of discovered tests.
     /// </summary>
-    public IEnumerable<TestCase> LastDiscoveredTests { get; set; }
+    public IEnumerable<TestCase>? LastDiscoveredTests { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether discovery was aborted.
@@ -32,7 +30,7 @@ public class DiscoveryCompletePayload
     /// <summary>
     /// Gets or sets the Metrics
     /// </summary>
-    public IDictionary<string, object> Metrics { get; set; }
+    public IDictionary<string, object>? Metrics { get; set; }
 
     /// <summary>
     /// Gets or sets list of sources which were fully discovered.

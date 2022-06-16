@@ -442,7 +442,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         Assert.IsNotNull(testRunCriteriaPassed);
         CollectionAssert.AreEqual(_mockTestRunCriteria.Object.AdapterSourceMap.Keys, testRunCriteriaPassed.AdapterSourceMap.Keys);
         CollectionAssert.AreEqual(_mockTestRunCriteria.Object.AdapterSourceMap.Values, testRunCriteriaPassed.AdapterSourceMap.Values);
-        Assert.AreEqual(_mockTestRunCriteria.Object.FrequencyOfRunStatsChangeEvent, testRunCriteriaPassed.TestExecutionContext.FrequencyOfRunStatsChangeEvent);
+        Assert.AreEqual(_mockTestRunCriteria.Object.FrequencyOfRunStatsChangeEvent, testRunCriteriaPassed.TestExecutionContext!.FrequencyOfRunStatsChangeEvent);
         Assert.AreEqual(_mockTestRunCriteria.Object.RunStatsChangeEventTimeout, testRunCriteriaPassed.TestExecutionContext.RunStatsChangeEventTimeout);
         Assert.AreEqual(_mockTestRunCriteria.Object.TestRunSettings, testRunCriteriaPassed.RunSettings);
     }
@@ -466,7 +466,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         CollectionAssert.AreEqual(runCriteria.Object.Tests.ToList(), testRunCriteriaPassed.Tests.ToList());
         Assert.AreEqual(
             runCriteria.Object.FrequencyOfRunStatsChangeEvent,
-            testRunCriteriaPassed.TestExecutionContext.FrequencyOfRunStatsChangeEvent);
+            testRunCriteriaPassed.TestExecutionContext!.FrequencyOfRunStatsChangeEvent);
         Assert.AreEqual(
             runCriteria.Object.RunStatsChangeEventTimeout,
             testRunCriteriaPassed.TestExecutionContext.RunStatsChangeEventTimeout);

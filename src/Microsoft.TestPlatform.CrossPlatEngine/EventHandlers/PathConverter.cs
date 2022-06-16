@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -43,10 +44,11 @@ internal class PathConverter : IPathConverter
         _deploymentPath = normalizedDeploymentPath;
     }
 
+    [return: NotNullIfNotNull("path")]
     public string? UpdatePath(string? path, PathConversionDirection updateDirection)
     {
         if (path == null)
-            return path;
+            return null;
 
         string find;
         string replaceWith;
@@ -63,7 +65,7 @@ internal class PathConverter : IPathConverter
             replaceWith = _originalPath;
         }
 
-        var result = path?.Replace(find, replaceWith);
+        var result = path.Replace(find, replaceWith);
         return result;
     }
 
@@ -157,8 +159,9 @@ internal class PathConverter : IPathConverter
     public TestRunCriteriaWithSources UpdateTestRunCriteriaWithSources(TestRunCriteriaWithSources testRunCriteriaWithSources, PathConversionDirection updateDirection)
     {
         ValidateArg.NotNull(testRunCriteriaWithSources, nameof(testRunCriteriaWithSources));
-        testRunCriteriaWithSources.AdapterSourceMap.ToList().ForEach(adapter => testRunCriteriaWithSources.AdapterSourceMap[adapter.Key] = UpdatePaths(adapter.Value, updateDirection));
-        var package = UpdatePath(testRunCriteriaWithSources.Package, updateDirection);
+        testRunCriteriaWithSources.AdapterSourceMap.ToList().ForEach(adapter =>
+            testRunCriteriaWithSources.AdapterSourceMap[adapter.Key] = UpdatePaths(adapter.Value, updateDirection)!);
+        var package = UpdatePath(testRunCriteriaWithSources.Package, updateDirection)!;
         return new TestRunCriteriaWithSources(testRunCriteriaWithSources.AdapterSourceMap, package, testRunCriteriaWithSources.RunSettings, testRunCriteriaWithSources.TestExecutionContext);
     }
 
@@ -166,7 +169,7 @@ internal class PathConverter : IPathConverter
     {
         ValidateArg.NotNull(testRunCriteriaWithTests, nameof(testRunCriteriaWithTests));
         var tests = UpdateTestCases(testRunCriteriaWithTests.Tests, updateDirection);
-        var package = UpdatePath(testRunCriteriaWithTests.Package, updateDirection);
+        var package = UpdatePath(testRunCriteriaWithTests.Package, updateDirection)!;
         return new TestRunCriteriaWithTests(tests, package, testRunCriteriaWithTests.RunSettings, testRunCriteriaWithTests.TestExecutionContext);
     }
 }

@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
 using Newtonsoft.Json;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 /// <summary>
@@ -28,7 +26,7 @@ public class TestRunCriteriaWithTests
     /// <param name="runSettings"> The test run settings. </param>
     /// <param name="testExecutionContext"> The test Execution Context. </param>
     [JsonConstructor]
-    public TestRunCriteriaWithTests(IEnumerable<TestCase> tests, string package, string runSettings, TestExecutionContext testExecutionContext)
+    public TestRunCriteriaWithTests(IEnumerable<TestCase> tests, string package, string? runSettings, TestExecutionContext? testExecutionContext)
     {
         Tests = tests;
         Package = package;
@@ -44,12 +42,12 @@ public class TestRunCriteriaWithTests
     /// <summary>
     /// Gets the test run settings.
     /// </summary>
-    public string RunSettings { get; private set; }
+    public string? RunSettings { get; private set; }
 
     /// <summary>
     /// Gets or sets the test execution context.
     /// </summary>
-    public TestExecutionContext TestExecutionContext { get; set; }
+    public TestExecutionContext? TestExecutionContext { get; set; }
 
     /// <summary>
     /// Gets the test Containers (e.g. .appx, .appxrecipie)

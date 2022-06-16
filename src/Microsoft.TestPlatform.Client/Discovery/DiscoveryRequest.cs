@@ -364,7 +364,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         if (string.Equals(message?.MessageType, MessageType.DiscoveryComplete))
         {
-            var discoveryCompletePayload = _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+            var discoveryCompletePayload = _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message!);
             rawMessage = UpdateRawMessageWithTelemetryInfo(discoveryCompletePayload, message) ?? rawMessage;
             HandleLoggerManagerDiscoveryComplete(discoveryCompletePayload);
         }
@@ -376,7 +376,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// Handles LoggerManager's DiscoveryComplete.
     /// </summary>
     /// <param name="discoveryCompletePayload">Discovery complete payload.</param>
-    private void HandleLoggerManagerDiscoveryComplete(DiscoveryCompletePayload discoveryCompletePayload)
+    private void HandleLoggerManagerDiscoveryComplete(DiscoveryCompletePayload? discoveryCompletePayload)
     {
         if (LoggerManager.LoggersInitialized && discoveryCompletePayload != null)
         {
