@@ -28,6 +28,7 @@
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
 
     <ChutzpahAdapterVersion>4.4.12</ChutzpahAdapterVersion>
+    <FluentAssertionsVersion>6.7.0</FluentAssertionsVersion>
 
     <!-- Versions that are used when building projects from TestAssets.sln for compatibility tests. See Invoke-TestAssetsBuild in scripts/build.ps1.
     Exact versions are used to avoid Nuget substituting them by closest match, if we make a typo.
