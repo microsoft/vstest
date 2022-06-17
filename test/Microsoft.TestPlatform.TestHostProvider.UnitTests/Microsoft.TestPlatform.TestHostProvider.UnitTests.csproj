@@ -13,9 +13,6 @@
     <OutputType Condition=" $(TargetFramework.StartsWith('net6')) ">Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net472' AND '$(OS)' != 'Windows_NT' ">

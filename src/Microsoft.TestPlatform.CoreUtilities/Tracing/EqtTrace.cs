@@ -180,7 +180,7 @@ public static class EqtTrace
     [Conditional("TRACE")]
     public static void Fail(string message)
     {
-        Fail(message, null);
+        Fail(message, new object[0]);
     }
 
     /// <summary>
@@ -190,7 +190,7 @@ public static class EqtTrace
     /// <param name="format">The formatted error message</param>
     /// <param name="args">Arguments to the format</param>
     [Conditional("TRACE")]
-    public static void Fail(string format, params object?[]? args)
+    public static void Fail(string format, params object?[] args)
     {
         string message = string.Format(CultureInfo.InvariantCulture, format, args);
 

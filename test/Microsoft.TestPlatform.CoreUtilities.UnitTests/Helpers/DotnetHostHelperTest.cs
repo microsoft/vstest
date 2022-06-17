@@ -89,7 +89,7 @@ public sealed class DotnetHostHelperTest : IDisposable
         _fileHelper.Setup(x => x.Exists(envVars[envVar])).Returns(true);
         if (found)
         {
-            _fileHelper.Setup(x => x.GetStream(envVars[envVar], FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(envVars[envVar]!));
+            _fileHelper.Setup(x => x.GetStream(envVars[envVar]!, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(envVars[envVar]!));
         }
 
         // Act & Assert

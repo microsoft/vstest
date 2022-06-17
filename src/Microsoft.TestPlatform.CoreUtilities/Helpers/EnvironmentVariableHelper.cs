@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 internal class EnvironmentVariableHelper : IEnvironmentVariableHelper
 {
     /// <inheritdoc />
-    public string GetEnvironmentVariable(string variable)
+    public string? GetEnvironmentVariable(string variable)
         => Environment.GetEnvironmentVariable(variable);
 
     /// <inheritdoc />

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 using System;
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -14,7 +12,7 @@ internal interface IEnvironmentVariableHelper
     /// </summary>
     /// <param name="variable">The name of the environment variable.</param>
     /// <returns>The value of the environment variable specified by variable, or null if the environment variable is not found.</returns>
-    string GetEnvironmentVariable(string variable);
+    string? GetEnvironmentVariable(string variable);
 
     /// <summary>
     /// Retrieves the value of an environment variable from the current process and converts it to the given type.

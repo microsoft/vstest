@@ -156,7 +156,7 @@ public class EnableDiagArgumentProcessorTests
 
         _diagProcessor.Executor!.Value.Initialize(_dummyFilePath);
 
-        _mockFileHelper.Verify(fh => fh.CreateDirectory(Path.GetDirectoryName(_dummyFilePath)), Times.Once);
+        _mockFileHelper.Verify(fh => fh.CreateDirectory(Path.GetDirectoryName(_dummyFilePath)!), Times.Once);
     }
 
     [TestMethod]
