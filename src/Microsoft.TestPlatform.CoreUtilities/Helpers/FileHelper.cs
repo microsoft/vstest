@@ -29,11 +29,11 @@ public class FileHelper : IFileHelper
         => Directory.GetCurrentDirectory();
 
     /// <inheritdoc/>
-    public bool Exists(string path)
+    public bool Exists(string? path)
         => File.Exists(path);
 
     /// <inheritdoc/>
-    public bool DirectoryExists(string path)
+    public bool DirectoryExists(string? path)
         => Directory.Exists(path);
 
     /// <inheritdoc/>
@@ -48,7 +48,7 @@ public class FileHelper : IFileHelper
     public IEnumerable<string> EnumerateFiles(
         string directory,
         SearchOption searchOption,
-        params string[] endsWithSearchPatterns)
+        params string[]? endsWithSearchPatterns)
     {
         if (endsWithSearchPatterns == null || endsWithSearchPatterns.Length == 0)
         {

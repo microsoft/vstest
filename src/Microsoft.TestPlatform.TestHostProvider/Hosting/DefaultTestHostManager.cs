@@ -282,7 +282,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     {
         if (sources != null && sources.Any())
         {
-            extensions = extensions.Concat(sources.SelectMany(s => _fileHelper.EnumerateFiles(Path.GetDirectoryName(s), SearchOption.TopDirectoryOnly, TestAdapterEndsWithPattern)));
+            extensions = extensions.Concat(sources.SelectMany(s => _fileHelper.EnumerateFiles(Path.GetDirectoryName(s)!, SearchOption.TopDirectoryOnly, TestAdapterEndsWithPattern)));
         }
 
         extensions = FilterExtensionsBasedOnVersion(extensions);

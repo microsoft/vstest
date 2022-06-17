@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 namespace vstest.ProgrammerTests.Fakes;
@@ -40,14 +41,15 @@ internal class FakeFileHelper : IFileHelper
         throw new NotImplementedException();
     }
 
-    public bool DirectoryExists(string path)
+    public bool DirectoryExists(string? path)
     {
+        TPDebug.Assert(path is not null, "path is null");
         // TODO: Check if any file has the directory in name. This will improve.
         var directoryExists = Files.Select(f => Path.GetDirectoryName(f.Path)).Any(p => p != null && p.StartsWith(path));
         return directoryExists;
     }
 
-    public IEnumerable<string> EnumerateFiles(string directory, SearchOption searchOption, params string[] endsWithSearchPatterns)
+    public IEnumerable<string> EnumerateFiles(string directory, SearchOption searchOption, params string[]? endsWithSearchPatterns)
     {
         Func<FakeFile, string, bool> predicate = searchOption == SearchOption.TopDirectoryOnly
             ? (f, dir) => Path.GetDirectoryName(f.Path) == dir
@@ -57,7 +59,7 @@ internal class FakeFileHelper : IFileHelper
         return files;
     }
 
-    public bool Exists(string path)
+    public bool Exists(string? path)
     {
         throw new NotImplementedException();
     }
