@@ -180,7 +180,7 @@ public class VsTestConsoleRequestSenderTests
 
         var discoveryMessage = new Message() { MessageType = MessageType.StartDiscovery };
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryMessage));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryMessage));
 
         var portOutput = await _requestSender.InitializeCommunicationAsync(_waitTimeout);
         Assert.AreEqual(-1, portOutput, "Connection must fail if version check failed.");
@@ -229,7 +229,7 @@ public class VsTestConsoleRequestSenderTests
 
         var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(sessionConnected));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(sessionConnected));
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck, _protocolVersion)).Throws(new Exception("Fail"));
 
         var portOutput = await _requestSender.InitializeCommunicationAsync(_waitTimeout);
@@ -298,9 +298,9 @@ public class VsTestConsoleRequestSenderTests
         };
 
         Action changedMessage =
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(protocolError));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(protocolError));
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(sessionConnected));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(sessionConnected));
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck)).Callback(changedMessage);
 
         var portOutput = await _requestSender.InitializeCommunicationAsync(_waitTimeout);
@@ -330,7 +330,7 @@ public class VsTestConsoleRequestSenderTests
             MessageType = MessageType.DiscoveryComplete,
             Payload = JToken.FromObject(payload)
         };
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryComplete));
 
         _requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -352,7 +352,7 @@ public class VsTestConsoleRequestSenderTests
             MessageType = MessageType.DiscoveryComplete,
             Payload = JToken.FromObject(payload)
         };
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryComplete));
 
         await _requestSender.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object);
 
@@ -383,9 +383,9 @@ public class VsTestConsoleRequestSenderTests
             Payload = JToken.FromObject(payload)
         };
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsFound));
         mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryComplete)));
 
         _requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -416,9 +416,9 @@ public class VsTestConsoleRequestSenderTests
             Payload = JToken.FromObject(payload)
         };
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsFound));
         mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryComplete)));
 
         await _requestSender.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -452,9 +452,9 @@ public class VsTestConsoleRequestSenderTests
 
         DiscoveryCompleteEventArgs? receivedDiscoveryCompleteEventArgs = null;
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsFound));
         mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
-            .Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
+            .Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryComplete)));
 
         mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
             .Callback((DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> tests) => receivedDiscoveryCompleteEventArgs = discoveryCompleteEventArgs);
@@ -492,9 +492,9 @@ public class VsTestConsoleRequestSenderTests
 
         DiscoveryCompleteEventArgs? receivedDiscoveryCompleteEventArgs = null;
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsFound));
         mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
-            .Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
+            .Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryComplete)));
 
         mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
             .Callback((DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> tests) => receivedDiscoveryCompleteEventArgs = discoveryCompleteEventArgs);
@@ -528,13 +528,13 @@ public class VsTestConsoleRequestSenderTests
         var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = null, IsAborted = false };
         var discoveryComplete = CreateMessage(MessageType.DiscoveryComplete, payload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsFound));
         mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
             .Callback(
                 (IEnumerable<TestCase> tests) =>
                 {
                     receivedTestCases = tests?.ToList();
-                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult((discoveryComplete)));
+                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryComplete));
                 });
 
         _requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object);
@@ -566,13 +566,13 @@ public class VsTestConsoleRequestSenderTests
         var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = null, IsAborted = false };
         var discoveryComplete = CreateMessage(MessageType.DiscoveryComplete, payload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsFound));
         mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
             .Callback(
                 (IEnumerable<TestCase>? tests) =>
                 {
                     receivedTestCases = tests?.ToList();
-                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult((discoveryComplete)));
+                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryComplete));
                 });
 
         await _requestSender.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object);
@@ -603,7 +603,7 @@ public class VsTestConsoleRequestSenderTests
         var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = testCaseList, IsAborted = false };
         var discoveryComplete = CreateMessage(MessageType.DiscoveryComplete, payload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryComplete));
         mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
             .Callback(
                 (DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> tests) => receivedTestCases = tests?.ToList());
@@ -636,7 +636,7 @@ public class VsTestConsoleRequestSenderTests
         var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = testCaseList, IsAborted = false };
         var discoveryComplete = CreateMessage(MessageType.DiscoveryComplete, payload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryComplete));
         mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
             .Callback(
                 (DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> tests) => receivedTestCases = tests?.ToList());
@@ -670,11 +670,11 @@ public class VsTestConsoleRequestSenderTests
         var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
         var message = CreateMessage(MessageType.TestMessage, mpayload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsFound));
         mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message)));
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryComplete)));
 
         _requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -700,11 +700,11 @@ public class VsTestConsoleRequestSenderTests
         var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
         var message = CreateMessage(MessageType.TestMessage, mpayload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsFound));
         mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message)));
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(discoveryComplete)));
 
         await _requestSender.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -818,7 +818,7 @@ public class VsTestConsoleRequestSenderTests
         };
 
         var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
 
         _requestSender.StartTestRun(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -847,7 +847,7 @@ public class VsTestConsoleRequestSenderTests
         };
 
         var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
 
         await _requestSender.StartTestRunAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object);
 
@@ -889,17 +889,17 @@ public class VsTestConsoleRequestSenderTests
         var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
         var message = CreateMessage(MessageType.TestMessage, mpayload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsPayload));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsPayload));
 
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
             (testRunChangedArgs) =>
             {
                 Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
-                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
+                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
         _requestSender.StartTestRun(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -941,17 +941,17 @@ public class VsTestConsoleRequestSenderTests
         var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
         var message = CreateMessage(MessageType.TestMessage, mpayload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsPayload));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsPayload));
 
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
             (testRunChangedArgs) =>
             {
                 Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
-                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
+                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
         await _requestSender.StartTestRunAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object);
 
@@ -1046,17 +1046,17 @@ public class VsTestConsoleRequestSenderTests
             (testRunChangedArgs) =>
             {
                 Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
-                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
+                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
         var mockLauncher = new Mock<ITestHostLauncher>();
         mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Callback
-            (() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsPayload)));
+            (() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsPayload)));
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runprocessInfoPayload));
 
         _requestSender.StartTestRunWithCustomHost(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object, mockLauncher.Object);
 
@@ -1107,17 +1107,17 @@ public class VsTestConsoleRequestSenderTests
             (testRunChangedArgs) =>
             {
                 Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
-                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
+                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
         var mockLauncher = new Mock<ITestHostLauncher>();
         mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Callback
-            (() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsPayload)));
+            (() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsPayload)));
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runprocessInfoPayload));
 
         await _requestSender.StartTestRunWithCustomHostAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object, mockLauncher.Object);
 
@@ -1166,10 +1166,10 @@ public class VsTestConsoleRequestSenderTests
         var mockLauncher = new Mock<ITestHostLauncher>();
         mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Throws(new Exception("BadError"));
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runprocessInfoPayload));
 
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>(), _protocolVersion)).
-            Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
+            Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
         _requestSender.StartTestRunWithCustomHost(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object, mockLauncher.Object);
 
@@ -1215,10 +1215,10 @@ public class VsTestConsoleRequestSenderTests
         var mockLauncher = new Mock<ITestHostLauncher>();
         mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Throws(new Exception("BadError"));
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runprocessInfoPayload));
 
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>(), _protocolVersion)).
-            Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
+            Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
         await _requestSender.StartTestRunWithCustomHostAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object, mockLauncher.Object);
 
@@ -1288,7 +1288,7 @@ public class VsTestConsoleRequestSenderTests
             TestRunCompleteArgs = dummyCompleteArgs
         };
         var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
 
         _requestSender.StartTestRun(new List<TestCase>(), null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -1315,7 +1315,7 @@ public class VsTestConsoleRequestSenderTests
             TestRunCompleteArgs = dummyCompleteArgs
         };
         var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
 
         await _requestSender.StartTestRunAsync(new List<TestCase>(), null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -1356,17 +1356,17 @@ public class VsTestConsoleRequestSenderTests
         var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
         var message = CreateMessage(MessageType.TestMessage, mpayload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsPayload));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsPayload));
 
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
             (testRunChangedArgs) =>
             {
                 Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
-                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
+                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
         _requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -1407,17 +1407,17 @@ public class VsTestConsoleRequestSenderTests
         var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
         var message = CreateMessage(MessageType.TestMessage, mpayload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsPayload));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsPayload));
 
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
             (testRunChangedArgs) =>
             {
                 Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
-                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
+                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
         await _requestSender.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -1455,7 +1455,7 @@ public class VsTestConsoleRequestSenderTests
         };
         var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
 
         mockHandler.Setup(mh => mh.HandleTestRunComplete(
                 It.IsAny<TestRunCompleteEventArgs>(),
@@ -1508,7 +1508,7 @@ public class VsTestConsoleRequestSenderTests
         };
         var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
 
         mockHandler.Setup(mh => mh.HandleTestRunComplete(
                 It.IsAny<TestRunCompleteEventArgs>(),
@@ -1567,7 +1567,7 @@ public class VsTestConsoleRequestSenderTests
         };
         var runComplete = CreateMessage(MessageType.ExecutionComplete, testRunCompletepayload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsRunStatsPayload));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsRunStatsPayload));
 
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(
                 It.IsAny<TestRunChangedEventArgs>()))
@@ -1575,7 +1575,7 @@ public class VsTestConsoleRequestSenderTests
                 (TestRunChangedEventArgs stats) =>
                 {
                     receivedChangeEventArgs = stats;
-                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
+                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
                 });
 
         _requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
@@ -1624,7 +1624,7 @@ public class VsTestConsoleRequestSenderTests
         };
         var runComplete = CreateMessage(MessageType.ExecutionComplete, testRunCompletepayload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsRunStatsPayload));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsRunStatsPayload));
 
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(
                 It.IsAny<TestRunChangedEventArgs>()))
@@ -1632,7 +1632,7 @@ public class VsTestConsoleRequestSenderTests
                 (TestRunChangedEventArgs stats) =>
                 {
                     receivedChangeEventArgs = stats;
-                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
+                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
                 });
 
         await _requestSender.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
@@ -1685,17 +1685,17 @@ public class VsTestConsoleRequestSenderTests
             (testRunChangedArgs) =>
             {
                 Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
-                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
+                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
         var mockLauncher = new Mock<ITestHostLauncher>();
         mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Callback
-            (() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsPayload)));
+            (() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsPayload)));
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runprocessInfoPayload));
 
         _requestSender.StartTestRunWithCustomHost(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object, mockLauncher.Object);
 
@@ -1744,17 +1744,17 @@ public class VsTestConsoleRequestSenderTests
             (testRunChangedArgs) =>
             {
                 Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
-                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
+                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
         var mockLauncher = new Mock<ITestHostLauncher>();
         mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Callback
-            (() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsPayload)));
+            (() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsPayload)));
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runprocessInfoPayload));
 
         await _requestSender.StartTestRunWithCustomHostAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object, mockLauncher.Object);
 
@@ -1785,17 +1785,17 @@ public class VsTestConsoleRequestSenderTests
         };
         var runComplete = CreateMessage(MessageType.ExecutionComplete, completepayload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message1));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message1));
         mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
             .Callback<TestProcessStartInfo>((startInfo) =>
             {
                 if (startInfo.FileName.Equals(p1.FileName))
                 {
-                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message2));
+                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message2));
                 }
                 else if (startInfo.FileName.Equals(p2.FileName))
                 {
-                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
+                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
                 }
             });
         _requestSender.InitializeCommunication();
@@ -1824,17 +1824,17 @@ public class VsTestConsoleRequestSenderTests
         };
         var runComplete = CreateMessage(MessageType.ExecutionComplete, completepayload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message1));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message1));
         mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
             .Callback<TestProcessStartInfo>((startInfo) =>
             {
                 if (startInfo.FileName.Equals(p1.FileName))
                 {
-                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message2));
+                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message2));
                 }
                 else if (startInfo.FileName.Equals(p2.FileName))
                 {
-                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
+                    _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
                 }
             });
 
@@ -1960,7 +1960,7 @@ public class VsTestConsoleRequestSenderTests
             MessageType = MessageType.TestRunAttachmentsProcessingComplete,
             Payload = JToken.FromObject(payload)
         };
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(attachmentsProcessingComplete));
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
         {
             Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
@@ -1999,7 +1999,7 @@ public class VsTestConsoleRequestSenderTests
             Payload = JToken.FromObject(payload)
         };
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(attachmentsProcessingComplete));
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
         {
             Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
@@ -2042,14 +2042,14 @@ public class VsTestConsoleRequestSenderTests
         var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
         var message = CreateMessage(MessageType.TestMessage, mpayload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
         {
             Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
             Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
         });
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(attachmentsProcessingComplete)));
 
         await _requestSender.ProcessTestRunAttachmentsAsync(
             new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
@@ -2094,7 +2094,7 @@ public class VsTestConsoleRequestSenderTests
             MessageType = MessageType.TestRunAttachmentsProcessingProgress,
             Payload = JToken.FromObject(progressPayload)
         };
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingProgress));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(attachmentsProcessingProgress));
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
         {
             Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
@@ -2102,7 +2102,7 @@ public class VsTestConsoleRequestSenderTests
         });
 
         mockHandler.Setup(mh => mh.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>())).Callback(
-            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete)));
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(attachmentsProcessingComplete)));
 
         await _requestSender.ProcessTestRunAttachmentsAsync(
             new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
@@ -2141,7 +2141,7 @@ public class VsTestConsoleRequestSenderTests
         var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
         var message = CreateMessage(MessageType.TestMessage, mpayload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
         {
             Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
@@ -2150,7 +2150,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(() =>
         {
             cts.Cancel();
-            _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
+            _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(attachmentsProcessingComplete));
         });
 
         await _requestSender.ProcessTestRunAttachmentsAsync(
@@ -2187,7 +2187,7 @@ public class VsTestConsoleRequestSenderTests
             Payload = JToken.FromObject(payload)
         };
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(attachmentsProcessingComplete));
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
         {
             Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
@@ -2320,7 +2320,7 @@ public class VsTestConsoleRequestSenderTests
             It.IsAny<Payloads.StartTestSessionPayload>(),
             _protocolVersion)).Callback(() => { });
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(message));
+            .Returns(Task.FromResult<Message?>(message));
 
         Assert.AreEqual(
             testSessionInfo,
@@ -2374,7 +2374,7 @@ public class VsTestConsoleRequestSenderTests
             It.IsAny<Payloads.StartTestSessionPayload>(),
             _protocolVersion)).Callback(() => { });
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(message));
+            .Returns(Task.FromResult<Message?>(message));
 
         Assert.AreEqual(
             testSessionInfo,
@@ -2432,7 +2432,7 @@ public class VsTestConsoleRequestSenderTests
             ackPayload);
 
         Action reconfigureAction = () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(ackMessage));
+            .Returns(Task.FromResult<Message?>(ackMessage));
 
         _mockCommunicationManager.Setup(cm => cm.SendMessage(
             MessageType.StartTestSession,
@@ -2444,7 +2444,7 @@ public class VsTestConsoleRequestSenderTests
                 _protocolVersion))
             .Callback((string messageType, object payload, int version) => Assert.AreEqual(((CustomHostLaunchAckPayload)payload).HostProcessId, TesthostPid));
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(launchMessage))
+            .Returns(Task.FromResult<Message?>(launchMessage))
             .Callback(reconfigureAction);
 
         // Act
@@ -2507,7 +2507,7 @@ public class VsTestConsoleRequestSenderTests
             ackPayload);
 
         Action reconfigureAction = () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(ackMessage));
+            .Returns(Task.FromResult<Message?>(ackMessage));
 
         _mockCommunicationManager.Setup(cm => cm.SendMessage(
             MessageType.StartTestSession,
@@ -2519,7 +2519,7 @@ public class VsTestConsoleRequestSenderTests
                 _protocolVersion))
             .Callback((string messageType, object payload, int version) => Assert.AreEqual(((CustomHostLaunchAckPayload)payload).HostProcessId, TesthostPid));
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(launchMessage))
+            .Returns(Task.FromResult<Message?>(launchMessage))
             .Callback(reconfigureAction);
 
         // Act
@@ -2581,7 +2581,7 @@ public class VsTestConsoleRequestSenderTests
             ackPayload);
 
         Action reconfigureAction = () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(ackMessage));
+            .Returns(Task.FromResult<Message?>(ackMessage));
 
         _mockCommunicationManager.Setup(cm => cm.SendMessage(
             MessageType.StartTestSession,
@@ -2593,7 +2593,7 @@ public class VsTestConsoleRequestSenderTests
                 _protocolVersion))
             .Callback((string messageType, object payload, int version) => Assert.IsTrue(((EditorAttachDebuggerAckPayload)payload).Attached));
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(launchMessage))
+            .Returns(Task.FromResult<Message?>(launchMessage))
             .Callback(reconfigureAction);
 
         // Act
@@ -2655,7 +2655,7 @@ public class VsTestConsoleRequestSenderTests
             ackPayload);
 
         Action reconfigureAction = () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(ackMessage));
+            .Returns(Task.FromResult<Message?>(ackMessage));
 
         _mockCommunicationManager.Setup(cm => cm.SendMessage(
             MessageType.StartTestSession,
@@ -2667,7 +2667,7 @@ public class VsTestConsoleRequestSenderTests
                 _protocolVersion))
             .Callback((string messageType, object payload, int version) => Assert.IsTrue(((EditorAttachDebuggerAckPayload)payload).Attached));
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(launchMessage))
+            .Returns(Task.FromResult<Message?>(launchMessage))
             .Callback(reconfigureAction);
 
         // Act
@@ -2749,7 +2749,7 @@ public class VsTestConsoleRequestSenderTests
 
         var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
     }
 
     private async Task InitializeCommunicationAsync()
@@ -2766,9 +2766,9 @@ public class VsTestConsoleRequestSenderTests
         var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
         var versionCheck = new Message() { MessageType = MessageType.VersionCheck, Payload = protocolVersion };
 
-        Action changedMessage = () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(versionCheck));
+        Action changedMessage = () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(versionCheck));
 
-        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(sessionConnected));
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(sessionConnected));
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck, It.IsAny<int>())).Callback(changedMessage);
 
         var portOutput = await _requestSender.InitializeCommunicationAsync(_waitTimeout);

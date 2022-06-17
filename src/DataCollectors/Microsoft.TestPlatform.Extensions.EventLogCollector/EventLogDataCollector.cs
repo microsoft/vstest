@@ -496,7 +496,7 @@ public class EventLogDataCollector : DataCollector
         string? eventSourcesStr = collectorNameValueConfigurationManager[EventLogConstants.SettingEventSources];
         if (!eventSourcesStr.IsNullOrEmpty())
         {
-            EventSources = ParseCommaSeparatedList(eventSourcesStr!);
+            EventSources = ParseCommaSeparatedList(eventSourcesStr);
             EqtTrace.Verbose(
                 $"EventLogDataCollector configuration: {EventLogConstants.SettingEventSources}={EventSources}");
         }

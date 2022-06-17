@@ -189,7 +189,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
             using var streamReader = new StreamReader(artifactStream);
             string executionCompleteMessage = await streamReader.ReadToEndAsync();
             EqtTrace.Verbose($"ArtifactProcessingManager.MergeDataCollectorAttachments: ExecutionComplete message \n{executionCompleteMessage}");
-            TestRunCompleteEventArgs eventArgs = _dataSerialized.DeserializePayload<TestRunCompleteEventArgs>(_dataSerialized.DeserializeMessage(executionCompleteMessage));
+            TestRunCompleteEventArgs? eventArgs = _dataSerialized.DeserializePayload<TestRunCompleteEventArgs>(_dataSerialized.DeserializeMessage(executionCompleteMessage));
             foreach (var invokedDataCollector in eventArgs?.InvokedDataCollectors ?? Enumerable.Empty<InvokedDataCollector>())
             {
                 invokedDataCollectors.Add(invokedDataCollector);

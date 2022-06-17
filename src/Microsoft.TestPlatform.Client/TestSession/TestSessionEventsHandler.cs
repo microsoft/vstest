@@ -51,7 +51,7 @@ internal class TestSessionEventsHandler : ITestSessionEventsHandler
     }
 
     /// <inheritdoc />
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         var messagePayload = new TestMessagePayload()
         {

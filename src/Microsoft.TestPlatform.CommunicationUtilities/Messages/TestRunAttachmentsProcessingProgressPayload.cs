@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 /// <summary>
@@ -15,5 +13,5 @@ public class TestRunAttachmentsProcessingProgressPayload
     /// <summary>
     /// Gets or sets the test run attachments processing complete args.
     /// </summary>
-    public TestRunAttachmentsProcessingProgressEventArgs AttachmentsProcessingProgressEventArgs { get; set; }
+    public TestRunAttachmentsProcessingProgressEventArgs? AttachmentsProcessingProgressEventArgs { get; set; }
 }

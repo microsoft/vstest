@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 /// Base class for Eqt Collections.
 /// Fast collection, default implementations (Add/Remove/etc) do not allow null items and ignore duplicates.
 /// </summary>
-internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
+internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore where T : notnull
 {
     #region private classes
     /// <summary>
@@ -91,7 +91,7 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
     {
         EqtAssert.ParameterNotNull(item, nameof(item));
 
-        if (!_container.Contains(item!))
+        if (!_container.Contains(item))
         {
             _container.Add(item!, null);    // Do not want to xml-persist the value.
         }
@@ -110,9 +110,9 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
     public virtual bool Remove(T item)
     {
         EqtAssert.ParameterNotNull(item, nameof(item));   // This is to be consistent with Add...
-        if (_container.Contains(item!))
+        if (_container.Contains(item))
         {
-            _container.Remove(item!);
+            _container.Remove(item);
             return true;
         }
 

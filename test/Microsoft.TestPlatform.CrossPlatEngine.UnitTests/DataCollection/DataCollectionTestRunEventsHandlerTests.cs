@@ -121,8 +121,10 @@ public class DataCollectionTestRunEventsHandlerTests
             .Returns(new DataCollectionResult(null, invokedDataCollectors));
         _mockDataSerializer.Setup(r => r.SerializePayload(It.IsAny<string>(), It.IsAny<object>())).Callback((string message, object o) =>
         {
-            Assert.AreEqual(1, ((TestRunCompletePayload)o).TestRunCompleteArgs.InvokedDataCollectors.Count);
-            Assert.AreEqual(invokedDataCollectors[0], ((TestRunCompletePayload)o).TestRunCompleteArgs.InvokedDataCollectors[0]);
+            var testRunCompleteArgs = o as TestRunCompletePayload;
+            Assert.IsNotNull(testRunCompleteArgs);
+            Assert.AreEqual(1, testRunCompleteArgs.TestRunCompleteArgs!.InvokedDataCollectors.Count);
+            Assert.AreEqual(invokedDataCollectors[0], testRunCompleteArgs.TestRunCompleteArgs.InvokedDataCollectors[0]);
         });
 
         _testRunEventHandler = new DataCollectionTestRunEventsHandler(_baseTestRunEventsHandler.Object, _proxyDataCollectionManager.Object, _mockDataSerializer.Object, CancellationToken.None);

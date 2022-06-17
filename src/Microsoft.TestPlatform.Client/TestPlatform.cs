@@ -179,7 +179,7 @@ internal class TestPlatform : ITestPlatform
 
     /// <inheritdoc/>
     public void UpdateExtensions(
-        IEnumerable<string> pathToAdditionalExtensions,
+        IEnumerable<string>? pathToAdditionalExtensions,
         bool skipExtensionFilters)
     {
         _testEngine.GetExtensionManager().UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);

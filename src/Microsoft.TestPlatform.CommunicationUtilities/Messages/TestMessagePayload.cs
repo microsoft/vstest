@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 /// <summary>
@@ -20,5 +18,5 @@ public class TestMessagePayload
     /// <summary>
     /// Gets or sets the message.
     /// </summary>
-    public string Message { get; set; }
+    public string? Message { get; set; }
 }

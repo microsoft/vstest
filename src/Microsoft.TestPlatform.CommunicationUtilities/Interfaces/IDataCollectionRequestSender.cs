@@ -7,8 +7,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
 
 /// <summary>
@@ -60,7 +58,7 @@ internal interface IDataCollectionRequestSender
     /// <returns>
     /// BeforeTestRunStartResult containing environment variables
     /// </returns>
-    BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingXml, IEnumerable<string> sources, bool isTelemetryOptedIn, ITestMessageEventHandler runEventsHandler);
+    BeforeTestRunStartResult? SendBeforeTestRunStartAndGetResult(string settingXml, IEnumerable<string> sources, bool isTelemetryOptedIn, ITestMessageEventHandler? runEventsHandler);
 
     /// <summary>
     /// Sends the AfterTestRunEnd event and waits for result
@@ -74,5 +72,5 @@ internal interface IDataCollectionRequestSender
     /// <returns>
     /// AfterTestRunEndResult containing dataCollector attachments and metrics
     /// </returns>
-    AfterTestRunEndResult SendAfterTestRunEndAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled);
+    AfterTestRunEndResult? SendAfterTestRunEndAndGetResult(ITestMessageEventHandler? runEventsHandler, bool isCancelled);
 }

@@ -22,6 +22,8 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     private Architecture _platform;
 
+    private Architecture? _defaultPlatform;
+
     /// <summary>
     /// Maximum number of cores that the engine can use to run tests in parallel
     /// </summary>
@@ -234,7 +236,7 @@ public class RunConfiguration : TestRunSettings
     }
 
     /// <summary>
-    /// Gets or sets the Target platform this run is targeting. Possible values are <c>x86|x64|arm|anycpu</c>.
+    /// Gets or sets the Target platform this run is targeting. Possible values are <see cref="Architecture"/> except for AnyCPU and Default.
     /// </summary>
     public Architecture TargetPlatform
     {
@@ -247,6 +249,23 @@ public class RunConfiguration : TestRunSettings
         {
             _platform = value;
             TargetPlatformSet = true;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the default platform that will be used for AnyCPU sources, or non-dll sources. Possible values are <see cref="Architecture"/> except for AnyCPU and Default.
+    /// </summary>
+    public Architecture? DefaultPlatform
+    {
+        get
+        {
+            return _defaultPlatform;
+        }
+
+        set
+        {
+            _defaultPlatform = value;
+            DefaultPlatformSet = true;
         }
     }
 
@@ -343,6 +362,15 @@ public class RunConfiguration : TestRunSettings
     /// Gets a value indicating whether target platform set.
     /// </summary>
     public bool TargetPlatformSet
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether default platform is set.
+    /// </summary>
+    public bool DefaultPlatformSet
     {
         get;
         private set;
@@ -454,6 +482,13 @@ public class RunConfiguration : TestRunSettings
         XmlElement targetPlatform = doc.CreateElement("TargetPlatform");
         targetPlatform.InnerXml = TargetPlatform.ToString();
         root.AppendChild(targetPlatform);
+
+        if (DefaultPlatform != null)
+        {
+            XmlElement defaultPlatform = doc.CreateElement("DefaultPlatform");
+            defaultPlatform.InnerXml = DefaultPlatform.ToString();
+            root.AppendChild(defaultPlatform);
+        }
 
         XmlElement maxCpuCount = doc.CreateElement("MaxCpuCount");
         maxCpuCount.InnerXml = MaxCpuCount.ToString();
@@ -735,6 +770,34 @@ public class RunConfiguration : TestRunSettings
                         }
 
                         runConfiguration.TargetPlatform = archType;
+                        break;
+
+                    case nameof(DefaultPlatform):
+                        XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                        Architecture defaultArchType;
+                        string defaultPlatformValue = reader.ReadElementContentAsString();
+                        try
+                        {
+                            defaultArchType = (Architecture)Enum.Parse(typeof(Architecture), defaultPlatformValue, true);
+                            // Ensure that the parsed value is actually in the enum, and that Default or AnyCpu are not provided.
+                            if (!Enum.IsDefined(typeof(Architecture), defaultArchType) || Architecture.Default == defaultArchType || Architecture.AnyCPU == defaultArchType)
+                            {
+                                throw new SettingsException(
+                                    string.Format(
+                                        CultureInfo.CurrentCulture,
+                                        Resources.Resources.InvalidSettingsIncorrectValue,
+                                        Constants.RunConfigurationSettingsName,
+                                        defaultPlatformValue,
+                                        elementName));
+                            }
+                        }
+                        catch (ArgumentException)
+                        {
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, defaultPlatformValue, elementName));
+                        }
+
+                        runConfiguration.DefaultPlatform = defaultArchType;
                         break;
 
                     case "TargetFrameworkVersion":

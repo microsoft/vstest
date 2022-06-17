@@ -958,3 +958,6 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArg
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.NotDiscoveredSources.get -> System.Collections.Generic.IList<string>
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.PartiallyDiscoveredSources.get -> System.Collections.Generic.IList<string>
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.SkippedDiscoveredSources.get -> System.Collections.Generic.IList<string>
+Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.DefaultPlatform.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture?
+Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.DefaultPlatform.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.DefaultPlatformSet.get -> bool

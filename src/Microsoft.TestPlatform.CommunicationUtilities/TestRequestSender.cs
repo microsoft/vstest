@@ -19,8 +19,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
@@ -32,38 +30,24 @@ public class TestRequestSender : ITestRequestSender
     private const int ClientProcessExitWaitTimeout = 10 * 1000;
 
     private readonly IDataSerializer _dataSerializer;
-
     private readonly ManualResetEventSlim _connected;
-
     private readonly ManualResetEventSlim _clientExited;
-
     private readonly int _clientExitedWaitTime;
-
     private readonly ICommunicationEndPoint _communicationEndpoint;
+    private readonly int _highestSupportedVersion = ProtocolVersioning.HighestSupportedVersion;
+    private readonly TestHostConnectionInfo _connectionInfo;
+    private readonly ITestRuntimeProvider? _runtimeProvider;
 
-    private ICommunicationChannel _channel;
-
-    private EventHandler<MessageReceivedEventArgs> _onMessageReceived;
-
-    private Action<DisconnectedEventArgs> _onDisconnected;
-
+    private ICommunicationChannel? _channel;
+    private EventHandler<MessageReceivedEventArgs>? _onMessageReceived;
+    private Action<DisconnectedEventArgs>? _onDisconnected;
     // Set to 1 if Discovery/Execution is complete, i.e. complete handlers have been invoked
     private int _operationCompleted;
-
-    private ITestMessageEventHandler _messageEventHandler;
-
-    private string _clientExitErrorMessage;
-
+    private ITestMessageEventHandler? _messageEventHandler;
+    private string? _clientExitErrorMessage;
     // Set default to 1, if protocol version check does not happen
     // that implies host is using version 1.
     private int _protocolVersion = 1;
-
-    private readonly int _highestSupportedVersion = ProtocolVersioning.HighestSupportedVersion;
-
-    private readonly TestHostConnectionInfo _connectionInfo;
-
-    private readonly ITestRuntimeProvider _runtimeProvider;
-
     private bool _isDiscoveryAborted;
 
     /// <summary>
@@ -83,8 +67,8 @@ public class TestRequestSender : ITestRequestSender
     }
 
     internal TestRequestSender(
-        ITestRuntimeProvider runtimeProvider,
-        ICommunicationEndPoint communicationEndPoint,
+        ITestRuntimeProvider? runtimeProvider,
+        ICommunicationEndPoint? communicationEndPoint,
         TestHostConnectionInfo testhostConnectionInfo,
         IDataSerializer serializer,
         ProtocolConfig protocolConfig,
@@ -197,6 +181,8 @@ public class TestRequestSender : ITestRequestSender
     /// <inheritdoc />
     public void CheckVersionWithTestHost()
     {
+        TPDebug.Assert(_channel is not null, "_channel is null");
+
         // Negotiation follows these steps:
         // Runner sends highest supported version to Test host
         // Test host compares the version with the highest version it can support.
@@ -205,7 +191,7 @@ public class TestRequestSender : ITestRequestSender
         var protocolNegotiated = new ManualResetEvent(false);
         _onMessageReceived = (sender, args) =>
         {
-            var message = _dataSerializer.DeserializeMessage(args.Data);
+            var message = _dataSerializer.DeserializeMessage(args.Data!);
 
             EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: onMessageReceived received message: {0}", message);
 
@@ -266,6 +252,7 @@ public class TestRequestSender : ITestRequestSender
     /// <inheritdoc />
     public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions)
     {
+        TPDebug.Assert(_channel is not null, "_channel is null");
         var message = _dataSerializer.SerializePayload(
             MessageType.DiscoveryInitialize,
             pathToAdditionalExtensions,
@@ -279,10 +266,11 @@ public class TestRequestSender : ITestRequestSender
     /// <inheritdoc/>
     public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 discoveryEventsHandler)
     {
+        TPDebug.Assert(_channel is not null, "_channel is null");
         _messageEventHandler = discoveryEventsHandler;
         // When testhost disconnects, it normally means there was an error in the testhost and it exited unexpectedly.
         // But when it was us who aborted the run and killed the testhost, we don't want to wait for it to report error, because there won't be any.
-        _onDisconnected = (disconnectedEventArgs) => OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, getClientError: !_isDiscoveryAborted);
+        _onDisconnected = disconnectedEventArgs => OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, getClientError: !_isDiscoveryAborted);
         _onMessageReceived = (sender, args) => OnDiscoveryMessageReceived(discoveryEventsHandler, args);
 
         _channel.MessageReceived += _onMessageReceived;
@@ -316,6 +304,7 @@ public class TestRequestSender : ITestRequestSender
     /// <inheritdoc />
     public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions)
     {
+        TPDebug.Assert(_channel is not null, "_channel is null");
         var message = _dataSerializer.SerializePayload(
             MessageType.ExecutionInitialize,
             pathToAdditionalExtensions,
@@ -329,6 +318,7 @@ public class TestRequestSender : ITestRequestSender
     /// <inheritdoc />
     public void StartTestRun(TestRunCriteriaWithSources runCriteria, IInternalTestRunEventsHandler eventHandler)
     {
+        TPDebug.Assert(_channel is not null, "_channel is null");
         _messageEventHandler = eventHandler;
         _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
@@ -371,6 +361,7 @@ public class TestRequestSender : ITestRequestSender
     /// <inheritdoc />
     public void StartTestRun(TestRunCriteriaWithTests runCriteria, IInternalTestRunEventsHandler eventHandler)
     {
+        TPDebug.Assert(_channel is not null, "_channel is null");
         _messageEventHandler = eventHandler;
         _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
@@ -490,6 +481,8 @@ public class TestRequestSender : ITestRequestSender
         {
             var rawMessage = messageReceived.Data;
             EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Received message: {0}", rawMessage);
+            TPDebug.Assert(rawMessage is not null, "rawMessage is null");
+            TPDebug.Assert(_channel is not null, "_channel is null");
 
             // Send raw message first to unblock handlers waiting to send message to IDEs
             testRunEventsHandler.HandleRawMessage(rawMessage);
@@ -505,6 +498,7 @@ public class TestRequestSender : ITestRequestSender
                     break;
                 case MessageType.ExecutionComplete:
                     var testRunCompletePayload = _dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+                    TPDebug.Assert(testRunCompletePayload is not null, "testRunCompletePayload is null");
 
                     testRunEventsHandler.HandleTestRunComplete(
                         testRunCompletePayload.TestRunCompleteArgs,
@@ -516,6 +510,7 @@ public class TestRequestSender : ITestRequestSender
                     break;
                 case MessageType.TestMessage:
                     var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                    TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
                     testRunEventsHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
                     break;
                 case MessageType.LaunchAdapterProcessWithDebuggerAttached:
@@ -534,6 +529,7 @@ public class TestRequestSender : ITestRequestSender
 
                 case MessageType.AttachDebugger:
                     var testProcessAttachDebuggerPayload = _dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
+                    TPDebug.Assert(testProcessAttachDebuggerPayload is not null, "testProcessAttachDebuggerPayload is null");
                     AttachDebuggerInfo attachDebugerInfo = MessageConverter.ConvertToAttachDebuggerInfo(testProcessAttachDebuggerPayload, message, _protocolVersion);
                     bool result = testRunEventsHandler.AttachDebuggerToProcess(attachDebugerInfo);
 
@@ -562,6 +558,7 @@ public class TestRequestSender : ITestRequestSender
         try
         {
             var rawMessage = args.Data;
+            TPDebug.Assert(rawMessage is not null, "rawMessage is null");
 
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
             EqtTrace.Verbose("TestRequestSender.OnDiscoveryMessageReceived: Received message: {0}", rawMessage);
@@ -570,6 +567,13 @@ public class TestRequestSender : ITestRequestSender
             discoveryEventsHandler.HandleRawMessage(rawMessage);
 
             var data = _dataSerializer.DeserializeMessage(rawMessage);
+            if (data is null)
+            {
+                EqtTrace.Error("TestRequestSender.OnDiscoveryMessageReceived: Deserialized message is null: {0}", rawMessage);
+                OnDiscoveryAbort(discoveryEventsHandler, null, false);
+                return;
+            }
+
             switch (data.MessageType)
             {
                 case MessageType.TestCasesFound:
@@ -578,6 +582,7 @@ public class TestRequestSender : ITestRequestSender
                     break;
                 case MessageType.DiscoveryComplete:
                     var payload = _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
+                    TPDebug.Assert(payload is not null, "payload is null");
                     var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs
                     {
                         TotalCount = payload.TotalTests,
@@ -598,6 +603,7 @@ public class TestRequestSender : ITestRequestSender
                 case MessageType.TestMessage:
                     var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(
                         data);
+                    TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
                     discoveryEventsHandler.HandleLogMessage(
                         testMessagePayload.MessageLevel,
                         testMessagePayload.Message);
@@ -610,7 +616,7 @@ public class TestRequestSender : ITestRequestSender
         }
     }
 
-    private void OnTestRunAbort(IInternalTestRunEventsHandler testRunEventsHandler, Exception exception, bool getClientError)
+    private void OnTestRunAbort(IInternalTestRunEventsHandler testRunEventsHandler, Exception? exception, bool getClientError)
     {
         if (IsOperationComplete())
         {
@@ -635,7 +641,7 @@ public class TestRequestSender : ITestRequestSender
         testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
     }
 
-    private void OnDiscoveryAbort(ITestDiscoveryEventsHandler2 eventHandler, Exception exception, bool getClientError)
+    private void OnDiscoveryAbort(ITestDiscoveryEventsHandler2 eventHandler, Exception? exception, bool getClientError)
     {
         if (IsOperationComplete())
         {
@@ -672,9 +678,9 @@ public class TestRequestSender : ITestRequestSender
         eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
     }
 
-    private string GetAbortErrorMessage(Exception exception, bool getClientError)
+    private string? GetAbortErrorMessage(Exception? exception, bool getClientError)
     {
-        EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Exception: " + exception);
+        EqtTrace.Verbose("TestRequestSender.GetAbortErrorMessage: Exception: " + exception);
 
         // It is also possible for an operation to abort even if client has not
         // disconnected, because we initiate client abort when there is error in processing incoming messages.
@@ -686,7 +692,7 @@ public class TestRequestSender : ITestRequestSender
             return exception?.Message;
         }
 
-        EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Client has disconnected. Wait for standard error.");
+        EqtTrace.Verbose("TestRequestSender.GetAbortErrorMessage: Client has disconnected. Wait for standard error.");
 
         // Wait for test host to exit for a moment
         // TODO: this timeout is 10 seconds, make it also configurable like the other famous timeout that is 100ms
@@ -694,7 +700,7 @@ public class TestRequestSender : ITestRequestSender
         {
             // Set a default message of test host process exited and additionally specify the error if we were able to get it
             // from error output of the process
-            EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
+            EqtTrace.Info("TestRequestSender.GetAbortErrorMessage: Received test host error message.");
             var reason = CommonResources.TestHostProcessCrashed;
             if (!string.IsNullOrWhiteSpace(_clientExitErrorMessage))
             {
@@ -705,7 +711,7 @@ public class TestRequestSender : ITestRequestSender
         }
         else
         {
-            EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Timed out waiting for test host error message.");
+            EqtTrace.Info("TestRequestSender.GetAbortErrorMessage: Timed out waiting for test host error message.");
             return CommonResources.UnableToCommunicateToTestHost;
         }
     }
