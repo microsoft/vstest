@@ -531,7 +531,7 @@ public class TestEngine : ITestEngine
                 // In case of a background discovery we want to reduce the number of cores utilized
                 // to leave enough power for other tasks.
                 var runSettingsEnvVariables = InferRunSettingsHelper.GetEnvironmentVariables(runSettings);
-                string? isBackgroundDiscoveryEnabled = null;
+                string isBackgroundDiscoveryEnabled = null;
                 if (runSettingsEnvVariables is not null
                     && runSettingsEnvVariables.TryGetValue("VSTEST_BACKGROUND_DISCOVERY", out isBackgroundDiscoveryEnabled)
                     && isBackgroundDiscoveryEnabled == "1"
