@@ -1376,24 +1376,18 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     private Message TryReceiveMessage()
     {
-        TPDebug.Assert(_processExitCancellationTokenSource is not null, "_processExitCancellationTokenSource is null");
-        var receiverMessageTask = _communicationManager.ReceiveMessageAsync(
-            _processExitCancellationTokenSource.Token);
-        receiverMessageTask.Wait();
-        Message? message = receiverMessageTask.Result;
-
-        return message ?? throw new TransationLayerException(
-            TranslationLayerResources.FailedToReceiveMessage);
+        return TryReceiveMessageAsync().GetAwaiter().GetResult();
     }
 
     private async Task<Message> TryReceiveMessageAsync()
     {
-        TPDebug.Assert(_processExitCancellationTokenSource is not null, "_processExitCancellationTokenSource is null");
-        Message? message = await _communicationManager.ReceiveMessageAsync(
-            _processExitCancellationTokenSource.Token).ConfigureAwait(false);
+        // TODO: Rework logic of this class to avoid relying on throwing/catching exceptions:
+        // - NRE on null _processExitCancellationTokenSource
+        // - TransationLayerException on null message
+        Message? message = await _communicationManager.ReceiveMessageAsync(_processExitCancellationTokenSource!.Token)
+            .ConfigureAwait(false);
 
-        return message ?? throw new TransationLayerException(
-            TranslationLayerResources.FailedToReceiveMessage);
+        return message ?? throw new TransationLayerException(TranslationLayerResources.FailedToReceiveMessage);
     }
 
     private void HandleCustomHostLaunch(ITestHostLauncher? customHostLauncher, Message message)
