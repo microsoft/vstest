@@ -72,8 +72,7 @@ public class CommandLineArgumentsHelper
             return false;
         }
 
-        value = int.Parse(optionValue);
-        return true;
+        return int.TryParse(optionValue, out value);
     }
 
 

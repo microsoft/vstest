@@ -105,7 +105,7 @@ public class DotnetHostHelper : IDotnetHostHelper
         }
 
         executablePath = string.Empty;
-        var pathString = Environment.GetEnvironmentVariable("PATH");
+        var pathString = Environment.GetEnvironmentVariable("PATH")!;
         foreach (string path in pathString.Split(Path.PathSeparator))
         {
             string exeFullPath = Path.Combine(path.Trim(), executableBaseName);
@@ -149,7 +149,7 @@ public class DotnetHostHelper : IDotnetHostHelper
         string envKey = $"DOTNET_ROOT_{targetArchitecture.ToString().ToUpperInvariant()}";
 
         // Try on arch specific env var
-        string envVar = _environmentVariableHelper.GetEnvironmentVariable(envKey);
+        string? envVar = _environmentVariableHelper.GetEnvironmentVariable(envKey);
 
         // Try on non virtualized x86 var(should happen only on non-x86 architecture)
         if ((envVar == null || !_fileHelper.DirectoryExists(envVar)) &&
@@ -233,14 +233,14 @@ public class DotnetHostHelper : IDotnetHostHelper
             if ((_environment.Architecture == PlatformArchitecture.X64 || _environment.Architecture == PlatformArchitecture.ARM64) &&
                  targetArchitecture == PlatformArchitecture.X86)
             {
-                muxerPath = Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", _muxerName);
+                muxerPath = Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles(x86)")!, "dotnet", _muxerName);
             }
             else
             {
                 // If we're on ARM and target is x64 we expect correct installation inside x64 folder
                 muxerPath = _environment.Architecture == PlatformArchitecture.ARM64 && targetArchitecture == PlatformArchitecture.X64
-                    ? Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "dotnet", "x64", _muxerName)
-                    : Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "dotnet", _muxerName);
+                    ? Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles")!, "dotnet", "x64", _muxerName)
+                    : Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles")!, "dotnet", _muxerName);
             }
         }
         else
