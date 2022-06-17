@@ -109,7 +109,7 @@ public class VsTestConsoleWrapperTests
             _consoleWrapper.StartTestSession(
                 _testSources,
                 null,
-                mockEventsHandler.Object).TestSessionInfo,
+                mockEventsHandler.Object)?.TestSessionInfo,
             testSessionInfo);
 
         _mockRequestSender.Verify(
@@ -144,7 +144,7 @@ public class VsTestConsoleWrapperTests
                 _testSources,
                 null,
                 testPlatformOptions,
-                mockEventsHandler.Object).TestSessionInfo,
+                mockEventsHandler.Object)?.TestSessionInfo,
             testSessionInfo);
 
         _mockRequestSender.Verify(
@@ -181,7 +181,7 @@ public class VsTestConsoleWrapperTests
                 null,
                 testPlatformOptions,
                 mockEventsHandler.Object,
-                mockTesthostLauncher.Object).TestSessionInfo,
+                mockTesthostLauncher.Object)?.TestSessionInfo,
             testSessionInfo);
 
         _mockRequestSender.Verify(

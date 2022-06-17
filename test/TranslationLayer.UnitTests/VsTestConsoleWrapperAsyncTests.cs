@@ -101,13 +101,13 @@ public class VsTestConsoleWrapperAsyncTests
                     null,
                     mockEventsHandler.Object,
                     null))
-            .Returns(Task.FromResult(testSessionInfo));
+            .Returns(Task.FromResult<TestSessionInfo?>(testSessionInfo));
 
         Assert.AreEqual(
             (await _consoleWrapper.StartTestSessionAsync(
                 _testSources,
                 null,
-                mockEventsHandler.Object).ConfigureAwait(false)).TestSessionInfo,
+                mockEventsHandler.Object).ConfigureAwait(false))?.TestSessionInfo,
             testSessionInfo);
 
         _mockRequestSender.Verify(
@@ -135,14 +135,14 @@ public class VsTestConsoleWrapperAsyncTests
                     testPlatformOptions,
                     mockEventsHandler.Object,
                     null))
-            .Returns(Task.FromResult(testSessionInfo));
+            .Returns(Task.FromResult<TestSessionInfo?>(testSessionInfo));
 
         Assert.AreEqual(
             (await _consoleWrapper.StartTestSessionAsync(
                 _testSources,
                 null,
                 testPlatformOptions,
-                mockEventsHandler.Object).ConfigureAwait(false)).TestSessionInfo,
+                mockEventsHandler.Object).ConfigureAwait(false))?.TestSessionInfo,
             testSessionInfo);
 
         _mockRequestSender.Verify(
@@ -171,7 +171,7 @@ public class VsTestConsoleWrapperAsyncTests
                     testPlatformOptions,
                     mockEventsHandler.Object,
                     mockTesthostLauncher.Object))
-            .Returns(Task.FromResult(testSessionInfo));
+            .Returns(Task.FromResult<TestSessionInfo?>(testSessionInfo));
 
         Assert.AreEqual(
             (await _consoleWrapper.StartTestSessionAsync(
@@ -179,7 +179,7 @@ public class VsTestConsoleWrapperAsyncTests
                 null,
                 testPlatformOptions,
                 mockEventsHandler.Object,
-                mockTesthostLauncher.Object).ConfigureAwait(false)).TestSessionInfo,
+                mockTesthostLauncher.Object).ConfigureAwait(false))?.TestSessionInfo,
             testSessionInfo);
 
         _mockRequestSender.Verify(
