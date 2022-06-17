@@ -368,6 +368,7 @@ public class DesignModeClient : IDesignModeClient
             {
                 var payload = new EditorAttachDebuggerPayload
                 {
+                    Sources = attachDebuggerInfo.Sources,
                     TargetFramework = attachDebuggerInfo.TargetFramework?.ToString(),
                     ProcessID = attachDebuggerInfo.ProcessId,
                 };
