@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #if !NETSTANDARD1_0
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 #endif
 
