@@ -961,3 +961,7 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArg
 Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.DefaultPlatform.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture?
 Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.DefaultPlatform.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.DefaultPlatformSet.get -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.Sources.get -> System.Collections.Generic.ICollection<string>
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.AttachDebuggerInfo.Sources.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload.Sources.get -> System.Collections.Generic.ICollection<string>
+Microsoft.VisualStudio.TestPlatform.ObjectModel.EditorAttachDebuggerPayload.Sources.set -> void
