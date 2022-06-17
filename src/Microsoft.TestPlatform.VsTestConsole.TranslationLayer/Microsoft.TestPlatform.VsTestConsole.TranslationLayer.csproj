@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.VsTestConsole.TranslationLayer</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net451;net6.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
