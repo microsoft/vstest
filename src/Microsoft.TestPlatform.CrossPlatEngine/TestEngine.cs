@@ -513,21 +513,14 @@ public class TestEngine : ITestEngine
         try
         {
             // Check the user parallel setting.
-            int userParallelSetting = RunSettingsUtilities.GetMaxCpuCount(runSettings);
-            parallelLevelToUse = userParallelSetting == 0
+            int maxCpuCount = RunSettingsUtilities.GetMaxCpuCount(runSettings);
+            parallelLevelToUse = maxCpuCount == 0
                 ? _environment.ProcessorCount
-                : userParallelSetting;
+                : maxCpuCount;
 
             EqtTrace.Verbose(
                 "TestEngine: Initializing Parallel Execution as MaxCpuCount is set to: {0}",
                 parallelLevelToUse);
-
-            // TODO: EXPERIMENTAL FEATURE - will need to be removed or strengthen/tested.
-            // A negative value is used to indicate that the value should be used as a percentage of the number of cores.
-            if (parallelLevelToUse < 0)
-            {
-                parallelLevelToUse = (int)Math.Max(1, Math.Round((double)-parallelLevelToUse * _environment.ProcessorCount / 100.0, MidpointRounding.AwayFromZero));
-            }
 
             var enableParallel = parallelLevelToUse > 1;
             // Verify if the number of sources is less than user setting of parallel.
@@ -535,6 +528,27 @@ public class TestEngine : ITestEngine
             // than parallel level.
             if (enableParallel)
             {
+                // In case of a background discovery we want to reduce the number of cores utilized
+                // to leave enough power for other tasks.
+                var runSettingsEnvVariables = InferRunSettingsHelper.GetEnvironmentVariables(runSettings);
+                string isBackgroundDiscoveryEnabled = null;
+                if (runSettingsEnvVariables is not null
+                    && runSettingsEnvVariables.TryGetValue("VSTEST_BACKGROUND_DISCOVERY", out isBackgroundDiscoveryEnabled)
+                    && isBackgroundDiscoveryEnabled == "1"
+                    && maxCpuCount == 0) // If user specifies a CPU count, respect it
+                {
+                    // Dummy logic based on some observations, might need to be tweaked/improved.
+                    parallelLevelToUse = parallelLevelToUse switch
+                    {
+                        1 => 1,
+                        < 8 => (int)Math.Round(parallelLevelToUse / 2.0, MidpointRounding.AwayFromZero),
+                        _ => (int)Math.Round(0.75 * parallelLevelToUse, MidpointRounding.AwayFromZero),
+                    };
+                }
+
+                EqtTrace.Verbose("TestEngine.VerifyParallelSettingAndCalculateParallelLevel: Parallel execution is enabled (cpu count: {0}, max cpu count is {1}, calculated cpu count is {2}, background mode is {3}, number of sources is {4})", _environment.ProcessorCount, maxCpuCount, parallelLevelToUse, isBackgroundDiscoveryEnabled == "1" ? "enabled" : "disabled", sourceCount);
+
+
                 parallelLevelToUse = Math.Min(sourceCount, parallelLevelToUse);
 
                 // If only one source, no need to use parallel service client.
