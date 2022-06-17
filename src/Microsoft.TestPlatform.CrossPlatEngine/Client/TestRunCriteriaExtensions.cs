@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -9,16 +10,13 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 internal static class TestRunCriteriaExtensions
 {
-    public static TestRunCriteriaWithSources CreateTestRunCriteriaForSources(this TestRunCriteria testRunCriteria, ITestRuntimeProvider testRuntimeProvider,
-        string runSettings, TestExecutionContext executionContext, IEnumerable<string> inputPackages)
+    public static TestRunCriteriaWithSources CreateTestRunCriteriaForSources(this TestRunCriteria testRunCriteria, ITestRuntimeProvider? testRuntimeProvider, string? runSettings, TestExecutionContext executionContext, IEnumerable<string>? inputPackages)
     {
-        if (TryCheckTestSourceDifferFromPackage(testRuntimeProvider, inputPackages, out IEnumerable<string> actualTestSources))
+        if (TryCheckTestSourceDifferFromPackage(testRuntimeProvider, inputPackages, out IEnumerable<string>? actualTestSources))
         {
             UpdateTestSources(actualTestSources, testRunCriteria.AdapterSourceMap);
         }
@@ -30,10 +28,10 @@ internal static class TestRunCriteriaExtensions
         return new TestRunCriteriaWithSources(testRunCriteria.AdapterSourceMap, inputPackages?.FirstOrDefault(), runSettings, executionContext);
     }
 
-    public static TestRunCriteriaWithTests CreateTestRunCriteriaForTests(this TestRunCriteria testRunCriteria, ITestRuntimeProvider testRuntimeProvider,
-        string runSettings, TestExecutionContext executionContext, IEnumerable<string> inputPackages)
+    public static TestRunCriteriaWithTests CreateTestRunCriteriaForTests(this TestRunCriteria testRunCriteria, ITestRuntimeProvider? testRuntimeProvider,
+        string? runSettings, TestExecutionContext executionContext, IEnumerable<string>? inputPackages)
     {
-        if (TryCheckTestSourceDifferFromPackage(testRuntimeProvider, inputPackages, out IEnumerable<string> actualTestSources))
+        if (TryCheckTestSourceDifferFromPackage(testRuntimeProvider, inputPackages, out IEnumerable<string>? actualTestSources))
         {
             // In UWP scenario TestCase object contains the package as source, which is not actual test source for adapters,
             // so update test case before sending them.
@@ -51,10 +49,15 @@ internal static class TestRunCriteriaExtensions
         return new TestRunCriteriaWithTests(testRunCriteria.Tests, inputPackages?.FirstOrDefault(), runSettings, executionContext);
     }
 
-    private static bool TryCheckTestSourceDifferFromPackage(ITestRuntimeProvider testRuntimeProvider,
-        IEnumerable<string> inputPackages, out IEnumerable<string> actualTestSources)
+    private static bool TryCheckTestSourceDifferFromPackage(ITestRuntimeProvider? testRuntimeProvider,
+        IEnumerable<string>? inputPackages, [NotNullWhen(true)] out IEnumerable<string>? actualTestSources)
     {
-        actualTestSources = testRuntimeProvider.GetTestSources(inputPackages);
+        actualTestSources = testRuntimeProvider?.GetTestSources(inputPackages);
+
+        if (inputPackages is null || actualTestSources is null)
+        {
+            return false;
+        }
 
         // For netcore/fullclr both packages and sources are same thing,
         // For UWP the actual source(exe) differs from input source(.appxrecipe) which we call package.

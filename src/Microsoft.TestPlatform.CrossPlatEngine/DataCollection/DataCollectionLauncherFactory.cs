@@ -4,11 +4,8 @@
 using System;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
@@ -23,15 +20,16 @@ internal static class DataCollectionLauncherFactory
     /// <returns>
     /// The <see cref="IDataCollectionLauncher"/>.
     /// </returns>
-    internal static IDataCollectionLauncher GetDataCollectorLauncher(IProcessHelper processHelper, string settingsXml)
+    internal static IDataCollectionLauncher GetDataCollectorLauncher(IProcessHelper processHelper, string? settingsXml)
     {
         // Event log datacollector is built for .NET Framework and we need to load inside .NET Framework process.
-        if (!string.IsNullOrWhiteSpace(settingsXml))
+        if (!settingsXml.IsNullOrWhiteSpace())
         {
             var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settingsXml);
             foreach (var dataCollectorSettings in dataCollectionRunSettings.DataCollectorSettingsList)
             {
-                if (string.Equals(dataCollectorSettings.FriendlyName, "event Log", StringComparison.OrdinalIgnoreCase) || string.Equals(dataCollectorSettings.Uri?.ToString(), @"datacollector://Microsoft/EventLog/2.0", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(dataCollectorSettings.FriendlyName, "event Log", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(dataCollectorSettings.Uri?.ToString(), @"datacollector://Microsoft/EventLog/2.0", StringComparison.OrdinalIgnoreCase))
                 {
                     return new DefaultDataCollectionLauncher();
                 }
@@ -40,6 +38,7 @@ internal static class DataCollectionLauncherFactory
 
         // Target Framework of DataCollection process and Runner should be same.
         var currentProcessPath = processHelper.GetCurrentProcessFileName();
+        TPDebug.Assert(currentProcessPath is not null, "currentProcessPath is null");
 
         return currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)

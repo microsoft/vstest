@@ -65,7 +65,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
 
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
-        _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null);
+        _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null!);
 
         _mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>()), Times.Never);
     }
@@ -158,7 +158,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
             _mockTestHostManager.Setup(x => x.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>()))
                 .Returns(extensions);
 
-            _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null);
+            _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null!);
 
             // Also verify that we have waited for client connection.
             _mockRequestSender.Verify(s => s.InitializeExecution(extensions), Times.Once);
@@ -178,7 +178,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
             _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             _mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll", "c:\\e1.dll" });
 
-            _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null);
+            _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null!);
 
             _mockRequestSender.Verify(s => s.InitializeExecution(new[] { "he1.dll", "c:\\e1.dll" }), Times.Once);
         }
@@ -200,7 +200,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
             _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
-            _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null);
+            _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null!);
 
             _mockTestHostManager.Verify(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), expectedResult), Times.Once);
         }
@@ -228,7 +228,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
         _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
 
-        _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null);
+        _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null!);
 
         _mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
         _mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -262,7 +262,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
         _mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "x.dll" });
 
-        _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null);
+        _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null!);
 
         _mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>()), Times.Once);
     }
@@ -437,7 +437,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
             .Callback(
                 (TestRunCriteriaWithSources criteria, IInternalTestRunEventsHandler sink) => testRunCriteriaPassed = criteria);
 
-        _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null);
+        _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null!);
 
         Assert.IsNotNull(testRunCriteriaPassed);
         CollectionAssert.AreEqual(_mockTestRunCriteria.Object.AdapterSourceMap.Keys, testRunCriteriaPassed.AdapterSourceMap.Keys);
@@ -460,7 +460,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
             new List<TestCase> { new TestCase("A.C.M", new Uri("executor://dummy"), "source.dll") },
             10);
 
-        _testExecutionManager.StartTestRun(runCriteria.Object, null);
+        _testExecutionManager.StartTestRun(runCriteria.Object, null!);
 
         Assert.IsNotNull(testRunCriteriaPassed);
         CollectionAssert.AreEqual(runCriteria.Object.Tests.ToList(), testRunCriteriaPassed.Tests.ToList());
@@ -739,7 +739,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
                     string.Empty,
                     _mockRequestData.Object);
 
-                return proxyOperationManager;
+                return proxyOperationManager!;
             };
 
         var testExecutionManager = new ProxyExecutionManager(
@@ -807,7 +807,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
             var expectedResult = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);
 
             _testExecutionManager.Initialize(skipDefaultAdapters);
-            _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null);
+            _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null!);
 
             _mockRequestSender.Verify(s => s.InitializeExecution(expectedResult), Times.Once);
         }

@@ -22,8 +22,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 /// <summary>
@@ -32,10 +30,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 public class ExecutionManager : IExecutionManager
 {
     private readonly ITestPlatformEventSource _testPlatformEventSource;
-    private BaseRunTests _activeTestRun;
     private readonly IRequestData _requestData;
-    private readonly TestSessionMessageLogger _sessionMessageLogger;
-    private ITestMessageEventHandler _testMessageEventsHandler;
+    private readonly TestSessionMessageLogger? _sessionMessageLogger;
+    private BaseRunTests? _activeTestRun;
+    private ITestMessageEventHandler? _testMessageEventsHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
@@ -63,7 +61,7 @@ public class ExecutionManager : IExecutionManager
     /// Initializes the execution manager.
     /// </summary>
     /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-    public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestMessageEventHandler testMessageEventsHandler)
+    public void Initialize(IEnumerable<string>? pathToAdditionalExtensions, ITestMessageEventHandler testMessageEventsHandler)
     {
         // Clear the request data metrics left over from a potential previous run.
         _requestData.MetricsCollection?.Metrics?.Clear();
@@ -80,7 +78,10 @@ public class ExecutionManager : IExecutionManager
         LoadExtensions();
 
         //unsubscribe session logger
-        _sessionMessageLogger.TestRunMessage -= TestSessionMessageHandler;
+        if (_sessionMessageLogger is not null)
+        {
+            _sessionMessageLogger.TestRunMessage -= TestSessionMessageHandler;
+        }
 
         _testPlatformEventSource.AdapterSearchStop();
     }
@@ -96,15 +97,22 @@ public class ExecutionManager : IExecutionManager
     /// <param name="runEventsHandler"> EventHandler for handling execution events from Engine.  </param>
     public void StartTestRun(
         Dictionary<string, IEnumerable<string>> adapterSourceMap,
-        string package,
-        string runSettings,
+        string? package,
+        string? runSettings,
         TestExecutionContext testExecutionContext,
-        ITestCaseEventsHandler testCaseEventsHandler,
+        ITestCaseEventsHandler? testCaseEventsHandler,
         IInternalTestRunEventsHandler runEventsHandler)
     {
         try
         {
-            InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap));
+            if (testCaseEventsHandler is not ITestEventsPublisher testEventsPublisher)
+            {
+                runEventsHandler.HandleLogMessage(TestMessageLevel.Error, "testCaseEventsHandler is not of type ITestEventsPublisher");
+                Abort(runEventsHandler);
+                return;
+            }
+
+            InitializeDataCollectors(runSettings, testEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap!));
 
             _activeTestRun = new RunTestsWithSources(_requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
@@ -132,15 +140,22 @@ public class ExecutionManager : IExecutionManager
     /// <param name="runEventsHandler"> EventHandler for handling execution events from Engine. </param>
     public void StartTestRun(
         IEnumerable<TestCase> tests,
-        string package,
-        string runSettings,
+        string? package,
+        string? runSettings,
         TestExecutionContext testExecutionContext,
-        ITestCaseEventsHandler testCaseEventsHandler,
+        ITestCaseEventsHandler? testCaseEventsHandler,
         IInternalTestRunEventsHandler runEventsHandler)
     {
         try
         {
-            InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(tests));
+            if (testCaseEventsHandler is not ITestEventsPublisher testEventsPublisher)
+            {
+                runEventsHandler.HandleLogMessage(TestMessageLevel.Error, "testCaseEventsHandler is not of type ITestEventsPublisher");
+                Abort(runEventsHandler);
+                return;
+            }
+
+            InitializeDataCollectors(runSettings, testEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(tests));
 
             _activeTestRun = new RunTestsWithTests(_requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
@@ -190,7 +205,7 @@ public class ExecutionManager : IExecutionManager
     }
 
     #endregion
-    private void LoadExtensions()
+    private static void LoadExtensions()
     {
         try
         {
@@ -215,7 +230,7 @@ public class ExecutionManager : IExecutionManager
     /// <summary>
     /// Initializes out-proc and in-proc data collectors.
     /// </summary>
-    private void InitializeDataCollectors(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase)
+    private static void InitializeDataCollectors(string? runSettings, ITestEventsPublisher testEventsPublisher, string? defaultCodeBase)
     {
         // Initialize out-proc data collectors if declared in run settings.
         if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings))
@@ -230,7 +245,7 @@ public class ExecutionManager : IExecutionManager
         }
     }
 
-    private void TestSessionMessageHandler(object sender, TestRunMessageEventArgs e)
+    private void TestSessionMessageHandler(object? sender, TestRunMessageEventArgs e)
     {
         if (_testMessageEventsHandler != null)
         {

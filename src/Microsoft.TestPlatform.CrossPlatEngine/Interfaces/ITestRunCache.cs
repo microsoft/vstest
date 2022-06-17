@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 /// <summary>

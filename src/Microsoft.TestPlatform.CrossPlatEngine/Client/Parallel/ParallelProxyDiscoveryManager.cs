@@ -84,7 +84,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         var workloads = SplitToWorkloads(discoveryCriteria, _sourceToTestHostProviderMap);
         _availableTestSources = workloads.SelectMany(w => w.Work.Sources).Count();
         var runnableWorkloads = workloads.Where(workload => workload.HasProvider).ToList();
-        _availableWorkloads = runnableWorkloads.Count();
+        _availableWorkloads = runnableWorkloads.Count;
         var nonRunnableWorkloads = workloads.Where(workload => !workload.HasProvider).ToList();
 
         EqtTrace.Verbose("ParallelProxyDiscoveryManager.DiscoverTests: Start discovery. Total sources: " + _availableTestSources);
@@ -230,8 +230,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
 
             foreach (var sourcesToDiscover in sourceBatches)
             {
-                var runsettings = testhostProviderInfo.RunSettings;
-                var updatedCriteria = NewDiscoveryCriteriaFromSourceAndSettings(sourcesToDiscover, discoveryCriteria, runsettings);
+                var updatedCriteria = NewDiscoveryCriteriaFromSourceAndSettings(sourcesToDiscover, discoveryCriteria, testhostProviderInfo.RunSettings);
                 var workload = new ProviderSpecificWorkload<DiscoveryCriteria>(updatedCriteria, testhostProviderInfo);
                 workloads.Add(workload);
             }
@@ -239,7 +238,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
 
         return workloads;
 
-        static DiscoveryCriteria NewDiscoveryCriteriaFromSourceAndSettings(IEnumerable<string> sources, DiscoveryCriteria discoveryCriteria, string runsettingsXml)
+        static DiscoveryCriteria NewDiscoveryCriteriaFromSourceAndSettings(IEnumerable<string> sources, DiscoveryCriteria discoveryCriteria, string? runsettingsXml)
         {
             var criteria = new DiscoveryCriteria(
                 sources,
@@ -278,9 +277,10 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
                     EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
 
                     var handler = eventHandler;
-                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
+                    var exceptionToString = t.Exception?.ToString();
+                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exceptionToString };
                     handler.HandleRawMessage(_dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
-                    handler.HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
+                    handler.HandleLogMessage(TestMessageLevel.Error, exceptionToString);
 
                     // Send discovery complete. Similar logic is also used in ProxyDiscoveryManager.DiscoverTests.
                     // Differences:

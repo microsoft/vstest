@@ -89,19 +89,21 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
         try
         {
             // We need to save in case of attachements, we'll show these at the end on console.
-            if (testRunCompleteEventArgs?.AttachmentSets.Count > 0)
+            if ((testRunCompleteEventArgs?.AttachmentSets.Count) <= 0)
             {
-                EqtTrace.Verbose($"ArtifactProcessingManager.CollectArtifacts: Saving data collectors artifacts for post process into {_processArtifactFolder}");
-                Stopwatch watch = Stopwatch.StartNew();
-                TPDebug.Assert(_testSessionProcessArtifactFolder is not null, "_testSessionProcessArtifactFolder is null");
-                _fileHelper.CreateDirectory(_testSessionProcessArtifactFolder);
-                EqtTrace.Verbose($"ArtifactProcessingManager.CollectArtifacts: Persist runsettings \n{runSettingsXml}");
-                _fileHelper.WriteAllTextToFile(Path.Combine(_testSessionProcessArtifactFolder, RunsettingsFileName), runSettingsXml);
-                var serializedExecutionComplete = _dataSerialized.SerializePayload(MessageType.ExecutionComplete, testRunCompleteEventArgs);
-                EqtTrace.Verbose($"ArtifactProcessingManager.CollectArtifacts: Persist ExecutionComplete message \n{serializedExecutionComplete}");
-                _fileHelper.WriteAllTextToFile(Path.Combine(_testSessionProcessArtifactFolder, ExecutionCompleteFileName), serializedExecutionComplete);
-                EqtTrace.Verbose($"ArtifactProcessingManager.CollectArtifacts: Artifacts saved in {watch.Elapsed}");
+                return;
             }
+
+            EqtTrace.Verbose($"ArtifactProcessingManager.CollectArtifacts: Saving data collectors artifacts for post process into {_processArtifactFolder}");
+            Stopwatch watch = Stopwatch.StartNew();
+            TPDebug.Assert(_testSessionProcessArtifactFolder is not null, "_testSessionProcessArtifactFolder is null");
+            _fileHelper.CreateDirectory(_testSessionProcessArtifactFolder);
+            EqtTrace.Verbose($"ArtifactProcessingManager.CollectArtifacts: Persist runsettings \n{runSettingsXml}");
+            _fileHelper.WriteAllTextToFile(Path.Combine(_testSessionProcessArtifactFolder, RunsettingsFileName), runSettingsXml);
+            var serializedExecutionComplete = _dataSerialized.SerializePayload(MessageType.ExecutionComplete, testRunCompleteEventArgs);
+            EqtTrace.Verbose($"ArtifactProcessingManager.CollectArtifacts: Persist ExecutionComplete message \n{serializedExecutionComplete}");
+            _fileHelper.WriteAllTextToFile(Path.Combine(_testSessionProcessArtifactFolder, ExecutionCompleteFileName), serializedExecutionComplete);
+            EqtTrace.Verbose($"ArtifactProcessingManager.CollectArtifacts: Artifacts saved in {watch.Elapsed}");
         }
         catch (Exception e)
         {
@@ -213,7 +215,6 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
             _testRunAttachmentsProcessingEventsHandler,
             CancellationToken.None);
     }
-
 
     private TestArtifacts[] LoadTestArtifacts()
     {

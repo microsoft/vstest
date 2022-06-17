@@ -18,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 
 /// <summary>
@@ -44,7 +42,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
     }
 
     /// <inheritdoc/>
-    public async Task ProcessTestRunAttachmentsAsync(string runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
+    public async Task ProcessTestRunAttachmentsAsync(string? runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
     {
         await InternalProcessTestRunAttachmentsAsync(runSettingsXml, requestData, new Collection<AttachmentSet>(attachments.ToList()), invokedDataCollector, eventHandler, cancellationToken).ConfigureAwait(false);
     }
@@ -54,27 +52,29 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         return InternalProcessTestRunAttachmentsAsync(runSettingsXml, requestData, new Collection<AttachmentSet>(attachments.ToList()), invokedDataCollector, null, cancellationToken);
     }
 
-    private async Task<Collection<AttachmentSet>> InternalProcessTestRunAttachmentsAsync(string runSettingsXml, IRequestData requestData, Collection<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
+    private async Task<Collection<AttachmentSet>> InternalProcessTestRunAttachmentsAsync(string? runSettingsXml, IRequestData requestData, Collection<AttachmentSet>? attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler? eventHandler, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
+        attachments = attachments is not null ? new(attachments) : new();
 
         try
         {
-            _testPlatformEventSource.TestRunAttachmentsProcessingStart(attachments?.Count ?? 0);
-            requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing, attachments?.Count ?? 0);
+            _testPlatformEventSource.TestRunAttachmentsProcessingStart(attachments.Count);
+            requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing, attachments.Count);
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var cancelAttachmentProcessingCompletionSource = new TaskCompletionSource<Collection<AttachmentSet>>();
+            var cancelAttachmentProcessingCompletionSource = new TaskCompletionSource<Collection<AttachmentSet>?>();
             using (cancellationToken.Register(() => cancelAttachmentProcessingCompletionSource.TrySetCanceled()))
             {
-                Task<Collection<AttachmentSet>> task = Task.Run(async () => await ProcessAttachmentsAsync(runSettingsXml, new Collection<AttachmentSet>(attachments.ToList()), invokedDataCollector, eventHandler, cancellationToken));
+                Task<Collection<AttachmentSet>?> task = Task.Run(async () => await ProcessAttachmentsAsync(runSettingsXml, attachments, invokedDataCollector, eventHandler, cancellationToken));
 
                 var completedTask = await Task.WhenAny(task, cancelAttachmentProcessingCompletionSource.Task).ConfigureAwait(false);
 
                 if (completedTask == task)
                 {
-                    return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(false, null), await task, stopwatch, eventHandler);
+                    var result = await task;
+                    return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(false, null), result!, stopwatch, eventHandler);
                 }
                 else
                 {
@@ -104,9 +104,10 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         }
     }
 
-    private async Task<Collection<AttachmentSet>> ProcessAttachmentsAsync(string runSettingsXml, Collection<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventsHandler, CancellationToken cancellationToken)
+    private async Task<Collection<AttachmentSet>?> ProcessAttachmentsAsync(string? runSettingsXml, Collection<AttachmentSet>? attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler? eventsHandler, CancellationToken cancellationToken)
     {
-        if (attachments == null || !attachments.Any()) return attachments;
+        if (attachments is null || !attachments.Any()) return attachments;
+
         var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(runSettingsXml);
 
         var logger = CreateMessageLogger(eventsHandler);
@@ -126,15 +127,17 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
             }
 
             // We run processor code inside a try/catch because we want to continue with the others in case of failure.
-            Collection<AttachmentSet> attachmentsBackup = null;
+            Collection<AttachmentSet>? attachmentsBackup = null;
             try
             {
+                // Null dataflow seems confused about attachments nullability
+                TPDebug.Assert(attachments is not null, "attachments is not null");
                 // We temporarily save the attachments to process because, in case of processor exception,
                 // we'll restore the attachmentSets to make those available to other processors.
                 // NB. attachments.ToList() is done on purpose we need a new ref list.
                 attachmentsBackup = new Collection<AttachmentSet>(attachments.ToList());
 
-                ICollection<Uri> attachmentProcessorUris = dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetExtensionUris()?.ToList();
+                ICollection<Uri>? attachmentProcessorUris = dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetExtensionUris()?.ToList();
                 if (attachmentProcessorUris != null && attachmentProcessorUris.Any())
                 {
                     var attachmentsToBeProcessed = attachments.Where(dataCollectionAttachment => attachmentProcessorUris.Any(uri => uri.Equals(dataCollectionAttachment.Uri))).ToArray();
@@ -149,7 +152,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
                             eventsHandler?.HandleTestRunAttachmentsProcessingProgress(
                                 new TestRunAttachmentsProcessingProgressEventArgs(attachmentsHandlerIndex, attachmentProcessorUris, progress, dataCollectorAttachmentsProcessors.Length)));
 
-                        XmlElement configuration = null;
+                        XmlElement? configuration = null;
                         var collectorConfiguration = dataCollectionRunSettings?.DataCollectorSettingsList.SingleOrDefault(c => c.FriendlyName == dataCollectorAttachmentsProcessor.FriendlyName);
                         if (collectorConfiguration != null && collectorConfiguration.IsEnabled)
                         {
@@ -194,7 +197,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         return attachments;
     }
 
-    private Collection<AttachmentSet> FinalizeOperation(IRequestData requestData, TestRunAttachmentsProcessingCompleteEventArgs completeArgs, Collection<AttachmentSet> attachments, Stopwatch stopwatch, ITestRunAttachmentsProcessingEventsHandler eventHandler)
+    private Collection<AttachmentSet> FinalizeOperation(IRequestData requestData, TestRunAttachmentsProcessingCompleteEventArgs completeArgs, Collection<AttachmentSet> attachments, Stopwatch stopwatch, ITestRunAttachmentsProcessingEventsHandler? eventHandler)
     {
         _testPlatformEventSource.TestRunAttachmentsProcessingStop(attachments.Count);
         requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsAfterProcessing, attachments.Count);
@@ -209,9 +212,9 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         return attachments;
     }
 
-    private IMessageLogger CreateMessageLogger(ITestRunAttachmentsProcessingEventsHandler eventsHandler)
+    private static IMessageLogger CreateMessageLogger(ITestRunAttachmentsProcessingEventsHandler? eventsHandler)
     {
-        return eventsHandler != null ? (IMessageLogger)new AttachmentsProcessingMessageLogger(eventsHandler) : new NullMessageLogger();
+        return eventsHandler != null ? new AttachmentsProcessingMessageLogger(eventsHandler) : new NullMessageLogger();
     }
 
     private class AttachmentsProcessingMessageLogger : IMessageLogger

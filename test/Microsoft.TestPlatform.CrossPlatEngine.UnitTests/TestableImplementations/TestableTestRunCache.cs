@@ -16,6 +16,9 @@ public sealed class TestableTestRunCache : ITestRunCache
         TestStartedList = new List<TestCase>();
         TestCompletedList = new List<TestCase>();
         TestResultList = new List<TestResult>();
+        TestResults = null!;
+        InProgressTests = null!;
+        TestRunStatistics = null!;
     }
 
     // use the below three to fill in data to the testable cache.
@@ -25,13 +28,13 @@ public sealed class TestableTestRunCache : ITestRunCache
 
     public List<TestResult> TestResultList { get; private set; }
 
-    public ICollection<TestCase>? InProgressTests { get; set; }
+    public ICollection<TestCase> InProgressTests { get; set; }
 
 
     // Use the TestResultList instead to fill in data. This is just to avoid confusion.
-    public ICollection<TestResult>? TestResults { get; set; }
+    public ICollection<TestResult> TestResults { get; set; }
 
-    public TestRunStatistics? TestRunStatistics { get; set; }
+    public TestRunStatistics TestRunStatistics { get; set; }
 
     public long TotalExecutedTests { get; set; }
 

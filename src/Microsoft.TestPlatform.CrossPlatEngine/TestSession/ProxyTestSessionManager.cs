@@ -18,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 /// <summary>
@@ -40,23 +38,22 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     private volatile bool _proxySetupFailed;
     private readonly StartTestSessionCriteria _testSessionCriteria;
     private readonly int _maxTesthostCount;
-    private TestSessionInfo _testSessionInfo;
-    private readonly Func<TestRuntimeProviderInfo, ProxyOperationManager> _proxyCreator;
+    private TestSessionInfo? _testSessionInfo;
+    private readonly Func<TestRuntimeProviderInfo, ProxyOperationManager?> _proxyCreator;
     private readonly List<TestRuntimeProviderInfo> _runtimeProviders;
     private readonly IList<ProxyOperationManagerContainer> _proxyContainerList;
     private readonly IDictionary<string, int> _proxyMap;
     private readonly Stopwatch _testSessionStopwatch;
     private readonly Dictionary<string, TestRuntimeProviderInfo> _sourceToRuntimeProviderInfoMap;
-    private IDictionary<string, string> _testSessionEnvironmentVariables = new Dictionary<string, string>();
+    private Dictionary<string, string?> _testSessionEnvironmentVariables = new();
 
-    private IDictionary<string, string> TestSessionEnvironmentVariables
+    private IDictionary<string, string?> TestSessionEnvironmentVariables
     {
         get
         {
             if (_testSessionEnvironmentVariables.Count == 0)
             {
-                _testSessionEnvironmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(
-                        _testSessionCriteria.RunSettings)
+                _testSessionEnvironmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(_testSessionCriteria.RunSettings)
                     ?? _testSessionEnvironmentVariables;
             }
 
@@ -74,7 +71,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     public ProxyTestSessionManager(
         StartTestSessionCriteria criteria,
         int maxTesthostCount,
-        Func<TestRuntimeProviderInfo, ProxyOperationManager> proxyCreator,
+        Func<TestRuntimeProviderInfo, ProxyOperationManager?> proxyCreator,
         List<TestRuntimeProviderInfo> runtimeProviders)
     {
         _testSessionCriteria = criteria;
@@ -231,9 +228,9 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     /// <param name="runSettings">The run settings.</param>
     ///
     /// <returns>The dequeued proxy.</returns>
-    public virtual ProxyOperationManager DequeueProxy(string source, string runSettings)
+    public virtual ProxyOperationManager DequeueProxy(string source, string? runSettings)
     {
-        ProxyOperationManagerContainer proxyContainer = null;
+        ProxyOperationManagerContainer? proxyContainer = null;
 
         lock (_proxyOperationLockObject)
         {
@@ -404,7 +401,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         }
     }
 
-    private bool CheckRunSettingsAreCompatible(string requestRunSettings)
+    private bool CheckRunSettingsAreCompatible(string? requestRunSettings)
     {
         // Environment variable sets should be identical, otherwise it's not safe to reuse the
         // already running testhosts.

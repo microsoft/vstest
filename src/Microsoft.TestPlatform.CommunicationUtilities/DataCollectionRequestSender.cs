@@ -98,7 +98,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     }
 
     /// <inheritdoc/>
-    public BeforeTestRunStartResult? SendBeforeTestRunStartAndGetResult(string settingsXml, IEnumerable<string> sources, bool isTelemetryOptedIn, ITestMessageEventHandler? runEventsHandler)
+    public BeforeTestRunStartResult? SendBeforeTestRunStartAndGetResult(string? settingsXml, IEnumerable<string> sources, bool isTelemetryOptedIn, ITestMessageEventHandler? runEventsHandler)
     {
         var isDataCollectionStarted = false;
         BeforeTestRunStartResult? result = null;

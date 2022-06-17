@@ -16,15 +16,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 internal static class StringUtils
 {
-    /// <inheritdoc cref="string.IsNullOrEmpty(string)"/>
+    /// <inheritdoc cref="StringUtils.IsNullOrEmpty(string)"/>
     [SuppressMessage("ApiDesign", "RS0030:Do not used banned APIs", Justification = "Replacement API to allow nullable hints for compiler")]
     public static bool IsNullOrEmpty([NotNullWhen(returnValue: false)] this string? value)
-        => string.IsNullOrEmpty(value);
+        => StringUtils.IsNullOrEmpty(value);
 
-    /// <inheritdoc cref="string.IsNullOrWhiteSpace(string)"/>
+    /// <inheritdoc cref="StringUtils.IsNullOrWhiteSpace(string)"/>
     [SuppressMessage("ApiDesign", "RS0030:Do not used banned APIs", Justification = "Replacement API to allow nullable hints for compiler")]
     public static bool IsNullOrWhiteSpace([NotNullWhen(returnValue: false)] this string? value)
-        => string.IsNullOrWhiteSpace(value);
+        => StringUtils.IsNullOrWhiteSpace(value);
 }
 
 [SuppressMessage("ApiDesign", "RS0030:Do not used banned APIs", Justification = "Replacement API to allow nullable hints for compiler")]

@@ -4,10 +4,7 @@
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 

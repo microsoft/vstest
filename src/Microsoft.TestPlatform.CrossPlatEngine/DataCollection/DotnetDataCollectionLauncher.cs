@@ -14,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
@@ -61,15 +59,17 @@ internal class DotnetDataCollectionLauncher : DataCollectionLauncher
     /// <param name="environmentVariables">Environment variables for the process.</param>
     /// <param name="commandLineArguments">The command line arguments to pass to the process.</param>
     /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
-    public override int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
+    public override int LaunchDataCollector(IDictionary<string, string>? environmentVariables, IList<string> commandLineArguments)
     {
         var dataCollectorDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
+        TPDebug.Assert(dataCollectorDirectory is not null, "dataCollectorDirectory is null");
+
         var currentProcessFileName = _processHelper.GetCurrentProcessFileName();
+        TPDebug.Assert(currentProcessFileName is not null, "currentProcessFileName is null");
 
         EqtTrace.Verbose("DotnetDataCollectionLauncher: Full path of dotnet.exe is {0}", currentProcessFileName);
 
         var dataCollectorAssemblyPath = Path.Combine(dataCollectorDirectory, DataCollectorProcessName);
-
         string dataCollectorFileName = Path.GetFileNameWithoutExtension(dataCollectorAssemblyPath);
 
         var args = "exec";

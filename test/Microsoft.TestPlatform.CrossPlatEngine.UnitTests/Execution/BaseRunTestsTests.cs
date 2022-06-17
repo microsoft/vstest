@@ -952,7 +952,7 @@ public class BaseRunTestsTests
         /// <summary>
         /// Gets the run settings.
         /// </summary>
-        public string GetRunSettings => RunSettings;
+        public string? GetRunSettings => RunSettings;
 
         /// <summary>
         /// Gets the test execution context.
@@ -982,9 +982,9 @@ public class BaseRunTestsTests
             BeforeRaisingTestRunCompleteCallback?.Invoke(exceptionsHitDuringRunTests);
         }
 
-        protected override IEnumerable<Tuple<Uri, string>>? GetExecutorUriExtensionMap(IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext)
+        protected override IEnumerable<Tuple<Uri, string>> GetExecutorUriExtensionMap(IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext)
         {
-            return GetExecutorUriExtensionMapCallback?.Invoke(testExecutorFrameworkHandle, runContext);
+            return GetExecutorUriExtensionMapCallback?.Invoke(testExecutorFrameworkHandle, runContext) ?? Enumerable.Empty<Tuple<Uri, string>>();
         }
 
         protected override void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle)

@@ -41,7 +41,7 @@ public class InProcDataCollectorTests
         _inProcDataCollector = new InProcDataCollector(
             string.Empty,
             string.Empty,
-            null,
+            null!,
             string.Empty,
             _assemblyLoadContext.Object,
             TestPluginCache.Instance);
@@ -58,7 +58,7 @@ public class InProcDataCollectorTests
         _inProcDataCollector = new InProcDataCollector(
             string.Empty,
             string.Empty,
-            null,
+            null!,
             string.Empty,
             _assemblyLoadContext.Object,
             TestPluginCache.Instance);
@@ -76,7 +76,7 @@ public class InProcDataCollectorTests
 
         _inProcDataCollector = new InProcDataCollector(
             string.Empty,
-            typeInfo.AssemblyQualifiedName,
+            typeInfo.AssemblyQualifiedName!,
             typeInfo,
             string.Empty,
             _assemblyLoadContext.Object,

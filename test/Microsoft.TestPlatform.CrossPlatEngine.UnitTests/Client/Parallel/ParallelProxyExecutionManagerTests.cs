@@ -189,7 +189,7 @@ public class ParallelProxyExecutionManagerTests
 
         // act
         // Tell the manager that completedManager finished work, and that it should progress to next work
-        parallelExecutionManager.HandlePartialRunComplete(completedManager.Object, completeArgs, null, null, null);
+        parallelExecutionManager.HandlePartialRunComplete(completedManager.Object, completeArgs, null!, null!, null!);
 
         // assert
         // We created 2 managers 1 for the original work and another one

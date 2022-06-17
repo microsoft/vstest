@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 
 internal static class SourceDetailHelper
 {
-    internal static string UpdateRunSettingsFromSourceDetail(string runSettings, SourceDetail sourceDetail)
+    internal static string? UpdateRunSettingsFromSourceDetail(string runSettings, SourceDetail sourceDetail)
     {
         using var stream = new StringReader(runSettings);
         using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
@@ -23,7 +23,7 @@ internal static class SourceDetailHelper
         InferRunSettingsHelper.UpdateTargetFramework(document, sourceDetail.Framework.ToString(), overwrite: true);
         InferRunSettingsHelper.UpdateTargetPlatform(document, sourceDetail.Architecture.ToString(), overwrite: true);
 
-        var updatedRunSettings = navigator.OuterXml;
+        var updatedRunSettings = navigator?.OuterXml;
         return updatedRunSettings;
     }
 }

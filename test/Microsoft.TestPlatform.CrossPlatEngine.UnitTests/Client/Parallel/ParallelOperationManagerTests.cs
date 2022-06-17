@@ -25,7 +25,7 @@ public class ParallelOperationManagerTests
 
         // Create more workloads than our parallel level so we can observe that the maximum parallel level is reached but not more
         var workloads = Enumerable.Range(1, maxParallelLevel + 2)
-            .Select(i => new ProviderSpecificWorkload<SampleWorkload>(new SampleWorkload { Id = i }, provider: null))
+            .Select(i => new ProviderSpecificWorkload<SampleWorkload>(new SampleWorkload { Id = i }, provider: null!))
             .ToList();
         var eventHandler = new SampleHandler();
 
@@ -75,7 +75,7 @@ public class ParallelOperationManagerTests
 
         // Create less workloads than our parallel level so we can observe that only as many slots are created as there are workloads.
         var workloads = Enumerable.Range(1, 2)
-            .Select(i => new ProviderSpecificWorkload<SampleWorkload>(new SampleWorkload { Id = i }, provider: null))
+            .Select(i => new ProviderSpecificWorkload<SampleWorkload>(new SampleWorkload { Id = i }, provider: null!))
             .ToList();
         var eventHandler = new SampleHandler();
 
@@ -109,7 +109,7 @@ public class ParallelOperationManagerTests
 
         // Create less workloads than our parallel level so we can observe that only as many slots are created as there are workloads.
         var workloads = Enumerable.Range(1, 2)
-            .Select(i => new ProviderSpecificWorkload<SampleWorkload>(new SampleWorkload { Id = i }, provider: null))
+            .Select(i => new ProviderSpecificWorkload<SampleWorkload>(new SampleWorkload { Id = i }, provider: null!))
             .ToList();
         var eventHandler = new SampleHandler();
 
@@ -148,7 +148,7 @@ public class ParallelOperationManagerTests
         // Create more workloads than our parallel level so we can observe that when one workload is finished, calling RunNextWork will move on
         // to the next workload.
         var workloads = Enumerable.Range(1, maxParallelLevel + 3)
-            .Select(i => new ProviderSpecificWorkload<SampleWorkload>(new SampleWorkload { Id = i }, provider: null))
+            .Select(i => new ProviderSpecificWorkload<SampleWorkload>(new SampleWorkload { Id = i }, provider: null!))
             .ToList();
         var eventHandler = new SampleHandler();
 
@@ -197,7 +197,7 @@ public class ParallelOperationManagerTests
         // Create more workloads than the parallel level so we can go past max parallel level of active workers and simulate that we
         // are aborting in the middle of a run.
         var workloads = Enumerable.Range(1, maxParallelLevel + 3)
-            .Select(i => new ProviderSpecificWorkload<SampleWorkload>(new SampleWorkload { Id = i }, provider: null))
+            .Select(i => new ProviderSpecificWorkload<SampleWorkload>(new SampleWorkload { Id = i }, provider: null!))
             .ToList();
 
         var parallelOperationManager = new ParallelOperationManager<SampleManager, SampleHandler, SampleWorkload>(createNewManager, maxParallelLevel);

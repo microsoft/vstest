@@ -47,7 +47,7 @@ public class DataCollectionTestRunEventsHandlerTests
     public void HandleRawMessageShouldSendMessageToBaseTestRunEventsHandler()
     {
         _mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.BeforeTestRunStart });
-        _testRunEventHandler.HandleRawMessage(null);
+        _testRunEventHandler.HandleRawMessage(null!);
         _baseTestRunEventsHandler.Verify(th => th.HandleRawMessage(null), Times.AtLeast(1));
     }
 

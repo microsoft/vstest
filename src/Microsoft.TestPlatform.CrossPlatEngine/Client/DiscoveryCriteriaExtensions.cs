@@ -7,8 +7,6 @@ using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 internal static class DiscoveryCriteriaExtensions
