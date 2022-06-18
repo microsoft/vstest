@@ -220,12 +220,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NoSuitableRuntimeProviderFound" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[No suitable test runtime provider was found:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[적합한 테스트 런타임 공급자를 찾을 수 없습니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NoTestHostProviderFound" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[No suitable test runtime provider found for this run.]]></Val>
+          <Val><![CDATA[No suitable test runtime provider was found for any source in this run.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[이 실행에 적합한 테스트 런타임 공급자를 찾지 못했습니다.]]></Val>
+            <Val><![CDATA[이 실행에서 원본에 적합한 테스트 런타임 공급자를 찾을 수 없습니다.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[No suitable test runtime provider found for this run.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -270,6 +282,15 @@
           <Val><![CDATA[Proxy with id {0} is already available and cannot be re-enqueued.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[ID가 {0}인 프록시를 이미 사용할 수 있으며 큐에 다시 넣을 수 없습니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";SkippingSource" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Skipping source:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[원본을 건너뛰는 중:]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

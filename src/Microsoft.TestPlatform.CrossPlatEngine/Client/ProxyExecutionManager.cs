@@ -40,6 +40,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
 
     private readonly IFileHelper _fileHelper;
     private readonly IDataSerializer _dataSerializer;
+    private List<string> _testSources;
     private bool _isCommunicationEstablished;
 
     private ProxyOperationManager _proxyOperationManager;
@@ -172,21 +173,21 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
         {
             EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
 
-            var testSources = new List<string>(
+            _testSources = new List<string>(
                 testRunCriteria.HasSpecificSources
                 ? testRunCriteria.Sources
                 // If the test execution is with a test filter, group them by sources.
                 : testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
 
             _isCommunicationEstablished = _proxyOperationManager.SetupChannel(
-                testSources,
+                _testSources,
                 testRunCriteria.TestRunSettings);
 
             if (_isCommunicationEstablished)
             {
                 _proxyOperationManager.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
 
-                InitializeExtensions(testSources);
+                InitializeExtensions(_testSources);
 
                 // This code should be in sync with InProcessProxyExecutionManager.StartTestRun
                 // execution context.
@@ -218,7 +219,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
                         _testHostManager,
                         runsettings,
                         executionContext,
-                        testSources);
+                        _testSources);
                     _proxyOperationManager.RequestSender.StartTestRun(runRequest, this);
                 }
                 else
@@ -227,7 +228,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
                         _testHostManager,
                         runsettings,
                         executionContext,
-                        testSources);
+                        _testSources);
                     _proxyOperationManager.RequestSender.StartTestRun(runRequest, this);
                 }
             }
@@ -347,10 +348,15 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
         // TestHost did not provide any additional TargetFramework info for the process it wants to attach to,
         // specify the TargetFramework of the testhost, in case it is just an old testhost that is not aware
         // of this capability.
-        if (attachDebuggerInfo.TargetFramework == default(string))
+        if (attachDebuggerInfo.TargetFramework is null)
         {
             attachDebuggerInfo.TargetFramework = _proxyOperationManager.TestHostManagerFramework.ToString();
         };
+
+        if (attachDebuggerInfo.Sources is null || !attachDebuggerInfo.Sources.Any())
+        {
+            attachDebuggerInfo.Sources = _testSources;
+        }
 
         return _baseTestRunEventsHandler.AttachDebuggerToProcess(attachDebuggerInfo);
     }

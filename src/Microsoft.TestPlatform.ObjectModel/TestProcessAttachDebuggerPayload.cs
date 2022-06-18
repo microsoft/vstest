@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -43,4 +45,7 @@ public class EditorAttachDebuggerPayload
 
     [DataMember]
     public string? TargetFramework { get; set; }
+
+    [DataMember]
+    public ICollection<string>? Sources { get; set; }
 }

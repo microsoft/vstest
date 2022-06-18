@@ -24,6 +24,9 @@
     <AdditionalFiles Include="BannedSymbols.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.Extensions.HtmlLogger\Microsoft.TestPlatform.Extensions.HtmlLogger.csproj" />
     <ProjectReference Include="$(TestPlatformRoot)test\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />
   </ItemGroup>

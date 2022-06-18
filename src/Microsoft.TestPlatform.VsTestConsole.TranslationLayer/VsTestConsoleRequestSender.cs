@@ -1447,7 +1447,13 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 switch (customHostLauncher)
                 {
                     case ITestHostLauncher3 launcher3:
-                        ackPayload.Attached = launcher3.AttachDebuggerToProcess(new AttachDebuggerInfo { ProcessId = attachDebuggerPayload.ProcessID, TargetFramework = attachDebuggerPayload.TargetFramework }, CancellationToken.None);
+                        var attachDebuggerInfo = new AttachDebuggerInfo
+                        {
+                            ProcessId = attachDebuggerPayload.ProcessID,
+                            TargetFramework = attachDebuggerPayload.TargetFramework,
+                            Sources = attachDebuggerPayload.Sources,
+                        };
+                        ackPayload.Attached = launcher3.AttachDebuggerToProcess(attachDebuggerInfo, CancellationToken.None);
                         break;
                     case ITestHostLauncher2 launcher2:
                         ackPayload.Attached = launcher2.AttachDebuggerToProcess(attachDebuggerPayload.ProcessID);

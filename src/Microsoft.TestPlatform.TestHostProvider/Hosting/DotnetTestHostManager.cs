@@ -434,7 +434,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 }
 
                 PlatformArchitecture finalTargetArchitecture = forceToX64 ? PlatformArchitecture.X64 : targetArchitecture;
-                if (!_dotnetHostHelper.TryGetDotnetPathByArchitecture(finalTargetArchitecture, out string muxerPath))
+                if (!_dotnetHostHelper.TryGetDotnetPathByArchitecture(finalTargetArchitecture, out string? muxerPath))
                 {
                     string message = string.Format(Resources.NoDotnetMuxerFoundForArchitecture, $"dotnet{(_platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : string.Empty)}", finalTargetArchitecture.ToString());
                     EqtTrace.Error(message);
@@ -748,7 +748,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             return false;
         }
 
-        DefaultTestHostManager.SetProcessPriority(_testHostProcess, _environmentVariableHelper);
+        DefaultTestHostManager.AdjustProcessPriorityBasedOnSettings(_testHostProcess, testHostStartInfo.EnvironmentVariables);
         OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
         return true;
     }

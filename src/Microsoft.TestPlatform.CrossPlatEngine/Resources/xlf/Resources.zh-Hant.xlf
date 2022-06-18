@@ -159,7 +159,7 @@
       </trans-unit>
       <trans-unit id="NoTestHostProviderFound">
         <source>No suitable test runtime provider was found for any source in this run.</source>
-        <target state="new">No suitable test runtime provider was found for any source in this run.</target>
+        <target state="translated">在此回合的任何來源中，找不到適合的測試執行階段提供者。</target>
         <note></note>
       </trans-unit>
       <trans-unit id="NoProxyMatchesDescription">
@@ -179,12 +179,12 @@
       </trans-unit>
       <trans-unit id="NoSuitableRuntimeProviderFound">
         <source>No suitable test runtime provider was found:</source>
-        <target state="new">No suitable test runtime provider was found:</target>
+        <target state="translated">找不到適合的測試執行階段提供者:</target>
         <note></note>
       </trans-unit>
       <trans-unit id="SkippingSource">
         <source>Skipping source:</source>
-        <target state="new">Skipping source:</target>
+        <target state="translated">正在略過來源:</target>
         <note></note>
       </trans-unit>
     </body>
