@@ -878,7 +878,7 @@ public class TestRunAttachmentsProcessingManagerTests
     private void VerifyCompleteEvent(bool isCanceled, bool containsError, params AttachmentSet[] expectedSets)
     {
         _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingComplete(
-            It.Is<TestRunAttachmentsProcessingCompleteEventArgs>(a => a.IsCanceled == isCanceled && (a.Error != null) == containsError),
+            It.Is<TestRunAttachmentsProcessingCompleteEventArgs>(a => a.IsCanceled == isCanceled && a.Error != null == containsError),
             It.Is<ICollection<AttachmentSet>>(c => c.Count == expectedSets.Length && expectedSets.All(e => c.Contains(e)))));
     }
 

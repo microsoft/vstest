@@ -196,8 +196,7 @@ internal abstract class BaseRunTests
     {
         using (TestRunCache)
         {
-            TimeSpan elapsedTime = TimeSpan.Zero;
-
+            TimeSpan? elapsedTime = null;
             Exception? exception = null;
             bool isAborted = false;
             bool shutdownAfterRun = false;
@@ -208,9 +207,16 @@ internal abstract class BaseRunTests
                 SendSessionStart();
 
                 elapsedTime = RunTestsInternal();
-
-                // Check the adapter setting for shutting down this process after run
-                shutdownAfterRun = FrameworkHandle.EnableShutdownAfterTestRun;
+                if (elapsedTime is null)
+                {
+                    EqtTrace.Error("BaseRunTests.RunTests: Failed to run the tests. Reason: GetExecutorUriExtensionMap returned null.");
+                    isAborted = true;
+                }
+                else
+                {
+                    // Check the adapter setting for shutting down this process after run
+                    shutdownAfterRun = FrameworkHandle.EnableShutdownAfterTestRun;
+                }
             }
             catch (Exception ex)
             {
@@ -227,7 +233,7 @@ internal abstract class BaseRunTests
                 try
                 {
                     // Send the test run complete event.
-                    RaiseTestRunComplete(exception, _isCancellationRequested, isAborted, elapsedTime);
+                    RaiseTestRunComplete(exception, _isCancellationRequested, isAborted, elapsedTime ?? TimeSpan.Zero);
                 }
                 catch (Exception ex2)
                 {
@@ -271,7 +277,7 @@ internal abstract class BaseRunTests
 
     protected abstract void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests);
 
-    protected abstract IEnumerable<Tuple<Uri, string>> GetExecutorUriExtensionMap(
+    protected abstract IEnumerable<Tuple<Uri, string>>? GetExecutorUriExtensionMap(
         IFrameworkHandle testExecutorFrameworkHandle,
         RunContext runContext);
 
@@ -316,18 +322,25 @@ internal abstract class BaseRunTests
         TestRunEventsHandler.HandleLogMessage(e.Level, e.Message);
     }
 
-    private TimeSpan RunTestsInternal()
+    private TimeSpan? RunTestsInternal()
     {
         long totalTests = 0;
-
-        var executorUriExtensionMap = GetExecutorUriExtensionMap(FrameworkHandle, RunContext);
 
         // Set on the logger the TreatAdapterErrorAsWarning setting from runsettings.
         SetAdapterLoggingSettings();
 
+        var executorUriExtensionMap = GetExecutorUriExtensionMap(FrameworkHandle, RunContext);
+
         var stopwatch = new Stopwatch();
         stopwatch.Start();
+
         _testPlatformEventSource.ExecutionStart();
+
+        if (executorUriExtensionMap is null)
+        {
+            return null;
+        }
+
         var exceptionsHitDuringRunTests = RunTestInternalWithExecutors(
             executorUriExtensionMap,
             totalTests);
@@ -341,11 +354,12 @@ internal abstract class BaseRunTests
     private bool RunTestInternalWithExecutors(IEnumerable<Tuple<Uri, string>> executorUriExtensionMap, long totalTests)
     {
         // Collecting Total Number of Adapters Discovered in Machine.
-        _requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, executorUriExtensionMap.Count());
+        var executorUriExtensionMapList = executorUriExtensionMap as IList<Tuple<Uri, string>> ?? executorUriExtensionMap.ToList();
+        _requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, executorUriExtensionMapList.Count);
 
         var attachedToTestHost = false;
         var executorCache = new Dictionary<string, LazyExtension<ITestExecutor, ITestExecutorCapabilities>>();
-        foreach (var executorUriExtensionTuple in executorUriExtensionMap)
+        foreach (var executorUriExtensionTuple in executorUriExtensionMapList)
         {
             // Avoid processing the same executor twice.
             if (executorCache.ContainsKey(executorUriExtensionTuple.Item1.AbsoluteUri))
@@ -415,7 +429,7 @@ internal abstract class BaseRunTests
         var executorsFromDeprecatedLocations = false;
         double totalTimeTakenByAdapters = 0;
 
-        foreach (var executorUriExtensionTuple in executorUriExtensionMap)
+        foreach (var executorUriExtensionTuple in executorUriExtensionMapList)
         {
             var executorUri = executorUriExtensionTuple.Item1.AbsoluteUri;
             // Get the executor from the cache.
