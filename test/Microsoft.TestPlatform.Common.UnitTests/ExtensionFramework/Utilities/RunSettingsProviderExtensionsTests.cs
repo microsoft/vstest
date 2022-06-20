@@ -34,21 +34,21 @@ public class RunSettingsProviderExtensionsTests
 
         _runSettingsProvider.UpdateRunSettings(runSettingsXml);
 
-        StringAssert.Contains(_runSettingsProvider.ActiveRunSettings.SettingsXml, runSettingsXml);
+        StringAssert.Contains(_runSettingsProvider.ActiveRunSettings!.SettingsXml, runSettingsXml);
     }
 
     [TestMethod]
     public void UpdateRunSettingsShouldThrownExceptionIfRunSettingsProviderIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(
-            () => RunSettingsProviderExtensions.UpdateRunSettings(null, "<RunSettings></RunSettings>"));
+            () => RunSettingsProviderExtensions.UpdateRunSettings(null!, "<RunSettings></RunSettings>"));
     }
 
     [TestMethod]
     public void UpdateRunSettingsShouldThrownExceptionIfSettingsXmlIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(
-            () => _runSettingsProvider.UpdateRunSettings(null));
+            () => _runSettingsProvider.UpdateRunSettings(null!));
     }
 
     [TestMethod]
@@ -64,7 +64,7 @@ public class RunSettingsProviderExtensionsTests
         _runSettingsProvider.AddDefaultRunSettings();
 
         var runConfiguration =
-            XmlRunSettingsUtilities.GetRunConfigurationNode(_runSettingsProvider.ActiveRunSettings.SettingsXml);
+            XmlRunSettingsUtilities.GetRunConfigurationNode(_runSettingsProvider.ActiveRunSettings!.SettingsXml);
         Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
         Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
         Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
@@ -83,7 +83,7 @@ public class RunSettingsProviderExtensionsTests
         _runSettingsProvider.AddDefaultRunSettings();
 
         var runConfiguration =
-            XmlRunSettingsUtilities.GetRunConfigurationNode(_runSettingsProvider.ActiveRunSettings.SettingsXml);
+            XmlRunSettingsUtilities.GetRunConfigurationNode(_runSettingsProvider.ActiveRunSettings!.SettingsXml);
         Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
         Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
     }
@@ -100,7 +100,7 @@ public class RunSettingsProviderExtensionsTests
         _runSettingsProvider.AddDefaultRunSettings();
 
         var runConfiguration =
-            XmlRunSettingsUtilities.GetRunConfigurationNode(_runSettingsProvider.ActiveRunSettings.SettingsXml);
+            XmlRunSettingsUtilities.GetRunConfigurationNode(_runSettingsProvider.ActiveRunSettings!.SettingsXml);
         Assert.AreEqual(runConfiguration.TargetPlatform, Architecture.X64);
     }
 
@@ -108,14 +108,14 @@ public class RunSettingsProviderExtensionsTests
     public void AddDefaultRunSettingsShouldThrowExceptionIfArgumentIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
-            RunSettingsProviderExtensions.AddDefaultRunSettings(null));
+            RunSettingsProviderExtensions.AddDefaultRunSettings(null!));
     }
 
     [TestMethod]
     public void UpdateRunSettingsNodeShouldThrowExceptionIfKeyIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
-            _runSettingsProvider.UpdateRunSettingsNode(null, "data"));
+            _runSettingsProvider.UpdateRunSettingsNode(null!, "data"));
     }
 
     [TestMethod]
@@ -129,14 +129,14 @@ public class RunSettingsProviderExtensionsTests
     public void UpdateRunSettingsNodeShouldThrowExceptionIfDataIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
-            _runSettingsProvider.UpdateRunSettingsNode("Key", null));
+            _runSettingsProvider.UpdateRunSettingsNode("Key", null!));
     }
 
     [TestMethod]
     public void UpdateRunSettingsNodeShouldThrowExceptionIfRunSettingsProviderIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
-            RunSettingsProviderExtensions.UpdateRunSettingsNode(null, "Key", "data"));
+            RunSettingsProviderExtensions.UpdateRunSettingsNode(null!, "Key", "data"));
     }
 
     [TestMethod]
@@ -179,7 +179,7 @@ public class RunSettingsProviderExtensionsTests
         _runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
 
         Assert.AreEqual(runSettingsWithTestRunParametersOverrode,
-            _runSettingsProvider.ActiveRunSettings.SettingsXml);
+            _runSettingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     [TestMethod]
@@ -213,7 +213,7 @@ public class RunSettingsProviderExtensionsTests
     public void UpdateRunSettingsNodeInnerXmlShouldThrowExceptionIfKeyIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
-            _runSettingsProvider.UpdateRunSettingsNodeInnerXml(null, "<myxml/>"));
+            _runSettingsProvider.UpdateRunSettingsNodeInnerXml(null!, "<myxml/>"));
     }
 
     [TestMethod]
@@ -227,14 +227,14 @@ public class RunSettingsProviderExtensionsTests
     public void UpdateRunSettingsNodeInnerXmlShouldThrowExceptionIfXmlIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
-            _runSettingsProvider.UpdateRunSettingsNodeInnerXml("Key", null));
+            _runSettingsProvider.UpdateRunSettingsNodeInnerXml("Key", null!));
     }
 
     [TestMethod]
     public void UpdateRunSettingsNodeInnerXmlShouldThrowExceptionIfRunSettingsProviderIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
-            RunSettingsProviderExtensions.UpdateRunSettingsNodeInnerXml(null, "Key", "<myxml/>"));
+            RunSettingsProviderExtensions.UpdateRunSettingsNodeInnerXml(null!, "Key", "<myxml/>"));
     }
 
     [TestMethod]
@@ -259,7 +259,7 @@ public class RunSettingsProviderExtensionsTests
     [TestMethod]
     public void QueryRunSettingsNodeShouldThrowIfKeyIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _runSettingsProvider.QueryRunSettingsNode(null));
+        Assert.ThrowsException<ArgumentNullException>(() => _runSettingsProvider.QueryRunSettingsNode(null!));
     }
 
     [TestMethod]
@@ -298,7 +298,7 @@ public class RunSettingsProviderExtensionsTests
         _runSettingsProvider.UpdateRunSettings("<RunSettings>\r\n  </RunSettings>");
         _runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
 
-        Assert.AreEqual(runSettingsWithTestRunParameters, _runSettingsProvider.ActiveRunSettings.SettingsXml);
+        Assert.AreEqual(runSettingsWithTestRunParameters, _runSettingsProvider.ActiveRunSettings!.SettingsXml);
     }
 
     private class TestableRunSettingsProvider : IRunSettingsProvider

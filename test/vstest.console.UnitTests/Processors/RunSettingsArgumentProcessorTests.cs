@@ -323,7 +323,7 @@ public class RunSettingsArgumentProcessorTests
             null);
 
         executor.Initialize(runsettingsFile);
-        Assert.IsTrue(_settingsProvider.ActiveRunSettings!.SettingsXml.Contains(@"C:\新しいフォルダー"));
+        Assert.IsTrue(_settingsProvider.ActiveRunSettings!.SettingsXml!.Contains(@"C:\新しいフォルダー"));
         File.Delete(runsettingsFile);
     }
 

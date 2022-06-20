@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 
 /// <summary>

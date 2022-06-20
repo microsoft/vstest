@@ -89,32 +89,32 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
                     // We cache extension locally by file path
                     var dataCollectorExtensionManager = DataCollectorExtensionManagerCache.GetOrAdd(invokedDataCollector.FilePath, DataCollectorExtensionManager.Create(invokedDataCollector.FilePath, true, TestSessionMessageLogger.Instance));
                     var dataCollectorExtension = dataCollectorExtensionManager.TryGetTestExtension(invokedDataCollector.Uri);
-                    if (dataCollectorExtension?.Metadata.HasAttachmentProcessor == true)
-                    {
-                        Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension.TestPluginInfo).AttachmentsProcessorType;
-                        IDataCollectorAttachmentProcessor? dataCollectorAttachmentProcessorInstance = null;
-                        try
-                        {
-                            dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);
-                            EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Creation of collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' succeded");
-                        }
-                        catch (Exception ex)
-                        {
-                            EqtTrace.Error($"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
-                            logger?.SendMessage(TestMessageLevel.Error, $"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
-                        }
-
-                        var attachmentQualifiedName = attachmentProcessorType.AssemblyQualifiedName;
-                        TPDebug.Assert(attachmentQualifiedName is not null, "attachmentQualifiedName is null");
-                        if (dataCollectorAttachmentProcessorInstance is not null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentQualifiedName))
-                        {
-                            datacollectorsAttachmentsProcessors.Add(attachmentQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
-                            EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' added to the 'run list'");
-                        }
-                    }
-                    else
+                    if ((dataCollectorExtension?.Metadata.HasAttachmentProcessor) != true)
                     {
                         EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: DataCollectorExtension not found for uri '{invokedDataCollector.Uri}'");
+                        continue;
+                    }
+
+                    TPDebug.Assert(dataCollectorExtension.TestPluginInfo is not null, "dataCollectorExtension.TestPluginInfo is null");
+                    Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension.TestPluginInfo!).AttachmentsProcessorType!;
+                    IDataCollectorAttachmentProcessor? dataCollectorAttachmentProcessorInstance = null;
+                    try
+                    {
+                        dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);
+                        EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Creation of collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' succeded");
+                    }
+                    catch (Exception ex)
+                    {
+                        EqtTrace.Error($"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
+                        logger?.SendMessage(TestMessageLevel.Error, $"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
+                    }
+
+                    var attachmentQualifiedName = attachmentProcessorType.AssemblyQualifiedName;
+                    TPDebug.Assert(attachmentQualifiedName is not null, "attachmentQualifiedName is null");
+                    if (dataCollectorAttachmentProcessorInstance is not null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentQualifiedName))
+                    {
+                        datacollectorsAttachmentsProcessors.Add(attachmentQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
+                        EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' added to the 'run list'");
                     }
                 }
             }

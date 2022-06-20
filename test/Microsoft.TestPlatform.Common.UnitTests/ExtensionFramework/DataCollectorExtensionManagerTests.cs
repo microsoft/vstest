@@ -24,7 +24,7 @@ public class DataCollectorExtensionManagerTests
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
         {
-            var dataCollectionExtensionManager = DataCollectorExtensionManager.Create(null);
+            var dataCollectionExtensionManager = DataCollectorExtensionManager.Create(null!);
         });
     }
 

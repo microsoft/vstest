@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 internal class AssemblyResolver : IDisposable
@@ -27,7 +25,7 @@ internal class AssemblyResolver : IDisposable
     /// Dictionary of Assemblies discovered to date. Must be locked as it may
     /// be accessed in a multi-threaded context.
     /// </summary>
-    private readonly Dictionary<string, Assembly> _resolvedAssemblies;
+    private readonly Dictionary<string, Assembly?> _resolvedAssemblies = new();
 
     /// <summary>
     /// Specifies whether the resolver is disposed or not
@@ -51,8 +49,6 @@ internal class AssemblyResolver : IDisposable
     public AssemblyResolver(IEnumerable<string> directories)
     {
         EqtTrace.Info($"AssemblyResolver.ctor: Creating AssemblyResolver with searchDirectories {string.Join(",", directories)}");
-
-        _resolvedAssemblies = new Dictionary<string, Assembly>();
 
         _searchDirectories = directories == null || !directories.Any() ? new HashSet<string>() : new HashSet<string>(directories);
 
@@ -83,7 +79,7 @@ internal class AssemblyResolver : IDisposable
     /// <returns>
     /// The <see cref="Assembly"/>.
     /// </returns>
-    private Assembly OnResolve(object sender, AssemblyResolveEventArgs args)
+    private Assembly? OnResolve(object? sender, AssemblyResolveEventArgs? args)
     {
         if (StringUtils.IsNullOrEmpty(args?.Name))
         {
@@ -108,7 +104,7 @@ internal class AssemblyResolver : IDisposable
                 return assembly;
             }
 
-            AssemblyName requestedName = null;
+            AssemblyName? requestedName = null;
             try
             {
                 // Can throw ArgumentException, FileLoadException if arg is empty/wrong format, etc. Should not return null.

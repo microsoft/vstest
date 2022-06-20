@@ -181,7 +181,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         TPDebug.Assert(Output != null);
         TPDebug.Assert(_commandLineOptions != null);
         TPDebug.Assert(_testRequestManager != null);
-        TPDebug.Assert(!_runSettingsManager.ActiveRunSettings.SettingsXml.IsNullOrWhiteSpace());
+        TPDebug.Assert(!StringUtils.IsNullOrWhiteSpace(_runSettingsManager.ActiveRunSettings?.SettingsXml));
 
         if (!_commandLineOptions.Sources.Any())
         {
@@ -366,6 +366,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
             // Collect tests session artifacts for post processing
             if (_commandLineOptions.ArtifactProcessingMode == ArtifactProcessingMode.Collect)
             {
+                TPDebug.Assert(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml is not null, "RunSettingsManager.Instance.ActiveRunSettings.SettingsXml is null");
                 _artifactProcessingManager.CollectArtifacts(e, RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
             }
         }

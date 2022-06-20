@@ -26,7 +26,7 @@ internal class NullPathConverter : IPathConverter
 
     string? IPathConverter.UpdatePath(string? path, PathConversionDirection _) => path;
 
-    IEnumerable<string?> IPathConverter.UpdatePaths(IEnumerable<string?> paths, PathConversionDirection _) => paths;
+    IEnumerable<string> IPathConverter.UpdatePaths(IEnumerable<string> paths, PathConversionDirection _) => paths;
 
     TestCase IPathConverter.UpdateTestCase(TestCase testCase, PathConversionDirection _) => testCase;
 

@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 /// <summary>
@@ -29,6 +27,6 @@ public interface IParallelProxyDiscoveryManager : IProxyDiscoveryManager
     bool HandlePartialDiscoveryComplete(
         IProxyDiscoveryManager proxyDiscoveryManager,
         long totalTests,
-        IEnumerable<TestCase> lastChunk,
+        IEnumerable<TestCase>? lastChunk,
         bool isAborted);
 }

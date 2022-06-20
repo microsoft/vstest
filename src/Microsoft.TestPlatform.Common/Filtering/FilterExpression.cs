@@ -14,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
 /// <summary>
@@ -30,17 +28,17 @@ internal class FilterExpression
     /// <summary>
     /// Condition, if expression is conditional expression.
     /// </summary>
-    private readonly Condition _condition;
+    private readonly Condition? _condition;
 
     /// <summary>
     /// Left operand, when expression is logical expression.
     /// </summary>
-    private readonly FilterExpression _left;
+    private readonly FilterExpression? _left;
 
     /// <summary>
     /// Right operand, when expression is logical expression.
     /// </summary>
-    private readonly FilterExpression _right;
+    private readonly FilterExpression? _right;
 
     /// <summary>
     /// If logical expression is using logical And ('&') operator.
@@ -119,9 +117,9 @@ internal class FilterExpression
     /// True, if filter is valid for given set of properties.
     /// When False, invalidProperties would contain properties making filter invalid.
     /// </summary>
-    internal string[] ValidForProperties(IEnumerable<string> properties, Func<string, TestProperty> propertyProvider)
+    internal string[]? ValidForProperties(IEnumerable<string>? properties, Func<string, TestProperty?>? propertyProvider)
     {
-        string[] invalidProperties = null;
+        string[]? invalidProperties = null;
 
         if (null == properties)
         {
@@ -140,8 +138,8 @@ internal class FilterExpression
         }
         else
         {
-            invalidProperties = _left.ValidForProperties(properties, propertyProvider);
-            var invalidRight = _right.ValidForProperties(properties, propertyProvider);
+            invalidProperties = _left!.ValidForProperties(properties, propertyProvider);
+            var invalidRight = _right!.ValidForProperties(properties, propertyProvider);
             if (null == invalidProperties)
             {
                 invalidProperties = invalidRight;
@@ -151,13 +149,14 @@ internal class FilterExpression
                 invalidProperties = invalidProperties.Concat(invalidRight).ToArray();
             }
         }
+
         return invalidProperties;
     }
 
     /// <summary>
     /// Return FilterExpression after parsing the given filter expression, and a FastFilter when possible.
     /// </summary>
-    internal static FilterExpression Parse(string filterString, out FastFilter fastFilter)
+    internal static FilterExpression Parse(string filterString, out FastFilter? fastFilter)
     {
         ValidateArg.NotNull(filterString, nameof(filterString));
 
@@ -172,7 +171,7 @@ internal class FilterExpression
         var operatorStack = new Stack<Operator>();
         var filterStack = new Stack<FilterExpression>();
 
-        var fastFilterBuilder = FastFilter.CreateBuilder();
+        FastFilter.Builder fastFilterBuilder = FastFilter.CreateBuilder();
 
         // This is based on standard parsing of in order expression using two stacks (operand stack and operator stack)
         // Precedence(And) > Precedence(Or)
@@ -272,7 +271,7 @@ internal class FilterExpression
     /// </summary>
     /// <param name="propertyValueProvider"> The property Value Provider.</param>
     /// <returns> True if evaluation is successful. </returns>
-    internal bool Evaluate(Func<string, object> propertyValueProvider)
+    internal bool Evaluate(Func<string, object?> propertyValueProvider)
     {
         ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
         bool filterResult = false;
@@ -283,8 +282,8 @@ internal class FilterExpression
         else
         {
             // & or | operator
-            bool leftResult = _left.Evaluate(propertyValueProvider);
-            bool rightResult = _right.Evaluate(propertyValueProvider);
+            bool leftResult = _left!.Evaluate(propertyValueProvider);
+            bool rightResult = _right!.Evaluate(propertyValueProvider);
             filterResult = _areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
         }
         return filterResult;

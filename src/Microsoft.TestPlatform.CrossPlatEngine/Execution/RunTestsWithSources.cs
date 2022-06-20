@@ -221,9 +221,9 @@ internal class RunTestsWithSources : BaseRunTests
             return;
         }
 
-        var properties = new Dictionary<string, object?>
+        var properties = new Dictionary<string, object>
         {
-            { "TestSources", TestSourcesUtility.GetSources(_adapterSourceMap!) }
+            { "TestSources", TestSourcesUtility.GetSources(_adapterSourceMap!)! }
         };
 
         _testCaseEventsHandler.SendSessionStart(properties);

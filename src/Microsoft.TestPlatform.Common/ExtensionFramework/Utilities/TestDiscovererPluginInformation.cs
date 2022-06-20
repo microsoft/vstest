@@ -38,7 +38,7 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
     /// <summary>
     /// Metadata for the test plugin
     /// </summary>
-    public override ICollection<Object> Metadata
+    public override ICollection<object> Metadata
     {
         get
         {

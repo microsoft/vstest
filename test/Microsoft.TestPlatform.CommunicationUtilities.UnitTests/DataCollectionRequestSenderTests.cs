@@ -51,7 +51,7 @@ public class DataCollectionRequestSenderTests
         Assert.IsNotNull(result.AttachmentSets);
         Assert.IsNotNull(result.Metrics);
         Assert.AreEqual(1, result.AttachmentSets.Count);
-        Assert.AreEqual(1, result.InvokedDataCollectors.Count);
+        Assert.AreEqual(1, result.InvokedDataCollectors!.Count);
         Assert.AreEqual(0, result.Metrics.Count);
         Assert.IsNotNull(result.AttachmentSets[0]);
         Assert.AreEqual(displayName, result.AttachmentSets[0].DisplayName);

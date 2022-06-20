@@ -85,16 +85,6 @@ public class DesignModeClientTests
     }
 
     [TestMethod]
-    public void TestRunMessageHandlerShouldNotCallCommmunicationManagerIfMessageisInformational()
-    {
-        _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
-
-        _designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Informational, "message"));
-
-        _mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<TestMessagePayload>()), Times.Never());
-    }
-
-    [TestMethod]
     public void DesignModeClientConnectShouldSetupChannel()
     {
         var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = _protocolVersion };

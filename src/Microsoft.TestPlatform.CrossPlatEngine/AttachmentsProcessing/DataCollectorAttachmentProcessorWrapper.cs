@@ -91,7 +91,8 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
             return false;
         }
 
-        Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension.TestPluginInfo).AttachmentsProcessorType;
+        TPDebug.Assert(dataCollectorExtension.TestPluginInfo is not null, "dataCollectorExtension.TestPluginInfo is null");
+        Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension.TestPluginInfo).AttachmentsProcessorType!;
         try
         {
             _dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);

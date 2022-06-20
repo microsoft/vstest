@@ -58,7 +58,7 @@ public class DataCollectionManagerTests
     [TestMethod]
     public void InitializeDataCollectorsShouldThrowExceptionIfSettingsXmlIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(null));
+        Assert.ThrowsException<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(null!));
     }
 
     [TestMethod]
@@ -525,24 +525,24 @@ internal class TestableDataCollectionManager : DataCollectionManager
         }
     }
 
-    protected override bool IsUriValid(string uri)
+    protected override bool IsUriValid(string? uri)
     {
-        return uri.Equals("my://custom/datacollector") || uri.Equals("my://custom/ccdatacollector");
+        return string.Equals(uri, "my://custom/datacollector") || string.Equals(uri, "my://custom/ccdatacollector");
     }
 
-    protected override ObjectModel.DataCollection.DataCollector? TryGetTestExtension(string extensionUri)
+    protected override ObjectModel.DataCollection.DataCollector TryGetTestExtension(string extensionUri)
     {
         if (extensionUri.Equals("my://custom/datacollector"))
         {
-            return _dataCollector;
+            return _dataCollector!;
         }
 
         if (extensionUri.Equals("my://custom/ccdatacollector"))
         {
-            return _ccDataCollector;
+            return _ccDataCollector!;
         }
 
-        return null;
+        return null!;
     }
 
     protected override DataCollectorConfig? TryGetDataCollectorConfig(string extensionUri)

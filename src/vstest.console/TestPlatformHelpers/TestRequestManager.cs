@@ -280,7 +280,7 @@ internal class TestRequestManager : ITestRequestManager
 
         if (UpdateRunSettingsIfRequired(
                 runsettings,
-                sources,
+                sources!,
                 testRunEventsRegistrar,
                 out string updatedRunsettings,
                 out IDictionary<string, Architecture> sourceToArchitectureMap,
@@ -574,7 +574,7 @@ internal class TestRequestManager : ITestRequestManager
         }
     }
 
-    private void LogTelemetryForLegacySettings(IRequestData requestData, string runsettings)
+    private static void LogTelemetryForLegacySettings(IRequestData requestData, string runsettings)
     {
         requestData.MetricsCollection.Add(
             TelemetryDataConstants.TestSettingsUsed,
@@ -651,7 +651,7 @@ internal class TestRequestManager : ITestRequestManager
 
     private bool UpdateRunSettingsIfRequired(
         string runsettingsXml,
-        IList<string?>? sources,
+        IList<string>? sources,
         IBaseTestEventsRegistrar? registrar,
         out string updatedRunSettingsXml,
         out IDictionary<string, Architecture> sourceToArchitectureMap,
@@ -679,7 +679,7 @@ internal class TestRequestManager : ITestRequestManager
         var frameworkWasAutodetected = UpdateFrameworkInRunSettingsIfRequired(
             document,
             navigator,
-            sources,
+            sources!,
             registrar,
             out Framework chosenFramework,
             out sourceToFrameworkMap);
@@ -927,7 +927,7 @@ internal class TestRequestManager : ITestRequestManager
         return updateRequired;
     }
 
-    private void CheckSourcesForCompatibility(
+    private static void CheckSourcesForCompatibility(
         Framework chosenFramework,
         Architecture chosenPlatform,
         Architecture defaultArchitecture,
@@ -959,7 +959,7 @@ internal class TestRequestManager : ITestRequestManager
     private bool UpdatePlatform(
         XmlDocument document,
         XPathNavigator navigator,
-        IList<string?>? sources,
+        IList<string>? sources,
         Architecture defaultArchitecture,
         out Architecture commonPlatform,
         out IDictionary<string, Architecture> sourceToPlatformMap)
@@ -1058,7 +1058,7 @@ internal class TestRequestManager : ITestRequestManager
     /// </summary>
     /// <param name="document">Runsettings document.</param>
     /// <param name="loggerRunSettings">Logger run settings.</param>
-    private void AddConsoleLogger(XmlDocument document, LoggerRunSettings loggerRunSettings)
+    private static void AddConsoleLogger(XmlDocument document, LoggerRunSettings loggerRunSettings)
     {
         var consoleLogger = new LoggerSettings
         {
@@ -1082,7 +1082,7 @@ internal class TestRequestManager : ITestRequestManager
     /// <param name="document">Runsettings document.</param>
     /// <param name="loggerRunSettings">Logger run settings.</param>
     /// <returns>True if updated console logger in runsettings successfully.</returns>
-    private bool UpdateConsoleLoggerIfExists(
+    private static bool UpdateConsoleLoggerIfExists(
         XmlDocument document,
         LoggerRunSettings loggerRunSettings)
     {
@@ -1245,7 +1245,7 @@ internal class TestRequestManager : ITestRequestManager
     /// </summary>
     /// <param name="requestData">Request data for common Discovery/Execution services.</param>
     /// <param name="runConfiguration">Run configuration.</param>
-    private void CollectMetrics(IRequestData requestData, RunConfiguration runConfiguration)
+    private static void CollectMetrics(IRequestData requestData, RunConfiguration runConfiguration)
     {
         // Collecting Target Framework.
         requestData.MetricsCollection.Add(
@@ -1400,10 +1400,10 @@ internal class TestRequestManager : ITestRequestManager
         };
     }
 
-    private static List<string?> GetSources(TestRunRequestPayload testRunRequestPayload)
+    private static List<string> GetSources(TestRunRequestPayload testRunRequestPayload)
     {
         // TODO: This should also use hashset to only return distinct sources.
-        List<string?> sources = new();
+        List<string> sources = new();
         if (testRunRequestPayload.Sources != null
             && testRunRequestPayload.Sources.Count > 0)
         {
@@ -1412,7 +1412,7 @@ internal class TestRequestManager : ITestRequestManager
         else if (testRunRequestPayload.TestCases != null
                  && testRunRequestPayload.TestCases.Count > 0)
         {
-            ISet<string?> sourcesSet = new HashSet<string?>();
+            ISet<string> sourcesSet = new HashSet<string>();
             foreach (var testCase in testRunRequestPayload.TestCases)
             {
                 sourcesSet.Add(testCase.Source);

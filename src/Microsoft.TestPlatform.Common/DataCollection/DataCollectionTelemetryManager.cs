@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>

@@ -11,8 +11,6 @@ using System.Xml.XPath;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 /// <summary>
@@ -126,7 +124,7 @@ public static class FakesUtilities
     {
         // override current settings
         var navigator = runSettings.CreateNavigator();
-        var nodes = navigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+        var nodes = navigator!.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
 
         foreach (XPathNavigator dataCollectorNavigator in nodes)
         {
@@ -135,7 +133,7 @@ public static class FakesUtilities
             if (string.Equals(FakesMetadata.DataCollectorUriV1, uri, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(FakesMetadata.DataCollectorUriV2, uri, StringComparison.OrdinalIgnoreCase))
             {
-                dataCollectorNavigator.ReplaceSelf(settings.ToXml().CreateNavigator());
+                dataCollectorNavigator.ReplaceSelf(settings.ToXml().CreateNavigator()!);
                 return;
             }
         }
@@ -174,7 +172,7 @@ public static class FakesUtilities
             return false;
         }
 
-        Func<IEnumerable<string>, string> netFrameworkConfigurator = TryGetNetFrameworkFakesDataCollectorConfigurator();
+        Func<IEnumerable<string>, string>? netFrameworkConfigurator = TryGetNetFrameworkFakesDataCollectorConfigurator();
         if (netFrameworkConfigurator == null)
         {
             return false;
@@ -217,7 +215,7 @@ public static class FakesUtilities
         TPDebug.Assert(settingsNode != null, "Invalid Settings Node");
         TPDebug.Assert(settings != null, "Invalid Settings");
 
-        var root = settings.DocumentElement;
+        var root = settings.DocumentElement!;
         if (root[settingsNode.Name] == null)
         {
             var newElement = settingsNode.ToXml();
@@ -226,7 +224,7 @@ public static class FakesUtilities
         }
     }
 
-    private static Func<IEnumerable<string>, string> TryGetNetFrameworkFakesDataCollectorConfigurator()
+    private static Func<IEnumerable<string>, string>? TryGetNetFrameworkFakesDataCollectorConfigurator()
     {
 #if NETFRAMEWORK
         try
@@ -247,7 +245,7 @@ public static class FakesUtilities
         return null;
     }
 
-    private static Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings> TryGetFakesCrossPlatformDataCollectorConfigurator()
+    private static Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings>? TryGetFakesCrossPlatformDataCollectorConfigurator()
     {
         try
         {
@@ -266,7 +264,8 @@ public static class FakesUtilities
 
         return null;
     }
-    private static Assembly LoadTestPlatformAssembly()
+
+    private static Assembly? LoadTestPlatformAssembly()
     {
         try
         {

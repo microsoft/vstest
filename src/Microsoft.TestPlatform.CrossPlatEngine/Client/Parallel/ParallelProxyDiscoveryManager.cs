@@ -143,7 +143,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
     #region IParallelProxyDiscoveryManager methods
 
     /// <inheritdoc/>
-    public bool HandlePartialDiscoveryComplete(IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
+    public bool HandlePartialDiscoveryComplete(IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, IEnumerable<TestCase>? lastChunk, bool isAborted)
     {
 #if DEBUG
         // Ensures that the total count of sources remains the same between each discovery

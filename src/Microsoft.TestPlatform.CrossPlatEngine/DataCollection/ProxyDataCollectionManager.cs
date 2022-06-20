@@ -361,7 +361,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
             extensionsFolder = string.Concat(tapNode.InnerText, ';', extensionsFolder);
         }
 
-        RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(document, "RunConfiguration.TestAdaptersPaths", extensionsFolder);
+        RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerText(document, "RunConfiguration.TestAdaptersPaths", extensionsFolder);
 
         return document.OuterXml;
     }

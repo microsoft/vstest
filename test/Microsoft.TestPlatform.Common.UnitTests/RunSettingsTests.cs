@@ -30,7 +30,7 @@ public class RunSettingsTests
     public void LoadSettingsXmlShouldThrowOnNullSettings()
     {
         var runSettings = new RunSettings();
-        Assert.ThrowsException<ArgumentException>(() => runSettings.LoadSettingsXml(null));
+        Assert.ThrowsException<ArgumentException>(() => runSettings.LoadSettingsXml(null!));
     }
 
     [TestMethod]
@@ -76,7 +76,7 @@ public class RunSettingsTests
     public void InitializeSettingsProvidersShouldThrowOnNullSettings()
     {
         var runSettings = new RunSettings();
-        Assert.ThrowsException<ArgumentNullException>(() => runSettings.InitializeSettingsProviders(null));
+        Assert.ThrowsException<ArgumentNullException>(() => runSettings.InitializeSettingsProviders(null!));
     }
 
     [TestMethod]
@@ -211,7 +211,7 @@ public class RunSettingsTests
     {
         var runSettings = new RunSettings();
 
-        Assert.ThrowsException<ArgumentException>(() => runSettings.GetSettings(null));
+        Assert.ThrowsException<ArgumentException>(() => runSettings.GetSettings(null!));
     }
 
     [TestMethod]

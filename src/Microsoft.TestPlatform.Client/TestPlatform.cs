@@ -274,7 +274,7 @@ internal class TestPlatform : ITestPlatform
         // Otherwise we will always get a "No suitable test runtime provider found for this run." error.
         // I (@haplois) will modify this behavior later on, but we also need to consider legacy adapters
         // and make sure they still work after modification.
-        string runSettings = RunSettingsManager.Instance.ActiveRunSettings.SettingsXml;
+        string? runSettings = RunSettingsManager.Instance.ActiveRunSettings.SettingsXml;
         RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
         TestAdapterLoadingStrategy strategy = runConfiguration.TestAdapterLoadingStrategy;
 

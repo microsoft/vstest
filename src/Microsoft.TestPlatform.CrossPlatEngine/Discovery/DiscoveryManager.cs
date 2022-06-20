@@ -69,7 +69,7 @@ public class DiscoveryManager : IDiscoveryManager
     /// Initializes the discovery manager.
     /// </summary>
     /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-    public void Initialize(IEnumerable<string>? pathToAdditionalExtensions, ITestDiscoveryEventsHandler2 eventHandler)
+    public void Initialize(IEnumerable<string>? pathToAdditionalExtensions, ITestDiscoveryEventsHandler2? eventHandler)
     {
         // Clear the request data metrics left over from a potential previous run.
         _requestData.MetricsCollection?.Metrics?.Clear();

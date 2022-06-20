@@ -25,7 +25,8 @@ public sealed class SessionStartEventArgs : DataCollectionEventArgs
     /// Default constructor with empty properties and default DataCollectionContext.
     /// DataCollectionContext with empty session signifies that is it irrelevant in the current context.
     /// </remarks>
-    public SessionStartEventArgs() : this(new DataCollectionContext(new SessionId(Guid.Empty)), new Dictionary<string, object>())
+    public SessionStartEventArgs()
+        : this(new DataCollectionContext(new SessionId(Guid.Empty)), new Dictionary<string, object>())
     {
 
     }
@@ -37,7 +38,8 @@ public sealed class SessionStartEventArgs : DataCollectionEventArgs
     /// constructor with properties and default DataCollectionContext.
     /// DataCollectionContext with empty session signifies that is it irrelevant in the current context.
     /// </remarks>
-    public SessionStartEventArgs(IDictionary<string, object> properties) : this(new DataCollectionContext(new SessionId(Guid.Empty)), properties)
+    public SessionStartEventArgs(IDictionary<string, object> properties)
+        : this(new DataCollectionContext(new SessionId(Guid.Empty)), properties)
     {
 
     }

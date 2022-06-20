@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>
@@ -49,27 +47,27 @@ internal sealed class TestPlatformDataCollectionEvents : DataCollectionEvents
     /// <summary>
     /// Raised when test host process has initialized
     /// </summary>
-    public override event EventHandler<TestHostLaunchedEventArgs> TestHostLaunched;
+    public override event EventHandler<TestHostLaunchedEventArgs>? TestHostLaunched;
 
     /// <summary>
     /// Raised when a session is starting
     /// </summary>
-    public override event EventHandler<SessionStartEventArgs> SessionStart;
+    public override event EventHandler<SessionStartEventArgs>? SessionStart;
 
     /// <summary>
     /// Raised when a session is ending
     /// </summary>
-    public override event EventHandler<SessionEndEventArgs> SessionEnd;
+    public override event EventHandler<SessionEndEventArgs>? SessionEnd;
 
     /// <summary>
     /// Raised when a test case is starting
     /// </summary>
-    public override event EventHandler<TestCaseStartEventArgs> TestCaseStart;
+    public override event EventHandler<TestCaseStartEventArgs>? TestCaseStart;
 
     /// <summary>
     /// Raised when a test case is ending
     /// </summary>
-    public override event EventHandler<TestCaseEndEventArgs> TestCaseEnd;
+    public override event EventHandler<TestCaseEndEventArgs>? TestCaseEnd;
 
     /// <summary>
     /// Raises the event corresponding to the event arguments to all registered handlers
@@ -100,7 +98,7 @@ internal sealed class TestPlatformDataCollectionEvents : DataCollectionEvents
         return (HasEventListener(TestCaseStart, valueOnFailure) || HasEventListener(TestCaseEnd, valueOnFailure));
     }
 
-    private bool HasEventListener(MulticastDelegate eventToCheck, bool valueOnFailure)
+    private static bool HasEventListener(MulticastDelegate? eventToCheck, bool valueOnFailure)
     {
         try
         {

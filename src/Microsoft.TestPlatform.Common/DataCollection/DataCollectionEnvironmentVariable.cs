@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>
@@ -81,7 +79,7 @@ internal class DataCollectionEnvironmentVariable
     }
 
     /// <summary>
-    /// Adds the data collector to the list of data collectors that requested this variable. 
+    /// Adds the data collector to the list of data collectors that requested this variable.
     /// </summary>
     /// <param name="requestingDataCollectorFriendlyName">Friendly name of requesting data collector.</param>
     public void AddRequestingDataCollector(string requestingDataCollectorFriendlyName)
