@@ -127,6 +127,24 @@ public class LengthPrefixCommunicationChannelTests : IDisposable
         Assert.IsTrue(_stream.CanWrite);
     }
 
+    [TestMethod]
+    public async Task DoNotFailWhenWritingOnADisposedBaseStream()
+    {
+        // Dispose base stream
+        _stream.Dispose();
+        await _channel.Send(Dummydata);
+    }
+
+    [TestMethod]
+    public async Task DoNotFailWhenReadingFromADisposedBaseStream()
+    {
+        var data = string.Empty;
+        _channel.MessageReceived += (sender, messageEventArgs) => data = messageEventArgs.Data;
+        // Dispose base stream
+        _stream.Dispose();
+        await _channel.NotifyDataAvailable();
+    }
+
     // TODO
     // WriteFromMultilpleThreadShouldBeInSequence
     private static void SeekToBeginning(Stream stream)
