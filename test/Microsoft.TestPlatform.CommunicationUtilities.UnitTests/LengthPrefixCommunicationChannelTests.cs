@@ -85,14 +85,6 @@ public class LengthPrefixCommunicationChannelTests : IDisposable
     }
 
     [TestMethod]
-    public void SendShouldThrowIfChannelIsDisconnected()
-    {
-        _stream.Dispose();
-
-        Assert.ThrowsException<CommunicationException>(() => _channel.Send(Dummydata).Wait());
-    }
-
-    [TestMethod]
     public async Task MessageReceivedShouldProvideDataOverStream()
     {
         var data = string.Empty;
@@ -125,6 +117,24 @@ public class LengthPrefixCommunicationChannelTests : IDisposable
 
         // Should throw if stream is disposed.
         Assert.IsTrue(_stream.CanWrite);
+    }
+
+    [TestMethod]
+    public async Task DoNotFailWhenWritingOnADisposedBaseStream()
+    {
+        // Dispose base stream
+        _stream.Dispose();
+        await _channel.Send(Dummydata);
+    }
+
+    [TestMethod]
+    public async Task DoNotFailWhenReadingFromADisposedBaseStream()
+    {
+        var data = string.Empty;
+        _channel.MessageReceived += (sender, messageEventArgs) => data = messageEventArgs.Data;
+        // Dispose base stream
+        _stream.Dispose();
+        await _channel.NotifyDataAvailable();
     }
 
     // TODO
