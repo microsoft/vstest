@@ -24,8 +24,6 @@ using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfa
 using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 /// <summary>
@@ -168,9 +166,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public ITestSession StartTestSession(
+    public ITestSession? StartTestSession(
         IList<string> sources,
-        string runSettings,
+        string? runSettings,
         ITestSessionEventsHandler eventsHandler)
     {
         return StartTestSession(
@@ -182,10 +180,10 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public ITestSession StartTestSession(
+    public ITestSession? StartTestSession(
         IList<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler)
     {
         return StartTestSession(
@@ -198,12 +196,12 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public ITestSession StartTestSession(
+    public ITestSession? StartTestSession(
         IList<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler,
-        ITestHostLauncher testHostLauncher)
+        ITestHostLauncher? testHostLauncher)
     {
         _testPlatformEventSource.TranslationLayerStartTestSessionStart();
 
@@ -227,7 +225,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public bool StopTestSession(
-        TestSessionInfo testSessionInfo,
+        TestSessionInfo? testSessionInfo,
         ITestSessionEventsHandler eventsHandler)
     {
         return StopTestSession(
@@ -239,8 +237,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public bool StopTestSession(
-        TestSessionInfo testSessionInfo,
-        TestPlatformOptions options,
+        TestSessionInfo? testSessionInfo,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler)
     {
         _testPlatformEventSource.TranslationLayerStopTestSessionStart();
@@ -264,7 +262,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void DiscoverTests(
         IEnumerable<string> sources,
-        string discoverySettings,
+        string? discoverySettings,
         ITestDiscoveryEventsHandler discoveryEventsHandler)
     {
         DiscoverTests(
@@ -277,8 +275,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void DiscoverTests(
         IEnumerable<string> sources,
-        string discoverySettings,
-        TestPlatformOptions options,
+        string? discoverySettings,
+        TestPlatformOptions? options,
         ITestDiscoveryEventsHandler2 discoveryEventsHandler)
     {
         DiscoverTests(
@@ -292,9 +290,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void DiscoverTests(
         IEnumerable<string> sources,
-        string discoverySettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? discoverySettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestDiscoveryEventsHandler2 discoveryEventsHandler)
     {
         _testPlatformEventSource.TranslationLayerDiscoveryStart();
@@ -317,7 +315,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void RunTests(
         IEnumerable<string> sources,
-        string runSettings,
+        string? runSettings,
         ITestRunEventsHandler testRunEventsHandler)
     {
         RunTests(
@@ -330,8 +328,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void RunTests(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler)
     {
         RunTests(
@@ -345,9 +343,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void RunTests(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler)
     {
         var sourceList = sources.ToList();
@@ -369,7 +367,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void RunTests(
         IEnumerable<TestCase> testCases,
-        string runSettings,
+        string? runSettings,
         ITestRunEventsHandler testRunEventsHandler)
     {
         RunTests(
@@ -382,8 +380,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void RunTests(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler)
     {
         RunTests(
@@ -397,9 +395,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void RunTests(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler)
     {
         var testCaseList = testCases.ToList();
@@ -421,7 +419,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void RunTestsWithCustomTestHost(
         IEnumerable<string> sources,
-        string runSettings,
+        string? runSettings,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
@@ -436,8 +434,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void RunTestsWithCustomTestHost(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
@@ -453,9 +451,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void RunTestsWithCustomTestHost(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
@@ -479,7 +477,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void RunTestsWithCustomTestHost(
         IEnumerable<TestCase> testCases,
-        string runSettings,
+        string? runSettings,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
@@ -494,8 +492,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void RunTestsWithCustomTestHost(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
@@ -511,9 +509,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void RunTestsWithCustomTestHost(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
@@ -594,9 +592,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public async Task<ITestSession> StartTestSessionAsync(
+    public async Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
-        string runSettings,
+        string? runSettings,
         ITestSessionEventsHandler eventsHandler)
     {
         return await StartTestSessionAsync(
@@ -608,10 +606,10 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public async Task<ITestSession> StartTestSessionAsync(
+    public async Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler)
     {
         return await StartTestSessionAsync(
@@ -624,12 +622,12 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public async Task<ITestSession> StartTestSessionAsync(
+    public async Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler,
-        ITestHostLauncher testHostLauncher)
+        ITestHostLauncher? testHostLauncher)
     {
         _testPlatformEventSource.TranslationLayerStartTestSessionStart();
 
@@ -642,7 +640,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
             eventsHandler,
             testHostLauncher).ConfigureAwait(false);
 
-        return (testSessionInfo != null)
+        return testSessionInfo != null
             ? new TestSession(
                 testSessionInfo,
                 eventsHandler,
@@ -653,7 +651,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task<bool> StopTestSessionAsync(
-        TestSessionInfo testSessionInfo,
+        TestSessionInfo? testSessionInfo,
         ITestSessionEventsHandler eventsHandler)
     {
         return await StopTestSessionAsync(
@@ -665,8 +663,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task<bool> StopTestSessionAsync(
-        TestSessionInfo testSessionInfo,
-        TestPlatformOptions options,
+        TestSessionInfo? testSessionInfo,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler)
     {
         _testPlatformEventSource.TranslationLayerStopTestSessionStart();
@@ -689,7 +687,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task DiscoverTestsAsync(
         IEnumerable<string> sources,
-        string discoverySettings,
+        string? discoverySettings,
         ITestDiscoveryEventsHandler discoveryEventsHandler)
     {
         await DiscoverTestsAsync(
@@ -703,8 +701,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task DiscoverTestsAsync(
         IEnumerable<string> sources,
-        string discoverySettings,
-        TestPlatformOptions options,
+        string? discoverySettings,
+        TestPlatformOptions? options,
         ITestDiscoveryEventsHandler2 discoveryEventsHandler)
     {
         await DiscoverTestsAsync(
@@ -718,9 +716,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task DiscoverTestsAsync(
         IEnumerable<string> sources,
-        string discoverySettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? discoverySettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestDiscoveryEventsHandler2 discoveryEventsHandler)
     {
         _testPlatformEventSource.TranslationLayerDiscoveryStart();
@@ -737,7 +735,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task RunTestsAsync(
         IEnumerable<string> sources,
-        string runSettings,
+        string? runSettings,
         ITestRunEventsHandler testRunEventsHandler)
     {
         await RunTestsAsync(
@@ -750,8 +748,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task RunTestsAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler)
     {
         await RunTestsAsync(
@@ -765,9 +763,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task RunTestsAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler)
     {
         var sourceList = sources.ToList();
@@ -789,7 +787,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
+        string? runSettings,
         ITestRunEventsHandler testRunEventsHandler)
     {
         await RunTestsAsync(
@@ -802,8 +800,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler)
     {
         await RunTestsAsync(
@@ -817,9 +815,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler)
     {
         var testCaseList = testCases.ToList();
@@ -841,7 +839,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
-        string runSettings,
+        string? runSettings,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
@@ -856,8 +854,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
@@ -873,9 +871,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
@@ -899,7 +897,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
+        string? runSettings,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
@@ -914,8 +912,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
@@ -931,9 +929,9 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
@@ -957,8 +955,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public async Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
-        IEnumerable<InvokedDataCollector> invokedDataCollectors,
-        string processingSettings,
+        IEnumerable<InvokedDataCollector>? invokedDataCollectors,
+        string? processingSettings,
         bool isLastBatch,
         bool collectMetrics,
         ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
@@ -979,7 +977,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
-        string processingSettings,
+        string? processingSettings,
         bool isLastBatch,
         bool collectMetrics,
         ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
