@@ -222,7 +222,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
         return _fileHelper.GetFiles(_processArtifactFolder, "*.*", SearchOption.AllDirectories)
             .Select(file => new { TestSessionId = Path.GetFileName(Path.GetDirectoryName(file)), Artifact = file })
             .GroupBy(grp => grp.TestSessionId)
-            .Select(testSessionArtifact => new TestArtifacts(testSessionArtifact.Key, testSessionArtifact.Select(x => ParseArtifact(x.Artifact)).Where(x => x is not null).ToArray()!)) // Bang because null dataflow doesn't yet backport learning from the `Where` clause
+            .Select(testSessionArtifact => new TestArtifacts(testSessionArtifact.Key!, testSessionArtifact.Select(x => ParseArtifact(x.Artifact)).Where(x => x is not null).ToArray()!)) // Bang because null dataflow doesn't yet backport learning from the `Where` clause
             .ToArray();
     }
 

@@ -105,17 +105,9 @@ public class ExecutionManager : IExecutionManager
     {
         try
         {
-            if (testCaseEventsHandler is not ITestEventsPublisher testEventsPublisher)
-            {
-                runEventsHandler.HandleLogMessage(TestMessageLevel.Error, "testCaseEventsHandler is not of type ITestEventsPublisher");
-                Abort(runEventsHandler);
-                return;
-            }
-
-            InitializeDataCollectors(runSettings, testEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap!));
+            InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap!));
 
             _activeTestRun = new RunTestsWithSources(_requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
-
             _activeTestRun.RunTests();
         }
         catch (Exception e)
@@ -148,17 +140,9 @@ public class ExecutionManager : IExecutionManager
     {
         try
         {
-            if (testCaseEventsHandler is not ITestEventsPublisher testEventsPublisher)
-            {
-                runEventsHandler.HandleLogMessage(TestMessageLevel.Error, "testCaseEventsHandler is not of type ITestEventsPublisher");
-                Abort(runEventsHandler);
-                return;
-            }
-
-            InitializeDataCollectors(runSettings, testEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(tests));
+            InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(tests));
 
             _activeTestRun = new RunTestsWithTests(_requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
-
             _activeTestRun.RunTests();
         }
         catch (Exception e)
@@ -230,17 +214,19 @@ public class ExecutionManager : IExecutionManager
     /// <summary>
     /// Initializes out-proc and in-proc data collectors.
     /// </summary>
-    private static void InitializeDataCollectors(string? runSettings, ITestEventsPublisher testEventsPublisher, string? defaultCodeBase)
+    private static void InitializeDataCollectors(string? runSettings, ITestEventsPublisher? testEventsPublisher, string? defaultCodeBase)
     {
         // Initialize out-proc data collectors if declared in run settings.
         if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings))
         {
+            TPDebug.Assert(testEventsPublisher is not null, "testEventsPublisher is null");
             _ = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, testEventsPublisher);
         }
 
         // Initialize in-proc data collectors if declared in run settings.
         if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
         {
+            TPDebug.Assert(testEventsPublisher is not null, "testEventsPublisher is null");
             _ = new InProcDataCollectionExtensionManager(runSettings, testEventsPublisher, defaultCodeBase, TestPluginCache.Instance);
         }
     }

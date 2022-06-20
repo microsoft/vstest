@@ -309,9 +309,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     public void OnMessageReceived(object? sender, MessageReceivedEventArgs messageReceivedArgs)
     {
         var message = _dataSerializer.DeserializeMessage(messageReceivedArgs.Data!);
-
         EqtTrace.Info("TestRequestHandler.OnMessageReceived: received message: {0}", message);
-        TPDebug.Assert(_testHostManagerFactory is not null, "_testHostManagerFactory is null");
 
         switch (message?.MessageType)
         {
@@ -378,6 +376,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
+                            TPDebug.Assert(_testHostManagerFactory is not null, "_testHostManagerFactory is null");
                             _testHostManagerFactory.GetDiscoveryManager().Initialize(pathToAdditionalExtensions, discoveryEventsHandler);
                         };
                         _jobQueue.QueueJob(job, 0);
@@ -405,6 +404,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
+                            TPDebug.Assert(_testHostManagerFactory is not null, "_testHostManagerFactory is null");
                             _testHostManagerFactory.GetDiscoveryManager()
                                 .DiscoverTests(discoveryCriteria, discoveryEventsHandler);
                         };
@@ -433,6 +433,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
+                            TPDebug.Assert(_testHostManagerFactory is not null, "_testHostManagerFactory is null");
                             _testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions, testInitializeEventsHandler);
                         };
                         _jobQueue.QueueJob(job, 0);
@@ -459,6 +460,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
+                            TPDebug.Assert(_testHostManagerFactory is not null, "_testHostManagerFactory is null");
                             _testHostManagerFactory.GetExecutionManager()
                                 .StartTestRun(
                                     testRunCriteriaWithSources.AdapterSourceMap,
@@ -493,6 +495,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                         Action job = () =>
                         {
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
+                            TPDebug.Assert(_testHostManagerFactory is not null, "_testHostManagerFactory is null");
                             _testHostManagerFactory.GetExecutionManager()
                                 .StartTestRun(
                                     testRunCriteriaWithTests.Tests,
@@ -517,6 +520,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
             case MessageType.CancelTestRun:
                 _jobQueue.Pause();
                 _testHostManagerFactoryReady.Wait();
+                TPDebug.Assert(_testHostManagerFactory is not null, "_testHostManagerFactory is null");
                 _testHostManagerFactory.GetExecutionManager().Cancel(new TestRunEventsHandler(this));
                 break;
 
@@ -531,6 +535,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
             case MessageType.CancelDiscovery:
                 _jobQueue.Pause();
                 _testHostManagerFactoryReady.Wait();
+                TPDebug.Assert(_testHostManagerFactory is not null, "_testHostManagerFactory is null");
                 _testHostManagerFactory.GetDiscoveryManager().Abort(new TestDiscoveryEventHandler(this));
                 break;
 
@@ -539,6 +544,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                 {
                     _jobQueue.Pause();
                     _testHostManagerFactoryReady.Wait();
+                    TPDebug.Assert(_testHostManagerFactory is not null, "_testHostManagerFactory is null");
                     _testHostManagerFactory.GetExecutionManager().Abort(new TestRunEventsHandler(this));
                 }
                 catch (Exception ex)

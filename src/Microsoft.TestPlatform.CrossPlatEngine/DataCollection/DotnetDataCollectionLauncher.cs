@@ -64,11 +64,6 @@ internal class DotnetDataCollectionLauncher : DataCollectionLauncher
         var dataCollectorDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
         TPDebug.Assert(dataCollectorDirectory is not null, "dataCollectorDirectory is null");
 
-        var currentProcessFileName = _processHelper.GetCurrentProcessFileName();
-        TPDebug.Assert(currentProcessFileName is not null, "currentProcessFileName is null");
-
-        EqtTrace.Verbose("DotnetDataCollectionLauncher: Full path of dotnet.exe is {0}", currentProcessFileName);
-
         var dataCollectorAssemblyPath = Path.Combine(dataCollectorDirectory, DataCollectorProcessName);
         string dataCollectorFileName = Path.GetFileNameWithoutExtension(dataCollectorAssemblyPath);
 
@@ -101,10 +96,17 @@ internal class DotnetDataCollectionLauncher : DataCollectionLauncher
             EqtTrace.Verbose("DotnetDataCollectionLauncher: File {0}, does not exist", depsFilePath);
         }
 
+        var currentProcessFileName = _processHelper.GetCurrentProcessFileName();
+        TPDebug.Assert(currentProcessFileName is not null, "currentProcessFileName is null");
+        EqtTrace.Verbose("DotnetDataCollectionLauncher: Full path of dotnet.exe is {0}", currentProcessFileName);
+
         var cliArgs = string.Join(" ", commandLineArguments);
         var argumentsString = string.Format("{0} \"{1}\" {2} ", args, dataCollectorAssemblyPath, cliArgs);
+
         var dataCollectorProcess = _processHelper.LaunchProcess(currentProcessFileName, argumentsString, Directory.GetCurrentDirectory(), environmentVariables, ErrorReceivedCallback, ExitCallBack, null);
+
         DataCollectorProcessId = _processHelper.GetProcessId(dataCollectorProcess);
+
         return DataCollectorProcessId;
     }
 }
