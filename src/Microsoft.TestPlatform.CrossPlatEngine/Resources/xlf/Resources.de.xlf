@@ -159,7 +159,7 @@
       </trans-unit>
       <trans-unit id="NoTestHostProviderFound">
         <source>No suitable test runtime provider was found for any source in this run.</source>
-        <target state="new">No suitable test runtime provider was found for any source in this run.</target>
+        <target state="translated">Für eine Quelle in dieser Ausführung wurde kein geeigneter Testruntimeanbieter gefunden.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="NoProxyMatchesDescription">
@@ -179,12 +179,12 @@
       </trans-unit>
       <trans-unit id="NoSuitableRuntimeProviderFound">
         <source>No suitable test runtime provider was found:</source>
-        <target state="new">No suitable test runtime provider was found:</target>
+        <target state="translated">Es wurde kein geeigneter Testruntimeanbieter gefunden:</target>
         <note></note>
       </trans-unit>
       <trans-unit id="SkippingSource">
         <source>Skipping source:</source>
-        <target state="new">Skipping source:</target>
+        <target state="translated">Quelle wird übersprungen:</target>
         <note></note>
       </trans-unit>
     </body>
