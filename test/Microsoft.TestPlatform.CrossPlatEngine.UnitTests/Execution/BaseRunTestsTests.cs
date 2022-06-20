@@ -952,7 +952,7 @@ public class BaseRunTestsTests
         /// <summary>
         /// Gets the run settings.
         /// </summary>
-        public string GetRunSettings => RunSettings;
+        public string? GetRunSettings => RunSettings;
 
         /// <summary>
         /// Gets the test execution context.

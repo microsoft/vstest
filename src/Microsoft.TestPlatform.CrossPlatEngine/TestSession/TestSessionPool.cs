@@ -3,13 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
@@ -19,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 public class TestSessionPool
 {
     private static readonly object InstanceLockObject = new();
-    private static volatile TestSessionPool s_instance;
+    private static volatile TestSessionPool? s_instance;
 
     private readonly object _lockObject = new();
     private readonly Dictionary<TestSessionInfo, ProxyTestSessionManager> _sessionPool;
@@ -38,6 +37,7 @@ public class TestSessionPool
     /// </summary>
     ///
     /// <remarks>Thread-safe singleton pattern.</remarks>
+    [AllowNull]
     public static TestSessionPool Instance
     {
         get
@@ -99,7 +99,7 @@ public class TestSessionPool
     {
         // TODO (copoiena): What happens if some request is running for the current session ?
         // Should we stop the request as well ? Probably yes.
-        IProxyTestSessionManager proxyManager = null;
+        IProxyTestSessionManager? proxyManager = null;
 
         lock (_lockObject)
         {
@@ -128,15 +128,15 @@ public class TestSessionPool
     /// <param name="requestData">The request data.</param>
     ///
     /// <returns>The proxy object.</returns>
-    public virtual ProxyOperationManager TryTakeProxy(
+    public virtual ProxyOperationManager? TryTakeProxy(
         TestSessionInfo testSessionInfo,
         string source,
-        string runSettings,
+        string? runSettings,
         IRequestData requestData)
     {
         ValidateArg.NotNull(requestData, nameof(requestData));
 
-        ProxyTestSessionManager sessionManager = null;
+        ProxyTestSessionManager? sessionManager = null;
         lock (_lockObject)
         {
             if (!_sessionPool.ContainsKey(testSessionInfo))
@@ -184,7 +184,7 @@ public class TestSessionPool
     /// <returns>True if the operation succeeded, false otherwise.</returns>
     public virtual bool ReturnProxy(TestSessionInfo testSessionInfo, int proxyId)
     {
-        ProxyTestSessionManager sessionManager = null;
+        ProxyTestSessionManager? sessionManager = null;
         lock (_lockObject)
         {
             if (!_sessionPool.ContainsKey(testSessionInfo))

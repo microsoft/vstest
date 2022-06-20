@@ -19,8 +19,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 /// <summary>
@@ -42,7 +40,7 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
     private int _runStartedClients;
     private int _availableWorkloads = -1;
 
-    private ParallelRunDataAggregator _currentRunDataAggregator;
+    private ParallelRunDataAggregator? _currentRunDataAggregator;
 
     private readonly IRequestData _requestData;
     private bool _skipDefaultAdapters;
@@ -140,15 +138,15 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
     public bool HandlePartialRunComplete(
         IProxyExecutionManager proxyExecutionManager,
         TestRunCompleteEventArgs testRunCompleteArgs,
-        TestRunChangedEventArgs lastChunkArgs,
-        ICollection<AttachmentSet> runContextAttachments,
-        ICollection<string> executorUris)
+        TestRunChangedEventArgs? lastChunkArgs,
+        ICollection<AttachmentSet>? runContextAttachments,
+        ICollection<string>? executorUris)
     {
         var allRunsCompleted = false;
         // TODO: Interlocked.Increment _runCompletedClients, and the condition on the bottom probably does not need to be under lock??
         lock (_executionStatusLockObject)
         {
-            // Each concurrent Executor calls this method 
+            // Each concurrent Executor calls this method
             // So, we need to keep track of total run complete calls
             _runCompletedClients++;
 
@@ -214,7 +212,7 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         // At that point we know that at least one testhost is not busy doing work anymore. It either
         // processed the workload and waits for another one, or it crashed and we should move to
         // another source.
-        // 
+        //
         // In the "partial" step we check if we have more workloads, and if the currently running testhost
         // is shared we try to find a workload that is appropriate for it. If we don't find any work that the
         // running testhost can do. Or if the testhost already exited (possibly because of crash), we start another one
@@ -303,7 +301,7 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
 
         return workloads;
 
-        TestRunCriteria CreateTestRunCriteriaFromTestCasesAndSettings(IEnumerable<TestCase> testCases, TestRunCriteria criteria, string runsettingsXml)
+        TestRunCriteria CreateTestRunCriteriaFromTestCasesAndSettings(IEnumerable<TestCase> testCases, TestRunCriteria criteria, string? runsettingsXml)
         {
             return new TestRunCriteria(
                  testCases,
@@ -316,7 +314,7 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
                  testRunCriteria.DebugEnabledForTestSession);
         }
 
-        TestRunCriteria CreateTestRunCriteriaFromSourceAndSettings(IEnumerable<string> sources, TestRunCriteria criteria, string runsettingsXml)
+        TestRunCriteria CreateTestRunCriteriaFromSourceAndSettings(IEnumerable<string> sources, TestRunCriteria criteria, string? runsettingsXml)
         {
             return new TestRunCriteria(
                  sources,
@@ -334,9 +332,10 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
 
     private ParallelRunEventsHandler GetParallelEventHandler(IInternalTestRunEventsHandler eventHandler, IProxyExecutionManager concurrentManager)
     {
-        if (concurrentManager is ProxyExecutionManagerWithDataCollection)
+        TPDebug.Assert(_currentRunDataAggregator is not null, "_currentRunDataAggregator is null");
+
+        if (concurrentManager is ProxyExecutionManagerWithDataCollection concurrentManagerWithDataCollection)
         {
-            var concurrentManagerWithDataCollection = concurrentManager as ProxyExecutionManagerWithDataCollection;
             var attachmentsProcessingManager = new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory());
 
             return new ParallelDataCollectionEventsHandler(
@@ -387,9 +386,10 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
                         EqtTrace.Error("ParallelProxyExecutionManager: Failed to trigger execution. Exception: " + t.Exception);
 
                         var handler = eventHandler;
-                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
+                        var exceptionToString = t.Exception?.ToString();
+                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exceptionToString };
                         handler.HandleRawMessage(_dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
-                        handler.HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
+                        handler.HandleLogMessage(TestMessageLevel.Error, exceptionToString);
 
                         // Send a run complete to caller. Similar logic is also used in ProxyExecutionManager.StartTestRun
                         // Differences:

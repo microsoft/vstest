@@ -26,7 +26,7 @@ public class TestRunCriteriaWithTests
     /// <param name="runSettings"> The test run settings. </param>
     /// <param name="testExecutionContext"> The test Execution Context. </param>
     [JsonConstructor]
-    public TestRunCriteriaWithTests(IEnumerable<TestCase> tests, string package, string? runSettings, TestExecutionContext? testExecutionContext)
+    public TestRunCriteriaWithTests(IEnumerable<TestCase> tests, string? package, string? runSettings, TestExecutionContext? testExecutionContext)
     {
         Tests = tests;
         Package = package;
@@ -52,5 +52,5 @@ public class TestRunCriteriaWithTests
     /// <summary>
     /// Gets the test Containers (e.g. .appx, .appxrecipie)
     /// </summary>
-    public string Package { get; private set; }
+    public string? Package { get; private set; }
 }

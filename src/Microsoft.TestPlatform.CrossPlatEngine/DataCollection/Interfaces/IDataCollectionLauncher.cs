@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 
 /// <summary>
@@ -29,5 +27,5 @@ internal interface IDataCollectionLauncher
     /// <returns>
     /// The <see cref="int"/>.
     /// </returns>
-    int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments);
+    int LaunchDataCollector(IDictionary<string, string>? environmentVariables, IList<string> commandLineArguments);
 }

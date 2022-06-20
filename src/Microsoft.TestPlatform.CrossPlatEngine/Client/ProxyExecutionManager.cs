@@ -24,8 +24,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
@@ -33,20 +31,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 /// </summary>
 internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInternalTestRunEventsHandler
 {
-    private readonly TestSessionInfo _testSessionInfo;
-    private readonly Func<string, ProxyExecutionManager, ProxyOperationManager> _proxyOperationManagerCreator;
-
-    private ITestRuntimeProvider _testHostManager;
-
+    private readonly TestSessionInfo? _testSessionInfo;
+    private readonly Func<string, ProxyExecutionManager, ProxyOperationManager>? _proxyOperationManagerCreator;
     private readonly IFileHelper _fileHelper;
     private readonly IDataSerializer _dataSerializer;
-    private List<string> _testSources;
-    private bool _isCommunicationEstablished;
-
-    private ProxyOperationManager _proxyOperationManager;
-    private IInternalTestRunEventsHandler _baseTestRunEventsHandler;
-    private bool _skipDefaultAdapters;
     private readonly bool _debugEnabledForTestSession;
+
+    private List<string>? _testSources;
+    private ITestRuntimeProvider? _testHostManager;
+    private bool _isCommunicationEstablished;
+    private ProxyOperationManager? _proxyOperationManager;
+    private IInternalTestRunEventsHandler? _baseTestRunEventsHandler;
+    private bool _skipDefaultAdapters;
 
     /// <inheritdoc/>
     public bool IsInitialized { get; private set; }
@@ -56,8 +52,16 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
     /// </summary>
     public CancellationTokenSource CancellationTokenSource
     {
-        get { return _proxyOperationManager.CancellationTokenSource; }
-        set { _proxyOperationManager.CancellationTokenSource = value; }
+        get
+        {
+            TPDebug.Assert(_proxyOperationManager is not null, "_proxyOperationManager is null");
+            return _proxyOperationManager.CancellationTokenSource;
+        }
+        set
+        {
+            TPDebug.Assert(_proxyOperationManager is not null, "_proxyOperationManager is null");
+            _proxyOperationManager.CancellationTokenSource = value;
+        }
     }
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class.
@@ -161,6 +165,8 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
                 ? TestSourcesUtility.GetSources(testRunCriteria.Tests)
                 : testRunCriteria.Sources;
 
+            TPDebug.Assert(_proxyOperationManagerCreator is not null, "_proxyOperationManagerCreator is null");
+            TPDebug.Assert(sources is not null, "sources is null");
             _proxyOperationManager = _proxyOperationManagerCreator(
                 sources.First(),
                 this);
@@ -175,9 +181,9 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
 
             _testSources = new List<string>(
                 testRunCriteria.HasSpecificSources
-                ? testRunCriteria.Sources
-                // If the test execution is with a test filter, group them by sources.
-                : testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
+                    ? testRunCriteria.Sources
+                    // If the test execution is with a test filter, group them by sources.
+                    : testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
 
             _isCommunicationEstablished = _proxyOperationManager.SetupChannel(
                 _testSources,
@@ -339,7 +345,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
     /// <inheritdoc/>
     public virtual int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
     {
-        return _baseTestRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+        return _baseTestRunEventsHandler?.LaunchProcessWithDebuggerAttached(testProcessStartInfo) ?? -1;
     }
 
     /// <inheritdoc />
@@ -350,7 +356,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
         // of this capability.
         if (attachDebuggerInfo.TargetFramework is null)
         {
-            attachDebuggerInfo.TargetFramework = _proxyOperationManager.TestHostManagerFramework.ToString();
+            attachDebuggerInfo.TargetFramework = _proxyOperationManager?.TestHostManagerFramework?.ToString();
         };
 
         if (attachDebuggerInfo.Sources is null || !attachDebuggerInfo.Sources.Any())
@@ -358,19 +364,19 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
             attachDebuggerInfo.Sources = _testSources;
         }
 
-        return _baseTestRunEventsHandler.AttachDebuggerToProcess(attachDebuggerInfo);
+        return _baseTestRunEventsHandler?.AttachDebuggerToProcess(attachDebuggerInfo) ?? false;
     }
 
     /// <inheritdoc/>
-    public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
+    public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris)
     {
-        _baseTestRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
+        _baseTestRunEventsHandler?.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
     }
 
     /// <inheritdoc/>
     public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
     {
-        _baseTestRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
+        _baseTestRunEventsHandler?.HandleTestRunStatsChange(testRunChangedArgs);
     }
 
     /// <inheritdoc/>
@@ -386,13 +392,13 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
             Close();
         }
 
-        _baseTestRunEventsHandler.HandleRawMessage(rawMessage);
+        _baseTestRunEventsHandler?.HandleRawMessage(rawMessage);
     }
 
     /// <inheritdoc/>
     public void HandleLogMessage(TestMessageLevel level, string message)
     {
-        _baseTestRunEventsHandler.HandleLogMessage(level, message);
+        _baseTestRunEventsHandler?.HandleLogMessage(level, message);
     }
 
     #endregion
@@ -402,7 +408,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
     public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
     {
         // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
-        var telemetryOptedIn = _proxyOperationManager.RequestData.IsTelemetryOptedIn ? "true" : "false";
+        var telemetryOptedIn = _proxyOperationManager?.RequestData?.IsTelemetryOptedIn == true ? "true" : "false";
         testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
         return testProcessStartInfo;
     }
@@ -421,7 +427,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
     /// </returns>
     public virtual bool SetupChannel(IEnumerable<string> sources, string runSettings)
     {
-        return _proxyOperationManager.SetupChannel(sources, runSettings);
+        return _proxyOperationManager?.SetupChannel(sources, runSettings) ?? false;
     }
 
     private void LogMessage(TestMessageLevel testMessageLevel, string message)
@@ -447,12 +453,12 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
         }
 
         var sourceList = sources.ToList();
-        var platformExtensions = _testHostManager.GetTestPlatformExtensions(sourceList, extensions.Except(nonExistingExtensions));
+        var platformExtensions = _testHostManager?.GetTestPlatformExtensions(sourceList, extensions.Except(nonExistingExtensions));
 
         // Only send this if needed.
-        if (platformExtensions.Any())
+        if (platformExtensions is not null && platformExtensions.Any())
         {
-            _proxyOperationManager.RequestSender.InitializeExecution(platformExtensions);
+            _proxyOperationManager?.RequestSender.InitializeExecution(platformExtensions);
         }
     }
 }

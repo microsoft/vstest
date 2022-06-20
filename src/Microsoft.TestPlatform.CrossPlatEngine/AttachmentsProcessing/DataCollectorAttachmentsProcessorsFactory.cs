@@ -16,8 +16,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 
 internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachmentsProcessorsFactory
@@ -25,7 +23,7 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
     private const string CoverageFriendlyName = "Code Coverage";
     private static readonly ConcurrentDictionary<string, DataCollectorExtensionManager> DataCollectorExtensionManagerCache = new();
 
-    public DataCollectorAttachmentProcessor[] Create(InvokedDataCollector[] invokedDataCollectors, IMessageLogger logger)
+    public DataCollectorAttachmentProcessor[] Create(InvokedDataCollector[]? invokedDataCollectors, IMessageLogger? logger)
     {
         IDictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>> datacollectorsAttachmentsProcessors = new Dictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>>();
 
@@ -62,9 +60,9 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
                         var wrapper = new DataCollectorAttachmentProcessorAppDomain(invokedDataCollector, logger);
                         if (wrapper.LoadSucceded && wrapper.HasAttachmentProcessor)
                         {
-                            if (!datacollectorsAttachmentsProcessors.ContainsKey(wrapper.AssemblyQualifiedName))
+                            if (!datacollectorsAttachmentsProcessors.ContainsKey(wrapper.AssemblyQualifiedName!))
                             {
-                                datacollectorsAttachmentsProcessors.Add(wrapper.AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(wrapper.FriendlyName, wrapper));
+                                datacollectorsAttachmentsProcessors.Add(wrapper.AssemblyQualifiedName!, new Tuple<string, IDataCollectorAttachmentProcessor>(wrapper.FriendlyName!, wrapper));
                                 EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor '{wrapper.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' added to the 'run list'");
                             }
                             else
@@ -94,7 +92,7 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
                     if (dataCollectorExtension?.Metadata.HasAttachmentProcessor == true)
                     {
                         Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension.TestPluginInfo).AttachmentsProcessorType;
-                        IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessorInstance = null;
+                        IDataCollectorAttachmentProcessor? dataCollectorAttachmentProcessorInstance = null;
                         try
                         {
                             dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);
@@ -106,9 +104,11 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
                             logger?.SendMessage(TestMessageLevel.Error, $"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
                         }
 
-                        if (dataCollectorAttachmentProcessorInstance is not null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentProcessorType.AssemblyQualifiedName))
+                        var attachmentQualifiedName = attachmentProcessorType.AssemblyQualifiedName;
+                        TPDebug.Assert(attachmentQualifiedName is not null, "attachmentQualifiedName is null");
+                        if (dataCollectorAttachmentProcessorInstance is not null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentQualifiedName))
                         {
-                            datacollectorsAttachmentsProcessors.Add(attachmentProcessorType.AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
+                            datacollectorsAttachmentsProcessors.Add(attachmentQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
                             EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' added to the 'run list'");
                         }
                     }
@@ -122,9 +122,9 @@ internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachm
 
         // We provide the implementation of CodeCoverageDataAttachmentsHandler through nuget package, but in case of absent registration or if for some reason
         // the attachment processor from package fails we fallback to the default implementation.
-        if (!datacollectorsAttachmentsProcessors.ContainsKey(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName))
+        if (!datacollectorsAttachmentsProcessors.ContainsKey(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName!))
         {
-            datacollectorsAttachmentsProcessors.Add(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(CoverageFriendlyName, new CodeCoverageDataAttachmentsHandler()));
+            datacollectorsAttachmentsProcessors.Add(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName!, new Tuple<string, IDataCollectorAttachmentProcessor>(CoverageFriendlyName, new CodeCoverageDataAttachmentsHandler()));
             EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor '{typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName}' for the data collector with friendly name '{CoverageFriendlyName}' added to the 'run list'");
         }
 

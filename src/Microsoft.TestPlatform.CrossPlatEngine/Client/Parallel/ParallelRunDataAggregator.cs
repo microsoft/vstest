@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 /// <summary>
@@ -125,9 +123,9 @@ internal class ParallelRunDataAggregator
         return _metricsAggregator;
     }
 
-    public Exception GetAggregatedException()
+    public Exception? GetAggregatedException()
     {
-        return Exceptions == null || Exceptions.Count < 1 ? null : (Exception)new AggregateException(Exceptions);
+        return Exceptions == null || Exceptions.Count < 1 ? null : new AggregateException(Exceptions);
     }
 
     /// <summary>
@@ -135,16 +133,16 @@ internal class ParallelRunDataAggregator
     /// Must be thread-safe as this is expected to be called by parallel managers
     /// </summary>
     public void Aggregate(
-        ITestRunStatistics testRunStats,
-        ICollection<string> executorUris,
-        Exception exception,
+        ITestRunStatistics? testRunStats,
+        ICollection<string>? executorUris,
+        Exception? exception,
         TimeSpan elapsedTime,
         bool isAborted,
         bool isCanceled,
-        ICollection<AttachmentSet> runContextAttachments,
-        Collection<AttachmentSet> runCompleteArgsAttachments,
-        Collection<InvokedDataCollector> invokedDataCollectors,
-        Dictionary<string, HashSet<string>> discoveredExtensions)
+        ICollection<AttachmentSet>? runContextAttachments,
+        Collection<AttachmentSet>? runCompleteArgsAttachments,
+        Collection<InvokedDataCollector>? invokedDataCollectors,
+        Dictionary<string, HashSet<string>>? discoveredExtensions)
     {
         lock (_dataUpdateSyncObject)
         {
@@ -185,7 +183,7 @@ internal class ParallelRunDataAggregator
     /// Aggregates Run Data Metrics from each Test Host Process
     /// </summary>
     /// <param name="metrics"></param>
-    public void AggregateRunDataMetrics(IDictionary<string, object> metrics)
+    public void AggregateRunDataMetrics(IDictionary<string, object>? metrics)
     {
         if (metrics == null || metrics.Count == 0 || _metricsAggregator == null)
         {

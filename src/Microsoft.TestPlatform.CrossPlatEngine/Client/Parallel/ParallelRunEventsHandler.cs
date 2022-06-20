@@ -14,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 /// <summary>
@@ -64,9 +62,9 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
     /// </summary>
     public virtual void HandleTestRunComplete(
         TestRunCompleteEventArgs testRunCompleteArgs,
-        TestRunChangedEventArgs lastChunkArgs,
-        ICollection<AttachmentSet> runContextAttachments,
-        ICollection<string> executorUris)
+        TestRunChangedEventArgs? lastChunkArgs,
+        ICollection<AttachmentSet>? runContextAttachments,
+        ICollection<string>? executorUris)
     {
         var parallelRunComplete = HandleSingleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
 
@@ -101,9 +99,9 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
     }
 
     protected bool HandleSingleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs,
-        TestRunChangedEventArgs lastChunkArgs,
-        ICollection<AttachmentSet> runContextAttachments,
-        ICollection<string> executorUris)
+        TestRunChangedEventArgs? lastChunkArgs,
+        ICollection<AttachmentSet>? runContextAttachments,
+        ICollection<string>? executorUris)
     {
         // we get run complete events from each executor process
         // so we cannot "complete" the actual executor operation until all sources/testcases are consumed

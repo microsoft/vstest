@@ -126,8 +126,13 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="message">A <see cref="Message"/> object.</param>
     /// <typeparam name="T">Payload type.</typeparam>
     /// <returns>The deserialized payload.</returns>
-    public T? DeserializePayload<T>(Message message)
+    public T? DeserializePayload<T>(Message? message)
     {
+        if (message is null)
+        {
+            return default;
+        }
+
         if (message.GetType() == typeof(Message))
         {
             // Message is specifically a Message, and not any of it's child types like VersionedMessage.

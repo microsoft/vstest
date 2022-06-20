@@ -33,8 +33,6 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 /// <summary>
@@ -42,20 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 /// </summary>
 internal abstract class BaseRunTests
 {
-    private readonly ITestEventsPublisher _testEventsPublisher;
-    private protected string _package;
-    private readonly IRequestData _requestData;
-
-    /// <summary>
-    /// Specifies that the test run cancellation is requested
-    /// </summary>
-    private volatile bool _isCancellationRequested;
-
-    /// <summary>
-    /// Active executor which is executing the tests currently
-    /// </summary>
-    private ITestExecutor _activeExecutor;
-    private readonly ITestCaseEventsHandler _testCaseEventsHandler;
+    private readonly ITestCaseEventsHandler? _testCaseEventsHandler;
     private readonly ITestPlatformEventSource _testPlatformEventSource;
 
     /// <summary>
@@ -73,6 +58,19 @@ internal abstract class BaseRunTests
     /// </summary>
     private readonly IDataSerializer _dataSerializer;
 
+    private protected string? _package;
+    private readonly IRequestData _requestData;
+
+    /// <summary>
+    /// Specifies that the test run cancellation is requested
+    /// </summary>
+    private volatile bool _isCancellationRequested;
+
+    /// <summary>
+    /// Active executor which is executing the tests currently
+    /// </summary>
+    private ITestExecutor? _activeExecutor;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
     /// </summary>
@@ -85,10 +83,10 @@ internal abstract class BaseRunTests
     /// <param name="testPlatformEventSource">Test platform event source.</param>
     protected BaseRunTests(
         IRequestData requestData,
-        string package,
-        string runSettings,
+        string? package,
+        string? runSettings,
         TestExecutionContext testExecutionContext,
-        ITestCaseEventsHandler testCaseEventsHandler,
+        ITestCaseEventsHandler? testCaseEventsHandler,
         IInternalTestRunEventsHandler testRunEventsHandler,
         ITestPlatformEventSource testPlatformEventSource)
         : this(
@@ -120,13 +118,13 @@ internal abstract class BaseRunTests
     /// <param name="dataSerializer">Data Serializer for cloning TestCase and test results object.</param>
     protected BaseRunTests(
         IRequestData requestData,
-        string package,
-        string runSettings,
+        string? package,
+        string? runSettings,
         TestExecutionContext testExecutionContext,
-        ITestCaseEventsHandler testCaseEventsHandler,
+        ITestCaseEventsHandler? testCaseEventsHandler,
         IInternalTestRunEventsHandler testRunEventsHandler,
         ITestPlatformEventSource testPlatformEventSource,
-        ITestEventsPublisher testEventsPublisher,
+        ITestEventsPublisher? testEventsPublisher,
         IThread platformThread,
         IDataSerializer dataSerializer)
     {
@@ -139,7 +137,6 @@ internal abstract class BaseRunTests
 
         _isCancellationRequested = false;
         _testPlatformEventSource = testPlatformEventSource;
-        _testEventsPublisher = testEventsPublisher;
         _platformThread = platformThread;
         _dataSerializer = dataSerializer;
 
@@ -170,7 +167,7 @@ internal abstract class BaseRunTests
     /// <summary>
     /// Gets the run settings.
     /// </summary>
-    protected string RunSettings { get; }
+    protected string? RunSettings { get; }
 
     /// <summary>
     /// Gets the test execution context.
@@ -199,9 +196,8 @@ internal abstract class BaseRunTests
     {
         using (TestRunCache)
         {
-            TimeSpan elapsedTime = TimeSpan.Zero;
-
-            Exception exception = null;
+            TimeSpan? elapsedTime = null;
+            Exception? exception = null;
             bool isAborted = false;
             bool shutdownAfterRun = false;
 
@@ -211,9 +207,16 @@ internal abstract class BaseRunTests
                 SendSessionStart();
 
                 elapsedTime = RunTestsInternal();
-
-                // Check the adapter setting for shutting down this process after run
-                shutdownAfterRun = FrameworkHandle.EnableShutdownAfterTestRun;
+                if (elapsedTime is null)
+                {
+                    EqtTrace.Error("BaseRunTests.RunTests: Failed to run the tests. Reason: GetExecutorUriExtensionMap returned null.");
+                    isAborted = true;
+                }
+                else
+                {
+                    // Check the adapter setting for shutting down this process after run
+                    shutdownAfterRun = FrameworkHandle.EnableShutdownAfterTestRun;
+                }
             }
             catch (Exception ex)
             {
@@ -230,7 +233,7 @@ internal abstract class BaseRunTests
                 try
                 {
                     // Send the test run complete event.
-                    RaiseTestRunComplete(exception, _isCancellationRequested, isAborted, elapsedTime);
+                    RaiseTestRunComplete(exception, _isCancellationRequested, isAborted, elapsedTime ?? TimeSpan.Zero);
                 }
                 catch (Exception ex2)
                 {
@@ -274,7 +277,7 @@ internal abstract class BaseRunTests
 
     protected abstract void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests);
 
-    protected abstract IEnumerable<Tuple<Uri, string>> GetExecutorUriExtensionMap(
+    protected abstract IEnumerable<Tuple<Uri, string>>? GetExecutorUriExtensionMap(
         IFrameworkHandle testExecutorFrameworkHandle,
         RunContext runContext);
 
@@ -303,7 +306,7 @@ internal abstract class BaseRunTests
 
     protected abstract void SendSessionEnd();
 
-    private void CancelTestRunInternal(ITestExecutor executor)
+    private static void CancelTestRunInternal(ITestExecutor executor)
     {
         try
         {
@@ -314,23 +317,30 @@ internal abstract class BaseRunTests
             EqtTrace.Info("{0}.Cancel threw an exception: {1} ", executor.GetType().FullName, e);
         }
     }
-    private void OnTestRunMessage(object sender, TestRunMessageEventArgs e)
+    private void OnTestRunMessage(object? sender, TestRunMessageEventArgs e)
     {
         TestRunEventsHandler.HandleLogMessage(e.Level, e.Message);
     }
 
-    private TimeSpan RunTestsInternal()
+    private TimeSpan? RunTestsInternal()
     {
         long totalTests = 0;
-
-        var executorUriExtensionMap = GetExecutorUriExtensionMap(FrameworkHandle, RunContext);
 
         // Set on the logger the TreatAdapterErrorAsWarning setting from runsettings.
         SetAdapterLoggingSettings();
 
+        var executorUriExtensionMap = GetExecutorUriExtensionMap(FrameworkHandle, RunContext);
+
         var stopwatch = new Stopwatch();
         stopwatch.Start();
+
         _testPlatformEventSource.ExecutionStart();
+
+        if (executorUriExtensionMap is null)
+        {
+            return null;
+        }
+
         var exceptionsHitDuringRunTests = RunTestInternalWithExecutors(
             executorUriExtensionMap,
             totalTests);
@@ -344,11 +354,12 @@ internal abstract class BaseRunTests
     private bool RunTestInternalWithExecutors(IEnumerable<Tuple<Uri, string>> executorUriExtensionMap, long totalTests)
     {
         // Collecting Total Number of Adapters Discovered in Machine.
-        _requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, executorUriExtensionMap.Count());
+        var executorUriExtensionMapList = executorUriExtensionMap as IList<Tuple<Uri, string>> ?? executorUriExtensionMap.ToList();
+        _requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, executorUriExtensionMapList.Count);
 
         var attachedToTestHost = false;
         var executorCache = new Dictionary<string, LazyExtension<ITestExecutor, ITestExecutorCapabilities>>();
-        foreach (var executorUriExtensionTuple in executorUriExtensionMap)
+        foreach (var executorUriExtensionTuple in executorUriExtensionMapList)
         {
             // Avoid processing the same executor twice.
             if (executorCache.ContainsKey(executorUriExtensionTuple.Item1.AbsoluteUri))
@@ -360,7 +371,7 @@ internal abstract class BaseRunTests
             var extensionManager = GetExecutorExtensionManager(executorUriExtensionTuple.Item2);
 
             // Look up the executor.
-            var executor = extensionManager.TryGetTestExtension(executorUriExtensionTuple.Item1);
+            var executor = extensionManager?.TryGetTestExtension(executorUriExtensionTuple.Item1);
             if (executor == null)
             {
                 // Commenting this out because of a compatibility issue with Microsoft.Dotnet.ProjectModel released on nuGet.org.
@@ -418,7 +429,7 @@ internal abstract class BaseRunTests
         var executorsFromDeprecatedLocations = false;
         double totalTimeTakenByAdapters = 0;
 
-        foreach (var executorUriExtensionTuple in executorUriExtensionMap)
+        foreach (var executorUriExtensionTuple in executorUriExtensionMapList)
         {
             var executorUri = executorUriExtensionTuple.Item1.AbsoluteUri;
             // Get the executor from the cache.
@@ -481,7 +492,7 @@ internal abstract class BaseRunTests
                     {
                         var executorLocation = executor.Value.GetType().GetTypeInfo().Assembly.GetAssemblyLocation();
 
-                        executorsFromDeprecatedLocations |= Path.GetDirectoryName(executorLocation).Equals(CrossPlatEngine.Constants.DefaultAdapterLocation);
+                        executorsFromDeprecatedLocations |= Path.GetDirectoryName(executorLocation)!.Equals(CrossPlatEngine.Constants.DefaultAdapterLocation);
                     }
 
                     totalTests = TestRunCache.TotalExecutedTests;
@@ -538,11 +549,11 @@ internal abstract class BaseRunTests
         return _runConfiguration.ExecutionThreadApartmentState != PlatformApartmentState.STA;
     }
 
-    private TestExecutorExtensionManager GetExecutorExtensionManager(string extensionAssembly)
+    private static TestExecutorExtensionManager? GetExecutorExtensionManager(string extensionAssembly)
     {
         try
         {
-            if (string.IsNullOrEmpty(extensionAssembly)
+            if (StringUtils.IsNullOrEmpty(extensionAssembly)
                 || string.Equals(extensionAssembly, ObjectModel.Constants.UnspecifiedAdapterPath))
             {
                 // full execution. Since the extension manager is cached this can be created multiple times without harming performance.
@@ -577,7 +588,7 @@ internal abstract class BaseRunTests
     }
 
     private void RaiseTestRunComplete(
-        Exception exception,
+        Exception? exception,
         bool canceled,
         bool aborted,
         TimeSpan elapsedTime)
@@ -604,7 +615,7 @@ internal abstract class BaseRunTests
             var testRunChangedEventArgs = new TestRunChangedEventArgs(runStats, lastChunkTestResults, Enumerable.Empty<TestCase>());
 
             // Adding Metrics along with Test Run Complete Event Args
-            Collection<AttachmentSet> attachments = FrameworkHandle?.Attachments;
+            Collection<AttachmentSet>? attachments = FrameworkHandle?.Attachments;
             var testRunCompleteEventArgs = new TestRunCompleteEventArgs(
                 runStats,
                 canceled,
@@ -632,10 +643,10 @@ internal abstract class BaseRunTests
 
     private bool IsTestSourceIsPackage()
     {
-        return !string.IsNullOrEmpty(_package);
+        return !StringUtils.IsNullOrEmpty(_package);
     }
 
-    private void OnCacheHit(TestRunStatistics testRunStats, ICollection<TestResult> results, ICollection<TestCase> inProgressTestCases)
+    private void OnCacheHit(TestRunStatistics testRunStats, ICollection<TestResult> results, ICollection<TestCase>? inProgressTestCases)
     {
         if (TestRunEventsHandler != null)
         {
@@ -675,9 +686,9 @@ internal abstract class BaseRunTests
 
     private void UpdateTestCaseSourceToPackage(
         ICollection<TestResult> testResults,
-        ICollection<TestCase> inProgressTestCases,
+        ICollection<TestCase>? inProgressTestCases,
         out ICollection<TestResult> updatedTestResults,
-        out ICollection<TestCase> updatedInProgressTestCases)
+        out ICollection<TestCase>? updatedInProgressTestCases)
     {
         EqtTrace.Verbose("BaseRunTests.UpdateTestCaseSourceToPackage: Update source details for testResults and testCases.");
 
@@ -685,13 +696,14 @@ internal abstract class BaseRunTests
         updatedInProgressTestCases = UpdateInProgressTests(inProgressTestCases, _package);
     }
 
-    private ICollection<TestResult> UpdateTestResults(ICollection<TestResult> testResults, string package)
+    private ICollection<TestResult> UpdateTestResults(ICollection<TestResult> testResults, string? package)
     {
         ICollection<TestResult> updatedTestResults = new List<TestResult>();
 
         foreach (var testResult in testResults)
         {
             var updatedTestResult = _dataSerializer.Clone(testResult);
+            TPDebug.Assert(updatedTestResult is not null, "updatedTestResult is null");
             updatedTestResult.TestCase.Source = package;
             updatedTestResults.Add(updatedTestResult);
         }
@@ -699,7 +711,7 @@ internal abstract class BaseRunTests
         return updatedTestResults;
     }
 
-    private ICollection<TestCase> UpdateInProgressTests(ICollection<TestCase> inProgressTestCases, string package)
+    private ICollection<TestCase>? UpdateInProgressTests(ICollection<TestCase>? inProgressTestCases, string? package)
     {
         if (inProgressTestCases == null)
         {
@@ -710,6 +722,7 @@ internal abstract class BaseRunTests
         foreach (var inProgressTestCase in inProgressTestCases)
         {
             var updatedTestCase = _dataSerializer.Clone(inProgressTestCase);
+            TPDebug.Assert(updatedTestCase is not null, "updatedTestCase is null");
             updatedTestCase.Source = package;
             updatedTestCases.Add(updatedTestCase);
         }

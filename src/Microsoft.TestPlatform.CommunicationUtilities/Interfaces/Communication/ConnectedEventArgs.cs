@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
@@ -42,6 +43,8 @@ public class ConnectedEventArgs : EventArgs
     /// <summary>
     /// Gets a value indicating whether channel is connected or not, true if it's connected.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(Channel))]
+    [MemberNotNullWhen(false, nameof(Fault))]
     public bool Connected { get; private set; }
 
     /// <summary>

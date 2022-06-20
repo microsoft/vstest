@@ -637,7 +637,7 @@ public class TestPlatformTests
             _hostProvider = hostProvider;
         }
 
-        public override ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration, List<string> _)
+        public override ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string? runConfiguration, List<string>? _)
         {
             return _hostProvider;
         }

@@ -143,7 +143,7 @@ internal sealed class DiscoveryDataAggregator
             {
                 var newValue = Convert.ToDouble(metric.Value);
 
-                if (_metricsAggregator.TryGetValue(metric.Key, out object oldValue))
+                if (_metricsAggregator.TryGetValue(metric.Key, out object? oldValue))
                 {
                     double oldDoubleValue = Convert.ToDouble(oldValue);
                     _metricsAggregator[metric.Key] = newValue + oldDoubleValue;

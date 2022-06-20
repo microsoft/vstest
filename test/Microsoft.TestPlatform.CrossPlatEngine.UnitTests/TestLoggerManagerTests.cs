@@ -50,9 +50,9 @@ public class TestLoggerManagerTests
     public void TryGetUriFromFriendlyNameShouldReturnUriIfLoggerIsAdded()
     {
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.TryGetUriFromFriendlyName("TestLoggerExtension", out var uri);
-        Assert.AreEqual(uri.ToString(), new Uri(_loggerUri).ToString());
+        Assert.AreEqual(uri?.ToString(), new Uri(_loggerUri).ToString());
     }
 
     [TestMethod]
@@ -67,7 +67,7 @@ public class TestLoggerManagerTests
     public void GetResultsDirectoryShouldReturnNullIfRunSettingsIsNull()
     {
         var testLoggerManager = new DummyTestLoggerManager();
-        string result = testLoggerManager.GetResultsDirectory(null);
+        var result = testLoggerManager.GetResultsDirectory(null);
         Assert.IsNull(result);
     }
 
@@ -85,7 +85,7 @@ public class TestLoggerManagerTests
     </RunSettings> ";
 
         var testLoggerManager = new DummyTestLoggerManager();
-        string result = testLoggerManager.GetResultsDirectory(runSettingsXml);
+        var result = testLoggerManager.GetResultsDirectory(runSettingsXml);
         Assert.AreEqual(0, string.Compare("DummyTestResultsFolder", result));
     }
 
@@ -102,7 +102,7 @@ public class TestLoggerManagerTests
     </RunSettings> ";
 
         var testLoggerManager = new DummyTestLoggerManager();
-        string result = testLoggerManager.GetResultsDirectory(runSettingsXml);
+        var result = testLoggerManager.GetResultsDirectory(runSettingsXml);
 
         Assert.AreEqual(0, string.Compare(Constants.DefaultResultsDirectory, result));
     }
@@ -122,7 +122,7 @@ public class TestLoggerManagerTests
         var testLoggerManager = new DummyTestLoggerManager();
         var framework = testLoggerManager.GetTargetFramework(runSettingsXml);
 
-        Assert.AreEqual(".NETFramework,Version=v4.5", framework.Name);
+        Assert.AreEqual(".NETFramework,Version=v4.5", framework?.Name);
     }
 
     [TestMethod]
@@ -131,7 +131,7 @@ public class TestLoggerManagerTests
         s_counter = 0;
         WaitHandle.Reset();
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.HandleTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational, "TestRunMessage"));
@@ -146,7 +146,7 @@ public class TestLoggerManagerTests
         s_counter = 0;
         WaitHandle.Reset();
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.Dispose();
@@ -162,7 +162,7 @@ public class TestLoggerManagerTests
         WaitHandle.Reset();
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, null, new TimeSpan()));
@@ -178,7 +178,7 @@ public class TestLoggerManagerTests
         WaitHandle.Reset();
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.Dispose();
@@ -194,7 +194,7 @@ public class TestLoggerManagerTests
         WaitHandle.Reset();
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, null, new TimeSpan()));
@@ -210,7 +210,7 @@ public class TestLoggerManagerTests
         WaitHandle.Reset();
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.HandleTestRunStatsChange(
@@ -237,7 +237,7 @@ public class TestLoggerManagerTests
         WaitHandle.Reset();
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.Dispose();
@@ -262,7 +262,7 @@ public class TestLoggerManagerTests
     {
         var testLoggerManager = new DummyTestLoggerManager();
         Assert.ThrowsException<ArgumentNullException>(
-            () => testLoggerManager.InitializeLoggerByUri(null, null));
+            () => testLoggerManager.InitializeLoggerByUri(null!, null));
     }
 
     [TestMethod]
@@ -348,7 +348,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
 
         // Act.
         testLoggerManager.Initialize(null);
@@ -372,7 +372,7 @@ public class TestLoggerManagerTests
 
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.HandleDiscoveryStart(discoveryStartEventArgs);
@@ -396,7 +396,7 @@ public class TestLoggerManagerTests
 
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.Dispose();
@@ -420,7 +420,7 @@ public class TestLoggerManagerTests
 
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.HandleDiscoveredTests(discoveredTestsEventArgs);
@@ -441,7 +441,7 @@ public class TestLoggerManagerTests
 
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.Dispose();
@@ -465,7 +465,7 @@ public class TestLoggerManagerTests
 
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.HandleTestRunStart(testRunStartEventArgs);
@@ -489,7 +489,7 @@ public class TestLoggerManagerTests
 
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.Dispose();
@@ -512,7 +512,7 @@ public class TestLoggerManagerTests
 
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
@@ -535,7 +535,7 @@ public class TestLoggerManagerTests
 
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.Dispose();
@@ -552,7 +552,7 @@ public class TestLoggerManagerTests
         WaitHandle.Reset();
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false);
@@ -576,7 +576,7 @@ public class TestLoggerManagerTests
 
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.HandleDiscoveryMessage(testRunMessageEventArgs);
@@ -600,7 +600,7 @@ public class TestLoggerManagerTests
 
         // setup TestLogger
         var testLoggerManager = new DummyTestLoggerManager();
-        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new Dictionary<string, string>());
+        testLoggerManager.InitializeLoggerByUri(new Uri(_loggerUri), new());
         testLoggerManager.EnableLogging();
 
         testLoggerManager.Dispose();
@@ -1673,12 +1673,14 @@ public class TestLoggerManagerTests
 
     internal class DummyTestLoggerManager : TestLoggerManager
     {
-        public DummyTestLoggerManager() : base(null, TestSessionMessageLogger.Instance, new InternalTestLoggerEvents(TestSessionMessageLogger.Instance))
+        public DummyTestLoggerManager()
+            : base(null!, TestSessionMessageLogger.Instance, new InternalTestLoggerEvents(TestSessionMessageLogger.Instance))
         {
 
         }
 
-        public DummyTestLoggerManager(IRequestData requestData) : base(requestData, TestSessionMessageLogger.Instance, new InternalTestLoggerEvents(TestSessionMessageLogger.Instance))
+        public DummyTestLoggerManager(IRequestData requestData)
+            : base(requestData, TestSessionMessageLogger.Instance, new InternalTestLoggerEvents(TestSessionMessageLogger.Instance))
         {
 
         }

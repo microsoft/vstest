@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,6 +64,7 @@ public class ProxyBaseManagerTests
             .Returns(Task.FromResult(true));
     }
 
+    [MemberNotNull(nameof(_testRequestSender), nameof(_testRequestSender))]
     private void SetupAndInitializeTestRequestSender()
     {
         var connectionInfo = new TestHostConnectionInfo

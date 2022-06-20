@@ -13,8 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
@@ -22,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 /// </summary>
 internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
 {
-    private IDictionary<string, string> _dataCollectionEnvironmentVariables;
+    private IDictionary<string, string>? _dataCollectionEnvironmentVariables;
     private int _dataCollectionPort;
     private readonly IRequestData _requestData;
 
@@ -61,7 +59,7 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
         testHostManager.HostLaunched += TestHostLaunchedHandler;
     }
 
-    private void TestHostLaunchedHandler(object sender, HostProviderEventArgs e)
+    private void TestHostLaunchedHandler(object? sender, HostProviderEventArgs e)
     {
         ProxyDataCollectionManager.TestHostLaunched(e.ProcessId);
     }
@@ -178,7 +176,7 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
         {
             testProcessStartInfo.EnvironmentVariables = _dataCollectionEnvironmentVariables;
         }
-        else
+        else if (_dataCollectionEnvironmentVariables is not null)
         {
             foreach (var kvp in _dataCollectionEnvironmentVariables)
             {
@@ -188,8 +186,7 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
 
         // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
         var telemetryOptedIn = _requestData.IsTelemetryOptedIn ? "true" : "false";
-        testProcessStartInfo.Arguments += " --datacollectionport " + _dataCollectionPort
-                                                                   + " --telemetryoptedin " + telemetryOptedIn;
+        testProcessStartInfo.Arguments += $" --datacollectionport {_dataCollectionPort} --telemetryoptedin {telemetryOptedIn}";
 
         return testProcessStartInfo;
     }

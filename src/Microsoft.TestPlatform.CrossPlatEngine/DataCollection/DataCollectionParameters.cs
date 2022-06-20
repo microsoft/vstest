@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
@@ -26,7 +24,7 @@ public class DataCollectionParameters
     /// </param>
     public DataCollectionParameters(
         bool areTestCaseLevelEventsRequired,
-        IDictionary<string, string> environmentVariables,
+        IDictionary<string, string>? environmentVariables,
         int dataCollectionEventsPort)
     {
         AreTestCaseLevelEventsRequired = areTestCaseLevelEventsRequired;
@@ -43,7 +41,7 @@ public class DataCollectionParameters
     /// <summary>
     /// Gets BeforeTestRunStart Call on the DataCollectors can yield/return a set of environment variables
     /// </summary>
-    public IDictionary<string, string> EnvironmentVariables { get; private set; }
+    public IDictionary<string, string>? EnvironmentVariables { get; private set; }
 
     /// <summary>
     /// Gets the data collection events port.

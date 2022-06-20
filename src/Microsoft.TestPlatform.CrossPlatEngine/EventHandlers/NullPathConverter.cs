@@ -30,9 +30,9 @@ internal class NullPathConverter : IPathConverter
 
     TestCase IPathConverter.UpdateTestCase(TestCase testCase, PathConversionDirection _) => testCase;
 
-    IEnumerable<TestCase> IPathConverter.UpdateTestCases(IEnumerable<TestCase> testCases, PathConversionDirection _) => testCases;
+    IEnumerable<TestCase> IPathConverter.UpdateTestCases(IEnumerable<TestCase>? testCases, PathConversionDirection _) => testCases!;
 
-    TestRunChangedEventArgs IPathConverter.UpdateTestRunChangedEventArgs(TestRunChangedEventArgs testRunChangedArgs, PathConversionDirection _) => testRunChangedArgs;
+    TestRunChangedEventArgs IPathConverter.UpdateTestRunChangedEventArgs(TestRunChangedEventArgs? testRunChangedArgs, PathConversionDirection _) => testRunChangedArgs!;
 
     TestRunCompleteEventArgs IPathConverter.UpdateTestRunCompleteEventArgs(TestRunCompleteEventArgs testRunCompleteEventArgs, PathConversionDirection _) => testRunCompleteEventArgs;
 

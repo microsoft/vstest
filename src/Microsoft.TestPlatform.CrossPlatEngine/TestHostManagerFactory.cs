@@ -7,8 +7,6 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 /// <summary>
@@ -16,14 +14,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 /// </summary>
 public class TestHostManagerFactory : ITestHostManagerFactory
 {
-    private IDiscoveryManager _discoveryManager;
-    private IExecutionManager _executionManager;
+    private IDiscoveryManager? _discoveryManager;
+    private IExecutionManager? _executionManager;
     private readonly bool _telemetryOptedIn;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestHostManagerFactory"/> class.
     /// </summary>
-    /// 
+    ///
     /// <param name="telemetryOptedIn">
     /// A value indicating if the telemetry is opted in or not.
     /// </param>
@@ -46,7 +44,7 @@ public class TestHostManagerFactory : ITestHostManagerFactory
     public IExecutionManager GetExecutionManager()
         => _executionManager ??= new ExecutionManager(GetRequestData(_telemetryOptedIn));
 
-    private RequestData GetRequestData(bool telemetryOptedIn)
+    private static RequestData GetRequestData(bool telemetryOptedIn)
     {
         return new RequestData
         {

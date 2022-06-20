@@ -67,7 +67,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
 
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
-        _discoveryManager.DiscoverTests(_discoveryCriteria, null);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, null!);
 
         _mockRequestSender.Verify(s => s.InitializeDiscovery(It.IsAny<IEnumerable<string>>()), Times.Never);
     }
@@ -184,7 +184,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             _mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "c:\\e1.dll", "c:\\e2.dll" });
 
-            _discoveryManager.DiscoverTests(_discoveryCriteria, null);
+            _discoveryManager.DiscoverTests(_discoveryCriteria, null!);
 
             // Also verify that we have waited for client connection.
             _mockRequestSender.Verify(s => s.InitializeDiscovery(extensions), Times.Once);
@@ -227,7 +227,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             _mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll", "c:\\e1.dll" });
 
-            _discoveryManager.DiscoverTests(_discoveryCriteria, null);
+            _discoveryManager.DiscoverTests(_discoveryCriteria, null!);
 
             _mockRequestSender.Verify(s => s.InitializeDiscovery(new[] { "he1.dll", "c:\\e1.dll" }), Times.Once);
         }
@@ -249,7 +249,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
-            _discoveryManager.DiscoverTests(_discoveryCriteria, null);
+            _discoveryManager.DiscoverTests(_discoveryCriteria, null!);
 
             _mockTestHostManager.Verify(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), expectedResult), Times.Once);
         }
@@ -278,7 +278,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
         // Act.
-        _discoveryManager.DiscoverTests(_discoveryCriteria, null);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, null!);
 
         _mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
         _mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -378,7 +378,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
 
         // Act.
-        _discoveryManager.DiscoverTests(_discoveryCriteria, null);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, null!);
 
         // Assert.
         _mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), _discoveryManager), Times.Once);
@@ -534,7 +534,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
                     _discoveryCriteria.RunSettings,
                     _mockRequestData.Object);
 
-                return proxyOperationManager;
+                return proxyOperationManager!;
             };
 
         var testDiscoveryManager = new ProxyDiscoveryManager(
@@ -743,7 +743,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             var expectedResult = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);
 
             _discoveryManager.Initialize(skipDefaultAdapters);
-            _discoveryManager.DiscoverTests(_discoveryCriteria, null);
+            _discoveryManager.DiscoverTests(_discoveryCriteria, null!);
 
             _mockRequestSender.Verify(s => s.InitializeDiscovery(expectedResult), Times.Once);
         }

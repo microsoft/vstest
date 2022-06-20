@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCo
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
@@ -27,17 +24,17 @@ internal class InProcDataCollector : IInProcDataCollector
     /// <summary>
     /// DataCollector Class Type
     /// </summary>
-    private readonly Type _dataCollectorType;
+    private readonly Type? _dataCollectorType;
 
     /// <summary>
     /// Instance of the
     /// </summary>
-    private object _dataCollectorObject;
+    private object? _dataCollectorObject;
 
     /// <summary>
     /// Config XML from the runsettings for current datacollector
     /// </summary>
-    private readonly string _configXml;
+    private readonly string? _configXml;
 
     /// <summary>
     /// AssemblyLoadContext for current platform
@@ -48,7 +45,7 @@ internal class InProcDataCollector : IInProcDataCollector
         string codeBase,
         string assemblyQualifiedName,
         TypeInfo interfaceTypeInfo,
-        string configXml)
+        string? configXml)
         : this(codeBase, assemblyQualifiedName, interfaceTypeInfo, configXml, new PlatformAssemblyLoadContext(), TestPluginCache.Instance)
     {
     }
@@ -66,7 +63,7 @@ internal class InProcDataCollector : IInProcDataCollector
     /// </param>
     /// <param name="assemblyLoadContext">
     /// </param>
-    internal InProcDataCollector(string codeBase, string assemblyQualifiedName, TypeInfo interfaceTypeInfo, string configXml, IAssemblyLoadContext assemblyLoadContext, TestPluginCache testPluginCache)
+    internal InProcDataCollector(string codeBase, string assemblyQualifiedName, TypeInfo interfaceTypeInfo, string? configXml, IAssemblyLoadContext assemblyLoadContext, TestPluginCache testPluginCache)
     {
         _configXml = configXml;
         _assemblyLoadContext = assemblyLoadContext;
@@ -78,15 +75,15 @@ internal class InProcDataCollector : IInProcDataCollector
         {
             // If we're loading coverlet collector we skip to check the version of assembly
             // to allow upgrade through nuget package
-            filterPredicate = (x) => x.FullName.Equals(Constants.CoverletDataCollectorTypeName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo());
+            filterPredicate = x => Constants.CoverletDataCollectorTypeName.Equals(x.FullName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo());
 
             // Coverlet collector is consumed as nuget package we need to add assemblies directory to resolver to correctly load references.
-            Debug.Assert(Path.IsPathRooted(codeBase), "Absolute path expected");
-            testPluginCache.AddResolverSearchDirectories(new string[] { Path.GetDirectoryName(codeBase) });
+            TPDebug.Assert(Path.IsPathRooted(codeBase), "Absolute path expected");
+            testPluginCache.AddResolverSearchDirectories(new string[] { Path.GetDirectoryName(codeBase)! });
         }
         else
         {
-            filterPredicate = (x) => x.AssemblyQualifiedName.Equals(assemblyQualifiedName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo());
+            filterPredicate = x => string.Equals(x.AssemblyQualifiedName, assemblyQualifiedName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo());
         }
 
         _dataCollectorType = assembly?.GetTypes().FirstOrDefault(filterPredicate);
@@ -96,7 +93,7 @@ internal class InProcDataCollector : IInProcDataCollector
     /// <summary>
     /// AssemblyQualifiedName of the datacollector type
     /// </summary>
-    public string AssemblyQualifiedName { get; private set; }
+    public string? AssemblyQualifiedName { get; private set; }
 
     /// <summary>
     /// Loads the DataCollector type
@@ -115,7 +112,7 @@ internal class InProcDataCollector : IInProcDataCollector
     /// <param name="methodArg">Arguments for the method</param>
     public void TriggerInProcDataCollectionMethod(string methodName, InProcDataCollectionArgs methodArg)
     {
-        var methodInfo = GetMethodInfoFromType(_dataCollectorObject.GetType(), methodName, new[] { methodArg.GetType() });
+        var methodInfo = GetMethodInfoFromType(_dataCollectorObject?.GetType(), methodName, new[] { methodArg.GetType() });
 
         if (methodName.Equals(Constants.TestSessionStartMethodName))
         {
@@ -129,21 +126,21 @@ internal class InProcDataCollector : IInProcDataCollector
         }
     }
 
-    private void InitializeDataCollector(object obj, IDataCollectionSink inProcDataCollectionSink)
+    private static void InitializeDataCollector(object? obj, IDataCollectionSink inProcDataCollectionSink)
     {
-        var initializeMethodInfo = GetMethodInfoFromType(obj.GetType(), "Initialize", new Type[] { typeof(IDataCollectionSink) });
-        initializeMethodInfo.Invoke(obj, new object[] { inProcDataCollectionSink });
+        var initializeMethodInfo = GetMethodInfoFromType(obj?.GetType(), "Initialize", new Type[] { typeof(IDataCollectionSink) });
+        initializeMethodInfo?.Invoke(obj, new object[] { inProcDataCollectionSink });
     }
 
-    private static MethodInfo GetMethodInfoFromType(Type type, string funcName, Type[] argumentTypes)
+    private static MethodInfo? GetMethodInfoFromType(Type? type, string funcName, Type[] argumentTypes)
     {
-        return type.GetMethod(funcName, argumentTypes);
+        return type?.GetMethod(funcName, argumentTypes);
     }
 
-    private static object CreateObjectFromType(Type type)
+    private static object? CreateObjectFromType(Type? type)
     {
-        var constructorInfo = type.GetConstructor(Type.EmptyTypes);
-        object obj = constructorInfo?.Invoke(new object[] { });
+        var constructorInfo = type?.GetConstructor(Type.EmptyTypes);
+        object? obj = constructorInfo?.Invoke(new object[] { });
         return obj;
     }
 
@@ -152,9 +149,9 @@ internal class InProcDataCollector : IInProcDataCollector
     /// </summary>
     /// <param name="codeBase"></param>
     /// <returns></returns>
-    private Assembly LoadInProcDataCollectorExtension(string codeBase)
+    private Assembly? LoadInProcDataCollectorExtension(string codeBase)
     {
-        Assembly assembly = null;
+        Assembly? assembly = null;
         try
         {
             assembly = _assemblyLoadContext.LoadAssemblyFromPath(Environment.ExpandEnvironmentVariables(codeBase));

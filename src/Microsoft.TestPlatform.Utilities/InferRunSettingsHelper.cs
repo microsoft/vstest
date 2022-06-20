@@ -389,9 +389,14 @@ public class InferRunSettingsHelper
     /// </summary>
     /// <param name="runsettingsXml">The run settings xml string</param>
     /// <returns>Environment Variables Dictionary</returns>
-    public static Dictionary<string, string?>? GetEnvironmentVariables(string runSettings)
+    public static Dictionary<string, string?>? GetEnvironmentVariables(string? runSettings)
     {
         Dictionary<string, string?>? environmentVariables = null;
+        if (runSettings is null)
+        {
+            return environmentVariables;
+        }
+
         try
         {
             using var stream = new StringReader(runSettings);

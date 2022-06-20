@@ -21,7 +21,7 @@ public interface IDataSerializer
     /// <typeparam name="T"> The type of object to deserialize to. </typeparam>
     /// <param name="message"> Message object </param>
     /// <returns> TestPlatform object </returns>
-    T? DeserializePayload<T>(Message message);
+    T? DeserializePayload<T>(Message? message);
 
     /// <summary>
     /// Serializes and creates a raw message given a message type

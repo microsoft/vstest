@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
 
 /// <summary>
@@ -19,15 +17,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
 /// </summary>
 internal class TestCaseEventsHandler : ITestCaseEventsHandler, ITestEventsPublisher
 {
-    public event EventHandler<SessionStartEventArgs> SessionStart;
+    public event EventHandler<SessionStartEventArgs>? SessionStart;
 
-    public event EventHandler<SessionEndEventArgs> SessionEnd;
+    public event EventHandler<SessionEndEventArgs>? SessionEnd;
 
-    public event EventHandler<TestCaseStartEventArgs> TestCaseStart;
+    public event EventHandler<TestCaseStartEventArgs>? TestCaseStart;
 
-    public event EventHandler<TestCaseEndEventArgs> TestCaseEnd;
+    public event EventHandler<TestCaseEndEventArgs>? TestCaseEnd;
 
-    public event EventHandler<TestResultEventArgs> TestResult;
+    public event EventHandler<TestResultEventArgs>? TestResult;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestCaseEventsHandler"/> class.

@@ -25,15 +25,15 @@ public class TestRunEventsHandlerTests
     [TestMethod]
     public void HandleTestRunStatsChangeShouldSendTestRunStatisticsToClient()
     {
-        _testRunEventHandler.HandleTestRunStatsChange(null);
-        _mockClient.Verify(th => th.SendTestRunStatistics(null), Times.Once);
+        _testRunEventHandler.HandleTestRunStatsChange(null!);
+        _mockClient.Verify(th => th.SendTestRunStatistics(null!), Times.Once);
     }
 
     [TestMethod]
     public void HandleTestRunCompleteShouldInformClient()
     {
-        _testRunEventHandler.HandleTestRunComplete(null, null, null, null);
-        _mockClient.Verify(th => th.SendExecutionComplete(null, null, null, null), Times.Once);
+        _testRunEventHandler.HandleTestRunComplete(null!, null!, null!, null!);
+        _mockClient.Verify(th => th.SendExecutionComplete(null!, null!, null!, null!), Times.Once);
     }
 
     [TestMethod]

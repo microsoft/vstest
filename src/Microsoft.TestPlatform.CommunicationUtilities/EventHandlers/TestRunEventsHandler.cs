@@ -32,7 +32,7 @@ public class TestRunEventsHandler : IInternalTestRunEventsHandler
     /// Handle test run stats change.
     /// </summary>
     /// <param name="testRunChangedArgs"> The test run changed args. </param>
-    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
     {
         EqtTrace.Info("Sending test run statistics");
         _requestHandler.SendTestRunStatistics(testRunChangedArgs);
@@ -45,7 +45,7 @@ public class TestRunEventsHandler : IInternalTestRunEventsHandler
     /// <param name="lastChunkArgs"> The last chunk args. </param>
     /// <param name="runContextAttachments"> The run context attachments. </param>
     /// <param name="executorUris"> The executor uris. </param>
-    public void HandleTestRunComplete(TestRunCompleteEventArgs? testRunCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris)
+    public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
     {
         EqtTrace.Info("Sending test run complete");
         _requestHandler.SendExecutionComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);

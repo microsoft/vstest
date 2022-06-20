@@ -29,6 +29,7 @@ public class DotnetDataCollectionLauncherTests
     {
         _mockFileHelper = new Mock<IFileHelper>();
         _mockProcessHelper = new Mock<IProcessHelper>();
+        _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("dotnet");
         _mockMessageLogger = new Mock<IMessageLogger>();
 
         _dataCollectionLauncher = new DotnetDataCollectionLauncher(_mockProcessHelper.Object, _mockFileHelper.Object, _mockMessageLogger.Object);

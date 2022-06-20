@@ -14,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
