@@ -42,7 +42,7 @@ public class DiscoveryEventsHandleConverter : ITestDiscoveryEventsHandler2
     /// </summary>
     /// <param name="level"></param>
     /// <param name="message"></param>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         _testDiscoveryEventsHandler.HandleLogMessage(level, message);
     }

@@ -154,7 +154,7 @@ internal class TestPlatform : ITestPlatform
         return testSessionManager.StartSession(eventsHandler, requestData);
     }
 
-    private void PopulateExtensions(string runSettings, IEnumerable<string> sources)
+    private void PopulateExtensions(string? runSettings, IEnumerable<string> sources)
     {
         RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
         TestAdapterLoadingStrategy strategy = runConfiguration.TestAdapterLoadingStrategy;
@@ -203,22 +203,24 @@ internal class TestPlatform : ITestPlatform
     }
 
 
-    private void AddExtensionAssemblies(string runSettings, TestAdapterLoadingStrategy adapterLoadingStrategy)
+    private void AddExtensionAssemblies(string? runSettings, TestAdapterLoadingStrategy adapterLoadingStrategy)
     {
         IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
 
-        if (customTestAdaptersPaths != null)
+        if (customTestAdaptersPaths == null)
         {
-            foreach (string customTestAdaptersPath in customTestAdaptersPaths)
+            return;
+        }
+
+        foreach (string customTestAdaptersPath in customTestAdaptersPaths)
+        {
+            IEnumerable<string> extensionAssemblies = ExpandTestAdapterPaths(customTestAdaptersPath, _fileHelper, adapterLoadingStrategy);
+
+            if (extensionAssemblies.Any())
             {
-                IEnumerable<string> extensionAssemblies = ExpandTestAdapterPaths(customTestAdaptersPath, _fileHelper, adapterLoadingStrategy);
-
-                if (extensionAssemblies.Any())
-                {
-                    UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
-                }
-
+                UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
             }
+
         }
     }
 

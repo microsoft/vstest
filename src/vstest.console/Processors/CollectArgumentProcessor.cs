@@ -228,7 +228,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
         dataCollectorSettings = null;
         foreach (var dataCollectorSetting in dataCollectionRunSettings.DataCollectorSettingsList)
         {
-            if (dataCollectorSetting.FriendlyName.Equals(friendlyName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(dataCollectorSetting.FriendlyName, friendlyName, StringComparison.OrdinalIgnoreCase))
             {
                 dataCollectorSettings = dataCollectorSetting;
                 return true;

@@ -18,15 +18,15 @@ internal interface IPathConverter
 
     TestCase UpdateTestCase(TestCase testCase, PathConversionDirection updateDirection);
 
-    IEnumerable<TestCase> UpdateTestCases(IEnumerable<TestCase> testCases, PathConversionDirection updateDirection);
+    IEnumerable<TestCase> UpdateTestCases(IEnumerable<TestCase>? testCases, PathConversionDirection updateDirection);
 
     TestRunCompleteEventArgs UpdateTestRunCompleteEventArgs(TestRunCompleteEventArgs testRunCompleteEventArgs, PathConversionDirection updateDirection);
 
-    TestRunChangedEventArgs UpdateTestRunChangedEventArgs(TestRunChangedEventArgs testRunChangedArgs, PathConversionDirection updateDirection);
+    TestRunChangedEventArgs UpdateTestRunChangedEventArgs(TestRunChangedEventArgs? testRunChangedArgs, PathConversionDirection updateDirection);
 
     Collection<AttachmentSet> UpdateAttachmentSets(Collection<AttachmentSet> attachmentSets, PathConversionDirection updateDirection);
 
-    ICollection<AttachmentSet> UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, PathConversionDirection updateDirection);
+    ICollection<AttachmentSet> UpdateAttachmentSets(ICollection<AttachmentSet>? attachmentSets, PathConversionDirection updateDirection);
 
     DiscoveryCriteria UpdateDiscoveryCriteria(DiscoveryCriteria discoveryCriteria, PathConversionDirection updateDirection);
 

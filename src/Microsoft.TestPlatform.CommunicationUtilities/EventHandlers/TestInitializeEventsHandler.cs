@@ -30,9 +30,9 @@ public class TestInitializeEventsHandler : ITestMessageEventHandler
     /// </summary>
     /// <param name="level"> The level. </param>
     /// <param name="message"> The message. </param>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
-        switch ((TestMessageLevel)level)
+        switch (level)
         {
             case TestMessageLevel.Informational:
                 EqtTrace.Info(message);

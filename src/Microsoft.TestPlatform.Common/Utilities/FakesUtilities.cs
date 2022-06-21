@@ -139,7 +139,7 @@ public static class FakesUtilities
         }
 
         // insert new node
-        XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), settings);
+        XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator()!, settings);
     }
 
     private static IDictionary<string, FrameworkVersion> CreateDictionary(IEnumerable<string> sources, FrameworkVersion framework)
@@ -200,7 +200,7 @@ public static class FakesUtilities
         }
 
         fakesSettings.Configuration = doc.DocumentElement;
-        XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
+        XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator()!, fakesSettings);
 
         return true;
     }

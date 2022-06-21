@@ -1,9 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
@@ -34,9 +33,12 @@ public class DataCollectionContext
     /// Constructs DataCollection Context for in process data collectors
     /// </summary>
     /// <param name="testCase">test case to identify the context</param>
-    public DataCollectionContext(TestCase testCase)
+    public DataCollectionContext(TestCase? testCase)
     {
         TestCase = testCase;
+        // TODO: Comment says this ctor should never have been made public but it was added.
+        // This leaves a path where SessionId is null but the rest of the class doesn't handle it.
+        SessionId = null!;
     }
 
     /// <summary>
@@ -45,7 +47,7 @@ public class DataCollectionContext
     /// </summary>
     /// <param name="sessionId">The session under which the data collection occurs.  Cannot be null.</param>
     protected internal DataCollectionContext(SessionId sessionId)
-        : this(sessionId, (TestExecId)null)
+        : this(sessionId, (TestExecId?)null)
     {
     }
 
@@ -56,7 +58,7 @@ public class DataCollectionContext
     /// <param name="sessionId">The session under which the data collection occurs.  Cannot be null.</param>
     /// <param name="testExecId">The test execution under which the data collection occurs,
     /// or null if no executing test case is in context</param>
-    protected internal DataCollectionContext(SessionId sessionId, TestExecId testExecId)
+    protected internal DataCollectionContext(SessionId sessionId, TestExecId? testExecId)
     {
         //TODO
         //EqtAssert.ParameterNotNull(sessionId, "sessionId");
@@ -66,7 +68,8 @@ public class DataCollectionContext
         _hashCode = ComputeHashCode();
     }
 
-    protected internal DataCollectionContext(SessionId sessionId, TestCase testCase) : this(sessionId, new TestExecId(testCase.Id))
+    protected internal DataCollectionContext(SessionId sessionId, TestCase testCase)
+        : this(sessionId, new TestExecId(testCase.Id))
     {
         TestCase = testCase;
 
@@ -75,7 +78,7 @@ public class DataCollectionContext
     /// Gets test case.
     /// </summary>
     [DataMember]
-    public TestCase TestCase { get; private set; }
+    public TestCase? TestCase { get; private set; }
 
     /// <summary>
     /// Identifies the session under which the data collection occurs.  Will not be null.
@@ -88,30 +91,31 @@ public class DataCollectionContext
     /// or null if no such test exists.
     /// </summary>
     [DataMember]
-    public TestExecId TestExecId { get; }
+    public TestExecId? TestExecId { get; }
 
     /// <summary>
     /// Returns true if there is an executing test case associated with this context.
     /// </summary>
     [DataMember]
+    [MemberNotNullWhen(true, nameof(TestExecId))]
     public bool HasTestCase
     {
         get { return TestExecId != null; }
     }
 
-    public static bool operator ==(DataCollectionContext context1, DataCollectionContext context2)
+    public static bool operator ==(DataCollectionContext? context1, DataCollectionContext? context2)
     {
         return Equals(context1, context2);
     }
 
-    public static bool operator !=(DataCollectionContext context1, DataCollectionContext context2)
+    public static bool operator !=(DataCollectionContext? context1, DataCollectionContext? context2)
     {
         return !(context1 == context2);
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        DataCollectionContext other = obj as DataCollectionContext;
+        DataCollectionContext? other = obj as DataCollectionContext;
 
         return other != null
                && SessionId.Equals(other.SessionId)

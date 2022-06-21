@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -17,8 +17,8 @@ public static class TestRunnerConnectionInfoExtensions
     /// <returns>Command line option string.</returns>
     public static string ToCommandLineOptions(this TestRunnerConnectionInfo connectionInfo)
     {
-        var options = "--port " + connectionInfo.Port + " --endpoint " + connectionInfo.ConnectionInfo.Endpoint + " --role " + (connectionInfo.ConnectionInfo.Role == ConnectionRole.Client ? "client" : "host") + " --parentprocessid " + connectionInfo.RunnerProcessId;
-        if (!string.IsNullOrEmpty(connectionInfo.LogFile))
+        var options = $"--port {connectionInfo.Port} --endpoint {connectionInfo.ConnectionInfo.Endpoint} --role {(connectionInfo.ConnectionInfo.Role == ConnectionRole.Client ? "client" : "host")} --parentprocessid {connectionInfo.RunnerProcessId}";
+        if (!StringUtils.IsNullOrEmpty(connectionInfo.LogFile))
         {
             options += " --diag " + connectionInfo.LogFile;
             options += " --tracelevel " + connectionInfo.TraceLevel;

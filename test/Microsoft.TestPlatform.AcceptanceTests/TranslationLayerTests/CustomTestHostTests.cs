@@ -226,8 +226,8 @@ public class CustomTestHostTests : AcceptanceTestBase
         public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken)
         {
             var processInfo = new ProcessStartInfo(
-                defaultTestHostStartInfo.FileName,
-                defaultTestHostStartInfo.Arguments)
+                defaultTestHostStartInfo.FileName!,
+                defaultTestHostStartInfo.Arguments!)
             {
                 WorkingDirectory = defaultTestHostStartInfo.WorkingDirectory
             };

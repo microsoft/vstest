@@ -3,10 +3,6 @@
 
 using System;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
-
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -23,11 +19,7 @@ public sealed class FriendlyNameAttribute : Attribute
     /// <param name="friendlyName">The friendly name of the Logger</param>
     public FriendlyNameAttribute(string friendlyName)
     {
-        if (string.IsNullOrWhiteSpace(friendlyName))
-        {
-            throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(friendlyName));
-        }
-
+        ValidateArg.NotNullOrWhiteSpace(friendlyName, nameof(friendlyName));
         FriendlyName = friendlyName;
     }
 

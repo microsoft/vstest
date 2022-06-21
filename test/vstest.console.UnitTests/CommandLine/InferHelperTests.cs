@@ -20,11 +20,11 @@ public class InferHelperTests
     private readonly InferHelper _inferHelper;
     private readonly Framework _defaultFramework = Framework.DefaultFramework;
     private readonly Architecture _defaultArchitecture = Architecture.X64;
-    private readonly Framework _frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5");
-    private readonly Framework _frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6");
-    private readonly Framework _frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7");
-    private readonly Framework _frameworkCore10 = Framework.FromString(".NETCoreApp,Version=1.0");
-    private readonly Framework _frameworkCore11 = Framework.FromString(".NETCoreApp,Version=1.1");
+    private readonly Framework _frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5")!;
+    private readonly Framework _frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6")!;
+    private readonly Framework _frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7")!;
+    private readonly Framework _frameworkCore10 = Framework.FromString(".NETCoreApp,Version=1.0")!;
+    private readonly Framework _frameworkCore11 = Framework.FromString(".NETCoreApp,Version=1.1")!;
 
     public InferHelperTests()
     {
@@ -190,7 +190,7 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnFrameworkUap10ForAppxFiles()
     {
-        var fx = Framework.FromString(Constants.DotNetFrameworkUap10);
+        var fx = Framework.FromString(Constants.DotNetFrameworkUap10)!;
         var assemblyName = "uwp10.appx";
         SetupAndValidateForSingleAssembly(assemblyName, fx, false);
     }
@@ -198,7 +198,7 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnFrameworkUap10ForMsixFiles()
     {
-        var fx = Framework.FromString(Constants.DotNetFrameworkUap10);
+        var fx = Framework.FromString(Constants.DotNetFrameworkUap10)!;
         var assemblyName = "uwp10.msix";
         SetupAndValidateForSingleAssembly(assemblyName, fx, false);
     }
@@ -206,7 +206,7 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnFrameworkUap10ForAppxrecipeFiles()
     {
-        var fx = Framework.FromString(Constants.DotNetFrameworkUap10);
+        var fx = Framework.FromString(Constants.DotNetFrameworkUap10)!;
         var assemblyName = "uwp10.appxrecipe";
         SetupAndValidateForSingleAssembly(assemblyName, fx, false);
     }
@@ -214,7 +214,7 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnDefaultFullFrameworkForJsFiles()
     {
-        var fx = Framework.FromString(Constants.DotNetFramework40);
+        var fx = Framework.FromString(Constants.DotNetFramework40)!;
         var assemblyName = "vstests.js";
         SetupAndValidateForSingleAssembly(assemblyName, fx, false);
     }

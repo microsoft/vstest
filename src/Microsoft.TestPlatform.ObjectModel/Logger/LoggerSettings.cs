@@ -5,7 +5,7 @@ using System;
 using System.Globalization;
 using System.Xml;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -17,7 +17,7 @@ public class LoggerSettings
     /// <summary>
     /// Gets or sets the uri.
     /// </summary>
-    public Uri Uri
+    public Uri? Uri
     {
         get;
         set;
@@ -26,7 +26,7 @@ public class LoggerSettings
     /// <summary>
     /// Gets or sets the assembly qualified name.
     /// </summary>
-    public string AssemblyQualifiedName
+    public string? AssemblyQualifiedName
     {
         get;
         set;
@@ -35,7 +35,7 @@ public class LoggerSettings
     /// <summary>
     /// Gets or sets value CodeBase of logger DLL. The syntax is same as Code Base in AssemblyName class.
     /// </summary>
-    public string CodeBase
+    public string? CodeBase
     {
         get;
         set;
@@ -44,7 +44,7 @@ public class LoggerSettings
     /// <summary>
     /// Gets or sets the friendly name.
     /// </summary>
-    public string FriendlyName
+    public string? FriendlyName
     {
         get;
         set;
@@ -63,7 +63,7 @@ public class LoggerSettings
     /// <summary>
     /// Gets or sets the configuration.
     /// </summary>
-    public XmlElement Configuration
+    public XmlElement? Configuration
     {
         get;
         set;
@@ -108,9 +108,9 @@ public class LoggerSettings
         return root;
     }
 
-    private static void AppendAttribute(XmlDocument doc, XmlElement owner, string attributeName, string attributeValue)
+    private static void AppendAttribute(XmlDocument doc, XmlElement owner, string attributeName, string? attributeValue)
     {
-        if (string.IsNullOrWhiteSpace(attributeValue))
+        if (StringUtils.IsNullOrWhiteSpace(attributeValue))
         {
             return;
         }
@@ -186,9 +186,9 @@ public class LoggerSettings
         }
 
         // Check for required attributes.
-        if (string.IsNullOrWhiteSpace(settings.FriendlyName) &&
-            string.IsNullOrWhiteSpace(settings.Uri?.ToString()) &&
-            string.IsNullOrWhiteSpace(settings.AssemblyQualifiedName))
+        if (StringUtils.IsNullOrWhiteSpace(settings.FriendlyName) &&
+            StringUtils.IsNullOrWhiteSpace(settings.Uri?.ToString()) &&
+            StringUtils.IsNullOrWhiteSpace(settings.AssemblyQualifiedName))
         {
             throw new SettingsException(
                 string.Format(
@@ -210,8 +210,10 @@ public class LoggerSettings
         // Read inner elements.
         while (reader.NodeType == XmlNodeType.Element)
         {
+#pragma warning disable IDE0066 // Convert switch statement to expression
             switch (reader.Name.ToLowerInvariant())
             {
+#pragma warning restore IDE0066 // Convert switch statement to expression
 #if !NETSTANDARD1_0
                 case Constants.LoggerConfigurationNameLower:
                     var document = new XmlDocument();

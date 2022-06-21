@@ -3,10 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.Serialization;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
@@ -16,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 [DataContract]
 public sealed class SessionStartEventArgs : DataCollectionEventArgs
 {
-    private readonly IDictionary<string, object> _properties;
+    private readonly IDictionary<string, object?> _properties;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class.
@@ -26,7 +25,7 @@ public sealed class SessionStartEventArgs : DataCollectionEventArgs
     /// DataCollectionContext with empty session signifies that is it irrelevant in the current context.
     /// </remarks>
     public SessionStartEventArgs()
-        : this(new DataCollectionContext(new SessionId(Guid.Empty)), new Dictionary<string, object>())
+        : this(new DataCollectionContext(new SessionId(Guid.Empty)), new Dictionary<string, object?>())
     {
 
     }
@@ -38,7 +37,7 @@ public sealed class SessionStartEventArgs : DataCollectionEventArgs
     /// constructor with properties and default DataCollectionContext.
     /// DataCollectionContext with empty session signifies that is it irrelevant in the current context.
     /// </remarks>
-    public SessionStartEventArgs(IDictionary<string, object> properties)
+    public SessionStartEventArgs(IDictionary<string, object?> properties)
         : this(new DataCollectionContext(new SessionId(Guid.Empty)), properties)
     {
 
@@ -50,17 +49,17 @@ public sealed class SessionStartEventArgs : DataCollectionEventArgs
     /// <param name="context">
     /// Context information for the session
     /// </param>
-    public SessionStartEventArgs(DataCollectionContext context, IDictionary<string, object> properties)
+    public SessionStartEventArgs(DataCollectionContext context, IDictionary<string, object?> properties)
         : base(context)
     {
         _properties = properties;
-        Debug.Assert(!context.HasTestCase, "Session event has test a case context");
+        TPDebug.Assert(!context.HasTestCase, "Session event has test a case context");
     }
 
     /// <summary>
     /// Gets session start properties enumerator
     /// </summary>
-    public IEnumerator<KeyValuePair<string, object>> GetProperties()
+    public IEnumerator<KeyValuePair<string, object?>> GetProperties()
     {
         return _properties.GetEnumerator();
     }
@@ -71,11 +70,11 @@ public sealed class SessionStartEventArgs : DataCollectionEventArgs
     /// <param name="property">
     /// Property name
     /// </param>
-    public T GetPropertyValue<T>(string property)
+    public T? GetPropertyValue<T>(string property)
     {
         ValidateArg.NotNullOrEmpty(property, nameof(property));
 
-        return _properties.ContainsKey(property) ? (T)_properties[property] : default;
+        return _properties.ContainsKey(property) ? (T?)_properties[property] : default;
     }
 
     /// <summary>
@@ -84,7 +83,7 @@ public sealed class SessionStartEventArgs : DataCollectionEventArgs
     /// <param name="property">
     /// Property name
     /// </param>
-    public object GetPropertyValue(string property)
+    public object? GetPropertyValue(string property)
     {
         ValidateArg.NotNullOrEmpty(property, nameof(property));
 
@@ -122,7 +121,7 @@ public sealed class SessionEndEventArgs : DataCollectionEventArgs
     public SessionEndEventArgs(DataCollectionContext context)
         : base(context)
     {
-        Debug.Assert(!context.HasTestCase, "Session event has test a case context");
+        TPDebug.Assert(!context.HasTestCase, "Session event has test a case context");
     }
 
 }

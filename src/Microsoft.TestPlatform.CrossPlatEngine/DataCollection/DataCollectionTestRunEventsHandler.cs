@@ -164,7 +164,7 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
     /// <param name="testRunChangedArgs">
     /// The test run changed args.
     /// </param>
-    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
     {
         _testRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
     }

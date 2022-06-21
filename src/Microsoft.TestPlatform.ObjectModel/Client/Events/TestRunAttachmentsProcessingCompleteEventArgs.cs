@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 [DataContract]
@@ -17,7 +15,7 @@ public class TestRunAttachmentsProcessingCompleteEventArgs : EventArgs
     /// </summary>
     /// <param name="isCanceled">Specifies whether the attachments processing is canceled.</param>
     /// <param name="error">Specifies the error encountered during the execution of the attachments processing.</param>
-    public TestRunAttachmentsProcessingCompleteEventArgs(bool isCanceled, Exception error)
+    public TestRunAttachmentsProcessingCompleteEventArgs(bool isCanceled, Exception? error)
     {
         IsCanceled = isCanceled;
         Error = error;
@@ -33,11 +31,11 @@ public class TestRunAttachmentsProcessingCompleteEventArgs : EventArgs
     /// Gets the error encountered during the attachments processing of the test runs. Null if there is no error.
     /// </summary>
     [DataMember]
-    public Exception Error { get; private set; }
+    public Exception? Error { get; private set; }
 
     /// <summary>
     /// Get or Sets the Metrics (used for telemetry)
     /// </summary>
     [DataMember]
-    public IDictionary<string, object> Metrics { get; set; }
+    public IDictionary<string, object>? Metrics { get; set; }
 }

@@ -501,7 +501,7 @@ public class TestRequestSender : ITestRequestSender
                     TPDebug.Assert(testRunCompletePayload is not null, "testRunCompletePayload is null");
 
                     testRunEventsHandler.HandleTestRunComplete(
-                        testRunCompletePayload.TestRunCompleteArgs,
+                        testRunCompletePayload.TestRunCompleteArgs!,
                         testRunCompletePayload.LastRunTests,
                         testRunCompletePayload.RunAttachments,
                         testRunCompletePayload.ExecutorUris);
@@ -515,7 +515,7 @@ public class TestRequestSender : ITestRequestSender
                     break;
                 case MessageType.LaunchAdapterProcessWithDebuggerAttached:
                     var testProcessStartInfo = _dataSerializer.DeserializePayload<TestProcessStartInfo>(message);
-                    int processId = testRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+                    int processId = testRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo!);
 
                     var data =
                         _dataSerializer.SerializePayload(

@@ -242,7 +242,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         // Add blame configuration element to blame collector.
         foreach (var item in dataCollectionRunSettings.DataCollectorSettingsList)
         {
-            if (item.FriendlyName.Equals(BlameFriendlyName))
+            if (string.Equals(item.FriendlyName, BlameFriendlyName))
             {
                 item.Configuration = outernode;
             }
@@ -257,20 +257,22 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="settings">Settings xml.</param>
     /// <returns>Results directory.</returns>
-    private string? GetResultsDirectory(string? settings)
+    private static string? GetResultsDirectory(string? settings)
     {
         string? resultsDirectory = null;
-        if (settings != null)
+        if (settings == null)
         {
-            try
-            {
-                RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settings);
-                resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
-            }
-            catch (SettingsException se)
-            {
-                EqtTrace.Error("EnableBlameArgumentProcessor: Unable to get the test results directory: Error {0}", se);
-            }
+            return resultsDirectory;
+        }
+
+        try
+        {
+            RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settings);
+            resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
+        }
+        catch (SettingsException se)
+        {
+            EqtTrace.Error("EnableBlameArgumentProcessor: Unable to get the test results directory: Error {0}", se);
         }
 
         return resultsDirectory;

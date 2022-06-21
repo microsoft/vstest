@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -18,7 +16,9 @@ public class TestRunCompleteEventArgs : EventArgs
 {
     // We have more than one ctor for backward-compatibility reason but we don't want to add dependency on Newtosoft([JsonConstructor])
     // We want to fallback to the non-public default constructor https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_ConstructorHandling.htm during deserialization
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     private TestRunCompleteEventArgs()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
         AttachmentSets = new Collection<AttachmentSet>();
         InvokedDataCollectors = new Collection<InvokedDataCollector>();
@@ -34,10 +34,10 @@ public class TestRunCompleteEventArgs : EventArgs
     /// <param name="attachmentSets">Attachment sets associated with the run.</param>
     /// <param name="elapsedTime">Time elapsed in just running tests</param>
     public TestRunCompleteEventArgs(
-        ITestRunStatistics stats,
+        ITestRunStatistics? stats,
         bool isCanceled,
         bool isAborted,
-        Exception error,
+        Exception? error,
         Collection<AttachmentSet> attachmentSets,
         TimeSpan elapsedTime)
         : this(
@@ -61,12 +61,12 @@ public class TestRunCompleteEventArgs : EventArgs
     /// <param name="InvokedDataCollectors">Invoked data collectors</param>
     /// <param name="elapsedTime">Time elapsed in just running tests</param>
     public TestRunCompleteEventArgs(
-        ITestRunStatistics stats,
+        ITestRunStatistics? stats,
         bool isCanceled,
         bool isAborted,
-        Exception error,
-        Collection<AttachmentSet> attachmentSets,
-        Collection<InvokedDataCollector> invokedDataCollectors,
+        Exception? error,
+        Collection<AttachmentSet>? attachmentSets,
+        Collection<InvokedDataCollector>? invokedDataCollectors,
         TimeSpan elapsedTime)
     {
         TestRunStatistics = stats;
@@ -84,7 +84,7 @@ public class TestRunCompleteEventArgs : EventArgs
     /// Gets the statistics on the state of the test run.
     /// </summary>
     [DataMember]
-    public ITestRunStatistics TestRunStatistics { get; private set; }
+    public ITestRunStatistics? TestRunStatistics { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether the test run is canceled or not.
@@ -102,7 +102,7 @@ public class TestRunCompleteEventArgs : EventArgs
     /// Gets the error encountered during the execution of the test run. Null if there is no error.
     /// </summary>
     [DataMember]
-    public Exception Error { get; private set; }
+    public Exception? Error { get; private set; }
 
     /// <summary>
     /// Gets the attachment sets associated with the test run.
@@ -127,11 +127,11 @@ public class TestRunCompleteEventArgs : EventArgs
     /// Get or Sets the Metrics
     /// </summary>
     [DataMember]
-    public IDictionary<string, object> Metrics { get; set; }
+    public IDictionary<string, object>? Metrics { get; set; }
 
     /// <summary>
     /// Gets or sets the collection of discovered extensions.
     /// </summary>
     [DataMember]
-    public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; set; }
+    public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; }
 }

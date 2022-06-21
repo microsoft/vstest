@@ -189,7 +189,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         ITestMessageEventHandler? runEventsHandler)
     {
         var areTestCaseLevelEventsRequired = false;
-        IDictionary<string, string> environmentVariables = new Dictionary<string, string>();
+        IDictionary<string, string?> environmentVariables = new Dictionary<string, string?>();
 
         var dataCollectionEventsPort = 0;
         InvokeDataCollectionServiceAction(

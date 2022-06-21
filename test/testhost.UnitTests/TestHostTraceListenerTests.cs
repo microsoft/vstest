@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-// define trace and debug to trigger the Debug.Assert calls even when we build in Release
+// define trace and debug to trigger the TPDebug.Assert calls even when we build in Release
 #define DEBUG
 
 #if NETCOREAPP
@@ -45,7 +45,7 @@ public class TestHostTraceListenerTests
     [ExpectedException(typeof(DebugAssertException))]
     public void DebugAssertThrowsDebugAssertException()
     {
-        Debug.Assert(false);
+        TPDebug.Assert(false);
     }
 
     [TestMethod]

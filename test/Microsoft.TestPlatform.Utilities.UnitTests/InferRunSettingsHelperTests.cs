@@ -23,9 +23,9 @@ public class InferRunSettingsHelperTests
 {
     private readonly IDictionary<string, Architecture> _sourceArchitectures;
     private readonly IDictionary<string, Framework> _sourceFrameworks;
-    private readonly Framework _frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5");
-    private readonly Framework _frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6");
-    private readonly Framework _frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7");
+    private readonly Framework _frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5")!;
+    private readonly Framework _frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6")!;
+    private readonly Framework _frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7")!;
     private const string MultiTargettingForwardLink = @"https://aka.ms/tp/vstest/multitargetingdoc?view=vs-2019";
 
     public InferRunSettingsHelperTests()

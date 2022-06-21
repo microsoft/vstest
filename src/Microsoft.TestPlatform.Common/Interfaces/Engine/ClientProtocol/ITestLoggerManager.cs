@@ -24,7 +24,7 @@ public interface ITestLoggerManager : IDisposable
     /// <summary>
     /// Initialize loggers.
     /// </summary>
-    void Initialize(string runSettings);
+    void Initialize(string? runSettings);
 
     /// <summary>
     /// Handles test run message.

@@ -21,7 +21,7 @@ public class BeforeTestRunStartResult
     /// <param name="dataCollectionEventsPort">
     /// The data Collection Events Port.
     /// </param>
-    public BeforeTestRunStartResult(IDictionary<string, string> environmentVariables, int dataCollectionEventsPort)
+    public BeforeTestRunStartResult(IDictionary<string, string?> environmentVariables, int dataCollectionEventsPort)
     {
         EnvironmentVariables = environmentVariables;
         DataCollectionEventsPort = dataCollectionEventsPort;
@@ -31,7 +31,7 @@ public class BeforeTestRunStartResult
     /// Gets the environment variable dictionary.
     /// </summary>
     [DataMember]
-    public IDictionary<string, string> EnvironmentVariables { get; private set; }
+    public IDictionary<string, string?> EnvironmentVariables { get; private set; }
 
     /// <summary>
     /// Gets the data collection events port.

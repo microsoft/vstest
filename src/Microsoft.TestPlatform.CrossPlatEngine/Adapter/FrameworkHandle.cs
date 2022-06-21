@@ -69,7 +69,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <param name="arguments">Command line arguments the process should be launched with.</param>
     /// <param name="environmentVariables">Environment variables to be set in target process</param>
     /// <returns>Process ID of the started process.</returns>
-    public int LaunchProcessWithDebuggerAttached(string filePath, string? workingDirectory, string? arguments, IDictionary<string, string>? environmentVariables)
+    public int LaunchProcessWithDebuggerAttached(string filePath, string? workingDirectory, string? arguments, IDictionary<string, string?>? environmentVariables)
     {
         // If an adapter attempts to launch a process after the run is complete (=> this object is disposed)
         // throw an error.

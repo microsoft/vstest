@@ -20,19 +20,19 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
     /// <summary>
     /// Gets the metrics.
     /// </summary>
-    public IDictionary<string, object> Metrics { get; private set; } = new Dictionary<string, object>();
+    public IDictionary<string, object>? Metrics { get; private set; } = new Dictionary<string, object>();
 
     public void HandleRawMessage(string rawMessage)
     {
         // No Op
     }
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         // No Op
     }
 
-    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
     {
         if (lastChunk != null)
         {
@@ -42,7 +42,7 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
         Metrics = discoveryCompleteEventArgs.Metrics;
     }
 
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+    public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
     {
         if (discoveredTestCases != null)
         {

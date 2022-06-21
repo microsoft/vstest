@@ -4,8 +4,6 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 
 /// <summary>
@@ -19,13 +17,13 @@ public class StartTestSessionPayload
     /// Gets or sets the sources used for starting the test session.
     /// </summary>
     [DataMember]
-    public IList<string> Sources { get; set; }
+    public IList<string>? Sources { get; set; }
 
     /// <summary>
     /// Gets or sets the run settings used for starting the test session.
     /// </summary>
     [DataMember]
-    public string RunSettings { get; set; }
+    public string? RunSettings { get; set; }
 
     /// <summary>
     /// Gets or sets a flag indicating if debugging is enabled.
@@ -43,5 +41,5 @@ public class StartTestSessionPayload
     /// Gets or sets the test platform options.
     /// </summary>
     [DataMember]
-    public TestPlatformOptions TestPlatformOptions { get; set; }
+    public TestPlatformOptions? TestPlatformOptions { get; set; }
 }

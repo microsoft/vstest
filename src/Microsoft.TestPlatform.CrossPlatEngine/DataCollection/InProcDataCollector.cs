@@ -117,7 +117,7 @@ internal class InProcDataCollector : IInProcDataCollector
         if (methodName.Equals(Constants.TestSessionStartMethodName))
         {
             var testSessionStartArgs = (TestSessionStartArgs)methodArg;
-            testSessionStartArgs.Configuration = _configXml;
+            testSessionStartArgs.Configuration = _configXml!;
             methodInfo?.Invoke(_dataCollectorObject, new object[] { testSessionStartArgs });
         }
         else

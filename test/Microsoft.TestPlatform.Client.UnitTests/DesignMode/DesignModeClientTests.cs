@@ -541,7 +541,7 @@ public class DesignModeClientTests
             .Callback((string _, object actualPayload) =>
             {
                 _completeEvent.Set();
-                Assert.IsNull(((StartTestSessionAckPayload)actualPayload).EventArgs.TestSessionInfo);
+                Assert.IsNull(((StartTestSessionAckPayload)actualPayload).EventArgs!.TestSessionInfo);
             });
         _mockCommunicationManager.Setup(
                 cm => cm.DeserializePayload<StartTestSessionPayload>(
@@ -592,8 +592,8 @@ public class DesignModeClientTests
             {
                 _completeEvent.Set();
 
-                Assert.AreEqual(((StopTestSessionAckPayload)actualPayload).EventArgs.TestSessionInfo, testSessionInfo);
-                Assert.IsFalse(((StopTestSessionAckPayload)actualPayload).EventArgs.IsStopped);
+                Assert.AreEqual(((StopTestSessionAckPayload)actualPayload).EventArgs!.TestSessionInfo, testSessionInfo);
+                Assert.IsFalse(((StopTestSessionAckPayload)actualPayload).EventArgs!.IsStopped);
             });
 
         _mockCommunicationManager.Setup(

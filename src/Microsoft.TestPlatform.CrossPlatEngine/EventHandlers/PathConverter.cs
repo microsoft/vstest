@@ -83,11 +83,11 @@ internal class PathConverter : IPathConverter
         return testCase;
     }
 
-    public IEnumerable<TestCase> UpdateTestCases(IEnumerable<TestCase> testCases, PathConversionDirection updateDirection)
+    public IEnumerable<TestCase> UpdateTestCases(IEnumerable<TestCase>? testCases, PathConversionDirection updateDirection)
     {
         ValidateArg.NotNull(testCases, nameof(testCases));
-        testCases.ToList().ForEach(tc => UpdateTestCase(tc, updateDirection));
-        return testCases;
+        testCases!.ToList().ForEach(tc => UpdateTestCase(tc, updateDirection));
+        return testCases!;
     }
 
     public TestRunCompleteEventArgs UpdateTestRunCompleteEventArgs(TestRunCompleteEventArgs testRunCompleteEventArgs, PathConversionDirection updateDirection)
@@ -97,10 +97,10 @@ internal class PathConverter : IPathConverter
         return testRunCompleteEventArgs;
     }
 
-    public TestRunChangedEventArgs UpdateTestRunChangedEventArgs(TestRunChangedEventArgs testRunChangedArgs, PathConversionDirection updateDirection)
+    public TestRunChangedEventArgs UpdateTestRunChangedEventArgs(TestRunChangedEventArgs? testRunChangedArgs, PathConversionDirection updateDirection)
     {
         ValidateArg.NotNull(testRunChangedArgs, nameof(testRunChangedArgs));
-        UpdateTestResults(testRunChangedArgs.NewTestResults, updateDirection);
+        UpdateTestResults(testRunChangedArgs!.NewTestResults!, updateDirection);
         UpdateTestCases(testRunChangedArgs.ActiveTests, updateDirection);
         return testRunChangedArgs;
     }
@@ -112,11 +112,11 @@ internal class PathConverter : IPathConverter
         return attachmentSets;
     }
 
-    public ICollection<AttachmentSet> UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, PathConversionDirection updateDirection)
+    public ICollection<AttachmentSet> UpdateAttachmentSets(ICollection<AttachmentSet>? attachmentSets, PathConversionDirection updateDirection)
     {
         ValidateArg.NotNull(attachmentSets, nameof(attachmentSets));
-        attachmentSets.ToList().ForEach(i => UpdateAttachmentSet(i, updateDirection));
-        return attachmentSets;
+        attachmentSets!.ToList().ForEach(i => UpdateAttachmentSet(i, updateDirection));
+        return attachmentSets!;
     }
 
     private AttachmentSet UpdateAttachmentSet(AttachmentSet attachmentSet, PathConversionDirection updateDirection)

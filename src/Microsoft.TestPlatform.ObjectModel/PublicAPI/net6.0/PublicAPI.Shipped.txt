@@ -1,1 +1,2 @@
-﻿
+﻿static Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace.TraceLevel.get -> System.Diagnostics.TraceLevel (forwarded, contained in Microsoft.TestPlatform.CoreUtilities)
+static Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace.TraceLevel.set -> void (forwarded, contained in Microsoft.TestPlatform.CoreUtilities)

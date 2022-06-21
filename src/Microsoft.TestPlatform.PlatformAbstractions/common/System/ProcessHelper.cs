@@ -26,7 +26,7 @@ public partial class ProcessHelper : IProcessHelper
     private readonly Process _currentProcess = Process.GetCurrentProcess();
 
     /// <inheritdoc/>
-    public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack)
+    public object LaunchProcess(string processPath, string? arguments, string? workingDirectory, IDictionary<string, string?>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack)
     {
         if (!File.Exists(processPath))
         {

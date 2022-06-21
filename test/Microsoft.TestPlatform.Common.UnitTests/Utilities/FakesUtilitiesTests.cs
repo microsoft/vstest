@@ -56,7 +56,7 @@ public class FakesUtilitiesTests
             IsEnabled = true,
             Configuration = doc.FirstChild as XmlElement
         };
-        XmlRunSettingsUtilities.InsertDataCollectorsNode(doc.CreateNavigator(), dataCollectorNode);
+        XmlRunSettingsUtilities.InsertDataCollectorsNode(doc.CreateNavigator()!, dataCollectorNode);
 
         var dataCollectorNode2 = new DataCollectorSettings()
         {

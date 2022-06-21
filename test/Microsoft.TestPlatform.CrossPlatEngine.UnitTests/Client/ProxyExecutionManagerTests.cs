@@ -93,7 +93,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         var inputSource = new List<string> { "inputPackage.appxrecipe" };
 
         var testRunCriteria = new TestRunCriteria(
-            new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), inputSource.FirstOrDefault()) },
+            new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), inputSource.First()) },
             frequencyOfRunStatsChangeEvent: 10);
 
         _mockTestHostManager.Setup(hm => hm.GetTestSources(inputSource)).Returns(actualSources);
@@ -115,7 +115,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         var inputSource = new List<string> { "actualSource.dll" };
 
         var testRunCriteria = new TestRunCriteria(
-            new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), inputSource.FirstOrDefault()) },
+            new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), inputSource.First()) },
             frequencyOfRunStatsChangeEvent: 10);
 
         _mockTestHostManager.Setup(hm => hm.GetTestSources(inputSource)).Returns(actualSources);

@@ -30,7 +30,7 @@ public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler2
     /// Handles discovered tests
     /// </summary>
     /// <param name="discoveredTestCases">List of test cases</param>
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+    public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
     {
         EqtTrace.Info("Test Cases found ");
         _requestHandler.SendTestCases(discoveredTestCases);
@@ -53,7 +53,7 @@ public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler2
     /// </summary>
     /// <param name="level"> Logging level. </param>
     /// <param name="message"> Logging message. </param>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         switch (level)
         {

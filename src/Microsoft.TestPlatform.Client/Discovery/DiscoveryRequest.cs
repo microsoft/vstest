@@ -262,7 +262,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 if (RequestData.IsTelemetryOptedIn)
                 {
                     TestExtensions.AddExtensionTelemetry(
-                        discoveryCompleteEventArgs.Metrics,
+                        discoveryCompleteEventArgs.Metrics!,
                         discoveryCompleteEventArgs.DiscoveredExtensions);
                 }
 
@@ -330,7 +330,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// </summary>
     /// <param name="level">Output level of the message being sent.</param>
     /// <param name="message">Actual contents of the message</param>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         EqtTrace.Verbose("DiscoveryRequest.HandleLogMessage: Starting.");
 
@@ -342,7 +342,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 return;
             }
 
-            var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
+            var testRunMessageEvent = new TestRunMessageEventArgs(level, message!);
             LoggerManager.HandleDiscoveryMessage(testRunMessageEvent);
             OnDiscoveryMessage.SafeInvoke(this, testRunMessageEvent, "DiscoveryRequest.OnTestMessageRecieved");
         }

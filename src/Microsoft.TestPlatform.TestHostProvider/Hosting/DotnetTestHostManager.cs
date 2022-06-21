@@ -117,10 +117,10 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     }
 
     /// <inheritdoc />
-    public event EventHandler<HostProviderEventArgs>? HostLaunched;
+    public event EventHandler<HostProviderEventArgs?>? HostLaunched;
 
     /// <inheritdoc />
-    public event EventHandler<HostProviderEventArgs>? HostExited;
+    public event EventHandler<HostProviderEventArgs?>? HostExited;
 
     /// <summary>
     /// Gets a value indicating whether gets a value indicating if the test host can be shared for multiple sources.
@@ -172,8 +172,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     };
 
     /// <inheritdoc/>
-    [MemberNotNull(nameof(_targetFramework), nameof(_dotnetHostPath))]
-    public void Initialize(IMessageLogger logger, string runsettingsXml)
+    public void Initialize(IMessageLogger? logger, string runsettingsXml)
     {
         _hostExitedEventRaised = false;
 
@@ -207,7 +206,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     /// <inheritdoc/>
     public virtual TestProcessStartInfo GetTestHostProcessStartInfo(
         IEnumerable<string> sources,
-        IDictionary<string, string>? environmentVariables,
+        IDictionary<string, string?>? environmentVariables,
         TestRunnerConnectionInfo connectionInfo)
     {
         TPDebug.Assert(_targetFramework is not null, "_targetFramework is null");
@@ -465,7 +464,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         // G:\nuget-package-path\microsoft.testplatform.testhost\version\**\testhost.dll
         // G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.dll
         startInfo.Arguments = args;
-        startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
+        startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string?>();
 
         // If we're running using custom apphost we need to set DOTNET_ROOT/DOTNET_ROOT(x86)
         // We're setting it inside SDK to support private install scenario.
@@ -614,7 +613,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         }
 
         EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{vstestDotnetRootEnvName}' in env variables, value '{vstestDotnetRootEnvValue}', forwarding to '{dotnetRootEnvName}' (target framework is {_targetFramework.Name}, Version={_targetFramework.Version}).");
-        startInfo.EnvironmentVariables.Add(dotnetRootEnvName, vstestDotnetRootEnvValue);
+        startInfo.EnvironmentVariables!.Add(dotnetRootEnvName, vstestDotnetRootEnvValue);
     }
 
     /// <inheritdoc/>
@@ -639,13 +638,13 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     }
 
     /// <inheritdoc/>
-    public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+    public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
     {
         var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
         var framework = config.TargetFramework;
 
         // This is expected to be called once every run so returning a new instance every time.
-        return framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+        return framework!.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
                || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
                || framework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0;
     }
@@ -728,7 +727,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             cancellationToken.ThrowIfCancellationRequested();
 
             _testHostProcess = _processHelper.LaunchProcess(
-                testHostStartInfo.FileName,
+                testHostStartInfo.FileName!,
                 testHostStartInfo.Arguments,
                 testHostStartInfo.WorkingDirectory,
                 testHostStartInfo.EnvironmentVariables,

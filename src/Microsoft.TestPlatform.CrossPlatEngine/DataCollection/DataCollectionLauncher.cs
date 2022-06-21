@@ -92,6 +92,6 @@ internal abstract class DataCollectionLauncher : IDataCollectionLauncher
     /// The <see cref="int"/>.
     /// </returns>
     public abstract int LaunchDataCollector(
-        IDictionary<string, string>? environmentVariables,
+        IDictionary<string, string?>? environmentVariables,
         IList<string> commandLineArguments);
 }

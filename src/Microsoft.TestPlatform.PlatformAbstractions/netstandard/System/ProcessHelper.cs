@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 public class ProcessHelper : IProcessHelper
 {
     /// <inheritdoc/>
-    public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack)
+    public object LaunchProcess(string processPath, string? arguments, string? workingDirectory, IDictionary<string, string?>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack)
     {
         throw new NotImplementedException();
     }

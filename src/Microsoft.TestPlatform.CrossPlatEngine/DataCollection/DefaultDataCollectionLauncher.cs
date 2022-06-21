@@ -51,7 +51,7 @@ internal class DefaultDataCollectionLauncher : DataCollectionLauncher
     /// <param name="environmentVariables">Environment variables for the process.</param>
     /// <param name="commandLineArguments">The command line arguments to pass to the process.</param>
     /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
-    public override int LaunchDataCollector(IDictionary<string, string>? environmentVariables, IList<string> commandLineArguments)
+    public override int LaunchDataCollector(IDictionary<string, string?>? environmentVariables, IList<string> commandLineArguments)
     {
         var dataCollectorDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
         TPDebug.Assert(dataCollectorDirectory is not null, "dataCollectorDirectory is not null");

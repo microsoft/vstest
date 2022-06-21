@@ -42,17 +42,17 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
     }
 
     /// <inheritdoc/>
-    public async Task ProcessTestRunAttachmentsAsync(string? runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
+    public async Task ProcessTestRunAttachmentsAsync(string? runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector>? invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
     {
         await InternalProcessTestRunAttachmentsAsync(runSettingsXml, requestData, attachments, invokedDataCollector, eventHandler, cancellationToken).ConfigureAwait(false);
     }
     /// <inheritdoc/>
-    public Task<Collection<AttachmentSet>> ProcessTestRunAttachmentsAsync(string? runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, CancellationToken cancellationToken)
+    public Task<Collection<AttachmentSet>> ProcessTestRunAttachmentsAsync(string? runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector>? invokedDataCollector, CancellationToken cancellationToken)
     {
         return InternalProcessTestRunAttachmentsAsync(runSettingsXml, requestData, attachments, invokedDataCollector, null, cancellationToken);
     }
 
-    private async Task<Collection<AttachmentSet>> InternalProcessTestRunAttachmentsAsync(string? runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler? eventHandler, CancellationToken cancellationToken)
+    private async Task<Collection<AttachmentSet>> InternalProcessTestRunAttachmentsAsync(string? runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector>? invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler? eventHandler, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
         Collection<AttachmentSet> localAttachments = new(attachments.ToList());
@@ -103,7 +103,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
         }
     }
 
-    private async Task<Collection<AttachmentSet>> ProcessAttachmentsAsync(string? runSettingsXml, Collection<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler? eventsHandler, CancellationToken cancellationToken)
+    private async Task<Collection<AttachmentSet>> ProcessAttachmentsAsync(string? runSettingsXml, Collection<AttachmentSet> attachments, IEnumerable<InvokedDataCollector>? invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler? eventsHandler, CancellationToken cancellationToken)
     {
         if (attachments.Count == 0)
         {
@@ -169,7 +169,7 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
 
                 EqtTrace.Info($"TestRunAttachmentsProcessingManager: Invocation of data collector attachment processor AssemblyQualifiedName: '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName}' FriendlyName: '{dataCollectorAttachmentsProcessor.FriendlyName}' with configuration '{(configuration == null ? "null" : configuration.OuterXml)}'");
                 ICollection<AttachmentSet> processedAttachments = await dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.ProcessAttachmentSetsAsync(
-                    configuration,
+                    configuration!,
                     new Collection<AttachmentSet>(attachmentsToBeProcessed),
                     progressReporter,
                     logger,

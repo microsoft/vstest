@@ -32,11 +32,11 @@ public class TestableRuntimeProvider : ITestRuntimeProvider
 
     public bool Shared { get; }
 
-    public void Initialize(IMessageLogger logger, string runsettingsXml)
+    public void Initialize(IMessageLogger? logger, string runsettingsXml)
     {
     }
 
-    public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+    public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
     {
         return true;
     }
@@ -56,12 +56,12 @@ public class TestableRuntimeProvider : ITestRuntimeProvider
         return Task.FromResult(true);
     }
 
-    public TestProcessStartInfo? GetTestHostProcessStartInfo(
+    public TestProcessStartInfo GetTestHostProcessStartInfo(
         IEnumerable<string> sources,
-        IDictionary<string, string> environmentVariables,
+        IDictionary<string, string?>? environmentVariables,
         TestRunnerConnectionInfo connectionInfo)
     {
-        return default;
+        return default!;
     }
 
     public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)

@@ -152,7 +152,7 @@ internal class DataCollectionManager : IDataCollectionManager
     }
 
     /// <inheritdoc/>
-    public IDictionary<string, string> InitializeDataCollectors(string settingsXml)
+    public IDictionary<string, string?> InitializeDataCollectors(string settingsXml)
     {
         ValidateArg.NotNull(settingsXml, nameof(settingsXml));
         if (settingsXml.Length == 0)
@@ -171,11 +171,11 @@ internal class DataCollectionManager : IDataCollectionManager
 
         // Environment variables are passed to testhost process, through ProcessStartInfo.EnvironmentVariables, which handles the key in a case-insensitive manner, which is translated to lowercase.
         // Therefore, using StringComparer.OrdinalIgnoreCase so that same keys with different cases are treated as same.
-        var executionEnvironmentVariables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var executionEnvironmentVariables = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
 
         var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settingsXml);
 
-        _isDataCollectionEnabled = dataCollectionRunSettings.IsCollectionEnabled;
+        _isDataCollectionEnabled = dataCollectionRunSettings?.IsCollectionEnabled ?? false;
 
         // If dataCollectionRunSettings is null, that means datacollectors are not configured.
         if (dataCollectionRunSettings == null || !dataCollectionRunSettings.IsCollectionEnabled)
@@ -261,10 +261,10 @@ internal class DataCollectionManager : IDataCollectionManager
         List<InvokedDataCollector> invokedDataCollector = new();
         foreach (DataCollectorInformation dataCollectorInformation in RunDataCollectors.Values)
         {
-            invokedDataCollector.Add(new InvokedDataCollector(dataCollectorInformation.DataCollectorConfig.TypeUri,
+            invokedDataCollector.Add(new InvokedDataCollector(dataCollectorInformation.DataCollectorConfig.TypeUri!,
                 dataCollectorInformation.DataCollectorConfig.FriendlyName,
-                dataCollectorInformation.DataCollectorConfig.DataCollectorType.AssemblyQualifiedName,
-                dataCollectorInformation.DataCollectorConfig.FilePath,
+                dataCollectorInformation.DataCollectorConfig.DataCollectorType.AssemblyQualifiedName!,
+                dataCollectorInformation.DataCollectorConfig.FilePath!,
                 dataCollectorInformation.DataCollectorConfig.HasAttachmentsProcessor()));
         }
 
@@ -310,6 +310,7 @@ internal class DataCollectionManager : IDataCollectionManager
         }
 
         TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
+        TPDebug.Assert(testCaseStartEventArgs.TestElement is not null, "testCaseStartEventArgs.TestElement is null");
         var context = new DataCollectionContext(_dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseStartEventArgs.TestElement);
         testCaseStartEventArgs.Context = context;
 
@@ -325,6 +326,7 @@ internal class DataCollectionManager : IDataCollectionManager
         }
 
         TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
+        TPDebug.Assert(testCaseEndEventArgs.TestElement is not null, "testCaseEndEventArgs.TestElement is null");
         var context = new DataCollectionContext(_dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseEndEventArgs.TestElement);
         testCaseEndEventArgs.Context = context;
 
@@ -391,7 +393,7 @@ internal class DataCollectionManager : IDataCollectionManager
     /// <param name="friendlyName">The friendly Name.</param>
     /// <param name="dataCollectorUri">The data collector Uri.</param>
     /// <returns><see cref="bool"/></returns>
-    protected virtual bool TryGetUriFromFriendlyName(string friendlyName, out string? dataCollectorUri)
+    protected virtual bool TryGetUriFromFriendlyName(string? friendlyName, out string? dataCollectorUri)
     {
         TPDebug.Assert(_dataCollectorExtensionManager is not null, "_dataCollectorExtensionManager is null");
         foreach (var extension in _dataCollectorExtensionManager.TestExtensions)

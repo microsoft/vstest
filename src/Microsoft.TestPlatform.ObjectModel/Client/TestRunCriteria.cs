@@ -526,10 +526,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
     [DataMember]
     public string TestCaseFilter
     {
-        get
-        {
-            return _testCaseFilter;
-        }
+        get => _testCaseFilter;
 
         private set
         {
@@ -549,10 +546,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
     [DataMember]
     public FilterOptions FilterOptions
     {
-        get
-        {
-            return _filterOptions;
-        }
+        get => _filterOptions;
 
         private set
         {

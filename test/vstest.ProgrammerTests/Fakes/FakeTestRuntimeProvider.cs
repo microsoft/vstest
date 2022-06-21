@@ -21,8 +21,8 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
     // TODO: make this configurable?
     public bool Shared => false;
 
-    public event EventHandler<HostProviderEventArgs>? HostLaunched;
-    public event EventHandler<HostProviderEventArgs>? HostExited;
+    public event EventHandler<HostProviderEventArgs?>? HostLaunched;
+    public event EventHandler<HostProviderEventArgs?>? HostExited;
 
     public FakeTestRuntimeProvider(FakeProcessHelper fakeProcessHelper, FakeProcess fakeTestHostProcess, FakeFileHelper fakeFileHelper, List<FakeTestDllFile> fakeTestDlls, FakeCommunicationEndpoint fakeCommunicationEndpoint, FakeErrorAggregator fakeErrorAggregator)
     {
@@ -54,12 +54,12 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
             if (HostExited != null)
             {
                 // TODO: When we exit, eventually there are no subscribers, maybe we should review if we don't lose the error output sometimes, in unnecessary way
-                HostExited(this, new HostProviderEventArgs(process.ErrorOutput, process.ExitCode, process.Id));
+                HostExited(this, new HostProviderEventArgs(process.ErrorOutput!, process.ExitCode, process.Id));
             }
         };
     }
 
-    public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+    public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
     {
         // <TargetPlatform>x86</TargetPlatform>
         // <TargetFrameworkVersion>Framework40</TargetFrameworkVersion>
@@ -80,7 +80,7 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
         return FakeCommunicationEndpoint.TestHostConnectionInfo;
     }
 
-    public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
+    public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string?>? environmentVariables, TestRunnerConnectionInfo connectionInfo)
     {
         // TODO: do we need to do more here? How to link testhost to the fake one we "start"?
         return TestHostProcess.TestProcessStartInfo;
@@ -99,7 +99,7 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
         return sources;
     }
 
-    public void Initialize(IMessageLogger logger, string runsettingsXml)
+    public void Initialize(IMessageLogger? logger, string runsettingsXml)
     {
         // TODO: this is called twice, is that okay?
         // TODO: and also by HandlePartialRunComplete after the test run has completed and we aborted because the client disconnected

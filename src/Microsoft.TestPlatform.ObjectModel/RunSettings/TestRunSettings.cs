@@ -5,8 +5,6 @@
 using System.Xml;
 #endif
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -21,7 +19,6 @@ public abstract class TestRunSettings
     protected TestRunSettings(string name)
     {
         ValidateArg.NotNullOrEmpty(name, nameof(name));
-
         Name = name;
     }
 

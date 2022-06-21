@@ -3,8 +3,6 @@
 
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -23,5 +21,5 @@ public class EditorAttachDebuggerAckPayload
     /// ErrorMessage, in cases where attaching the debugger fails.
     /// </summary>
     [DataMember]
-    public string ErrorMessage { get; set; }
+    public string? ErrorMessage { get; set; }
 }

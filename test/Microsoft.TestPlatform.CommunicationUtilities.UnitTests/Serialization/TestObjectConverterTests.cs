@@ -99,7 +99,7 @@ public class TestObjectConverterTests
 
         var properties = test.Properties.ToArray();
         Assert.AreEqual(1, properties.Length);
-        Assert.IsTrue(string.IsNullOrEmpty(test.GetPropertyValue(properties[0]).ToString()));
+        Assert.IsTrue(string.IsNullOrEmpty(test.GetPropertyValue(properties[0])!.ToString()));
     }
 
     [TestMethod]
@@ -111,7 +111,7 @@ public class TestObjectConverterTests
 
         var properties = test.Properties.ToArray();
         Assert.AreEqual(1, properties.Length);
-        CollectionAssert.AreEqual(new[] { "val1", "val2" }, (string[])test.GetPropertyValue(properties[0]));
+        CollectionAssert.AreEqual(new[] { "val1", "val2" }, (string[])test.GetPropertyValue(properties[0])!);
     }
 
     [TestMethod]

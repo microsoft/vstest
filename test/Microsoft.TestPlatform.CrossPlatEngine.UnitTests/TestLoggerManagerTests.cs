@@ -1650,7 +1650,7 @@ public class TestLoggerManagerTests
     [FriendlyName("TestLoggerWithParameterExtension")]
     private class ValidLoggerWithParameters : ITestLoggerWithParameters
     {
-        public static Dictionary<string, string>? Parameters;
+        public static Dictionary<string, string?>? Parameters;
         public static int Counter;
 
         public void Initialize(TestLoggerEvents events, string testRunDirectory)
@@ -1658,7 +1658,7 @@ public class TestLoggerManagerTests
             Counter += 2;
         }
 
-        public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+        public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters)
         {
             Counter++;
             Parameters = parameters;

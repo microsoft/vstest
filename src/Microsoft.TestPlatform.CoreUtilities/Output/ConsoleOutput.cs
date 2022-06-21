@@ -57,7 +57,7 @@ public class ConsoleOutput : IOutput
     /// </summary>
     /// <param name="message">Message to be output.</param>
     /// <param name="level">Level of the message.</param>
-    public void WriteLine(string message, OutputLevel level)
+    public void WriteLine(string? message, OutputLevel level)
     {
         Write(message, level);
         Write(Environment.NewLine, level);
@@ -68,7 +68,7 @@ public class ConsoleOutput : IOutput
     /// </summary>
     /// <param name="message">Message to be output.</param>
     /// <param name="level">Level of the message.</param>
-    public void Write(string message, OutputLevel level)
+    public void Write(string? message, OutputLevel level)
     {
         switch (level)
         {

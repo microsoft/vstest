@@ -20,7 +20,7 @@ internal interface IDataCollectionManager : IDisposable
     /// </summary>
     /// <param name="settingsXml">Run Settings which has DataCollector configuration.</param>
     /// <returns>Environment variables.</returns>
-    IDictionary<string, string> InitializeDataCollectors(string settingsXml);
+    IDictionary<string, string?> InitializeDataCollectors(string settingsXml);
 
     /// <summary>
     /// Raises TestCaseStart event to all data collectors configured for run.

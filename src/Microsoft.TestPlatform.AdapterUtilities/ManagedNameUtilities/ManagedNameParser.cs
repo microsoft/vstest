@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 
 using Microsoft.TestPlatform.AdapterUtilities.Helpers;
@@ -116,7 +115,7 @@ public class ManagedNameParser
     // parse arity in the form `nn where nn is an integer value.
     private static int ParseArity(string managedMethodName, int start, out int arity)
     {
-        Debug.Assert(managedMethodName[start] == '`');
+        TPDebug.Assert(managedMethodName[start] == '`');
 
         int i = start + 1; // skip initial '`' char
         for (; i < managedMethodName.Length; i++)
@@ -137,7 +136,7 @@ public class ManagedNameParser
         {
             return start;
         }
-        Debug.Assert(managedMethodName[start] == '(');
+        TPDebug.Assert(managedMethodName[start] == '(');
 
         var types = new List<string>();
 

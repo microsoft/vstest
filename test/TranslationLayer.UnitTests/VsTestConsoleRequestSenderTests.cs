@@ -894,7 +894,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
             (testRunChangedArgs) =>
             {
-                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
+                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults!.Any(), "TestResults must be passed properly");
                 _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
@@ -946,7 +946,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
             (testRunChangedArgs) =>
             {
-                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
+                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults!.Any(), "TestResults must be passed properly");
                 _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
@@ -1003,7 +1003,7 @@ public class VsTestConsoleRequestSenderTests
         // Assert.
         Assert.IsNotNull(receivedRequest);
         CollectionAssert.AreEqual(sources, receivedRequest.Sources);
-        Assert.AreEqual(filter, receivedRequest.TestPlatformOptions.TestCaseFilter, "The run request message should include test case filter");
+        Assert.AreEqual(filter, receivedRequest.TestPlatformOptions!.TestCaseFilter, "The run request message should include test case filter");
     }
 
     [TestMethod]
@@ -1045,7 +1045,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
             (testRunChangedArgs) =>
             {
-                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
+                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults!.Any(), "TestResults must be passed properly");
                 _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
@@ -1106,7 +1106,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
             (testRunChangedArgs) =>
             {
-                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
+                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults!.Any(), "TestResults must be passed properly");
                 _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
@@ -1268,7 +1268,7 @@ public class VsTestConsoleRequestSenderTests
         // Assert.
         Assert.IsNotNull(receivedRequest);
         CollectionAssert.AreEqual(sources, receivedRequest.Sources);
-        Assert.AreEqual(filter, receivedRequest.TestPlatformOptions.TestCaseFilter, "The run request message should include test case filter");
+        Assert.AreEqual(filter, receivedRequest.TestPlatformOptions!.TestCaseFilter, "The run request message should include test case filter");
     }
 
     [TestMethod]
@@ -1361,7 +1361,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
             (testRunChangedArgs) =>
             {
-                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
+                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults!.Any(), "TestResults must be passed properly");
                 _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
@@ -1412,7 +1412,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
             (testRunChangedArgs) =>
             {
-                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
+                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults!.Any(), "TestResults must be passed properly");
                 _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
@@ -1471,10 +1471,10 @@ public class VsTestConsoleRequestSenderTests
         _requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
 
         Assert.IsNotNull(receivedChangeEventArgs);
-        Assert.IsTrue(receivedChangeEventArgs.NewTestResults.Any());
+        Assert.IsTrue(receivedChangeEventArgs.NewTestResults!.Any());
 
         // Verify that the traits are passed through properly.
-        var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
+        var traits = receivedChangeEventArgs.NewTestResults!.ToArray()[0].TestCase.Traits;
         Assert.IsNotNull(traits);
         Assert.AreEqual("a", traits.ToArray()[0].Name);
         Assert.AreEqual("b", traits.ToArray()[0].Value);
@@ -1524,10 +1524,10 @@ public class VsTestConsoleRequestSenderTests
         await _requestSender.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
 
         Assert.IsNotNull(receivedChangeEventArgs);
-        Assert.IsTrue(receivedChangeEventArgs.NewTestResults.Any());
+        Assert.IsTrue(receivedChangeEventArgs.NewTestResults!.Any());
 
         // Verify that the traits are passed through properly.
-        var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
+        var traits = receivedChangeEventArgs.NewTestResults!.ToArray()[0].TestCase.Traits;
         Assert.IsNotNull(traits);
         Assert.AreEqual("a", traits.ToArray()[0].Name);
         Assert.AreEqual("b", traits.ToArray()[0].Value);
@@ -1581,10 +1581,10 @@ public class VsTestConsoleRequestSenderTests
         _requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
 
         Assert.IsNotNull(receivedChangeEventArgs);
-        Assert.IsTrue(receivedChangeEventArgs.NewTestResults.Any());
+        Assert.IsTrue(receivedChangeEventArgs.NewTestResults!.Any());
 
         // Verify that the traits are passed through properly.
-        var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
+        var traits = receivedChangeEventArgs.NewTestResults!.ToArray()[0].TestCase.Traits;
         Assert.IsNotNull(traits);
         Assert.AreEqual("a", traits.ToArray()[0].Name);
         Assert.AreEqual("b", traits.ToArray()[0].Value);
@@ -1638,10 +1638,10 @@ public class VsTestConsoleRequestSenderTests
         await _requestSender.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
 
         Assert.IsNotNull(receivedChangeEventArgs);
-        Assert.IsTrue(receivedChangeEventArgs.NewTestResults.Any());
+        Assert.IsTrue(receivedChangeEventArgs.NewTestResults!.Any());
 
         // Verify that the traits are passed through properly.
-        var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
+        var traits = receivedChangeEventArgs.NewTestResults!.ToArray()[0].TestCase.Traits;
         Assert.IsNotNull(traits);
         Assert.AreEqual("a", traits.ToArray()[0].Name);
         Assert.AreEqual("b", traits.ToArray()[0].Value);
@@ -1684,7 +1684,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
             (testRunChangedArgs) =>
             {
-                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
+                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults!.Any(), "TestResults must be passed properly");
                 _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
@@ -1743,7 +1743,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
             (testRunChangedArgs) =>
             {
-                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Any(), "TestResults must be passed properly");
+                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults!.Any(), "TestResults must be passed properly");
                 _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
             });
 
@@ -1789,7 +1789,7 @@ public class VsTestConsoleRequestSenderTests
         mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
             .Callback<TestProcessStartInfo>((startInfo) =>
             {
-                if (startInfo.FileName.Equals(p1.FileName))
+                if (startInfo.FileName!.Equals(p1.FileName))
                 {
                     _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message2));
                 }
@@ -1828,7 +1828,7 @@ public class VsTestConsoleRequestSenderTests
         mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
             .Callback<TestProcessStartInfo>((startInfo) =>
             {
-                if (startInfo.FileName.Equals(p1.FileName))
+                if (startInfo.FileName!.Equals(p1.FileName))
                 {
                     _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message2));
                 }
@@ -1964,12 +1964,12 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
         {
             Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
-            Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
+            Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors!.Count());
         });
 
         await _requestSender.ProcessTestRunAttachmentsAsync(
             new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
-            new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+            new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location, false) },
             Constants.EmptyRunSettings,
             true,
             mockHandler.Object,
@@ -2003,12 +2003,12 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
         {
             Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
-            Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
+            Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors!.Count());
         });
 
         await _requestSender.ProcessTestRunAttachmentsAsync(
             new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
-            new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+            new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location, false) },
             Constants.EmptyRunSettings,
             true,
             mockHandler.Object,
@@ -2046,14 +2046,14 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
         {
             Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
-            Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
+            Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors!.Count());
         });
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
             () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(attachmentsProcessingComplete)));
 
         await _requestSender.ProcessTestRunAttachmentsAsync(
             new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
-            new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+            new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location, false) },
             Constants.EmptyRunSettings,
             false,
             mockHandler.Object,
@@ -2098,7 +2098,7 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
         {
             Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
-            Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
+            Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors!.Count());
         });
 
         mockHandler.Setup(mh => mh.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>())).Callback(
@@ -2106,7 +2106,7 @@ public class VsTestConsoleRequestSenderTests
 
         await _requestSender.ProcessTestRunAttachmentsAsync(
             new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
-            new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+            new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location, false) },
             Constants.EmptyRunSettings,
             false,
             mockHandler.Object,
@@ -2145,7 +2145,7 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
         {
             Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
-            Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
+            Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors!.Count());
         });
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(() =>
         {
@@ -2155,7 +2155,7 @@ public class VsTestConsoleRequestSenderTests
 
         await _requestSender.ProcessTestRunAttachmentsAsync(
             new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
-            new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+            new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location, false) },
             Constants.EmptyRunSettings,
             false,
             mockHandler.Object,
@@ -2191,12 +2191,12 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
         {
             Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
-            Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
+            Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors!.Count());
         });
 
         await _requestSender.ProcessTestRunAttachmentsAsync(
             new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
-            new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+            new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location, false) },
             Constants.EmptyRunSettings,
             true,
             mockHandler.Object,

@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -21,7 +19,7 @@ public class TestRunChangedEventArgs : EventArgs
     /// <param name="stats"> The stats. </param>
     /// <param name="newTestResults"> The new test results. </param>
     /// <param name="activeTests"> The active tests. </param>
-    public TestRunChangedEventArgs(ITestRunStatistics stats, IEnumerable<TestResult> newTestResults, IEnumerable<TestCase> activeTests)
+    public TestRunChangedEventArgs(ITestRunStatistics? stats, IEnumerable<TestResult>? newTestResults, IEnumerable<TestCase>? activeTests)
     {
         TestRunStatistics = stats;
         NewTestResults = newTestResults;
@@ -32,17 +30,17 @@ public class TestRunChangedEventArgs : EventArgs
     /// Gets the new test results.
     /// </summary>
     [DataMember]
-    public IEnumerable<TestResult> NewTestResults { get; private set; }
+    public IEnumerable<TestResult>? NewTestResults { get; private set; }
 
     /// <summary>
     /// Gets the test run statistics.
     /// </summary>
     [DataMember]
-    public ITestRunStatistics TestRunStatistics { get; private set; }
+    public ITestRunStatistics? TestRunStatistics { get; private set; }
 
     /// <summary>
     /// Gets the active tests.
     /// </summary>
     [DataMember]
-    public IEnumerable<TestCase> ActiveTests { get; private set; }
+    public IEnumerable<TestCase>? ActiveTests { get; private set; }
 }

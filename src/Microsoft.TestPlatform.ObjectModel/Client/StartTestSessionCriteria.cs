@@ -6,8 +6,6 @@ using System.Runtime.Serialization;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -20,17 +18,17 @@ public class StartTestSessionCriteria
     /// Gets or sets the sources used for starting the test session.
     /// </summary>
     [DataMember]
-    public IList<string> Sources { get; set; }
+    public IList<string>? Sources { get; set; }
 
     /// <summary>
     /// Gets or sets the run settings used for starting the test session.
     /// </summary>
     [DataMember]
-    public string RunSettings { get; set; }
+    public string? RunSettings { get; set; }
 
     /// <summary>
     /// Gets or sets the test host launcher used for starting the test session.
     /// </summary>
     [DataMember]
-    public ITestHostLauncher TestHostLauncher { get; set; }
+    public ITestHostLauncher? TestHostLauncher { get; set; }
 }

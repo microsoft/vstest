@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -403,6 +404,7 @@ public class ProxyOperationManager
         return updatedRunSettingsXml;
     }
 
+    [return: NotNullIfNotNull("logFile")]
     private static string? GetTimestampedLogFile(string? logFile)
     {
         return logFile.IsNullOrWhiteSpace()
@@ -437,16 +439,16 @@ public class ProxyOperationManager
         }
     }
 
-    private void TestHostManagerHostLaunched(object? sender, HostProviderEventArgs e)
+    private void TestHostManagerHostLaunched(object? sender, HostProviderEventArgs? e)
     {
-        EqtTrace.Verbose(e.Data);
+        EqtTrace.Verbose(e!.Data);
         _testHostProcessId = e.ProcessId;
     }
 
-    private void TestHostManagerHostExited(object? sender, HostProviderEventArgs e)
+    private void TestHostManagerHostExited(object? sender, HostProviderEventArgs? e)
     {
         EqtTrace.Verbose("CrossPlatEngine.TestHostManagerHostExited: calling on client process exit callback.");
-        _testHostProcessStdError = e.Data;
+        _testHostProcessStdError = e!.Data;
 
         // This needs to be set before we call the OnClientProcess exit because the
         // OnClientProcess will short-circuit WaitForRequestHandlerConnection in SetupChannel

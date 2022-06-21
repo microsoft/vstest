@@ -171,12 +171,12 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
         }
     }
 
-    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
     {
         _actualRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
     }
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         _actualRunEventsHandler.HandleLogMessage(level, message);
     }
@@ -194,7 +194,7 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
 
     private void ConvertToRawMessageAndSend(string messageType, object payload)
     {
-        var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig.Version);
+        var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig!.Version);
         _actualRunEventsHandler.HandleRawMessage(rawMessage);
     }
 }

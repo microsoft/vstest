@@ -200,11 +200,11 @@ public class DataCollectorAttachmentProcessorAppDomainTests
     public class AppDomainSampleDataCollector : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
 
         }
@@ -257,11 +257,11 @@ public class DataCollectorAttachmentProcessorAppDomainTests
     public class AppDomainSampleDataCollectorFailure : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
 
         }

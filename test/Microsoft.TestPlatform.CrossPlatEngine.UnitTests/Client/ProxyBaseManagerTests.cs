@@ -55,7 +55,7 @@ public class ProxyBaseManagerTests
         _mockTestHostManager.Setup(
                 m => m.GetTestHostProcessStartInfo(
                     It.IsAny<IEnumerable<string>>(),
-                    It.IsAny<IDictionary<string, string>>(),
+                    It.IsAny<IDictionary<string, string?>>(),
                     It.IsAny<TestRunnerConnectionInfo>()))
             .Returns(new TestProcessStartInfo());
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))

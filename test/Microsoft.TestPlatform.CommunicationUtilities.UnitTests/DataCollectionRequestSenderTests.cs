@@ -39,7 +39,7 @@ public class DataCollectionRequestSenderTests
         var displayName = "CustomDataCollector";
         var attachment = new AttachmentSet(datacollectorUri, displayName);
         attachment.Attachments.Add(new UriDataAttachment(attachmentUri, "filename.txt"));
-        var invokedDataCollector = new InvokedDataCollector(datacollectorUri, displayName, typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false);
+        var invokedDataCollector = new InvokedDataCollector(datacollectorUri, displayName, typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location, false);
         _mockDataSerializer.Setup(x => x.DeserializePayload<AfterTestRunEndResult>(It.IsAny<Message>())).Returns(
             new AfterTestRunEndResult(new Collection<AttachmentSet>() { attachment }, new Collection<InvokedDataCollector>() { invokedDataCollector }, new Dictionary<string, object>()));
         _mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.AfterTestRunEndResult, Payload = null });

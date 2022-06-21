@@ -45,7 +45,7 @@ public class DiscoveryPerfTests : TelemetryPerfTestBase
             vstestConsoleWrapper.DiscoverTests(assetPath, GetDefaultRunSettings(), options, discoveryEventHandler2);
             vstestConsoleWrapper.EndSession();
         }
-        Assert.AreEqual(expectedNumberOfTests, discoveryEventHandler2.Metrics[TelemetryDataConstants.TotalTestsDiscovered]);
+        Assert.AreEqual(expectedNumberOfTests, discoveryEventHandler2.Metrics![TelemetryDataConstants.TotalTestsDiscovered]);
         PostTelemetry(discoveryEventHandler2.Metrics, perfAnalyzer, projectName);
     }
 
@@ -88,7 +88,7 @@ public class DiscoveryPerfTests : TelemetryPerfTestBase
             vstestConsoleWrapper.EndSession();
         }
 
-        Assert.AreEqual(expectedNumberOfTests, discoveryEventHandler2.Metrics[TelemetryDataConstants.TotalTestsDiscovered]);
+        Assert.AreEqual(expectedNumberOfTests, discoveryEventHandler2.Metrics![TelemetryDataConstants.TotalTestsDiscovered]);
         PostTelemetry(discoveryEventHandler2.Metrics, perfAnalyzer, projectName);
     }
 }

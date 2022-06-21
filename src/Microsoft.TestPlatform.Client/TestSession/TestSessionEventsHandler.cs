@@ -29,9 +29,9 @@ internal class TestSessionEventsHandler : ITestSessionEventsHandler
     }
 
     /// <inheritdoc />
-    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs)
+    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs? eventArgs)
     {
-        var ackPayload = new StartTestSessionAckPayload()
+        var ackPayload = new StartTestSessionAckPayload
         {
             EventArgs = eventArgs
         };
@@ -40,7 +40,7 @@ internal class TestSessionEventsHandler : ITestSessionEventsHandler
     }
 
     /// <inheritdoc />
-    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs eventArgs)
+    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs? eventArgs)
     {
         var ackPayload = new StopTestSessionAckPayload()
         {

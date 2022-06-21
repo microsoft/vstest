@@ -26,7 +26,7 @@ internal static class DataCollectionLauncherFactory
         if (!settingsXml.IsNullOrWhiteSpace())
         {
             var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settingsXml);
-            foreach (var dataCollectorSettings in dataCollectionRunSettings.DataCollectorSettingsList)
+            foreach (var dataCollectorSettings in dataCollectionRunSettings!.DataCollectorSettingsList)
             {
                 if (string.Equals(dataCollectorSettings.FriendlyName, "event Log", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(dataCollectorSettings.Uri?.ToString(), @"datacollector://Microsoft/EventLog/2.0", StringComparison.OrdinalIgnoreCase))

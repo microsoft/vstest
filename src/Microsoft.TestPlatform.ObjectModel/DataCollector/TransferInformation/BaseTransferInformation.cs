@@ -42,16 +42,11 @@ public abstract class BasicTransferInformation
     /// </summary>
     public string Description
     {
-        get
-        {
-            return _description;
-        }
+        get => _description;
 
-        set
-        {
+        set =>
             // If we don't have a description, use an empty string.
             _description = value ?? string.Empty;
-        }
     }
 
     /// <summary>

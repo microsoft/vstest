@@ -38,7 +38,7 @@ public class DiaSessionTests : IntegrationTestBase
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var diaSession = new DiaSession(assemblyPath);
-        DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "PassingTest");
+        DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "PassingTest");
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
@@ -56,7 +56,7 @@ public class DiaSessionTests : IntegrationTestBase
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var diaSession = new DiaSession(assemblyPath);
-        DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1+<AsyncTestMethod>d__1", "MoveNext");
+        DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1+<AsyncTestMethod>d__1", "MoveNext");
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
@@ -74,7 +74,7 @@ public class DiaSessionTests : IntegrationTestBase
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var diaSession = new DiaSession(assemblyPath);
-        DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "OverLoadedMethod");
+        DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "OverLoadedMethod");
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
@@ -95,7 +95,7 @@ public class DiaSessionTests : IntegrationTestBase
         var diaSession = new DiaSession(assemblyPath);
 
         // Not exist method name
-        DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "NotExistMethod");
+        DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "NotExistMethod");
         Assert.IsNull(diaNavigationData);
 
         // Not Exist Type name
@@ -113,7 +113,7 @@ public class DiaSessionTests : IntegrationTestBase
 
         var watch = Stopwatch.StartNew();
         var diaSession = new DiaSession(assemblyPath);
-        DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.HugeMethodSet", "MSTest_D1_01");
+        DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.HugeMethodSet", "MSTest_D1_01");
         watch.Stop();
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
