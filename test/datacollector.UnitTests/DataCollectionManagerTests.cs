@@ -123,16 +123,6 @@ public class DataCollectionManagerTests
     }
 
     [TestMethod]
-    public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsNull()
-    {
-        var dataCollectorSettingsWithNullUri = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, _friendlyName, string.Empty, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("uri=\"\"", string.Empty));
-        _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithNullUri);
-
-        Assert.AreEqual(0, _dataCollectionManager.RunDataCollectors.Count);
-        _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
-    }
-
-    [TestMethod]
     public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsNullAndUriIsCorrect()
     {
         var dataCollectorSettingsWithNullFriendlyName = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, string.Empty, _uri, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("friendlyName=\"\"", string.Empty));
@@ -527,12 +517,6 @@ internal class TestableDataCollectionManager : DataCollectionManager
 
     protected override bool IsUriValid(string? uri)
     {
-        if (uri is null)
-        {
-            // This is needed for test InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsNull
-            throw new ArgumentNullException(nameof(uri));
-        }
-
         return string.Equals(uri, "my://custom/datacollector") || string.Equals(uri, "my://custom/ccdatacollector");
     }
 
