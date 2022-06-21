@@ -8,8 +8,6 @@ using System.Reflection;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
@@ -17,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 /// </summary>
 internal class TestPluginManager
 {
-    private static TestPluginManager s_instance;
+    private static TestPluginManager? s_instance;
 
     /// <summary>
     /// Gets the singleton instance of TestPluginManager.
@@ -30,9 +28,9 @@ internal class TestPluginManager
     /// </summary>
     /// <param name="extensionTypeName">Assembly qualified name of the test extension</param>
     /// <returns>Data type of the test extension</returns>
-    public static Type GetTestExtensionType(string extensionTypeName)
+    public static Type? GetTestExtensionType(string extensionTypeName)
     {
-        Type extensionType;
+        Type? extensionType;
         try
         {
             extensionType = Type.GetType(extensionTypeName, true);
@@ -62,9 +60,9 @@ internal class TestPluginManager
 
         try
         {
-            object rawPlugin = Activator.CreateInstance(extensionType);
+            object? rawPlugin = Activator.CreateInstance(extensionType);
 
-            T testExtension = (T)rawPlugin;
+            T testExtension = (T)rawPlugin!;
             return testExtension;
         }
         catch (Exception ex)
@@ -114,7 +112,8 @@ internal class TestPluginManager
         out IEnumerable<LazyExtension<TExtension, IMetadata>> filtered) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
     {
         var extensions = TestPluginCache.Instance.DiscoverTestExtensions<TPluginInfo, TExtension>(endsWithPattern);
-        TestPluginManager.GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
+        TPDebug.Assert(extensions is not null, "extensions is null");
+        GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
     }
 
     /// <summary>
@@ -150,7 +149,7 @@ internal class TestPluginManager
         bool skipCache = false) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
     {
         var extensions = TestPluginCache.Instance.GetTestExtensions<TPluginInfo, TExtension>(extensionAssembly, skipCache);
-        TestPluginManager.GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
+        GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
     }
 
     /// <summary>
@@ -159,7 +158,8 @@ internal class TestPluginManager
     /// <typeparam name="T"> Type of TestPluginIInformation. </typeparam>
     /// <param name="dictionary"> The dictionary containing plugin identifier data and its info. </param>
     /// <returns> Collection of test plugins information </returns>
-    private static IEnumerable<TestPluginInformation> GetValuesFromDictionary<T>(Dictionary<string, T> dictionary) where T : TestPluginInformation
+    private static IEnumerable<TestPluginInformation> GetValuesFromDictionary<T>(Dictionary<string, T> dictionary)
+        where T : TestPluginInformation
     {
         var values = new List<TestPluginInformation>();
 
@@ -197,12 +197,14 @@ internal class TestPluginManager
     private static void GetExtensions<TPluginInfo, TExtension, IMetadata, TMetadata>(
         Dictionary<string, TPluginInfo> testPluginInfo,
         out IEnumerable<LazyExtension<TExtension, Dictionary<string, object>>> unfiltered,
-        out IEnumerable<LazyExtension<TExtension, IMetadata>> filtered) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
+        out IEnumerable<LazyExtension<TExtension, IMetadata>> filtered)
+        where TMetadata : IMetadata
+        where TPluginInfo : TestPluginInformation
     {
         var unfilteredExtensions = new List<LazyExtension<TExtension, Dictionary<string, object>>>();
         var filteredExtensions = new List<LazyExtension<TExtension, IMetadata>>();
 
-        var testPlugins = TestPluginManager.GetValuesFromDictionary(testPluginInfo);
+        var testPlugins = GetValuesFromDictionary(testPluginInfo);
         foreach (var plugin in testPlugins)
         {
             if (!plugin.IdentifierData.IsNullOrEmpty())

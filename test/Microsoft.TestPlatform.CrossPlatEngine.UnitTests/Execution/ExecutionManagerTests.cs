@@ -88,7 +88,7 @@ public class ExecutionManagerTests
         Assert.IsNotNull(TestPluginCache.Instance.TestExtensions);
 
         // Executors
-        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestExecutors.Count > 0);
+        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestExecutors!.Count > 0);
         var allExecutors = TestExecutorExtensionManager.Create().TestExtensions;
 
         foreach (var executor in allExecutors)
@@ -97,7 +97,7 @@ public class ExecutionManagerTests
         }
 
         // Settings Providers
-        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestSettingsProviders.Count > 0);
+        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestSettingsProviders!.Count > 0);
         var settingsProviders = SettingsProviderExtensionManager.Create().SettingsProvidersMap.Values;
 
         foreach (var provider in settingsProviders)

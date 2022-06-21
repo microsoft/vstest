@@ -38,7 +38,7 @@ public class RequestDataTests
     public void RequestDataShouldThrowArgumentNullExpectionOnNullMetricsCollection()
     {
         var requestData = new RequestData();
-        requestData.MetricsCollection = null;
+        requestData.MetricsCollection = null!;
     }
 
     [TestMethod]

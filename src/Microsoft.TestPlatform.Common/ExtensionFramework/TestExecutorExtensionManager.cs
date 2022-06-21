@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
@@ -21,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 /// </summary>
 internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor, ITestExecutorCapabilities>
 {
-    private static TestExecutorExtensionManager s_testExecutorExtensionManager;
+    private static TestExecutorExtensionManager? s_testExecutorExtensionManager;
     private static readonly object Synclock = new();
 
     /// <summary>
@@ -45,14 +43,14 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
     /// <summary>
     /// Merges two test extension lists.
     /// </summary>
-    /// 
+    ///
     /// <typeparam name="TExecutor1">Type of first test extension.</typeparam>
     /// <typeparam name="TExecutor2">Type of second test extension.</typeparam>
     /// <typeparam name="TValue">Type of the value used in the lazy extension expression.</typeparam>
-    /// 
+    ///
     /// <param name="testExtensions1">First test extension list.</param>
     /// <param name="testExtensions2">Second test extension list.</param>
-    /// 
+    ///
     /// <returns>A merged list of test extensions.</returns>
     private static IEnumerable<LazyExtension<TExecutor1, TValue>> MergeTestExtensionLists<TExecutor1, TExecutor2, TValue>(
         IEnumerable<LazyExtension<TExecutor1, TValue>> testExtensions1,
@@ -69,18 +67,20 @@ internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor
         // Create the cache used for merging by adding all extensions from the first list.
         foreach (var testExtension in testExtensions1)
         {
-            cache.Add(testExtension.TestPluginInfo.IdentifierData, testExtension);
+            if (testExtension.TestPluginInfo?.IdentifierData is not null)
+            {
+                cache.Add(testExtension.TestPluginInfo.IdentifierData, testExtension);
+            }
         }
 
         // Update the cache with extensions from the second list. Should there be any conflict
         // we prefer the second extension to the first.
         foreach (var testExtension in testExtensions2)
         {
-            if (cache.ContainsKey(testExtension.TestPluginInfo.IdentifierData))
+            if (testExtension.TestPluginInfo?.IdentifierData is not null
+                && cache.ContainsKey(testExtension.TestPluginInfo.IdentifierData))
             {
-                cache[testExtension.TestPluginInfo.IdentifierData] =
-                    new LazyExtension<TExecutor1, TValue>(
-                        (TExecutor1)testExtension.Value, testExtension.Metadata);
+                cache[testExtension.TestPluginInfo.IdentifierData] = new(testExtension.Value, testExtension.Metadata);
             }
         }
 

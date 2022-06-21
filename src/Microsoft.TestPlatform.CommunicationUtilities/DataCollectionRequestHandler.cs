@@ -323,6 +323,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
         UpdateRequestData(payload.IsTelemetryOptedIn);
         AddExtensionAssemblies(payload);
 
+        TPDebug.Assert(payload.SettingsXml is not null, "payload.SettingsXml is null");
         var envVariables = _dataCollectionManager.InitializeDataCollectors(payload.SettingsXml);
 
         var properties = new Dictionary<string, object?>

@@ -158,7 +158,7 @@ public class ConsoleLoggerTests
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
 
-        Assert.ThrowsException<ArgumentNullException>(() => loggerEvents.RaiseTestRunMessage(default));
+        Assert.ThrowsException<ArgumentNullException>(() => loggerEvents.RaiseTestRunMessage(default!));
     }
 
     [TestMethod]
@@ -229,7 +229,7 @@ public class ConsoleLoggerTests
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
 
-        Assert.ThrowsException<ArgumentNullException>(() => loggerEvents.RaiseTestResult(default));
+        Assert.ThrowsException<ArgumentNullException>(() => loggerEvents.RaiseTestResult(default!));
     }
 
     [TestMethod]

@@ -50,7 +50,7 @@ public class TestPluginDiscovererTests
         // The below should not throw an exception.
         var testExtensions = _testPluginDiscoverer.GetTestExtensionsInformation<TestDiscovererPluginInformation, ITestDiscoverer>(pathToExtensions);
         var discovererPluginInformation = new TestDiscovererPluginInformation(typeof(AbstractTestDiscoverer));
-        Assert.IsFalse(testExtensions.ContainsKey(discovererPluginInformation.IdentifierData));
+        Assert.IsFalse(testExtensions.ContainsKey(discovererPluginInformation.IdentifierData!));
     }
 
     [TestMethod]
@@ -64,8 +64,8 @@ public class TestPluginDiscovererTests
         var discovererPluginInformation = new TestDiscovererPluginInformation(typeof(ValidDiscoverer));
         var discovererPluginInformation2 = new TestDiscovererPluginInformation(typeof(ValidDiscoverer2));
 
-        Assert.IsTrue(testExtensions.ContainsKey(discovererPluginInformation.IdentifierData));
-        Assert.IsTrue(testExtensions.ContainsKey(discovererPluginInformation2.IdentifierData));
+        Assert.IsTrue(testExtensions.ContainsKey(discovererPluginInformation.IdentifierData!));
+        Assert.IsTrue(testExtensions.ContainsKey(discovererPluginInformation2.IdentifierData!));
     }
 
     [TestMethod]
@@ -80,8 +80,8 @@ public class TestPluginDiscovererTests
         var pluginInformation2 = new TestExecutorPluginInformation(typeof(ValidExecutor2));
 
         Assert.AreEqual(2, testExtensions.Keys.Count(k => k.Contains("ValidExecutor")));
-        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData));
-        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData));
+        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData!));
+        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData!));
     }
 
     [TestMethod]
@@ -96,8 +96,7 @@ public class TestPluginDiscovererTests
         var pluginInformation2 = new TestLoggerPluginInformation(typeof(ValidLogger2));
 
         Assert.AreEqual(1, testExtensions.Keys.Count(k => k.Contains("csv")));
-        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData));
-        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData));
+        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData!));
     }
 
     [TestMethod]
@@ -127,8 +126,8 @@ public class TestPluginDiscovererTests
         var pluginInformation2 = new TestSettingsProviderPluginInformation(typeof(ValidSettingsProvider2));
 
         Assert.IsTrue(testExtensions.Keys.Select(k => k.Contains("ValidSettingsProvider")).Count() >= 3);
-        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData));
-        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData));
+        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData!));
+        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData!));
     }
 
     [TestMethod]

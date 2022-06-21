@@ -69,10 +69,10 @@ internal class PathConverter : IPathConverter
         return result;
     }
 
-    public IEnumerable<string?> UpdatePaths(IEnumerable<string?> paths, PathConversionDirection updateDirection)
+    public IEnumerable<string> UpdatePaths(IEnumerable<string> paths, PathConversionDirection updateDirection)
     {
         ValidateArg.NotNull(paths, nameof(paths));
-        return paths.Select(i => UpdatePath(i, updateDirection)).ToList();
+        return paths.Select(p => UpdatePath(p, updateDirection)).ToList();
     }
 
     public TestCase UpdateTestCase(TestCase testCase, PathConversionDirection updateDirection)

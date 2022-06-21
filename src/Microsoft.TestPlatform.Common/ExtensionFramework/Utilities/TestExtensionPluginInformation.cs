@@ -8,8 +8,6 @@ using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 
 /// <summary>
@@ -21,7 +19,7 @@ internal abstract class TestExtensionPluginInformation : TestPluginInformation
     /// Default constructor
     /// </summary>
     /// <param name="type"> The test Logger Type. </param>
-    public TestExtensionPluginInformation(Type type)
+    public TestExtensionPluginInformation(Type? type)
         : base(type)
     {
         if (type != null)
@@ -33,7 +31,7 @@ internal abstract class TestExtensionPluginInformation : TestPluginInformation
     /// <summary>
     /// Gets data value identifying the test plugin
     /// </summary>
-    public override string IdentifierData
+    public override string? IdentifierData
     {
         get
         {
@@ -44,18 +42,18 @@ internal abstract class TestExtensionPluginInformation : TestPluginInformation
     /// <summary>
     /// Metadata for the test plugin
     /// </summary>
-    public override ICollection<object> Metadata
+    public override ICollection<object?> Metadata
     {
         get
         {
-            return new object[] { ExtensionUri };
+            return new object?[] { ExtensionUri };
         }
     }
 
     /// <summary>
     /// Gets the Uri identifying the test extension.
     /// </summary>
-    public string ExtensionUri
+    public string? ExtensionUri
     {
         get;
         private set;
@@ -71,7 +69,7 @@ internal abstract class TestExtensionPluginInformation : TestPluginInformation
         string extensionUri = string.Empty;
 
         object[] attributes = testLoggerType.GetTypeInfo().GetCustomAttributes(typeof(ExtensionUriAttribute), false).ToArray();
-        if (attributes != null && attributes.Length > 0)
+        if (attributes.Length > 0)
         {
             ExtensionUriAttribute extensionUriAttribute = (ExtensionUriAttribute)attributes[0];
 

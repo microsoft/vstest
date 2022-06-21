@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>
@@ -36,7 +34,7 @@ internal class TestPlatformDataCollectionSink : DataCollectionSink
     /// <summary>
     /// Event handler for handling file transfer completed event.
     /// </summary>
-    public override event AsyncCompletedEventHandler SendFileCompleted;
+    public override event AsyncCompletedEventHandler? SendFileCompleted;
 
     /// <summary>
     /// Gets or sets message sink to transfer collection message.
@@ -61,6 +59,7 @@ internal class TestPlatformDataCollectionSink : DataCollectionSink
     public override void SendFileAsync(FileTransferInformation fileTransferInformation)
     {
         ValidateArg.NotNull(fileTransferInformation, nameof(fileTransferInformation));
+        TPDebug.Assert(DataCollectorConfig.TypeUri is not null, "DataCollectorConfig.TypeUri is null");
         AttachmentManager.AddAttachment(fileTransferInformation, SendFileCompleted, DataCollectorConfig.TypeUri, DataCollectorConfig.FriendlyName);
     }
 }

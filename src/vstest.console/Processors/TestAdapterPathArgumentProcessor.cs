@@ -167,7 +167,7 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="paths">Source paths joined by semicolons.</param>
     /// <returns>Paths.</returns>
-    internal static string[] SplitPaths(string paths)
+    internal static string[] SplitPaths(string? paths)
     {
         return paths.IsNullOrWhiteSpace() ? new string[0] : paths.Split(ArgumentSeparators, StringSplitOptions.RemoveEmptyEntries);
     }

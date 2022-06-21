@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
 public interface ITestDiscoveryEventsRegistrar : IBaseTestEventsRegistrar

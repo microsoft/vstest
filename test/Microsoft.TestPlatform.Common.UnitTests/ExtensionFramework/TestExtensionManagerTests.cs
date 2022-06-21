@@ -62,7 +62,7 @@ public class TestExtensionManagerTests
         TestPluginCacheHelper.SetupMockAdditionalPathExtensions(typeof(TestExtensionManagerTests));
         Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                var result = _testExtensionManager.TryGetTestExtension(default(Uri));
+                var result = _testExtensionManager.TryGetTestExtension(default(Uri)!);
             }
         );
     }

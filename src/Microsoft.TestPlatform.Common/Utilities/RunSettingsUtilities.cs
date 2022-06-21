@@ -3,12 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
@@ -20,11 +19,11 @@ public static class RunSettingsUtilities
     /// <summary>
     /// Create RunSettings object corresponding to settingsXml
     /// </summary>
-    public static RunSettings CreateAndInitializeRunSettings(string settingsXml)
+    public static RunSettings? CreateAndInitializeRunSettings(string? settingsXml)
     {
-        RunSettings settings = null;
+        RunSettings? settings = null;
 
-        if (!StringUtilities.IsNullOrWhiteSpace(settingsXml))
+        if (!settingsXml.IsNullOrWhiteSpace())
         {
             settings = new RunSettings();
             settings.LoadSettingsXml(settingsXml);
@@ -38,16 +37,16 @@ public static class RunSettingsUtilities
     /// </summary>
     /// <param name="runConfiguration">Test run configuration</param>
     /// <returns>Test results directory</returns>
-    public static string GetTestResultsDirectory(RunConfiguration runConfiguration)
+    [return: NotNullIfNotNull("runConfiguration")]
+    public static string? GetTestResultsDirectory(RunConfiguration? runConfiguration)
     {
-        string resultsDirectory = null;
         if (runConfiguration != null)
         {
             // It will try to get path from runsettings, if not found then it will return default path.
-            resultsDirectory = Environment.ExpandEnvironmentVariables(runConfiguration.ResultsDirectory);
+            return Environment.ExpandEnvironmentVariables(runConfiguration.ResultsDirectory);
         }
 
-        return resultsDirectory;
+        return null;
     }
 
     /// <summary>
@@ -55,16 +54,16 @@ public static class RunSettingsUtilities
     /// </summary>
     /// <param name="runConfiguration">Test run configuration</param>
     /// <returns>Target Framework</returns>
-    public static Framework GetTargetFramework(RunConfiguration runConfiguration)
+    [return: NotNullIfNotNull("runConfiguration")]
+    public static Framework? GetTargetFramework(RunConfiguration? runConfiguration)
     {
-        Framework targetFramework = null;
         if (runConfiguration != null)
         {
             // It will get target framework from runsettings
-            targetFramework = runConfiguration.TargetFramework;
+            return runConfiguration.TargetFramework;
         }
 
-        return targetFramework;
+        return null;
     }
 
     /// <summary>
@@ -72,9 +71,9 @@ public static class RunSettingsUtilities
     /// </summary>
     /// <param name="runConfiguration">Test run configuration</param>
     /// <returns>Solution directory</returns>
-    public static string GetSolutionDirectory(RunConfiguration runConfiguration)
+    public static string? GetSolutionDirectory(RunConfiguration? runConfiguration)
     {
-        string solutionDirectory = null;
+        string? solutionDirectory = null;
         if (runConfiguration != null)
         {
             if (!runConfiguration.SolutionDirectory.IsNullOrEmpty())
@@ -92,7 +91,7 @@ public static class RunSettingsUtilities
     /// </summary>
     /// <param name="settingXml">setting xml</param>
     /// <returns>Maximum CPU Count</returns>
-    public static int GetMaxCpuCount(string settingXml)
+    public static int GetMaxCpuCount(string? settingXml)
     {
         int cpuCount = Constants.DefaultCpuCount;
 
@@ -119,7 +118,7 @@ public static class RunSettingsUtilities
     /// </summary>
     /// <param name="runConfiguration">Test run configuration</param>
     /// <returns>Maximum CPU Count</returns>
-    public static int GetMaxCpuCount(RunConfiguration runConfiguration)
+    public static int GetMaxCpuCount(RunConfiguration? runConfiguration)
     {
         int cpuCount = Constants.DefaultCpuCount;
 
@@ -135,7 +134,7 @@ public static class RunSettingsUtilities
     /// </summary>
     /// <param name="runSettings">Runsetting string value</param>
     /// <returns>The value of TreatNoTestsAsError</returns>
-    public static bool GetTreatNoTestsAsError(string runSettings)
+    public static bool GetTreatNoTestsAsError(string? runSettings)
     {
         bool treatNoTestsAsError = false;
 
@@ -155,7 +154,7 @@ public static class RunSettingsUtilities
         return treatNoTestsAsError;
     }
 
-    private static bool GetTreatNoTestsAsError(RunConfiguration runConfiguration)
+    private static bool GetTreatNoTestsAsError(RunConfiguration? runConfiguration)
     {
         bool treatNoTestsAsError = false;
 
@@ -174,7 +173,7 @@ public static class RunSettingsUtilities
     /// <param name="runSettings">Test run settings</param>
     /// <param name="returnNullIfNotSet">True to return null, if adapter paths is not set.</param>
     /// <returns>Test adapters paths</returns>
-    public static IEnumerable<string> GetTestAdaptersPaths(string runSettings)
+    public static IEnumerable<string> GetTestAdaptersPaths(string? runSettings)
     {
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
 
@@ -195,7 +194,7 @@ public static class RunSettingsUtilities
     /// </summary>
     /// <param name="runSettings">Test run settings</param>
     /// <returns>Test adapter loading strategy</returns>
-    internal static TestAdapterLoadingStrategy GetLoadingStrategy(string runSettings)
+    internal static TestAdapterLoadingStrategy GetLoadingStrategy(string? runSettings)
     {
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
 

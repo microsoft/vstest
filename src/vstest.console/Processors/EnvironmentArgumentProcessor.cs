@@ -85,7 +85,7 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
             TPDebug.Assert(!StringUtils.IsNullOrWhiteSpace(argument));
             TPDebug.Assert(_output != null);
             TPDebug.Assert(_commandLineOptions != null);
-            TPDebug.Assert(!StringUtils.IsNullOrWhiteSpace(_runSettingsProvider.ActiveRunSettings.SettingsXml));
+            TPDebug.Assert(!StringUtils.IsNullOrWhiteSpace(_runSettingsProvider.ActiveRunSettings?.SettingsXml));
 
             var key = argument;
             var value = string.Empty;

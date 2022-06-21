@@ -67,7 +67,7 @@ public class InProcessProxyExecutionManagerTests
         var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
         var manualResetEvent = new ManualResetEvent(true);
 
-        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.AdapterSourceMap, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null)).Callback(
+        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.AdapterSourceMap, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null!)).Callback(
             () => manualResetEvent.Set());
 
         _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null!);
@@ -95,7 +95,7 @@ public class InProcessProxyExecutionManagerTests
             frequencyOfRunStatsChangeEvent: 10);
         var manualResetEvent = new ManualResetEvent(true);
 
-        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null)).Callback(
+        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null!)).Callback(
             () => manualResetEvent.Set());
 
         _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null!);
@@ -116,7 +116,7 @@ public class InProcessProxyExecutionManagerTests
 
         _mockTestHostManager.Setup(hm => hm.GetTestSources(inputSource)).Returns(actualSources);
 
-        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, inputSource.FirstOrDefault(), testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null))
+        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, inputSource.FirstOrDefault(), testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null!))
             .Callback(() => manualResetEvent.Set());
 
         _inProcessProxyExecutionManager = new InProcessProxyExecutionManager(_mockTestHostManager.Object, _mockTestHostManagerFactory.Object);
@@ -124,7 +124,7 @@ public class InProcessProxyExecutionManagerTests
         _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null!);
 
         Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
-        _mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, inputSource.FirstOrDefault(), testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null));
+        _mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, inputSource.FirstOrDefault(), testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null!));
         _mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
         Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault()?.Source);
     }
@@ -140,13 +140,13 @@ public class InProcessProxyExecutionManagerTests
 
         _mockTestHostManager.Setup(hm => hm.GetTestSources(actualSources)).Returns(actualSources);
 
-        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null))
+        _mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null!))
             .Callback(() => manualResetEvent.Set());
 
         _inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null!);
 
         Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
-        _mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null));
+        _mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null!));
         _mockTestHostManager.Verify(hm => hm.GetTestSources(actualSources));
         Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault()?.Source);
     }

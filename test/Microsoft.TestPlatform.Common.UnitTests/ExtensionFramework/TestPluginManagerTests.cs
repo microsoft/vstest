@@ -25,7 +25,7 @@ public class TestPluginManagerTests
     [TestMethod]
     public void GetTestExtensionTypeShouldReturnExtensionType()
     {
-        var type = TestPluginManager.GetTestExtensionType(typeof(TestPluginManagerTests).AssemblyQualifiedName);
+        var type = TestPluginManager.GetTestExtensionType(typeof(TestPluginManagerTests).AssemblyQualifiedName!);
 
         Assert.AreEqual(typeof(TestPluginManagerTests), type);
     }

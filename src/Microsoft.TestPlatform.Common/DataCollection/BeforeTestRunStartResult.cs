@@ -4,8 +4,6 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
 
 /// <summary>

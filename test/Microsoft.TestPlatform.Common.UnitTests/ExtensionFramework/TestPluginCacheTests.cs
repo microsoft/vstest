@@ -250,7 +250,7 @@ public class TestPluginCacheTests
         var resolutionPaths = TestPluginCache.Instance.GetDefaultResolutionPaths();
 
         Assert.IsNotNull(resolutionPaths);
-        Assert.IsTrue(resolutionPaths.Contains(Path.GetDirectoryName(defaultExtensionsFile)));
+        Assert.IsTrue(resolutionPaths.Contains(Path.GetDirectoryName(defaultExtensionsFile)!));
     }
 
     #endregion
@@ -260,7 +260,7 @@ public class TestPluginCacheTests
     [TestMethod]
     public void GetResolutionPathsShouldThrowIfExtensionAssemblyIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => TestPluginCache.Instance.GetResolutionPaths(null));
+        Assert.ThrowsException<ArgumentNullException>(() => TestPluginCache.Instance.GetResolutionPaths(null!));
     }
 
     [TestMethod]
@@ -299,7 +299,7 @@ public class TestPluginCacheTests
         TestPluginCache.Instance.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location);
 
         Assert.IsNotNull(TestPluginCache.Instance.TestExtensions);
-        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestDiscoverers.Count > 0);
+        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestDiscoverers!.Count > 0);
     }
 
     [TestMethod]
@@ -309,8 +309,9 @@ public class TestPluginCacheTests
 
         var testDiscovererPluginInfos = _testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly);
 
+        Assert.IsNotNull(_testablePluginCache.TestExtensions);
         CollectionAssert.AreEqual(
-            _testablePluginCache.TestExtensions.TestDiscoverers.Keys,
+            _testablePluginCache.TestExtensions.TestDiscoverers!.Keys,
             testDiscovererPluginInfos.Keys);
     }
 
@@ -322,7 +323,7 @@ public class TestPluginCacheTests
         Assert.IsFalse(testDiscovererPluginInfos.ContainsKey("td"));
 
         // Set the cache.
-        _testablePluginCache.TestExtensions.TestDiscoverers.Add("td", new TestDiscovererPluginInformation(typeof(TestPluginCacheTests)));
+        _testablePluginCache.TestExtensions!.TestDiscoverers!.Add("td", new TestDiscovererPluginInformation(typeof(TestPluginCacheTests)));
 
         testDiscovererPluginInfos = _testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly);
         Assert.IsTrue(testDiscovererPluginInfos.ContainsKey("td"));
@@ -352,7 +353,7 @@ public class TestPluginCacheTests
         Assert.IsNotNull(TestPluginCache.Instance.TestExtensions);
 
         // Validate the discoverers to be absolutely certain.
-        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestDiscoverers.Count > 0);
+        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestDiscoverers!.Count > 0);
     }
 
     [TestMethod]
@@ -362,7 +363,7 @@ public class TestPluginCacheTests
 
         TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterEndsWithPattern);
 
-        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestDiscoverersCached);
+        Assert.IsTrue(TestPluginCache.Instance.TestExtensions!.AreTestDiscoverersCached);
         Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestExtensionsCached<TestDiscovererPluginInformation>());
     }
 

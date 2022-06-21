@@ -14,7 +14,7 @@ internal interface IPathConverter
 {
     string? UpdatePath(string? path, PathConversionDirection updateDirection);
 
-    IEnumerable<string?> UpdatePaths(IEnumerable<string?> paths, PathConversionDirection updateDirection);
+    IEnumerable<string> UpdatePaths(IEnumerable<string> paths, PathConversionDirection updateDirection);
 
     TestCase UpdateTestCase(TestCase testCase, PathConversionDirection updateDirection);
 

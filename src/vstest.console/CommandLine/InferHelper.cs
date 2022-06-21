@@ -23,7 +23,7 @@ internal class InferHelper
     /// <summary>
     /// Determines Architecture from sources.
     /// </summary>
-    public Architecture AutoDetectArchitecture(IList<string?>? sources, Architecture defaultArchitecture, out IDictionary<string, Architecture> sourceToPlatformMap)
+    public Architecture AutoDetectArchitecture(IList<string>? sources, Architecture defaultArchitecture, out IDictionary<string, Architecture> sourceToPlatformMap)
     {
         sourceToPlatformMap = new Dictionary<string, Architecture>();
         if (sources == null || sources.Count == 0)

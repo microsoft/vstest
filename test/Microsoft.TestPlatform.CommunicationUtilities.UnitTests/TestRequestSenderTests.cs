@@ -57,7 +57,7 @@ public class TestRequestSenderTests
         _connectedEventArgs = new ConnectedEventArgs(_mockChannel.Object);
         _mockDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
         _mockExecutionEventsHandler = new Mock<IInternalTestRunEventsHandler>();
-        _testRunCriteriaWithSources = new TestRunCriteriaWithSources(new Dictionary<string, IEnumerable<string>>(), "runsettings", null, null);
+        _testRunCriteriaWithSources = new TestRunCriteriaWithSources(new Dictionary<string, IEnumerable<string>>(), "runsettings", null, null!);
     }
 
     [TestCleanup]
@@ -529,7 +529,7 @@ public class TestRequestSenderTests
     [TestMethod]
     public void StartTestRunWithTestsShouldSendStartTestExecutionWithTestsOnChannel()
     {
-        var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], "runsettings", null, null);
+        var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], "runsettings", null, null!);
         SetupFakeCommunicationChannel();
 
         _testRequestSender.StartTestRun(runCriteria, _mockExecutionEventsHandler.Object);
@@ -541,7 +541,7 @@ public class TestRequestSenderTests
     [TestMethod]
     public void StartTestRunWithTestsShouldSendStartTestExecutionWithTestsOnChannelWithVersion()
     {
-        var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], "runsettings", null, null);
+        var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], "runsettings", null, null!);
         SetupFakeChannelWithVersionNegotiation(Dummynegotiatedprotocolversion);
 
         _testRequestSender.StartTestRun(runCriteria, _mockExecutionEventsHandler.Object);

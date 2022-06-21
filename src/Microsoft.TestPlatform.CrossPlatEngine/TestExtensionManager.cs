@@ -20,7 +20,7 @@ public class TestExtensionManager : ITestExtensionManager
     }
 
     /// <inheritdoc />
-    public void UseAdditionalExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
+    public void UseAdditionalExtensions(IEnumerable<string>? pathToAdditionalExtensions, bool skipExtensionFilters)
     {
         TestPluginCache.Instance.UpdateExtensions(pathToAdditionalExtensions, skipExtensionFilters);
     }

@@ -24,7 +24,7 @@ public class TestRunCriteriaWithSources
     /// <param name="runSettings"> The run settings.  </param>
     /// <param name="testExecutionContext"> The test Execution Context. </param>
     [JsonConstructor]
-    public TestRunCriteriaWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string? package, string? runSettings, TestExecutionContext? testExecutionContext)
+    public TestRunCriteriaWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string? package, string? runSettings, TestExecutionContext testExecutionContext)
     {
         AdapterSourceMap = adapterSourceMap;
         Package = package;
@@ -45,7 +45,7 @@ public class TestRunCriteriaWithSources
     /// <summary>
     /// Gets or sets the test execution context.
     /// </summary>
-    public TestExecutionContext? TestExecutionContext { get; set; }
+    public TestExecutionContext TestExecutionContext { get; set; }
 
     /// <summary>
     /// Gets the test Containers (e.g. .appx, .appxrecipie)

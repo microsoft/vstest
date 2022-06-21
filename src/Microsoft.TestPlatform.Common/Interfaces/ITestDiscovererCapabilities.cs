@@ -6,8 +6,6 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
 /// <summary>
@@ -18,12 +16,12 @@ public interface ITestDiscovererCapabilities
     /// <summary>
     /// List of file extensions that the test discoverer can process tests from.
     /// </summary>
-    IEnumerable<string> FileExtension { get; }
+    IEnumerable<string>? FileExtension { get; }
 
     /// <summary>
     /// Default executor Uri for this discoverer
     /// </summary>
-    Uri DefaultExecutorUri { get; }
+    Uri? DefaultExecutorUri { get; }
 
     /// <summary>
     /// Assembly type that the test discoverer supports.

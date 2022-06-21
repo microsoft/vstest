@@ -35,19 +35,19 @@ public class TestPlatformDataCollectionLoggerTests
     [TestMethod]
     public void LogErrorShouldThrowExceptionIfContextIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(null, string.Empty));
+        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(null!, string.Empty));
 
         Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(null, new Exception()));
 
-        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(null, string.Empty, new Exception()));
+        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(null!, string.Empty, new Exception()));
     }
 
     [TestMethod]
     public void LogErrorShouldThrowExceptionIfTextIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, (string?)null));
+        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, (string)null!));
 
-        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, null, new Exception()));
+        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, null!, new Exception()));
     }
 
     [TestMethod]
@@ -55,7 +55,7 @@ public class TestPlatformDataCollectionLoggerTests
     {
         Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, (Exception?)null));
 
-        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, string.Empty, null));
+        Assert.ThrowsException<ArgumentNullException>(() => _logger.LogError(_context, string.Empty, null!));
     }
 
     [TestMethod]

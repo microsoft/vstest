@@ -16,7 +16,7 @@ public class FilterExpressionTests
     [TestMethod]
     public void TokenizeNullThrowsArgumentNullException()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => FilterExpression.TokenizeFilterExpressionString(null), "str");
+        Assert.ThrowsException<ArgumentNullException>(() => FilterExpression.TokenizeFilterExpressionString(null!), "str");
     }
 
     [TestMethod]

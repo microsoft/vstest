@@ -7,8 +7,6 @@ using System.Runtime.Serialization;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
 
 /// <summary>
@@ -21,7 +19,11 @@ public class AfterTestRunEndResult
     // We want to fallback to the non-public default constructor https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_ConstructorHandling.htm during deserialization
     private AfterTestRunEndResult()
     {
-
+        // Forcing nulls to the differnet properties as this is only serialization ctor but
+        // we can guarantee non-null for the other ctors.
+        AttachmentSets = null!;
+        InvokedDataCollectors = null!;
+        Metrics = null!;
     }
 
     /// <summary>
@@ -50,7 +52,7 @@ public class AfterTestRunEndResult
     /// The metrics.
     /// </param>
     public AfterTestRunEndResult(Collection<AttachmentSet> attachmentSets,
-        Collection<InvokedDataCollector> invokedDataCollectors,
+        Collection<InvokedDataCollector>? invokedDataCollectors,
         IDictionary<string, object> metrics)
     {
         AttachmentSets = attachmentSets;
@@ -62,7 +64,7 @@ public class AfterTestRunEndResult
     public Collection<AttachmentSet> AttachmentSets { get; private set; }
 
     [DataMember]
-    public Collection<InvokedDataCollector> InvokedDataCollectors { get; private set; }
+    public Collection<InvokedDataCollector>? InvokedDataCollectors { get; private set; }
 
     [DataMember]
     public IDictionary<string, object> Metrics { get; private set; }

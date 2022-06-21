@@ -103,9 +103,9 @@ internal class RunTestsWithTests : BaseRunTests
             return;
         }
 
-        var properties = new Dictionary<string, object?>
+        var properties = new Dictionary<string, object>
         {
-            { "TestSources", TestSourcesUtility.GetSources(_testCases) }
+            { "TestSources", TestSourcesUtility.GetSources(_testCases)! }
         };
 
         _testCaseEventsHandler.SendSessionStart(properties);

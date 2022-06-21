@@ -61,7 +61,7 @@ public class ExecutionManager : IExecutionManager
     /// Initializes the execution manager.
     /// </summary>
     /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-    public void Initialize(IEnumerable<string>? pathToAdditionalExtensions, ITestMessageEventHandler testMessageEventsHandler)
+    public void Initialize(IEnumerable<string>? pathToAdditionalExtensions, ITestMessageEventHandler? testMessageEventsHandler)
     {
         // Clear the request data metrics left over from a potential previous run.
         _requestData.MetricsCollection?.Metrics?.Clear();

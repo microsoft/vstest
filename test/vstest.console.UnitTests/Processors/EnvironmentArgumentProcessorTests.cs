@@ -171,7 +171,7 @@ public class EnvironmentArgumentProcessorTests
 
     private XmlParseResult ParseSettingsXml(IRunSettingsProvider provider)
     {
-        var document = XDocument.Parse(provider.ActiveRunSettings.SettingsXml);
+        var document = XDocument.Parse(provider.ActiveRunSettings!.SettingsXml!);
 
         var runConfiguration = document
             ?.Root

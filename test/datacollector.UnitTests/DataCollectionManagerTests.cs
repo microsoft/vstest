@@ -58,7 +58,7 @@ public class DataCollectionManagerTests
     [TestMethod]
     public void InitializeDataCollectorsShouldThrowExceptionIfSettingsXmlIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(null));
+        Assert.ThrowsException<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(null!));
     }
 
     [TestMethod]
@@ -120,16 +120,6 @@ public class DataCollectionManagerTests
 
         Assert.AreEqual(1, _dataCollectionManager.RunDataCollectors.Count);
         _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
-    }
-
-    [TestMethod]
-    public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsNull()
-    {
-        var dataCollectorSettingsWithNullUri = string.Format(_defaultRunSettings, string.Format(_defaultDataCollectionSettings, _friendlyName, string.Empty, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("uri=\"\"", string.Empty));
-        _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithNullUri);
-
-        Assert.AreEqual(0, _dataCollectionManager.RunDataCollectors.Count);
-        _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
     }
 
     [TestMethod]
@@ -525,24 +515,24 @@ internal class TestableDataCollectionManager : DataCollectionManager
         }
     }
 
-    protected override bool IsUriValid(string uri)
+    protected override bool IsUriValid(string? uri)
     {
-        return uri.Equals("my://custom/datacollector") || uri.Equals("my://custom/ccdatacollector");
+        return string.Equals(uri, "my://custom/datacollector") || string.Equals(uri, "my://custom/ccdatacollector");
     }
 
-    protected override ObjectModel.DataCollection.DataCollector? TryGetTestExtension(string extensionUri)
+    protected override ObjectModel.DataCollection.DataCollector TryGetTestExtension(string extensionUri)
     {
         if (extensionUri.Equals("my://custom/datacollector"))
         {
-            return _dataCollector;
+            return _dataCollector!;
         }
 
         if (extensionUri.Equals("my://custom/ccdatacollector"))
         {
-            return _ccDataCollector;
+            return _ccDataCollector!;
         }
 
-        return null;
+        return null!;
     }
 
     protected override DataCollectorConfig? TryGetDataCollectorConfig(string extensionUri)

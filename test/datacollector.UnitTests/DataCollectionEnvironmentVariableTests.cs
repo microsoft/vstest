@@ -17,7 +17,7 @@ public class DataCollectionEnvironmentVariableTests
         Assert.ThrowsException<ArgumentNullException>(
             () =>
             {
-                var envvariable = new DataCollectionEnvironmentVariable(default, null);
+                var envvariable = new DataCollectionEnvironmentVariable(default, null!);
             });
     }
 

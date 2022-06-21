@@ -110,6 +110,7 @@ public class DataCollectionTestCaseEventHandlerTests
         _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.SessionEnd, Payload = "false" });
 
         var requestHandler = new DataCollectionTestCaseEventHandler(_messageSink.Object, _mockCommunicationManager.Object, _mockDataCollectionManager.Object, _dataSerializer.Object);
+        _dataSerializer.Setup(x => x.DeserializePayload<TestCaseStartEventArgs>(message)).Returns(new TestCaseStartEventArgs());
 
         requestHandler.ProcessRequests();
 
@@ -127,6 +128,7 @@ public class DataCollectionTestCaseEventHandlerTests
         _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.SessionEnd, Payload = "false" });
 
         var requestHandler = new DataCollectionTestCaseEventHandler(_messageSink.Object, _mockCommunicationManager.Object, _mockDataCollectionManager.Object, _dataSerializer.Object);
+        _dataSerializer.Setup(x => x.DeserializePayload<TestCaseEndEventArgs>(message)).Returns(new TestCaseEndEventArgs());
 
         requestHandler.ProcessRequests();
 

@@ -427,7 +427,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                     {
                         _testHostManagerFactoryReady.Wait();
                         var testInitializeEventsHandler = new TestInitializeEventsHandler(this);
-                        var pathToAdditionalExtensions = _dataSerializer.DeserializePayload<IEnumerable<string?>>(message);
+                        var pathToAdditionalExtensions = _dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                         TPDebug.Assert(pathToAdditionalExtensions is not null, "pathToAdditionalExtensions is null");
                         pathToAdditionalExtensions = _pathConverter.UpdatePaths(pathToAdditionalExtensions, PathConversionDirection.Receive);
                         Action job = () =>

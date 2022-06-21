@@ -12,7 +12,7 @@ internal class FakeTestExtensionManager : ITestExtensionManager
         throw new NotImplementedException();
     }
 
-    public void UseAdditionalExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
+    public void UseAdditionalExtensions(IEnumerable<string>? pathToAdditionalExtensions, bool skipExtensionFilters)
     {
         throw new NotImplementedException();
     }
