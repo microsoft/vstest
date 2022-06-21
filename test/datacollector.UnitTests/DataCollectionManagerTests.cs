@@ -527,6 +527,12 @@ internal class TestableDataCollectionManager : DataCollectionManager
 
     protected override bool IsUriValid(string? uri)
     {
+        if (uri is null)
+        {
+            // This is needed for test InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsNull
+            throw new ArgumentNullException(nameof(uri));
+        }
+
         return string.Equals(uri, "my://custom/datacollector") || string.Equals(uri, "my://custom/ccdatacollector");
     }
 
