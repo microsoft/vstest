@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -57,7 +58,13 @@ public class VsTestConsoleWrapperAsyncTests
     public async Task StartSessionAsyncShouldStartVsTestConsoleWithCorrectArguments()
     {
         var inputPort = 123;
-        int expectedParentProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
+#if NET5_0_OR_GREATER
+        var expectedParentProcessId = Environment.ProcessId;
+#else
+        int expectedParentProcessId;
+        using (var p = Process.GetCurrentProcess())
+            expectedParentProcessId = p.Id;
+#endif
         _mockRequestSender.Setup(rs => rs.InitializeCommunicationAsync(It.IsAny<int>())).Returns(Task.FromResult(inputPort));
 
         await _consoleWrapper.StartSessionAsync();
