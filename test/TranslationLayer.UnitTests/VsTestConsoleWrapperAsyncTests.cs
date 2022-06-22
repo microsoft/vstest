@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+#if !NET5_0_OR_GREATER
 using System.Diagnostics;
+#endif
 using System.Threading;
 using System.Threading.Tasks;
 
