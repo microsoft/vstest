@@ -8,10 +8,7 @@ using System.Linq;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 
@@ -38,18 +35,18 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
     /// <summary>
     /// Metadata for the test plugin
     /// </summary>
-    public override ICollection<object> Metadata
+    public override ICollection<object?> Metadata
     {
         get
         {
-            return new object[] { FileExtensions, DefaultExecutorUri, AssemblyType };
+            return new object?[] { FileExtensions, DefaultExecutorUri, AssemblyType };
         }
     }
 
     /// <summary>
     /// Gets collection of file extensions supported by discoverer plugin.
     /// </summary>
-    public List<string> FileExtensions
+    public List<string>? FileExtensions
     {
         get;
         private set;
@@ -58,7 +55,7 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
     /// <summary>
     /// Gets the Uri identifying the executor
     /// </summary>
-    public string DefaultExecutorUri
+    public string? DefaultExecutorUri
     {
         get;
         private set;
@@ -126,7 +123,7 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
     /// </summary>
     /// <param name="testDiscovererType"> The test discoverer Type. </param>
     /// <returns> Supported assembly type. </returns>
-    private AssemblyType GetAssemblyType(Type testDiscovererType)
+    private static AssemblyType GetAssemblyType(Type testDiscovererType)
     {
 
         // Get Category
