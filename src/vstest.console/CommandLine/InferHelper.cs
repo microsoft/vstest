@@ -147,10 +147,10 @@ internal class InferHelper
         }
 
         EqtTrace.Info("Determined framework for all sources: {0}", framework);
-        return framework;
+        return framework!;
     }
 
-    private Framework DetermineFramework(IEnumerable<string?> sources, out IDictionary<string, Framework> sourceToFrameworkMap, out bool conflictInFxIdentifier)
+    private Framework? DetermineFramework(IEnumerable<string?> sources, out IDictionary<string, Framework> sourceToFrameworkMap, out bool conflictInFxIdentifier)
     {
         sourceToFrameworkMap = new Dictionary<string, Framework>();
 
@@ -191,7 +191,7 @@ internal class InferHelper
                     }
                 }
 
-                sourceToFrameworkMap.Add(source, Framework.FromString(fx.FullName));
+                sourceToFrameworkMap.Add(source, Framework.FromString(fx.FullName)!);
 
                 if (finalFx == null)
                 {

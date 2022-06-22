@@ -17,8 +17,8 @@ public class FilterHelpersTests
     [TestMethod]
     public void EscapeUnescapeNullThrowsArgumentNullException()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => FilterHelper.Escape(null));
-        Assert.ThrowsException<ArgumentNullException>(() => FilterHelper.Unescape(null));
+        Assert.ThrowsException<ArgumentNullException>(() => FilterHelper.Escape(null!));
+        Assert.ThrowsException<ArgumentNullException>(() => FilterHelper.Unescape(null!));
     }
 
     [TestMethod]

@@ -155,7 +155,7 @@ internal class TestLoggerManager : ITestLoggerManager
             // Try initializing logger by type.
             if (!StringUtils.IsNullOrWhiteSpace(logger.AssemblyQualifiedName))
             {
-                loggerInitialized = InitializeLoggerByType(logger.AssemblyQualifiedName, logger.CodeBase, parameters);
+                loggerInitialized = InitializeLoggerByType(logger.AssemblyQualifiedName, logger.CodeBase!, parameters);
             }
 
             // Try initializing logger by uri.
@@ -220,7 +220,7 @@ internal class TestLoggerManager : ITestLoggerManager
             return;
         }
 
-        foreach (TestResult result in e.NewTestResults)
+        foreach (TestResult result in e.NewTestResults!)
         {
             _loggerEvents.RaiseTestResult(new TestResultEventArgs(result));
         }
@@ -393,30 +393,32 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <param name="friendlyName">The friendly Name.</param>
     /// <param name="loggerUri">The logger Uri.</param>
     /// <returns><see cref="bool"/></returns>
-    internal bool TryGetUriFromFriendlyName(string friendlyName, out Uri? loggerUri)
+    internal bool TryGetUriFromFriendlyName(string? friendlyName, out Uri? loggerUri)
     {
         var extensionManager = TestLoggerExtensionManager;
         foreach (var extension in extensionManager.TestExtensions)
         {
-            if (string.Equals(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase))
             {
-                try
-                {
-                    loggerUri = new Uri(extension.Metadata.ExtensionUri);
-                }
-                catch (UriFormatException)
-                {
-                    loggerUri = null;
-
-                    throw new InvalidLoggerException(
-                        string.Format(
-                            CultureInfo.CurrentUICulture,
-                            CommonResources.LoggerUriInvalid,
-                            extension.Metadata.ExtensionUri));
-                }
-
-                return true;
+                continue;
             }
+
+            try
+            {
+                loggerUri = new Uri(extension.Metadata.ExtensionUri);
+            }
+            catch (UriFormatException)
+            {
+                loggerUri = null;
+
+                throw new InvalidLoggerException(
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommonResources.LoggerUriInvalid,
+                        extension.Metadata.ExtensionUri));
+            }
+
+            return true;
         }
 
         loggerUri = null;
@@ -520,7 +522,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="configuration"></param>
     /// <returns></returns>
-    private static Dictionary<string, string?> GetParametersFromConfigurationElement(XmlElement configuration)
+    private static Dictionary<string, string?> GetParametersFromConfigurationElement(XmlElement? configuration)
     {
         var configurationManager = new LoggerNameValueConfigurationManager(configuration);
         return configurationManager.NameValuePairs;
@@ -596,7 +598,7 @@ internal class TestLoggerManager : ITestLoggerManager
                     break;
 
                 case ITestLogger _:
-                    ((ITestLogger)logger).Initialize(_loggerEvents, _testRunDirectory);
+                    ((ITestLogger)logger).Initialize(_loggerEvents, _testRunDirectory!);
                     break;
 
                 default:

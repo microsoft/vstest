@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 /// </summary>
 internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
 {
-    private IDictionary<string, string>? _dataCollectionEnvironmentVariables;
+    private IDictionary<string, string?>? _dataCollectionEnvironmentVariables;
     private int _dataCollectionPort;
     private readonly IRequestData _requestData;
 
@@ -54,7 +54,7 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
         ProxyDataCollectionManager = proxyDataCollectionManager;
         DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
         _requestData = requestData;
-        _dataCollectionEnvironmentVariables = new Dictionary<string, string>();
+        _dataCollectionEnvironmentVariables = new Dictionary<string, string?>();
 
         testHostManager.HostLaunched += TestHostLaunchedHandler;
     }
@@ -150,7 +150,7 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
         {
             if (testProcessStartInfo.EnvironmentVariables == null)
             {
-                testProcessStartInfo.EnvironmentVariables = new Dictionary<string, string>();
+                testProcessStartInfo.EnvironmentVariables = new Dictionary<string, string?>();
             }
 
             foreach (var envVariable in _dataCollectionEnvironmentVariables)
@@ -202,18 +202,18 @@ internal class DataCollectionRunEventsHandler : ITestMessageEventHandler
     /// </summary>
     public DataCollectionRunEventsHandler()
     {
-        Messages = new List<Tuple<TestMessageLevel, string>>();
+        Messages = new List<Tuple<TestMessageLevel, string?>>();
     }
 
     /// <summary>
     /// Gets the cached messages.
     /// </summary>
-    public List<Tuple<TestMessageLevel, string>> Messages { get; private set; }
+    public List<Tuple<TestMessageLevel, string?>> Messages { get; private set; }
 
     /// <inheritdoc />
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
-        Messages.Add(new Tuple<TestMessageLevel, string>(level, message));
+        Messages.Add(new Tuple<TestMessageLevel, string?>(level, message));
     }
 
     /// <inheritdoc />

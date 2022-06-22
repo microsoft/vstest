@@ -413,7 +413,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                 if (_requestData.IsTelemetryOptedIn)
                 {
                     TestExtensions.AddExtensionTelemetry(
-                        runCompleteArgs.Metrics,
+                        runCompleteArgs.Metrics!,
                         runCompleteArgs.DiscoveredExtensions);
                 }
 
@@ -501,7 +501,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// <summary>
     /// Invoked when log messages are received
     /// </summary>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         EqtTrace.Verbose("TestRunRequest:SendTestRunMessage: Starting.");
 
@@ -514,7 +514,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                 return;
             }
 
-            var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
+            var testRunMessageEvent = new TestRunMessageEventArgs(level, message!);
             LoggerManager.HandleTestRunMessage(testRunMessageEvent);
             TestRunMessage.SafeInvoke(this, testRunMessageEvent, "TestRun.LogMessages");
         }

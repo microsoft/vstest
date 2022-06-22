@@ -2,9 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
@@ -19,8 +16,11 @@ public abstract class DataCollectionEventArgs : EventArgs
     /// <summary>
     /// Default constructor added for serialization/deserialization.
     /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public DataCollectionEventArgs()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
+        // TODO: Make private
     }
 
     /// <summary>
@@ -40,21 +40,4 @@ public abstract class DataCollectionEventArgs : EventArgs
         get;
         internal set;
     }
-
-    /// <summary>
-    /// Updates the data collection context stored by this instance.
-    /// </summary>
-    /// <param name="context">Context to update with.</param>
-    /// <remarks>
-    /// Generally the data collection context is known in advance, however there
-    /// are cases around custom notifications where it is not necessarily known
-    /// until the event is being sent.  This is used for updating the context when
-    /// sending the event.
-    /// </remarks>
-    internal void UpdateDataCollectionContext(DataCollectionContext context)
-    {
-        Debug.Assert(context != null, "'context' cannot be null.");
-        Context = context;
-    }
-
 }

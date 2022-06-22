@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
 /// <summary>
@@ -18,5 +16,5 @@ public interface INavigationSession : IDisposable
     /// <param name="declaringTypeName"> The declaring type name. </param>
     /// <param name="methodName"> The method name. </param>
     /// <returns> The <see cref="INavigationData"/> to get to the method. </returns>
-    INavigationData GetNavigationDataForMethod(string declaringTypeName, string methodName);
+    INavigationData? GetNavigationDataForMethod(string declaringTypeName, string methodName);
 }

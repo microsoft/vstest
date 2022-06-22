@@ -110,7 +110,7 @@ public class InProcessProxyExecutionManagerTests
         var inputSource = new List<string> { "inputPackage.appxrecipe" };
 
         var testRunCriteria = new TestRunCriteria(
-            new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), inputSource.FirstOrDefault()) },
+            new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), inputSource.First()) },
             frequencyOfRunStatsChangeEvent: 10);
         var manualResetEvent = new ManualResetEvent(false);
 
@@ -134,7 +134,7 @@ public class InProcessProxyExecutionManagerTests
     {
         var actualSources = new List<string> { "actualSource.dll" };
         var testRunCriteria = new TestRunCriteria(
-            new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), actualSources.FirstOrDefault()) },
+            new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), actualSources.First()) },
             frequencyOfRunStatsChangeEvent: 10);
         var manualResetEvent = new ManualResetEvent(false);
 

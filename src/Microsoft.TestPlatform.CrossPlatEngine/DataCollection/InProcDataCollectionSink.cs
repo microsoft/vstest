@@ -26,9 +26,9 @@ internal class InProcDataCollectionSink : IDataCollectionSink
     {
         ValidateArg.NotNullOrEmpty(key, nameof(key));
         ValidateArg.NotNullOrEmpty(value, nameof(value));
-        ValidateArg.NotNullOrEmpty(dataCollectionContext.TestCase.Id.ToString(), "dataCollectionContext.TestCase.Id");
+        ValidateArg.NotNullOrEmpty(dataCollectionContext?.TestCase?.Id.ToString(), "dataCollectionContext.TestCase.Id");
 
-        var testCaseId = dataCollectionContext.TestCase.Id;
+        var testCaseId = dataCollectionContext!.TestCase!.Id;
         AddKeyValuePairToDictionary(testCaseId, key, value);
     }
 

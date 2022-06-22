@@ -496,9 +496,9 @@ internal class TestableDataCollectionManager : DataCollectionManager
     {
     }
 
-    protected override bool TryGetUriFromFriendlyName(string friendlyName, out string dataCollectorUri)
+    protected override bool TryGetUriFromFriendlyName(string? friendlyName, out string dataCollectorUri)
     {
-        if (friendlyName.Equals("CustomDataCollector"))
+        if (friendlyName!.Equals("CustomDataCollector"))
         {
             dataCollectorUri = "my://custom/datacollector";
             return true;

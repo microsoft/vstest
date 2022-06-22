@@ -34,7 +34,7 @@ public interface ITestCaseEventsHandler
     /// The purpose of this is to perform any initialization before the test case level events are sent.
     /// </summary>
     /// <param name="properties"> The session start properties. </param>
-    void SendSessionStart(IDictionary<string, object> properties);
+    void SendSessionStart(IDictionary<string, object?> properties);
 
     /// <summary>
     /// Sends session end event.

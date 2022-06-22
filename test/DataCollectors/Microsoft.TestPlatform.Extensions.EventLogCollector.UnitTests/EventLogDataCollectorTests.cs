@@ -287,7 +287,7 @@ public class EventLogDataCollectorTests
         var eventLogDataCollector = new EventLogDataCollector();
         eventLogDataCollector.Initialize(null, _mockDataCollectionEvents.Object, _mockDataCollectionSink, _mockDataCollectionLogger.Object, _dataCollectionEnvironmentContext);
         var testcase = new TestCase() { Id = Guid.NewGuid() };
-        _mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs(_dataCollectionEnvironmentContext.SessionDataCollectionContext, new Dictionary<string, object>()));
+        _mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs(_dataCollectionEnvironmentContext.SessionDataCollectionContext, new Dictionary<string, object?>()));
         _mockDataCollectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(_dataCollectionEnvironmentContext.SessionDataCollectionContext));
         Assert.IsTrue(_mockDataCollectionSink.IsSendFileAsyncInvoked);
     }

@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 /// </summary>
 internal sealed class TestResultId : IXmlTestStore
 {
-    private Guid _runId;
+    private readonly Guid _runId;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestResultId"/> class.

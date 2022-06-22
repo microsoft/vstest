@@ -87,7 +87,7 @@ public class DefaultTestHostManagerTests
 
         var startInfo = _testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default);
 
-        Assert.IsTrue(startInfo.FileName.EndsWith(Path.Combine(subFoler, "testhost.exe")));
+        Assert.IsTrue(startInfo.FileName!.EndsWith(Path.Combine(subFoler, "testhost.exe")));
     }
 
     [TestMethod]
@@ -120,13 +120,13 @@ public class DefaultTestHostManagerTests
     [TestMethod]
     public void GetTestHostProcessStartInfoShouldIncludeEmptyEnvironmentVariables()
     {
-        Assert.AreEqual(0, _startInfo.EnvironmentVariables.Count);
+        Assert.AreEqual(0, _startInfo.EnvironmentVariables!.Count);
     }
 
     [TestMethod]
     public void GetTestHostProcessStartInfoShouldIncludeEnvironmentVariables()
     {
-        var environmentVariables = new Dictionary<string, string> { { "k1", "v1" } };
+        var environmentVariables = new Dictionary<string, string?> { { "k1", "v1" } };
 
         var info = _testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), environmentVariables, default);
 
@@ -185,7 +185,7 @@ public class DefaultTestHostManagerTests
             default);
 
         StringAssert.Contains(info.FileName, "TestHost" + Path.DirectorySeparatorChar + "testhost.exe");
-        Assert.IsFalse(info.Arguments.Contains("TestHost" + Path.DirectorySeparatorChar + "testhost.exe"));
+        Assert.IsFalse(info.Arguments!.Contains("TestHost" + Path.DirectorySeparatorChar + "testhost.exe"));
     }
 
     [TestMethod]
@@ -326,7 +326,7 @@ public class DefaultTestHostManagerTests
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
-                    It.IsAny<IDictionary<string, string>>(),
+                    It.IsAny<IDictionary<string, string?>>(),
                     It.IsAny<Action<object?, string?>>(),
                     It.IsAny<Action<object?>>(),
                     It.IsAny<Action<object?, string?>>())).Returns(Process.GetCurrentProcess());
@@ -553,7 +553,7 @@ public class DefaultTestHostManagerTests
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<string>(),
-                        It.IsAny<IDictionary<string, string>>(),
+                        It.IsAny<IDictionary<string, string?>>(),
                         It.IsAny<Action<object?, string?>>(),
                         It.IsAny<Action<object?>>(),
                         It.IsAny<Action<object?, string?>>()))
@@ -587,7 +587,7 @@ public class DefaultTestHostManagerTests
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<string>(),
-                        It.IsAny<IDictionary<string, string>>(),
+                        It.IsAny<IDictionary<string, string?>>(),
                         It.IsAny<Action<object?, string?>>(),
                         It.IsAny<Action<object?>>(),
                         It.IsAny<Action<object?, string?>>()))

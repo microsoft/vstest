@@ -22,7 +22,7 @@ public interface IProcessHelper
     /// <param name="exitCallBack">Call back for on process exit</param>
     /// <param name="outputCallback">Call back for on process output</param>
     /// <returns>The process created.</returns>
-    object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack);
+    object LaunchProcess(string processPath, string? arguments, string? workingDirectory, IDictionary<string, string?>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack);
 
     /// <summary>
     /// Gets the current process file path.

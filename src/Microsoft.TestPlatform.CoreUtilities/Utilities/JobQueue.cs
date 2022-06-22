@@ -3,12 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -145,7 +145,7 @@ public class JobQueue<T> : IDisposable
     {
         CheckDisposed();
 
-        Debug.Assert(jobSize >= 0, "Job size should never be negative");
+        TPDebug.Assert(jobSize >= 0, "Job size should never be negative");
 
         // Add the job and signal that a new job is available.
         InternalQueueJob(new Job<T>(job, jobSize));

@@ -203,7 +203,7 @@ public static class EqtTrace
     /// </summary>
     /// <param name="message">Error message.</param>
     [Conditional("TRACE")]
-    public static void Error(string message)
+    public static void Error(string? message)
     {
         if (TraceImpl.ShouldTrace(PlatformTraceLevel.Error))
         {
@@ -264,7 +264,7 @@ public static class EqtTrace
     [Conditional("TRACE")]
     public static void Error(string format, params object?[] args)
     {
-        Debug.Assert(format != null, "format != null");
+        TPDebug.Assert(format != null, "format != null");
 
         // Check level before doing string.Format to avoid string creation if tracing is off.
         if (TraceImpl.ShouldTrace(PlatformTraceLevel.Error))
@@ -329,7 +329,7 @@ public static class EqtTrace
     [Conditional("TRACE")]
     public static void ErrorAssert(string format, params object?[] args)
     {
-        Debug.Assert(format != null, "format != null");
+        TPDebug.Assert(format != null, "format != null");
         var message = string.Format(CultureInfo.InvariantCulture, format, args);
         Error(message);
         FailDebugger(message);
@@ -358,7 +358,7 @@ public static class EqtTrace
     /// </summary>
     /// <param name="message">Trace message.</param>
     [Conditional("TRACE")]
-    public static void Warning(string message)
+    public static void Warning(string? message)
     {
         if (TraceImpl.ShouldTrace(PlatformTraceLevel.Warning))
         {
@@ -419,7 +419,7 @@ public static class EqtTrace
     [Conditional("TRACE")]
     public static void Warning(string format, params object?[] args)
     {
-        Debug.Assert(format != null, "format != null");
+        TPDebug.Assert(format != null, "format != null");
 
         // Check level before doing string.Format to avoid string creation if tracing is off.
         if (TraceImpl.ShouldTrace(PlatformTraceLevel.Warning))
@@ -481,7 +481,7 @@ public static class EqtTrace
     /// </summary>
     /// <param name="message">Trace message.</param>
     [Conditional("TRACE")]
-    public static void Info(string message)
+    public static void Info(string? message)
     {
         if (TraceImpl.ShouldTrace(PlatformTraceLevel.Info))
         {
@@ -542,7 +542,7 @@ public static class EqtTrace
     [Conditional("TRACE")]
     public static void Info(string format, params object?[] args)
     {
-        Debug.Assert(format != null, "format != null");
+        TPDebug.Assert(format != null, "format != null");
 
         // Check level before doing string.Format to avoid string creation if tracing is off.
         if (TraceImpl.ShouldTrace(PlatformTraceLevel.Info))
@@ -665,7 +665,7 @@ public static class EqtTrace
     [Conditional("TRACE")]
     public static void Verbose(string format, params object?[] args)
     {
-        Debug.Assert(format != null, "format != null");
+        TPDebug.Assert(format != null, "format != null");
 
         // Check level before doing string.Format to avoid string creation if tracing is off.
         if (TraceImpl.ShouldTrace(PlatformTraceLevel.Verbose))
@@ -817,7 +817,7 @@ public static class EqtTrace
 
     private static void WriteAtLevel(PlatformTraceLevel level, string format, params object?[] args)
     {
-        Debug.Assert(format != null, "format != null");
+        TPDebug.Assert(format != null, "format != null");
         WriteAtLevel(level, string.Format(CultureInfo.InvariantCulture, format, args));
     }
 
@@ -825,7 +825,7 @@ public static class EqtTrace
     {
 #if DEBUG
 #if NETSTANDARD1_0
-        Debug.Assert(false, message);
+        TPDebug.Assert(false, message);
 #else
         Debug.Fail(message);
 #endif

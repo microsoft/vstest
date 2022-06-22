@@ -249,7 +249,7 @@ internal class DefaultEngineInvoker :
         // Start Processing of requests
         var connectionInfo = new TestHostConnectionInfo
         {
-            Endpoint = endpoint,
+            Endpoint = endpoint!,
             Role = connectionRole,
             Transport = Transport.Sockets
         };

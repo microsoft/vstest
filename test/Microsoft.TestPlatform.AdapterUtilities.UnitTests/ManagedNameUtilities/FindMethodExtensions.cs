@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -51,7 +50,7 @@ internal static class FindMethodExtensions
             candidates = candidates.Where(m => m.Parameters.Select(p => p.Type).SequenceEqual(methodParameterTypes));
         }
 
-        Debug.Assert(candidates.Any() && !candidates.Skip(1).Any());
+        TPDebug.Assert(candidates.Any() && !candidates.Skip(1).Any());
         return candidates.Single();
     }
 
@@ -82,7 +81,7 @@ internal static class FindMethodExtensions
 
         candidates = candidates.Where(selector);
 
-        Debug.Assert(candidates.Any() && !candidates.Skip(1).Any());
+        TPDebug.Assert(candidates.Any() && !candidates.Skip(1).Any());
         return candidates.Single();
     }
 

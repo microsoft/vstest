@@ -399,10 +399,10 @@ public class ParallelProxyExecutionManagerTests
                         Assert.IsTrue(completeArgs.IsAborted, "Aborted value must be OR of all values");
                         Assert.IsTrue(completeArgs.IsCanceled, "Canceled value must be OR of all values");
 
-                        Assert.AreEqual(10, completeArgs.TestRunStatistics.ExecutedTests,
+                        Assert.AreEqual(10, completeArgs.TestRunStatistics!.ExecutedTests,
                             "Stats must be aggregated properly");
 
-                        Assert.AreEqual(6, completeArgs.TestRunStatistics.Stats[TestOutcome.Passed],
+                        Assert.AreEqual(6, completeArgs.TestRunStatistics.Stats![TestOutcome.Passed],
                             "Stats must be aggregated properly");
                         Assert.AreEqual(4, completeArgs.TestRunStatistics.Stats[TestOutcome.Failed],
                             "Stats must be aggregated properly");

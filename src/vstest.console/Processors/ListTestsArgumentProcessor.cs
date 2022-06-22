@@ -210,10 +210,10 @@ internal class ListTestsArgumentExecutor : IArgumentExecutor
             discoveryRequest.OnDiscoveredTests -= DiscoveryRequest_OnDiscoveredTests;
         }
 
-        private void DiscoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
+        private void DiscoveryRequest_OnDiscoveredTests(object sender, DiscoveredTestsEventArgs args)
         {
             // List out each of the tests.
-            foreach (var test in args.DiscoveredTestCases)
+            foreach (var test in args.DiscoveredTestCases!)
             {
                 _output.WriteLine(string.Format(CultureInfo.CurrentUICulture,
                         CommandLineResources.AvailableTestsFormat,

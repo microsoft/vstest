@@ -166,7 +166,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     }
 
     /// <inheritdoc />
-    public void SendTestCases(IEnumerable<TestCase> discoveredTestCases)
+    public void SendTestCases(IEnumerable<TestCase>? discoveredTestCases)
     {
         var updatedTestCases = _pathConverter.UpdateTestCases(discoveredTestCases, PathConversionDirection.Send);
         var data = _dataSerializer.SerializePayload(MessageType.TestCasesFound, updatedTestCases, _protocolVersion);
@@ -174,7 +174,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     }
 
     /// <inheritdoc />
-    public void SendTestRunStatistics(TestRunChangedEventArgs testRunChangedArgs)
+    public void SendTestRunStatistics(TestRunChangedEventArgs? testRunChangedArgs)
     {
         var updatedTestRunChangedEventArgs = _pathConverter.UpdateTestRunChangedEventArgs(testRunChangedArgs, PathConversionDirection.Send);
         var data = _dataSerializer.SerializePayload(MessageType.TestRunStatsChange, updatedTestRunChangedEventArgs, _protocolVersion);
@@ -182,7 +182,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     }
 
     /// <inheritdoc />
-    public void SendLog(TestMessageLevel messageLevel, string message)
+    public void SendLog(TestMessageLevel messageLevel, string? message)
     {
         var data = _dataSerializer.SerializePayload(
             MessageType.TestMessage,
@@ -194,9 +194,9 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     /// <inheritdoc />
     public void SendExecutionComplete(
         TestRunCompleteEventArgs testRunCompleteArgs,
-        TestRunChangedEventArgs lastChunkArgs,
-        ICollection<AttachmentSet> runContextAttachments,
-        ICollection<string> executorUris)
+        TestRunChangedEventArgs? lastChunkArgs,
+        ICollection<AttachmentSet>? runContextAttachments,
+        ICollection<string>? executorUris)
     {
         // When we abort the run we might have saved the error before we gave the handler the chance to abort
         // if the handler does not return with any new error we report the original one.

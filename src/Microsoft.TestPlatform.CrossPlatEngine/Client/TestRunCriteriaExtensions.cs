@@ -38,7 +38,7 @@ internal static class TestRunCriteriaExtensions
             // We are limiting that a testhost will always run for a single package, A package can contain multiple sources
             foreach (var tc in testRunCriteria.Tests)
             {
-                tc.Source = actualTestSources.FirstOrDefault();
+                tc.Source = actualTestSources.FirstOrDefault()!;
             }
         }
         else
@@ -52,7 +52,7 @@ internal static class TestRunCriteriaExtensions
     private static bool TryCheckTestSourceDifferFromPackage(ITestRuntimeProvider? testRuntimeProvider,
         IEnumerable<string>? inputPackages, [NotNullWhen(true)] out IEnumerable<string>? actualTestSources)
     {
-        actualTestSources = testRuntimeProvider?.GetTestSources(inputPackages);
+        actualTestSources = testRuntimeProvider?.GetTestSources(inputPackages!);
 
         if (inputPackages is null || actualTestSources is null)
         {

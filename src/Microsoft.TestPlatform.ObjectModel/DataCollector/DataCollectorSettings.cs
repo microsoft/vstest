@@ -5,7 +5,7 @@ using System;
 using System.Globalization;
 using System.Xml;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -17,7 +17,7 @@ public class DataCollectorSettings
     /// <summary>
     /// Gets or sets the uri.
     /// </summary>
-    public Uri Uri
+    public Uri? Uri
     {
         get;
         set;
@@ -26,7 +26,7 @@ public class DataCollectorSettings
     /// <summary>
     /// Gets or sets the assembly qualified name.
     /// </summary>
-    public string AssemblyQualifiedName
+    public string? AssemblyQualifiedName
     {
         get;
         set;
@@ -35,7 +35,7 @@ public class DataCollectorSettings
     /// <summary>
     /// Gets or sets the friendly name.
     /// </summary>
-    public string FriendlyName
+    public string? FriendlyName
     {
         get;
         set;
@@ -53,7 +53,7 @@ public class DataCollectorSettings
     /// <summary>
     /// Gets or sets value CodeBase of collector DLL. The syntax is same as Code Base in AssemblyName class.
     /// </summary>
-    public string CodeBase
+    public string? CodeBase
     {
         get;
         set;
@@ -62,7 +62,7 @@ public class DataCollectorSettings
     /// <summary>
     /// Gets or sets the configuration.
     /// </summary>
-    public XmlElement Configuration
+    public XmlElement? Configuration
     {
         get;
         set;
@@ -78,11 +78,11 @@ public class DataCollectorSettings
     {
         XmlDocument doc = new();
         XmlElement root = doc.CreateElement(Constants.DataCollectorSettingName);
-        AppendAttribute(doc, root, "uri", Uri.ToString());
+        AppendAttribute(doc, root, "uri", Uri?.ToString());
         AppendAttribute(doc, root, "assemblyQualifiedName", AssemblyQualifiedName);
         AppendAttribute(doc, root, "friendlyName", FriendlyName);
 
-        root.AppendChild(doc.ImportNode(Configuration, true));
+        root.AppendChild(doc.ImportNode(Configuration!, true));
 
         return root;
     }
@@ -105,19 +105,19 @@ public class DataCollectorSettings
             AppendAttribute(doc, root, "uri", Uri.ToString());
         }
 
-        if (!string.IsNullOrWhiteSpace(AssemblyQualifiedName))
+        if (!StringUtils.IsNullOrWhiteSpace(AssemblyQualifiedName))
         {
             AppendAttribute(doc, root, "assemblyQualifiedName", AssemblyQualifiedName);
         }
 
-        if (!string.IsNullOrWhiteSpace(FriendlyName))
+        if (!StringUtils.IsNullOrWhiteSpace(FriendlyName))
         {
             AppendAttribute(doc, root, "friendlyName", FriendlyName);
         }
 
         AppendAttribute(doc, root, "enabled", IsEnabled.ToString());
 
-        if (!string.IsNullOrWhiteSpace(CodeBase))
+        if (!StringUtils.IsNullOrWhiteSpace(CodeBase))
         {
             AppendAttribute(doc, root, "codebase", CodeBase);
         }
@@ -224,7 +224,7 @@ public class DataCollectorSettings
         return settings;
     }
 
-    private static void AppendAttribute(XmlDocument doc, XmlElement owner, string attributeName, string attributeValue)
+    private static void AppendAttribute(XmlDocument doc, XmlElement owner, string attributeName, string? attributeValue)
     {
         XmlAttribute attribute = doc.CreateAttribute(attributeName);
         attribute.Value = attributeValue;

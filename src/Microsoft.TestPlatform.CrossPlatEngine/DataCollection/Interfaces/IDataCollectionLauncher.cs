@@ -27,5 +27,5 @@ internal interface IDataCollectionLauncher
     /// <returns>
     /// The <see cref="int"/>.
     /// </returns>
-    int LaunchDataCollector(IDictionary<string, string>? environmentVariables, IList<string> commandLineArguments);
+    int LaunchDataCollector(IDictionary<string, string?>? environmentVariables, IList<string> commandLineArguments);
 }

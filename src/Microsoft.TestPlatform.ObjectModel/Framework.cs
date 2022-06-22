@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
+
 #if !NETSTANDARD1_0
+
 using NuGet.Frameworks;
 
 using static NuGet.Frameworks.FrameworkConstants;
 #endif
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -16,18 +17,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 /// </summary>
 public class Framework
 {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable. | Suppressed as we know values are set
     private Framework()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
     }
 
     /// <summary>
     /// Default .Net target framework.
     /// </summary>
-    public static Framework DefaultFramework { get; }
 #if NETFRAMEWORK
-        = Framework.FromString(".NETFramework,Version=v4.0");
+    public static Framework DefaultFramework { get; } = Framework.FromString(".NETFramework,Version=v4.0")!;
 #elif !NETSTANDARD1_0
-        = Framework.FromString(".NETCoreApp,Version=v1.0");
+    public static Framework DefaultFramework { get; } = Framework.FromString(".NETCoreApp,Version=v1.0")!;
+#else
+    public static Framework? DefaultFramework { get; }
 #endif
 
     /// <summary>
@@ -45,7 +49,7 @@ public class Framework
     /// </summary>
     /// <param name="frameworkString">Framework name</param>
     /// <returns>A framework object</returns>
-    public static Framework FromString(string frameworkString)
+    public static Framework? FromString(string? frameworkString)
     {
 #if NETSTANDARD1_0
 #pragma warning disable IDE1006 // Naming Styles
@@ -60,7 +64,7 @@ public class Framework
         };
 #endif
 
-        if (string.IsNullOrWhiteSpace(frameworkString))
+        if (frameworkString.IsNullOrWhiteSpace())
         {
             return null;
         }

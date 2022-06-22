@@ -156,7 +156,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <inheritdoc/>
     public virtual TestProcessStartInfo GetTestHostProcessStartInfo(
         IEnumerable<string> sources,
-        IDictionary<string, string>? environmentVariables,
+        IDictionary<string, string?>? environmentVariables,
         TestRunnerConnectionInfo connectionInfo)
     {
         TPDebug.Assert(IsInitialized, "Initialize must have been called before GetTestHostProcessStartInfo");
@@ -203,7 +203,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         {
             FileName = launcherPath,
             Arguments = argumentsString,
-            EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>(),
+            EnvironmentVariables = environmentVariables ?? new Dictionary<string, string?>(),
             WorkingDirectory = processWorkingDirectory
         };
     }
@@ -312,21 +312,20 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     }
 
     /// <inheritdoc/>
-    public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+    public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
     {
         var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
         var framework = config.TargetFramework;
 
         // This is expected to be called once every run so returning a new instance every time.
-        return framework.Name.IndexOf("NETFramework", StringComparison.OrdinalIgnoreCase) >= 0;
+        return framework!.Name.IndexOf("NETFramework", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
     [MemberNotNullWhen(true, nameof(_messageLogger), nameof(_targetFramework))]
     private bool IsInitialized { get; set; }
 
     /// <inheritdoc/>
-    [MemberNotNull(nameof(_messageLogger), nameof(_targetFramework))]
-    public void Initialize(IMessageLogger logger, string runsettingsXml)
+    public void Initialize(IMessageLogger? logger, string runsettingsXml)
     {
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
 
@@ -487,7 +486,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
             cancellationToken.ThrowIfCancellationRequested();
             _testHostProcess = _processHelper.LaunchProcess(
-                testHostStartInfo.FileName,
+                testHostStartInfo.FileName!,
                 testHostStartInfo.Arguments,
                 testHostStartInfo.WorkingDirectory,
                 testHostStartInfo.EnvironmentVariables,

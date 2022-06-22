@@ -54,7 +54,6 @@ public static class RunSettingsUtilities
     /// </summary>
     /// <param name="runConfiguration">Test run configuration</param>
     /// <returns>Target Framework</returns>
-    [return: NotNullIfNotNull("runConfiguration")]
     public static Framework? GetTargetFramework(RunConfiguration? runConfiguration)
     {
         if (runConfiguration != null)

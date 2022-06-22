@@ -181,13 +181,13 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     }
 
     /// <inheritdoc/>
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+    public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
     {
         _actualDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
     }
 
     /// <inheritdoc/>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         _actualDiscoveryEventsHandler.HandleLogMessage(level, message);
     }
@@ -199,7 +199,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     /// <param name="payload"></param>
     private void ConvertToRawMessageAndSend(string messageType, object payload)
     {
-        var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig.Version);
+        var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig!.Version);
         _actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
     }
 }

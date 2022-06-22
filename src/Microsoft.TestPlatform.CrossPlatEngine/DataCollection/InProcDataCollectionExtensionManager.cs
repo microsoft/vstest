@@ -218,9 +218,9 @@ internal class InProcDataCollectionExtensionManager
             var interfaceTypeInfo = typeof(InProcDataCollection).GetTypeInfo();
             foreach (var inProcDc in _inProcDataCollectorSettingsCollection)
             {
-                var codeBase = GetCodebase(inProcDc.CodeBase);
-                var assemblyQualifiedName = inProcDc.AssemblyQualifiedName;
-                var configuration = inProcDc.Configuration;
+                var codeBase = GetCodebase(inProcDc.CodeBase!);
+                var assemblyQualifiedName = inProcDc.AssemblyQualifiedName!;
+                var configuration = inProcDc.Configuration!;
                 var inProcDataCollector = CreateDataCollector(assemblyQualifiedName, codeBase, configuration, interfaceTypeInfo);
                 InProcDataCollectors[inProcDataCollector.AssemblyQualifiedName!] = inProcDataCollector;
             }
@@ -265,9 +265,9 @@ internal class InProcDataCollectionExtensionManager
         return codeBase;
     }
 
-    private static IDictionary<string, object> GetSessionStartProperties(SessionStartEventArgs sessionStartEventArgs)
+    private static IDictionary<string, object?> GetSessionStartProperties(SessionStartEventArgs sessionStartEventArgs)
     {
-        var properties = new Dictionary<string, object>
+        var properties = new Dictionary<string, object?>
         {
             { Constants.TestSourcesPropertyName, sessionStartEventArgs.GetPropertyValue<IEnumerable<string>>(Constants.TestSourcesPropertyName) }
         };

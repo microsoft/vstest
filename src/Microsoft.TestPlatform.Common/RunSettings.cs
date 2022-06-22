@@ -56,7 +56,7 @@ public class RunSettings : IRunSettings
     /// <returns>The settings provider for the settings or null if one was not found.</returns>
     public ISettingsProvider? GetSettings(string settingsName)
     {
-        if (StringUtilities.IsNullOrWhiteSpace(settingsName))
+        if (settingsName.IsNullOrWhiteSpace())
         {
             throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(settingsName));
         }

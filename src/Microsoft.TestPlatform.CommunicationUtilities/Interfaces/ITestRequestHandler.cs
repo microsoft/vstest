@@ -49,20 +49,20 @@ public interface ITestRequestHandler : IDisposable
     /// The send test cases.
     /// </summary>
     /// <param name="discoveredTestCases"> The discovered test cases. </param>
-    void SendTestCases(IEnumerable<TestCase> discoveredTestCases);
+    void SendTestCases(IEnumerable<TestCase>? discoveredTestCases);
 
     /// <summary>
     /// The send test run statistics.
     /// </summary>
     /// <param name="testRunChangedArgs"> The test run changed args. </param>
-    void SendTestRunStatistics(TestRunChangedEventArgs testRunChangedArgs);
+    void SendTestRunStatistics(TestRunChangedEventArgs? testRunChangedArgs);
 
     /// <summary>
     /// Sends the logs back to the server.
     /// </summary>
     /// <param name="messageLevel"> The message level. </param>
     /// <param name="message"> The message. </param>
-    void SendLog(TestMessageLevel messageLevel, string message);
+    void SendLog(TestMessageLevel messageLevel, string? message);
 
     /// <summary>
     /// The send execution complete.
@@ -71,7 +71,7 @@ public interface ITestRequestHandler : IDisposable
     /// <param name="lastChunkArgs"> The last chunk args. </param>
     /// <param name="runContextAttachments"> The run context attachments. </param>
     /// <param name="executorUris"> The executor uris. </param>
-    void SendExecutionComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris);
+    void SendExecutionComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris);
 
     /// <summary>
     /// The discovery complete handler

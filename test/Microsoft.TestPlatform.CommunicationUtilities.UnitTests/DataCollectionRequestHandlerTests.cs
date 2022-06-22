@@ -352,8 +352,8 @@ public class DataCollectionRequestHandlerTests
         _requestHandler.ProcessRequests();
 
         _mockDataCollectionManager.Verify(x => x.SessionStarted(It.Is<SessionStartEventArgs>(
-            y => y.GetPropertyValue<IEnumerable<string>>("TestSources").Contains("test1.dll") &&
-                 y.GetPropertyValue<IEnumerable<string>>("TestSources").Contains("test2.dll"))));
+            y => y.GetPropertyValue<IEnumerable<string>>("TestSources")!.Contains("test1.dll") &&
+                 y.GetPropertyValue<IEnumerable<string>>("TestSources")!.Contains("test2.dll"))));
     }
 
     [TestMethod]

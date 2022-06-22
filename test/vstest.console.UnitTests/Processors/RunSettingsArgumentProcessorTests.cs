@@ -208,7 +208,7 @@ public class RunSettingsArgumentProcessorTests
         RunConfiguration runConfiguration =
             XmlRunSettingsUtilities.GetRunConfigurationNode(_settingsProvider.ActiveRunSettings.SettingsXml);
         Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
-        Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
+        Assert.AreEqual(runConfiguration.TargetFramework!.ToString(), Framework.DefaultFramework.ToString());
         Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
 
     }

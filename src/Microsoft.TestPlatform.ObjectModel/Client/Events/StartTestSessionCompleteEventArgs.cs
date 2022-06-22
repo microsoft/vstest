@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -19,11 +17,11 @@ public class StartTestSessionCompleteEventArgs : EventArgs
     /// Gets or sets the test session info.
     /// </summary>
     [DataMember]
-    public TestSessionInfo TestSessionInfo { get; set; } = null;
+    public TestSessionInfo? TestSessionInfo { get; set; }
 
     /// <summary>
     /// Gets or sets the metrics.
     /// </summary>
     [DataMember]
-    public IDictionary<string, object> Metrics { get; set; } = null;
+    public IDictionary<string, object>? Metrics { get; set; }
 }

@@ -72,7 +72,7 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeWithParametersShouldThrowExceptionIfEventsIsNull()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "param1", "value" },
         };
@@ -83,19 +83,19 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeWithParametersShouldThrowExceptionIfParametersIsEmpty()
     {
-        Assert.ThrowsException<ArgumentException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, new Dictionary<string, string>()));
+        Assert.ThrowsException<ArgumentException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, new Dictionary<string, string?>()));
     }
 
     [TestMethod]
     public void InitializeWithParametersShouldThrowExceptionIfParametersIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, (Dictionary<string, string>)null!));
+        Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, (Dictionary<string, string?>)null!));
     }
 
     [TestMethod]
     public void InitializeWithParametersShouldSetVerbosityLevel()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "minimal" },
             { DefaultLoggerParameterNames.TargetFramework , "net451"}
@@ -108,7 +108,7 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeWithParametersShouldDefaultToNormalVerbosityLevelForInvalidVerbosity()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "" },
         };
@@ -125,7 +125,7 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeWithParametersShouldSetPrefixValue()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "prefix", "true" },
         };
@@ -140,7 +140,7 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeWithParametersShouldSetNoProgress()
     {
-        var parameters = new Dictionary<string, string>();
+        var parameters = new Dictionary<string, string?>();
 
         Assert.IsFalse(ConsoleLogger.EnableProgress);
 
@@ -216,7 +216,7 @@ public class ConsoleLoggerTests
     {
         loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -241,7 +241,7 @@ public class ConsoleLoggerTests
 
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -272,7 +272,7 @@ public class ConsoleLoggerTests
         // Setup
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -301,7 +301,7 @@ public class ConsoleLoggerTests
         // Setup
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "detailed" }
         };
@@ -333,7 +333,7 @@ public class ConsoleLoggerTests
         // Setup
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "detailed" }
         };
@@ -357,7 +357,7 @@ public class ConsoleLoggerTests
         // Setup
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "quiet" },
             { DefaultLoggerParameterNames.TargetFramework , "abc" }
@@ -381,7 +381,7 @@ public class ConsoleLoggerTests
         // Setup
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "quiet" },
             { DefaultLoggerParameterNames.TargetFramework , "abc" }
@@ -405,7 +405,7 @@ public class ConsoleLoggerTests
         // Setup
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -431,7 +431,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -456,7 +456,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -483,7 +483,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -508,7 +508,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -535,7 +535,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -562,7 +562,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -593,7 +593,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", verbosityLevel },
             { DefaultLoggerParameterNames.TargetFramework , framework}
@@ -645,7 +645,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", verbosityLevel },
             { DefaultLoggerParameterNames.TargetFramework , "net451"}
@@ -674,7 +674,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -701,7 +701,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -728,7 +728,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "minimal" },
             { DefaultLoggerParameterNames.TargetFramework , "net451"}
@@ -754,7 +754,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "quiet" },
             { DefaultLoggerParameterNames.TargetFramework , "net451"}
@@ -785,7 +785,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -808,7 +808,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -831,7 +831,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -856,7 +856,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -880,7 +880,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -904,7 +904,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -920,7 +920,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -941,7 +941,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -967,7 +967,7 @@ public class ConsoleLoggerTests
 
         CommandLineOptions.Instance.AddSource(testFilePath);
 
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -999,7 +999,7 @@ public class ConsoleLoggerTests
         CommandLineOptions.Instance.AddSource(testFilePath);
         CommandLineOptions.Instance.AddSource(testFilePath2);
 
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "detailed" }
         };
@@ -1033,7 +1033,7 @@ public class ConsoleLoggerTests
         CommandLineOptions.Instance.AddSource(testFilePath);
         CommandLineOptions.Instance.AddSource(testFilePath2);
 
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -1053,7 +1053,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -1080,7 +1080,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -1106,7 +1106,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "detailed" }
         };
@@ -1132,7 +1132,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -1169,7 +1169,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", verbosityLevel }
         };
@@ -1195,7 +1195,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };

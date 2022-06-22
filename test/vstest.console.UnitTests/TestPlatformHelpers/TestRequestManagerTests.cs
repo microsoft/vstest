@@ -264,7 +264,7 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
         // Verify.
-        Assert.AreEqual(6, actualRequestData!.ProtocolConfig.Version);
+        Assert.AreEqual(6, actualRequestData!.ProtocolConfig!.Version);
     }
 
 
@@ -681,7 +681,7 @@ public class TestRequestManagerTests
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
         _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
-        Assert.IsTrue(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
+        Assert.IsTrue(actualDiscoveryCriteria!.RunSettings!.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
     }
 
@@ -715,7 +715,7 @@ public class TestRequestManagerTests
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
         _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Never);
 
-        Assert.IsTrue(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
+        Assert.IsTrue(actualDiscoveryCriteria!.RunSettings!.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
     }
 
@@ -746,7 +746,7 @@ public class TestRequestManagerTests
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
         _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
-        Assert.IsTrue(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
+        Assert.IsTrue(actualDiscoveryCriteria!.RunSettings!.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
     }
 
@@ -787,8 +787,8 @@ public class TestRequestManagerTests
         _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Once);
 
         // but we don't update the settings, to keep what user specified
-        Assert.IsFalse(actualDiscoveryCriteria!.RunSettings.Contains(Constants.DotNetFramework46));
-        Assert.IsFalse(actualDiscoveryCriteria!.RunSettings.Contains(nameof(Architecture.ARM)));
+        Assert.IsFalse(actualDiscoveryCriteria!.RunSettings!.Contains(Constants.DotNetFramework46));
+        Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
     }
 
     [TestMethod]
@@ -913,7 +913,7 @@ public class TestRequestManagerTests
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
         // Verify.
-        Assert.AreEqual(6, actualRequestData!.ProtocolConfig.Version);
+        Assert.AreEqual(6, actualRequestData!.ProtocolConfig!.Version);
     }
 
     [TestMethod]
@@ -1326,11 +1326,11 @@ public class TestRequestManagerTests
 
         var designmode = $"<DesignMode>{designModeValue}</DesignMode>";
         _mockTestPlatform.Verify(
-            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
+            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings!.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
 
         var collectSourceInformation = $"<CollectSourceInformation>{designModeValue}</CollectSourceInformation>";
         _mockTestPlatform.Verify(
-            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(collectSourceInformation)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
+            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings!.Contains(collectSourceInformation)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
     [TestMethod]
@@ -1344,7 +1344,7 @@ public class TestRequestManagerTests
 
         var designmode = "<DesignMode>False</DesignMode>";
         _mockTestPlatform.Verify(
-            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
+            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings!.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
     [DataTestMethod]
@@ -1379,7 +1379,7 @@ public class TestRequestManagerTests
 
         var collectSourceInformation = $"<CollectSourceInformation>{val}</CollectSourceInformation>";
         _mockTestPlatform.Verify(
-            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(collectSourceInformation)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
+            tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings!.Contains(collectSourceInformation)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
     [TestMethod]
@@ -1735,7 +1735,7 @@ public class TestRequestManagerTests
 
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
-        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria!.TestRunSettings).LoggerSettingsList;
+        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria!.TestRunSettings)!.LoggerSettingsList;
         Assert.AreEqual(1, loggerSettingsList.Count);
         Assert.AreEqual("Console", loggerSettingsList[0].FriendlyName);
         Assert.IsNotNull(loggerSettingsList[0].AssemblyQualifiedName);
@@ -1773,7 +1773,7 @@ public class TestRequestManagerTests
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap, IWarningLogger _) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
-        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria!.TestRunSettings).LoggerSettingsList;
+        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria!.TestRunSettings)!.LoggerSettingsList;
         Assert.AreEqual(2, loggerSettingsList.Count);
         Assert.IsNotNull(loggerSettingsList[0].Configuration);
         Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
@@ -1816,7 +1816,7 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload,
             new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
 
-        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria!.RunSettings).LoggerSettingsList;
+        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria!.RunSettings)!.LoggerSettingsList;
         Assert.AreEqual(2, loggerSettingsList.Count);
         Assert.IsNotNull(loggerSettingsList[0].Configuration);
         Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
@@ -1874,7 +1874,7 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload,
             new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
 
-        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria!.RunSettings).LoggerSettingsList;
+        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria!.RunSettings)!.LoggerSettingsList;
         Assert.AreEqual(1, loggerSettingsList.Count);
         Assert.AreEqual("Console", loggerSettingsList[0].FriendlyName);
         Assert.IsNotNull(loggerSettingsList[0].AssemblyQualifiedName);
@@ -1906,7 +1906,7 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload,
             new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
 
-        Assert.IsFalse(actualDiscoveryCriteria!.RunSettings.Contains("LoggerRunSettings"));
+        Assert.IsFalse(actualDiscoveryCriteria!.RunSettings!.Contains("LoggerRunSettings"));
     }
 
     [TestMethod]
@@ -1945,15 +1945,15 @@ public class TestRequestManagerTests
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap, IWarningLogger _) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
-        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria!.TestRunSettings).LoggerSettingsList;
+        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria!.TestRunSettings)!.LoggerSettingsList;
         Assert.AreEqual(2, loggerSettingsList.Count);
         Assert.IsNotNull(loggerSettingsList[0].Configuration);
         Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
         Assert.AreEqual("console", loggerSettingsList[1].FriendlyName);
-        Assert.AreEqual(new Uri("logger://tempconsoleUri").ToString(), loggerSettingsList[1].Uri.ToString());
+        Assert.AreEqual(new Uri("logger://tempconsoleUri").ToString(), loggerSettingsList[1].Uri!.ToString());
         Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].AssemblyQualifiedName);
         Assert.AreNotEqual("tempCodeBase", loggerSettingsList[1].CodeBase);
-        Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
+        Assert.IsTrue(loggerSettingsList[1].Configuration!.InnerXml.Contains("Value1"));
         Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
         Assert.IsNotNull(loggerSettingsList[1].CodeBase);
     }
@@ -1997,15 +1997,15 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload,
             new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
 
-        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria!.RunSettings).LoggerSettingsList;
+        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria!.RunSettings)!.LoggerSettingsList;
         Assert.AreEqual(2, loggerSettingsList.Count);
         Assert.IsNotNull(loggerSettingsList[0].Configuration);
         Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
         Assert.AreEqual("consoleTemp", loggerSettingsList[1].FriendlyName);
-        Assert.AreEqual(new Uri("logger://Microsoft/TestPlatform/ConsoleLogger/v1").ToString(), loggerSettingsList[1].Uri.ToString());
+        Assert.AreEqual(new Uri("logger://Microsoft/TestPlatform/ConsoleLogger/v1").ToString(), loggerSettingsList[1].Uri!.ToString());
         Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].AssemblyQualifiedName);
         Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].CodeBase);
-        Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
+        Assert.IsTrue(loggerSettingsList[1].Configuration!.InnerXml.Contains("Value1"));
         Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
         Assert.IsNotNull(loggerSettingsList[1].CodeBase);
     }
@@ -2046,15 +2046,15 @@ public class TestRequestManagerTests
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap, IWarningLogger _) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
-        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria!.TestRunSettings).LoggerSettingsList;
+        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria!.TestRunSettings)!.LoggerSettingsList;
         Assert.AreEqual(2, loggerSettingsList.Count);
         Assert.IsNotNull(loggerSettingsList[0].Configuration);
         Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
         Assert.AreEqual("console", loggerSettingsList[1].FriendlyName);
-        Assert.AreEqual(new Uri("logger://tempconsoleUri").ToString(), loggerSettingsList[1].Uri.ToString());
+        Assert.AreEqual(new Uri("logger://tempconsoleUri").ToString(), loggerSettingsList[1].Uri!.ToString());
         Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].AssemblyQualifiedName);
         Assert.AreNotEqual("tempCodeBase", loggerSettingsList[1].CodeBase);
-        Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
+        Assert.IsTrue(loggerSettingsList[1].Configuration!.InnerXml.Contains("Value1"));
         Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
         Assert.IsNotNull(loggerSettingsList[1].CodeBase);
     }
@@ -2098,15 +2098,15 @@ public class TestRequestManagerTests
         _testRequestManager.DiscoverTests(payload,
             new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
 
-        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria!.RunSettings).LoggerSettingsList;
+        var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria!.RunSettings)!.LoggerSettingsList;
         Assert.AreEqual(2, loggerSettingsList.Count);
         Assert.IsNotNull(loggerSettingsList[0].Configuration);
         Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
         Assert.AreEqual("consoleTemp", loggerSettingsList[1].FriendlyName);
-        Assert.AreEqual(new Uri("logger://Microsoft/TestPlatform/ConsoleLogger/v1").ToString(), loggerSettingsList[1].Uri.ToString());
+        Assert.AreEqual(new Uri("logger://Microsoft/TestPlatform/ConsoleLogger/v1").ToString(), loggerSettingsList[1].Uri!.ToString());
         Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].AssemblyQualifiedName);
         Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].CodeBase);
-        Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
+        Assert.IsTrue(loggerSettingsList[1].Configuration!.InnerXml.Contains("Value1"));
         Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
         Assert.IsNotNull(loggerSettingsList[1].CodeBase);
     }
@@ -2280,7 +2280,7 @@ public class TestRequestManagerTests
             .Callback(
                 (IRequestData _, StartTestSessionCriteria criteria, ITestSessionEventsHandler _, Dictionary<string, SourceDetail> _, IWarningLogger _) =>
                 {
-                    Assert.IsTrue(criteria.RunSettings.Contains(Constants.DotNetFramework46));
+                    Assert.IsTrue(criteria.RunSettings!.Contains(Constants.DotNetFramework46));
                     Assert.IsTrue(criteria.RunSettings.Contains(nameof(Architecture.ARM)));
                 });
 

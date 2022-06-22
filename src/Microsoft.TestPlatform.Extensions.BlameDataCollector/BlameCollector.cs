@@ -110,13 +110,13 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// <param name="dataSink">A data collection sink for data transfer</param>
     /// <param name="logger">Data Collection Logger to send messages to the client </param>
     /// <param name="environmentContext">Context of data collector environment</param>
-    [MemberNotNull(nameof(_events), nameof(_dataCollectionSink), nameof(_context), nameof(_testSequence), nameof(_testObjectDictionary), nameof(_logger))]
+    [MemberNotNull(nameof(_events), nameof(_dataCollectionSink), nameof(_testSequence), nameof(_testObjectDictionary), nameof(_logger))]
     public override void Initialize(
         XmlElement? configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
         DataCollectionLogger logger,
-        DataCollectionEnvironmentContext environmentContext)
+        DataCollectionEnvironmentContext? environmentContext)
     {
         _events = events;
         _dataCollectionSink = dataSink;
@@ -419,8 +419,9 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         TPDebug.Assert(_testSequence != null && _testObjectDictionary != null, "Initialize must be called before calling this method");
         ResetInactivityTimer();
 
-        EqtTrace.Info("Blame Collector : Test Case Start");
+        EqtTrace.Info("BlameCollector.EventsTestCaseStart: Test Case Start");
 
+        TPDebug.Assert(e.TestElement is not null, "e.TestElement is null");
         var blameTestObject = new BlameTestObject(e.TestElement);
 
         // Add guid to list of test sequence to maintain the order.
@@ -443,11 +444,12 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         TPDebug.Assert(_testObjectDictionary != null, "Initialize must be called before calling this method");
         ResetInactivityTimer();
 
-        EqtTrace.Info("Blame Collector: Test Case End");
+        EqtTrace.Info("BlameCollector.EventsTestCaseEnd: Test Case End");
 
         _testEndCount++;
 
         // Update the test object in the dictionary as the test has completed.
+        TPDebug.Assert(e.TestElement is not null, "e.TestElement is null");
         if (_testObjectDictionary.ContainsKey(e.TestElement.Id))
         {
             _testObjectDictionary[e.TestElement.Id].IsCompleted = true;

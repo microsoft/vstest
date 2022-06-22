@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 /// </summary>
 public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
 {
-    private IDictionary<string, string>? _dataCollectionEnvironmentVariables;
+    private IDictionary<string, string?>? _dataCollectionEnvironmentVariables;
     private readonly IRequestData _requestData;
     private int _dataCollectionPort;
 
@@ -45,7 +45,7 @@ public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
         ProxyDataCollectionManager = proxyDataCollectionManager;
         DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
         _requestData = requestData;
-        _dataCollectionEnvironmentVariables = new Dictionary<string, string>();
+        _dataCollectionEnvironmentVariables = new Dictionary<string, string?>();
 
         testHostManager.HostLaunched += TestHostLaunchedHandler;
     }

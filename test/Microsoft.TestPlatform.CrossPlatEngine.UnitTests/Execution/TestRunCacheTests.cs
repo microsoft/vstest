@@ -132,7 +132,7 @@ public class TestRunCacheBehaviors
         }
 
         Assert.AreEqual(2, cache.TestRunStatistics.ExecutedTests);
-        Assert.AreEqual(2, cache.TestRunStatistics.Stats[TestOutcome.Passed]);
+        Assert.AreEqual(2, cache.TestRunStatistics.Stats![TestOutcome.Passed]);
     }
 
     [TestMethod]
@@ -358,7 +358,7 @@ public class TestRunCacheBehaviors
         var stats = cache.TestRunStatistics;
 
         Assert.AreEqual(cacheSize, stats.ExecutedTests);
-        Assert.AreEqual(5, stats.Stats[TestOutcome.Passed]);
+        Assert.AreEqual(5, stats.Stats![TestOutcome.Passed]);
         Assert.AreEqual(5, stats.Stats[TestOutcome.Failed]);
     }
 
@@ -383,14 +383,14 @@ public class TestRunCacheBehaviors
 
         public int TotalInProgressTestsReceived { get; set; }
 
-        public void CacheHitOnSize(TestRunStatistics stats, ICollection<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult> results, ICollection<TestCase> tests)
+        public void CacheHitOnSize(TestRunStatistics _, ICollection<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult> results, ICollection<TestCase> tests)
         {
             Assert.AreEqual(ExpectedCacheSize, results.Count + tests.Count);
             CacheHitCount++;
             TotalInProgressTestsReceived += tests.Count;
         }
 
-        public void CacheHitOnTimerLimit(ICollection<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult> results, ICollection<TestCase> tests)
+        public void CacheHitOnTimerLimit(ICollection<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult> _, ICollection<TestCase> tests)
         {
             CacheHitCount++;
             TotalInProgressTestsReceived += tests.Count;

@@ -164,7 +164,7 @@ public class InferRunSettingsHelper
         var shouldUpdatePlatform = true;
 
         TryGetPlatformXml(runSettingsNavigator, out var nodeXml);
-        if (!string.IsNullOrEmpty(nodeXml))
+        if (!nodeXml.IsNullOrEmpty())
         {
             architecture = (Architecture)Enum.Parse(typeof(Architecture), nodeXml, true);
             shouldUpdatePlatform = false;
@@ -174,9 +174,11 @@ public class InferRunSettingsHelper
         var shouldUpdateFramework = true;
         TryGetFrameworkXml(runSettingsNavigator, out nodeXml);
 
-        if (!string.IsNullOrEmpty(nodeXml))
+        if (!nodeXml.IsNullOrEmpty())
         {
-            framework = Framework.FromString(nodeXml);
+            var fwkFromString = Framework.FromString(nodeXml);
+            TPDebug.Assert(fwkFromString is not null, "fwkFromString is null");
+            framework = fwkFromString;
             shouldUpdateFramework = false;
         }
 

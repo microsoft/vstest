@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -13,12 +11,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 /// </summary>
 public partial class DiscoveredTestsEventArgs : EventArgs
 {
-    public DiscoveredTestsEventArgs(IEnumerable<TestCase> discoveredTestCases)
+    public DiscoveredTestsEventArgs(IEnumerable<TestCase>? discoveredTestCases)
     {
         DiscoveredTestCases = discoveredTestCases;
     }
     /// <summary>
     /// Tests discovered in this discovery request
     /// </summary>
-    public IEnumerable<TestCase> DiscoveredTestCases { get; private set; }
+    public IEnumerable<TestCase>? DiscoveredTestCases { get; private set; }
 }

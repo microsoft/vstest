@@ -2,13 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Xml;
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -32,7 +32,7 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// .Net framework which rocksteady should use for discovery/execution
     /// </summary>
-    private Framework _framework;
+    private Framework? _framework;
 
     /// <summary>
     /// Specifies the frequency of the runStats/discoveredTests event
@@ -47,7 +47,7 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Paths at which rocksteady should look for test adapters
     /// </summary>
-    private string _testAdaptersPaths;
+    private string? _testAdaptersPaths;
 
     /// <summary>
     /// Indication to adapters to disable app domain.
@@ -97,7 +97,7 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Gets or sets the solution directory.
     /// </summary>
-    public string SolutionDirectory
+    public string? SolutionDirectory
     {
         get;
         set;
@@ -108,10 +108,7 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public string ResultsDirectory
     {
-        get
-        {
-            return _resultsDirectory;
-        }
+        get => _resultsDirectory;
 
         set
         {
@@ -125,10 +122,7 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public int MaxCpuCount
     {
-        get
-        {
-            return _maxCpuCount;
-        }
+        get => _maxCpuCount;
         set
         {
             _maxCpuCount = value;
@@ -141,10 +135,7 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public long BatchSize
     {
-        get
-        {
-            return _batchSize;
-        }
+        get => _batchSize;
         set
         {
             _batchSize = value;
@@ -162,10 +153,7 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public bool DesignMode
     {
-        get
-        {
-            return _designMode;
-        }
+        get => _designMode;
 
         set
         {
@@ -184,10 +172,7 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public bool ShouldCollectSourceInformation
     {
-        get
-        {
-            return (CollectSourceInformationSet) ? _shouldCollectSourceInformation : _designMode;
-        }
+        get => (CollectSourceInformationSet) ? _shouldCollectSourceInformation : _designMode;
 
         set
         {
@@ -201,10 +186,7 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public bool DisableAppDomain
     {
-        get
-        {
-            return _disableAppDomain;
-        }
+        get => _disableAppDomain;
 
         set
         {
@@ -223,10 +205,7 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public bool DisableParallelization
     {
-        get
-        {
-            return _disableParallelization;
-        }
+        get => _disableParallelization;
 
         set
         {
@@ -240,10 +219,7 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public Architecture TargetPlatform
     {
-        get
-        {
-            return _platform;
-        }
+        get => _platform;
 
         set
         {
@@ -257,10 +233,7 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public Architecture? DefaultPlatform
     {
-        get
-        {
-            return _defaultPlatform;
-        }
+        get => _defaultPlatform;
 
         set
         {
@@ -272,12 +245,9 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Gets or sets the target Framework this run is targeting.
     /// </summary>
-    public Framework TargetFramework
+    public Framework? TargetFramework
     {
-        get
-        {
-            return _framework;
-        }
+        get => _framework;
 
         set
         {
@@ -300,7 +270,7 @@ public class RunConfiguration : TestRunSettings
     [Obsolete("Use TargetFramework instead")]
     public FrameworkVersion TargetFrameworkVersion
     {
-        get => (_framework?.Name) switch
+        get => _framework?.Name switch
         {
             Constants.DotNetFramework35 => FrameworkVersion.Framework35,
             Constants.DotNetFramework40 => FrameworkVersion.Framework40,
@@ -320,17 +290,14 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Gets or sets the target device IP. For Phone this value is Device, for emulators "Mobile Emulator 10.0.15063.0 WVGA 4 inch 1GB"
     /// </summary>
-    public string TargetDevice { get; set; }
+    public string? TargetDevice { get; set; }
 
     /// <summary>
     /// Gets or sets the paths used for test adapters lookup in test platform.
     /// </summary>
-    public string TestAdaptersPaths
+    public string? TestAdaptersPaths
     {
-        get
-        {
-            return _testAdaptersPaths;
-        }
+        get => _testAdaptersPaths;
 
         set
         {
@@ -433,6 +400,7 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Gets a value indicating whether test adapters paths set.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(TestAdaptersPaths))]
     public bool TestAdaptersPathsSet
     {
         get;
@@ -451,7 +419,7 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Gets the binaries root.
     /// </summary>
-    public string BinariesRoot { get; private set; }
+    public string? BinariesRoot { get; private set; }
 
     /// <summary>
     /// Collect source information
@@ -461,11 +429,11 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Default filter to use to filter tests
     /// </summary>
-    public string TestCaseFilter { get; private set; }
+    public string? TestCaseFilter { get; private set; }
 
     /// Path to dotnet executable to be used to invoke testhost.dll. Specifying this will skip looking up testhost.exe and will force usage of the testhost.dll.
     /// </summary>
-    public string DotnetHostPath { get; private set; }
+    public string? DotnetHostPath { get; private set; }
 
 #if !NETSTANDARD1_0
     /// <inheritdoc/>
@@ -486,7 +454,7 @@ public class RunConfiguration : TestRunSettings
         if (DefaultPlatform != null)
         {
             XmlElement defaultPlatform = doc.CreateElement("DefaultPlatform");
-            defaultPlatform.InnerXml = DefaultPlatform.ToString();
+            defaultPlatform.InnerXml = DefaultPlatform.ToString()!;
             root.AppendChild(defaultPlatform);
         }
 
@@ -523,7 +491,7 @@ public class RunConfiguration : TestRunSettings
         root.AppendChild(disableParallelization);
 
         XmlElement targetFrameworkVersion = doc.CreateElement("TargetFrameworkVersion");
-        targetFrameworkVersion.InnerXml = TargetFramework.ToString();
+        targetFrameworkVersion.InnerXml = TargetFramework?.ToString()!;
         root.AppendChild(targetFrameworkVersion);
 
         XmlElement executionThreadApartmentState = doc.CreateElement("ExecutionThreadApartmentState");
@@ -555,21 +523,21 @@ public class RunConfiguration : TestRunSettings
             root.AppendChild(binariesRoot);
         }
 
-        if (!string.IsNullOrEmpty(TargetDevice))
+        if (!StringUtils.IsNullOrEmpty(TargetDevice))
         {
             XmlElement targetDevice = doc.CreateElement("TargetDevice");
             targetDevice.InnerXml = TargetDevice;
             root.AppendChild(targetDevice);
         }
 
-        if (!string.IsNullOrEmpty(TestCaseFilter))
+        if (!StringUtils.IsNullOrEmpty(TestCaseFilter))
         {
             XmlElement testCaseFilter = doc.CreateElement(nameof(TestCaseFilter));
             testCaseFilter.InnerXml = TestCaseFilter;
             root.AppendChild(testCaseFilter);
         }
 
-        if (!string.IsNullOrEmpty(DotnetHostPath))
+        if (!StringUtils.IsNullOrEmpty(DotnetHostPath))
         {
             XmlElement dotnetHostPath = doc.CreateElement(nameof(DotnetHostPath));
             dotnetHostPath.InnerXml = DotnetHostPath;
@@ -614,7 +582,7 @@ public class RunConfiguration : TestRunSettings
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
 
                         string resultsDir = reader.ReadElementContentAsString();
-                        if (string.IsNullOrEmpty(resultsDir))
+                        if (StringUtils.IsNullOrEmpty(resultsDir))
                         {
                             throw new SettingsException(
                                 string.Format(
@@ -802,7 +770,7 @@ public class RunConfiguration : TestRunSettings
 
                     case "TargetFrameworkVersion":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                        Framework frameworkType;
+                        Framework? frameworkType;
                         value = reader.ReadElementContentAsString();
                         try
                         {
@@ -874,13 +842,13 @@ public class RunConfiguration : TestRunSettings
 
                     case "SolutionDirectory":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                        string solutionDirectory = reader.ReadElementContentAsString();
+                        string? solutionDirectory = reader.ReadElementContentAsString();
 
 #if !NETSTANDARD1_0
                         solutionDirectory = Environment.ExpandEnvironmentVariables(solutionDirectory);
 #endif
 
-                        if (string.IsNullOrEmpty(solutionDirectory)
+                        if (StringUtils.IsNullOrEmpty(solutionDirectory)
 #if !NETSTANDARD1_0
                             || !System.IO.Directory.Exists(solutionDirectory)
 #endif

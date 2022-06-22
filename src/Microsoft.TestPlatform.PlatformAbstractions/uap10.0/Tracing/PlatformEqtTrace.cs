@@ -43,7 +43,7 @@ public class PlatformEqtTrace : IPlatformEqtTrace
     private static PlatformTraceLevel TraceLevel { get; set; }
 
     /// <inheritdoc/>
-    public void WriteLine(PlatformTraceLevel level, string message)
+    public void WriteLine(PlatformTraceLevel level, string? message)
     {
         if (TraceInitialized() && TraceLevel > PlatformTraceLevel.Off)
         {

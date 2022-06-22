@@ -145,12 +145,12 @@ internal class TestObjectConverter7 : JsonConverter
         {
             // This call will fail with NRE on .NET Standard 1.3
             var testProperty = (TestProperty)TestPropertyCtor!.Invoke(EmptyObjectArray);
-            testProperty.Id = property.Key.Id;
-            testProperty.Label = property.Key.Label;
-            testProperty.Category = property.Key.Category;
-            testProperty.Description = property.Key.Description;
+            testProperty.Id = property.Key.Id!;
+            testProperty.Label = property.Key.Label!;
+            testProperty.Category = property.Key.Category!;
+            testProperty.Description = property.Key.Description!;
             testProperty.Attributes = (TestPropertyAttributes)property.Key.Attributes;
-            testProperty.ValueType = property.Key.ValueType;
+            testProperty.ValueType = property.Key.ValueType!;
 
 
             object? propertyData = null;

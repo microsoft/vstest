@@ -501,7 +501,7 @@ public class MultiTFM
             await testRequestManager.ExecuteWithAbort(tm => tm.StartTestSession(startTestSessionPayload, testHostLauncher: null, fixture.TestSessionEventsHandler, fixture.ProtocolConfig));
 
             // You need to pass this on, otherwise it will ignore the test session that you just started. This is a by product of being able to start multiple test sessions.
-            var testSessionInfo = fixture.TestSessionEventsHandler.StartTestSessionCompleteEvents.Single().TestSessionInfo;
+            var testSessionInfo = fixture.TestSessionEventsHandler.StartTestSessionCompleteEvents.Single()!.TestSessionInfo;
 
             var testRunRequestPayload = new TestRunRequestPayload
             {

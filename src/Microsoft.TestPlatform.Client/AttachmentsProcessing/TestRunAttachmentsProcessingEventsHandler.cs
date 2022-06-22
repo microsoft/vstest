@@ -29,7 +29,7 @@ public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProc
     }
 
     /// <inheritdoc/>
-    public void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk)
+    public void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet>? lastChunk)
     {
         EqtTrace.Info("Test run attachments processing completed.");
 
@@ -60,7 +60,7 @@ public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProc
     }
 
     /// <inheritdoc/>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         var testMessagePayload = new TestMessagePayload { MessageLevel = level, Message = message };
         _communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);

@@ -279,10 +279,10 @@ public class RunTestsWithSourcesTests
 
         _runTestsInstance.CallSendSessionStart();
 
-        mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<string, object>>(
+        mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<string, object?>>(
             y => y.ContainsKey("TestSources")
-                 && ((IEnumerable<string>)y["TestSources"]).Contains("1.dll")
-                 && ((IEnumerable<string>)y["TestSources"]).Contains("2.dll")
+                 && ((IEnumerable<string>)y["TestSources"]!).Contains("1.dll")
+                 && ((IEnumerable<string>)y["TestSources"]!).Contains("2.dll")
         )));
     }
 
@@ -395,20 +395,20 @@ public class RunTestsWithSourcesTests
     [ExtensionUri(RunTestsWithSourcesTestsExecutorUri)]
     internal class RunTestWithSourcesExecutor : ITestExecutor
     {
-        public static Action<IEnumerable<string>, IRunContext, IFrameworkHandle>? RunTestsWithSourcesCallback { get; set; }
-        public static Action<IEnumerable<TestCase>, IRunContext, IFrameworkHandle>? RunTestsWithTestsCallback { get; set; }
+        public static Action<IEnumerable<string>?, IRunContext?, IFrameworkHandle?>? RunTestsWithSourcesCallback { get; set; }
+        public static Action<IEnumerable<TestCase>?, IRunContext?, IFrameworkHandle?>? RunTestsWithTestsCallback { get; set; }
 
         public void Cancel()
         {
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             RunTestsWithSourcesCallback?.Invoke(sources, runContext, frameworkHandle);
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             RunTestsWithTestsCallback?.Invoke(tests, runContext, frameworkHandle);
         }

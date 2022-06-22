@@ -63,7 +63,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         _isParallel = parallelLevel > 1;
         _parallelOperationManager = new(actualProxyManagerCreator, parallelLevel);
         _sourceToTestHostProviderMap = testHostProviders
-            .SelectMany(provider => provider.SourceDetails.Select(s => new KeyValuePair<string, TestRuntimeProviderInfo>(s.Source, provider)))
+            .SelectMany(provider => provider.SourceDetails.Select(s => new KeyValuePair<string, TestRuntimeProviderInfo>(s.Source!, provider)))
             .ToDictionary(pair => pair.Key, pair => pair.Value);
     }
 

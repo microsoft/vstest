@@ -83,7 +83,7 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <summary>
     /// Parameters dictionary for logger. Ex: {"LogFileName":"TestResults.trx"}.
     /// </summary>
-    private Dictionary<string, string>? _parametersDictionary;
+    private Dictionary<string, string?>? _parametersDictionary;
 
     /// <summary>
     /// Gets the directory under which default trx file and test results attachments should be saved.
@@ -127,7 +127,7 @@ public class TrxLogger : ITestLoggerWithParameters
 
     /// <inheritdoc/>
     [MemberNotNull(nameof(_parametersDictionary))]
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters)
     {
         ValidateArg.NotNull(parameters, nameof(parameters));
         if (parameters.Count == 0)
@@ -148,7 +148,7 @@ public class TrxLogger : ITestLoggerWithParameters
         }
 
         _parametersDictionary = parameters;
-        Initialize(events, _parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]);
+        Initialize(events, _parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]!);
     }
     #endregion
 
@@ -610,7 +610,7 @@ public class TrxLogger : ITestLoggerWithParameters
         Guid testId = _converter.GetTestId(testCase);
 
         // Scenario for inner test case when parent test element is not present.
-        var testName = testCase.DisplayName;
+        string? testName = testCase.DisplayName;
         var adapter = testCase.ExecutorUri.ToString();
         if (adapter.Contains(TrxLoggerConstants.MstestAdapterString) &&
             parentTestElement == null &&
@@ -629,7 +629,7 @@ public class TrxLogger : ITestLoggerWithParameters
         // Create test element
         if (testElement == null)
         {
-            testElement = _converter.ToTestElement(testId, executionId, parentExecutionId, testName, testType, testCase);
+            testElement = _converter.ToTestElement(testId, executionId, parentExecutionId, testName!, testType, testCase);
             _testElements.TryAdd(testId, testElement);
         }
 

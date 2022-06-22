@@ -4,8 +4,6 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -21,7 +19,7 @@ public class TestRunRequestPayload
     /// if a linq query outputs the IEnumerable.
     /// </remarks>
     [DataMember]
-    public List<string> Sources { get; set; }
+    public List<string>? Sources { get; set; }
 
     /// <summary>
     /// Gets or sets the test cases for the test run request.
@@ -31,13 +29,13 @@ public class TestRunRequestPayload
     /// if a linq query outputs the IEnumerable.
     /// </remarks>
     [DataMember]
-    public List<TestCase> TestCases { get; set; }
+    public List<TestCase>? TestCases { get; set; }
 
     /// <summary>
     /// Gets or sets the settings used for the test run request.
     /// </summary>
     [DataMember]
-    public string RunSettings { get; set; }
+    public string? RunSettings { get; set; }
 
     /// <summary>
     /// Settings used for the Run request.
@@ -55,11 +53,11 @@ public class TestRunRequestPayload
     /// Gets or sets the testplatform options
     /// </summary>
     [DataMember]
-    public TestPlatformOptions TestPlatformOptions { get; set; }
+    public TestPlatformOptions? TestPlatformOptions { get; set; }
 
     /// <summary>
     /// Gets or sets the test session info.
     /// </summary>
     [DataMember]
-    public TestSessionInfo TestSessionInfo { get; set; }
+    public TestSessionInfo? TestSessionInfo { get; set; }
 }

@@ -160,17 +160,17 @@ public class TestHostProviderManagerTests
         public bool Shared { get; private set; }
 
 
-        public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+        public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             var framework = config.TargetFramework;
             Shared = !config.DisableAppDomain;
 
             // This is expected to be called once every run so returning a new instance every time.
-            return framework.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0;
+            return framework!.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
+        public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string?>? environmentVariables, TestRunnerConnectionInfo connectionInfo)
         {
             throw new NotImplementedException();
         }
@@ -185,7 +185,7 @@ public class TestHostProviderManagerTests
             return sources;
         }
 
-        public void Initialize(IMessageLogger logger, string runsettingsXml)
+        public void Initialize(IMessageLogger? logger, string runsettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             Shared = !config.DisableAppDomain;
@@ -232,18 +232,18 @@ public class TestHostProviderManagerTests
 
         public bool Shared { get; private set; }
 
-        public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+        public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             var framework = config.TargetFramework;
             Shared = !config.DisableAppDomain;
 
             // This is expected to be called once every run so returning a new instance every time.
-            return framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+            return framework!.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
                    || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
+        public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string?>? environmentVariables, TestRunnerConnectionInfo connectionInfo)
         {
             throw new NotImplementedException();
         }
@@ -253,7 +253,7 @@ public class TestHostProviderManagerTests
             throw new NotImplementedException();
         }
 
-        public void Initialize(IMessageLogger logger, string runsettingsXml)
+        public void Initialize(IMessageLogger? logger, string runsettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             Shared = !config.DisableAppDomain;

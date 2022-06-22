@@ -374,7 +374,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
     }
 
     /// <inheritdoc/>
-    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
     {
         _baseTestRunEventsHandler?.HandleTestRunStatsChange(testRunChangedArgs);
     }
@@ -396,7 +396,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
     }
 
     /// <inheritdoc/>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         _baseTestRunEventsHandler?.HandleLogMessage(level, message);
     }

@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -44,9 +42,7 @@ public class AttachmentSet
     }
 
     public override string ToString()
-    {
-        return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(DisplayName)}: {DisplayName}, {nameof(Attachments)}: [{string.Join(",", Attachments)}]";
-    }
+        => $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(DisplayName)}: {DisplayName}, {nameof(Attachments)}: [{string.Join(",", Attachments)}]";
 }
 
 

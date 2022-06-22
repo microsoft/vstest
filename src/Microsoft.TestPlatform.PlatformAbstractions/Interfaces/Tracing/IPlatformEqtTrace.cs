@@ -23,7 +23,7 @@ public partial interface IPlatformEqtTrace
     /// </summary>
     /// <param name="level">Trace level.</param>
     /// <param name="message">The message to add to trace.</param>
-    void WriteLine(PlatformTraceLevel level, string message);
+    void WriteLine(PlatformTraceLevel level, string? message);
 
     /// <summary>
     /// Initializes the verbose tracing with custom log file

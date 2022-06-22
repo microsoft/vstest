@@ -53,7 +53,7 @@ internal class TestCaseEventsHandler : ITestCaseEventsHandler, ITestEventsPublis
     }
 
     /// <inheritdoc />
-    public void SendSessionStart(IDictionary<string, object> properties)
+    public void SendSessionStart(IDictionary<string, object?> properties)
     {
         SessionStart.SafeInvoke(this, new SessionStartEventArgs(properties), "TestCaseEventsHandler.RaiseSessionStart");
     }

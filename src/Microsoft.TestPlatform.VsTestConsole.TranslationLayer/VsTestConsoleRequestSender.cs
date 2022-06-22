@@ -446,7 +446,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         var ackPayload = _dataSerializer.DeserializePayload<StartTestSessionAckPayload>(message);
                         TPDebug.Assert(ackPayload is not null, "ackPayload is null");
                         eventsHandler?.HandleStartTestSessionComplete(ackPayload.EventArgs);
-                        return ackPayload.EventArgs.TestSessionInfo;
+                        return ackPayload.EventArgs!.TestSessionInfo;
 
                     case MessageType.CustomTestHostLaunch:
                         HandleCustomHostLaunch(testHostLauncher, message);
@@ -527,7 +527,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 Sources = sources,
                 RunSettings = runSettings,
                 HasCustomHostLauncher = testHostLauncher != null,
-                IsDebuggingEnabled = (testHostLauncher != null) && testHostLauncher.IsDebug,
+                IsDebuggingEnabled = testHostLauncher != null && testHostLauncher.IsDebug,
                 TestPlatformOptions = options
             };
 
@@ -546,7 +546,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         var ackPayload = _dataSerializer.DeserializePayload<StartTestSessionAckPayload>(message);
                         TPDebug.Assert(ackPayload is not null, "ackPayload is null");
                         eventsHandler?.HandleStartTestSessionComplete(ackPayload.EventArgs);
-                        return ackPayload.EventArgs.TestSessionInfo;
+                        return ackPayload.EventArgs!.TestSessionInfo;
 
                     case MessageType.CustomTestHostLaunch:
                         HandleCustomHostLaunch(testHostLauncher, message);
@@ -642,7 +642,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         var payload = _dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
                         TPDebug.Assert(payload is not null, "payload is null");
                         eventsHandler?.HandleStopTestSessionComplete(payload.EventArgs);
-                        return payload.EventArgs.IsStopped;
+                        return payload.EventArgs!.IsStopped;
 
                     case MessageType.TestMessage:
                         var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(message);
@@ -732,7 +732,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         var payload = _dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
                         TPDebug.Assert(payload is not null, "payload is null");
                         eventsHandler?.HandleStopTestSessionComplete(payload.EventArgs);
-                        return payload.EventArgs.IsStopped;
+                        return payload.EventArgs!.IsStopped;
 
                     case MessageType.TestMessage:
                         var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(message);
@@ -1146,7 +1146,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         .DeserializePayload<TestRunCompletePayload>(message);
                     TPDebug.Assert(testRunCompletePayload is not null, "testRunCompletePayload is null");
                     eventHandler.HandleTestRunComplete(
-                        testRunCompletePayload.TestRunCompleteArgs,
+                        testRunCompletePayload.TestRunCompleteArgs!,
                         testRunCompletePayload.LastRunTests,
                         testRunCompletePayload.RunAttachments,
                         testRunCompletePayload.ExecutorUris);
@@ -1227,7 +1227,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         .DeserializePayload<TestRunCompletePayload>(message);
                     TPDebug.Assert(testRunCompletePayload is not null, "testRunCompletePayload is null");
                     eventHandler.HandleTestRunComplete(
-                        testRunCompletePayload.TestRunCompleteArgs,
+                        testRunCompletePayload.TestRunCompleteArgs!,
                         testRunCompletePayload.LastRunTests,
                         testRunCompletePayload.RunAttachments,
                         testRunCompletePayload.ExecutorUris);
@@ -1319,7 +1319,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         TPDebug.Assert(testRunAttachmentsProcessingCompletePayload is not null, "testRunAttachmentsProcessingCompletePayload is null");
 
                         eventHandler.HandleTestRunAttachmentsProcessingComplete(
-                            testRunAttachmentsProcessingCompletePayload.AttachmentsProcessingCompleteEventArgs,
+                            testRunAttachmentsProcessingCompletePayload.AttachmentsProcessingCompleteEventArgs!,
                             testRunAttachmentsProcessingCompletePayload.Attachments);
                         isTestRunAttachmentsProcessingComplete = true;
                     }
@@ -1332,7 +1332,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         TPDebug.Assert(testRunAttachmentsProcessingProgressPayload is not null, "testRunAttachmentsProcessingProgressPayload is null");
 
                         eventHandler.HandleTestRunAttachmentsProcessingProgress(
-                            testRunAttachmentsProcessingProgressPayload.AttachmentsProcessingProgressEventArgs);
+                            testRunAttachmentsProcessingProgressPayload.AttachmentsProcessingProgressEventArgs!);
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
                     {
@@ -1400,11 +1400,10 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
         try
         {
-            var testProcessStartInfo = _dataSerializer
-                .DeserializePayload<TestProcessStartInfo>(message);
+            var testProcessStartInfo = _dataSerializer.DeserializePayload<TestProcessStartInfo>(message);
 
             ackPayload.HostProcessId = customHostLauncher != null
-                ? customHostLauncher.LaunchTestHost(testProcessStartInfo)
+                ? customHostLauncher.LaunchTestHost(testProcessStartInfo!)
                 : -1;
         }
         catch (Exception ex)

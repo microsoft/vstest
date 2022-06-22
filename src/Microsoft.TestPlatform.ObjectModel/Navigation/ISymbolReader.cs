@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
 /// <summary>
@@ -21,7 +19,7 @@ internal interface ISymbolReader : IDisposable
     /// <param name="searchPath">
     /// search path.
     /// </param>
-    void CacheSymbols(string binaryPath, string searchPath);
+    void CacheSymbols(string binaryPath, string? searchPath);
 
     /// <summary>
     /// Gets Navigation data from caches
@@ -36,5 +34,5 @@ internal interface ISymbolReader : IDisposable
     /// <see cref="INavigationData"/>.
     /// Returns INavigationData which contains file name and line number.
     /// </returns>
-    INavigationData GetNavigationData(string declaringTypeName, string methodName);
+    INavigationData? GetNavigationData(string declaringTypeName, string methodName);
 }

@@ -85,7 +85,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         // Get dictionary from source -> runtimeProviderInfo, that has the type of runtime provider to create for this
         // source, and updated runsettings.
         _sourceToRuntimeProviderInfoMap = _runtimeProviders
-            .SelectMany(runtimeProviderInfo => runtimeProviderInfo.SourceDetails.Select(detail => new KeyValuePair<string, TestRuntimeProviderInfo>(detail.Source, runtimeProviderInfo)))
+            .SelectMany(runtimeProviderInfo => runtimeProviderInfo.SourceDetails.Select(detail => new KeyValuePair<string, TestRuntimeProviderInfo>(detail.Source!, runtimeProviderInfo)))
             .ToDictionary(pair => pair.Key, pair => pair.Value);
     }
 
@@ -117,6 +117,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         {
             // This is similar to what we do in ProxyExecutionManager, and ProxyDiscoveryManager, we split
             // up the payload into multiple smaller pieces. Here it is one source per proxy.
+            TPDebug.Assert(_testSessionCriteria.Sources is not null, "_testSessionCriteria.Sources is null");
             var source = _testSessionCriteria.Sources[i];
             var sources = new List<string>() { source };
             var runtimeProviderInfo = _sourceToRuntimeProviderInfoMap[source];

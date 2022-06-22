@@ -29,7 +29,7 @@ public class PlatformEqtTrace : IPlatformEqtTrace
 
     public bool DoNotInitialize { get; set; }
 
-    public void WriteLine(PlatformTraceLevel traceLevel, string message)
+    public void WriteLine(PlatformTraceLevel traceLevel, string? message)
     {
         if (!ShouldTrace(traceLevel))
         {

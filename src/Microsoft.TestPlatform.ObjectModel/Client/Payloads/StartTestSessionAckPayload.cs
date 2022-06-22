@@ -3,8 +3,6 @@
 
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 
 /// <summary>
@@ -18,5 +16,5 @@ public class StartTestSessionAckPayload
     /// Gets or sets the event args.
     /// </summary>
     [DataMember]
-    public StartTestSessionCompleteEventArgs EventArgs { get; set; } = null;
+    public StartTestSessionCompleteEventArgs? EventArgs { get; set; }
 }

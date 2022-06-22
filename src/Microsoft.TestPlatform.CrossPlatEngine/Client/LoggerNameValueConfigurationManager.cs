@@ -21,14 +21,14 @@ internal class LoggerNameValueConfigurationManager
     /// <param name="configurationElement">
     /// XML element containing the configuration
     /// </param>
-    public LoggerNameValueConfigurationManager(XmlElement configurationElement)
+    public LoggerNameValueConfigurationManager(XmlElement? configurationElement)
     {
         Initialize(configurationElement);
     }
 
     public Dictionary<string, string?> NameValuePairs { get; } = new();
 
-    private void Initialize(XmlElement configurationElement)
+    private void Initialize(XmlElement? configurationElement)
     {
         if (configurationElement == null)
         {

@@ -42,7 +42,7 @@ internal class Program
         var sourceSettings = $$$"""
             <RunSettings>
                 <RunConfiguration>
-           
+
                     <!-- <MaxCpuCount>1</MaxCpuCount> -->
                     <!-- <TargetPlatform>x86</TargetPlatform> -->
                     <!-- <TargetFrameworkVersion>net472</TargetFrameworkVersion> -->
@@ -135,7 +135,7 @@ internal class Program
 
         public List<TestCase> TestCases { get; internal set; } = new List<TestCase>();
 
-        public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+        public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
         {
             Console.WriteLine($"[DISCOVERY.PROGRESS]");
             Console.WriteLine(WriteTests(discoveredTestCases));
@@ -143,7 +143,7 @@ internal class Program
             if (discoveredTestCases != null) { TestCases.AddRange(discoveredTestCases); }
         }
 
-        public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
+        public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase>? lastChunk, bool isAborted)
         {
             Console.WriteLine($"[DISCOVERY.COMPLETE] aborted? {isAborted}, tests count: {totalTests}");
             Console.WriteLine("Last chunk:");
@@ -151,7 +151,7 @@ internal class Program
             if (lastChunk != null) { TestCases.AddRange(lastChunk); }
         }
 
-        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
         {
             Console.WriteLine($"[DISCOVERY.COMPLETE] aborted? {discoveryCompleteEventArgs.IsAborted}, tests count: {discoveryCompleteEventArgs.TotalCount}, discovered count: {_testCasesCount}");
             Console.WriteLine("Last chunk:");
@@ -167,7 +167,7 @@ internal class Program
             if (lastChunk != null) { TestCases.AddRange(lastChunk); }
         }
 
-        public void HandleLogMessage(TestMessageLevel level, string message)
+        public void HandleLogMessage(TestMessageLevel level, string? message)
         {
             Console.WriteLine($"[DISCOVERY.{level.ToString().ToUpper()}] {message}");
         }
@@ -177,12 +177,12 @@ internal class Program
             Console.WriteLine($"[DISCOVERY.MESSAGE] {rawMessage}");
         }
 
-        private static string WriteTests(IEnumerable<TestCase> testCases)
+        private static string WriteTests(IEnumerable<TestCase>? testCases)
             => testCases?.Any() == true
-                ? "\t" + string.Join("\n\t", testCases.Select(r => r.Source + " " + r.DisplayName))
+                ? "\t" + string.Join("\n\t", testCases?.Select(r => r.Source + " " + r.DisplayName))
                 : "\t<empty>";
 
-        private static string WriteSources(IEnumerable<string> sources)
+        private static string WriteSources(IEnumerable<string>? sources)
             => sources?.Any() == true
                 ? "\t" + string.Join("\n\t", sources)
                 : "\t<empty>";
@@ -195,7 +195,7 @@ internal class Program
         {
         }
 
-        public void HandleLogMessage(TestMessageLevel level, string message)
+        public void HandleLogMessage(TestMessageLevel level, string? message)
         {
             Console.WriteLine($"[{level.ToString().ToUpper()}]: {message}");
         }
@@ -205,16 +205,16 @@ internal class Program
             Console.WriteLine($"[RUN.MESSAGE]: {rawMessage}");
         }
 
-        public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
+        public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris)
         {
             Console.WriteLine($"[RUN.COMPLETE]: err: {testRunCompleteArgs.Error}, lastChunk:");
             Console.WriteLine(WriteTests(lastChunkArgs?.NewTestResults));
         }
 
-        public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+        public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
         {
             Console.WriteLine($"[RUN.PROGRESS]");
-            Console.WriteLine(WriteTests(testRunChangedArgs.NewTestResults));
+            Console.WriteLine(WriteTests(testRunChangedArgs?.NewTestResults));
         }
 
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
@@ -261,7 +261,7 @@ internal class TestSessionHandler : ITestSessionEventsHandler
 {
     public TestSessionInfo? TestSessionInfo { get; private set; }
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
 
     }
@@ -271,12 +271,12 @@ internal class TestSessionHandler : ITestSessionEventsHandler
 
     }
 
-    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs)
+    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs? eventArgs)
     {
-        TestSessionInfo = eventArgs.TestSessionInfo;
+        TestSessionInfo = eventArgs?.TestSessionInfo;
     }
 
-    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs eventArgs)
+    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs? eventArgs)
     {
 
     }

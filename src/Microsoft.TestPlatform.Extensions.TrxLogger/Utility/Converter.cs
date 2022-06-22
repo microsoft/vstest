@@ -104,7 +104,7 @@ internal class Converter
         TestRun testRun,
         VisualStudio.TestPlatform.ObjectModel.TestResult rockSteadyTestResult)
     {
-        var resultName = !string.IsNullOrEmpty(rockSteadyTestResult.DisplayName) ? rockSteadyTestResult.DisplayName : testName;
+        string resultName = !string.IsNullOrEmpty(rockSteadyTestResult.DisplayName) ? rockSteadyTestResult.DisplayName! : testName;
         var testResult = CreateTestResult(testRun.Id, testId, executionId, parentExecutionId, resultName, testOutcome, testType, testCategoryId);
 
         if (rockSteadyTestResult.ErrorMessage != null)
@@ -239,7 +239,7 @@ internal class Converter
         {
             if (TestResultMessage.AdditionalInfoCategory.Equals(message.Category, StringComparison.OrdinalIgnoreCase))
             {
-                unitTestResult.AddTextMessage(message.Text);
+                unitTestResult.AddTextMessage(message.Text!);
             }
             else if (TestResultMessage.DebugTraceCategory.Equals(message.Category, StringComparison.OrdinalIgnoreCase))
             {
@@ -276,7 +276,7 @@ internal class Converter
 
         if (customProperty != null)
         {
-            var cateogryValues = (string[])testCase.GetPropertyValue(customProperty);
+            var cateogryValues = (string[]?)testCase.GetPropertyValue(customProperty);
             return cateogryValues != null ? cateogryValues.ToList() : Enumerable.Empty<string>().ToList();
         }
 

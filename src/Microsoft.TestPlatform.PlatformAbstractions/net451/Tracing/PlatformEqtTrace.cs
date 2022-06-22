@@ -32,7 +32,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     /// <param name="childDomain">Child <c>AppDomain</c>.</param>
     public void SetupRemoteEqtTraceListeners(AppDomain? childDomain)
     {
-        Debug.Assert(childDomain != null, "domain");
+        TPDebug.Assert(childDomain != null, "domain");
         if (childDomain == null)
         {
             return;

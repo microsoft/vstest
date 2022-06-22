@@ -24,7 +24,7 @@ public class DiscoveryEventHandler : ITestDiscoveryEventsHandler
         DiscoveredTestCases = new List<TestCase>();
     }
 
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+    public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
     {
         if (discoveredTestCases != null)
         {
@@ -32,7 +32,7 @@ public class DiscoveryEventHandler : ITestDiscoveryEventsHandler
         }
     }
 
-    public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
+    public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase>? lastChunk, bool isAborted)
     {
         if (lastChunk != null)
         {
@@ -40,7 +40,7 @@ public class DiscoveryEventHandler : ITestDiscoveryEventsHandler
         }
     }
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         // No Op
     }
@@ -54,9 +54,9 @@ public class DiscoveryEventHandler : ITestDiscoveryEventsHandler
 public struct TestMessage
 {
     public TestMessageLevel TestMessageLevel;
-    public string Message;
+    public string? Message;
 
-    public TestMessage(TestMessageLevel testMessageLevel, string message)
+    public TestMessage(TestMessageLevel testMessageLevel, string? message)
     {
         TestMessageLevel = testMessageLevel;
         Message = message;
@@ -94,12 +94,12 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
         // No Op
     }
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         TestMessages.Add(new TestMessage(level, message));
     }
 
-    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
     {
         if (lastChunk != null)
         {
@@ -113,7 +113,7 @@ public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
         SkippedDiscoveredSources = discoveryCompleteEventArgs.SkippedDiscoveredSources;
     }
 
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+    public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
     {
         if (discoveredTestCases != null)
         {
@@ -145,7 +145,7 @@ public class DiscoveryEventHandlerForBatchSize : ITestDiscoveryEventsHandler2, I
         // No Op
     }
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         if (level == TestMessageLevel.Error)
         {
@@ -153,7 +153,7 @@ public class DiscoveryEventHandlerForBatchSize : ITestDiscoveryEventsHandler2, I
         };
     }
 
-    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
     {
         if (lastChunk != null)
         {
@@ -161,7 +161,7 @@ public class DiscoveryEventHandlerForBatchSize : ITestDiscoveryEventsHandler2, I
         }
     }
 
-    public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
+    public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase>? lastChunk, bool isAborted)
     {
         if (lastChunk != null)
         {
@@ -169,7 +169,7 @@ public class DiscoveryEventHandlerForBatchSize : ITestDiscoveryEventsHandler2, I
         }
     }
 
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+    public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
     {
         if (discoveredTestCases != null && discoveredTestCases.Any())
         {

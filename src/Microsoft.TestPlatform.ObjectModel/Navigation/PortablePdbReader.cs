@@ -7,8 +7,6 @@ using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
 /// <summary>
@@ -20,19 +18,19 @@ internal class PortablePdbReader : IDisposable
     /// Use to get method token
     /// </summary>
     private static readonly PropertyInfo MethodInfoMethodTokenProperty =
-        typeof(MethodInfo).GetProperty("MetadataToken");
+        typeof(MethodInfo).GetProperty("MetadataToken")!;
 
     /// <summary>
     /// Metadata reader provider from portable pdb stream
     /// To get Metadata reader
     /// </summary>
-    private MetadataReaderProvider _provider;
+    private readonly MetadataReaderProvider _provider;
 
     /// <summary>
     /// Metadata reader from portable pdb stream
     /// To get method debug info from method info
     /// </summary>
-    private MetadataReader _reader;
+    private readonly MetadataReader _reader;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PortablePdbReader"/> class.
@@ -71,8 +69,6 @@ internal class PortablePdbReader : IDisposable
     public void Dispose()
     {
         _provider?.Dispose();
-        _provider = null;
-        _reader = null;
     }
 
     /// <summary>
@@ -84,7 +80,7 @@ internal class PortablePdbReader : IDisposable
     /// <returns>
     /// The <see cref="DiaNavigationData"/>.
     /// </returns>
-    public DiaNavigationData GetDiaNavigationData(MethodInfo methodInfo)
+    public DiaNavigationData? GetDiaNavigationData(MethodInfo? methodInfo)
     {
         if (methodInfo == null)
         {
@@ -118,7 +114,7 @@ internal class PortablePdbReader : IDisposable
 
     internal static MethodDebugInformationHandle GetMethodDebugInformationHandle(MethodInfo methodInfo)
     {
-        var methodToken = (int)MethodInfoMethodTokenProperty.GetValue(methodInfo);
+        var methodToken = (int)MethodInfoMethodTokenProperty.GetValue(methodInfo)!;
         var handle = ((MethodDefinitionHandle)MetadataTokens.Handle(methodToken)).ToDebugInformationHandle();
         return handle;
     }
@@ -144,14 +140,14 @@ internal class PortablePdbReader : IDisposable
         }
     }
 
-    private DiaNavigationData GetDiaNavigationData(MethodDebugInformationHandle handle)
+    private DiaNavigationData? GetDiaNavigationData(MethodDebugInformationHandle handle)
     {
         if (_reader == null)
         {
             throw new ObjectDisposedException(nameof(PortablePdbReader));
         }
 
-        DiaNavigationData diaNavigationData = null;
+        DiaNavigationData? diaNavigationData = null;
         try
         {
             var methodDebugDefinition = _reader.GetMethodDebugInformation(handle);

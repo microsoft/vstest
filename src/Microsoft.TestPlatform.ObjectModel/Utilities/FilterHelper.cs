@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 public static class FilterHelper

@@ -8,8 +8,6 @@ using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Text;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 internal class CustomStringArrayConverter : TypeConverter
@@ -17,19 +15,19 @@ internal class CustomStringArrayConverter : TypeConverter
     private readonly DataContractJsonSerializer _serializer = new(typeof(string[]));
 
     /// <inheritdoc/>
-    public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+    public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
     {
         return sourceType == typeof(string);
     }
 
     /// <inheritdoc/>
-    public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+    public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
     {
         return value is string[] strings ? strings : base.ConvertTo(context, culture, value, destinationType);
     }
 
     /// <inheritdoc/>
-    public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+    public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object? value)
     {
         // PERF: The strings returned here can possibly be cached, but the benefits are not huge speed wise,
         // and it is unclear how many distinct strings we get, and how much memory this would consume. I was seeing around 200ms improvement on 10k tests.

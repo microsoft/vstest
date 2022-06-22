@@ -65,11 +65,11 @@ public class TestCaseConverter : JsonConverter
                 case "TestCase.ExecutorUri":
                     testCase.ExecutorUri = new Uri(propertyData!); break;
                 case "TestCase.FullyQualifiedName":
-                    testCase.FullyQualifiedName = propertyData; break;
+                    testCase.FullyQualifiedName = propertyData!; break;
                 case "TestCase.DisplayName":
-                    testCase.DisplayName = propertyData; break;
+                    testCase.DisplayName = propertyData!; break;
                 case "TestCase.Source":
-                    testCase.Source = propertyData; break;
+                    testCase.Source = propertyData!; break;
                 case "TestCase.CodeFilePath":
                     testCase.CodeFilePath = propertyData; break;
                 case "TestCase.LineNumber":

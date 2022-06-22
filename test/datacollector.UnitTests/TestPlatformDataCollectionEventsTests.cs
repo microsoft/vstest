@@ -37,7 +37,7 @@ public class TestPlatformDataCollectionEventsTests
         _context = new DataCollectionContext(testCase);
 
         _events.SessionStart += SessionStartMessageHandler;
-        var eventArgs = new SessionStartEventArgs(_context, new Dictionary<string, object>());
+        var eventArgs = new SessionStartEventArgs(_context, new Dictionary<string, object?>());
         _events.RaiseEvent(eventArgs);
 
         Assert.IsTrue(_isEventRaised);
@@ -50,7 +50,7 @@ public class TestPlatformDataCollectionEventsTests
         var testCase = new TestCase();
         _context = new DataCollectionContext(testCase);
 
-        var eventArgs = new SessionStartEventArgs(_context, new Dictionary<string, object>());
+        var eventArgs = new SessionStartEventArgs(_context, new Dictionary<string, object?>());
         _events.RaiseEvent(eventArgs);
 
         Assert.IsFalse(_isEventRaised);
@@ -65,7 +65,7 @@ public class TestPlatformDataCollectionEventsTests
 
         _events.SessionStart += SessionStartMessageHandler;
         _events.SessionStart -= SessionStartMessageHandler;
-        var eventArgs = new SessionStartEventArgs(_context, new Dictionary<string, object>());
+        var eventArgs = new SessionStartEventArgs(_context, new Dictionary<string, object?>());
         _events.RaiseEvent(eventArgs);
 
         Assert.IsFalse(_isEventRaised);

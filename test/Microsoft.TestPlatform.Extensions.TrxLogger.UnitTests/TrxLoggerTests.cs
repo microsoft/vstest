@@ -36,7 +36,7 @@ public class TrxLoggerTests
     private static readonly string DefaultLogFileNameParameterValue = "logfilevalue.trx";
 
     private readonly Mock<TestLoggerEvents> _events;
-    private readonly Dictionary<string, string> _parameters;
+    private readonly Dictionary<string, string?> _parameters;
 
     private TestableTrxLogger _testableTrxLogger;
 
@@ -45,7 +45,7 @@ public class TrxLoggerTests
         _events = new Mock<TestLoggerEvents>();
 
         _testableTrxLogger = new TestableTrxLogger();
-        _parameters = new Dictionary<string, string>(2)
+        _parameters = new Dictionary<string, string?>(2)
         {
             [DefaultLoggerParameterNames.TestRunDirectory] = DefaultTestRunDirectory,
             [TrxLoggerConstants.LogFileNameKey] = DefaultLogFileNameParameterValue
@@ -99,7 +99,7 @@ public class TrxLoggerTests
     public void InitializeShouldThrowExceptionIfParametersAreEmpty()
     {
         var events = new Mock<TestLoggerEvents>();
-        Assert.ThrowsException<ArgumentException>(() => _testableTrxLogger.Initialize(events.Object, new Dictionary<string, string>()));
+        Assert.ThrowsException<ArgumentException>(() => _testableTrxLogger.Initialize(events.Object, new Dictionary<string, string?>()));
     }
 
     [TestMethod]

@@ -23,7 +23,7 @@ internal interface ITestRunAttachmentsProcessingManager
     /// <param name="invokedDataCollector">Collection of invoked data collectors</param>
     /// <param name="eventHandler">EventHandler for handling test run attachments processing event</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task ProcessTestRunAttachmentsAsync(string? runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken);
+    Task ProcessTestRunAttachmentsAsync(string? runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector>? invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken);
 
     /// <summary>
     /// Processes attachments
@@ -33,5 +33,5 @@ internal interface ITestRunAttachmentsProcessingManager
     /// <param name="invokedDataCollector">Collection of invoked data collectors</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Collection of attachments.</returns>
-    Task<Collection<AttachmentSet>> ProcessTestRunAttachmentsAsync(string? runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, CancellationToken cancellationToken);
+    Task<Collection<AttachmentSet>> ProcessTestRunAttachmentsAsync(string? runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector>? invokedDataCollector, CancellationToken cancellationToken);
 }

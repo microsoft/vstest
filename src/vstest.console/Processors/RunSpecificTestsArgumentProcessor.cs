@@ -274,7 +274,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         TPDebug.Assert(_selectedTestNames != null, "Initialize should have been called");
 
         _discoveredTestCount += args.DiscoveredTestCases.Count();
-        foreach (var testCase in args.DiscoveredTestCases)
+        foreach (var testCase in args.DiscoveredTestCases!)
         {
             foreach (var nameCriteria in _selectedTestNames)
             {
