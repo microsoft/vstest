@@ -101,10 +101,10 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     }
 
     /// <inheritdoc/>
-    public event EventHandler<HostProviderEventArgs?>? HostLaunched;
+    public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
     /// <inheritdoc/>
-    public event EventHandler<HostProviderEventArgs?>? HostExited;
+    public event EventHandler<HostProviderEventArgs>? HostExited;
 
     /// <inheritdoc/>
     public bool Shared { get; private set; }

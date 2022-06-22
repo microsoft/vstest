@@ -516,23 +516,23 @@ public class DefaultTestHostManagerTests
         Assert.IsTrue(isVerified);
     }
 
-    private void TestableTestHostManagerHostExited(object? sender, HostProviderEventArgs? e)
+    private void TestableTestHostManagerHostExited(object? sender, HostProviderEventArgs e)
     {
-        _errorMessage = e!.Data.TrimEnd(Environment.NewLine.ToCharArray());
+        _errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
         _exitCode = e.ErrroCode;
     }
 
-    private void TestHostManagerHostExited(object? sender, HostProviderEventArgs? e)
+    private void TestHostManagerHostExited(object? sender, HostProviderEventArgs e)
     {
-        if (e!.ErrroCode != 0)
+        if (e.ErrroCode != 0)
         {
             _errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
         }
     }
 
-    private void TestHostManagerHostLaunched(object? sender, HostProviderEventArgs? e)
+    private void TestHostManagerHostLaunched(object? sender, HostProviderEventArgs e)
     {
-        _testHostId = e!.ProcessId;
+        _testHostId = e.ProcessId;
     }
 
     [MemberNotNull(nameof(_testableTestHostManager))]

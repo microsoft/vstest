@@ -139,8 +139,8 @@ public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
         get; private set;
     }
 
-    private void TestHostLaunchedHandler(object? sender, HostProviderEventArgs? e)
+    private void TestHostLaunchedHandler(object? sender, HostProviderEventArgs e)
     {
-        ProxyDataCollectionManager.TestHostLaunched(e!.ProcessId);
+        ProxyDataCollectionManager.TestHostLaunched(e.ProcessId);
     }
 }

@@ -26,9 +26,9 @@ public class TestableRuntimeProvider : ITestRuntimeProvider
         Shared = shared;
     }
 
-    public event EventHandler<HostProviderEventArgs?>? HostLaunched;
+    public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
-    public event EventHandler<HostProviderEventArgs?>? HostExited;
+    public event EventHandler<HostProviderEventArgs>? HostExited;
 
     public bool Shared { get; }
 
@@ -52,7 +52,7 @@ public class TestableRuntimeProvider : ITestRuntimeProvider
 
     public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
     {
-        HostLaunched?.Invoke(this, null);
+        HostLaunched?.Invoke(this, null!);
         return Task.FromResult(true);
     }
 
@@ -76,7 +76,7 @@ public class TestableRuntimeProvider : ITestRuntimeProvider
 
     public Task CleanTestHostAsync(CancellationToken cancellationToken)
     {
-        HostExited?.Invoke(this, null);
+        HostExited?.Invoke(this, null!);
         return Task.FromResult(true);
     }
 }

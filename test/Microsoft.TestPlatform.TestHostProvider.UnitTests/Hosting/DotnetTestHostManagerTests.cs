@@ -1162,23 +1162,23 @@ public class DotnetTestHostManagerTests
         Assert.AreEqual(0, startInfo.EnvironmentVariables.Count);
     }
 
-    private void DotnetHostManagerExitCodeTesterHostExited(object? sender, HostProviderEventArgs? e)
+    private void DotnetHostManagerExitCodeTesterHostExited(object? sender, HostProviderEventArgs e)
     {
-        _errorMessage = e!.Data.TrimEnd(Environment.NewLine.ToCharArray());
+        _errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
         _exitCode = e.ErrroCode;
     }
 
-    private void DotnetHostManagerHostExited(object? sender, HostProviderEventArgs? e)
+    private void DotnetHostManagerHostExited(object? sender, HostProviderEventArgs e)
     {
-        if (e!.ErrroCode != 0)
+        if (e.ErrroCode != 0)
         {
             _errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
         }
     }
 
-    private void DotnetHostManagerHostLaunched(object? sender, HostProviderEventArgs? e)
+    private void DotnetHostManagerHostLaunched(object? sender, HostProviderEventArgs e)
     {
-        _testHostId = e!.ProcessId;
+        _testHostId = e.ProcessId;
     }
 
     private void ErrorCallBackTestHelper(string errorMessage, int exitCode)

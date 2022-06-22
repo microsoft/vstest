@@ -117,10 +117,10 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     }
 
     /// <inheritdoc />
-    public event EventHandler<HostProviderEventArgs?>? HostLaunched;
+    public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
     /// <inheritdoc />
-    public event EventHandler<HostProviderEventArgs?>? HostExited;
+    public event EventHandler<HostProviderEventArgs>? HostExited;
 
     /// <summary>
     /// Gets a value indicating whether gets a value indicating if the test host can be shared for multiple sources.

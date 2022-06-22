@@ -21,8 +21,8 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
     // TODO: make this configurable?
     public bool Shared => false;
 
-    public event EventHandler<HostProviderEventArgs?>? HostLaunched;
-    public event EventHandler<HostProviderEventArgs?>? HostExited;
+    public event EventHandler<HostProviderEventArgs>? HostLaunched;
+    public event EventHandler<HostProviderEventArgs>? HostExited;
 
     public FakeTestRuntimeProvider(FakeProcessHelper fakeProcessHelper, FakeProcess fakeTestHostProcess, FakeFileHelper fakeFileHelper, List<FakeTestDllFile> fakeTestDlls, FakeCommunicationEndpoint fakeCommunicationEndpoint, FakeErrorAggregator fakeErrorAggregator)
     {
@@ -51,11 +51,8 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
             // TODO: Validate the process we are passed is actually the same as TestHostProcess
             // TODO: Validate we already started the process.
             var process = (FakeProcess)p;
-            if (HostExited != null)
-            {
-                // TODO: When we exit, eventually there are no subscribers, maybe we should review if we don't lose the error output sometimes, in unnecessary way
-                HostExited(this, new HostProviderEventArgs(process.ErrorOutput!, process.ExitCode, process.Id));
-            }
+            // TODO: When we exit, eventually there are no subscribers, maybe we should review if we don't lose the error output sometimes, in unnecessary way
+            HostExited?.Invoke(this, new HostProviderEventArgs(process.ErrorOutput!, process.ExitCode, process.Id));
         };
     }
 
@@ -113,11 +110,8 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
             throw new InvalidOperationException($"Tried to start a different process than the one associated with this provider: File name is {testHostStartInfo.FileName} is not the same as the fake process associated with this provider {TestHostProcess.TestProcessStartInfo.FileName}.");
 
         FakeProcessHelper.StartFakeProcess(TestHostProcess);
+        HostLaunched?.Invoke(this, new HostProviderEventArgs("Fake testhost launched", 0, TestHostProcess.Id));
 
-        if (HostLaunched != null)
-        {
-            HostLaunched(this, new HostProviderEventArgs("Fake testhost launched", 0, TestHostProcess.Id));
-        }
         return Task.FromResult(true);
     }
 

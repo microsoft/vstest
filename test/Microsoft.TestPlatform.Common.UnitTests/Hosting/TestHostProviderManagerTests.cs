@@ -153,9 +153,9 @@ public class TestHostProviderManagerTests
     [FriendlyName("DesktopTestHost")]
     private class CustomTestHost : ITestRuntimeProvider
     {
-        public event EventHandler<HostProviderEventArgs?>? HostLaunched;
+        public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
-        public event EventHandler<HostProviderEventArgs?>? HostExited;
+        public event EventHandler<HostProviderEventArgs>? HostExited;
 
         public bool Shared { get; private set; }
 
@@ -226,9 +226,9 @@ public class TestHostProviderManagerTests
     [FriendlyName("NetCoreTestHost")]
     private class TestableTestHostManager : ITestRuntimeProvider
     {
-        public event EventHandler<HostProviderEventArgs?>? HostLaunched;
+        public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
-        public event EventHandler<HostProviderEventArgs?>? HostExited;
+        public event EventHandler<HostProviderEventArgs>? HostExited;
 
         public bool Shared { get; private set; }
 
