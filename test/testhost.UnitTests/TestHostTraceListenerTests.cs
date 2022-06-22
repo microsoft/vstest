@@ -45,7 +45,7 @@ public class TestHostTraceListenerTests
     [ExpectedException(typeof(DebugAssertException))]
     public void DebugAssertThrowsDebugAssertException()
     {
-        TPDebug.Assert(false);
+        Debug.Assert(false);
     }
 
     [TestMethod]
