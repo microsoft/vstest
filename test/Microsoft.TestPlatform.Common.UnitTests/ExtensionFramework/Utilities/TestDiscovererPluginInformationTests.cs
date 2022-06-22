@@ -126,9 +126,9 @@ public class TestDiscovererPluginInformationTests
         var expectedFileExtensions = new List<string> { "csv", "docx" };
         var testPluginMetada = _testPluginInformation.Metadata.ToArray();
 
-        CollectionAssert.AreEqual(expectedFileExtensions, ((List<string>)testPluginMetada[0]).ToArray());
+        CollectionAssert.AreEqual(expectedFileExtensions, ((List<string>)testPluginMetada[0]!).ToArray());
         Assert.AreEqual("csvexecutor", testPluginMetada[1] as string);
-        Assert.AreEqual(AssemblyType.Managed, Enum.Parse(typeof(AssemblyType), testPluginMetada[2].ToString()!));
+        Assert.AreEqual(AssemblyType.Managed, Enum.Parse(typeof(AssemblyType), testPluginMetada[2]!.ToString()!));
     }
 }
 
