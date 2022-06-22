@@ -58,7 +58,13 @@ public class VsTestConsoleWrapperTests
     public void StartSessionShouldStartVsTestConsoleWithCorrectArguments()
     {
         var inputPort = 123;
-        int expectedParentProcessId = Process.GetCurrentProcess().Id;
+#if NET5_0_OR_GREATER
+        var expectedParentProcessId = Environment.ProcessId;
+#else
+        int expectedParentProcessId;
+        using (var p = Process.GetCurrentProcess())
+            expectedParentProcessId = p.Id;
+#endif
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(inputPort);
 
         _consoleWrapper.StartSession();

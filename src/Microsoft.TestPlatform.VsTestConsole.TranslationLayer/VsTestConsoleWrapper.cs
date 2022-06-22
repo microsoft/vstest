@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+#if !NET5_0_OR_GREATER
 using System.Diagnostics;
+#endif
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -150,7 +152,12 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         if (port > 0)
         {
             // Fill the parameters
-            _consoleParameters.ParentProcessId = Process.GetCurrentProcess().Id;
+#if NET5_0_OR_GREATER
+            _consoleParameters.ParentProcessId = Environment.ProcessId;
+#else
+            using (var process = Process.GetCurrentProcess())
+                _consoleParameters.ParentProcessId = process.Id;
+#endif
             _consoleParameters.PortNumber = port;
 
             // Start vstest.console.exe process
@@ -576,7 +583,12 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         if (port > 0)
         {
             // Fill the parameters
-            _consoleParameters.ParentProcessId = Process.GetCurrentProcess().Id;
+#if NET5_0_OR_GREATER
+            _consoleParameters.ParentProcessId = Environment.ProcessId;
+#else
+            using (var process = Process.GetCurrentProcess())
+                _consoleParameters.ParentProcessId = process.Id;
+#endif
             _consoleParameters.PortNumber = port;
 
             // Start vstest.console.exe process

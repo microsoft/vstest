@@ -109,12 +109,20 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
 
         _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
+#if NET5_0_OR_GREATER
+        var pid = Environment.ProcessId;
+#else
+        int pid;
+        using (var p = Process.GetCurrentProcess())
+            pid = p.Id;
+#endif
+
         _mockTestHostManager.Verify(
             th =>
                 th.GetTestHostProcessStartInfo(
                     It.IsAny<IEnumerable<string>>(),
                     It.IsAny<Dictionary<string, string>>(),
-                    It.Is<TestRunnerConnectionInfo>(t => t.RunnerProcessId.Equals(Process.GetCurrentProcess().Id))));
+                    It.Is<TestRunnerConnectionInfo>(t => t.RunnerProcessId.Equals(pid))));
     }
 
     [TestMethod]

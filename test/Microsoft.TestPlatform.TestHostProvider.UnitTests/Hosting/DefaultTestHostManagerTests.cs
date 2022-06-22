@@ -341,7 +341,14 @@ public class DefaultTestHostManagerTests
 
         Assert.IsTrue(processId.Result);
 
-        Assert.AreEqual(Process.GetCurrentProcess().Id, _testHostId);
+#if NET5_0_OR_GREATER
+        var pid = Environment.ProcessId;
+#else
+        int pid;
+        using (var p = Process.GetCurrentProcess())
+            pid = p.Id;
+#endif
+        Assert.AreEqual(pid, _testHostId);
     }
 
     [TestMethod]
@@ -471,7 +478,13 @@ public class DefaultTestHostManagerTests
     [TestMethod]
     public async Task CleanTestHostAsyncShouldKillTestHostProcess()
     {
-        var pid = Process.GetCurrentProcess().Id;
+#if NET5_0_OR_GREATER
+        var pid = Environment.ProcessId;
+#else
+        int pid;
+        using (var p = Process.GetCurrentProcess())
+            pid = p.Id;
+#endif
         bool isVerified = false;
         _mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>()))
             .Callback<object>(p => isVerified = ((Process)p).Id == pid);
@@ -486,7 +499,13 @@ public class DefaultTestHostManagerTests
     [TestMethod]
     public async Task CleanTestHostAsyncShouldNotThrowIfTestHostIsNotStarted()
     {
-        var pid = Process.GetCurrentProcess().Id;
+#if NET5_0_OR_GREATER
+        var pid = Environment.ProcessId;
+#else
+        int pid;
+        using (var p = Process.GetCurrentProcess())
+            pid = p.Id;
+#endif
         bool isVerified = false;
         _mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>())).Callback<object>(p => isVerified = ((Process)p).Id == pid).Throws<Exception>();
 
