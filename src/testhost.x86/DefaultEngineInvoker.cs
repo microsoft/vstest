@@ -101,7 +101,7 @@ internal class DefaultEngineInvoker :
                 .GetTypeInfo()
                 .Assembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-            EqtTrace.Verbose($"Version: {version}");
+            EqtTrace.Verbose($"Version: {version} Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}");
 #if NETCOREAPP2_0_OR_GREATER || NETFRAMEWORK
             // https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location?view=net-6.0#remarks
             // In .NET 5 and later versions, for bundled assemblies, the value returned is an empty string.
