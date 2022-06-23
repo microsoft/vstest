@@ -1,53 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Globalization;
 
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-namespace Microsoft.VisualStudio.TestPlatform.TestExecutor.Tests;
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 
 [TestClass]
-public class UnitTestClientTests
+public class MainTests
 {
-    [TestMethod]
-    public void SplitArgumentsShouldHonorDoubleQuotes()
-    {
-        var expected = new string[] { "--port", "8080", "--endpoint", "127.0.0.1:8020", "--diag", "\"abc txt\"" };
-        var argument = "--port 8080 --endpoint 127.0.0.1:8020 --diag \"abc txt\"";
-        string[] argsArr = UnitTestClient.SplitArguments(argument);
-
-        Assert.AreEqual(6, argsArr.Length);
-        CollectionAssert.AreEqual(argsArr, expected);
-    }
-
-    [TestMethod]
-    public void SplitArgumentsShouldHonorSingleQuotes()
-    {
-        var expected = new string[] { "--port", "8080", "--endpoint", "127.0.0.1:8020", "--diag", "\'abc txt\'" };
-        var argument = "--port 8080 --endpoint 127.0.0.1:8020 --diag \'abc txt\'";
-        string[] argsArr = UnitTestClient.SplitArguments(argument);
-
-        Assert.AreEqual(6, argsArr.Length);
-        CollectionAssert.AreEqual(expected, argsArr);
-    }
-
-    [TestMethod]
-    public void SplitArgumentsShouldSplitAtSpacesOutsideOfQuotes()
-    {
-        var expected = new string[] { "--port", "8080", "--endpoint", "127.0.0.1:8020", "--diag", "abc", "txt" };
-        var argument = "--port 8080 --endpoint 127.0.0.1:8020 --diag abc txt";
-        string[] argsArr = UnitTestClient.SplitArguments(argument);
-
-        Assert.AreEqual(7, argsArr.Length);
-        CollectionAssert.AreEqual(expected, argsArr);
-    }
-
     [TestMethod]
     public void RunWhenCliUiLanguageIsSetChangesCultureAndFlowsOverride()
     {
@@ -59,7 +24,7 @@ public class UnitTestClientTests
         bool threadCultureWasSet = false;
 
         // Act - We have an exception because we are not passing the right args but that's ok for our test
-        Assert.ThrowsException<ArgumentException>(() => Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture))));
+        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture)));
 
         // Assert
         Assert.IsTrue(threadCultureWasSet, "DefaultThreadCurrentUICulture was not set");
@@ -81,7 +46,7 @@ public class UnitTestClientTests
         bool threadCultureWasSet = false;
 
         // Act - We have an exception because we are not passing the right args but that's ok for our test
-        Assert.ThrowsException<ArgumentException>(() => Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture))));
+        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture)));
 
         // Assert
         Assert.IsTrue(threadCultureWasSet, "DefaultThreadCurrentUICulture was not set");
@@ -102,7 +67,7 @@ public class UnitTestClientTests
         bool threadCultureWasSet = false;
 
         // Act - We have an exception because we are not passing the right args but that's ok for our test
-        Assert.ThrowsException<ArgumentException>(() => Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = true)));
+        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = true));
 
         // Assert
         Assert.IsFalse(threadCultureWasSet, "DefaultThreadCurrentUICulture was set");

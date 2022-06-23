@@ -51,12 +51,14 @@ public class Program
     }
 
     // In UWP(App models) Run will act as entry point from Application end, so making this method public
-    public static void Run(string[]? args)
+    public static void Run(string[]? args) => Run(args, new());
+
+    internal static void Run(string[]? args, UiLanguageOverride uiLanguageOverride)
     {
         DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_HOST_DEBUG_ATTACHVS");
         DebuggerBreakpoint.WaitForNativeDebugger("VSTEST_HOST_NATIVE_DEBUG");
         DebuggerBreakpoint.WaitForDebugger("VSTEST_HOST_DEBUG");
-        UiLanguageOverride.SetCultureSpecifiedByUser();
+        uiLanguageOverride.SetCultureSpecifiedByUser();
         var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
 
         // Invoke the engine with arguments

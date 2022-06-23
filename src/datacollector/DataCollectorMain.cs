@@ -51,21 +51,24 @@ public class DataCollectorMain
 
     private readonly IEnvironment _environment;
     private readonly IDataCollectionRequestHandler _requestHandler;
+    private readonly UiLanguageOverride _uiLanguageOverride;
 
     public DataCollectorMain() :
         this(
             new ProcessHelper(),
             new PlatformEnvironment(),
-            DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink())
+            DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink()),
+            new UiLanguageOverride()
         )
     {
     }
 
-    internal DataCollectorMain(IProcessHelper processHelper, IEnvironment environment, IDataCollectionRequestHandler requestHandler)
+    internal DataCollectorMain(IProcessHelper processHelper, IEnvironment environment, IDataCollectionRequestHandler requestHandler, UiLanguageOverride uiLanguageOverride)
     {
         _processHelper = processHelper;
         _environment = environment;
         _requestHandler = requestHandler;
+        _uiLanguageOverride = uiLanguageOverride;
     }
 
     public void Run(string[]? args)
@@ -108,7 +111,7 @@ public class DataCollectorMain
             EqtTrace.Verbose($"Version: {version}");
         }
 
-        UiLanguageOverride.SetCultureSpecifiedByUser();
+        _uiLanguageOverride.SetCultureSpecifiedByUser();
 
         EqtTrace.Info("DataCollectorMain.Run: Starting data collector run with args: {0}", args != null ? string.Join(",", args) : "null");
 
