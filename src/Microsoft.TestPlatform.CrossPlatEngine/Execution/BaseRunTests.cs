@@ -678,7 +678,7 @@ internal abstract class BaseRunTests
             EqtTrace.Warning("BaseRunTests.TryToRunInSTAThread: Failed to run in STA thread: {0}", ex);
             TestRunEventsHandler.HandleLogMessage(
                 TestMessageLevel.Warning,
-                string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.ExecutionThreadApartmentStateNotSupportedForFramework, _runConfiguration.TargetFramework.ToString()));
+                string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.ExecutionThreadApartmentStateNotSupportedForFramework, _runConfiguration.TargetFramework!.ToString()));
         }
 
         return success;

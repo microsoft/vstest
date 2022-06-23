@@ -95,11 +95,11 @@ public class TestResultConverter : JsonConverter
                 case "TestResult.Outcome":
                     testResult.Outcome = (TestOutcome)Enum.Parse(typeof(TestOutcome), propertyData!); break;
                 case "TestResult.Duration":
-                    testResult.Duration = TimeSpan.Parse(propertyData!); break;
+                    testResult.Duration = TimeSpan.Parse(propertyData!, CultureInfo.CurrentCulture); break;
                 case "TestResult.StartTime":
-                    testResult.StartTime = DateTimeOffset.Parse(propertyData!); break;
+                    testResult.StartTime = DateTimeOffset.Parse(propertyData!, CultureInfo.CurrentCulture); break;
                 case "TestResult.EndTime":
-                    testResult.EndTime = DateTimeOffset.Parse(propertyData!); break;
+                    testResult.EndTime = DateTimeOffset.Parse(propertyData!, CultureInfo.CurrentCulture); break;
                 case "TestResult.ErrorMessage":
                     testResult.ErrorMessage = propertyData; break;
                 case "TestResult.ErrorStackTrace":

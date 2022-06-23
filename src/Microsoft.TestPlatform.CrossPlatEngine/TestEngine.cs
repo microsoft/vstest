@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -674,7 +673,11 @@ public class TestEngine : ITestEngine
                     {
                         stringBuilder.Append(Resources.Resources.SkippingSource).Append(' ');
                     }
-                    stringBuilder.AppendLine($"{detail.Source} ({detail.Framework}, {detail.Architecture})");
+                    stringBuilder.AppendLine(
+#if NET6_0_OR_GREATER
+                        System.Globalization.CultureInfo.InvariantCulture,
+#endif
+                        $"{detail.Source} ({detail.Framework}, {detail.Architecture})");
                 });
             }
 

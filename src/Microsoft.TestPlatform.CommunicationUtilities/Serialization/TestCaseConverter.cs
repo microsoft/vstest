@@ -85,7 +85,7 @@ public class TestCaseConverter : JsonConverter
                 case "TestCase.CodeFilePath":
                     testCase.CodeFilePath = propertyData; break;
                 case "TestCase.LineNumber":
-                    testCase.LineNumber = int.Parse(propertyData!); break;
+                    testCase.LineNumber = int.Parse(propertyData!, CultureInfo.CurrentCulture); break;
                 default:
                     // No need to register member properties as they get registered as part of TestCaseProperties class.
                     testProperty = TestProperty.Register(testProperty.Id, testProperty.Label, testProperty.GetValueType(), testProperty.Attributes, typeof(TestObject));

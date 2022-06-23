@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
