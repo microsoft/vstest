@@ -6,11 +6,12 @@ using System.Globalization;
 
 namespace Microsoft.VisualStudio.TestPlatform.Execution;
 
+// Borrowed from dotnet/sdk
 internal static class UiLanguageOverride
 {
-    private const string DotnetCliUiLanguage = nameof(DotnetCliUiLanguage);
-    private const string Vslang = nameof(Vslang);
-    private const string PreferredUiLang = nameof(PreferredUiLang);
+    private const string DOTNET_CLI_UI_LANGUAGE = nameof(DOTNET_CLI_UI_LANGUAGE);
+    private const string VSLANG = nameof(VSLANG);
+    private const string PreferredUILang = nameof(PreferredUILang);
 
     internal static void SetCultureSpecifiedByUser()
     {
@@ -33,7 +34,7 @@ internal static class UiLanguageOverride
     private static CultureInfo? GetOverriddenUiLanguage()
     {
         // DOTNET_CLI_UI_LANGUAGE=<culture name> is the main way for users to customize the CLI's UI language.
-        string dotnetCliLanguage = Environment.GetEnvironmentVariable(DotnetCliUiLanguage);
+        string? dotnetCliLanguage = Environment.GetEnvironmentVariable(DOTNET_CLI_UI_LANGUAGE);
         if (dotnetCliLanguage != null)
         {
             try
@@ -46,7 +47,7 @@ internal static class UiLanguageOverride
 #if !NETCOREAPP1_0 && !NETSTANDARD1_3
         // VSLANG=<lcid> is set by VS and we respect that as well so that we will respect the VS
         // language preference if we're invoked by VS.
-        string vsLang = Environment.GetEnvironmentVariable(Vslang);
+        string? vsLang = Environment.GetEnvironmentVariable(VSLANG);
         if (vsLang != null && int.TryParse(vsLang, out int vsLcid))
         {
             try
@@ -63,16 +64,16 @@ internal static class UiLanguageOverride
     private static void FlowOverrideToChildProcesses(CultureInfo language)
     {
         // Do not override any environment variables that are already set as we do not want to clobber a more granular setting with our global setting.
-        SetIfNotAlreadySet(DotnetCliUiLanguage, language.Name);
+        SetIfNotAlreadySet(DOTNET_CLI_UI_LANGUAGE, language.Name);
 #if !NETCOREAPP1_0 && !NETSTANDARD1_3
-        SetIfNotAlreadySet(Vslang, language.LCID.ToString()); // for tools following VS guidelines to just work in CLI
+        SetIfNotAlreadySet(VSLANG, language.LCID.ToString()); // for tools following VS guidelines to just work in CLI
 #endif
-        SetIfNotAlreadySet(PreferredUiLang, language.Name); // for C#/VB targets that pass $(PreferredUILang) to compiler
+        SetIfNotAlreadySet(PreferredUILang, language.Name); // for C#/VB targets that pass $(PreferredUILang) to compiler
     }
 
     private static void SetIfNotAlreadySet(string environmentVariableName, string value)
     {
-        string currentValue = Environment.GetEnvironmentVariable(environmentVariableName);
+        string? currentValue = Environment.GetEnvironmentVariable(environmentVariableName);
         if (currentValue == null)
         {
             Environment.SetEnvironmentVariable(environmentVariableName, value);
