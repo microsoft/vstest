@@ -143,7 +143,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         string objectTypeLocation = typeof(object).Assembly.Location;
         if (!StringUtils.IsNullOrEmpty(objectTypeLocation))
         {
-            EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(typeof(object).Assembly.Location)}");
+            EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(objectTypeLocation)}");
         }
     }
 
