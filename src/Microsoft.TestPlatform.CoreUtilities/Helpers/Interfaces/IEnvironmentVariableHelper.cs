@@ -22,4 +22,11 @@ internal interface IEnvironmentVariableHelper
     /// <param name="defaultValue">The default value to return if the environment variable is not found.</param>
     /// <returns></returns>
     TEnum GetEnvironmentVariableAsEnum<TEnum>(string variable, TEnum defaultValue = default) where TEnum : struct, Enum;
+
+    /// <summary>
+    /// Creates, modifies, or deletes an environment variable stored in the current process.
+    /// </summary>
+    /// <param name="variable">The name of an environment variable.</param>
+    /// <param name="value">A value to assign to variable.</param>
+    void SetEnvironmentVariable(string variable, string value);
 }

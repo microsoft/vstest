@@ -20,6 +20,10 @@ internal class EnvironmentVariableHelper : IEnvironmentVariableHelper
         => Environment.GetEnvironmentVariable(variable) is string value && !string.IsNullOrEmpty(value)
             ? Enum.TryParse<TEnum>(value, out var enumValue) ? enumValue : defaultValue
             : defaultValue;
+
+    /// <inheritdoc />
+    public void SetEnvironmentVariable(string variable, string value)
+        => Environment.SetEnvironmentVariable(variable, value);
 }
 
 #endif
