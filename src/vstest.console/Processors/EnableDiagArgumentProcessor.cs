@@ -138,7 +138,13 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         // Write version to the log here, because that is the
         // first place where we know if we log or not.
         EqtTrace.Verbose($"Version: {Product.Version} Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}");
-        EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(typeof(object).Assembly.Location)}");
+        // https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location?view=net-6.0#remarks
+        // In .NET 5 and later versions, for bundled assemblies, the value returned is an empty string.
+        string objectTypeLocation = typeof(object).Assembly.Location;
+        if (!StringUtils.IsNullOrEmpty(objectTypeLocation))
+        {
+            EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(typeof(object).Assembly.Location)}");
+        }
     }
 
     /// <summary>

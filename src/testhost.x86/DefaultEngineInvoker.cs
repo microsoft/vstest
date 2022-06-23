@@ -103,7 +103,13 @@ internal class DefaultEngineInvoker :
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
             EqtTrace.Verbose($"Version: {version}");
 #if NETCOREAPP2_0_OR_GREATER || NETFRAMEWORK
-            EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(typeof(object).Assembly.Location)}");
+            // https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location?view=net-6.0#remarks
+            // In .NET 5 and later versions, for bundled assemblies, the value returned is an empty string.
+            string objectTypeLocation = typeof(object).Assembly.Location;
+            if (!string.IsNullOrEmpty(objectTypeLocation))
+            {
+                EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(typeof(object).Assembly.Location)}");
+            }
 #endif
         }
 
