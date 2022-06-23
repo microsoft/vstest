@@ -76,14 +76,14 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         // Make sure TestPlugincache is refreshed.
         TestPluginCache.Instance = null;
 
-        _mockTestHostManager.Setup(hm => hm.GetTestSources(_mockTestRunCriteria.Object.Sources)).Returns(_mockTestRunCriteria.Object.Sources);
+        _mockTestHostManager.Setup(hm => hm.GetTestSources(_mockTestRunCriteria.Object.Sources!)).Returns(_mockTestRunCriteria.Object.Sources!);
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
 
         Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
-        _mockTestHostManager.Verify(hm => hm.GetTestSources(_mockTestRunCriteria.Object.Sources), Times.Once);
+        _mockTestHostManager.Verify(hm => hm.GetTestSources(_mockTestRunCriteria.Object.Sources!), Times.Once);
     }
 
     [TestMethod]
@@ -105,7 +105,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _testExecutionManager.StartTestRun(testRunCriteria, mockTestRunEventsHandler.Object);
 
         _mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
-        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault()?.Source);
+        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests!.FirstOrDefault()?.Source);
     }
 
     [TestMethod]
@@ -127,7 +127,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _testExecutionManager.StartTestRun(testRunCriteria, mockTestRunEventsHandler.Object);
 
         _mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
-        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault()?.Source);
+        Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests!.FirstOrDefault()?.Source);
     }
 
     [TestMethod]
@@ -440,7 +440,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, null!);
 
         Assert.IsNotNull(testRunCriteriaPassed);
-        CollectionAssert.AreEqual(_mockTestRunCriteria.Object.AdapterSourceMap.Keys, testRunCriteriaPassed.AdapterSourceMap.Keys);
+        CollectionAssert.AreEqual(_mockTestRunCriteria.Object.AdapterSourceMap!.Keys, testRunCriteriaPassed.AdapterSourceMap.Keys);
         CollectionAssert.AreEqual(_mockTestRunCriteria.Object.AdapterSourceMap.Values, testRunCriteriaPassed.AdapterSourceMap.Values);
         Assert.AreEqual(_mockTestRunCriteria.Object.FrequencyOfRunStatsChangeEvent, testRunCriteriaPassed.TestExecutionContext!.FrequencyOfRunStatsChangeEvent);
         Assert.AreEqual(_mockTestRunCriteria.Object.RunStatsChangeEventTimeout, testRunCriteriaPassed.TestExecutionContext.RunStatsChangeEventTimeout);
@@ -463,7 +463,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         _testExecutionManager.StartTestRun(runCriteria.Object, null!);
 
         Assert.IsNotNull(testRunCriteriaPassed);
-        CollectionAssert.AreEqual(runCriteria.Object.Tests.ToList(), testRunCriteriaPassed.Tests.ToList());
+        CollectionAssert.AreEqual(runCriteria.Object.Tests!.ToList(), testRunCriteriaPassed.Tests.ToList());
         Assert.AreEqual(
             runCriteria.Object.FrequencyOfRunStatsChangeEvent,
             testRunCriteriaPassed.TestExecutionContext!.FrequencyOfRunStatsChangeEvent);

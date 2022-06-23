@@ -35,5 +35,5 @@ public interface ITestRunConfiguration
     /// <summary>
     /// The specific tests for this test run if any.
     /// </summary>
-    IEnumerable<TestCase> Tests { get; }
+    IEnumerable<TestCase>? Tests { get; }
 }

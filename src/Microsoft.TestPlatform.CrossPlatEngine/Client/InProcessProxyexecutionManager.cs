@@ -59,7 +59,7 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
             var testPackages = new List<string>(testRunCriteria.HasSpecificSources ? testRunCriteria.Sources :
                 // If the test execution is with a test filter, group them by sources
-                testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
+                testRunCriteria.Tests!.GroupBy(tc => tc.Source).Select(g => g.Key));
 
             // This code should be in sync with ProxyExecutionManager.StartTestRun executionContext
             var executionContext = new TestExecutionContext(

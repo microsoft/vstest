@@ -348,7 +348,7 @@ public class ParallelProxyExecutionManagerTests
                     {
                         lock (syncObject)
                         {
-                            _processedSources.AddRange(criteria.Sources);
+                            _processedSources.AddRange(criteria.Sources!);
                         }
 
                         Task.Delay(100).Wait();
@@ -526,7 +526,7 @@ public class ParallelProxyExecutionManagerTests
                     {
                         lock (syncObject)
                         {
-                            processedTestCases.AddRange(criteria.Tests);
+                            processedTestCases.AddRange(criteria.Tests!);
                         }
 
                         Task.Delay(100).Wait();
@@ -561,7 +561,7 @@ public class ParallelProxyExecutionManagerTests
                     {
                         lock (syncObject)
                         {
-                            processedSources.AddRange(criteria.Sources);
+                            processedSources.AddRange(criteria.Sources!);
                         }
                         Task.Delay(100).Wait();
 

@@ -471,6 +471,7 @@ internal class Converter
                 // (Trx viewer automatically adds In\ to the collected file.
                 string fileName = Path.Combine(Environment.MachineName, Path.GetFileName(targetFileName));
                 Uri sourceFileUri = new(fileName, UriKind.Relative);
+                TPDebug.Assert(uriDataAttachment.Description is not null, "uriDataAttachment.Description is null");
                 TrxObjectModel.UriDataAttachment dataAttachment = new(uriDataAttachment.Description, sourceFileUri, _trxFileHelper);
 
                 uriDataAttachments.Add(dataAttachment);

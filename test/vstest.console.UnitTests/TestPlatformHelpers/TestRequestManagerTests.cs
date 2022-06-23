@@ -1156,9 +1156,9 @@ public class TestRequestManagerTests
         Assert.AreEqual(testCaseFilterValue, observedCriteria!.TestCaseFilter, "TestCaseFilter must be set");
 
         Assert.AreEqual(1, createRunRequestCalled, "CreateRunRequest must be invoked only once.");
-        Assert.AreEqual(2, observedCriteria.Sources.Count(), "All Sources must be used for discovery request");
-        Assert.AreEqual("a", observedCriteria.Sources.First(), "First Source in list is incorrect");
-        Assert.AreEqual("b", observedCriteria.Sources.ElementAt(1), "Second Source in list is incorrect");
+        Assert.AreEqual(2, observedCriteria.Sources!.Count(), "All Sources must be used for discovery request");
+        Assert.AreEqual("a", observedCriteria.Sources!.First(), "First Source in list is incorrect");
+        Assert.AreEqual("b", observedCriteria.Sources!.ElementAt(1), "Second Source in list is incorrect");
 
         // Check for the default value for the frequency
         Assert.AreEqual(10, observedCriteria.FrequencyOfRunStatsChangeEvent);
@@ -1364,7 +1364,7 @@ public class TestRequestManagerTests
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
         var designmode = $"<DesignMode>{designModeValue}</DesignMode>";
-        _mockTestPlatform.Verify(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.Is<TestRunCriteria>(rc => rc.TestRunSettings.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
+        _mockTestPlatform.Verify(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.Is<TestRunCriteria>(rc => rc.TestRunSettings!.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
     [DataTestMethod]
@@ -1411,7 +1411,7 @@ public class TestRequestManagerTests
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
         _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
-        Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
+        Assert.IsTrue(actualTestRunCriteria!.TestRunSettings!.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
 
     }
@@ -1450,7 +1450,7 @@ public class TestRequestManagerTests
         _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Once);
 
         // but don't update runsettings because we want to keep what user specified
-        Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
+        Assert.IsTrue(actualTestRunCriteria!.TestRunSettings!.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(nameof(Architecture.ARM)));
     }
 
@@ -1491,7 +1491,7 @@ public class TestRequestManagerTests
         _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Once);
 
         // don't update it in runsettings to keep what user provided
-        Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(targetPlatform));
+        Assert.IsTrue(actualTestRunCriteria!.TestRunSettings!.Contains(targetPlatform));
     }
 
     [TestMethod]
@@ -1523,7 +1523,7 @@ public class TestRequestManagerTests
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
         _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
-        Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
+        Assert.IsTrue(actualTestRunCriteria!.TestRunSettings!.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
     }
 
@@ -1563,7 +1563,7 @@ public class TestRequestManagerTests
         _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()), Times.Once);
 
         // but don't update them in runsettings so we keep what user specified
-        Assert.IsFalse(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
+        Assert.IsFalse(actualTestRunCriteria!.TestRunSettings!.Contains(Constants.DotNetFramework46));
         Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
     }
 
@@ -1603,7 +1603,7 @@ public class TestRequestManagerTests
         _mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
         _mockAssemblyMetadataProvider.Verify(a => a.GetFrameworkName(It.IsAny<string>()));
 
-        Assert.IsTrue(actualTestRunCriteria!.TestRunSettings.Contains(Constants.DotNetFramework46));
+        Assert.IsTrue(actualTestRunCriteria!.TestRunSettings!.Contains(Constants.DotNetFramework46));
         Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
         CollectionAssert.AreEqual(actualSources, archSources);
         CollectionAssert.AreEqual(actualSources, fxSources);
@@ -1847,7 +1847,7 @@ public class TestRequestManagerTests
             (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options, Dictionary<string, SourceDetail> sourceToSourceDetailMap, IWarningLogger _) => actualTestRunCriteria = runCriteria).Returns(mockTestRunRequest.Object);
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, _protocolConfig);
 
-        Assert.IsFalse(actualTestRunCriteria!.TestRunSettings.Contains("LoggerRunSettings"));
+        Assert.IsFalse(actualTestRunCriteria!.TestRunSettings!.Contains("LoggerRunSettings"));
     }
 
     [TestMethod]
