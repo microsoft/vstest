@@ -125,7 +125,7 @@
     <comment>An escape sequence started with '\', but it wasn't legal. {0}: Invalid string, {1}: starting position of invalid sequence.</comment>
   </data>
   <data name="ErrorMethodArityMustBeNumeric" xml:space="preserve">
-    <value>Method arity must be numeric</value>
+    <value>Method arity must be numeric.</value>
   </data>
   <data name="ErrorMethodNotFound" xml:space="preserve">
     <value>Method '{0}' not found on type '{1}'</value>
