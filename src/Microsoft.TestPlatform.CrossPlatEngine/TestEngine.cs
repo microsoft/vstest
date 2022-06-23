@@ -192,6 +192,8 @@ public class TestEngine : ITestEngine
         IDictionary<string, SourceDetail> sourceToSourceDetailMap,
         IWarningLogger warningLogger)
     {
+        TPDebug.Assert(testRunCriteria.TestRunSettings is not null, "testRunCriteria.TestRunSettings is null");
+
         // We use mulitple "different" runsettings here. We have runsettings that come with the testRunCriteria,
         // and we use that to figure out the common stuff before we try to setup the run. Later we patch the settings
         // from the additional details that were passed. Those should not affect the common properties that are used for setup.
@@ -492,11 +494,11 @@ public class TestEngine : ITestEngine
     {
         // No point in creating more processes if number of sources is less than what the user
         // configured for.
-        int numSources = testRunCriteria.HasSpecificTests
+        int numberOfSources = testRunCriteria.HasSpecificTests
             ? new HashSet<string>(
                 testRunCriteria.Tests.Select(testCase => testCase.Source)).Count
             : testRunCriteria.Sources.Count();
-        return numSources;
+        return numberOfSources;
     }
 
     /// <summary>
@@ -509,7 +511,7 @@ public class TestEngine : ITestEngine
     /// <returns>The parallel level to use.</returns>
     private int VerifyParallelSettingAndCalculateParallelLevel(
         int sourceCount,
-        string runSettings)
+        string? runSettings)
     {
         // Default is 1.
         int parallelLevelToUse;

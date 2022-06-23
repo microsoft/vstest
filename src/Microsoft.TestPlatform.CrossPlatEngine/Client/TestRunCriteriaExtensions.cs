@@ -16,6 +16,7 @@ internal static class TestRunCriteriaExtensions
 {
     public static TestRunCriteriaWithSources CreateTestRunCriteriaForSources(this TestRunCriteria testRunCriteria, ITestRuntimeProvider? testRuntimeProvider, string? runSettings, TestExecutionContext executionContext, IEnumerable<string>? inputPackages)
     {
+        TPDebug.Assert(testRunCriteria.AdapterSourceMap is not null, "testRunCriteria.AdapterSourceMap is null");
         if (TryCheckTestSourceDifferFromPackage(testRuntimeProvider, inputPackages, out IEnumerable<string>? actualTestSources))
         {
             UpdateTestSources(actualTestSources, testRunCriteria.AdapterSourceMap);
@@ -31,6 +32,7 @@ internal static class TestRunCriteriaExtensions
     public static TestRunCriteriaWithTests CreateTestRunCriteriaForTests(this TestRunCriteria testRunCriteria, ITestRuntimeProvider? testRuntimeProvider,
         string? runSettings, TestExecutionContext executionContext, IEnumerable<string>? inputPackages)
     {
+        TPDebug.Assert(testRunCriteria.Tests is not null, "testRunCriteria.Tests is null");
         if (TryCheckTestSourceDifferFromPackage(testRuntimeProvider, inputPackages, out IEnumerable<string>? actualTestSources))
         {
             // In UWP scenario TestCase object contains the package as source, which is not actual test source for adapters,

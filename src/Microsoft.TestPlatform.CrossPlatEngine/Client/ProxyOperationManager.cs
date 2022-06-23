@@ -382,7 +382,7 @@ public class ProxyOperationManager
     /// <param name="runsettingsXml">Run settings string.</param>
     ///
     /// <returns>The run settings after removing non-required nodes.</returns>
-    public string? RemoveNodesFromRunsettingsIfRequired(string runsettingsXml, Action<TestMessageLevel, string> logMessage)
+    public string? RemoveNodesFromRunsettingsIfRequired(string? runsettingsXml, Action<TestMessageLevel, string> logMessage)
     {
         var updatedRunSettingsXml = runsettingsXml;
         if (!_makeRunsettingsCompatibleSet)

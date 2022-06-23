@@ -103,6 +103,7 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         _runCompletedClients = 0;
 
         // One data aggregator per parallel run
+        TPDebug.Assert(testRunCriteria.TestRunSettings is not null, "testRunCriteria.TestRunSettings is null");
         _currentRunDataAggregator = new ParallelRunDataAggregator(testRunCriteria.TestRunSettings);
         if (nonRunnableWorkloads.Count > 0)
         {
@@ -267,9 +268,9 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         }
         else
         {
-            var sources = testRunCriteria.Sources;
+            TPDebug.Assert(testRunCriteria.Sources is not null, "testRunCriteria.Sources is null");
             // Each source is grouped with its respective provider.
-            var providerGroups = sources
+            var providerGroups = testRunCriteria.Sources
                 .Select(source => new ProviderSpecificWorkload<string>(source, sourceToTestHostProviderMap[source]))
                 .GroupBy(psw => psw.Provider);
 

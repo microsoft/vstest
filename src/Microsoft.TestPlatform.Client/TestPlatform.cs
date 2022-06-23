@@ -386,9 +386,15 @@ internal class TestPlatform : ITestPlatform
                 TestPlatformConstants.RunTimeEndsWithPattern);
     }
 
-    private static IEnumerable<string> GetSources(TestRunCriteria testRunCriteria) =>
-        testRunCriteria.HasSpecificTests
+    private static IEnumerable<string> GetSources(TestRunCriteria testRunCriteria)
+    {
+        if (testRunCriteria.HasSpecificTests)
+        {
             // If the test execution is with a test filter, filter sources too.
-            ? testRunCriteria.Tests.Select(tc => tc.Source).Distinct()
-            : testRunCriteria.Sources;
+            return testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
+        }
+
+        TPDebug.Assert(testRunCriteria.Sources is not null, "testRunCriteria.Sources is null");
+        return testRunCriteria.Sources;
+    }
 }

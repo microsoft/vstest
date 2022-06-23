@@ -72,7 +72,7 @@ public class TestRunCriteriaTests
 
         var expectedSourceSet = new List<string>(sourceSet1);
         expectedSourceSet.AddRange(sourceSet2);
-        CollectionAssert.AreEqual(expectedSourceSet, testRunCriteria.Sources.ToList());
+        CollectionAssert.AreEqual(expectedSourceSet, testRunCriteria.Sources!.ToList());
     }
 
     [TestMethod]

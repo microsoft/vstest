@@ -149,8 +149,8 @@ public class TestPlatformTests
 
         var temp = Path.GetTempPath();
         var testRunCriteria = new TestRunCriteria(new List<string> { $@"{temp}foo.dll" }, 10, false, settingsXml, TimeSpan.Zero);
-        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
-            .Returns(testRunCriteria.Sources);
+        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources!))
+            .Returns(testRunCriteria.Sources!);
 
         _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_executionManager.Object);
         _testEngine.Setup(te => te.GetExtensionManager()).Returns(_extensionManager.Object);
@@ -233,8 +233,8 @@ public class TestPlatformTests
 
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
         var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10);
-        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
-            .Returns(testRunCriteria.Sources);
+        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources!))
+            .Returns(testRunCriteria.Sources!);
 
         var testRunRequest = tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>());
 
@@ -608,8 +608,8 @@ public class TestPlatformTests
 
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
         var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10);
-        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
-            .Returns(testRunCriteria.Sources);
+        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources!))
+            .Returns(testRunCriteria.Sources!);
 
         tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, options, new Dictionary<string, SourceDetail>(), new Mock<IWarningLogger>().Object);
     }

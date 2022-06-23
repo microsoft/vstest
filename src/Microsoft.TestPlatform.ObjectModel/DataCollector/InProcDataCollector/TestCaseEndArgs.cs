@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
 
 /// <summary>

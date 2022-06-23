@@ -425,14 +425,11 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
             }
             finally
             {
-                if (isCanceled)
-                {
-                    State = TestRunState.Canceled;
-                }
-                else
-                {
-                    State = isAborted ? TestRunState.Aborted : TestRunState.Completed;
-                }
+                State = isCanceled
+                    ? TestRunState.Canceled
+                    : isAborted
+                        ? TestRunState.Aborted
+                        : TestRunState.Completed;
 
                 // Notify the waiting handle that run is complete
                 _runCompletionEvent.Set();
@@ -655,6 +652,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     {
         int processId = -1;
 
+        TPDebug.Assert(TestRunCriteria.TestHostLauncher is not null, "TestRunCriteria.TestHostLauncher is null");
         // Only launch while the test run is in progress and the launcher is a debug one
         if (State == TestRunState.InProgress && TestRunCriteria.TestHostLauncher.IsDebug)
         {
