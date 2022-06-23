@@ -10,7 +10,7 @@
       <trans-unit id="ErrorMethodArityMustBeNumeric">
         <source>Method arity must be numeric.</source>
         <note></note>
-        <target state="new">Die Stelligkeit der Methode muss numerisch sein.</target>
+        <target state="new">Method arity must be numeric.</target>
       </trans-unit>
       <trans-unit id="ErrorMethodNotFound">
         <source>Method '{0}' not found on type '{1}'</source>
