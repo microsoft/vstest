@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Threading;
@@ -101,6 +102,9 @@ internal class DefaultEngineInvoker :
                 .Assembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
             EqtTrace.Verbose($"Version: {version}");
+#if NET20_OR_GREATER
+            EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(typeof(object).Assembly.Location)}");
+#endif
         }
 
         if (EqtTrace.IsInfoEnabled)

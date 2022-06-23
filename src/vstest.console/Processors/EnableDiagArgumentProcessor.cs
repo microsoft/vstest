@@ -138,6 +138,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         // Write version to the log here, because that is the
         // first place where we know if we log or not.
         EqtTrace.Verbose($"Version: {Product.Version} Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}");
+        EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(typeof(object).Assembly.Location)}");
     }
 
     /// <summary>
