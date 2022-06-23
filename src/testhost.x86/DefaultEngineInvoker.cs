@@ -102,7 +102,7 @@ internal class DefaultEngineInvoker :
                 .Assembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
             EqtTrace.Verbose($"Version: {version}");
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETFRAMEWORK
             EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(typeof(object).Assembly.Location)}");
 #endif
         }
