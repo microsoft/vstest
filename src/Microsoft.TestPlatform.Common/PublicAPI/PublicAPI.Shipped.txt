@@ -112,7 +112,7 @@ Microsoft.VisualStudio.TestPlatform.Common.RequestData.ProtocolConfig.get -> Mic
 Microsoft.VisualStudio.TestPlatform.Common.RequestData.ProtocolConfig.set -> void
 Microsoft.VisualStudio.TestPlatform.Common.RequestData.RequestData() -> void
 Microsoft.VisualStudio.TestPlatform.Common.RunSettings
-Microsoft.VisualStudio.TestPlatform.Common.RunSettings.GetSettings(string! settingsName) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter.ISettingsProvider?
+Microsoft.VisualStudio.TestPlatform.Common.RunSettings.GetSettings(string? settingsName) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter.ISettingsProvider?
 Microsoft.VisualStudio.TestPlatform.Common.RunSettings.InitializeSettingsProviders(string! settings) -> void
 Microsoft.VisualStudio.TestPlatform.Common.RunSettings.LoadSettingsXml(string! settings) -> void
 Microsoft.VisualStudio.TestPlatform.Common.RunSettings.RunSettings() -> void

@@ -28,12 +28,12 @@ public static class EqtTrace
     private static readonly IPlatformEqtTrace TraceImpl = new PlatformEqtTrace();
 
 #if NETFRAMEWORK
-    public static void SetupRemoteEqtTraceListeners(AppDomain childDomain)
+    public static void SetupRemoteEqtTraceListeners(AppDomain? childDomain)
     {
         TraceImpl.SetupRemoteEqtTraceListeners(childDomain);
     }
 
-    public static void SetupListener(TraceListener listener)
+    public static void SetupListener(TraceListener? listener)
     {
         TraceImpl.SetupListener(listener);
     }

@@ -3,8 +3,8 @@ Microsoft.VisualStudio.TestPlatform.Utilities.ConsoleOutput
 Microsoft.VisualStudio.TestPlatform.Utilities.ConsoleOutput.Write(string? message, Microsoft.VisualStudio.TestPlatform.Utilities.OutputLevel level) -> void
 Microsoft.VisualStudio.TestPlatform.Utilities.ConsoleOutput.WriteLine(string? message, Microsoft.VisualStudio.TestPlatform.Utilities.OutputLevel level) -> void
 Microsoft.VisualStudio.TestPlatform.Utilities.OutputExtensions
-static Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace.SetupListener(System.Diagnostics.TraceListener! listener) -> void
-static Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace.SetupRemoteEqtTraceListeners(System.AppDomain! childDomain) -> void
+static Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace.SetupListener(System.Diagnostics.TraceListener? listener) -> void
+static Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace.SetupRemoteEqtTraceListeners(System.AppDomain? childDomain) -> void
 static Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace.TraceLevel.get -> System.Diagnostics.TraceLevel
 static Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace.TraceLevel.set -> void
 static Microsoft.VisualStudio.TestPlatform.Utilities.ConsoleOutput.Instance.get -> Microsoft.VisualStudio.TestPlatform.Utilities.ConsoleOutput!
