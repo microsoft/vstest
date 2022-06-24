@@ -485,7 +485,6 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.ConnectionRole
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ConnectionRole.Client = 1 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ConnectionRole
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ConnectionRole.Host = 0 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ConnectionRole
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants
-Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestResultEventArgs.TestResultEventArgs(Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionContext! context, Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult! testResult) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DefaultExecutorUriAttribute
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DefaultExecutorUriAttribute.DefaultExecutorUriAttribute(string! executorUri) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DefaultExecutorUriAttribute.ExecutorUri.get -> string!
