@@ -129,7 +129,7 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestHostLaunchedE
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestResultEventArgs
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestResultEventArgs.TestResult.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult!
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestResultEventArgs.TestResultEventArgs() -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestResultEventArgs.TestResultEventArgs(Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionContext context, Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult! testResult) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestResultEventArgs.TestResultEventArgs(Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionContext! context, Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult! testResult) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestResultEventArgs.TestResultEventArgs(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult! testResult) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollectionRunSettings
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollectionRunSettings.DataCollectionRunSettings() -> void
