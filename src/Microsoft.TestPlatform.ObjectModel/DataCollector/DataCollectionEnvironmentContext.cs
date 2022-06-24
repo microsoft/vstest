@@ -38,6 +38,7 @@ public sealed class DataCollectionEnvironmentContext
     /// <returns>An environment context for a local (hosted) agent and controller</returns>
     public static DataCollectionEnvironmentContext CreateForLocalEnvironment()
     {
+        // TODO: This API appears unused, can we remove it?
         return CreateForLocalEnvironment(null!);
     }
 

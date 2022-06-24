@@ -1,3 +1,4 @@
+#nullable enable
 Microsoft.TestPlatform.Build.Tasks.VSTestForwardingApp
 Microsoft.TestPlatform.Build.Tasks.VSTestForwardingApp.Cancel() -> void
 Microsoft.TestPlatform.Build.Tasks.VSTestForwardingApp.Execute() -> int

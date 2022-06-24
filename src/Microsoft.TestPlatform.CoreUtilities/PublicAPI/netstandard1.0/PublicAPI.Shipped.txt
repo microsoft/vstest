@@ -1,2 +1,3 @@
-﻿static Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace.TraceLevel.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel
+﻿#nullable enable
+static Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace.TraceLevel.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel
 static Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace.TraceLevel.set -> void
