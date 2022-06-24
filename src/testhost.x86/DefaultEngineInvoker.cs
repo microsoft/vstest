@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Threading;
@@ -100,7 +101,16 @@ internal class DefaultEngineInvoker :
                 .GetTypeInfo()
                 .Assembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-            EqtTrace.Verbose($"Version: {version}");
+            EqtTrace.Verbose($"Version: {version} Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}");
+#if NETCOREAPP2_0_OR_GREATER || NETFRAMEWORK
+            // https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location?view=net-6.0#remarks
+            // In .NET 5 and later versions, for bundled assemblies, the value returned is an empty string.
+            string objectTypeLocation = typeof(object).Assembly.Location;
+            if (!objectTypeLocation.IsNullOrEmpty())
+            {
+                EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(objectTypeLocation)}");
+            }
+#endif
         }
 
         if (EqtTrace.IsInfoEnabled)
