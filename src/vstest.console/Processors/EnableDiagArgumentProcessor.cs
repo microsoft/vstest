@@ -141,7 +141,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         // https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location?view=net-6.0#remarks
         // In .NET 5 and later versions, for bundled assemblies, the value returned is an empty string.
         string objectTypeLocation = typeof(object).Assembly.Location;
-        if (!StringUtils.IsNullOrEmpty(objectTypeLocation))
+        if (!objectTypeLocation.IsNullOrEmpty())
         {
             EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(objectTypeLocation)}");
         }
