@@ -157,7 +157,9 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
         cancellationToken.Register(() => _wrapper.CancelProcessAttachment());
         _processAttachmentSetsLogger = logger;
         _progressReporter = progressReporter;
+#pragma warning disable CS8603 // Possible null reference return.
         return JsonDataSerializer.Instance.Deserialize<AttachmentSet[]>(await Task.Run(() => _wrapper.ProcessAttachment(configurationElement.OuterXml, JsonDataSerializer.Instance.Serialize(attachments.ToArray()))).ConfigureAwait(false));
+#pragma warning restore CS8603 // Possible null reference return.
     }
 
     public void Dispose()

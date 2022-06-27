@@ -118,6 +118,6 @@ public class ProtocolV2Tests
 
     private static T DeserializeV2<T>(string json)
     {
-        return JsonDataSerializer.Instance.Deserialize<T>(json, version: 2);
+        return JsonDataSerializer.Instance.Deserialize<T>(json, version: 2)!;
     }
 }
