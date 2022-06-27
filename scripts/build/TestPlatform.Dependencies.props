@@ -64,7 +64,7 @@
     <!-- Portable CPP test runner -->
     <TestPlatformRemoteExternalsVersion>17.1.0-preview-2-31925-026</TestPlatformRemoteExternalsVersion>
     <InteropExternalsVersion>17.1.0-preview-2-31925-026</InteropExternalsVersion>
-    <MicrosoftFakesVersion>17.3.0-beta.22308.6</MicrosoftFakesVersion>
+    <MicrosoftFakesVersion>17.3.0-beta.22327.2</MicrosoftFakesVersion>
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
     <MicrosoftBuildFrameworkPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>
