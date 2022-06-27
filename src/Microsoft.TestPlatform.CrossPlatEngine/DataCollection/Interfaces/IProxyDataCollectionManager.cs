@@ -6,8 +6,6 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 
 /// <summary>
@@ -23,7 +21,7 @@ public interface IProxyDataCollectionManager : IDisposable
     /// <summary>
     /// The settings xml
     /// </summary>
-    string SettingsXml { get; }
+    string? SettingsXml { get; }
 
     /// <summary>
     /// List of test sources

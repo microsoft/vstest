@@ -8,8 +8,6 @@ using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 
 /// <summary>
@@ -21,7 +19,7 @@ internal class TestSettingsProviderPluginInformation : TestPluginInformation
     /// Default constructor
     /// </summary>
     /// <param name="testSettingsProviderType"> The test Settings Provider Type. </param>
-    public TestSettingsProviderPluginInformation(Type testSettingsProviderType)
+    public TestSettingsProviderPluginInformation(Type? testSettingsProviderType)
         : base(testSettingsProviderType)
     {
         if (testSettingsProviderType != null)
@@ -33,7 +31,7 @@ internal class TestSettingsProviderPluginInformation : TestPluginInformation
     /// <summary>
     /// Gets data value identifying the test plugin
     /// </summary>
-    public override string IdentifierData
+    public override string? IdentifierData
     {
         get
         {
@@ -44,18 +42,18 @@ internal class TestSettingsProviderPluginInformation : TestPluginInformation
     /// <summary>
     /// Metadata for the test plugin
     /// </summary>
-    public override ICollection<Object> Metadata
+    public override ICollection<object?> Metadata
     {
         get
         {
-            return new object[] { SettingsName };
+            return new object?[] { SettingsName };
         }
     }
 
     /// <summary>
     /// Gets name of test settings supported by plugin.
     /// </summary>
-    public string SettingsName
+    public string? SettingsName
     {
         get;
         private set;

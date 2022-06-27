@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -18,7 +16,7 @@ public interface IRequestData
     /// <summary>
     /// Gets or sets the ProtocolConfig <see cref="ProtocolConfig"/>
     /// </summary>
-    ProtocolConfig ProtocolConfig { get; set; }
+    ProtocolConfig? ProtocolConfig { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether is telemetry opted in.

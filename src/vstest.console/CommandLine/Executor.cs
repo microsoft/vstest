@@ -305,20 +305,22 @@ internal class Executor
         // Check each processor.
         foreach (var processor in argumentProcessors)
         {
-            if (!processor.Metadata.Value.AllowMultiple)
+            if (processor.Metadata.Value.AllowMultiple)
             {
-                if (!commandSeenCount.TryGetValue(processor.Metadata.Value.CommandName, out int count))
-                {
-                    commandSeenCount.Add(processor.Metadata.Value.CommandName, 1);
-                }
-                else if (count == 1)
-                {
-                    result = 1;
+                continue;
+            }
 
-                    // Update the count so we do not print the error out for this argument multiple times.
-                    commandSeenCount[processor.Metadata.Value.CommandName] = ++count;
-                    Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
-                }
+            if (!commandSeenCount.TryGetValue(processor.Metadata.Value.CommandName, out int count))
+            {
+                commandSeenCount.Add(processor.Metadata.Value.CommandName, 1);
+            }
+            else if (count == 1)
+            {
+                result = 1;
+
+                // Update the count so we do not print the error out for this argument multiple times.
+                commandSeenCount[processor.Metadata.Value.CommandName] = ++count;
+                Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
             }
         }
         return result;

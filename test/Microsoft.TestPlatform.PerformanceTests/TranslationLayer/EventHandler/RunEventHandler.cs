@@ -20,7 +20,7 @@ public class RunEventHandler : ITestRunEventsHandler
     /// <summary>
     /// Gets the metrics.
     /// </summary>
-    public IDictionary<string, object> Metrics { get; private set; } = new Dictionary<string, object>();
+    public IDictionary<string, object>? Metrics { get; private set; } = new Dictionary<string, object>();
 
     /// <summary>
     /// Gets the log message.
@@ -32,16 +32,16 @@ public class RunEventHandler : ITestRunEventsHandler
         TestResults = new List<TestResult>();
     }
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         LogMessages.Add($"[{level.ToString().ToUpperInvariant()}]: {message}");
     }
 
     public void HandleTestRunComplete(
         TestRunCompleteEventArgs testRunCompleteArgs,
-        TestRunChangedEventArgs lastChunkArgs,
-        ICollection<AttachmentSet> runContextAttachments,
-        ICollection<string> executorUris)
+        TestRunChangedEventArgs? lastChunkArgs,
+        ICollection<AttachmentSet>? runContextAttachments,
+        ICollection<string>? executorUris)
     {
         if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)
         {
@@ -55,7 +55,7 @@ public class RunEventHandler : ITestRunEventsHandler
         }
     }
 
-    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
     {
         if (testRunChangedArgs != null && testRunChangedArgs.NewTestResults != null)
         {

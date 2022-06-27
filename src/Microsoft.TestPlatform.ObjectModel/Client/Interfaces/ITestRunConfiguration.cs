@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -37,5 +35,5 @@ public interface ITestRunConfiguration
     /// <summary>
     /// The specific tests for this test run if any.
     /// </summary>
-    IEnumerable<TestCase> Tests { get; }
+    IEnumerable<TestCase>? Tests { get; }
 }

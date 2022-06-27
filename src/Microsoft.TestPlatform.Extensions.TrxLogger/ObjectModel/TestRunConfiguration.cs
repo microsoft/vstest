@@ -2,15 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Xml;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
@@ -81,7 +78,7 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
     {
         get
         {
-            Debug.Assert(_runDeploymentRoot != null, "runDeploymentRoot is null");
+            TPDebug.Assert(_runDeploymentRoot != null, "runDeploymentRoot is null");
             return Path.Combine(_runDeploymentRoot, DeploymentInDirectorySuffix);
         }
     }
@@ -100,7 +97,7 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
 
         set
         {
-            Debug.Assert(!string.IsNullOrEmpty(value), "RunDeploymentRootDirectory.value should not be null or empty.");
+            TPDebug.Assert(!string.IsNullOrEmpty(value), "RunDeploymentRootDirectory.value should not be null or empty.");
             _runDeploymentRoot = value;
         }
     }
@@ -116,7 +113,7 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
     /// <param name="parameters">
     /// The parameters.
     /// </param>
-    public void Save(XmlElement element, XmlTestStoreParameters parameters)
+    public void Save(XmlElement element, XmlTestStoreParameters? parameters)
     {
         XmlPersistence helper = new();
 
@@ -127,14 +124,15 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
 
         // When saving and loading a TRX file, we want to use the run deployment root directory based on where the TRX file
         // is being saved to or loaded from
-        if (parameters.TryGetValue(XmlFilePersistence.RootObjectType, out object filePersistenceRootObjectType) &&
+        // REVIEW ME: NRE on parameters, is it expected?
+        if (parameters!.TryGetValue(XmlFilePersistence.RootObjectType, out object? filePersistenceRootObjectType) &&
             (Type)filePersistenceRootObjectType == typeof(TestRun))
         {
-            Debug.Assert(
+            TPDebug.Assert(
                 parameters.ContainsKey(XmlFilePersistence.DirectoryPath),
                 "TestRun is the type of the root object being saved to a file, but the DirectoryPath was not specified in the XML test store parameters");
 
-            Debug.Assert(
+            TPDebug.Assert(
                 !string.IsNullOrEmpty(_runDeploymentRoot),
                 "TestRun is the type of the root object being saved to a file, but the run deployment root directory is null or empty");
 
@@ -144,7 +142,7 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
             helper.SaveSimpleField(
                 element,
                 "Deployment/@runDeploymentRoot",
-                _trxFileHelper.MakePathRelative(_runDeploymentRoot, Path.GetDirectoryName(_runDeploymentRoot)),
+                _trxFileHelper.MakePathRelative(_runDeploymentRoot, Path.GetDirectoryName(_runDeploymentRoot)!),
                 string.Empty);
         }
         else

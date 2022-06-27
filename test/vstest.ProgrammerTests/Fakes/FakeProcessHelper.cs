@@ -80,7 +80,7 @@ internal class FakeProcessHelper : IProcessHelper
         throw new NotImplementedException();
     }
 
-    public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string>? environmentVariables, Action<object?, string>? errorCallback, Action<object>? exitCallBack, Action<object?, string>? outputCallback)
+    public object LaunchProcess(string processPath, string? arguments, string? workingDirectory, IDictionary<string, string?>? environmentVariables, Action<object?, string>? errorCallback, Action<object>? exitCallBack, Action<object?, string>? outputCallback)
     {
         // TODO: Throw if setting says we can't start new processes;
         var process = new FakeProcess(FakeErrorAggregator, processPath, arguments, workingDirectory, environmentVariables, errorCallback, exitCallBack, outputCallback);

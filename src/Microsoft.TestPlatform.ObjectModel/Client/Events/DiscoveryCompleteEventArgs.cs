@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -44,29 +42,37 @@ public class DiscoveryCompleteEventArgs : EventArgs
     /// Metrics
     /// </summary>
     [DataMember]
-    public IDictionary<string, object> Metrics { get; set; }
+    public IDictionary<string, object>? Metrics { get; set; }
 
     /// <summary>
-    /// Gets the list of sources which were fully discovered.
+    /// Gets or sets the list of sources which were fully discovered.
     /// </summary>
     [DataMember]
-    public IList<string> FullyDiscoveredSources { get; set; } = new List<string>();
+    public IList<string>? FullyDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
-    /// Gets the list of sources which were partially discovered (started discover tests, but then discovery aborted).
+    /// Gets or sets the list of sources which were partially discovered (started discover tests, but then discovery aborted).
     /// </summary>
     [DataMember]
-    public IList<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
+    // Added in protocol version 6.
+    public IList<string>? PartiallyDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
-    /// Gets the list of sources which were not discovered at all.
+    ///  Gets or sets the list of sources that were skipped during discovery.
     /// </summary>
     [DataMember]
-    public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
+    // Added in protocol version 7, for previous versions this is put into NotDiscoveredSources.
+    public IList<string>? SkippedDiscoveredSources { get; set; } = new List<string>();
+
+    /// <summary>
+    /// Gets or sets the list of sources which were not discovered at all.
+    /// </summary>
+    [DataMember]
+    public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets or sets the collection of discovered extensions.
     /// </summary>
     [DataMember]
-    public Dictionary<string, HashSet<string>> DiscoveredExtensions { get; set; } = new();
+    public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
 }

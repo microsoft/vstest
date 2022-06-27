@@ -89,6 +89,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
         var fullyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered);
         var partiallyDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered);
         var notDiscovered = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
+        var skippedDiscovery = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.SkippedDiscovery);
 
         // As we immediately return results to IDE in case of aborting we need to set
         // isAborted = true and totalTests = -1
@@ -131,6 +132,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             FullyDiscoveredSources = fullyDiscovered,
             PartiallyDiscoveredSources = partiallyDiscovered,
             NotDiscoveredSources = notDiscovered,
+            SkippedDiscoverySources = skippedDiscovery,
             DiscoveredExtensions = _discoveryDataAggregator.DiscoveredExtensions,
             Metrics = aggregatedDiscoveryDataMetrics,
         };
@@ -146,6 +148,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
             FullyDiscoveredSources = fullyDiscovered,
             PartiallyDiscoveredSources = partiallyDiscovered,
             NotDiscoveredSources = notDiscovered,
+            SkippedDiscoveredSources = skippedDiscovery,
             DiscoveredExtensions = _discoveryDataAggregator.DiscoveredExtensions,
             Metrics = aggregatedDiscoveryDataMetrics,
         };
@@ -178,13 +181,13 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     }
 
     /// <inheritdoc/>
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+    public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
     {
         _actualDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
     }
 
     /// <inheritdoc/>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         _actualDiscoveryEventsHandler.HandleLogMessage(level, message);
     }
@@ -196,7 +199,7 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     /// <param name="payload"></param>
     private void ConvertToRawMessageAndSend(string messageType, object payload)
     {
-        var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig.Version);
+        var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig!.Version);
         _actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
     }
 }

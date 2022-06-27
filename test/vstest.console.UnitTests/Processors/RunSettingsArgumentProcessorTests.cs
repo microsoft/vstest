@@ -208,7 +208,7 @@ public class RunSettingsArgumentProcessorTests
         RunConfiguration runConfiguration =
             XmlRunSettingsUtilities.GetRunConfigurationNode(_settingsProvider.ActiveRunSettings.SettingsXml);
         Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
-        Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
+        Assert.AreEqual(runConfiguration.TargetFramework!.ToString(), Framework.DefaultFramework.ToString());
         Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
 
     }
@@ -323,7 +323,7 @@ public class RunSettingsArgumentProcessorTests
             null);
 
         executor.Initialize(runsettingsFile);
-        Assert.IsTrue(_settingsProvider.ActiveRunSettings!.SettingsXml.Contains(@"C:\新しいフォルダー"));
+        Assert.IsTrue(_settingsProvider.ActiveRunSettings!.SettingsXml!.Contains(@"C:\新しいフォルダー"));
         File.Delete(runsettingsFile);
     }
 

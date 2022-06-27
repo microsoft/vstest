@@ -6,8 +6,6 @@ using System.Runtime.Serialization;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
 /// <summary>
@@ -47,8 +45,8 @@ public class TestExecutionContext
         bool areTestCaseLevelEventsRequired,
         bool hasTestRun,
         bool isDebug,
-        string testCaseFilter,
-        FilterOptions filterOptions)
+        string? testCaseFilter,
+        FilterOptions? filterOptions)
     {
         FrequencyOfRunStatsChangeEvent = frequencyOfRunStatsChangeEvent;
         RunStatsChangeEventTimeout = runStatsChangeEventTimeout;
@@ -128,7 +126,7 @@ public class TestExecutionContext
     /// Gets or sets the filter criteria for run with sources to filter test cases.
     /// </summary>
     [DataMember]
-    public string TestCaseFilter
+    public string? TestCaseFilter
     {
         get;
         set;
@@ -139,7 +137,7 @@ public class TestExecutionContext
     /// Gets or sets additional options for filtering.
     /// </summary>
     [DataMember]
-    public FilterOptions FilterOptions
+    public FilterOptions? FilterOptions
     {
         get;
         set;
@@ -171,7 +169,7 @@ public class TestExecutionContext
     /// </summary>
     /// <remarks>It is not serialized over <c>wcf </c> as the information is available in the run settings</remarks>
     [IgnoreDataMember]
-    public RunConfiguration TestRunConfiguration
+    public RunConfiguration? TestRunConfiguration
     {
         get;
         set;

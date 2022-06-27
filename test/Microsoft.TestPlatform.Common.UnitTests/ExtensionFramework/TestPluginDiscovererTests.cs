@@ -21,8 +21,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MSTest.TestFramework.AssertExtensions;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 
 [TestClass]
@@ -52,7 +50,7 @@ public class TestPluginDiscovererTests
         // The below should not throw an exception.
         var testExtensions = _testPluginDiscoverer.GetTestExtensionsInformation<TestDiscovererPluginInformation, ITestDiscoverer>(pathToExtensions);
         var discovererPluginInformation = new TestDiscovererPluginInformation(typeof(AbstractTestDiscoverer));
-        Assert.IsFalse(testExtensions.ContainsKey(discovererPluginInformation.IdentifierData));
+        Assert.IsFalse(testExtensions.ContainsKey(discovererPluginInformation.IdentifierData!));
     }
 
     [TestMethod]
@@ -66,8 +64,8 @@ public class TestPluginDiscovererTests
         var discovererPluginInformation = new TestDiscovererPluginInformation(typeof(ValidDiscoverer));
         var discovererPluginInformation2 = new TestDiscovererPluginInformation(typeof(ValidDiscoverer2));
 
-        Assert.IsTrue(testExtensions.ContainsKey(discovererPluginInformation.IdentifierData));
-        Assert.IsTrue(testExtensions.ContainsKey(discovererPluginInformation2.IdentifierData));
+        Assert.IsTrue(testExtensions.ContainsKey(discovererPluginInformation.IdentifierData!));
+        Assert.IsTrue(testExtensions.ContainsKey(discovererPluginInformation2.IdentifierData!));
     }
 
     [TestMethod]
@@ -82,8 +80,8 @@ public class TestPluginDiscovererTests
         var pluginInformation2 = new TestExecutorPluginInformation(typeof(ValidExecutor2));
 
         Assert.AreEqual(2, testExtensions.Keys.Count(k => k.Contains("ValidExecutor")));
-        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData));
-        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData));
+        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData!));
+        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData!));
     }
 
     [TestMethod]
@@ -98,8 +96,7 @@ public class TestPluginDiscovererTests
         var pluginInformation2 = new TestLoggerPluginInformation(typeof(ValidLogger2));
 
         Assert.AreEqual(1, testExtensions.Keys.Count(k => k.Contains("csv")));
-        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData));
-        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData));
+        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData!));
     }
 
     [TestMethod]
@@ -129,8 +126,8 @@ public class TestPluginDiscovererTests
         var pluginInformation2 = new TestSettingsProviderPluginInformation(typeof(ValidSettingsProvider2));
 
         Assert.IsTrue(testExtensions.Keys.Select(k => k.Contains("ValidSettingsProvider")).Count() >= 3);
-        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData));
-        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData));
+        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData!));
+        Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData!));
     }
 
     [TestMethod]
@@ -186,12 +183,12 @@ public class TestPluginDiscovererTests
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
@@ -205,12 +202,12 @@ public class TestPluginDiscovererTests
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
@@ -224,12 +221,12 @@ public class TestPluginDiscovererTests
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
@@ -304,11 +301,11 @@ public class TestPluginDiscovererTests
     public class InvalidDataCollector : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
         }
     }
@@ -328,11 +325,11 @@ public class TestPluginDiscovererTests
     public class ValidDataCollector : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
         }
     }

@@ -66,7 +66,7 @@ public class TrxLoggerTests
     public void InitializeShouldThrowExceptionIfEventsIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(
-            () => _testableTrxLogger.Initialize(null, _parameters));
+            () => _testableTrxLogger.Initialize(null!, _parameters));
     }
 
     [TestMethod]
@@ -83,7 +83,7 @@ public class TrxLoggerTests
             () =>
             {
                 var events = new Mock<TestLoggerEvents>();
-                _parameters[DefaultLoggerParameterNames.TestRunDirectory] = null;
+                _parameters[DefaultLoggerParameterNames.TestRunDirectory] = null!;
                 _testableTrxLogger.Initialize(events.Object, _parameters);
             });
     }
@@ -99,13 +99,13 @@ public class TrxLoggerTests
     public void InitializeShouldThrowExceptionIfParametersAreEmpty()
     {
         var events = new Mock<TestLoggerEvents>();
-        Assert.ThrowsException<ArgumentException>(() => _testableTrxLogger.Initialize(events.Object, new Dictionary<string, string>()));
+        Assert.ThrowsException<ArgumentException>(() => _testableTrxLogger.Initialize(events.Object, new Dictionary<string, string?>()));
     }
 
     [TestMethod]
     public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _testableTrxLogger.TestMessageHandler(new object(), default));
+        Assert.ThrowsException<ArgumentNullException>(() => _testableTrxLogger.TestMessageHandler(new object(), default!));
     }
 
     [TestMethod]
@@ -153,7 +153,7 @@ public class TrxLoggerTests
 
         _testableTrxLogger.TestResultHandler(new object(), e.Object);
 
-        Assert.AreEqual(_testableTrxLogger.TestRunStartTime, _testableTrxLogger.LoggerTestRun.Started);
+        Assert.AreEqual(_testableTrxLogger.TestRunStartTime, _testableTrxLogger.LoggerTestRun?.Started);
     }
 
     [TestMethod]
@@ -614,7 +614,7 @@ public class TrxLoggerTests
     public void TheDefaultTrxFileNameShouldNotHaveWhiteSpace()
     {
         // To create default trx file, log file parameter should be null.
-        _parameters[TrxLoggerConstants.LogFileNameKey] = null;
+        _parameters[TrxLoggerConstants.LogFileNameKey] = null!;
         _testableTrxLogger.Initialize(_events.Object, _parameters);
 
         MakeTestRunComplete();
@@ -885,7 +885,7 @@ public class TrxLoggerTests
         ValidateResultAttributesInTrx(_testableTrxLogger.TrxFile!, testCase.Id, testCase.DisplayName, isMstestAdapter);
     }
 
-    private void ValidateResultAttributesInTrx(string trxFileName, Guid testId, string testName, bool isMstestAdapter)
+    private static void ValidateResultAttributesInTrx(string trxFileName, Guid testId, string testName, bool isMstestAdapter)
     {
         using FileStream file = File.OpenRead(trxFileName);
         using XmlReader reader = XmlReader.Create(file);
@@ -956,7 +956,7 @@ public class TrxLoggerTests
 
     private void MakeTestRunComplete() => MakeTestRunComplete(_testableTrxLogger);
 
-    private void MakeTestRunComplete(TestableTrxLogger testableTrxLogger)
+    private static void MakeTestRunComplete(TestableTrxLogger testableTrxLogger)
     {
         var pass = CreatePassTestResultEventArgsMock();
         testableTrxLogger.TestResultHandler(new object(), pass.Object);

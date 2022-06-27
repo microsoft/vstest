@@ -110,13 +110,13 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// <param name="dataSink">A data collection sink for data transfer</param>
     /// <param name="logger">Data Collection Logger to send messages to the client </param>
     /// <param name="environmentContext">Context of data collector environment</param>
-    [MemberNotNull(nameof(_events), nameof(_dataCollectionSink), nameof(_context), nameof(_testSequence), nameof(_testObjectDictionary), nameof(_logger))]
+    [MemberNotNull(nameof(_events), nameof(_dataCollectionSink), nameof(_testSequence), nameof(_testObjectDictionary), nameof(_logger))]
     public override void Initialize(
         XmlElement? configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
         DataCollectionLogger logger,
-        DataCollectionEnvironmentContext environmentContext)
+        DataCollectionEnvironmentContext? environmentContext)
     {
         _events = events;
         _dataCollectionSink = dataSink;
@@ -134,12 +134,10 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
         if (_configurationElement != null)
         {
-            var collectDumpNode = _configurationElement[Constants.DumpModeKey];
-            _collectProcessDumpOnCrash = collectDumpNode != null;
-
-            if (_collectProcessDumpOnCrash)
+            if (_configurationElement[Constants.DumpModeKey] is XmlElement collectDumpNode)
             {
-                ValidateAndAddCrashProcessDumpParameters(collectDumpNode!);
+                _collectProcessDumpOnCrash = true;
+                ValidateAndAddCrashProcessDumpParameters(collectDumpNode);
 
                 // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
@@ -153,15 +151,22 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                 var dumpPath = Path.Combine(dumpDirectory, $"%e_%p_%t_crashdump.dmp");
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
             }
-
-            var collectHangBasedDumpNode = _configurationElement[Constants.CollectDumpOnTestSessionHang];
-            _collectProcessDumpOnHang = collectHangBasedDumpNode != null;
-            if (_collectProcessDumpOnHang)
+            else
             {
+                _collectProcessDumpOnCrash = false;
+            }
+
+            if (_configurationElement[Constants.CollectDumpOnTestSessionHang] is XmlElement collectHangBasedDumpNode)
+            {
+                _collectProcessDumpOnHang = true;
                 // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
 
                 ValidateAndAddHangProcessDumpParameters(collectHangBasedDumpNode!);
+            }
+            else
+            {
+                _collectProcessDumpOnHang = false;
             }
 
             var tfm = _configurationElement[Constants.TargetFramework]?.InnerText;
@@ -188,7 +193,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// </summary>
     private void CollectDumpAndAbortTesthost()
     {
-        TPDebug.Assert(_logger != null && _context != null && _targetFramework != null && _dataCollectionSink != null, "Initialize must be called before calling this method");
+        TPDebug.Assert(_logger != null && _context != null && _dataCollectionSink != null, "Initialize must be called before calling this method");
         _inactivityTimerAlreadyFired = true;
 
         string value;
@@ -236,7 +241,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             {
                 Action<string> logWarning = m => _logger.LogWarning(_context.SessionDataCollectionContext, m);
                 var dumpDirectory = GetDumpDirectory();
-                _processDumpUtility.StartHangBasedProcessDump(_testHostProcessId, dumpDirectory, _hangDumpType == HangDumpType.Full, _targetFramework, logWarning);
+                _processDumpUtility.StartHangBasedProcessDump(_testHostProcessId, dumpDirectory, _hangDumpType == HangDumpType.Full, _targetFramework!, logWarning);
                 hangDumpSuccess = true;
             }
             catch (Exception ex)
@@ -414,8 +419,9 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         TPDebug.Assert(_testSequence != null && _testObjectDictionary != null, "Initialize must be called before calling this method");
         ResetInactivityTimer();
 
-        EqtTrace.Info("Blame Collector : Test Case Start");
+        EqtTrace.Info("BlameCollector.EventsTestCaseStart: Test Case Start");
 
+        TPDebug.Assert(e.TestElement is not null, "e.TestElement is null");
         var blameTestObject = new BlameTestObject(e.TestElement);
 
         // Add guid to list of test sequence to maintain the order.
@@ -438,11 +444,12 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         TPDebug.Assert(_testObjectDictionary != null, "Initialize must be called before calling this method");
         ResetInactivityTimer();
 
-        EqtTrace.Info("Blame Collector: Test Case End");
+        EqtTrace.Info("BlameCollector.EventsTestCaseEnd: Test Case End");
 
         _testEndCount++;
 
         // Update the test object in the dictionary as the test has completed.
+        TPDebug.Assert(e.TestElement is not null, "e.TestElement is null");
         if (_testObjectDictionary.ContainsKey(e.TestElement.Id))
         {
             _testObjectDictionary[e.TestElement.Id].IsCompleted = true;
@@ -543,13 +550,13 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             return;
         }
 
-        TPDebug.Assert(_logger != null && _context != null && _targetFramework != null, "Initialize must be called before calling this method");
+        TPDebug.Assert(_logger != null && _context != null, "Initialize must be called before calling this method");
 
         try
         {
             var dumpDirectory = GetDumpDirectory();
             Action<string> logWarning = m => _logger.LogWarning(_context.SessionDataCollectionContext, m);
-            _processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, dumpDirectory, _crashDumpType == CrashDumpType.Full, _targetFramework, _collectDumpAlways, logWarning);
+            _processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, dumpDirectory, _crashDumpType == CrashDumpType.Full, _targetFramework!, _collectDumpAlways, logWarning);
         }
         catch (TestPlatformException e)
         {

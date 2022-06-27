@@ -51,15 +51,12 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
             // TODO: Validate the process we are passed is actually the same as TestHostProcess
             // TODO: Validate we already started the process.
             var process = (FakeProcess)p;
-            if (HostExited != null)
-            {
-                // TODO: When we exit, eventually there are no subscribers, maybe we should review if we don't lose the error output sometimes, in unnecessary way
-                HostExited(this, new HostProviderEventArgs(process.ErrorOutput, process.ExitCode, process.Id));
-            }
+            // TODO: When we exit, eventually there are no subscribers, maybe we should review if we don't lose the error output sometimes, in unnecessary way
+            HostExited?.Invoke(this, new HostProviderEventArgs(process.ErrorOutput!, process.ExitCode, process.Id));
         };
     }
 
-    public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+    public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
     {
         // <TargetPlatform>x86</TargetPlatform>
         // <TargetFrameworkVersion>Framework40</TargetFrameworkVersion>
@@ -80,7 +77,7 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
         return FakeCommunicationEndpoint.TestHostConnectionInfo;
     }
 
-    public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
+    public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string?>? environmentVariables, TestRunnerConnectionInfo connectionInfo)
     {
         // TODO: do we need to do more here? How to link testhost to the fake one we "start"?
         return TestHostProcess.TestProcessStartInfo;
@@ -99,7 +96,7 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
         return sources;
     }
 
-    public void Initialize(IMessageLogger logger, string runsettingsXml)
+    public void Initialize(IMessageLogger? logger, string runsettingsXml)
     {
         // TODO: this is called twice, is that okay?
         // TODO: and also by HandlePartialRunComplete after the test run has completed and we aborted because the client disconnected
@@ -113,11 +110,8 @@ internal class FakeTestRuntimeProvider : ITestRuntimeProvider
             throw new InvalidOperationException($"Tried to start a different process than the one associated with this provider: File name is {testHostStartInfo.FileName} is not the same as the fake process associated with this provider {TestHostProcess.TestProcessStartInfo.FileName}.");
 
         FakeProcessHelper.StartFakeProcess(TestHostProcess);
+        HostLaunched?.Invoke(this, new HostProviderEventArgs("Fake testhost launched", 0, TestHostProcess.Id));
 
-        if (HostLaunched != null)
-        {
-            HostLaunched(this, new HostProviderEventArgs("Fake testhost launched", 0, TestHostProcess.Id));
-        }
         return Task.FromResult(true);
     }
 

@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -19,28 +17,15 @@ public static class TestOutcomeHelper
     /// <returns>The localized outcome string.</returns>
     public static string GetOutcomeString(TestOutcome outcome)
     {
-        string result;
-        switch (outcome)
+        string result = outcome switch
         {
-            case TestOutcome.None:
-                result = Resources.Resources.TestOutcomeNone;
-                break;
-            case TestOutcome.Passed:
-                result = Resources.Resources.TestOutcomePassed;
-                break;
-            case TestOutcome.Failed:
-                result = Resources.Resources.TestOutcomeFailed;
-                break;
-            case TestOutcome.Skipped:
-                result = Resources.Resources.TestOutcomeSkipped;
-                break;
-            case TestOutcome.NotFound:
-                result = Resources.Resources.TestOutcomeNotFound;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(outcome));
-        }
-
+            TestOutcome.None => Resources.Resources.TestOutcomeNone,
+            TestOutcome.Passed => Resources.Resources.TestOutcomePassed,
+            TestOutcome.Failed => Resources.Resources.TestOutcomeFailed,
+            TestOutcome.Skipped => Resources.Resources.TestOutcomeSkipped,
+            TestOutcome.NotFound => Resources.Resources.TestOutcomeNotFound,
+            _ => throw new ArgumentOutOfRangeException(nameof(outcome)),
+        };
         return result;
     }
 }

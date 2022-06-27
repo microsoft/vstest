@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -25,8 +26,6 @@ using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Con
 using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
 using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
@@ -58,43 +57,47 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <summary>
     /// Cache the TRX file path
     /// </summary>
-    private string _trxFilePath;
+    private string? _trxFilePath;
 
     // The converter class
     private readonly Converter _converter;
-    private ConcurrentDictionary<Guid, ITestResult> _results;
-    private ConcurrentDictionary<Guid, ITestElement> _testElements;
-    private ConcurrentDictionary<Guid, TestEntry> _entries;
+    private ConcurrentDictionary<Guid, ITestResult>? _results;
+    private ConcurrentDictionary<Guid, ITestElement>? _testElements;
+    private ConcurrentDictionary<Guid, TestEntry>? _entries;
 
     // Caching results and inner test entries for constant time lookup for inner parents.
-    private ConcurrentDictionary<Guid, ITestResult> _innerResults;
-    private ConcurrentDictionary<Guid, TestEntry> _innerTestEntries;
+    private ConcurrentDictionary<Guid, ITestResult>? _innerResults;
+    private ConcurrentDictionary<Guid, TestEntry>? _innerTestEntries;
 
     private readonly TrxFileHelper _trxFileHelper;
 
     /// <summary>
     /// Specifies the run level "out" messages
     /// </summary>
-    private StringBuilder _runLevelStdOut;
+    private StringBuilder? _runLevelStdOut;
 
     // List of run level errors and warnings generated. These are logged in the Trx in the Results Summary.
-    private List<RunInfo> _runLevelErrorsAndWarnings;
+    private List<RunInfo>? _runLevelErrorsAndWarnings;
     private readonly string _trxFileExtension = ".trx";
 
     /// <summary>
     /// Parameters dictionary for logger. Ex: {"LogFileName":"TestResults.trx"}.
     /// </summary>
-    private Dictionary<string, string> _parametersDictionary;
+    private Dictionary<string, string?>? _parametersDictionary;
 
     /// <summary>
     /// Gets the directory under which default trx file and test results attachments should be saved.
     /// </summary>
-    private string _testResultsDirPath;
+    private string? _testResultsDirPath;
 
 
     #region ITestLogger
 
+    [MemberNotNullWhen(true, nameof(_testResultsDirPath), nameof(_results), nameof(_innerResults), nameof(_testElements), nameof(_entries), nameof(_innerTestEntries), nameof(_runLevelErrorsAndWarnings), nameof(_runLevelStdOut))]
+    private bool IsInitialized { get; set; }
+
     /// <inheritdoc/>
+    [MemberNotNull(nameof(_testResultsDirPath), nameof(_results), nameof(_innerResults), nameof(_testElements), nameof(_entries), nameof(_innerTestEntries), nameof(_runLevelErrorsAndWarnings), nameof(_runLevelStdOut))]
     public void Initialize(TestLoggerEvents events, string testResultsDirPath)
     {
         ValidateArg.NotNull(events, nameof(events));
@@ -106,11 +109,25 @@ public class TrxLogger : ITestLoggerWithParameters
         events.TestRunComplete += TestRunCompleteHandler;
 
         _testResultsDirPath = testResultsDirPath;
-        InitializeInternal();
+        _results = new ConcurrentDictionary<Guid, ITestResult>();
+        _innerResults = new ConcurrentDictionary<Guid, ITestResult>();
+        _testElements = new ConcurrentDictionary<Guid, ITestElement>();
+        _entries = new ConcurrentDictionary<Guid, TestEntry>();
+        _innerTestEntries = new ConcurrentDictionary<Guid, TestEntry>();
+        _runLevelErrorsAndWarnings = new List<RunInfo>();
+        LoggerTestRun = null;
+        TotalTestCount = 0;
+        PassedTestCount = 0;
+        FailedTestCount = 0;
+        _runLevelStdOut = new StringBuilder();
+        TestRunStartTime = DateTime.UtcNow;
+
+        IsInitialized = true;
     }
 
     /// <inheritdoc/>
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+    [MemberNotNull(nameof(_parametersDictionary))]
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters)
     {
         ValidateArg.NotNull(parameters, nameof(parameters));
         if (parameters.Count == 0)
@@ -131,7 +148,7 @@ public class TrxLogger : ITestLoggerWithParameters
         }
 
         _parametersDictionary = parameters;
-        Initialize(events, _parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]);
+        Initialize(events, _parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]!);
     }
     #endregion
 
@@ -139,17 +156,19 @@ public class TrxLogger : ITestLoggerWithParameters
 
     internal string GetRunLevelInformationalMessage()
     {
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
         return _runLevelStdOut.ToString();
     }
 
     internal List<RunInfo> GetRunLevelErrorsAndWarnings()
     {
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
         return _runLevelErrorsAndWarnings;
     }
 
     internal DateTime TestRunStartTime { get; private set; }
 
-    internal TestRun LoggerTestRun { get; private set; }
+    internal TestRun? LoggerTestRun { get; private set; }
 
     internal int TotalTestCount { get; private set; }
 
@@ -159,17 +178,29 @@ public class TrxLogger : ITestLoggerWithParameters
 
     internal int TestResultCount
     {
-        get { return _results.Count; }
+        get
+        {
+            TPDebug.Assert(IsInitialized, "Logger is not initialized");
+            return _results.Count;
+        }
     }
 
     internal int UnitTestElementCount
     {
-        get { return _testElements.Count; }
+        get
+        {
+            TPDebug.Assert(IsInitialized, "Logger is not initialized");
+            return _testElements.Count;
+        }
     }
 
     internal int TestEntryCount
     {
-        get { return _entries.Count; }
+        get
+        {
+            TPDebug.Assert(IsInitialized, "Logger is not initialized");
+            return _entries.Count;
+        }
     }
 
     internal TrxLoggerObjectModel.TestOutcome TestResultOutcome { get; private set; } = TrxLoggerObjectModel.TestOutcome.Passed;
@@ -187,10 +218,11 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <param name="e">
     /// Event args
     /// </param>
-    internal void TestMessageHandler(object sender, TestRunMessageEventArgs e)
+    internal void TestMessageHandler(object? sender, TestRunMessageEventArgs e)
     {
         ValidateArg.NotNull(sender, nameof(sender));
         ValidateArg.NotNull(e, nameof(e));
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
         RunInfo runMessage;
 
         switch (e.Level)
@@ -222,7 +254,7 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <param name="e">
     /// The eventArgs.
     /// </param>
-    internal void TestResultHandler(object sender, TestResultEventArgs e)
+    internal void TestResultHandler(object? sender, TestResultEventArgs e)
     {
         // Create test run
         if (LoggerTestRun == null)
@@ -238,7 +270,7 @@ public class TrxLogger : ITestLoggerWithParameters
         // Setting parent properties like parent result, parent test element, parent execution id.
         var parentExecutionId = _converter.GetParentExecutionId(e.Result);
         var parentTestResult = GetTestResult(parentExecutionId);
-        var parentTestElement = (parentTestResult != null) ? GetTestElement(parentTestResult.Id.TestId) : null;
+        var parentTestElement = parentTestResult != null ? GetTestElement(parentTestResult.Id.TestId) : null;
 
         // Switch to flat test results in case any parent related information is missing.
         if (parentTestResult == null || parentTestElement == null || parentExecutionId == Guid.Empty)
@@ -282,13 +314,15 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <param name="e">
     /// Test run complete events arguments.
     /// </param>
-    internal void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
+    internal void TestRunCompleteHandler(object? sender, TestRunCompleteEventArgs e)
     {
         // Create test run
         // If abort occurs there is no call to TestResultHandler which results in testRun not created.
         // This happens when some test aborts in the first batch of execution.
         if (LoggerTestRun == null)
             CreateTestRun();
+
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
 
         XmlPersistence helper = new();
         XmlTestStoreParameters parameters = XmlTestStoreParameters.GetParameters();
@@ -355,7 +389,7 @@ public class TrxLogger : ITestLoggerWithParameters
         helper.SaveObject(runSummary, rootElement, "ResultSummary", parameters);
 
         ReserveTrxFilePath();
-        PopulateTrxFile(_trxFilePath, rootElement);
+        PopulateTrxFile(_trxFilePath!, rootElement);
     }
 
     /// <summary>
@@ -388,23 +422,6 @@ public class TrxLogger : ITestLoggerWithParameters
         }
     }
 
-    // Initializes trx logger cache.
-    private void InitializeInternal()
-    {
-        _results = new ConcurrentDictionary<Guid, ITestResult>();
-        _innerResults = new ConcurrentDictionary<Guid, ITestResult>();
-        _testElements = new ConcurrentDictionary<Guid, ITestElement>();
-        _entries = new ConcurrentDictionary<Guid, TestEntry>();
-        _innerTestEntries = new ConcurrentDictionary<Guid, TestEntry>();
-        _runLevelErrorsAndWarnings = new List<RunInfo>();
-        LoggerTestRun = null;
-        TotalTestCount = 0;
-        PassedTestCount = 0;
-        FailedTestCount = 0;
-        _runLevelStdOut = new StringBuilder();
-        TestRunStartTime = DateTime.UtcNow;
-    }
-
     /// <summary>
     /// Add run level informational message
     /// </summary>
@@ -413,13 +430,14 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </param>
     private void AddRunLevelInformationalMessage(string message)
     {
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
         _runLevelStdOut.AppendLine(message);
     }
 
     // Handle the skipped test result
     private void HandleSkippedTest(ObjectModel.TestResult rsTestResult)
     {
-        Debug.Assert(rsTestResult.Outcome == ObjectModel.TestOutcome.Skipped, "Test Result should be skipped but it is " + rsTestResult.Outcome);
+        TPDebug.Assert(rsTestResult.Outcome == ObjectModel.TestOutcome.Skipped, "Test Result should be skipped but it is " + rsTestResult.Outcome);
 
         TestCase testCase = rsTestResult.TestCase;
         string testCaseName = !string.IsNullOrEmpty(testCase.DisplayName) ? testCase.DisplayName : testCase.FullyQualifiedName;
@@ -459,11 +477,14 @@ public class TrxLogger : ITestLoggerWithParameters
 
     private string AcquireTrxFileNamePath(out bool shouldOverwrite)
     {
-        shouldOverwrite = false;
-        var isLogFileNameParameterExists = _parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue);
-        var isLogFilePrefixParameterExists = _parametersDictionary.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue);
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
+        TPDebug.Assert(_parametersDictionary is not null, "_parametersDictionary is null");
 
-        string filePath = null;
+        shouldOverwrite = false;
+        var isLogFileNameParameterExists = _parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string? logFileNameValue) && !logFileNameValue.IsNullOrWhiteSpace();
+        var isLogFilePrefixParameterExists = _parametersDictionary.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string? logFilePrefixValue) && !logFilePrefixValue.IsNullOrWhiteSpace();
+
+        string? filePath = null;
 
         if (isLogFilePrefixParameterExists)
         {
@@ -477,7 +498,7 @@ public class TrxLogger : ITestLoggerWithParameters
         }
         else if (isLogFileNameParameterExists)
         {
-            filePath = Path.Combine(_testResultsDirPath, logFileNameValue);
+            filePath = Path.Combine(_testResultsDirPath, logFileNameValue!);
             shouldOverwrite = true;
         }
 
@@ -487,7 +508,7 @@ public class TrxLogger : ITestLoggerWithParameters
 
         if (!Directory.Exists(trxFileDirPath))
         {
-            Directory.CreateDirectory(trxFileDirPath);
+            Directory.CreateDirectory(trxFileDirPath!);
         }
 
         return filePath;
@@ -498,6 +519,9 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </summary>
     private string SetDefaultTrxFilePath()
     {
+        TPDebug.Assert(LoggerTestRun != null, "LoggerTestRun is null");
+        TPDebug.Assert(LoggerTestRun.RunConfiguration != null, "LoggerTestRun.RunConfiguration is null");
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
         var defaultTrxFileName = LoggerTestRun.RunConfiguration.RunDeploymentRootDirectory + ".trx";
 
         return _trxFileHelper.GetNextIterationFileName(_testResultsDirPath, defaultTrxFileName, false);
@@ -506,6 +530,7 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <summary>
     /// Creates test run.
     /// </summary>
+    [MemberNotNull(nameof(LoggerTestRun))]
     private void CreateTestRun()
     {
         // Skip run creation if already exists.
@@ -533,9 +558,10 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="executionId"></param>
     /// <returns>Test result</returns>
-    private ITestResult GetTestResult(Guid executionId)
+    private ITestResult? GetTestResult(Guid executionId)
     {
-        ITestResult testResult = null;
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
+        ITestResult? testResult = null;
 
         if (executionId != Guid.Empty)
         {
@@ -553,8 +579,9 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="testId"></param>
     /// <returns></returns>
-    private ITestElement GetTestElement(Guid testId)
+    private ITestElement? GetTestElement(Guid testId)
     {
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
         _testElements.TryGetValue(testId, out var testElement);
         return testElement;
     }
@@ -568,21 +595,22 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <param name="parentTestElement"></param>
     /// <param name="rockSteadyTestCase"></param>
     /// <returns>Trx test element</returns>
-    private ITestElement GetOrCreateTestElement(Guid executionId, Guid parentExecutionId, TestType testType, ITestElement parentTestElement, ObjectModel.TestResult rockSteadyTestResult)
+    private ITestElement GetOrCreateTestElement(Guid executionId, Guid parentExecutionId, TestType testType, ITestElement? parentTestElement, ObjectModel.TestResult rockSteadyTestResult)
     {
-        ITestElement testElement = parentTestElement;
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
+        ITestElement? testElement = parentTestElement;
 
         // For scenarios like data driven tests, test element is same as parent test element.
         if (parentTestElement != null && !parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType))
         {
-            return testElement;
+            return testElement!;
         }
 
         TestCase testCase = rockSteadyTestResult.TestCase;
         Guid testId = _converter.GetTestId(testCase);
 
         // Scenario for inner test case when parent test element is not present.
-        var testName = testCase.DisplayName;
+        string? testName = testCase.DisplayName;
         var adapter = testCase.ExecutorUri.ToString();
         if (adapter.Contains(TrxLoggerConstants.MstestAdapterString) &&
             parentTestElement == null &&
@@ -601,7 +629,7 @@ public class TrxLogger : ITestLoggerWithParameters
         // Create test element
         if (testElement == null)
         {
-            testElement = _converter.ToTestElement(testId, executionId, parentExecutionId, testName, testType, testCase);
+            testElement = _converter.ToTestElement(testId, executionId, parentExecutionId, testName!, testType, testCase);
             _testElements.TryAdd(testId, testElement);
         }
 
@@ -613,13 +641,18 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="testElement"></param>
     /// <param name="parentTestElement"></param>
-    private void UpdateTestLinks(ITestElement testElement, ITestElement parentTestElement)
+    private static void UpdateTestLinks(ITestElement testElement, ITestElement? parentTestElement)
     {
-        if (parentTestElement != null &&
-            parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType) &&
-            !(parentTestElement as OrderedTestElement).TestLinks.ContainsKey(testElement.Id.Id))
+        if (parentTestElement == null
+            || !parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType))
         {
-            (parentTestElement as OrderedTestElement).TestLinks.Add(testElement.Id.Id, new TestLink(testElement.Id.Id, testElement.Name, testElement.Storage));
+            return;
+        }
+
+        var orderedTest = (OrderedTestElement)parentTestElement;
+        if (!orderedTest.TestLinks.ContainsKey(testElement.Id.Id))
+        {
+            orderedTest.TestLinks.Add(testElement.Id.Id, new TestLink(testElement.Id.Id, testElement.Name, testElement.Storage));
         }
     }
 
@@ -635,10 +668,12 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <param name="rocksteadyTestResult"></param>
     /// <returns>Trx test result</returns>
     private ITestResult CreateTestResult(Guid executionId, Guid parentExecutionId, TestType testType,
-        ITestElement testElement, ITestElement parentTestElement, ITestResult parentTestResult, ObjectModel.TestResult rocksteadyTestResult)
+        ITestElement testElement, ITestElement? parentTestElement, ITestResult? parentTestResult, ObjectModel.TestResult rocksteadyTestResult)
     {
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
         // Create test result
         TrxLoggerObjectModel.TestOutcome testOutcome = _converter.ToOutcome(rocksteadyTestResult.Outcome);
+        TPDebug.Assert(LoggerTestRun != null, "LoggerTestRun is null");
         var testResult = _converter.ToTestResult(testElement.Id.Id, executionId, parentExecutionId, testElement.Name,
             _testResultsDirPath, testType, testElement.CategoryId, testOutcome, LoggerTestRun, rocksteadyTestResult);
 
@@ -652,7 +687,8 @@ public class TrxLogger : ITestLoggerWithParameters
         // Ordered test inner result scenario
         if (parentTestElement != null && parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType))
         {
-            (parentTestResult as TestResultAggregation).InnerResults.Add(testResult);
+            TPDebug.Assert(parentTestResult is TestResultAggregation, "parentTestResult is not of type TestResultAggregation");
+            ((TestResultAggregation)parentTestResult).InnerResults.Add(testResult);
             _innerResults.TryAdd(executionId, testResult);
             return testResult;
         }
@@ -660,8 +696,10 @@ public class TrxLogger : ITestLoggerWithParameters
         // Data driven inner result scenario
         if (parentTestElement != null && parentTestElement.TestType.Equals(TrxLoggerConstants.UnitTestType))
         {
-            (parentTestResult as TestResultAggregation).InnerResults.Add(testResult);
-            testResult.DataRowInfo = (parentTestResult as TestResultAggregation).InnerResults.Count;
+            TPDebug.Assert(parentTestResult is TestResultAggregation, "parentTestResult is not of type TestResultAggregation");
+            var testResultAggregation = (TestResultAggregation)parentTestResult;
+            testResultAggregation.InnerResults.Add(testResult);
+            testResult.DataRowInfo = testResultAggregation.InnerResults.Count;
             testResult.ResultType = TrxLoggerConstants.InnerDataDrivenResultType;
             parentTestResult.ResultType = TrxLoggerConstants.ParentDataDrivenResultType;
             return testResult;
@@ -677,8 +715,9 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <param name="parentExecutionId"></param>
     /// <param name="testElement"></param>
     /// <param name="parentTestElement"></param>
-    private void UpdateTestEntries(Guid executionId, Guid parentExecutionId, ITestElement testElement, ITestElement parentTestElement)
+    private void UpdateTestEntries(Guid executionId, Guid parentExecutionId, ITestElement testElement, ITestElement? parentTestElement)
     {
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
         TestEntry te = new(testElement.Id, TestListCategory.UncategorizedResults.Id);
         te.ExecutionId = executionId;
 
@@ -703,9 +742,10 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="executionId"></param>
     /// <returns>Test entry</returns>
-    private TestEntry GetTestEntry(Guid executionId)
+    private TestEntry? GetTestEntry(Guid executionId)
     {
-        TestEntry testEntry = null;
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
+        TestEntry? testEntry = null;
 
         if (executionId != Guid.Empty)
         {
@@ -720,6 +760,9 @@ public class TrxLogger : ITestLoggerWithParameters
 
     private TrxLoggerObjectModel.TestOutcome ChangeTestOutcomeIfNecessary(TrxLoggerObjectModel.TestOutcome outcome)
     {
+        TPDebug.Assert(IsInitialized, "Logger is not initialized");
+        TPDebug.Assert(_parametersDictionary is not null, "_parametersDictionary is null");
+
         // If no tests discovered/executed and TreatNoTestsAsError was set to True
         // We will return ResultSummary as Failed
         // Note : we only send the value of TreatNoTestsAsError if it is "True"

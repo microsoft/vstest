@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
 /// <summary>
@@ -16,7 +14,7 @@ internal abstract class StoreXmlAttribute : Attribute
     /// <summary>
     /// simple xpath location. only element and attribute names can be used.
     /// </summary>
-    public string Location;
+    public string? Location;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StoreXmlAttribute"/> class.
@@ -31,7 +29,7 @@ internal abstract class StoreXmlAttribute : Attribute
     /// <param name="location">
     /// The location.
     /// </param>
-    public StoreXmlAttribute(string location)
+    public StoreXmlAttribute(string? location)
     {
         Location = location;
     }
@@ -43,7 +41,7 @@ internal abstract class StoreXmlAttribute : Attribute
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
 internal sealed class StoreXmlSimpleFieldAttribute : StoreXmlAttribute
 {
-    public object DefaultValue;
+    public object? DefaultValue;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StoreXmlSimpleFieldAttribute"/> class.
@@ -81,7 +79,7 @@ internal sealed class StoreXmlSimpleFieldAttribute : StoreXmlAttribute
     /// <param name="defaultValue">
     /// The default value.
     /// </param>
-    public StoreXmlSimpleFieldAttribute(string location, object defaultValue)
+    public StoreXmlSimpleFieldAttribute(string? location, object defaultValue)
         : base(location)
     {
         DefaultValue = defaultValue;

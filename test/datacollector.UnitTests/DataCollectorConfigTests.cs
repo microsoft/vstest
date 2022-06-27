@@ -17,14 +17,14 @@ public class DataCollectorConfigTests
         var dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector));
 
         Assert.AreEqual("CustomDataCollector", dataCollectorConfig.FriendlyName);
-        Assert.AreEqual("my://custom/datacollector", dataCollectorConfig.TypeUri.ToString());
+        Assert.AreEqual("my://custom/datacollector", dataCollectorConfig.TypeUri!.ToString());
     }
 
     [TestMethod]
     public void ConstructorShouldThrowExceptionIfTypeIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(
-            () => new DataCollectorConfig(null));
+            () => new DataCollectorConfig(null!));
     }
 
     [TestMethod]
@@ -40,7 +40,7 @@ public class DataCollectorConfigTests
     {
         var dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollectorWithEmptyFriendlyName));
         Assert.AreEqual("", dataCollectorConfig.FriendlyName);
-        Assert.AreEqual("my://custom/datacollector", dataCollectorConfig.TypeUri.ToString());
+        Assert.AreEqual("my://custom/datacollector", dataCollectorConfig.TypeUri!.ToString());
     }
 
     [TestMethod]
@@ -48,6 +48,6 @@ public class DataCollectorConfigTests
     {
         var dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollectorWithoutFriendlyName));
         Assert.AreEqual("", dataCollectorConfig.FriendlyName);
-        Assert.AreEqual("my://custom/datacollector", dataCollectorConfig.TypeUri.ToString());
+        Assert.AreEqual("my://custom/datacollector", dataCollectorConfig.TypeUri!.ToString());
     }
 }

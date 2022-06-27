@@ -34,7 +34,7 @@ public static class TestServiceLocator
         }
 
 #if !NETSTANDARD1_0
-        Resolves.Add(new Resolve(name, typeof(TRegistration).FullName, Environment.StackTrace));
+        Resolves.Add(new Resolve(name, typeof(TRegistration).FullName!, Environment.StackTrace));
 #endif
         return (TRegistration)instance;
     }

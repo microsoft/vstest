@@ -4,9 +4,9 @@
 using System;
 using System.Globalization;
 
-using CommandLineResources = Microsoft.VisualStudio.TestPlatform.SettingsMigrator.Resources.Resources;
+using SettingsMigrator;
 
-#nullable disable
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.SettingsMigrator.Resources.Resources;
 
 namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator;
 
@@ -23,9 +23,9 @@ public static class Program
     public static int Main(string[] args)
     {
         var pathResolver = new PathResolver();
-        string newFilePath = pathResolver.GetTargetPath(args);
+        string? newFilePath = pathResolver.GetTargetPath(args);
 
-        if (!string.IsNullOrEmpty(newFilePath))
+        if (!newFilePath.IsNullOrEmpty())
         {
             string oldFilePath = args[0];
             var migrator = new Migrator();

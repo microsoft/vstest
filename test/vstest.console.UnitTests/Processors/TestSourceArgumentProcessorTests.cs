@@ -81,7 +81,8 @@ public class TestSourceArgumentProcessorTests
         catch (Exception ex)
         {
             Assert.IsTrue(ex is TestSourceException);
-            Assert.AreEqual("The test source file \"" + testFilePath + "\" provided was not found.", ex.Message);
+            StringAssert.StartsWith(ex.Message, "The test source file \"");
+            StringAssert.EndsWith(ex.Message, testFilePath + "\" provided was not found.");
         }
     }
 

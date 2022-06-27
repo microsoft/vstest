@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -44,9 +42,7 @@ public class AttachmentSet
     }
 
     public override string ToString()
-    {
-        return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(DisplayName)}: {DisplayName}, {nameof(Attachments)}: [{string.Join(",", Attachments)}]";
-    }
+        => $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(DisplayName)}: {DisplayName}, {nameof(Attachments)}: [{string.Join(",", Attachments)}]";
 }
 
 
@@ -61,7 +57,7 @@ public class UriDataAttachment
     /// Description of the attachment.
     /// </summary>
     [DataMember]
-    public string Description { get; }
+    public string? Description { get; }
 
     /// <summary>
     /// Uri of the attachment.
@@ -69,7 +65,7 @@ public class UriDataAttachment
     [DataMember]
     public Uri Uri { get; }
 
-    public UriDataAttachment(Uri uri, string description)
+    public UriDataAttachment(Uri uri, string? description)
     {
         Uri = uri;
         Description = description;
@@ -80,7 +76,7 @@ public class UriDataAttachment
         return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(Description)}: {Description}";
     }
 
-    public static UriDataAttachment CreateFrom(string localFilePath, string description)
+    public static UriDataAttachment CreateFrom(string localFilePath, string? description)
     {
         var uri = new UriBuilder() { Scheme = "file", Host = "", Path = localFilePath }.Uri;
         return new UriDataAttachment(uri, description);

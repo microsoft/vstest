@@ -18,11 +18,11 @@ public class CustomDataCollector : ObjectModel.DataCollection.DataCollector, ITe
     private DataCollectionLogger? _logger;
 
     public override void Initialize(
-        XmlElement configurationElement,
+        XmlElement? configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
         DataCollectionLogger logger,
-        DataCollectionEnvironmentContext environmentContext)
+        DataCollectionEnvironmentContext? environmentContext)
     {
         _dataCollectionSink = dataSink;
         _context = environmentContext;

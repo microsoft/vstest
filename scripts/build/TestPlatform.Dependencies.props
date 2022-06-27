@@ -15,8 +15,8 @@
 
     <!-- These versions are used for running unit tests, and running acceptance tests. They are also used as the default version for projects
     in TestAssets.sln to allow running and debugging tests in that solution directly in VS without having to run them via AcceptanceTests. -->
-    <MSTestFrameworkVersion>2.2.9-preview-20220210-07</MSTestFrameworkVersion>
-    <MSTestAdapterVersion>2.2.9-preview-20220210-07</MSTestAdapterVersion>
+    <MSTestFrameworkVersion>2.3.0-preview-20220613-02</MSTestFrameworkVersion>
+    <MSTestAdapterVersion>2.3.0-preview-20220613-02</MSTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
 
     <XUnitFrameworkVersion>2.3.1</XUnitFrameworkVersion>
@@ -28,14 +28,15 @@
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
 
     <ChutzpahAdapterVersion>4.4.12</ChutzpahAdapterVersion>
+    <FluentAssertionsVersion>6.7.0</FluentAssertionsVersion>
 
     <!-- Versions that are used when building projects from TestAssets.sln for compatibility tests. See Invoke-TestAssetsBuild in scripts/build.ps1.
     Exact versions are used to avoid Nuget substituting them by closest match, if we make a typo.
     These versions need to be "statically" readable because we read this file as xml in our build and tests. -->
     <!-- <MSTestFrameworkLatestVersion></MSTestFrameworkLatestVersion> is not here, because we don't build MSTest locally, so we don't have access to the latest version. -->
-    <MSTestFrameworkLatestPreviewVersion>[2.2.10-preview-20220414-01]</MSTestFrameworkLatestPreviewVersion>
+    <MSTestFrameworkLatestPreviewVersion>[2.3.0-preview-20220613-02]</MSTestFrameworkLatestPreviewVersion>
     <MSTestFrameworkLatestStableVersion>[2.2.10]</MSTestFrameworkLatestStableVersion>
-    <MSTestFrameworkRecentStableVersion>[2.2.8]</MSTestFrameworkRecentStableVersion>
+    <MSTestFrameworkRecentStableVersion>[2.2.9]</MSTestFrameworkRecentStableVersion>
     <MSTestFrameworkMostDownloadedVersion>[2.1.0]</MSTestFrameworkMostDownloadedVersion>
     <MSTestFrameworkPreviousStableVersion>[2.1.0]</MSTestFrameworkPreviousStableVersion>
     <MSTestFrameworkLegacyStableVersion>[1.4.0]</MSTestFrameworkLegacyStableVersion>
@@ -58,12 +59,13 @@
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
     <JsonNetVersion>9.0.1</JsonNetVersion>
 
-    <TestPlatformExternalsVersion>17.3.0-preview-2-32502-021</TestPlatformExternalsVersion>
-    <!-- <TestPlatformMSDiaVersion>$(TestPlatformExternalsVersion)</TestPlatformMSDiaVersion> -->
-    <TestPlatformMSDiaVersion>17.1.0-preview-2-31925-026</TestPlatformMSDiaVersion>
+    <!-- We cannot reuse $(msbuildvar) because we need the text value inside build.ps1 -->
+    <TestPlatformExternalsVersion>17.3.32621.448</TestPlatformExternalsVersion>
     <!-- Portable CPP test runner -->
-    <TestPlatformRemoteExternalsVersion>17.1.0-preview-2-31925-026</TestPlatformRemoteExternalsVersion>
-    <InteropExternalsVersion>17.1.0-preview-2-31925-026</InteropExternalsVersion>
+    <TestPlatformRemoteExternalsVersion>17.3.32621.448</TestPlatformRemoteExternalsVersion>
+    <TestPlatformMSDiaVersion>17.3.32621.448</TestPlatformMSDiaVersion>
+    <InteropExternalsVersion>17.3.32621.448</InteropExternalsVersion>
+    
     <MicrosoftFakesVersion>17.3.0-beta.22327.2</MicrosoftFakesVersion>
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
     <MicrosoftBuildFrameworkPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildFrameworkPackageVersion>

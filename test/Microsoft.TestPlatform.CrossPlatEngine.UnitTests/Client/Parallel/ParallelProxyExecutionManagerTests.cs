@@ -189,7 +189,7 @@ public class ParallelProxyExecutionManagerTests
 
         // act
         // Tell the manager that completedManager finished work, and that it should progress to next work
-        parallelExecutionManager.HandlePartialRunComplete(completedManager.Object, completeArgs, null, null, null);
+        parallelExecutionManager.HandlePartialRunComplete(completedManager.Object, completeArgs, null!, null!, null!);
 
         // assert
         // We created 2 managers 1 for the original work and another one
@@ -348,7 +348,7 @@ public class ParallelProxyExecutionManagerTests
                     {
                         lock (syncObject)
                         {
-                            _processedSources.AddRange(criteria.Sources);
+                            _processedSources.AddRange(criteria.Sources!);
                         }
 
                         Task.Delay(100).Wait();
@@ -399,10 +399,10 @@ public class ParallelProxyExecutionManagerTests
                         Assert.IsTrue(completeArgs.IsAborted, "Aborted value must be OR of all values");
                         Assert.IsTrue(completeArgs.IsCanceled, "Canceled value must be OR of all values");
 
-                        Assert.AreEqual(10, completeArgs.TestRunStatistics.ExecutedTests,
+                        Assert.AreEqual(10, completeArgs.TestRunStatistics!.ExecutedTests,
                             "Stats must be aggregated properly");
 
-                        Assert.AreEqual(6, completeArgs.TestRunStatistics.Stats[TestOutcome.Passed],
+                        Assert.AreEqual(6, completeArgs.TestRunStatistics.Stats![TestOutcome.Passed],
                             "Stats must be aggregated properly");
                         Assert.AreEqual(4, completeArgs.TestRunStatistics.Stats[TestOutcome.Failed],
                             "Stats must be aggregated properly");
@@ -526,7 +526,7 @@ public class ParallelProxyExecutionManagerTests
                     {
                         lock (syncObject)
                         {
-                            processedTestCases.AddRange(criteria.Tests);
+                            processedTestCases.AddRange(criteria.Tests!);
                         }
 
                         Task.Delay(100).Wait();
@@ -561,7 +561,7 @@ public class ParallelProxyExecutionManagerTests
                     {
                         lock (syncObject)
                         {
-                            processedSources.AddRange(criteria.Sources);
+                            processedSources.AddRange(criteria.Sources!);
                         }
                         Task.Delay(100).Wait();
 

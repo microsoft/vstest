@@ -4,8 +4,6 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -18,30 +16,30 @@ public class TestProcessStartInfo
     /// The name of the test runner exe
     /// </summary>
     [DataMember]
-    public string FileName { get; set; }
+    public string? FileName { get; set; }
 
     /// <summary>
     /// The arguments for the test runner
     /// </summary>
     [DataMember]
-    public string Arguments { get; set; }
+    public string? Arguments { get; set; }
 
     /// <summary>
     /// The working directory for the test runner
     /// </summary>
     [DataMember]
-    public string WorkingDirectory { get; set; }
+    public string? WorkingDirectory { get; set; }
 
     /// <summary>
     /// The associated environment variables
     /// </summary>
     [DataMember]
-    public IDictionary<string, string> EnvironmentVariables { get; set; }
+    public IDictionary<string, string?>? EnvironmentVariables { get; set; }
 
     /// <summary>
     /// Any additional custom properties that might be required for the launch
     /// For example - emulator ID, remote machine details etc.
     /// </summary>
     [DataMember]
-    public IDictionary<string, string> CustomProperties { get; set; }
+    public IDictionary<string, string>? CustomProperties { get; set; }
 }

@@ -5,8 +5,6 @@ using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
 
 public class InvalidLoggerException : TestPlatformException
@@ -15,7 +13,7 @@ public class InvalidLoggerException : TestPlatformException
     /// Initializes with the message.
     /// </summary>
     /// <param name="message">Message for the exception.</param>
-    public InvalidLoggerException(string message)
+    public InvalidLoggerException(string? message)
         : base(message)
     {
     }
@@ -25,7 +23,7 @@ public class InvalidLoggerException : TestPlatformException
     /// </summary>
     /// <param name="message">Message for the exception.</param>
     /// <param name="innerException">The inner exception.</param>
-    public InvalidLoggerException(string message, Exception innerException)
+    public InvalidLoggerException(string? message, Exception? innerException)
         : base(message, innerException)
     {
     }

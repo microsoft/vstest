@@ -4,8 +4,6 @@
 using System;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 public sealed class InvokedDataCollector : IEquatable<InvokedDataCollector>
@@ -61,22 +59,20 @@ public sealed class InvokedDataCollector : IEquatable<InvokedDataCollector>
     /// </summary>
     /// <param name="other">InvokedDataCollector instance</param>
     /// <returns>True if objects are equal</returns>
-    public bool Equals(InvokedDataCollector other)
-    {
-        return other is not null
-               && HasAttachmentProcessor == other.HasAttachmentProcessor &&
-               Uri.AbsoluteUri == other.Uri.AbsoluteUri &&
-               FriendlyName == other.FriendlyName &&
-               AssemblyQualifiedName == other.AssemblyQualifiedName &&
-               FilePath == other.FilePath;
-    }
+    public bool Equals(InvokedDataCollector? other)
+        => other is not null
+        && HasAttachmentProcessor == other.HasAttachmentProcessor
+        && Uri.AbsoluteUri == other.Uri.AbsoluteUri
+        && FriendlyName == other.FriendlyName
+        && AssemblyQualifiedName == other.AssemblyQualifiedName
+        && FilePath == other.FilePath;
 
     /// <summary>
     /// Compares InvokedDataCollector instances for equality.
     /// </summary>
     /// <param name="obj">InvokedDataCollector instance</param>
     /// <returns>True if objects are equal</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
         => Equals(obj as InvokedDataCollector);
 
     /// <summary>

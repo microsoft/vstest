@@ -3,11 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
@@ -21,13 +20,13 @@ internal class FullSymbolReader : ISymbolReader
     /// </summary>
     private bool _isDisposed;
 
-    private IDiaDataSource _source;
-    private IDiaSession _session;
+    private IDiaDataSource? _source;
+    private IDiaSession? _session;
 
     /// <summary>
     /// Holds type symbols available in the source.
     /// </summary>
-    private Dictionary<string, IDiaSymbol> _typeSymbols = new();
+    private readonly Dictionary<string, IDiaSymbol> _typeSymbols = new();
 
     /// <summary>
     /// Holds method symbols for all types in the source.
@@ -35,7 +34,7 @@ internal class FullSymbolReader : ISymbolReader
     /// Bug: Method overrides in same type are not handled (not a regression)
     /// ToDo(Solution): Use method token along with as identifier, this will always give unique method.The adapters would need to send this token to us to correct the behavior.
     /// </summary>
-    private Dictionary<string, Dictionary<string, IDiaSymbol>> _methodSymbols = new();
+    private readonly Dictionary<string, Dictionary<string, IDiaSymbol>> _methodSymbols = new();
 
     /// <summary>
     /// dispose caches
@@ -58,7 +57,7 @@ internal class FullSymbolReader : ISymbolReader
     /// <param name="searchPath">
     /// search path.
     /// </param>
-    public void CacheSymbols(string binaryPath, string searchPath)
+    public void CacheSymbols(string binaryPath, string? searchPath)
     {
         try
         {
@@ -87,11 +86,11 @@ internal class FullSymbolReader : ISymbolReader
     /// <see cref="INavigationData"/>.
     /// Returns INavigationData which contains filename and line number.
     /// </returns>
-    public INavigationData GetNavigationData(string declaringTypeName, string methodName)
+    public INavigationData? GetNavigationData(string declaringTypeName, string methodName)
     {
-        INavigationData navigationData = null;
-        IDiaSymbol typeSymbol = GetTypeSymbol(declaringTypeName, SymTagEnum.SymTagCompiland);
-        IDiaSymbol methodSymbol;
+        INavigationData? navigationData = null;
+        IDiaSymbol? typeSymbol = GetTypeSymbol(declaringTypeName, SymTagEnum.SymTagCompiland);
+        IDiaSymbol? methodSymbol;
         if (typeSymbol != null)
         {
             methodSymbol = GetMethodSymbol(typeSymbol, methodName);
@@ -113,7 +112,7 @@ internal class FullSymbolReader : ISymbolReader
         return navigationData;
     }
 
-    private bool OpenSession(string filename, string searchPath)
+    private bool OpenSession(string filename, string? searchPath)
     {
         try
         {
@@ -129,7 +128,7 @@ internal class FullSymbolReader : ISymbolReader
             if (!Path.IsPathRooted(filename))
             {
                 filename = Path.Combine(Directory.GetCurrentDirectory(), filename);
-                if (string.IsNullOrEmpty(searchPath))
+                if (StringUtils.IsNullOrEmpty(searchPath))
                 {
                     searchPath = Directory.GetCurrentDirectory();
                 }
@@ -169,7 +168,7 @@ internal class FullSymbolReader : ISymbolReader
 
         DiaNavigationData navigationData = new(null, int.MaxValue, int.MinValue);
 
-        IDiaEnumLineNumbers lines = null;
+        IDiaEnumLineNumbers? lines = null;
 
         try
         {
@@ -191,18 +190,19 @@ internal class FullSymbolReader : ISymbolReader
                 return navigationData;
             }
 
+            TPDebug.Assert(_session is not null, "_session is null");
             _session.FindLinesByAddress(section, offset, (uint)length, out lines);
 
             while (true)
             {
-                lines.GetNext(1, out IDiaLineNumber lineNumber, out uint celt);
+                lines.GetNext(1, out IDiaLineNumber? lineNumber, out uint celt);
 
                 if (celt != 1)
                 {
                     break;
                 }
 
-                IDiaSourceFile sourceFile = null;
+                IDiaSourceFile? sourceFile = null;
                 try
                 {
                     lineNumber.GetSourceFile(out sourceFile);
@@ -244,10 +244,11 @@ internal class FullSymbolReader : ISymbolReader
 
     private void PopulateCacheForTypeAndMethodSymbols()
     {
-        IDiaEnumSymbols enumTypeSymbols = null;
-        IDiaSymbol global = null;
+        IDiaEnumSymbols? enumTypeSymbols = null;
+        IDiaSymbol? global = null;
         try
         {
+            TPDebug.Assert(_session is not null, "_session is null");
             _session.GetGlobalScope(out global);
             global.FindChildren(SymTagEnum.SymTagCompiland, null, 0, out enumTypeSymbols);
 
@@ -260,7 +261,7 @@ internal class FullSymbolReader : ISymbolReader
                 typeSymbol.GetName(out var name);
                 _typeSymbols[name] = typeSymbol;
 
-                IDiaEnumSymbols enumMethodSymbols = null;
+                IDiaEnumSymbols? enumMethodSymbols = null;
                 try
                 {
                     Dictionary<string, IDiaSymbol> methodSymbolsForType = new();
@@ -302,13 +303,13 @@ internal class FullSymbolReader : ISymbolReader
         }
     }
 
-    private IDiaSymbol GetTypeSymbol(string typeName, SymTagEnum symTag)
+    private IDiaSymbol? GetTypeSymbol(string typeName, SymTagEnum symTag)
     {
         ValidateArg.NotNullOrEmpty(typeName, nameof(typeName));
 
-        IDiaEnumSymbols enumSymbols = null;
-        IDiaSymbol typeSymbol = null;
-        IDiaSymbol global = null;
+        IDiaEnumSymbols? enumSymbols = null;
+        IDiaSymbol? typeSymbol = null;
+        IDiaSymbol? global = null;
 
         try
         {
@@ -318,6 +319,7 @@ internal class FullSymbolReader : ISymbolReader
                 return _typeSymbols[typeName];
             }
 
+            TPDebug.Assert(_session is not null, "_session is null");
             _session.GetGlobalScope(out global);
             global.FindChildren(symTag, typeName, 0, out enumSymbols);
 
@@ -326,7 +328,7 @@ internal class FullSymbolReader : ISymbolReader
 #if DEBUG
             if (typeSymbol == null)
             {
-                IDiaEnumSymbols enumAllSymbols = null;
+                IDiaEnumSymbols? enumAllSymbols = null;
                 try
                 {
                     global.FindChildren(symTag, null, 0, out enumAllSymbols);
@@ -334,7 +336,7 @@ internal class FullSymbolReader : ISymbolReader
 
                     while (true)
                     {
-                        enumAllSymbols.GetNext(1, out IDiaSymbol childSymbol, out uint fetchedCount);
+                        enumAllSymbols.GetNext(1, out IDiaSymbol? childSymbol, out uint fetchedCount);
                         if (fetchedCount == 0 || childSymbol == null)
                         {
                             break;
@@ -345,7 +347,7 @@ internal class FullSymbolReader : ISymbolReader
                         ReleaseComObject(ref childSymbol);
                     }
 
-                    Debug.Assert(children.Count > 0);
+                    TPDebug.Assert(children.Count > 0);
                 }
                 finally
                 {
@@ -369,13 +371,13 @@ internal class FullSymbolReader : ISymbolReader
         return typeSymbol;
     }
 
-    private IDiaSymbol GetMethodSymbol(IDiaSymbol typeSymbol, string methodName)
+    private IDiaSymbol? GetMethodSymbol(IDiaSymbol typeSymbol, string methodName)
     {
         ValidateArg.NotNull(typeSymbol, nameof(typeSymbol));
         ValidateArg.NotNullOrEmpty(methodName, nameof(methodName));
 
-        IDiaEnumSymbols enumSymbols = null;
-        IDiaSymbol methodSymbol = null;
+        IDiaEnumSymbols? enumSymbols = null;
+        IDiaSymbol? methodSymbol = null;
         Dictionary<string, IDiaSymbol> methodSymbolsForType;
 
         try
@@ -402,7 +404,7 @@ internal class FullSymbolReader : ISymbolReader
 #if DEBUG
             if (methodSymbol == null)
             {
-                IDiaEnumSymbols enumAllSymbols = null;
+                IDiaEnumSymbols? enumAllSymbols = null;
                 try
                 {
                     typeSymbol.FindChildren(SymTagEnum.SymTagFunction, null, 0, out enumAllSymbols);
@@ -410,7 +412,7 @@ internal class FullSymbolReader : ISymbolReader
 
                     while (true)
                     {
-                        enumAllSymbols.GetNext(1, out IDiaSymbol childSymbol, out uint fetchedCount);
+                        enumAllSymbols.GetNext(1, out IDiaSymbol? childSymbol, out uint fetchedCount);
                         if (fetchedCount == 0 || childSymbol == null)
                         {
                             break;
@@ -421,7 +423,7 @@ internal class FullSymbolReader : ISymbolReader
                         ReleaseComObject(ref childSymbol);
                     }
 
-                    Debug.Assert(children.Count > 0);
+                    TPDebug.Assert(children.Count > 0);
                 }
                 finally
                 {
@@ -449,13 +451,13 @@ internal class FullSymbolReader : ISymbolReader
     /// </summary>
     private static void UpdateMethodSymbolCache(string methodName, IDiaSymbol methodSymbol, Dictionary<string, IDiaSymbol> methodSymbolCache)
     {
-        Debug.Assert(!string.IsNullOrEmpty(methodName), "MethodName cannot be empty.");
-        Debug.Assert(methodSymbol != null, "Method symbol cannot be null.");
-        Debug.Assert(methodSymbolCache != null, "Method symbol cache cannot be null.");
+        TPDebug.Assert(!StringUtils.IsNullOrEmpty(methodName), "MethodName cannot be empty.");
+        TPDebug.Assert(methodSymbol != null, "Method symbol cannot be null.");
+        TPDebug.Assert(methodSymbolCache != null, "Method symbol cache cannot be null.");
 
         // #827589, In case a type has overloaded methods, then there could be a method already in the
         // cache which should be disposed.
-        if (methodSymbolCache.TryGetValue(methodName, out IDiaSymbol oldSymbol))
+        if (methodSymbolCache.TryGetValue(methodName, out IDiaSymbol? oldSymbol))
         {
             ReleaseComObject(ref oldSymbol);
         }
@@ -463,7 +465,7 @@ internal class FullSymbolReader : ISymbolReader
         methodSymbolCache[methodName] = methodSymbol;
     }
 
-    private static void ReleaseComObject<T>(ref T obj)
+    private static void ReleaseComObject<T>(ref T? obj)
         where T : class
     {
         if (obj != null)
@@ -483,7 +485,7 @@ internal class FullSymbolReader : ISymbolReader
                 {
                     foreach (IDiaSymbol methodSymbol in methodSymbolsForType.Values)
                     {
-                        IDiaSymbol symToRelease = methodSymbol;
+                        IDiaSymbol? symToRelease = methodSymbol;
                         ReleaseComObject(ref symToRelease);
                     }
 
@@ -491,15 +493,13 @@ internal class FullSymbolReader : ISymbolReader
                 }
 
                 _methodSymbols.Clear();
-                _methodSymbols = null;
                 foreach (IDiaSymbol typeSymbol in _typeSymbols.Values)
                 {
-                    IDiaSymbol symToRelease = typeSymbol;
+                    IDiaSymbol? symToRelease = typeSymbol;
                     ReleaseComObject(ref symToRelease);
                 }
 
                 _typeSymbols.Clear();
-                _typeSymbols = null;
                 ReleaseComObject(ref _session);
                 ReleaseComObject(ref _source);
             }

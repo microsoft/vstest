@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 
 [TestClass]
@@ -118,7 +116,7 @@ public class TestDiscovererMetadataTests
         var extensions = new List<string> { "csv", "dll" };
         var metadata = new TestDiscovererMetadata(extensions, null);
 
-        CollectionAssert.AreEqual(extensions, metadata.FileExtension.ToList());
+        CollectionAssert.AreEqual(extensions, metadata.FileExtension!.ToList());
     }
 
     [TestMethod]
@@ -126,7 +124,7 @@ public class TestDiscovererMetadataTests
     {
         var metadata = new TestDiscovererMetadata(null, "executor://helloworld");
 
-        Assert.AreEqual("executor://helloworld/", metadata.DefaultExecutorUri.AbsoluteUri);
+        Assert.AreEqual("executor://helloworld/", metadata.DefaultExecutorUri!.AbsoluteUri);
     }
 
     [TestMethod]

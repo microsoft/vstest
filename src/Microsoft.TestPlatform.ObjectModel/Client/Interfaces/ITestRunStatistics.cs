@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -22,7 +20,7 @@ public interface ITestRunStatistics
     /// <summary>
     /// TestOutcome - Test count map
     /// </summary>
-    IDictionary<TestOutcome, long> Stats { get; }
+    IDictionary<TestOutcome, long>? Stats { get; }
 
     /// <summary>
     /// Number of tests that have been run.

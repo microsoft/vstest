@@ -74,6 +74,9 @@ public class PlatformEnvironment : IEnvironment
     public string OperatingSystemVersion => Environment.OSVersion.ToString();
 
     /// <inheritdoc />
+    public int ProcessorCount => Environment.ProcessorCount;
+
+    /// <inheritdoc />
     public void Exit(int exitcode)
     {
         Environment.Exit(exitcode);

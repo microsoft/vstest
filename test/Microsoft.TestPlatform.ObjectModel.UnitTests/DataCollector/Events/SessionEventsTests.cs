@@ -15,7 +15,7 @@ public class SessionEventsTests
 
     public SessionEventsTests()
     {
-        var properties = new Dictionary<string, object>
+        var properties = new Dictionary<string, object?>
         {
             { "property1", 1 },
             { "property2", 2 }

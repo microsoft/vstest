@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.Utilities;
 
 [TestClass]
@@ -21,13 +19,13 @@ public class FakesUtilitiesTests
     public void FakesSettingsShouldThrowExceptionIfSourcesArePassedAsNull()
     {
         string runSettingsXml = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.netstandard,Version=5.0</TargetFrameworkVersion></RunConfiguration ></RunSettings>";
-        Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(null, runSettingsXml));
+        Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(null!, runSettingsXml));
     }
 
     [TestMethod]
     public void FakesSettingsShouldThrowExceptionIfRunSettingsIsPassedAsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(new string[] { }, null));
+        Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(new string[] { }, null!));
     }
 
     [TestMethod]
@@ -58,7 +56,7 @@ public class FakesUtilitiesTests
             IsEnabled = true,
             Configuration = doc.FirstChild as XmlElement
         };
-        XmlRunSettingsUtilities.InsertDataCollectorsNode(doc.CreateNavigator(), dataCollectorNode);
+        XmlRunSettingsUtilities.InsertDataCollectorsNode(doc.CreateNavigator()!, dataCollectorNode);
 
         var dataCollectorNode2 = new DataCollectorSettings()
         {
@@ -120,7 +118,7 @@ public class FakesUtilitiesTests
         };
         FakesUtilities.InsertOrReplaceFakesDataCollectorNode(doc, dataCollectorNode2);
         Assert.IsTrue(XmlRunSettingsUtilities.ContainsDataCollector(doc, FakesUtilities.FakesMetadata.DataCollectorUriV2));
-        XmlNodeList nodes = doc.SelectNodes("//RunSettings/RunConfiguration/TargetFrameworkVersion");
-        Assert.AreEqual("FrameworkCore10", nodes[0].InnerText);
+        XmlNodeList nodes = doc.SelectNodes("//RunSettings/RunConfiguration/TargetFrameworkVersion")!;
+        Assert.AreEqual("FrameworkCore10", nodes[0]!.InnerText);
     }
 }

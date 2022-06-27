@@ -2,14 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Logging;
 
@@ -18,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging;
 /// </summary>
 internal class TestSessionMessageLogger : IMessageLogger
 {
-    private static TestSessionMessageLogger s_instance;
+    private static TestSessionMessageLogger? s_instance;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestSessionMessageLogger"/> class.
@@ -31,11 +30,12 @@ internal class TestSessionMessageLogger : IMessageLogger
     /// <summary>
     /// Raised when a discovery message is received.
     /// </summary>
-    internal event EventHandler<TestRunMessageEventArgs> TestRunMessage;
+    internal event EventHandler<TestRunMessageEventArgs>? TestRunMessage;
 
     /// <summary>
     /// Gets the instance of the singleton.
     /// </summary>
+    [AllowNull]
     public static TestSessionMessageLogger Instance
     {
         get

@@ -220,7 +220,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
     {
         if (key.Equals(FrameworkArgumentExecutor.RunSettingsPath))
         {
-            Framework framework = Framework.FromString(value);
+            Framework? framework = Framework.FromString(value);
             if (framework != null)
             {
                 _commandLineOptions.TargetFrameworkVersion = framework;

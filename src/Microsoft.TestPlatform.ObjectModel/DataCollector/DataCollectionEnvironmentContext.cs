@@ -5,8 +5,6 @@
 using System;
 #endif
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
@@ -18,14 +16,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 public sealed class DataCollectionEnvironmentContext
 {
     /// <summary>
-    /// DataCollectionContext for the session.
+    /// Serialization Constructor
     /// </summary>
-
-    /// <summary>
-    /// Default Constructor
-    /// </summary>
-    internal DataCollectionEnvironmentContext()
-        : this(null)
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    private DataCollectionEnvironmentContext()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
     }
 
@@ -37,14 +32,13 @@ public sealed class DataCollectionEnvironmentContext
         SessionDataCollectionContext = sessionDataCollectionContext;
     }
 
-
     /// <summary>
     /// Creates an environment context for a local (hosted) agent and controller
     /// </summary>
     /// <returns>An environment context for a local (hosted) agent and controller</returns>
     public static DataCollectionEnvironmentContext CreateForLocalEnvironment()
     {
-        return CreateForLocalEnvironment(null);
+        return CreateForLocalEnvironment(null!);
     }
 
     /// <summary>
@@ -54,8 +48,7 @@ public sealed class DataCollectionEnvironmentContext
     /// <returns>An environment context for a local (hosted) agent and controller</returns>
     public static DataCollectionEnvironmentContext CreateForLocalEnvironment(DataCollectionContext sessionDataCollectionContext)
     {
-        var dataCollectionEnvironmentContext = new DataCollectionEnvironmentContext();
-        dataCollectionEnvironmentContext.SessionDataCollectionContext = sessionDataCollectionContext;
+        var dataCollectionEnvironmentContext = new DataCollectionEnvironmentContext(sessionDataCollectionContext);
 
         return dataCollectionEnvironmentContext;
     }
@@ -63,6 +56,6 @@ public sealed class DataCollectionEnvironmentContext
     /// <summary>
     /// DataCollectionContext for the session.
     /// </summary>
-    public DataCollectionContext SessionDataCollectionContext { get; internal set; }
+    public DataCollectionContext SessionDataCollectionContext { get; private set; }
 
 }

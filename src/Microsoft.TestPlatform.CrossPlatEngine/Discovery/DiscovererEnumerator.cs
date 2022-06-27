@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -26,8 +27,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 
@@ -96,7 +95,7 @@ internal class DiscovererEnumerator
     /// <param name="settings"> The settings. </param>
     /// <param name="testCaseFilter"> The test case filter. </param>
     /// <param name="logger"> The logger. </param>
-    public void LoadTests(IDictionary<string, IEnumerable<string>> testExtensionSourceMap, IRunSettings settings, string testCaseFilter, IMessageLogger logger)
+    public void LoadTests(IDictionary<string, IEnumerable<string>> testExtensionSourceMap, IRunSettings? settings, string? testCaseFilter, IMessageLogger logger)
     {
         _testPlatformEventSource.DiscoveryStart();
         try
@@ -122,7 +121,7 @@ internal class DiscovererEnumerator
     /// <param name="settings"> The settings.   </param>
     /// <param name="settings"> The test case filter. </param>
     /// <param name="logger"> The logger.  </param>
-    private void LoadTestsFromAnExtension(string extensionAssembly, IEnumerable<string> sources, IRunSettings settings, string testCaseFilter, IMessageLogger logger)
+    private void LoadTestsFromAnExtension(string extensionAssembly, IEnumerable<string> sources, IRunSettings? settings, string? testCaseFilter, IMessageLogger logger)
     {
         // Stopwatch to collect metrics
         var timeStart = DateTime.UtcNow;
@@ -147,7 +146,7 @@ internal class DiscovererEnumerator
             _requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, discovererToSourcesMap.Keys.Count);
 
             var context = new DiscoveryContext { RunSettings = settings };
-            context.FilterExpressionWrapper = !string.IsNullOrEmpty(testCaseFilter) ? new FilterExpressionWrapper(testCaseFilter) : null;
+            context.FilterExpressionWrapper = !StringUtils.IsNullOrEmpty(testCaseFilter) ? new FilterExpressionWrapper(testCaseFilter) : null;
 
             // Set on the logger the TreatAdapterErrorAsWarning setting from runsettings.
             SetAdapterLoggingSettings(logger, settings);
@@ -176,7 +175,7 @@ internal class DiscovererEnumerator
         }
     }
 
-    private void LogTestsDiscoveryCancellation(IMessageLogger logger)
+    private static void LogTestsDiscoveryCancellation(IMessageLogger logger)
     {
         logger.SendMessage(TestMessageLevel.Warning, CrossPlatEngineResources.TestDiscoveryCancelled);
     }
@@ -267,7 +266,7 @@ internal class DiscovererEnumerator
         }
     }
 
-    private static bool TryToLoadDiscoverer(LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> discoverer, IMessageLogger logger, out Type discovererType)
+    private static bool TryToLoadDiscoverer(LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> discoverer, IMessageLogger logger, [NotNullWhen(true)] out Type? discovererType)
     {
         discovererType = null;
 
@@ -294,24 +293,24 @@ internal class DiscovererEnumerator
     private static bool IsDiscovererFromDeprecatedLocations(
         LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> discoverer)
     {
-        if (CrossPlatEngine.Constants.DefaultAdapters.Contains(discoverer.Metadata.DefaultExecutorUri.ToString(),
-                StringComparer.OrdinalIgnoreCase))
+        TPDebug.Assert(discoverer.Metadata.DefaultExecutorUri is not null, "discoverer.Metadata.DefaultExecutorUri is null");
+        if (Constants.DefaultAdapters.Contains(discoverer.Metadata.DefaultExecutorUri.ToString(), StringComparer.OrdinalIgnoreCase))
         {
             return false;
         }
 
         var discovererLocation = discoverer.Value.GetType().GetTypeInfo().Assembly.GetAssemblyLocation();
 
-        return Path.GetDirectoryName(discovererLocation)
-            .Equals(CrossPlatEngine.Constants.DefaultAdapterLocation, StringComparison.OrdinalIgnoreCase);
+        return Path.GetDirectoryName(discovererLocation)!
+            .Equals(Constants.DefaultAdapterLocation, StringComparison.OrdinalIgnoreCase);
     }
 
-    private static void LogWarningOnNoTestsDiscovered(IEnumerable<string> sources, string testCaseFilter, IMessageLogger logger)
+    private static void LogWarningOnNoTestsDiscovered(IEnumerable<string> sources, string? testCaseFilter, IMessageLogger logger)
     {
         var sourcesString = string.Join(" ", sources);
 
         // Print warning on no tests.
-        if (!string.IsNullOrEmpty(testCaseFilter))
+        if (!testCaseFilter.IsNullOrEmpty())
         {
             var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(testCaseFilter);
 
@@ -330,7 +329,7 @@ internal class DiscovererEnumerator
         }
     }
 
-    private void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)
+    private static void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings? runSettings)
     {
         if (messageLogger is TestSessionMessageLogger discoveryMessageLogger && runSettings != null)
         {
@@ -355,7 +354,7 @@ internal class DiscovererEnumerator
     /// <param name="sources"> The sources. </param>
     /// <param name="logger"> The logger instance. </param>
     /// <returns> The map between an extension type and a source. </returns>
-    internal static Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>> GetDiscovererToSourcesMap(
+    internal static Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>>? GetDiscovererToSourcesMap(
         string extensionAssembly,
         IEnumerable<string> sources,
         IMessageLogger logger,
@@ -374,7 +373,7 @@ internal class DiscovererEnumerator
             return null;
         }
 
-        IDictionary<AssemblyType, IList<string>> assemblyTypeToSoucesMap = null;
+        IDictionary<AssemblyType, IList<string>>? assemblyTypeToSoucesMap = null;
         var result = new Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>>();
         var sourcesForWhichNoDiscovererIsAvailable = new List<string>(sources);
 
@@ -465,13 +464,13 @@ internal class DiscovererEnumerator
                ".exe".Equals(fileExtension, StringComparison.OrdinalIgnoreCase);
     }
 
-    private static IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> GetDiscoverers(
+    private static IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>>? GetDiscoverers(
         string extensionAssembly,
         bool throwOnError)
     {
         try
         {
-            if (string.IsNullOrEmpty(extensionAssembly) || string.Equals(extensionAssembly, ObjectModel.Constants.UnspecifiedAdapterPath))
+            if (StringUtils.IsNullOrEmpty(extensionAssembly) || string.Equals(extensionAssembly, ObjectModel.Constants.UnspecifiedAdapterPath))
             {
                 // full discovery.
                 return TestDiscoveryExtensionManager.Create().Discoverers;

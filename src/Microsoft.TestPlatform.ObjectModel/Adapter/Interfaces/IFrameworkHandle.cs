@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 /// <summary>
@@ -29,5 +27,5 @@ public interface IFrameworkHandle : ITestExecutionRecorder, IMessageLogger
     /// <param name="arguments">Command line arguments the process should be launched with.</param>
     /// <param name="environmentVariables">Environment variables to be set in target process</param>
     /// <returns>Process ID of the started process.</returns>
-    int LaunchProcessWithDebuggerAttached(string filePath, string workingDirectory, string arguments, IDictionary<string, string> environmentVariables);
+    int LaunchProcessWithDebuggerAttached(string filePath, string workingDirectory, string arguments, IDictionary<string, string?> environmentVariables);
 }

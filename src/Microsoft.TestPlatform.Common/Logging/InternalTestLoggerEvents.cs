@@ -13,8 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System.Configuration;
 #endif
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Logging;
 
 /// <summary>
@@ -75,42 +73,42 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// <summary>
     /// Raised when a test message is received.
     /// </summary>
-    public override event EventHandler<TestRunMessageEventArgs> TestRunMessage;
+    public override event EventHandler<TestRunMessageEventArgs>? TestRunMessage;
 
     /// <summary>
     /// Raised when a test run starts.
     /// </summary>
-    public override event EventHandler<TestRunStartEventArgs> TestRunStart;
+    public override event EventHandler<TestRunStartEventArgs>? TestRunStart;
 
     /// <summary>
     /// Raised when a test result is received.
     /// </summary>
-    public override event EventHandler<TestResultEventArgs> TestResult;
+    public override event EventHandler<TestResultEventArgs>? TestResult;
 
     /// <summary>
     /// Raised when a test run is complete.
     /// </summary>
-    public override event EventHandler<TestRunCompleteEventArgs> TestRunComplete;
+    public override event EventHandler<TestRunCompleteEventArgs>? TestRunComplete;
 
     /// <summary>
     /// Raised when test discovery starts.
     /// </summary>
-    public override event EventHandler<DiscoveryStartEventArgs> DiscoveryStart;
+    public override event EventHandler<DiscoveryStartEventArgs>? DiscoveryStart;
 
     /// <summary>
     /// Raised when a discovery message is received.
     /// </summary>
-    public override event EventHandler<TestRunMessageEventArgs> DiscoveryMessage;
+    public override event EventHandler<TestRunMessageEventArgs>? DiscoveryMessage;
 
     /// <summary>
     /// Raised when discovered tests are received
     /// </summary>
-    public override event EventHandler<DiscoveredTestsEventArgs> DiscoveredTests;
+    public override event EventHandler<DiscoveredTestsEventArgs>? DiscoveredTests;
 
     /// <summary>
     /// Raised when test discovery is complete
     /// </summary>
-    public override event EventHandler<DiscoveryCompleteEventArgs> DiscoveryComplete;
+    public override event EventHandler<DiscoveryCompleteEventArgs>? DiscoveryComplete;
 
 
     #region IDisposable
@@ -287,7 +285,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// <param name="attachmentSet">Run level attachment sets</param>
     /// <param name="invokedDataCollectors">Invoked data collectors</param>
     /// <param name="elapsedTime">Time elapsed in just running the tests.</param>
-    internal void CompleteTestRun(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSet, Collection<InvokedDataCollector> invokedDataCollectors, TimeSpan elapsedTime)
+    internal void CompleteTestRun(ITestRunStatistics? stats, bool isCanceled, bool isAborted, Exception? error, Collection<AttachmentSet>? attachmentSet, Collection<InvokedDataCollector>? invokedDataCollectors, TimeSpan elapsedTime)
     {
         CheckDisposed();
 
@@ -303,7 +301,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// <summary>
     /// Called when a test run message is sent through the ITestRunMessageLogger which is exported.
     /// </summary>
-    private void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
+    private void TestRunMessageHandler(object? sender, TestRunMessageEventArgs e)
     {
         // Broadcast the message to the loggers.
         SafeInvokeAsync(() => TestRunMessage, e, 0, "InternalTestLoggerEvents.SendMessage");
@@ -314,7 +312,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// ensuring that each handler is invoked even if one throws.
     /// The actual calling of the subscribers is done on a background thread.
     /// </summary>
-    private void SafeInvokeAsync(Func<MulticastDelegate> eventHandlersFactory, EventArgs args, int size, string traceDisplayName)
+    private void SafeInvokeAsync(Func<MulticastDelegate?> eventHandlersFactory, EventArgs args, int size, string traceDisplayName)
     {
         // If you are wondering why this is taking a Func<MulticastDelegate> rather than just a MulticastDelegate it is because
         // taking just that will capture only the subscribers that were present at the time we passed the delegate into this
@@ -347,9 +345,9 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// <summary>
     /// Method called to process a job which is coming from the logger event queue.
     /// </summary>
-    private void ProcessQueuedJob(Action action)
+    private void ProcessQueuedJob(Action? action)
     {
-        action();
+        action?.Invoke();
     }
 
     /// <summary>
@@ -367,7 +365,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// The method parses the config file of vstest.console.exe to see if the Max Job Queue Length is defined.
     /// Return the Max Queue Length so defined or a default value specified by TestPlatformDefaults.DefaultMaxLoggerEventsToCache
     /// </summary>
-    private int GetMaxNumberOfJobsInQueue()
+    private static int GetMaxNumberOfJobsInQueue()
     {
         return GetSetting(TestPlatformDefaults.MaxNumberOfEventsLoggerEventQueueCanHold,
             TestPlatformDefaults.DefaultMaxNumberOfEventsLoggerEventQueueCanHold);
@@ -377,7 +375,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// The method parses the config file of vstest.console.exe to see if the Max Job Queue size is defined.
     /// Return the Max Queue size so defined or a default value specified by TestPlatformDefaults.DefaultMaxJobQueueSize
     /// </summary>
-    private int GetMaxBytesQueueCanHold()
+    private static int GetMaxBytesQueueCanHold()
     {
         return GetSetting(TestPlatformDefaults.MaxBytesLoggerEventQueueCanHold,
             TestPlatformDefaults.DefaultMaxBytesLoggerEventQueueCanHold);
@@ -389,7 +387,7 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     private static bool IsBoundsEnabledOnLoggerEventQueue()
     {
         bool enableBounds;
-        string enableBoundsOnEventQueueIsDefined =
+        string? enableBoundsOnEventQueueIsDefined =
 #if NETFRAMEWORK
             ConfigurationManager.AppSettings[TestPlatformDefaults.EnableBoundsOnLoggerEventQueue];
 #else
@@ -433,10 +431,10 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// Get the appsetting value for the parameter appSettingKey. Use the parameter defaultValue if
     /// value is not there or is invalid.
     /// </summary>
-    private int GetSetting(string appSettingKey, int defaultValue)
+    private static int GetSetting(string appSettingKey, int defaultValue)
     {
         int value;
-        string appSettingValue =
+        string? appSettingValue =
 #if NETFRAMEWORK
             ConfigurationManager.AppSettings[appSettingKey];
 #else

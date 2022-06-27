@@ -29,6 +29,7 @@ public class DotnetDataCollectionLauncherTests
     {
         _mockFileHelper = new Mock<IFileHelper>();
         _mockProcessHelper = new Mock<IProcessHelper>();
+        _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("dotnet");
         _mockMessageLogger = new Mock<IMessageLogger>();
 
         _dataCollectionLauncher = new DotnetDataCollectionLauncher(_mockProcessHelper.Object, _mockFileHelper.Object, _mockMessageLogger.Object);
@@ -40,7 +41,7 @@ public class DotnetDataCollectionLauncherTests
         List<string> arguments = new();
         _dataCollectionLauncher.LaunchDataCollector(null, arguments);
 
-        _mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<object?, string>>(), It.IsAny<Action<Object>>(), It.IsAny<Action<object?, string>>()), Times.Once());
+        _mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string?>>(), It.IsAny<Action<object?, string?>>(), It.IsAny<Action<object?>>(), It.IsAny<Action<object?, string?>>()), Times.Once());
     }
 
     [TestMethod]
@@ -52,7 +53,7 @@ public class DotnetDataCollectionLauncherTests
         List<string> arguments = new();
         _dataCollectionLauncher.LaunchDataCollector(null, arguments);
 
-        _mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), string.Format("{0} \"{1}\" {2} ", "exec", dataCollectorAssemblyPath, string.Join(" ", arguments)), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<object?, string>>(), It.IsAny<Action<Object>>(), It.IsAny<Action<object?, string>>()), Times.Once());
+        _mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), string.Format("{0} \"{1}\" {2} ", "exec", dataCollectorAssemblyPath, string.Join(" ", arguments)), It.IsAny<string>(), It.IsAny<IDictionary<string, string?>>(), It.IsAny<Action<object?, string?>>(), It.IsAny<Action<object?>>(), It.IsAny<Action<object?, string?>>()), Times.Once());
     }
 
     [TestMethod]
@@ -63,6 +64,6 @@ public class DotnetDataCollectionLauncherTests
 
         string currentWorkingDirectory = Directory.GetCurrentDirectory();
 
-        _mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), currentWorkingDirectory, It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<object?, string>>(), It.IsAny<Action<Object>>(), It.IsAny<Action<object?, string>>()), Times.Once());
+        _mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), currentWorkingDirectory, It.IsAny<IDictionary<string, string?>>(), It.IsAny<Action<object?, string?>>(), It.IsAny<Action<object?>>(), It.IsAny<Action<object?, string?>>()), Times.Once());
     }
 }

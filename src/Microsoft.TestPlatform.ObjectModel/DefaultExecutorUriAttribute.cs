@@ -3,10 +3,6 @@
 
 using System;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
-
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -21,11 +17,7 @@ public sealed class DefaultExecutorUriAttribute : Attribute
     /// <param name="defaultExecutorUri">The Uri of the executor</param>
     public DefaultExecutorUriAttribute(string executorUri)
     {
-        if (string.IsNullOrWhiteSpace(executorUri))
-        {
-            throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(executorUri));
-        }
-
+        ValidateArg.NotNullOrWhiteSpace(executorUri, nameof(executorUri));
         ExecutorUri = executorUri;
     }
 

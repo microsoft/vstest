@@ -26,8 +26,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client;
 
 /// <summary>
@@ -81,8 +79,9 @@ internal class TestPlatform : ITestPlatform
     public IDiscoveryRequest CreateDiscoveryRequest(
         IRequestData requestData,
         DiscoveryCriteria discoveryCriteria,
-        TestPlatformOptions options,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
+        TestPlatformOptions? options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger)
     {
         ValidateArg.NotNull(discoveryCriteria, nameof(discoveryCriteria));
 
@@ -92,7 +91,7 @@ internal class TestPlatform : ITestPlatform
         ITestLoggerManager loggerManager = _testEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(discoveryCriteria.RunSettings);
 
-        IProxyDiscoveryManager discoveryManager = _testEngine.GetDiscoveryManager(requestData, discoveryCriteria, sourceToSourceDetailMap);
+        IProxyDiscoveryManager discoveryManager = _testEngine.GetDiscoveryManager(requestData, discoveryCriteria, sourceToSourceDetailMap, warningLogger);
         discoveryManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager, loggerManager);
@@ -102,8 +101,9 @@ internal class TestPlatform : ITestPlatform
     public ITestRunRequest CreateTestRunRequest(
         IRequestData requestData,
         TestRunCriteria testRunCriteria,
-        TestPlatformOptions options,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
+        TestPlatformOptions? options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger)
     {
         ValidateArg.NotNull(testRunCriteria, nameof(testRunCriteria));
 
@@ -114,7 +114,7 @@ internal class TestPlatform : ITestPlatform
         ITestLoggerManager loggerManager = _testEngine.GetLoggerManager(requestData);
         loggerManager.Initialize(testRunCriteria.TestRunSettings);
 
-        IProxyExecutionManager executionManager = _testEngine.GetExecutionManager(requestData, testRunCriteria, sourceToSourceDetailMap);
+        IProxyExecutionManager executionManager = _testEngine.GetExecutionManager(requestData, testRunCriteria, sourceToSourceDetailMap, warningLogger);
         executionManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
         return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
@@ -125,7 +125,8 @@ internal class TestPlatform : ITestPlatform
         IRequestData requestData,
         StartTestSessionCriteria testSessionCriteria,
         ITestSessionEventsHandler eventsHandler,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap)
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger)
     {
         ValidateArg.NotNull(testSessionCriteria, nameof(testSessionCriteria));
 
@@ -139,7 +140,7 @@ internal class TestPlatform : ITestPlatform
             return false;
         }
 
-        IProxyTestSessionManager testSessionManager = _testEngine.GetTestSessionManager(requestData, testSessionCriteria, sourceToSourceDetailMap);
+        IProxyTestSessionManager? testSessionManager = _testEngine.GetTestSessionManager(requestData, testSessionCriteria, sourceToSourceDetailMap, warningLogger);
         if (testSessionManager == null)
         {
             // The test session manager is null because the combination of runsettings and
@@ -153,7 +154,7 @@ internal class TestPlatform : ITestPlatform
         return testSessionManager.StartSession(eventsHandler, requestData);
     }
 
-    private void PopulateExtensions(string runSettings, IEnumerable<string> sources)
+    private void PopulateExtensions(string? runSettings, IEnumerable<string> sources)
     {
         RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
         TestAdapterLoadingStrategy strategy = runConfiguration.TestAdapterLoadingStrategy;
@@ -178,7 +179,7 @@ internal class TestPlatform : ITestPlatform
 
     /// <inheritdoc/>
     public void UpdateExtensions(
-        IEnumerable<string> pathToAdditionalExtensions,
+        IEnumerable<string>? pathToAdditionalExtensions,
         bool skipExtensionFilters)
     {
         _testEngine.GetExtensionManager().UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
@@ -191,7 +192,7 @@ internal class TestPlatform : ITestPlatform
     }
 
     private static void ThrowExceptionIfTestHostManagerIsNull(
-        ITestRuntimeProvider testHostManager,
+        ITestRuntimeProvider? testHostManager,
         string settingsXml)
     {
         if (testHostManager == null)
@@ -202,22 +203,24 @@ internal class TestPlatform : ITestPlatform
     }
 
 
-    private void AddExtensionAssemblies(string runSettings, TestAdapterLoadingStrategy adapterLoadingStrategy)
+    private void AddExtensionAssemblies(string? runSettings, TestAdapterLoadingStrategy adapterLoadingStrategy)
     {
         IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
 
-        if (customTestAdaptersPaths != null)
+        if (customTestAdaptersPaths == null)
         {
-            foreach (string customTestAdaptersPath in customTestAdaptersPaths)
+            return;
+        }
+
+        foreach (string customTestAdaptersPath in customTestAdaptersPaths)
+        {
+            IEnumerable<string> extensionAssemblies = ExpandTestAdapterPaths(customTestAdaptersPath, _fileHelper, adapterLoadingStrategy);
+
+            if (extensionAssemblies.Any())
             {
-                IEnumerable<string> extensionAssemblies = ExpandTestAdapterPaths(customTestAdaptersPath, _fileHelper, adapterLoadingStrategy);
-
-                if (extensionAssemblies.Any())
-                {
-                    UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
-                }
-
+                UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
             }
+
         }
     }
 
@@ -273,7 +276,7 @@ internal class TestPlatform : ITestPlatform
         // Otherwise we will always get a "No suitable test runtime provider found for this run." error.
         // I (@haplois) will modify this behavior later on, but we also need to consider legacy adapters
         // and make sure they still work after modification.
-        string runSettings = RunSettingsManager.Instance.ActiveRunSettings.SettingsXml;
+        string? runSettings = RunSettingsManager.Instance.ActiveRunSettings.SettingsXml;
         RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
         TestAdapterLoadingStrategy strategy = runConfiguration.TestAdapterLoadingStrategy;
 
@@ -383,9 +386,15 @@ internal class TestPlatform : ITestPlatform
                 TestPlatformConstants.RunTimeEndsWithPattern);
     }
 
-    private static IEnumerable<string> GetSources(TestRunCriteria testRunCriteria) =>
-        testRunCriteria.HasSpecificTests
+    private static IEnumerable<string> GetSources(TestRunCriteria testRunCriteria)
+    {
+        if (testRunCriteria.HasSpecificTests)
+        {
             // If the test execution is with a test filter, filter sources too.
-            ? testRunCriteria.Tests.Select(tc => tc.Source).Distinct()
-            : testRunCriteria.Sources;
+            return testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
+        }
+
+        TPDebug.Assert(testRunCriteria.Sources is not null, "testRunCriteria.Sources is null");
+        return testRunCriteria.Sources;
+    }
 }

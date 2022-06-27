@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 
 /// <summary>
@@ -26,7 +24,7 @@ public interface ITestRequestManager : IDisposable
     /// <param name="pathToAdditionalExtensions">Paths to additional extensions.</param>
     /// <param name="skipExtensionFilters">Skip extension filtering by name if true.</param>
     void InitializeExtensions(
-        IEnumerable<string> pathToAdditionalExtensions,
+        IEnumerable<string>? pathToAdditionalExtensions,
         bool skipExtensionFilters);
 
     /// <summary>
@@ -56,7 +54,7 @@ public interface ITestRequestManager : IDisposable
     /// <param name="protocolConfig">Protocol related information.</param>
     void RunTests(
         TestRunRequestPayload testRunRequestPayLoad,
-        ITestHostLauncher3 customTestHostLauncher,
+        ITestHostLauncher3? customTestHostLauncher,
         ITestRunEventsRegistrar testRunEventsRegistrar,
         ProtocolConfig protocolConfig);
 
@@ -86,14 +84,14 @@ public interface ITestRequestManager : IDisposable
     /// <param name="protocolConfig">Protocol related information.</param>
     void StartTestSession(
         StartTestSessionPayload payload,
-        ITestHostLauncher3 testHostLauncher,
+        ITestHostLauncher3? testHostLauncher,
         ITestSessionEventsHandler eventsHandler,
         ProtocolConfig protocolConfig);
 
     /// <summary>
     /// Stops a test session.
     /// </summary>
-    /// 
+    ///
     /// <param name="testSessionInfo">The stop test session payload.</param>
     /// <param name="eventsHandler">The events handler.</param>
     /// <param name="protocolConfig">Protocol related information.</param>

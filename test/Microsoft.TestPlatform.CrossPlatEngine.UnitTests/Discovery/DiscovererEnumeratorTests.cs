@@ -231,7 +231,7 @@ public class DiscovererEnumeratorTests
         // Also validate that the right set of arguments were passed on to the discoverer.
         CollectionAssert.AreEqual(sources, ManagedDllTestDiscoverer.Sources!.ToList());
         Assert.AreEqual(_runSettingsMock.Object, DllTestDiscoverer.DiscoveryContext!.RunSettings);
-        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)DllTestDiscoverer.DiscoveryContext).FilterExpressionWrapper.FilterString);
+        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)DllTestDiscoverer.DiscoveryContext).FilterExpressionWrapper!.FilterString);
         Assert.AreEqual(_messageLoggerMock.Object, DllTestDiscoverer.MessageLogger);
         Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
     }
@@ -273,13 +273,13 @@ public class DiscovererEnumeratorTests
         // Also validate that the right set of arguments were passed on to the discoverer.
         CollectionAssert.AreEqual(dllsources, ManagedDllTestDiscoverer.Sources!.ToList());
         Assert.AreEqual(runSettings, DllTestDiscoverer.DiscoveryContext!.RunSettings);
-        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)DllTestDiscoverer.DiscoveryContext).FilterExpressionWrapper.FilterString);
+        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)DllTestDiscoverer.DiscoveryContext).FilterExpressionWrapper!.FilterString);
         Assert.AreEqual(_messageLoggerMock.Object, DllTestDiscoverer.MessageLogger);
         Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
 
         CollectionAssert.AreEqual(jsonsources, JsonTestDiscoverer.Sources!.ToList());
         Assert.AreEqual(runSettings, JsonTestDiscoverer.DiscoveryContext!.RunSettings);
-        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)JsonTestDiscoverer.DiscoveryContext).FilterExpressionWrapper.FilterString);
+        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)JsonTestDiscoverer.DiscoveryContext).FilterExpressionWrapper!.FilterString);
         Assert.AreEqual(_messageLoggerMock.Object, JsonTestDiscoverer.MessageLogger);
         Assert.IsNotNull(JsonTestDiscoverer.DiscoverySink);
     }
@@ -314,7 +314,7 @@ public class DiscovererEnumeratorTests
         // Also validate that the right set of arguments were passed on to the discoverer.
         CollectionAssert.AreEqual(new List<string> { sources[1] }, ManagedDllTestDiscoverer.Sources!.ToList());
         Assert.AreEqual(runSettings, DllTestDiscoverer.DiscoveryContext!.RunSettings);
-        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)DllTestDiscoverer.DiscoveryContext).FilterExpressionWrapper.FilterString);
+        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)DllTestDiscoverer.DiscoveryContext).FilterExpressionWrapper!.FilterString);
         Assert.AreEqual(_messageLoggerMock.Object, DllTestDiscoverer.MessageLogger);
         Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
     }
@@ -349,7 +349,7 @@ public class DiscovererEnumeratorTests
         // Also validate that the right set of arguments were passed on to the discoverer.
         CollectionAssert.AreEqual(new List<string> { sources[1] }, ManagedDllTestDiscoverer.Sources!.ToList());
         Assert.AreEqual(runSettings, DllTestDiscoverer.DiscoveryContext!.RunSettings);
-        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)DllTestDiscoverer.DiscoveryContext).FilterExpressionWrapper.FilterString);
+        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)DllTestDiscoverer.DiscoveryContext).FilterExpressionWrapper!.FilterString);
         Assert.AreEqual(_messageLoggerMock.Object, DllTestDiscoverer.MessageLogger);
         Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
 
@@ -524,13 +524,13 @@ public class DiscovererEnumeratorTests
         // Also validate that the right set of arguments were passed on to the discoverer.
         CollectionAssert.AreEqual(dllsources, ManagedDllTestDiscoverer.Sources!.ToList());
         Assert.AreEqual(runSettings, DllTestDiscoverer.DiscoveryContext!.RunSettings);
-        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)DllTestDiscoverer.DiscoveryContext).FilterExpressionWrapper.FilterString);
+        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)DllTestDiscoverer.DiscoveryContext).FilterExpressionWrapper!.FilterString);
         Assert.AreEqual(_messageLoggerMock.Object, DllTestDiscoverer.MessageLogger);
         Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
 
         CollectionAssert.AreEqual(jsonsources, JsonTestDiscoverer.Sources!.ToList());
         Assert.AreEqual(runSettings, JsonTestDiscoverer.DiscoveryContext!.RunSettings);
-        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)JsonTestDiscoverer.DiscoveryContext).FilterExpressionWrapper.FilterString);
+        Assert.AreEqual(testCaseFilter, ((DiscoveryContext)JsonTestDiscoverer.DiscoveryContext).FilterExpressionWrapper!.FilterString);
         Assert.AreEqual(_messageLoggerMock.Object, JsonTestDiscoverer.MessageLogger);
         Assert.IsNotNull(JsonTestDiscoverer.DiscoverySink);
     }

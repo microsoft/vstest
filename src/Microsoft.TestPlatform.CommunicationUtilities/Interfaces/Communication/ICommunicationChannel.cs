@@ -4,8 +4,6 @@
 using System;
 using System.Threading.Tasks;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 public interface ICommunicationChannel : IDisposable

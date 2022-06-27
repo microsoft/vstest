@@ -4,10 +4,6 @@
 using System;
 using System.Runtime.Serialization;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
-
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 /// <summary>
@@ -23,10 +19,7 @@ public class TestRunMessageEventArgs : EventArgs
     /// <param name="message">The message.</param>
     public TestRunMessageEventArgs(TestMessageLevel level, string message)
     {
-        if (string.IsNullOrWhiteSpace(message))
-        {
-            throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(message));
-        }
+        ValidateArg.NotNullOrWhiteSpace(message, nameof(message));
 
         if (level is < TestMessageLevel.Informational or > TestMessageLevel.Error)
         {

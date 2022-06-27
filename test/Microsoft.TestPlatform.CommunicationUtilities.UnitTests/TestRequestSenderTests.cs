@@ -57,7 +57,7 @@ public class TestRequestSenderTests
         _connectedEventArgs = new ConnectedEventArgs(_mockChannel.Object);
         _mockDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
         _mockExecutionEventsHandler = new Mock<IInternalTestRunEventsHandler>();
-        _testRunCriteriaWithSources = new TestRunCriteriaWithSources(new Dictionary<string, IEnumerable<string>>(), "runsettings", null, null);
+        _testRunCriteriaWithSources = new TestRunCriteriaWithSources(new Dictionary<string, IEnumerable<string>>(), "runsettings", null, null!);
     }
 
     [TestCleanup]
@@ -234,7 +234,7 @@ public class TestRequestSenderTests
         _testRequestSender.OnClientProcessExit("Dummy Stderr");
 
         RaiseClientDisconnectedEvent();
-        _mockDataSerializer.Verify(ds => ds.SerializePayload(MessageType.TestMessage, It.Is<TestMessagePayload>(p => p.Message.Contains("Dummy Stderr"))), Times.Never);
+        _mockDataSerializer.Verify(ds => ds.SerializePayload(MessageType.TestMessage, It.Is<TestMessagePayload>(p => p.Message!.Contains("Dummy Stderr"))), Times.Never);
         _mockExecutionEventsHandler.Verify(eh => eh.HandleRawMessage(It.IsAny<string>()), Times.Never);
     }
 
@@ -444,7 +444,7 @@ public class TestRequestSenderTests
         // Expect default error message since we've not set any client exit message
         var expectedErrorMessage = "Reason: Unable to communicate";
         SetupFakeCommunicationChannel();
-        _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.Is<TestMessagePayload>(p => p.Message.Contains(expectedErrorMessage))))
+        _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.Is<TestMessagePayload>(p => p.Message!.Contains(expectedErrorMessage))))
             .Returns("Serialized error");
         _testRequestSender.DiscoverTests(new DiscoveryCriteria(), _mockDiscoveryEventsHandler.Object);
 
@@ -458,7 +458,7 @@ public class TestRequestSenderTests
     public void DiscoverTestShouldNotifyLogMessageIfClientDisconnectedWithClientExit()
     {
         SetupFakeCommunicationChannel();
-        _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.Is<TestMessagePayload>(p => p.Message.Contains("Dummy Stderr"))))
+        _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.Is<TestMessagePayload>(p => p.Message!.Contains("Dummy Stderr"))))
             .Returns("Serialized Stderr");
         _testRequestSender.DiscoverTests(new DiscoveryCriteria(), _mockDiscoveryEventsHandler.Object);
         _testRequestSender.OnClientProcessExit("Dummy Stderr");
@@ -529,7 +529,7 @@ public class TestRequestSenderTests
     [TestMethod]
     public void StartTestRunWithTestsShouldSendStartTestExecutionWithTestsOnChannel()
     {
-        var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], "runsettings", null, null);
+        var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], "runsettings", null, null!);
         SetupFakeCommunicationChannel();
 
         _testRequestSender.StartTestRun(runCriteria, _mockExecutionEventsHandler.Object);
@@ -541,7 +541,7 @@ public class TestRequestSenderTests
     [TestMethod]
     public void StartTestRunWithTestsShouldSendStartTestExecutionWithTestsOnChannelWithVersion()
     {
-        var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], "runsettings", null, null);
+        var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], "runsettings", null, null!);
         SetupFakeChannelWithVersionNegotiation(Dummynegotiatedprotocolversion);
 
         _testRequestSender.StartTestRun(runCriteria, _mockExecutionEventsHandler.Object);
@@ -838,7 +838,7 @@ public class TestRequestSenderTests
     {
         // Serialize the exception message
         _mockDataSerializer
-            .Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.Is<TestMessagePayload>(p => p.Message.Contains("Dummy Message"))))
+            .Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.Is<TestMessagePayload>(p => p.Message!.Contains("Dummy Message"))))
             .Returns("SerializedMessage");
     }
 
@@ -846,7 +846,7 @@ public class TestRequestSenderTests
     {
         // Serialize the execution aborted
         _mockDataSerializer
-            .Setup(ds => ds.SerializePayload(MessageType.ExecutionComplete, It.Is<TestRunCompletePayload>(p => p.TestRunCompleteArgs.IsAborted)))
+            .Setup(ds => ds.SerializePayload(MessageType.ExecutionComplete, It.Is<TestRunCompletePayload>(p => p.TestRunCompleteArgs!.IsAborted)))
             .Returns("SerializedAbortedPayload");
     }
 

@@ -14,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
@@ -31,22 +29,22 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <summary>
     /// TCP Listener to host TCP channel and listen
     /// </summary>
-    private TcpListener _tcpListener;
+    private TcpListener? _tcpListener;
 
     /// <summary>
     /// TCP Client that can connect to a TCP listener
     /// </summary>
-    private TcpClient _tcpClient;
+    private TcpClient? _tcpClient;
 
     /// <summary>
     /// Binary Writer to write to channel stream
     /// </summary>
-    private BinaryWriter _binaryWriter;
+    private BinaryWriter? _binaryWriter;
 
     /// <summary>
     /// Binary reader to read from channel stream
     /// </summary>
-    private BinaryReader _binaryReader;
+    private BinaryReader? _binaryReader;
 
     /// <summary>
     /// Serializer for the data objects
@@ -74,7 +72,7 @@ public class SocketCommunicationManager : ICommunicationManager
     /// </summary>
     private readonly object _receiveSyncObject = new();
 
-    private Socket _socket;
+    private Socket? _socket;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SocketCommunicationManager"/> class.
@@ -111,24 +109,26 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task AcceptClientAsync()
     {
-        if (_tcpListener != null)
+        if (_tcpListener == null)
         {
-            _clientConnectedEvent.Reset();
-
-            var client = await _tcpListener.AcceptTcpClientAsync();
-            _socket = client.Client;
-            _socket.NoDelay = true;
-
-            // Using Buffered stream only in case of write, and Network stream in case of read.
-            var bufferedStream = new PlatformStream().CreateBufferedStream(client.GetStream(), SocketConstants.BufferSize);
-            var networkStream = client.GetStream();
-            _binaryReader = new BinaryReader(networkStream);
-            _binaryWriter = new BinaryWriter(bufferedStream);
-
-            _clientConnectedEvent.Set();
-            EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
-            EqtTrace.Info("Accepted Client request and set the flag");
+            return;
         }
+
+        _clientConnectedEvent.Reset();
+
+        var client = await _tcpListener.AcceptTcpClientAsync();
+        _socket = client.Client;
+        _socket.NoDelay = true;
+
+        // Using Buffered stream only in case of write, and Network stream in case of read.
+        var bufferedStream = new PlatformStream().CreateBufferedStream(client.GetStream(), SocketConstants.BufferSize);
+        var networkStream = client.GetStream();
+        _binaryReader = new BinaryReader(networkStream);
+        _binaryWriter = new BinaryWriter(bufferedStream);
+
+        _clientConnectedEvent.Set();
+        EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
+        EqtTrace.Info("Accepted Client request and set the flag");
     }
 
     /// <summary>
@@ -287,15 +287,12 @@ public class SocketCommunicationManager : ICommunicationManager
     /// Reads message from the binary reader
     /// </summary>
     /// <returns>Returns message read from the binary reader</returns>
-    public Message ReceiveMessage()
+    public Message? ReceiveMessage()
     {
         var rawMessage = ReceiveRawMessage();
-        if (!string.IsNullOrEmpty(rawMessage))
-        {
-            return _dataSerializer.DeserializeMessage(rawMessage);
-        }
-
-        return null;
+        return !rawMessage.IsNullOrEmpty()
+            ? _dataSerializer.DeserializeMessage(rawMessage)
+            : null;
     }
 
     /// <summary>
@@ -307,22 +304,19 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <returns>
     /// Returns message read from the binary reader
     /// </returns>
-    public async Task<Message> ReceiveMessageAsync(CancellationToken cancellationToken)
+    public async Task<Message?> ReceiveMessageAsync(CancellationToken cancellationToken)
     {
         var rawMessage = await ReceiveRawMessageAsync(cancellationToken);
-        if (!string.IsNullOrEmpty(rawMessage))
-        {
-            return _dataSerializer.DeserializeMessage(rawMessage);
-        }
-
-        return null;
+        return !rawMessage.IsNullOrEmpty()
+            ? _dataSerializer.DeserializeMessage(rawMessage)
+            : null;
     }
 
     /// <summary>
     /// Reads message from the binary reader
     /// </summary>
     /// <returns> Raw message string </returns>
-    public string ReceiveRawMessage()
+    public string? ReceiveRawMessage()
     {
         lock (_receiveSyncObject)
         {
@@ -340,7 +334,7 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <returns>
     /// Raw message string
     /// </returns>
-    public async Task<string> ReceiveRawMessageAsync(CancellationToken cancellationToken)
+    public async Task<string?> ReceiveRawMessageAsync(CancellationToken cancellationToken)
     {
         var str = await Task.Run(() => TryReceiveRawMessage(cancellationToken));
         return str;
@@ -352,14 +346,14 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <typeparam name="T"> The type of object to deserialize to. </typeparam>
     /// <param name="message"> Message object </param>
     /// <returns> TestPlatform object </returns>
-    public T DeserializePayload<T>(Message message)
+    public T? DeserializePayload<T>(Message message)
     {
         return _dataSerializer.DeserializePayload<T>(message);
     }
 
-    private string TryReceiveRawMessage(CancellationToken cancellationToken)
+    private string? TryReceiveRawMessage(CancellationToken cancellationToken)
     {
-        string str = null;
+        string? str = null;
         bool success = false;
 
         // Set read timeout to avoid blocking receive raw message
@@ -367,7 +361,13 @@ public class SocketCommunicationManager : ICommunicationManager
         {
             try
             {
-                if (_socket.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead))
+                if (_socket is null)
+                {
+                    EqtTrace.Error("SocketCommunicationManager.TryReceiveRawMessage: Socket is null");
+                    break;
+                }
+
+                if (_socket.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead) == true)
                 {
                     str = ReceiveRawMessage();
                     success = true;
@@ -379,13 +379,13 @@ public class SocketCommunicationManager : ICommunicationManager
                     && socketException.SocketErrorCode == SocketError.TimedOut)
                 {
                     EqtTrace.Info(
-                        "SocketCommunicationManager ReceiveMessage: failed to receive message because read timeout {0}",
+                        "SocketCommunicationManager.ReceiveMessage: failed to receive message because read timeout {0}",
                         ioException);
                 }
                 else
                 {
                     EqtTrace.Error(
-                        "SocketCommunicationManager ReceiveMessage: failed to receive message {0}",
+                        "SocketCommunicationManager.ReceiveMessage: failed to receive message {0}",
                         ioException);
                     break;
                 }
@@ -393,7 +393,7 @@ public class SocketCommunicationManager : ICommunicationManager
             catch (Exception exception)
             {
                 EqtTrace.Error(
-                    "SocketCommunicationManager ReceiveMessage: failed to receive message {0}",
+                    "SocketCommunicationManager.ReceiveMessage: failed to receive message {0}",
                     exception);
                 break;
             }

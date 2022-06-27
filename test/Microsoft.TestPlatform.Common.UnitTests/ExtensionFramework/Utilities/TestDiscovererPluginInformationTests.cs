@@ -11,14 +11,12 @@ using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities;
 
 [TestClass]
 public class TestDiscovererPluginInformationTests
 {
-    private TestDiscovererPluginInformation _testPluginInformation;
+    private TestDiscovererPluginInformation? _testPluginInformation;
 
     [TestMethod]
     public void AssemblyQualifiedNameShouldReturnTestExtensionTypesName()
@@ -128,9 +126,9 @@ public class TestDiscovererPluginInformationTests
         var expectedFileExtensions = new List<string> { "csv", "docx" };
         var testPluginMetada = _testPluginInformation.Metadata.ToArray();
 
-        CollectionAssert.AreEqual(expectedFileExtensions, (testPluginMetada[0] as List<string>).ToArray());
+        CollectionAssert.AreEqual(expectedFileExtensions, ((List<string>)testPluginMetada[0]!).ToArray());
         Assert.AreEqual("csvexecutor", testPluginMetada[1] as string);
-        Assert.AreEqual(AssemblyType.Managed, Enum.Parse(typeof(AssemblyType), testPluginMetada[2].ToString()));
+        Assert.AreEqual(AssemblyType.Managed, Enum.Parse(typeof(AssemblyType), testPluginMetada[2]!.ToString()!));
     }
 }
 

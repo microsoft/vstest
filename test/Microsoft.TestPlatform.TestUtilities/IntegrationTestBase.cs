@@ -15,6 +15,7 @@ using FluentAssertions;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -39,7 +40,7 @@ public class IntegrationTestBase
     private string _standardTestError = string.Empty;
     private int _runnerExitCode = -1;
 
-    private string _arguments = string.Empty;
+    private string? _arguments = string.Empty;
 
     protected readonly IntegrationTestEnvironment _testEnvironment;
 
@@ -103,7 +104,7 @@ public class IntegrationTestBase
     /// <param name="framework"></param>
     /// <param name="inIsolation"></param>
     /// <returns>Command line arguments string.</returns>
-    public static string PrepareArguments(string[] testAssemblies, string testAdapterPath, string runSettings,
+    public static string PrepareArguments(string[] testAssemblies, string? testAdapterPath, string? runSettings,
         string framework, string? inIsolation = "", string? resultsDirectory = null)
     {
         var arguments = "";
@@ -172,7 +173,7 @@ public class IntegrationTestBase
     /// <param name="framework"></param>
     /// <param name="inIsolation"></param>
     /// <returns>Command line arguments string.</returns>
-    public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings,
+    public static string PrepareArguments(string testAssembly, string? testAdapterPath, string? runSettings,
         string framework, string? inIsolation = "", string? resultsDirectory = null)
         => PrepareArguments(new string[] { testAssembly }, testAdapterPath, runSettings, framework, inIsolation, resultsDirectory);
 
@@ -181,7 +182,7 @@ public class IntegrationTestBase
     /// Invokes <c>vstest.console</c> with specified arguments.
     /// </summary>
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
-    public void InvokeVsTest(string arguments, Dictionary<string, string>? environmentVariables = null)
+    public void InvokeVsTest(string? arguments, Dictionary<string, string?>? environmentVariables = null)
     {
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
         ExecuteVsTestConsole(arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
@@ -192,7 +193,7 @@ public class IntegrationTestBase
     /// Invokes our local copy of dotnet that is patched with artifacts from the build with specified arguments.
     /// </summary>
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
-    public void InvokeDotnetTest(string arguments, Dictionary<string, string>? environmentVariables = null)
+    public void InvokeDotnetTest(string arguments, Dictionary<string, string?>? environmentVariables = null, bool useDotnetFromTools = false, string? workingDirectory = null)
     {
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
 
@@ -207,7 +208,7 @@ public class IntegrationTestBase
         // https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestForwardingApp.cs#L30-L39
         debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
 
-        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
+        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables, useDotnetFromTools, workingDirectory);
         FormatStandardOutCome();
     }
 
@@ -219,18 +220,18 @@ public class IntegrationTestBase
     /// <param name="framework">Dotnet Framework of test assembly.</param>
     /// <param name="runSettings">Run settings for execution.</param>
     public void InvokeVsTestForExecution(string testAssembly,
-        string testAdapterPath,
+        string? testAdapterPath,
         string framework,
-        string runSettings = "",
-        Dictionary<string, string>? environmentVariables = null)
+        string? runSettings = "",
+        Dictionary<string, string?>? environmentVariables = null)
     {
         var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
         InvokeVsTest(arguments, environmentVariables);
     }
 
-    private Dictionary<string, string> AddDebugEnvironmentVariables(Dictionary<string, string>? environmentVariables)
+    private Dictionary<string, string?> AddDebugEnvironmentVariables(Dictionary<string, string?>? environmentVariables)
     {
-        environmentVariables ??= new Dictionary<string, string>();
+        environmentVariables ??= new();
 
         if (_testEnvironment.DebugInfo != null)
         {
@@ -265,7 +266,7 @@ public class IntegrationTestBase
     /// <param name="testAdapterPath">Path to test adapters.</param>
     /// <param name="runSettings">Run settings for execution.</param>
     public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "",
-        Dictionary<string, string>? environmentVariables = null)
+        Dictionary<string, string?>? environmentVariables = null)
     {
         var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, _testEnvironment.InIsolationValue!, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /listtests");
@@ -635,7 +636,7 @@ public class IntegrationTestBase
         return consoleRunnerPath;
     }
 
-    protected virtual string SetVSTestConsoleDLLPathInArgs(string args)
+    protected virtual string SetVSTestConsoleDLLPathInArgs(string? args)
     {
         var vstestConsoleDll = GetDotnetRunnerPath();
         vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();
@@ -698,7 +699,7 @@ public class IntegrationTestBase
         // TODO: This is scheduled to be fixed in 17.3, where it will start working normally. We will just add those
         // variables, unless we explicitly say to clean them. https://github.com/microsoft/vstest/pull/3433
         // Remove this code later, and just pass the variables you want to add.
-        var debugEnvironmentVariables = AddDebugEnvironmentVariables(new Dictionary<string, string>());
+        var debugEnvironmentVariables = AddDebugEnvironmentVariables(new());
         environmentVariables ??= new();
         if (debugEnvironmentVariables.Count > 0)
         {
@@ -739,7 +740,7 @@ public class IntegrationTestBase
         return testMethodName;
     }
 
-    protected void ExecuteVsTestConsole(string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string>? environmentVariables = null)
+    protected void ExecuteVsTestConsole(string? args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string?>? environmentVariables = null)
     {
         if (IsNetCoreRunner())
         {
@@ -761,22 +762,22 @@ public class IntegrationTestBase
     /// <param name="stdError"></param>
     /// <param name="exitCode"></param>
     private void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode,
-        Dictionary<string, string>? environmentVariables = null)
+        Dictionary<string, string?>? environmentVariables = null, bool useDotnetFromTools = false, string? workingDirectory = null)
     {
         if (environmentVariables is null)
         {
-            environmentVariables = new Dictionary<string, string>();
+            environmentVariables = new();
         }
 
         environmentVariables["DOTNET_MULTILEVEL_LOOKUP"] = "0";
 
         var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
-        var patchedDotnetPath = Path.Combine(_testEnvironment.TestArtifactsDirectory, executablePath);
-        ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
+        var patchedDotnetPath = Path.Combine(useDotnetFromTools ? _testEnvironment.ToolsDirectory : _testEnvironment.TestArtifactsDirectory, executablePath);
+        ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables, workingDirectory);
     }
 
-    protected static void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode,
-        Dictionary<string, string>? environmentVariables = null, string? workingDirectory = null)
+    protected static void ExecuteApplication(string path, string? args, out string stdOut, out string stdError, out int exitCode,
+        Dictionary<string, string?>? environmentVariables = null, string? workingDirectory = null)
     {
         if (path.IsNullOrWhiteSpace())
         {

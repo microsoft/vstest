@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 using Newtonsoft.Json.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 
 /// <summary>

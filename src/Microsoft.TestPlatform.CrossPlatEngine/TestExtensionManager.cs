@@ -4,10 +4,7 @@
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
@@ -23,7 +20,7 @@ public class TestExtensionManager : ITestExtensionManager
     }
 
     /// <inheritdoc />
-    public void UseAdditionalExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
+    public void UseAdditionalExtensions(IEnumerable<string>? pathToAdditionalExtensions, bool skipExtensionFilters)
     {
         TestPluginCache.Instance.UpdateExtensions(pathToAdditionalExtensions, skipExtensionFilters);
     }

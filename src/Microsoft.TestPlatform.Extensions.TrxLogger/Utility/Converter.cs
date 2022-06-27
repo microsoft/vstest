@@ -10,13 +10,12 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
@@ -105,7 +104,7 @@ internal class Converter
         TestRun testRun,
         VisualStudio.TestPlatform.ObjectModel.TestResult rockSteadyTestResult)
     {
-        var resultName = !string.IsNullOrEmpty(rockSteadyTestResult.DisplayName) ? rockSteadyTestResult.DisplayName : testName;
+        string resultName = !string.IsNullOrEmpty(rockSteadyTestResult.DisplayName) ? rockSteadyTestResult.DisplayName! : testName;
         var testResult = CreateTestResult(testRun.Id, testId, executionId, parentExecutionId, resultName, testOutcome, testType, testCategoryId);
 
         if (rockSteadyTestResult.ErrorMessage != null)
@@ -190,7 +189,7 @@ internal class Converter
         return collectorEntries;
     }
 
-    public IList<string> ToResultFiles(IEnumerable<AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory,
+    public IList<string> ToResultFiles(IEnumerable<AttachmentSet>? attachmentSets, TestRun testRun, string trxFileDirectory,
         List<string> errorMessages)
     {
         List<string> resultFiles = new();
@@ -240,7 +239,7 @@ internal class Converter
         {
             if (TestResultMessage.AdditionalInfoCategory.Equals(message.Category, StringComparison.OrdinalIgnoreCase))
             {
-                unitTestResult.AddTextMessage(message.Text);
+                unitTestResult.AddTextMessage(message.Text!);
             }
             else if (TestResultMessage.DebugTraceCategory.Equals(message.Category, StringComparison.OrdinalIgnoreCase))
             {
@@ -277,7 +276,7 @@ internal class Converter
 
         if (customProperty != null)
         {
-            var cateogryValues = (string[])testCase.GetPropertyValue(customProperty);
+            var cateogryValues = (string[]?)testCase.GetPropertyValue(customProperty);
             return cateogryValues != null ? cateogryValues.ToList() : Enumerable.Empty<string>().ToList();
         }
 
@@ -295,7 +294,7 @@ internal class Converter
         Guid testId = Guid.Empty;
 
         // Setting test id to tmi test id.
-        TestProperty tmiTestIdProperty = rockSteadyTestCase.Properties.FirstOrDefault(
+        TestProperty? tmiTestIdProperty = rockSteadyTestCase.Properties.FirstOrDefault(
             property => property.Id.Equals(Constants.TmiTestIdPropertyIdentifier));
 
         if (tmiTestIdProperty != null)
@@ -315,7 +314,7 @@ internal class Converter
     /// <returns>Parent execution id.</returns>
     public Guid GetParentExecutionId(VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
     {
-        TestProperty parentExecutionIdProperty = testResult.Properties.FirstOrDefault(
+        TestProperty? parentExecutionIdProperty = testResult.Properties.FirstOrDefault(
             property => property.Id.Equals(Constants.ParentExecutionIdPropertyIdentifier));
 
         return parentExecutionIdProperty == null ?
@@ -330,7 +329,7 @@ internal class Converter
     /// <returns>Execution id.</returns>
     public Guid GetExecutionId(VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
     {
-        TestProperty executionIdProperty = testResult.Properties.FirstOrDefault(
+        TestProperty? executionIdProperty = testResult.Properties.FirstOrDefault(
             property => property.Id.Equals(Constants.ExecutionIdPropertyIdentifier));
 
         var executionId = Guid.Empty;
@@ -351,8 +350,8 @@ internal class Converter
         var testTypeGuid = Constants.UnitTestTypeGuid;
 
         // Get test type from property. default to unit test type.
-        TestProperty testTypeProperty = testResult.Properties.FirstOrDefault(property => property.Id.Equals(Constants.TestTypePropertyIdentifier));
-        testTypeGuid = (testTypeProperty == null) ? testTypeGuid : testResult.GetPropertyValue(testTypeProperty, testTypeGuid);
+        TestProperty? testTypeProperty = testResult.Properties.FirstOrDefault(property => property.Id.Equals(Constants.TestTypePropertyIdentifier));
+        testTypeGuid = testTypeProperty == null ? testTypeGuid : testResult.GetPropertyValue(testTypeProperty, testTypeGuid);
 
         // Currently trx supports ordered test and unit test. All tests except ordered test are modified as unit test type.
         return (testTypeGuid.Equals(Constants.OrderedTestTypeGuid)) ?
@@ -436,7 +435,7 @@ internal class Converter
     // Returns a list of collector entry
     private CollectorDataEntry ToCollectorEntry(AttachmentSet attachmentSet, Guid testResultExecutionId, TestRun testRun, string trxFileDirectory)
     {
-        string runDirectoryName = Path.Combine(trxFileDirectory, testRun.RunConfiguration.RunDeploymentRootDirectory);
+        string runDirectoryName = Path.Combine(trxFileDirectory, testRun.RunConfiguration!.RunDeploymentRootDirectory);
         string inDirectory = Path.Combine(runDirectoryName, "In");
 
         string targetDirectory = inDirectory;
@@ -455,11 +454,11 @@ internal class Converter
         List<IDataAttachment> uriDataAttachments = new();
         foreach (VisualStudio.TestPlatform.ObjectModel.UriDataAttachment uriDataAttachment in attachmentSet.Attachments)
         {
-            EqtTrace.Verbose("TrxLogger.ToCollectorEntry: Got attachment " + uriDataAttachment.Uri + " with description " + uriDataAttachment.Description);
+            EqtTrace.Verbose($"TrxLogger.ToCollectorEntry: Got attachment {uriDataAttachment.Uri} with description {uriDataAttachment.Description}");
 
             string sourceFile = uriDataAttachment.Uri.LocalPath;
             _ = (Path.GetFullPath(sourceFile) == sourceFile);
-            Debug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
+            TPDebug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
 
             // copy the source file to the target location
             string targetFileName = _trxFileHelper.GetNextIterationFileName(targetDirectory, Path.GetFileName(sourceFile), false);
@@ -472,13 +471,14 @@ internal class Converter
                 // (Trx viewer automatically adds In\ to the collected file.
                 string fileName = Path.Combine(Environment.MachineName, Path.GetFileName(targetFileName));
                 Uri sourceFileUri = new(fileName, UriKind.Relative);
+                TPDebug.Assert(uriDataAttachment.Description is not null, "uriDataAttachment.Description is null");
                 TrxObjectModel.UriDataAttachment dataAttachment = new(uriDataAttachment.Description, sourceFileUri, _trxFileHelper);
 
                 uriDataAttachments.Add(dataAttachment);
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("Trxlogger: ToCollectorEntry: " + ex);
+                EqtTrace.Error($"Trxlogger.ToCollectorEntry: {ex}");
             }
         }
 
@@ -494,7 +494,7 @@ internal class Converter
     // Get the path to the result files
     private IList<string> ToResultFiles(AttachmentSet attachmentSet, Guid testResultExecutionId, TestRun testRun, string trxFileDirectory)
     {
-        string runDirectoryName = Path.Combine(trxFileDirectory, testRun.RunConfiguration.RunDeploymentRootDirectory);
+        string runDirectoryName = Path.Combine(trxFileDirectory, testRun.RunConfiguration!.RunDeploymentRootDirectory);
         string testResultDirectory = Path.Combine(runDirectoryName, "In");
 
         if (!Equals(testResultExecutionId, Guid.Empty))
@@ -514,9 +514,9 @@ internal class Converter
         {
             string sourceFile = uriDataAttachment.Uri.IsAbsoluteUri ? uriDataAttachment.Uri.LocalPath : uriDataAttachment.Uri.ToString();
 
-            EqtTrace.Verbose("TrxLogger: ToResultFiles: Got attachment " + uriDataAttachment.Uri + " with local path " + sourceFile);
+            EqtTrace.Verbose($"TrxLogger.ToResultFiles: Got attachment {uriDataAttachment.Uri} with local path {sourceFile}");
 
-            Debug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
+            TPDebug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
             // copy the source file to the target location
             string targetFileName = _trxFileHelper.GetNextIterationFileName(testResultDirectory, Path.GetFileName(sourceFile), false);
 
@@ -556,11 +556,11 @@ internal class Converter
     /// </summary>
     /// <param name="rockSteadyTestCase"></param>
     /// <returns>Priority</returns>
-    private int GetPriority(TestCase rockSteadyTestCase)
+    private static int GetPriority(TestCase rockSteadyTestCase)
     {
         int priority = int.MaxValue;
 
-        Trait priorityTrait = rockSteadyTestCase.Traits?.FirstOrDefault(t => t.Name.Equals("Priority"));
+        Trait? priorityTrait = rockSteadyTestCase.Traits?.FirstOrDefault(t => t.Name.Equals("Priority"));
         if (priorityTrait != null && int.TryParse(priorityTrait.Value, out int priorityValue))
             priority = priorityValue;
 
@@ -572,11 +572,11 @@ internal class Converter
     /// </summary>
     /// <param name="rockSteadyTestCase"></param>
     /// <returns>Owner</returns>
-    private string GetOwner(TestCase rockSteadyTestCase)
+    private static string GetOwner(TestCase rockSteadyTestCase)
     {
-        string owner = null;
+        string? owner = null;
 
-        Trait ownerTrait = rockSteadyTestCase.Traits?.FirstOrDefault(t => t.Name.Equals("Owner"));
+        Trait? ownerTrait = rockSteadyTestCase.Traits?.FirstOrDefault(t => t.Name.Equals("Owner"));
         if (ownerTrait != null)
             owner = ownerTrait.Value;
 
@@ -590,7 +590,7 @@ internal class Converter
     /// <param name="fullyQualifiedName">Fully qualified name.</param>
     /// <param name="source">Source.</param>
     /// <returns>Test class name.</returns>
-    private string GetTestClassName(string testName, string fullyQualifiedName, string source)
+    private static string GetTestClassName(string testName, string fullyQualifiedName, string source)
     {
         var className = "DefaultClassName";
 
@@ -644,23 +644,20 @@ internal class Converter
     /// <param name="source"></param>
     /// <param name="testType"></param>
     /// <returns>Trx test element</returns>
-    private TestElement CreateTestElement(Guid testId, string name, string fullyQualifiedName, string adapter, string source, TestType testType)
+    private static TestElement CreateTestElement(Guid testId, string name, string fullyQualifiedName, string adapter, string source, TestType testType)
     {
-        TestElement testElement;
         if (testType.Equals(Constants.OrderedTestType))
         {
-            testElement = new OrderedTestElement(testId, name, adapter);
+            return new OrderedTestElement(testId, name, adapter);
         }
-        else
-        {
-            var codeBase = source;
-            var className = GetTestClassName(name, fullyQualifiedName, source);
-            var testMethodName = fullyQualifiedName.StartsWith($"{className}.") ? fullyQualifiedName.Remove(0, $"{className}.".Length) : fullyQualifiedName;
-            var testMethod = new TestMethod(testMethodName, className);
 
-            testElement = new UnitTestElement(testId, name, adapter, testMethod);
-            (testElement as UnitTestElement).CodeBase = codeBase;
-        }
+        var codeBase = source;
+        var className = GetTestClassName(name, fullyQualifiedName, source);
+        var testMethodName = fullyQualifiedName.StartsWith($"{className}.") ? fullyQualifiedName.Remove(0, $"{className}.".Length) : fullyQualifiedName;
+        var testMethod = new TestMethod(testMethodName, className);
+
+        var testElement = new UnitTestElement(testId, name, adapter, testMethod);
+        testElement.CodeBase = codeBase;
 
         return testElement;
     }

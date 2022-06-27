@@ -27,7 +27,7 @@ public class EnableDiagArgumentProcessorTests
     private readonly Mock<IFileHelper> _mockFileHelper;
 
     private readonly TraceLevel _traceLevel;
-    private readonly string _traceFileName;
+    private readonly string? _traceFileName;
 
     public EnableDiagArgumentProcessorTests()
     {
@@ -85,7 +85,7 @@ public class EnableDiagArgumentProcessorTests
     [TestMethod]
     public void EnableDiagArgumentProcessorExecutorDoesNotThrowsIfFileDotOpenThrow()
     {
-        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath))).Returns(true);
+        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath)!)).Returns(true);
 
         _diagProcessor.Executor!.Value.Initialize(_dummyFilePath);
     }
@@ -146,17 +146,17 @@ public class EnableDiagArgumentProcessorTests
         _diagProcessor.Executor!.Value.Initialize(argument);
 
         Assert.AreEqual(TraceLevel.Info, (TraceLevel)EqtTrace.TraceLevel);
-        Assert.IsTrue(EqtTrace.LogFile.Contains("abc.txt"));
+        Assert.IsTrue(EqtTrace.LogFile?.Contains("abc.txt"));
     }
 
     [TestMethod]
     public void EnableDiagArgumentProcessorExecutorShouldCreateDirectoryOfLogFileIfNotExists()
     {
-        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath))).Returns(false);
+        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath)!)).Returns(false);
 
         _diagProcessor.Executor!.Value.Initialize(_dummyFilePath);
 
-        _mockFileHelper.Verify(fh => fh.CreateDirectory(Path.GetDirectoryName(_dummyFilePath)), Times.Once);
+        _mockFileHelper.Verify(fh => fh.CreateDirectory(Path.GetDirectoryName(_dummyFilePath)!), Times.Once);
     }
 
     [TestMethod]

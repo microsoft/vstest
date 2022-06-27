@@ -6,8 +6,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 using static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ProtocolVersioning;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 /// <summary>

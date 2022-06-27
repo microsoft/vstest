@@ -16,8 +16,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
 
 /// <summary>
@@ -29,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
 /// </remarks>
 public class SettingsProviderExtensionManager
 {
-    private static SettingsProviderExtensionManager s_settingsProviderExtensionManager;
+    private static SettingsProviderExtensionManager? s_settingsProviderExtensionManager;
     private static readonly object Synclock = new();
 
     /// <summary>
@@ -63,18 +61,24 @@ public class SettingsProviderExtensionManager
 
         foreach (var settingsProvider in _settingsProviders)
         {
-            if (SettingsProvidersMap.ContainsKey(settingsProvider.Metadata.SettingsName))
+            var settingsName = settingsProvider.Metadata?.SettingsName;
+            if (settingsName is null)
+            {
+                continue;
+            }
+
+            if (SettingsProvidersMap.ContainsKey(settingsName))
             {
                 _logger.SendMessage(
                     TestMessageLevel.Error,
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         CommonResources.DuplicateSettingsName,
-                        settingsProvider.Metadata.SettingsName));
+                        settingsName));
             }
             else
             {
-                SettingsProvidersMap.Add(settingsProvider.Metadata.SettingsName, settingsProvider);
+                SettingsProvidersMap.Add(settingsName, settingsProvider);
             }
         }
     }
@@ -160,14 +164,14 @@ public class SettingsProviderExtensionManager
     /// </summary>
     /// <param name="settingsName">Name of the settings to get.</param>
     /// <returns>Settings provider with the provided name or null if one was not found.</returns>
-    internal LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> GetSettingsProvider(string settingsName)
+    internal LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>? GetSettingsProvider(string settingsName)
     {
         if (settingsName.IsNullOrWhiteSpace())
         {
             throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(settingsName));
         }
 
-        SettingsProvidersMap.TryGetValue(settingsName, out LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> settingsProvider);
+        SettingsProvidersMap.TryGetValue(settingsName, out var settingsProvider);
 
         return settingsProvider;
     }

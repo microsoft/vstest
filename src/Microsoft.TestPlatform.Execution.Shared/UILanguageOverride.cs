@@ -4,36 +4,51 @@
 using System;
 using System.Globalization;
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
 namespace Microsoft.VisualStudio.TestPlatform.Execution;
 
-internal static class UiLanguageOverride
+// Borrowed from dotnet/sdk with some tweaks to allow testing
+internal class UiLanguageOverride
 {
-    private const string DotnetCliUiLanguage = nameof(DotnetCliUiLanguage);
-    private const string Vslang = nameof(Vslang);
-    private const string PreferredUiLang = nameof(PreferredUiLang);
+    private const string DOTNET_CLI_UI_LANGUAGE = nameof(DOTNET_CLI_UI_LANGUAGE);
+    private const string VSLANG = nameof(VSLANG);
+    private const string PreferredUILang = nameof(PreferredUILang);
+    private readonly IEnvironmentVariableHelper _environmentVariableHelper;
+    private readonly Action<CultureInfo> _setDefaultThreadCurrentUICulture;
 
-    internal static void SetCultureSpecifiedByUser()
+    public UiLanguageOverride()
+        : this(new EnvironmentVariableHelper(), language => CultureInfo.DefaultThreadCurrentUICulture = language)
+    { }
+
+    public UiLanguageOverride(IEnvironmentVariableHelper environmentVariableHelper, Action<CultureInfo> setDefaultThreadCurrentUICulture)
     {
-        var language = GetOverriddenUiLanguage();
+        _environmentVariableHelper = environmentVariableHelper;
+        _setDefaultThreadCurrentUICulture = setDefaultThreadCurrentUICulture;
+    }
+
+    internal void SetCultureSpecifiedByUser()
+    {
+        var language = GetOverriddenUiLanguage(_environmentVariableHelper);
         if (language == null)
         {
             return;
         }
 
-        ApplyOverrideToCurrentProcess(language);
-        FlowOverrideToChildProcesses(language);
+        ApplyOverrideToCurrentProcess(language, _setDefaultThreadCurrentUICulture);
+        FlowOverrideToChildProcesses(language, _environmentVariableHelper);
     }
 
-
-    private static void ApplyOverrideToCurrentProcess(CultureInfo language)
+    private static void ApplyOverrideToCurrentProcess(CultureInfo language, Action<CultureInfo> setDefaultThreadCurrentUICulture)
     {
-        CultureInfo.DefaultThreadCurrentUICulture = language;
+        setDefaultThreadCurrentUICulture(language);
     }
 
-    private static CultureInfo? GetOverriddenUiLanguage()
+    private static CultureInfo? GetOverriddenUiLanguage(IEnvironmentVariableHelper environmentVariableHelper)
     {
         // DOTNET_CLI_UI_LANGUAGE=<culture name> is the main way for users to customize the CLI's UI language.
-        string dotnetCliLanguage = Environment.GetEnvironmentVariable(DotnetCliUiLanguage);
+        string? dotnetCliLanguage = environmentVariableHelper.GetEnvironmentVariable(DOTNET_CLI_UI_LANGUAGE);
         if (dotnetCliLanguage != null)
         {
             try
@@ -46,7 +61,7 @@ internal static class UiLanguageOverride
 #if !NETCOREAPP1_0 && !NETSTANDARD1_3
         // VSLANG=<lcid> is set by VS and we respect that as well so that we will respect the VS
         // language preference if we're invoked by VS.
-        string vsLang = Environment.GetEnvironmentVariable(Vslang);
+        string? vsLang = environmentVariableHelper.GetEnvironmentVariable(VSLANG);
         if (vsLang != null && int.TryParse(vsLang, out int vsLcid))
         {
             try
@@ -60,22 +75,22 @@ internal static class UiLanguageOverride
         return null;
     }
 
-    private static void FlowOverrideToChildProcesses(CultureInfo language)
+    private static void FlowOverrideToChildProcesses(CultureInfo language, IEnvironmentVariableHelper environmentVariableHelper)
     {
         // Do not override any environment variables that are already set as we do not want to clobber a more granular setting with our global setting.
-        SetIfNotAlreadySet(DotnetCliUiLanguage, language.Name);
+        SetIfNotAlreadySet(DOTNET_CLI_UI_LANGUAGE, language.Name, environmentVariableHelper);
 #if !NETCOREAPP1_0 && !NETSTANDARD1_3
-        SetIfNotAlreadySet(Vslang, language.LCID.ToString()); // for tools following VS guidelines to just work in CLI
+        SetIfNotAlreadySet(VSLANG, language.LCID.ToString(), environmentVariableHelper); // for tools following VS guidelines to just work in CLI
 #endif
-        SetIfNotAlreadySet(PreferredUiLang, language.Name); // for C#/VB targets that pass $(PreferredUILang) to compiler
+        SetIfNotAlreadySet(PreferredUILang, language.Name, environmentVariableHelper); // for C#/VB targets that pass $(PreferredUILang) to compiler
     }
 
-    private static void SetIfNotAlreadySet(string environmentVariableName, string value)
+    private static void SetIfNotAlreadySet(string environmentVariableName, string value, IEnvironmentVariableHelper environmentVariableHelper)
     {
-        string currentValue = Environment.GetEnvironmentVariable(environmentVariableName);
+        string? currentValue = environmentVariableHelper.GetEnvironmentVariable(environmentVariableName);
         if (currentValue == null)
         {
-            Environment.SetEnvironmentVariable(environmentVariableName, value);
+            environmentVariableHelper.SetEnvironmentVariable(environmentVariableName, value);
         }
     }
 }

@@ -26,8 +26,8 @@ public class TestDiscoveryEventHandlerTests
     [TestMethod]
     public void HandleDiscoveredTestShouldSendTestCasesToClient()
     {
-        _testDiscoveryEventHandler.HandleDiscoveredTests(null);
-        _mockClient.Verify(th => th.SendTestCases(null), Times.Once);
+        _testDiscoveryEventHandler.HandleDiscoveredTests(null!);
+        _mockClient.Verify(th => th.SendTestCases(null!), Times.Once);
     }
 
     [TestMethod]
@@ -44,7 +44,7 @@ public class TestDiscoveryEventHandlerTests
     {
         _testDiscoveryEventHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(0, false), null);
 
-        _mockClient.Verify(th => th.SendTestCases(null), Times.Never);
+        _mockClient.Verify(th => th.SendTestCases(null!), Times.Never);
     }
 
     [TestMethod]

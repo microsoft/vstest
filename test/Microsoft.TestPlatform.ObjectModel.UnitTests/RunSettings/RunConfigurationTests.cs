@@ -88,9 +88,9 @@ public class RunConfigurationTests
         // Verify Default
         Assert.AreEqual(Architecture.X64, runConfiguration.TargetPlatform);
 
-        var expectedFramework = Framework.FromString("FrameworkCore10");
+        var expectedFramework = Framework.FromString("FrameworkCore10")!;
         _ = runConfiguration.TargetFramework;
-        Assert.AreEqual(expectedFramework.Name, runConfiguration.TargetFramework.Name);
+        Assert.AreEqual(expectedFramework.Name, runConfiguration.TargetFramework!.Name);
         Assert.AreEqual(expectedFramework.Version, runConfiguration.TargetFramework.Version);
 
         Assert.AreEqual("TestResults", runConfiguration.ResultsDirectory);
@@ -118,23 +118,23 @@ public class RunConfigurationTests
     {
         var runConfiguration = new RunConfiguration();
         runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework35;
-        Equals(Framework.FromString("Framework35").Name, runConfiguration.TargetFramework.Name);
+        Equals(Framework.FromString("Framework35")!.Name, runConfiguration.TargetFramework!.Name);
         Assert.AreEqual(FrameworkVersion.Framework35, runConfiguration.TargetFrameworkVersion);
 
         runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework40;
-        Equals(Framework.FromString("Framework40").Name, runConfiguration.TargetFramework.Name);
+        Equals(Framework.FromString("Framework40")!.Name, runConfiguration.TargetFramework.Name);
         Assert.AreEqual(FrameworkVersion.Framework40, runConfiguration.TargetFrameworkVersion);
 
         runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework45;
-        Equals(Framework.FromString("Framework45").Name, runConfiguration.TargetFramework.Name);
+        Equals(Framework.FromString("Framework45")!.Name, runConfiguration.TargetFramework.Name);
         Assert.AreEqual(FrameworkVersion.Framework45, runConfiguration.TargetFrameworkVersion);
 
         runConfiguration.TargetFrameworkVersion = FrameworkVersion.FrameworkCore10;
-        Equals(Framework.FromString("FrameworkCore10").Name, runConfiguration.TargetFramework.Name);
+        Equals(Framework.FromString("FrameworkCore10")!.Name, runConfiguration.TargetFramework.Name);
         Assert.AreEqual(FrameworkVersion.FrameworkCore10, runConfiguration.TargetFrameworkVersion);
 
         runConfiguration.TargetFrameworkVersion = FrameworkVersion.FrameworkUap10;
-        Equals(Framework.FromString("FrameworkUap10").Name, runConfiguration.TargetFramework.Name);
+        Equals(Framework.FromString("FrameworkUap10")!.Name, runConfiguration.TargetFramework.Name);
         Assert.AreEqual(FrameworkVersion.FrameworkUap10, runConfiguration.TargetFrameworkVersion);
     }
 

@@ -47,14 +47,14 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         _environment = environment;
     }
 
-    protected Action<object?, string> OutputReceivedCallback => (process, data) =>
+    protected Action<object?, string?> OutputReceivedCallback => (process, data) =>
         // useful for visibility when debugging this tool
         // Console.ForegroundColor = ConsoleColor.Cyan;
         // Console.WriteLine(data);
         // Console.ForegroundColor = ConsoleColor.White;
         // Log all standard output message of procdump in diag files.
         // Otherwise they end up coming on console in pipleine.
-        EqtTrace.Info("ProcDumpDumper.OutputReceivedCallback: Output received from procdump process: " + data);
+        EqtTrace.Info($"ProcDumpDumper.OutputReceivedCallback: Output received from procdump process: {data ?? "<null>"}");
 
     /// <inheritdoc/>
     public void WaitForDumpToFinish()

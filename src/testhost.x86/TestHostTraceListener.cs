@@ -41,7 +41,7 @@ internal class TestHostTraceListener : DefaultTraceListener
             try
             {
                 // workaround for netcoreapp2.1 where the trace listener api is not called when
-                // Debug.Assert fails. This method is internal, but the class is on purpose keeping the
+                // TPDebug.Assert fails. This method is internal, but the class is on purpose keeping the
                 // callback settable so tests can set the callback
                 var field = typeof(Debug).GetField("s_ShowDialog", BindingFlags.Static | BindingFlags.NonPublic);
                 if (field != null)
@@ -52,7 +52,7 @@ internal class TestHostTraceListener : DefaultTraceListener
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("TestPlatformTraceListener.Setup: Failed to replace inner callback to ShowDialog in Debug.Assert. Calls to Debug.Assert with crash the test host process. {0}", ex);
+                EqtTrace.Error("TestPlatformTraceListener.Setup: Failed to replace inner callback to ShowDialog in TPDebug.Assert. Calls to TPDebug.Assert with crash the test host process. {0}", ex);
             }
         }
     }

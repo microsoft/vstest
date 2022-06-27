@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -24,8 +22,8 @@ internal interface ILazyPropertyValue
 /// <typeparam name="T">The type of the value to be calculated</typeparam>
 public sealed class LazyPropertyValue<T> : ILazyPropertyValue
 {
-    private T _value;
     private readonly Func<T> _getValue;
+    private T? _value;
     private bool _isValueCreated;
 
     public LazyPropertyValue(Func<T> getValue)
@@ -48,7 +46,7 @@ public sealed class LazyPropertyValue<T> : ILazyPropertyValue
                 _isValueCreated = true;
             }
 
-            return _value;
+            return _value!;
         }
     }
 
@@ -56,7 +54,7 @@ public sealed class LazyPropertyValue<T> : ILazyPropertyValue
     {
         get
         {
-            return Value;
+            return Value!;
         }
     }
 }

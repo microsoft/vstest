@@ -43,7 +43,7 @@ public class PlatformEqtTrace : IPlatformEqtTrace
     private static PlatformTraceLevel TraceLevel { get; set; }
 
     /// <inheritdoc/>
-    public void WriteLine(PlatformTraceLevel level, string message)
+    public void WriteLine(PlatformTraceLevel level, string? message)
     {
         if (TraceInitialized() && TraceLevel > PlatformTraceLevel.Off)
         {
@@ -72,18 +72,20 @@ public class PlatformEqtTrace : IPlatformEqtTrace
     }
 
     /// <inheritdoc/>
-    public bool InitializeVerboseTrace(string customLogFile)
+    public bool InitializeVerboseTrace(string? customLogFile)
     {
         return InitializeTrace(customLogFile, PlatformTraceLevel.Verbose);
     }
 
     /// <inheritdoc/>
-    public bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel)
+    public bool InitializeTrace(string? customLogFile, PlatformTraceLevel traceLevel)
     {
         string logFileName;
         try
         {
-            logFileName = Path.GetFileNameWithoutExtension(customLogFile.TrimStart('"').TrimEnd('"')).Replace(" ", "_");
+            logFileName = customLogFile is not null
+                ? Path.GetFileNameWithoutExtension(customLogFile.TrimStart('"').TrimEnd('"')).Replace(" ", "_")
+                : Guid.NewGuid().ToString();
         }
         catch
         {

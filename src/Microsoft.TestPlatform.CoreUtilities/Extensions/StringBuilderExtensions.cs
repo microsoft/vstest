@@ -4,8 +4,6 @@
 using System;
 using System.Text;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 
 public static class StringBuilderExtensions
@@ -16,26 +14,28 @@ public static class StringBuilderExtensions
     /// <param name="result">string builder</param>
     /// <param name="data">data to be appended.</param>
     /// <returns></returns>
-    public static void AppendSafeWithNewLine(this StringBuilder result, string data)
+    public static void AppendSafeWithNewLine(this StringBuilder result, string? data)
     {
-        if (!string.IsNullOrEmpty(data))
+        if (data.IsNullOrEmpty())
         {
-            // Don't append more data if already reached max length.
-            if (result.Length >= result.MaxCapacity)
-            {
-                return;
-            }
-
-            // Add newline for readability.
-            data += Environment.NewLine;
-
-            // Append sub string of data if appending all the data exceeds max capacity.
-            if (result.Length + data.Length >= result.MaxCapacity)
-            {
-                data = data.Substring(0, result.MaxCapacity - result.Length);
-            }
-
-            result.Append(data);
+            return;
         }
+
+        // Don't append more data if already reached max length.
+        if (result.Length >= result.MaxCapacity)
+        {
+            return;
+        }
+
+        // Add newline for readability.
+        data += Environment.NewLine;
+
+        // Append sub string of data if appending all the data exceeds max capacity.
+        if (result.Length + data.Length >= result.MaxCapacity)
+        {
+            data = data.Substring(0, result.MaxCapacity - result.Length);
+        }
+
+        result.Append(data);
     }
 }

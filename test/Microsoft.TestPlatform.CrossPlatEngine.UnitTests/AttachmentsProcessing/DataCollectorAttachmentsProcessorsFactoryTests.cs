@@ -44,9 +44,9 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
         // arrange
         List<InvokedDataCollector> invokedDataCollectors = new()
         {
-            new InvokedDataCollector(new Uri("datacollector://Sample"), "Sample", typeof(SampleDataCollector).AssemblyQualifiedName, typeof(SampleDataCollector).Assembly.Location, true),
-            new InvokedDataCollector(new Uri("datacollector://SampleData2"), "SampleData2", typeof(SampleData2Collector).AssemblyQualifiedName, typeof(SampleData2Collector).Assembly.Location, true),
-            new InvokedDataCollector(new Uri("datacollector://SampleData3"), "SampleData3", typeof(SampleData3Collector).AssemblyQualifiedName, typeof(SampleData3Collector).Assembly.Location, true)
+            new InvokedDataCollector(new Uri("datacollector://Sample"), "Sample", typeof(SampleDataCollector).AssemblyQualifiedName!, typeof(SampleDataCollector).Assembly.Location, true),
+            new InvokedDataCollector(new Uri("datacollector://SampleData2"), "SampleData2", typeof(SampleData2Collector).AssemblyQualifiedName!, typeof(SampleData2Collector).Assembly.Location, true),
+            new InvokedDataCollector(new Uri("datacollector://SampleData3"), "SampleData3", typeof(SampleData3Collector).AssemblyQualifiedName!, typeof(SampleData3Collector).Assembly.Location, true)
         };
         // act
         var dataCollectorAttachmentsProcessors = _dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollectors.ToArray(), null);
@@ -82,7 +82,7 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
         // arrange
         List<InvokedDataCollector> invokedDataCollectors = new()
         {
-            new InvokedDataCollector(new Uri("datacollector://SampleData4"), "SampleData4", typeof(SampleData4Collector).AssemblyQualifiedName, typeof(SampleData4Collector).Assembly.Location, true)
+            new InvokedDataCollector(new Uri("datacollector://SampleData4"), "SampleData4", typeof(SampleData4Collector).AssemblyQualifiedName!, typeof(SampleData4Collector).Assembly.Location, true)
         };
 
         // act
@@ -99,7 +99,7 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
         // arrange
         List<InvokedDataCollector> invokedDataCollectors = new()
         {
-            new InvokedDataCollector(new Uri("datacollector://microsoft/CodeCoverage/2.0"), "SampleData5", typeof(SampleData5Collector).AssemblyQualifiedName, typeof(SampleData5Collector).Assembly.Location, true)
+            new InvokedDataCollector(new Uri("datacollector://microsoft/CodeCoverage/2.0"), "SampleData5", typeof(SampleData5Collector).AssemblyQualifiedName!, typeof(SampleData5Collector).Assembly.Location, true)
         };
 
         // act
@@ -170,11 +170,11 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
     public class SampleDataCollector : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
 
         }
@@ -186,11 +186,11 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
     public class SampleData2Collector : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
 
         }
@@ -202,11 +202,11 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
     public class SampleData3Collector : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
 
         }
@@ -218,11 +218,11 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
     public class SampleData4Collector : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
 
         }
@@ -234,11 +234,11 @@ public class DataCollectorAttachmentsProcessorsFactoryTests
     public class SampleData5Collector : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
 
         }

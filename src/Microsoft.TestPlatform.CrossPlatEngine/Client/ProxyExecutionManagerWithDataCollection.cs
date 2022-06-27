@@ -13,8 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
@@ -22,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 /// </summary>
 internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
 {
-    private IDictionary<string, string> _dataCollectionEnvironmentVariables;
+    private IDictionary<string, string?>? _dataCollectionEnvironmentVariables;
     private int _dataCollectionPort;
     private readonly IRequestData _requestData;
 
@@ -56,12 +54,12 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
         ProxyDataCollectionManager = proxyDataCollectionManager;
         DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
         _requestData = requestData;
-        _dataCollectionEnvironmentVariables = new Dictionary<string, string>();
+        _dataCollectionEnvironmentVariables = new Dictionary<string, string?>();
 
         testHostManager.HostLaunched += TestHostLaunchedHandler;
     }
 
-    private void TestHostLaunchedHandler(object sender, HostProviderEventArgs e)
+    private void TestHostLaunchedHandler(object? sender, HostProviderEventArgs e)
     {
         ProxyDataCollectionManager.TestHostLaunched(e.ProcessId);
     }
@@ -152,7 +150,7 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
         {
             if (testProcessStartInfo.EnvironmentVariables == null)
             {
-                testProcessStartInfo.EnvironmentVariables = new Dictionary<string, string>();
+                testProcessStartInfo.EnvironmentVariables = new Dictionary<string, string?>();
             }
 
             foreach (var envVariable in _dataCollectionEnvironmentVariables)
@@ -178,7 +176,7 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
         {
             testProcessStartInfo.EnvironmentVariables = _dataCollectionEnvironmentVariables;
         }
-        else
+        else if (_dataCollectionEnvironmentVariables is not null)
         {
             foreach (var kvp in _dataCollectionEnvironmentVariables)
             {
@@ -188,8 +186,7 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
 
         // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
         var telemetryOptedIn = _requestData.IsTelemetryOptedIn ? "true" : "false";
-        testProcessStartInfo.Arguments += " --datacollectionport " + _dataCollectionPort
-                                                                   + " --telemetryoptedin " + telemetryOptedIn;
+        testProcessStartInfo.Arguments += $" --datacollectionport {_dataCollectionPort} --telemetryoptedin {telemetryOptedIn}";
 
         return testProcessStartInfo;
     }
@@ -205,18 +202,18 @@ internal class DataCollectionRunEventsHandler : ITestMessageEventHandler
     /// </summary>
     public DataCollectionRunEventsHandler()
     {
-        Messages = new List<Tuple<TestMessageLevel, string>>();
+        Messages = new List<Tuple<TestMessageLevel, string?>>();
     }
 
     /// <summary>
     /// Gets the cached messages.
     /// </summary>
-    public List<Tuple<TestMessageLevel, string>> Messages { get; private set; }
+    public List<Tuple<TestMessageLevel, string?>> Messages { get; private set; }
 
     /// <inheritdoc />
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
-        Messages.Add(new Tuple<TestMessageLevel, string>(level, message));
+        Messages.Add(new Tuple<TestMessageLevel, string?>(level, message));
     }
 
     /// <inheritdoc />

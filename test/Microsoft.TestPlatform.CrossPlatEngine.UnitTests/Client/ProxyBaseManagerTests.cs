@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,23 +20,24 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ProxyBaseManagerTests
 {
     private const int Clientprocessexitwait = 10 * 1000;
-    private Mock<ICommunicationEndPoint> _mockCommunicationEndpoint;
-    private ITestRequestSender _testRequestSender;
-    readonly ProtocolConfig _protocolConfig = new() { Version = 2 };
+    private readonly ProtocolConfig _protocolConfig = new() { Version = 2 };
     private readonly Mock<IRequestData> _mockRequestData;
-    protected readonly Mock<ITestRuntimeProvider> _mockTestHostManager;
-    protected Mock<IDataSerializer> _mockDataSerializer;
-    protected Mock<ICommunicationChannel> _mockChannel;
     private readonly Mock<IFileHelper> _mockFileHelper;
     private readonly DiscoveryDataAggregator _discoveryDataAggregator;
+
+    protected readonly Mock<ITestRuntimeProvider> _mockTestHostManager;
+
+    private Mock<ICommunicationEndPoint>? _mockCommunicationEndpoint;
+    private ITestRequestSender? _testRequestSender;
+
+    protected Mock<IDataSerializer> _mockDataSerializer;
+    protected Mock<ICommunicationChannel> _mockChannel;
 
     public ProxyBaseManagerTests()
     {
@@ -47,13 +49,13 @@ public class ProxyBaseManagerTests
         _discoveryDataAggregator = new();
 
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new Mock<IMetricsCollection>().Object);
-        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(null)).Returns(new Message());
+        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(null!)).Returns(new Message());
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(string.Empty)).Returns(new Message());
         _mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
         _mockTestHostManager.Setup(
                 m => m.GetTestHostProcessStartInfo(
                     It.IsAny<IEnumerable<string>>(),
-                    It.IsAny<IDictionary<string, string>>(),
+                    It.IsAny<IDictionary<string, string?>>(),
                     It.IsAny<TestRunnerConnectionInfo>()))
             .Returns(new TestProcessStartInfo());
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
@@ -62,6 +64,7 @@ public class ProxyBaseManagerTests
             .Returns(Task.FromResult(true));
     }
 
+    [MemberNotNull(nameof(_testRequestSender), nameof(_testRequestSender))]
     private void SetupAndInitializeTestRequestSender()
     {
         var connectionInfo = new TestHostConnectionInfo
@@ -89,7 +92,7 @@ public class ProxyBaseManagerTests
         _mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>())).Returns(messageType);
         _mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>(), It.IsAny<int>())).Returns(messageType);
         _mockDataSerializer.Setup(ds => ds.DeserializeMessage(It.Is<string>(s => s.Equals(messageType)))).Returns(new Message { MessageType = returnMessageType });
-        _mockDataSerializer.Setup(ds => ds.DeserializePayload<TPayload>(It.Is<Message>(m => m.MessageType.Equals(messageType)))).Returns(returnPayload);
+        _mockDataSerializer.Setup(ds => ds.DeserializePayload<TPayload>(It.Is<Message>(m => string.Equals(m.MessageType, messageType)))).Returns(returnPayload);
     }
 
     public void RaiseMessageReceived(string data)

@@ -3,7 +3,7 @@
 
 using System;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -18,10 +18,10 @@ public static class StringUtilities
     /// </summary>
     /// <param name="input">The input string.</param>
     /// <returns>The string that is prepared for output.</returns>
-    public static string PrepareForOutput(string input)
+    public static string PrepareForOutput(string? input)
     {
-        string result = input;
-        if (input == null)
+        string? result = input;
+        if (result == null)
         {
             result = Resources.Resources.NullString;
         }
@@ -36,13 +36,13 @@ public static class StringUtilities
     /// </summary>
     /// <param name="input">string to check</param>
     /// <returns>True if string is null or a whitespace, false otherwise</returns>
-    public static bool IsNullOrWhiteSpace(string input)
+    public static bool IsNullOrWhiteSpace(string? input)
     {
         if (input != null)
         {
             input = input.Trim();
         }
 
-        return string.IsNullOrEmpty(input);
+        return input.IsNullOrEmpty();
     }
 }

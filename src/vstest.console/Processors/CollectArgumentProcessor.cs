@@ -105,7 +105,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
             throw new CommandLineException(exceptionMessage);
         }
 
-        if (InferRunSettingsHelper.IsTestSettingsEnabled(_runSettingsManager.ActiveRunSettings.SettingsXml))
+        if (InferRunSettingsHelper.IsTestSettingsEnabled(_runSettingsManager.ActiveRunSettings?.SettingsXml))
         {
             throw new SettingsException(string.Format(CommandLineResources.CollectWithTestSettingErrorMessage, argument));
         }
@@ -117,7 +117,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     /// </summary>
     private static string? GetCoverletCodeBasePath(IRunSettingsProvider runSettingProvider, IFileHelper fileHelper)
     {
-        foreach (string adapterPath in RunSettingsUtilities.GetTestAdaptersPaths(runSettingProvider.ActiveRunSettings.SettingsXml))
+        foreach (string adapterPath in RunSettingsUtilities.GetTestAdaptersPaths(runSettingProvider.ActiveRunSettings?.SettingsXml))
         {
             string collectorPath = Path.Combine(adapterPath, CoverletConstants.CoverletDataCollectorCodebase);
             if (fileHelper.Exists(collectorPath))
@@ -228,7 +228,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
         dataCollectorSettings = null;
         foreach (var dataCollectorSetting in dataCollectionRunSettings.DataCollectorSettingsList)
         {
-            if (dataCollectorSetting.FriendlyName.Equals(friendlyName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(dataCollectorSetting.FriendlyName, friendlyName, StringComparison.OrdinalIgnoreCase))
             {
                 dataCollectorSettings = dataCollectorSetting;
                 return true;

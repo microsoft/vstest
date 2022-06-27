@@ -26,14 +26,14 @@ public class RunSettingsTests
         {
         }
 
-        public override XmlElement? ToXml()
+        public override XmlElement ToXml()
         {
             var document = new XmlDocument();
             using (XmlWriter writer = document.CreateNavigator()!.AppendChild())
             {
                 new XmlSerializer(typeof(ChildRunSettings)).Serialize(writer, this);
             }
-            return document.DocumentElement;
+            return document.DocumentElement!;
         }
     }
 }

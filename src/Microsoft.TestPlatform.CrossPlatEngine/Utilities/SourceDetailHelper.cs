@@ -20,10 +20,10 @@ internal static class SourceDetailHelper
         document.Load(reader);
         var navigator = document.CreateNavigator();
 
-        InferRunSettingsHelper.UpdateTargetFramework(document, sourceDetail.Framework.ToString(), overwrite: true);
+        InferRunSettingsHelper.UpdateTargetFramework(document, sourceDetail.Framework!.ToString(), overwrite: true);
         InferRunSettingsHelper.UpdateTargetPlatform(document, sourceDetail.Architecture.ToString(), overwrite: true);
 
-        var updatedRunSettings = navigator.OuterXml;
+        var updatedRunSettings = navigator!.OuterXml;
         return updatedRunSettings;
     }
 }

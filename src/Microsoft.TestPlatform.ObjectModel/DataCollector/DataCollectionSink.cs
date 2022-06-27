@@ -3,8 +3,6 @@
 
 using System.ComponentModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
@@ -22,7 +20,7 @@ public abstract class DataCollectionSink
     /// <summary>
     /// Called when sending of a file has completed.
     /// </summary>
-    public abstract event AsyncCompletedEventHandler SendFileCompleted;
+    public abstract event AsyncCompletedEventHandler? SendFileCompleted;
 
     /// <summary>
     /// Sends a file to up-stream components.

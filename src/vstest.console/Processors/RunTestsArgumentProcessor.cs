@@ -215,8 +215,8 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
             // we need to check if there are any tests executed - to try show some help info to user to check for installed vsix extensions
             if (!e.IsAborted && !e.IsCanceled)
             {
-                s_numberOfExecutedTests = e.TestRunStatistics.ExecutedTests;
-                var testsFoundInAnySource = e.TestRunStatistics != null && (e.TestRunStatistics.ExecutedTests > 0);
+                var testsFoundInAnySource = e.TestRunStatistics != null && e.TestRunStatistics.ExecutedTests > 0;
+                s_numberOfExecutedTests = e.TestRunStatistics!.ExecutedTests;
 
                 // Indicate the user to use test adapter path command if there are no tests found
                 if (!testsFoundInAnySource && !CommandLineOptions.Instance.TestAdapterPathsSet && _commandLineOptions.TestCaseFilterValue == null)
@@ -228,6 +228,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
             // Collect tests session artifacts for post processing
             if (_commandLineOptions.ArtifactProcessingMode == ArtifactProcessingMode.Collect)
             {
+                TPDebug.Assert(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml is not null, "RunSettingsManager.Instance.ActiveRunSettings.SettingsXml is null");
                 _artifactProcessingManager.CollectArtifacts(e, RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
             }
         }

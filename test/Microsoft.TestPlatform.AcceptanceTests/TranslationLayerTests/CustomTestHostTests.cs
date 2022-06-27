@@ -13,8 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 /// <summary>
@@ -23,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 [TestClass]
 public class CustomTestHostTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private IVsTestConsoleWrapper? _vstestConsoleWrapper;
 
     [TestCleanup]
     public void Cleanup()
@@ -228,8 +226,8 @@ public class CustomTestHostTests : AcceptanceTestBase
         public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken)
         {
             var processInfo = new ProcessStartInfo(
-                defaultTestHostStartInfo.FileName,
-                defaultTestHostStartInfo.Arguments)
+                defaultTestHostStartInfo.FileName!,
+                defaultTestHostStartInfo.Arguments!)
             {
                 WorkingDirectory = defaultTestHostStartInfo.WorkingDirectory
             };

@@ -14,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
 /// <summary>
@@ -64,9 +62,9 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
     /// </summary>
     public virtual void HandleTestRunComplete(
         TestRunCompleteEventArgs testRunCompleteArgs,
-        TestRunChangedEventArgs lastChunkArgs,
-        ICollection<AttachmentSet> runContextAttachments,
-        ICollection<string> executorUris)
+        TestRunChangedEventArgs? lastChunkArgs,
+        ICollection<AttachmentSet>? runContextAttachments,
+        ICollection<string>? executorUris)
     {
         var parallelRunComplete = HandleSingleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
 
@@ -101,9 +99,9 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
     }
 
     protected bool HandleSingleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs,
-        TestRunChangedEventArgs lastChunkArgs,
-        ICollection<AttachmentSet> runContextAttachments,
-        ICollection<string> executorUris)
+        TestRunChangedEventArgs? lastChunkArgs,
+        ICollection<AttachmentSet>? runContextAttachments,
+        ICollection<string>? executorUris)
     {
         // we get run complete events from each executor process
         // so we cannot "complete" the actual executor operation until all sources/testcases are consumed
@@ -173,12 +171,12 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
         }
     }
 
-    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
     {
         _actualRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
     }
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         _actualRunEventsHandler.HandleLogMessage(level, message);
     }
@@ -196,7 +194,7 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
 
     private void ConvertToRawMessageAndSend(string messageType, object payload)
     {
-        var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig.Version);
+        var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig!.Version);
         _actualRunEventsHandler.HandleRawMessage(rawMessage);
     }
 }

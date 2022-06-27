@@ -2,9 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -20,7 +19,7 @@ public static class EqtHash
     /// </summary>
     public static Guid GuidFromString(string data)
     {
-        Debug.Assert(data != null);
+        TPDebug.Assert(data != null);
 
         // Do NOT change the algorithm ever as this will have compat implications
         // TC-TA team has a feature in VS where workitems are associated based on TestCase Ids
@@ -31,7 +30,7 @@ public static class EqtHash
         byte[] hash = Sha1Helper.ComputeSha1(System.Text.Encoding.Unicode.GetBytes(data));
 
         // Guid is always 16 bytes
-        Debug.Assert(Guid.Empty.ToByteArray().Length == 16, "Expected Guid to be 16 bytes");
+        TPDebug.Assert(Guid.Empty.ToByteArray().Length == 16, "Expected Guid to be 16 bytes");
 
         byte[] toGuid = new byte[16];
         Array.Copy(hash, toGuid, 16);

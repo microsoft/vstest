@@ -318,7 +318,7 @@ public class CollectArgumentProcessorTests
             $"      <InProcDataCollector assemblyQualifiedName=\"Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\" friendlyName=\"XPlat Code Coverage\" enabled=\"True\" codebase=\"c:\\AdapterFolderPath{Path.DirectorySeparatorChar}coverlet.collector.dll\" />",
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
-            "</RunSettings>").ShowWhiteSpace(), _settingsProvider.ActiveRunSettings!.SettingsXml.ShowWhiteSpace());
+            "</RunSettings>").ShowWhiteSpace(), _settingsProvider.ActiveRunSettings!.SettingsXml!.ShowWhiteSpace());
     }
 
     [TestMethod]

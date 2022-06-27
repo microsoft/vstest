@@ -2,10 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 using System.Runtime.Serialization;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
@@ -18,8 +17,11 @@ public abstract class TestCaseEventArgs : DataCollectionEventArgs
     /// <summary>
     /// Default constructor added for serialization/deserialization.
     /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public TestCaseEventArgs()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
+        // TODO: Make private
     }
 
     /// <summary>
@@ -40,7 +42,7 @@ public abstract class TestCaseEventArgs : DataCollectionEventArgs
     protected TestCaseEventArgs(
         DataCollectionContext context,
         Guid testCaseId,
-        string testCaseName,
+        string? testCaseName,
         bool isChildTestCase)
         : base(context)
     {
@@ -114,7 +116,7 @@ public abstract class TestCaseEventArgs : DataCollectionEventArgs
     /// Gets test element of the test this event is for.
     /// </summary>
     [DataMember]
-    public TestCase TestElement
+    public TestCase? TestElement
     {
         get;
         internal set;
@@ -191,7 +193,7 @@ public sealed class TestCaseStartEventArgs : TestCaseEventArgs
         bool isChildTestCase)
         : base(context, testCaseId, testCaseName, isChildTestCase)
     {
-        Debug.Assert(context.HasTestCase, "Context is not for a test case");
+        TPDebug.Assert(context.HasTestCase, "Context is not for a test case");
     }
 
 }
@@ -305,7 +307,7 @@ public sealed class TestCaseEndEventArgs : TestCaseEventArgs
         TestOutcome testOutcome)
         : base(context, testCaseId, testCaseName, isChildTestCase)
     {
-        Debug.Assert(context.HasTestCase, "Context is not for a test case");
+        TPDebug.Assert(context.HasTestCase, "Context is not for a test case");
         TestOutcome = testOutcome;
     }
 
@@ -329,8 +331,11 @@ public sealed class TestResultEventArgs : TestCaseEventArgs
     /// <summary>
     /// Default constructor for serialization/deserialization
     /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public TestResultEventArgs()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
+        // TODO: Make private
     }
 
     /// <summary>
@@ -399,7 +404,7 @@ public sealed class TestResultEventArgs : TestCaseEventArgs
         TestResult testResult)
         : base(context, testCaseId, testCaseName, isChildTestCase)
     {
-        Debug.Assert(context.HasTestCase, "Context is not for a test case");
+        TPDebug.Assert(context.HasTestCase, "Context is not for a test case");
         TestResult = testResult;
     }
 

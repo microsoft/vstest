@@ -2,8 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-
-#nullable disable
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
@@ -30,7 +29,7 @@ public class ConnectedEventArgs : EventArgs
         Connected = true;
     }
 
-    public ConnectedEventArgs(Exception faultException)
+    public ConnectedEventArgs(Exception? faultException)
     {
         Connected = false;
         Fault = faultException;
@@ -39,15 +38,17 @@ public class ConnectedEventArgs : EventArgs
     /// <summary>
     /// Gets the communication channel based on this connection.
     /// </summary>
-    public ICommunicationChannel Channel { get; private set; }
+    public ICommunicationChannel? Channel { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether channel is connected or not, true if it's connected.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(Channel))]
+    [MemberNotNullWhen(false, nameof(Fault))]
     public bool Connected { get; private set; }
 
     /// <summary>
     /// Gets the exception if it's not connected.
     /// </summary>
-    public Exception Fault { get; private set; }
+    public Exception? Fault { get; private set; }
 }

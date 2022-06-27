@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Common.UnitTests.Filtering;
 
 [TestClass]
@@ -18,7 +16,7 @@ public class ConditionTests
     [TestMethod]
     public void ParseShouldThrownFormatExceptionOnNullConditionString()
     {
-        string conditionString = null;
+        string? conditionString = null;
         Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));
     }
 
@@ -130,7 +128,7 @@ public class ConditionTests
     [TestMethod]
     public void TokenizeNullThrowsArgumentNullException()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => Condition.TokenizeFilterConditionString(null), "str");
+        Assert.ThrowsException<ArgumentNullException>(() => Condition.TokenizeFilterConditionString(null!), "str");
     }
 
     [TestMethod]

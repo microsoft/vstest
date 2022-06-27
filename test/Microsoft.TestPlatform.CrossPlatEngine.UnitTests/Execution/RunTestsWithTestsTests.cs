@@ -158,9 +158,9 @@ public class RunTestsWithTestsTests
 
         _runTestsInstance.CallSendSessionStart();
 
-        mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<string, object>>(
+        mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<string, object?>>(
             y => y.ContainsKey("TestSources")
-                 && ((IEnumerable<string>)y["TestSources"]).Contains("s.dll")
+                 && ((IEnumerable<string>)y["TestSources"]!).Contains("s.dll")
         )));
     }
 

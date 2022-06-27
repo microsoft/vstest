@@ -158,7 +158,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="NoTestHostProviderFound">
-        <source>No suitable test runtime provider found for this run.</source>
+        <source>No suitable test runtime provider was found for any source in this run.</source>
         <target state="translated">Nenhum provedor de runtime de teste encontrado para esta execução.</target>
         <note></note>
       </trans-unit>
@@ -175,6 +175,16 @@
       <trans-unit id="AttachmentsBanner">
         <source>Attachments:</source>
         <target state="translated">Anexos:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoSuitableRuntimeProviderFound">
+        <source>No suitable test runtime provider was found:</source>
+        <target state="translated">Nenhum provedor de runtime de teste encontrado:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SkippingSource">
+        <source>Skipping source:</source>
+        <target state="translated">Ignorando origem:</target>
         <note></note>
       </trans-unit>
     </body>

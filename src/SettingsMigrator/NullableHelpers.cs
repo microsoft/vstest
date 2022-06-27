@@ -12,7 +12,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.TestPlatform.TestUtilities;
+namespace SettingsMigrator;
 
 internal static class StringUtils
 {

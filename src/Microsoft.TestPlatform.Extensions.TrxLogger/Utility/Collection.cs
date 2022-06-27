@@ -3,13 +3,11 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Xml;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
@@ -17,7 +15,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 /// Base class for Eqt Collections.
 /// Fast collection, default implementations (Add/Remove/etc) do not allow null items and ignore duplicates.
 /// </summary>
-internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
+internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore where T : notnull
 {
     #region private classes
     /// <summary>
@@ -30,7 +28,7 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
 
         internal EqtBaseCollectionEnumerator(IEnumerator e)
         {
-            Debug.Assert(e != null, "e is null");
+            TPDebug.Assert(e != null, "e is null");
             _enumerator = e;
         }
 
@@ -62,7 +60,7 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
 
     protected Hashtable _container;
 
-    private string _childElementName;
+    private string? _childElementName;
     protected EqtBaseCollection()
     {
         _container = new Hashtable();
@@ -95,7 +93,7 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
 
         if (!_container.Contains(item))
         {
-            _container.Add(item, null);    // Do not want to xml-persist the value.
+            _container.Add(item!, null);    // Do not want to xml-persist the value.
         }
     }
 
@@ -173,7 +171,7 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
     /// Default behavior is to create child elements with name same as name of type T.
     /// Does not respect IXmlTestStoreCustom.
     /// </summary>
-    public virtual void Save(XmlElement element, XmlTestStoreParameters parameters)
+    public virtual void Save(XmlElement element, XmlTestStoreParameters? parameters)
     {
         XmlPersistence xmlPersistence = new();
         xmlPersistence.SaveHashtable(_container, element, ".", ".", null, ChildElementName, parameters);

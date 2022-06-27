@@ -71,7 +71,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         var expectedStartInfo = new TestProcessStartInfo();
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
         _mockTestHostManager.Setup(
-                th => th.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<TestRunnerConnectionInfo>()))
+                th => th.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), It.IsAny<Dictionary<string, string?>>(), It.IsAny<TestRunnerConnectionInfo>()))
             .Returns(expectedStartInfo);
 
         _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
@@ -91,9 +91,9 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
             th =>
                 th.GetTestHostProcessStartInfo(
                     It.IsAny<IEnumerable<string>>(),
-                    It.IsAny<Dictionary<string, string>>(),
+                    It.IsAny<Dictionary<string, string?>>(),
                     It.Is<TestRunnerConnectionInfo>(
-                        t => t.LogFile.Contains("log.host." + DateTime.Now.ToString("yy-MM-dd"))
+                        t => t.LogFile!.Contains("log.host." + DateTime.Now.ToString("yy-MM-dd"))
                              && t.LogFile.Contains("_" + Environment.CurrentManagedThreadId + ".txt"))));
 #if NETFRAMEWORK
         EqtTrace.TraceLevel = TraceLevel.Off;
@@ -109,12 +109,20 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
 
         _testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
+#if NET5_0_OR_GREATER
+        var pid = Environment.ProcessId;
+#else
+        int pid;
+        using (var p = Process.GetCurrentProcess())
+            pid = p.Id;
+#endif
+
         _mockTestHostManager.Verify(
             th =>
                 th.GetTestHostProcessStartInfo(
                     It.IsAny<IEnumerable<string>>(),
-                    It.IsAny<Dictionary<string, string>>(),
-                    It.Is<TestRunnerConnectionInfo>(t => t.RunnerProcessId.Equals(Process.GetCurrentProcess().Id))));
+                    It.IsAny<Dictionary<string, string?>>(),
+                    It.Is<TestRunnerConnectionInfo>(t => t.RunnerProcessId.Equals(pid))));
     }
 
     [TestMethod]
@@ -133,7 +141,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
             th =>
                 th.GetTestHostProcessStartInfo(
                     It.IsAny<IEnumerable<string>>(),
-                    It.IsAny<Dictionary<string, string>>(),
+                    It.IsAny<Dictionary<string, string?>>(),
                     It.Is<TestRunnerConnectionInfo>(t => t.TraceLevel == (int)PlatformTraceLevel.Info)));
     }
 
@@ -438,7 +446,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         // Verify.
-        Assert.IsTrue(receivedTestProcessInfo.Arguments.Contains("--telemetryoptedin true"));
+        Assert.IsTrue(receivedTestProcessInfo.Arguments!.Contains("--telemetryoptedin true"));
     }
 
     [TestMethod]
@@ -461,7 +469,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         testOperationManager.SetupChannel(Enumerable.Empty<string>(), DefaultRunSettings);
 
         // Verify.
-        Assert.IsTrue(receivedTestProcessInfo.Arguments.Contains("--telemetryoptedin false"));
+        Assert.IsTrue(receivedTestProcessInfo.Arguments!.Contains("--telemetryoptedin false"));
     }
 
     [MemberNotNull(nameof(_mockProcessHelper), nameof(_mockFileHelper), nameof(_mockEnvironment), nameof(_mockRunsettingHelper), nameof(_mockWindowsRegistry), nameof(_mockEnvironmentVariableHelper))]
@@ -481,10 +489,10 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<string>(),
-                        It.IsAny<IDictionary<string, string>>(),
-                        It.IsAny<Action<object?, string>>(),
-                        It.IsAny<Action<object>>(),
-                        It.IsAny<Action<object?, string>>()))
+                        It.IsAny<IDictionary<string, string?>>(),
+                        It.IsAny<Action<object?, string?>>(),
+                        It.IsAny<Action<object?>>(),
+                        It.IsAny<Action<object?, string?>>()))
             .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
                 (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
                 {
@@ -540,7 +548,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
 
         public override TestProcessStartInfo GetTestHostProcessStartInfo(
             IEnumerable<string> sources,
-            IDictionary<string, string> environmentVariables,
+            IDictionary<string, string?>? environmentVariables,
             TestRunnerConnectionInfo connectionInfo)
         {
             return new TestProcessStartInfo();

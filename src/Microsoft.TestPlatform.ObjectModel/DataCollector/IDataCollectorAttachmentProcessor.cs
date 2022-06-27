@@ -9,8 +9,6 @@ using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
@@ -21,7 +19,7 @@ public interface IDataCollectorAttachmentProcessor
     /// <summary>
     /// Gets the attachments Uris, which are handled by attachment processor
     /// </summary>
-    IEnumerable<Uri> GetExtensionUris();
+    IEnumerable<Uri>? GetExtensionUris();
 
     /// <summary>
     /// Indicates whether attachment processor is supporting incremental processing of attachments
@@ -34,7 +32,7 @@ public interface IDataCollectorAttachmentProcessor
     /// * `var result1 = await ProcessAttachmentSetsAsync([a1, a2, a3], ...);` when first 3 executions are done
     /// * `var result2 = await ProcessAttachmentSetsAsync(result1.Concat([a4]), ...);` when 4th execution is done
     /// * `var finalResult = await ProcessAttachmentSetsAsync(result2.Concat([a5]), ...);` when last test execution is done
-    /// 
+    ///
     /// If `SupportsIncrementalProcessing` is `False` then Test Platform will wait for all test executions to finish and call `ProcessAttachmentSetsAsync` only once:
     /// * `var finalResult = await ProcessAttachmentSetsAsync([a1, a2, a3, a4, a5], ...);`
     /// </remarks>
