@@ -156,8 +156,9 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             // NOMERGE: Patching the relative path, so I can run in Playground.
             if (!File.Exists(testhostProcessPath))
             {
-                testHostProcessName = Path.Combine("vstest.console", "TestHost", originalTestHostProcessName);
-                testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+                testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", originalTestHostProcessName);
+                //testHostProcessName = Path.Combine("vstest.console", "TestHost", originalTestHostProcessName);
+                //testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
             }
         }
 

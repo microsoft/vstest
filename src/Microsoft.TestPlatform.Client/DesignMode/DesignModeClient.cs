@@ -83,6 +83,8 @@ public class DesignModeClient : IDesignModeClient
     /// </summary>
     public static IDesignModeClient Instance { get; private set; }
 
+    public ITestRequestManager TestRequestManager { get; private set; }
+
     /// <summary>
     /// Initializes DesignMode
     /// </summary>
@@ -102,7 +104,7 @@ public class DesignModeClient : IDesignModeClient
     /// </param>
     public void ConnectToClientAndProcessRequests(int port, ITestRequestManager testRequestManager)
     {
-        _testRequestManager = testRequestManager;
+        TestRequestManager = testRequestManager;
         EqtTrace.Info("Trying to connect to server on port : {0}", port);
         _communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
 
@@ -584,7 +586,6 @@ public class DesignModeClient : IDesignModeClient
     #region IDisposable Support
 
     private bool _disposedValue; // To detect redundant calls
-    public ITestRequestManager _testRequestManager;
 
     protected virtual void Dispose(bool disposing)
     {

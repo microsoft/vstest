@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 /// <summary>
 /// Vstest console request sender for sending requests to vstest.console.exe
 /// </summary>
-internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
+public class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 {
     /// <summary>
     /// The minimum protocol version that has test session support.
