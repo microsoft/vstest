@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Client;
 using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -17,6 +18,7 @@ using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
@@ -190,7 +192,53 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         ITestSessionEventsHandler eventsHandler,
         ITestHostLauncher? testHostLauncher)
     {
-        throw new NotImplementedException();
+        _testPlatformEventSource.TranslationLayerStartTestSessionStart();
+
+        var designModeClient = (DesignModeClient)DesignModeClient.Instance!;
+        var testRequestManager = designModeClient.TestRequestManager;
+
+        var resetEvent = new ManualResetEvent(false);
+        TestSessionInfo? testSessionInfo = null;
+
+        // Comes from DesignModeClient private methods, but without all the sending stuff.
+        try
+        {
+            testRequestManager.ResetOptions();
+            var startTestSessionPayload = new StartTestSessionPayload()
+            {
+                Sources = sources,
+                RunSettings = runSettings,
+                HasCustomHostLauncher = testHostLauncher != null,
+                IsDebuggingEnabled = (testHostLauncher != null)
+                                     && testHostLauncher.IsDebug,
+                TestPlatformOptions = options
+            };
+
+            var inProcessEventsHandler = new InProcessTestSessionEventsHandler(eventsHandler);
+            inProcessEventsHandler.StartTestSessionCompleteEventHandler += (_, eventArgs) =>
+            {
+                testSessionInfo = eventArgs?.TestSessionInfo;
+                resetEvent.Set();
+            };
+
+            testRequestManager.StartTestSession(
+                startTestSessionPayload,
+                (ITestHostLauncher3?)testHostLauncher,
+                inProcessEventsHandler,
+                new ProtocolConfig { Version = _highestSupportedVersion });
+
+            resetEvent.WaitOne();
+            inProcessEventsHandler.StartTestSessionCompleteEventHandler = null;
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error("DesignModeClient: Exception in StartTestSession: " + ex);
+
+            eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
+            eventsHandler.HandleStartTestSessionComplete(new());
+        }
+
+        return new TestSession(testSessionInfo, eventsHandler, this);
     }
 
     /// <inheritdoc/>
@@ -209,7 +257,48 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler)
     {
-        throw new NotImplementedException();
+        _testPlatformEventSource.TranslationLayerStartTestSessionStart();
+
+        var designModeClient = (DesignModeClient)DesignModeClient.Instance!;
+        var testRequestManager = designModeClient.TestRequestManager;
+
+        var isStopped = false;
+        var resetEvent = new ManualResetEvent(false);
+
+        // Comes from DesignModeClient private methods, but without all the sending stuff.
+        try
+        {
+            testRequestManager.ResetOptions();
+            var stopTestSessionPayload = new StopTestSessionPayload()
+            {
+                TestSessionInfo = testSessionInfo,
+                CollectMetrics = options?.CollectMetrics ?? false
+            };
+
+            var inProcessEventsHandler = new InProcessTestSessionEventsHandler(eventsHandler);
+            inProcessEventsHandler.StopTestSessionCompleteEventHandler += (_, eventArgs) =>
+            {
+                isStopped = (eventArgs?.IsStopped == true);
+                resetEvent.Set();
+            };
+
+            testRequestManager.StopTestSession(
+                stopTestSessionPayload,
+                inProcessEventsHandler,
+                new ProtocolConfig { Version = _highestSupportedVersion });
+
+            resetEvent.WaitOne();
+            inProcessEventsHandler.StopTestSessionCompleteEventHandler = null;
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error("DesignModeClient: Exception in StopTestSession: " + ex);
+
+            eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
+            eventsHandler.HandleStopTestSessionComplete(new());
+        }
+
+        return isStopped;
     }
 
     /// <inheritdoc/>
@@ -241,7 +330,6 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             sources,
             discoverySettings,
             options: null,
-            testSessionInfo: null,
             new DiscoveryEventsHandleConverter(discoveryEventsHandler));
     }
 
@@ -316,7 +404,6 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             sources,
             runSettings,
             options: null,
-            testSessionInfo: null,
             testRunEventsHandler);
     }
 
@@ -390,7 +477,6 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             testCases,
             runSettings,
             options: null,
-            testSessionInfo: null,
             testRunEventsHandler);
     }
 
@@ -465,7 +551,6 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             sources,
             runSettings,
             options: null,
-            testSessionInfo: null,
             testRunEventsHandler,
             customTestHostLauncher);
     }
@@ -560,7 +645,6 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             testCases,
             runSettings,
             options: null,
-            testSessionInfo: null,
             testRunEventsHandler,
             customTestHostLauncher);
     }
@@ -646,26 +730,37 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
 
     #region Async, not implemented
     /// <inheritdoc/>
-    public Task DiscoverTestsAsync(
+    public async Task DiscoverTestsAsync(
         IEnumerable<string> sources,
         string? discoverySettings,
         ITestDiscoveryEventsHandler discoveryEventsHandler)
     {
-        throw new NotImplementedException();
+        await DiscoverTestsAsync(
+                sources,
+                discoverySettings,
+                options: null,
+                new DiscoveryEventsHandleConverter(discoveryEventsHandler))
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public Task DiscoverTestsAsync(
+    public async Task DiscoverTestsAsync(
         IEnumerable<string> sources,
         string? discoverySettings,
         TestPlatformOptions? options,
         ITestDiscoveryEventsHandler2 discoveryEventsHandler)
     {
-        throw new NotImplementedException();
+        await DiscoverTestsAsync(
+                sources,
+                discoverySettings,
+                options,
+                testSessionInfo: null,
+                discoveryEventsHandler)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public Task DiscoverTestsAsync(
+    public async Task DiscoverTestsAsync(
         IEnumerable<string> sources,
         string? discoverySettings,
         TestPlatformOptions? options,
@@ -676,13 +771,13 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public Task InitializeExtensionsAsync(IEnumerable<string> pathToAdditionalExtensions)
+    public async Task InitializeExtensionsAsync(IEnumerable<string> pathToAdditionalExtensions)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public Task ProcessTestRunAttachmentsAsync(
+    public async Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
         string? processingSettings,
         bool isLastBatch,
@@ -690,11 +785,19 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         ITestRunAttachmentsProcessingEventsHandler eventsHandler,
         CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await ProcessTestRunAttachmentsAsync(
+                attachments,
+                invokedDataCollectors: null,
+                processingSettings,
+                isLastBatch,
+                collectMetrics,
+                eventsHandler,
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public Task ProcessTestRunAttachmentsAsync(
+    public async Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
         IEnumerable<InvokedDataCollector>? invokedDataCollectors,
         string? processingSettings,
@@ -707,27 +810,79 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public Task RunTestsAsync(
+    public async Task RunTestsAsync(
         IEnumerable<string> sources,
         string? runSettings,
         ITestRunEventsHandler testRunEventsHandler)
     {
-        throw new NotImplementedException();
+        await RunTestsAsync(
+                sources,
+                runSettings,
+                options: null,
+                testRunEventsHandler)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public Task RunTestsAsync(
+    public async Task RunTestsAsync(
         IEnumerable<string> sources,
         string? runSettings,
         TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler)
     {
+        await RunTestsAsync(
+                sources,
+                runSettings,
+                options,
+                testSessionInfo: null,
+                testRunEventsHandler)
+            .ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task RunTestsAsync(
+        IEnumerable<string> sources,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
+        ITestRunEventsHandler testRunEventsHandler)
+    {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public Task RunTestsAsync(
-        IEnumerable<string> sources,
+    public async Task RunTestsAsync(
+        IEnumerable<TestCase> testCases,
+        string? runSettings,
+        ITestRunEventsHandler testRunEventsHandler)
+    {
+        await RunTestsAsync(
+                testCases,
+                runSettings,
+                options: null,
+                testRunEventsHandler)
+            .ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task RunTestsAsync(
+        IEnumerable<TestCase> testCases,
+        string? runSettings,
+        TestPlatformOptions? options,
+        ITestRunEventsHandler testRunEventsHandler)
+    {
+        await RunTestsAsync(
+                testCases,
+                runSettings,
+                options,
+                testSessionInfo: null,
+                testRunEventsHandler)
+            .ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task RunTestsAsync(
+        IEnumerable<TestCase> testCases,
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
@@ -737,58 +892,41 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public Task RunTestsAsync(
-        IEnumerable<TestCase> testCases,
-        string? runSettings,
-        ITestRunEventsHandler testRunEventsHandler)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public Task RunTestsAsync(
-        IEnumerable<TestCase> testCases,
-        string? runSettings,
-        TestPlatformOptions? options,
-        ITestRunEventsHandler testRunEventsHandler)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public Task RunTestsAsync(
-        IEnumerable<TestCase> testCases,
-        string? runSettings,
-        TestPlatformOptions? options,
-        TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler testRunEventsHandler)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public Task RunTestsWithCustomTestHostAsync(
+    public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string? runSettings,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
-        throw new NotImplementedException();
+        await RunTestsWithCustomTestHostAsync(
+                sources,
+                runSettings,
+                options: null,
+                testRunEventsHandler,
+                customTestHostLauncher)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public Task RunTestsWithCustomTestHostAsync(
+    public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string? runSettings,
         TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
-        throw new NotImplementedException();
+        await RunTestsWithCustomTestHostAsync(
+                sources,
+                runSettings,
+                options,
+                testSessionInfo: null,
+                testRunEventsHandler,
+                customTestHostLauncher)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public Task RunTestsWithCustomTestHostAsync(
+    public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string? runSettings,
         TestPlatformOptions? options,
@@ -800,28 +938,41 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public Task RunTestsWithCustomTestHostAsync(
+    public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
-        throw new NotImplementedException();
+        await RunTestsWithCustomTestHostAsync(
+                testCases,
+                runSettings,
+                options: null,
+                testRunEventsHandler,
+                customTestHostLauncher)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public Task RunTestsWithCustomTestHostAsync(
+    public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
         TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
-        throw new NotImplementedException();
+        await RunTestsWithCustomTestHostAsync(
+                testCases,
+                runSettings,
+                options,
+                testSessionInfo: null,
+                testRunEventsHandler,
+                customTestHostLauncher)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public Task RunTestsWithCustomTestHostAsync(
+    public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
         TestPlatformOptions? options,
@@ -833,35 +984,46 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public Task StartSessionAsync()
+    public async Task StartSessionAsync()
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public Task<ITestSession?> StartTestSessionAsync(
+    public async Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
         ITestSessionEventsHandler eventsHandler)
     {
-        throw new NotImplementedException();
+        return await StartTestSessionAsync(
+                sources,
+                runSettings,
+                options: null,
+                eventsHandler)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public Task<ITestSession?> StartTestSessionAsync(
+    public async Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
         TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler)
     {
-        throw new NotImplementedException();
+        return await StartTestSessionAsync(
+                sources,
+                runSettings,
+                options,
+                eventsHandler,
+                testHostLauncher: null)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public Task<ITestSession?> StartTestSessionAsync(
+    public async Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
         TestPlatformOptions? options,
@@ -873,16 +1035,20 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public Task<bool> StopTestSessionAsync(
+    public async Task<bool> StopTestSessionAsync(
         TestSessionInfo? testSessionInfo,
         ITestSessionEventsHandler eventsHandler)
     {
-        throw new NotImplementedException();
+        return await StopTestSessionAsync(
+                testSessionInfo,
+                options: null,
+                eventsHandler)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public Task<bool> StopTestSessionAsync(
+    public async Task<bool> StopTestSessionAsync(
         TestSessionInfo? testSessionInfo,
         TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler)
