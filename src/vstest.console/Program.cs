@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.Execution;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
@@ -19,6 +20,7 @@ public static class Program
 
     internal static int Run(string[]? args, UiLanguageOverride uiLanguageOverride)
     {
+        uiLanguageOverride.SetCultureSpecifiedByUser();
         return new Executor(ConsoleOutput.Instance).Execute(args);
     }
 }

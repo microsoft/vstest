@@ -67,7 +67,6 @@ internal class Executor
     {
         DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_RUNNER_DEBUG_ATTACHVS");
         DebuggerBreakpoint.WaitForDebugger("VSTEST_RUNNER_DEBUG");
-        UiLanguageOverride.SetCultureSpecifiedByUser();
 
         Output = output;
         _testPlatformEventSource = testPlatformEventSource;
