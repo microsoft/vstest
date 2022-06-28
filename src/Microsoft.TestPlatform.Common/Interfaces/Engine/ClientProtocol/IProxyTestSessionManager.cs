@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 /// <summary>
@@ -16,12 +14,12 @@ public interface IProxyTestSessionManager
     /// <summary>
     /// Starts the test session based on the test session criteria.
     /// </summary>
-    /// 
+    ///
     /// <param name="eventsHandler">
     /// Event handler for handling events fired during test session management operations.
     /// </param>
     /// <param name="requestData">The request data.</param>
-    /// 
+    ///
     /// <returns>True if the operation succeeded, false otherwise.</returns>
     bool StartSession(ITestSessionEventsHandler eventsHandler, IRequestData requestData);
 

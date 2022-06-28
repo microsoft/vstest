@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 
 /// <summary>
@@ -58,56 +56,58 @@ public class TestResultConverter : JsonConverter
         }
 
         JToken properties = data["Properties"];
-        if (properties != null && properties.HasValues)
+        if (properties == null || !properties.HasValues)
         {
-            // Every class that inherits from TestObject uses a properties store for <Property, Object>
-            // key value pairs.
-            foreach (var property in properties.Values<JToken>())
+            return testResult;
+        }
+
+        // Every class that inherits from TestObject uses a properties store for <Property, Object>
+        // key value pairs.
+        foreach (var property in properties.Values<JToken>())
+        {
+            var testProperty = property["Key"].ToObject<TestProperty>(serializer);
+
+            // Let the null values be passed in as null data
+            var token = property["Value"];
+            string? propertyData = null;
+            if (token.Type != JTokenType.Null)
             {
-                var testProperty = property["Key"].ToObject<TestProperty>(serializer);
-
-                // Let the null values be passed in as null data
-                var token = property["Value"];
-                string propertyData = null;
-                if (token.Type != JTokenType.Null)
+                // If the property is already a string. No need to convert again.
+                if (token.Type == JTokenType.String)
                 {
-                    // If the property is already a string. No need to convert again.
-                    if (token.Type == JTokenType.String)
-                    {
-                        propertyData = token.ToObject<string>(serializer);
-                    }
-                    else
-                    {
-                        // On deserialization, the value for each TestProperty is always a string. It is up
-                        // to the consumer to deserialize it further as appropriate.
-                        propertyData = token.ToString(Formatting.None).Trim('"');
-                    }
+                    propertyData = token.ToObject<string>(serializer);
                 }
-
-                switch (testProperty.Id)
+                else
                 {
-                    case "TestResult.DisplayName":
-                        testResult.DisplayName = propertyData; break;
-                    case "TestResult.ComputerName":
-                        testResult.ComputerName = propertyData ?? string.Empty; break;
-                    case "TestResult.Outcome":
-                        testResult.Outcome = (TestOutcome)Enum.Parse(typeof(TestOutcome), propertyData); break;
-                    case "TestResult.Duration":
-                        testResult.Duration = TimeSpan.Parse(propertyData); break;
-                    case "TestResult.StartTime":
-                        testResult.StartTime = DateTimeOffset.Parse(propertyData); break;
-                    case "TestResult.EndTime":
-                        testResult.EndTime = DateTimeOffset.Parse(propertyData); break;
-                    case "TestResult.ErrorMessage":
-                        testResult.ErrorMessage = propertyData; break;
-                    case "TestResult.ErrorStackTrace":
-                        testResult.ErrorStackTrace = propertyData; break;
-                    default:
-                        // No need to register member properties as they get registered as part of TestResultProperties class.
-                        testProperty = TestProperty.Register(testProperty.Id, testProperty.Label, testProperty.GetValueType(), testProperty.Attributes, typeof(TestObject));
-                        testResult.SetPropertyValue(testProperty, propertyData);
-                        break;
+                    // On deserialization, the value for each TestProperty is always a string. It is up
+                    // to the consumer to deserialize it further as appropriate.
+                    propertyData = token.ToString(Formatting.None).Trim('"');
                 }
+            }
+
+            switch (testProperty.Id)
+            {
+                case "TestResult.DisplayName":
+                    testResult.DisplayName = propertyData; break;
+                case "TestResult.ComputerName":
+                    testResult.ComputerName = propertyData ?? string.Empty; break;
+                case "TestResult.Outcome":
+                    testResult.Outcome = (TestOutcome)Enum.Parse(typeof(TestOutcome), propertyData!); break;
+                case "TestResult.Duration":
+                    testResult.Duration = TimeSpan.Parse(propertyData!); break;
+                case "TestResult.StartTime":
+                    testResult.StartTime = DateTimeOffset.Parse(propertyData!); break;
+                case "TestResult.EndTime":
+                    testResult.EndTime = DateTimeOffset.Parse(propertyData!); break;
+                case "TestResult.ErrorMessage":
+                    testResult.ErrorMessage = propertyData; break;
+                case "TestResult.ErrorStackTrace":
+                    testResult.ErrorStackTrace = propertyData; break;
+                default:
+                    // No need to register member properties as they get registered as part of TestResultProperties class.
+                    testProperty = TestProperty.Register(testProperty.Id, testProperty.Label, testProperty.GetValueType(), testProperty.Attributes, typeof(TestObject));
+                    testResult.SetPropertyValue(testProperty, propertyData);
+                    break;
             }
         }
 
@@ -118,7 +118,7 @@ public class TestResultConverter : JsonConverter
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         // P2 to P1
-        var testResult = value as TestResult;
+        var testResult = (TestResult)value;
 
         writer.WriteStartObject();
         writer.WritePropertyName("TestCase");

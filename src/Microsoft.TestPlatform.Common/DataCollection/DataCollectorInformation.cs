@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>
@@ -45,7 +43,7 @@ internal class DataCollectorInformation
     /// The message Sink.
     /// </param>
     /// <param name="settingsXml"></param>
-    internal DataCollectorInformation(ObjectModel.DataCollection.DataCollector dataCollector, XmlElement configurationElement, DataCollectorConfig dataCollectorConfig, DataCollectionEnvironmentContext environmentContext, IDataCollectionAttachmentManager attachmentManager, TestPlatformDataCollectionEvents events, IMessageSink messageSink, string settingsXml)
+    internal DataCollectorInformation(ObjectModel.DataCollection.DataCollector dataCollector, XmlElement? configurationElement, DataCollectorConfig dataCollectorConfig, DataCollectionEnvironmentContext? environmentContext, IDataCollectionAttachmentManager attachmentManager, TestPlatformDataCollectionEvents events, IMessageSink messageSink, string settingsXml)
     {
         DataCollector = dataCollector;
         ConfigurationElement = configurationElement;
@@ -65,7 +63,7 @@ internal class DataCollectorInformation
     /// <summary>
     /// Gets or sets the configuration element.
     /// </summary>
-    public XmlElement ConfigurationElement { get; set; }
+    public XmlElement? ConfigurationElement { get; set; }
 
     /// <summary>
     /// Gets or sets the data collector config.
@@ -85,7 +83,7 @@ internal class DataCollectorInformation
     /// <summary>
     /// Gets the data collection environment context.
     /// </summary>
-    public DataCollectionEnvironmentContext EnvironmentContext { get; private set; }
+    public DataCollectionEnvironmentContext? EnvironmentContext { get; private set; }
 
     /// <summary>
     /// Gets the data collection logger
@@ -103,7 +101,7 @@ internal class DataCollectorInformation
     /// Gets or sets environment variables supplied by the data collector.
     /// These are available after the collector has been initialized.
     /// </summary>
-    public IEnumerable<KeyValuePair<string, string>> TestExecutionEnvironmentVariables
+    public IEnumerable<KeyValuePair<string, string>>? TestExecutionEnvironmentVariables
     {
         get;
         set;
@@ -134,7 +132,7 @@ internal class DataCollectorInformation
                 doc.Load(xmlReader);
             }
 
-            ConfigurationElement = doc.DocumentElement;
+            ConfigurationElement = doc.DocumentElement!;
         }
 
         // Add Framework config, since it could be required by DataCollector, to determine whether they support this Framework or not

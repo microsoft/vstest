@@ -5,8 +5,6 @@ using System.Globalization;
 using System.Runtime.Serialization;
 using System.Text;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -19,14 +17,14 @@ public class FilterOptions
     /// Gets or sets the regular expression that will be applied on the property before matching.
     /// </summary>
     [DataMember]
-    public string FilterRegEx { get; set; }
+    public string? FilterRegEx { get; set; }
 
     /// <summary>
     /// Gets or sets the optional regular expression replacement string. When this property is set, <see cref="System.Text.RegularExpressions.Regex.Replace"/>
     /// will be called upon property value instead of <see cref="System.Text.RegularExpressions.Regex.Match"/> before matching.
     /// </summary>
     [DataMember]
-    public string FilterRegExReplacement { get; set; }
+    public string? FilterRegExReplacement { get; set; }
 
     /// <inheritdoc/>
     public override string ToString()
@@ -40,20 +38,20 @@ public class FilterOptions
         return sb.ToString();
     }
 
-    protected bool Equals(FilterOptions other) =>
+    protected bool Equals(FilterOptions? other) =>
         other != null &&
         string.Equals(FilterRegEx, other.FilterRegEx) &&
         string.Equals(FilterRegExReplacement, other.FilterRegExReplacement);
 
     /// <inheritdoc/>
-    public override bool Equals(object obj) => Equals(obj as FilterOptions);
+    public override bool Equals(object? obj) => Equals(obj as FilterOptions);
 
     /// <inheritdoc/>
     public override int GetHashCode()
     {
         unchecked
         {
-            var hashCode = FilterRegEx.GetHashCode();
+            var hashCode = FilterRegEx?.GetHashCode() ?? 0;
             return (hashCode * 397) ^ (FilterRegExReplacement != null ? FilterRegExReplacement.GetHashCode() : 0);
         }
     }

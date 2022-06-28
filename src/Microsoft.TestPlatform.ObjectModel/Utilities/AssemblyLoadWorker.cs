@@ -3,12 +3,11 @@
 
 #if NETFRAMEWORK
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -77,11 +76,11 @@ internal class AssemblyLoadWorker : MarshalByRefObject
     /// Returns null on failure and an empty array if there is no reference in the project.
     /// </summary>
     /// <param name="path">Path to the assembly file to load from.</param>
-    public string[] GetReferencedAssemblies(string path)
+    public string[]? GetReferencedAssemblies(string path)
     {
-        Debug.Assert(!string.IsNullOrEmpty(path));
+        TPDebug.Assert(!StringUtils.IsNullOrEmpty(path));
 
-        Assembly a = null;
+        Assembly? a = null;
         try
         {
             // ReflectionOnlyLoadFrom does not use the probing paths and loads from the
@@ -93,7 +92,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
         {
             return null;
         }
-        Debug.Assert(a != null);
+        TPDebug.Assert(a != null);
 
         AssemblyName[] assemblies = a.GetReferencedAssemblies();
         return assemblies == null || assemblies.Length == 0
@@ -115,7 +114,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
             //
             Assembly a = Assembly.ReflectionOnlyLoadFrom(path);
 
-            Debug.Assert(a != null);
+            TPDebug.Assert(a != null);
 
             AssemblyName[] assemblies = a.GetReferencedAssemblies();
 
@@ -175,7 +174,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
             // in the loaded context.
 
             var a = Assembly.ReflectionOnlyLoadFrom(path);
-            Debug.Assert(a != null);
+            TPDebug.Assert(a != null);
             a.ManifestModule.GetPEKind(out var peKind, out var machine);
 
             // conversion to string type is needed for below reason
@@ -210,7 +209,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
                 }
             }
 
-            if (string.IsNullOrEmpty(procArchType))
+            if (StringUtils.IsNullOrEmpty(procArchType))
             {
                 EqtTrace.Verbose("Unable to find the platform type for image:{0} with PEKind:{1}, Machine:{2}. Returning Default:{3}", path, peKindString, machineTypeString, "AnyCPU");
                 procArchType = "AnyCPU";

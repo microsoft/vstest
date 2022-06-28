@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -15,11 +14,10 @@ using System.Text.RegularExpressions;
 using System.Xml;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
@@ -52,7 +50,7 @@ internal class XmlPersistence
         /// <param name="key">Key that was a duplicate</param>
         /// <param name="message">The duplicate-key exception message</param>
         /// <param name="innerException">The inner exception</param>
-        public DuplicateKeyLoadException(object key, string message, Exception innerException)
+        public DuplicateKeyLoadException(object key, string message, Exception? innerException)
             : base(message, innerException)
         {
             Key = key;
@@ -151,7 +149,7 @@ internal class XmlPersistence
 
         XmlDocument dom = new();
         dom.AppendChild(dom.CreateXmlDeclaration("1.0", "UTF-8", null));
-        return (XmlElement)dom.AppendChild(dom.CreateElement(_prefix, name, namespaceUri));
+        return (XmlElement)dom.AppendChild(dom.CreateElement(_prefix, name, namespaceUri))!;
     }
 
     #region PublicSaveDataInTrx
@@ -168,7 +166,7 @@ internal class XmlPersistence
     /// <param name="parameters">
     /// The parameters.
     /// </param>
-    public void SaveSingleFields(XmlElement parentXml, object instance, XmlTestStoreParameters parameters)
+    public void SaveSingleFields(XmlElement parentXml, object instance, XmlTestStoreParameters? parameters)
     {
         SaveSingleFields(parentXml, instance, null, parameters);
     }
@@ -188,7 +186,7 @@ internal class XmlPersistence
     /// <param name="parameters">
     /// The parameters.
     /// </param>
-    public void SaveSingleFields(XmlElement parentXml, object instance, Type requestedType, XmlTestStoreParameters parameters)
+    public void SaveSingleFields(XmlElement parentXml, object? instance, Type? requestedType, XmlTestStoreParameters? parameters)
     {
         if (instance == null)
         {
@@ -199,17 +197,19 @@ internal class XmlPersistence
 
         foreach (FieldPersistenceInfo info in GetFieldInfos(type))
         {
-            object fieldValue = info.FieldInfo.GetValue(instance);
-            if (fieldValue != null)
+            object? fieldValue = info.FieldInfo.GetValue(instance);
+            if (fieldValue == null)
             {
-                if (info.FieldAttribute != null)
-                {
-                    SaveObject(fieldValue, parentXml, info.Location, parameters);
-                }
-                else if (info.SimpleFieldAttribute != null)
-                {
-                    SaveSimpleField(parentXml, info.Location, fieldValue, info.SimpleFieldAttribute.DefaultValue);
-                }
+                continue;
+            }
+
+            if (info.FieldAttribute != null)
+            {
+                SaveObject(fieldValue, parentXml, info.Location, parameters);
+            }
+            else if (info.SimpleFieldAttribute != null)
+            {
+                SaveSimpleField(parentXml, info.Location!, fieldValue, info.SimpleFieldAttribute.DefaultValue);
             }
         }
     }
@@ -229,26 +229,29 @@ internal class XmlPersistence
     /// <param name="parameters">
     /// The parameters.
     /// </param>
-    public void SaveObject(object objectToSave, XmlElement parentXml, string location, XmlTestStoreParameters parameters)
+    public void SaveObject(object? objectToSave, XmlElement parentXml, string? location, XmlTestStoreParameters? parameters)
     {
-        if (objectToSave != null && location != null)
+        if (objectToSave == null || location == null)
         {
-            string nameSpaceUri = _namespaceUri;
-            if (objectToSave is IXmlTestStoreCustom customStore)
-            {
-                nameSpaceUri = customStore.NamespaceUri;
-            }
+            return;
+        }
 
-            XmlNode xmlNode = EnsureLocationExists(parentXml, location, nameSpaceUri);
-            SaveObject(objectToSave, xmlNode, parameters);
+        string? nameSpaceUri = _namespaceUri;
+        if (objectToSave is IXmlTestStoreCustom customStore)
+        {
+            nameSpaceUri = customStore.NamespaceUri;
+        }
 
-            if (xmlNode is XmlElement element &&
-                !element.HasAttributes &&
-                !element.HasChildNodes &&
-                string.IsNullOrEmpty(element.InnerText))
-            {
-                element.ParentNode.RemoveChild(element);    // get rid of empty elements to keep the xml clean
-            }
+        XmlNode? xmlNode = EnsureLocationExists(parentXml, location, nameSpaceUri);
+        TPDebug.Assert(xmlNode != null, "EnsureLocationExists should have returned a node");
+        SaveObject(objectToSave, xmlNode, parameters);
+
+        if (xmlNode is XmlElement element &&
+            !element.HasAttributes &&
+            !element.HasChildNodes &&
+            element.InnerText.IsNullOrEmpty())
+        {
+            element.ParentNode!.RemoveChild(element);    // get rid of empty elements to keep the xml clean
         }
     }
 
@@ -264,7 +267,7 @@ internal class XmlPersistence
     /// <param name="parameters">
     /// The parameters.
     /// </param>
-    public void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters parameters)
+    public void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters? parameters)
     {
         SaveObject(objectToSave, nodeToSaveAt, parameters, null);
     }
@@ -284,18 +287,20 @@ internal class XmlPersistence
     /// <param name="defaultValue">
     /// The default value.
     /// </param>
-    public void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters parameters, object defaultValue)
+    public void SaveObject(object? objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters? parameters, object? defaultValue)
     {
-        if (objectToSave != null)
+        if (objectToSave == null)
         {
-            if (objectToSave is IXmlTestStore persistable)
-            {
-                persistable.Save((XmlElement)nodeToSaveAt, parameters);
-            }
-            else
-            {
-                SaveSimpleData(objectToSave, nodeToSaveAt, defaultValue);
-            }
+            return;
+        }
+
+        if (objectToSave is IXmlTestStore persistable)
+        {
+            persistable.Save((XmlElement)nodeToSaveAt, parameters);
+        }
+        else
+        {
+            SaveSimpleData(objectToSave, nodeToSaveAt, defaultValue);
         }
     }
 
@@ -314,14 +319,15 @@ internal class XmlPersistence
     /// <param name="defaultValue">
     /// The default value.
     /// </param>
-    public void SaveSimpleField(XmlElement xml, string location, object value, object defaultValue)
+    public void SaveSimpleField(XmlElement xml, string location, object? value, object? defaultValue)
     {
         if (value == null || value.Equals(defaultValue))
         {
             return;
         }
 
-        XmlNode saveTarget = EnsureLocationExists(xml, location);
+        XmlNode? saveTarget = EnsureLocationExists(xml, location);
+        TPDebug.Assert(saveTarget != null, "EnsureLocationExists should have returned a node");
         SaveSimpleData(value, saveTarget, defaultValue);
     }
 
@@ -342,33 +348,39 @@ internal class XmlPersistence
         SaveSimpleField(xml, location, guid.ToString(), EmptyGuidString);
     }
 
-    public void SaveHashtable(Hashtable ht, XmlElement element, string location, string keyLocation, string valueLocation, string itemElementName, XmlTestStoreParameters parameters)
+    public void SaveHashtable(Hashtable ht, XmlElement element, string location, string keyLocation, string? valueLocation, string itemElementName, XmlTestStoreParameters? parameters)
     {
-        if (ht != null && ht.Count > 0)
+        if (ht == null || ht.Count <= 0)
         {
-            XmlElement dictionaryElement = (XmlElement)EnsureLocationExists(element, location);
-            foreach (DictionaryEntry de in ht)
-            {
-                XmlElement itemXml = CreateElement(dictionaryElement, itemElementName);
+            return;
+        }
 
-                SaveObject(de.Key, itemXml, keyLocation, parameters);
-                SaveObject(de.Value, itemXml, valueLocation, parameters);
-            }
+        XmlElement? dictionaryElement = (XmlElement?)EnsureLocationExists(element, location);
+        TPDebug.Assert(dictionaryElement != null, "EnsureLocationExists should have returned a node");
+        foreach (DictionaryEntry de in ht)
+        {
+            XmlElement itemXml = CreateElement(dictionaryElement, itemElementName);
+
+            SaveObject(de.Key, itemXml, keyLocation, parameters);
+            SaveObject(de.Value, itemXml, valueLocation, parameters);
         }
     }
 
     public void SaveStringDictionary(StringDictionary dict, XmlElement element, string location, string keyLocation, string valueLocation, string itemElementName, XmlTestStoreParameters parameters)
     {
-        if (dict != null && dict.Count > 0)
+        if (dict == null || dict.Count <= 0)
         {
-            XmlElement dictionaryElement = (XmlElement)EnsureLocationExists(element, location);
-            foreach (DictionaryEntry de in dict)
-            {
-                XmlElement itemXml = CreateElement(dictionaryElement, itemElementName);
+            return;
+        }
 
-                SaveObject(de.Key, itemXml, keyLocation, parameters);
-                SaveObject(de.Value, itemXml, valueLocation, parameters);
-            }
+        XmlElement? dictionaryElement = (XmlElement?)EnsureLocationExists(element, location);
+        TPDebug.Assert(dictionaryElement != null, "EnsureLocationExists should have returned a node");
+        foreach (DictionaryEntry de in dict)
+        {
+            XmlElement itemXml = CreateElement(dictionaryElement, itemElementName);
+
+            SaveObject(de.Key, itemXml, keyLocation, parameters);
+            SaveObject(de.Value, itemXml, valueLocation, parameters);
         }
     }
 
@@ -394,16 +406,19 @@ internal class XmlPersistence
     /// <param name="parameters">
     /// The parameters.
     /// </param>
-    public void SaveIEnumerable(IEnumerable list, XmlElement element, string listXmlElement, string itemLocation, string itemElementName, XmlTestStoreParameters parameters)
+    public void SaveIEnumerable(IEnumerable? list, XmlElement element, string listXmlElement, string itemLocation, string? itemElementName, XmlTestStoreParameters? parameters)
     {
-        if (list != null && list.GetEnumerator().MoveNext())
+        if (list == null || !list.GetEnumerator().MoveNext())
         {
-            XmlElement listElement = (XmlElement)EnsureLocationExists(element, listXmlElement);
-            foreach (object item in list)
-            {
-                XmlElement itemXml = CreateElement(listElement, itemElementName, item);
-                SaveObject(item, itemXml, itemLocation, parameters);
-            }
+            return;
+        }
+
+        XmlElement? listElement = (XmlElement?)EnsureLocationExists(element, listXmlElement);
+        TPDebug.Assert(listElement != null, "EnsureLocationExists should have returned a node");
+        foreach (object item in list)
+        {
+            XmlElement itemXml = CreateElement(listElement, itemElementName, item);
+            SaveObject(item, itemXml, itemLocation, parameters);
         }
     }
 
@@ -431,15 +446,19 @@ internal class XmlPersistence
     /// <typeparam name="V"> Generic parameter
     /// </typeparam>
     public void SaveList<V>(IList<V> list, XmlElement element, string listXmlElement, string itemLocation, string itemElementName, XmlTestStoreParameters parameters)
+        where V : notnull
     {
-        if (list != null && list.Count > 0)
+        if (list == null || list.Count <= 0)
         {
-            XmlElement listElement = (XmlElement)EnsureLocationExists(element, listXmlElement);
-            foreach (V item in list)
-            {
-                XmlElement itemXml = CreateElement(listElement, itemElementName, item);
-                SaveObject(item, itemXml, itemLocation, parameters);
-            }
+            return;
+        }
+
+        XmlElement? listElement = (XmlElement?)EnsureLocationExists(element, listXmlElement);
+        TPDebug.Assert(listElement != null, "EnsureLocationExists should have returned a node");
+        foreach (V item in list)
+        {
+            XmlElement itemXml = CreateElement(listElement, itemElementName, item);
+            SaveObject(item, itemXml, itemLocation, parameters);
         }
     }
 
@@ -447,7 +466,7 @@ internal class XmlPersistence
 
     public void SaveCounters(XmlElement xml, string location, int[] counters)
     {
-        xml = (XmlElement)LocationToXmlNode(xml, location);
+        xml = (XmlElement)LocationToXmlNode(xml, location)!;
 
         for (int i = 0; i < counters.Length; i++)
         {
@@ -463,7 +482,7 @@ internal class XmlPersistence
 
     #endregion List
 
-    internal static void SaveUsingReflection(XmlElement element, object instance, Type requestedType, XmlTestStoreParameters parameters)
+    internal static void SaveUsingReflection(XmlElement element, object instance, Type? requestedType, XmlTestStoreParameters? parameters)
     {
         XmlPersistence helper = new();
         helper.SaveSingleFields(element, instance, requestedType, parameters);
@@ -555,11 +574,11 @@ internal class XmlPersistence
         }
     }
 
-    private static string GetFieldLocation(FieldInfo fieldInfo)
+    private static string? GetFieldLocation(FieldInfo fieldInfo)
     {
-        string location = null;
+        string? location = null;
 
-        StoreXmlAttribute locationAttribute = GetAttribute<StoreXmlAttribute>(fieldInfo);
+        StoreXmlAttribute? locationAttribute = GetAttribute<StoreXmlAttribute>(fieldInfo);
         if (locationAttribute != null)
         {
             location = locationAttribute.Location ?? GetDefaultFieldLocation(fieldInfo);
@@ -586,14 +605,14 @@ internal class XmlPersistence
         return type.GetTypeInfo().GetInterface(typeof(IXmlTestStore).Name) != null;
     }
 
-    private static T GetAttribute<T>(FieldInfo fieldInfo) where T : Attribute
+    private static T? GetAttribute<T>(FieldInfo fieldInfo) where T : Attribute
     {
         var attributes = fieldInfo.GetCustomAttributes(typeof(T), false).ToArray();
 
         return attributes.Length > 0 ? (T)attributes[0] : default;
     }
 
-    private void SaveSimpleData(object value, XmlNode nodeToSaveAt, object defaultValue)
+    private static void SaveSimpleData(object? value, XmlNode nodeToSaveAt, object? defaultValue)
     {
         if (value == null || value.Equals(defaultValue))
         {
@@ -602,15 +621,15 @@ internal class XmlPersistence
 
         Type valueType = value.GetType();
 
-        string valueToSave;
+        string? valueToSave;
         if (valueType == BoolType)
         {
-            valueToSave = value.ToString().ToLowerInvariant();
+            valueToSave = value.ToString()!.ToLowerInvariant();
         }
         else if (valueType == ByteArrayType)
         {
             // Use only for Arrays, Collections and Lists. E.g. string is also IEnumerable.
-            valueToSave = Convert.ToBase64String(value as byte[]);
+            valueToSave = Convert.ToBase64String((byte[])value);
         }
         else if (valueType == DateTimeType)
         {
@@ -636,6 +655,7 @@ internal class XmlPersistence
         valueToSave = RemoveInvalidXmlChar(valueToSave);
         if (nodeToSaveAt is XmlElement elementToSaveAt)
         {
+            TPDebug.Assert(valueToSave is not null, "valueToSave is null");
             elementToSaveAt.InnerText = valueToSave;
         }
         else
@@ -644,26 +664,26 @@ internal class XmlPersistence
         }
     }
 
-    public XmlNode EnsureLocationExists(XmlElement xml, string location)
+    public XmlNode? EnsureLocationExists(XmlElement xml, string location)
     {
         return EnsureLocationExists(xml, location, _namespaceUri);
     }
 
-    private static string RemoveInvalidXmlChar(string str)
+    private static string? RemoveInvalidXmlChar(string? str)
     {
-        if (str != null)
+        if (str == null)
         {
-            // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars:
-            // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-
-            // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
-            // because C# support unicode character in range \u0000 to \uFFFF
-            MatchEvaluator evaluator = new(ReplaceInvalidCharacterWithUniCodeEscapeSequence);
-            string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD]";
-            return Regex.Replace(str, invalidChar, evaluator);
+            return null;
         }
 
-        return str;
+        // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars:
+        // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+
+        // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
+        // because C# support unicode character in range \u0000 to \uFFFF
+        MatchEvaluator evaluator = new(ReplaceInvalidCharacterWithUniCodeEscapeSequence);
+        string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD]";
+        return Regex.Replace(str, invalidChar, evaluator);
     }
 
     private static string ReplaceInvalidCharacterWithUniCodeEscapeSequence(Match match)
@@ -672,9 +692,9 @@ internal class XmlPersistence
         return string.Format(@"\u{0:x4}", (ushort)x);
     }
 
-    private XmlNode EnsureLocationExists(XmlElement xml, string location, string nameSpaceUri)
+    private XmlNode? EnsureLocationExists(XmlElement xml, string location, string? nameSpaceUri)
     {
-        XmlNode node = LocationToXmlNode(xml, location);
+        XmlNode? node = LocationToXmlNode(xml, location);
         if (node != null)
         {
             return node;
@@ -692,7 +712,7 @@ internal class XmlPersistence
             string[] parts = location.Split(new char[] { '/' }, 2);
             string firstPart = parts[0];
 
-            XmlNode firstChild = LocationToXmlNode(xml, firstPart);
+            XmlNode? firstChild = LocationToXmlNode(xml, firstPart);
             if (firstChild == null)
             {
                 firstChild = CreateElement(xml, firstPart, GetNamespaceUriOrDefault(nameSpaceUri));
@@ -702,7 +722,7 @@ internal class XmlPersistence
         }
     }
 
-    private string GetNamespaceUriOrDefault(string nameSpaceUri)
+    private string GetNamespaceUriOrDefault(string? nameSpaceUri)
     {
         return nameSpaceUri ?? _namespaceUri;
     }
@@ -718,9 +738,9 @@ internal class XmlPersistence
         return CreateElement(xml, name, _namespaceUri);
     }
 
-    private XmlElement CreateElement(XmlElement xml, string name, string elementNamespaceUri)
+    private XmlElement CreateElement(XmlElement xml, string name, string? elementNamespaceUri)
     {
-        return (XmlElement)xml.AppendChild(xml.OwnerDocument.CreateElement(_prefix, name, elementNamespaceUri));
+        return (XmlElement)xml.AppendChild(xml.OwnerDocument.CreateElement(_prefix, name, elementNamespaceUri))!;
     }
 
     /// <summary>
@@ -730,7 +750,7 @@ internal class XmlPersistence
     /// <param name="name">The local name of the new element. </param>
     /// <param name="instance">the object for which element has to create</param>
     /// <returns>a new XmlElement attached to the parent</returns>
-    private XmlElement CreateElement(XmlElement parent, string name, object instance)
+    private XmlElement CreateElement(XmlElement parent, string? name, object instance)
     {
         if (name != null)
         {
@@ -739,13 +759,14 @@ internal class XmlPersistence
         else
         {
             NewElementCreateData createData = GetElementCreateData(instance);
+            TPDebug.Assert(createData.ElementName is not null, "createData.ElementName is null");
             return CreateElement(parent, createData.ElementName, createData.NamespaceUri);
         }
     }
 
     private NewElementCreateData GetElementCreateData(object persistee)
     {
-        Debug.Assert(persistee != null, "persistee is null");
+        TPDebug.Assert(persistee != null, "persistee is null");
 
         NewElementCreateData toReturn = new();
         if (persistee is IXmlTestStoreCustom custom)
@@ -767,7 +788,7 @@ internal class XmlPersistence
         return toReturn;
     }
 
-    private XmlNode LocationToXmlNode(XmlElement element, string location)
+    private XmlNode? LocationToXmlNode(XmlElement element, string location)
     {
         location = ProcessXPathQuery(location);
 
@@ -777,7 +798,7 @@ internal class XmlPersistence
         }
         catch (System.Xml.XPath.XPathException e)
         {
-            throw new Exception("The persistence location is invalid. Element: '" + element.Name + "', location: '" + location + "'", e);
+            throw new Exception($"The persistence location is invalid. Element: '{element.Name}', location: '{location}'", e);
         }
     }
 
@@ -827,9 +848,9 @@ internal class XmlPersistence
 
     private class NewElementCreateData
     {
-        public string NamespaceUri { get; set; }
+        public string? NamespaceUri { get; set; }
 
-        public string ElementName { get; set; }
+        public string? ElementName { get; set; }
     }
 
     /// <summary>
@@ -839,13 +860,13 @@ internal class XmlPersistence
     {
         internal readonly FieldInfo FieldInfo;
 
-        internal readonly string Location;
+        internal readonly string? Location;
 
-        internal readonly StoreXmlAttribute Attribute;
+        internal readonly StoreXmlAttribute? Attribute;
 
-        internal readonly StoreXmlSimpleFieldAttribute SimpleFieldAttribute;
+        internal readonly StoreXmlSimpleFieldAttribute? SimpleFieldAttribute;
 
-        internal readonly StoreXmlFieldAttribute FieldAttribute;
+        internal readonly StoreXmlFieldAttribute? FieldAttribute;
 
         internal FieldPersistenceInfo(FieldInfo fieldInfo)
         {

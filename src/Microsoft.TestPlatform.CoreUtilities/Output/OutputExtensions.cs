@@ -9,8 +9,6 @@ using System.Globalization;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
@@ -27,7 +25,7 @@ public static class OutputExtensions
     /// <param name="appendPrefix">Bool to decide whether Verbose level should be added as prefix or not in log messages.</param>
     /// <param name="format">Format string for the error message.</param>
     /// <param name="args">Arguments to format into the format string.</param>
-    public static void Error(this IOutput output, bool appendPrefix, string format, params object[] args)
+    public static void Error(this IOutput output, bool appendPrefix, string format, params object?[]? args)
     {
         SetColorForAction(ConsoleColor.Red, () => Output(output, OutputLevel.Error, appendPrefix ? Resources.CommandLineError : DefaultFormat, format, args));
     }
@@ -39,7 +37,7 @@ public static class OutputExtensions
     /// <param name="appendPrefix">Bool to decide whether Verbose level should be added as prefix or not in log messages.</param>
     /// <param name="format">Format string for the warning message.</param>
     /// <param name="args">Arguments to format into the format string.</param>
-    public static void Warning(this IOutput output, bool appendPrefix, string format, params object[] args)
+    public static void Warning(this IOutput output, bool appendPrefix, string format, params object?[]? args)
     {
         SetColorForAction(ConsoleColor.Yellow, () => Output(output, OutputLevel.Warning, appendPrefix ? Resources.CommandLineWarning : DefaultFormat, format, args));
     }
@@ -51,7 +49,7 @@ public static class OutputExtensions
     /// <param name="appendPrefix">Bool to decide whether Verbose level should be added as prefix or not in log messages.</param>
     /// <param name="format">Format string for the informational message.</param>
     /// <param name="args">Arguments to format into the format string.</param>
-    public static void Information(this IOutput output, bool appendPrefix, string format, params object[] args)
+    public static void Information(this IOutput output, bool appendPrefix, string format, params object?[]? args)
     {
         Information(output, appendPrefix, Console.ForegroundColor, format, args);
     }
@@ -64,7 +62,7 @@ public static class OutputExtensions
     /// <param name="foregroundColor">Color in which text prints.</param>
     /// <param name="format">Format string for the informational message.</param>
     /// <param name="args">Arguments to format into the format string.</param>
-    public static void Information(this IOutput output, bool appendPrefix, ConsoleColor foregroundColor, string format, params object[] args)
+    public static void Information(this IOutput output, bool appendPrefix, ConsoleColor foregroundColor, string format, params object?[]? args)
     {
         SetColorForAction(foregroundColor, () => Output(output, OutputLevel.Information, appendPrefix ? Resources.CommandLineInformational : DefaultFormat, format, args));
     }
@@ -89,7 +87,7 @@ public static class OutputExtensions
     /// <param name="messageTypeFormat">Format string for the message type.</param>
     /// <param name="format">Format string for the error message.</param>
     /// <param name="args">Arguments to format into the format string.</param>
-    private static void Output(IOutput output, OutputLevel level, string messageTypeFormat, string format, params object[] args)
+    private static void Output(IOutput output, OutputLevel level, string messageTypeFormat, string format, params object?[]? args)
     {
         ValidateArg.NotNull(output, nameof(output));
         output.WriteLine(Format(messageTypeFormat, format, args), level);
@@ -102,7 +100,7 @@ public static class OutputExtensions
     /// <param name="format">Format string for the error message.</param>
     /// <param name="args">Arguments to format into the format string.</param>
     /// <returns>Formatted message.</returns>
-    private static string Format(string messageTypeFormat, string format, params object[] args)
+    private static string Format(string messageTypeFormat, string format, params object?[]? args)
     {
         if (format == null || string.IsNullOrEmpty(format.Trim()))
         {

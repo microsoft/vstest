@@ -2,24 +2,23 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 internal sealed class FileHelper
 {
-    private static readonly Dictionary<char, object> InvalidFileNameChars;
+    private static readonly Dictionary<char, object?> InvalidFileNameChars;
     private static readonly Regex ReservedFileNamesRegex = new(@"(?i:^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]|CLOCK\$)(\..*)?)$");
 
     static FileHelper()
     {
         // Create a hash table of invalid chars.
         char[] invalidCharsArray = Path.GetInvalidFileNameChars();
-        InvalidFileNameChars = new Dictionary<char, object>(invalidCharsArray.Length);
+        InvalidFileNameChars = new(invalidCharsArray.Length);
         foreach (char c in invalidCharsArray)
         {
             InvalidFileNameChars.Add(c, null);
@@ -35,7 +34,7 @@ internal sealed class FileHelper
     /// <param name="fileName">File name to check.</param>
     /// <param name="invalidCharacters">Invalid characters which were found in the file name.</param>
     /// <returns>True if the file name is valid and false if the filename contains invalid characters.</returns>
-    public static bool IsValidFileName(string fileName, out string invalidCharacters)
+    public static bool IsValidFileName(string fileName, out string? invalidCharacters)
     {
         bool result = true;
         //EqtAssert.StringNotNullOrEmpty(fileName, "fileName");
@@ -60,8 +59,7 @@ internal sealed class FileHelper
     /// <param name="fileName">The name of the file. Note: only a file name, does not expect to contain directory separators.</param>
     internal static bool IsReservedFileName(string fileName)
     {
-        Debug.Assert(!string.IsNullOrEmpty(fileName), "FileHelper.IsReservedFileName: the argument is null or empty string!");
-        if (string.IsNullOrEmpty(fileName))
+        if (fileName.IsNullOrEmpty())
         {
             return false;
         }

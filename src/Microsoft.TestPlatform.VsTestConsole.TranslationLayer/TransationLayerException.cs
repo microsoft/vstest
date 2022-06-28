@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 /// <summary>
@@ -16,7 +14,7 @@ public class TransationLayerException : Exception
     /// Initializes a new instance of the TransationLayerException class.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
-    public TransationLayerException(string message)
+    public TransationLayerException(string? message)
         : base(message)
     {
     }
@@ -26,7 +24,7 @@ public class TransationLayerException : Exception
     /// </summary>
     /// <param name="message">The error message that explains the reason for the exception.</param>
     /// <param name="innerException">The exception that is the cause of the current exception.</param>
-    public TransationLayerException(string message, Exception innerException)
+    public TransationLayerException(string? message, Exception? innerException)
         : base(message, innerException)
     {
     }

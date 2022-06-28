@@ -76,13 +76,13 @@ public class DataCollectionRequestHandlerTests
     [TestMethod]
     public void CreateInstanceShouldThrowExceptionIfInstanceCommunicationManagerIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(null, _mockMessageSink.Object));
+        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(null!, _mockMessageSink.Object));
     }
 
     [TestMethod]
     public void CreateInstanceShouldThrowExceptinIfInstanceMessageSinkIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(_mockCommunicationManager.Object, null));
+        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(_mockCommunicationManager.Object, null!));
     }
 
     [TestMethod]
@@ -352,8 +352,8 @@ public class DataCollectionRequestHandlerTests
         _requestHandler.ProcessRequests();
 
         _mockDataCollectionManager.Verify(x => x.SessionStarted(It.Is<SessionStartEventArgs>(
-            y => y.GetPropertyValue<IEnumerable<string>>("TestSources").Contains("test1.dll") &&
-                 y.GetPropertyValue<IEnumerable<string>>("TestSources").Contains("test2.dll"))));
+            y => y.GetPropertyValue<IEnumerable<string>>("TestSources")!.Contains("test1.dll") &&
+                 y.GetPropertyValue<IEnumerable<string>>("TestSources")!.Contains("test2.dll"))));
     }
 
     [TestMethod]

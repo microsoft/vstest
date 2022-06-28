@@ -22,19 +22,17 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 internal class RunTestsWithSources : BaseRunTests
 {
     private readonly Dictionary<string, IEnumerable<string>> _adapterSourceMap;
 
-    private Dictionary<Tuple<Uri, string>, IEnumerable<string>> _executorUriVsSourceList;
+    private Dictionary<Tuple<Uri, string>, IEnumerable<string>>? _executorUriVsSourceList;
 
-    private readonly ITestCaseEventsHandler _testCaseEventsHandler;
+    private readonly ITestCaseEventsHandler? _testCaseEventsHandler;
 
-    public RunTestsWithSources(IRequestData requestData, Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, IInternalTestRunEventsHandler testRunEventsHandler)
+    public RunTestsWithSources(IRequestData requestData, Dictionary<string, IEnumerable<string>> adapterSourceMap, string? package, string? runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler? testCaseEventsHandler, IInternalTestRunEventsHandler testRunEventsHandler)
         : this(requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
     {
     }
@@ -51,7 +49,7 @@ internal class RunTestsWithSources : BaseRunTests
     /// <param name="testRunEventsHandler"></param>
     /// <param name="executorUriVsSourceList"></param>
     /// <param name="testRunCache"></param>
-    internal RunTestsWithSources(IRequestData requestData, Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, IInternalTestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList)
+    internal RunTestsWithSources(IRequestData requestData, Dictionary<string, IEnumerable<string>> adapterSourceMap, string? package, string? runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler? testCaseEventsHandler, IInternalTestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>>? executorUriVsSourceList)
         : base(requestData, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
     {
         _adapterSourceMap = adapterSourceMap;
@@ -75,7 +73,7 @@ internal class RunTestsWithSources : BaseRunTests
     {
         IEnumerable<string> sources = new List<string>();
         var sourcesArray = _adapterSourceMap.Values
-            .Aggregate(sources, (current, enumerable) => current.Concat(enumerable)).ToArray();
+            .Aggregate(sources, (current, enumerable) => enumerable is not null ? current.Concat(enumerable) : current).ToArray();
         var sourcesString = string.Join(" ", sourcesArray);
 
         if (TestExecutionContext.TestCaseFilter != null)
@@ -101,7 +99,7 @@ internal class RunTestsWithSources : BaseRunTests
         _executorUriVsSourceList = GetExecutorVsSourcesList(testExecutorFrameworkHandle);
         var executorUris = _executorUriVsSourceList.Keys;
 
-        runContext.FilterExpressionWrapper = !string.IsNullOrEmpty(TestExecutionContext.TestCaseFilter)
+        runContext.FilterExpressionWrapper = !TestExecutionContext.TestCaseFilter.IsNullOrEmpty()
             ? new FilterExpressionWrapper(TestExecutionContext.TestCaseFilter, TestExecutionContext.FilterOptions)
             : null;
 
@@ -111,10 +109,10 @@ internal class RunTestsWithSources : BaseRunTests
     protected override void InvokeExecutor(
         LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
         Tuple<Uri, string> executorUriExtensionTuple,
-        RunContext runContext,
-        IFrameworkHandle frameworkHandle)
+        RunContext? runContext,
+        IFrameworkHandle? frameworkHandle)
     {
-        executor?.Value.RunTests(_executorUriVsSourceList[executorUriExtensionTuple], runContext, frameworkHandle);
+        executor?.Value.RunTests(_executorUriVsSourceList?[executorUriExtensionTuple], runContext, frameworkHandle);
     }
 
     /// <inheritdoc />
@@ -127,7 +125,7 @@ internal class RunTestsWithSources : BaseRunTests
         // the default test host by default to preserve old behavior.
         return executor?.Value is not ITestExecutor2 convertedExecutor
                || convertedExecutor.ShouldAttachToTestHost(
-                   _executorUriVsSourceList[executorUriExtensionTuple],
+                   _executorUriVsSourceList?[executorUriExtensionTuple],
                    runContext);
     }
 
@@ -140,7 +138,7 @@ internal class RunTestsWithSources : BaseRunTests
 
         var verifiedExtensionSourceMap = new Dictionary<string, IEnumerable<string>>();
 
-        // Validate the sources 
+        // Validate the sources
         foreach (var kvp in _adapterSourceMap)
         {
             var verifiedSources = DiscoveryManager.GetValidSources(kvp.Value, logger, _package);
@@ -158,12 +156,11 @@ internal class RunTestsWithSources : BaseRunTests
 
         foreach (var kvp in verifiedExtensionSourceMap)
         {
-            Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>>
-                discovererToSourcesMap = DiscovererEnumerator.GetDiscovererToSourcesMap(
-                    kvp.Key,
-                    kvp.Value,
-                    logger,
-                    new AssemblyProperties());
+            var discovererToSourcesMap = DiscovererEnumerator.GetDiscovererToSourcesMap(
+                kvp.Key,
+                kvp.Value,
+                logger,
+                new AssemblyProperties());
 
             // Warning is logged by the inner layer
             if (discovererToSourcesMap == null || discovererToSourcesMap.Count == 0)
@@ -205,15 +202,6 @@ internal class RunTestsWithSources : BaseRunTests
         return result;
     }
 
-    private static string TestCaseFilterToShow(string testCaseFilter)
-    {
-        var maxTestCaseFilterToShowLength = 63;
-        string testCaseFilterToShow = testCaseFilter.Length > maxTestCaseFilterToShowLength
-            ? testCaseFilter.Substring(0, maxTestCaseFilterToShowLength - 3) + "..."
-            : testCaseFilter;
-        return testCaseFilterToShow;
-    }
-
     /// <summary>
     /// Sends Session-End event on in-proc datacollectors
     /// </summary>
@@ -233,9 +221,9 @@ internal class RunTestsWithSources : BaseRunTests
             return;
         }
 
-        var properties = new Dictionary<string, object>
+        var properties = new Dictionary<string, object?>
         {
-            { "TestSources", TestSourcesUtility.GetSources(_adapterSourceMap) }
+            { "TestSources", TestSourcesUtility.GetSources(_adapterSourceMap!)! }
         };
 
         _testCaseEventsHandler.SendSessionStart(properties);

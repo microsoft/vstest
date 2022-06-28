@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -12,13 +10,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 /// </summary>
 public class DiaNavigationData : INavigationData
 {
-    public string FileName { get; set; }
+    public string? FileName { get; set; }
 
     public int MinLineNumber { get; set; }
 
     public int MaxLineNumber { get; set; }
 
-    public DiaNavigationData(string fileName, int minLineNumber, int maxLineNumber)
+    public DiaNavigationData(string? fileName, int minLineNumber, int maxLineNumber)
     {
         FileName = fileName;
         MinLineNumber = minLineNumber;

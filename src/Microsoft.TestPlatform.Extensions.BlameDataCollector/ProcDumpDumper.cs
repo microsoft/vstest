@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-using Microsoft.VisualStudio.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -37,25 +36,25 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     private string? _outputFilePrefix;
 
     public ProcDumpDumper()
-        : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), new NativeMethodsHelper())
+        : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment())
     {
     }
 
-    public ProcDumpDumper(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, INativeMethodsHelper? nativeMethodsHelper)
+    public ProcDumpDumper(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment)
     {
         _processHelper = processHelper;
         _fileHelper = fileHelper;
         _environment = environment;
     }
 
-    protected Action<object?, string> OutputReceivedCallback => (process, data) =>
+    protected Action<object?, string?> OutputReceivedCallback => (process, data) =>
         // useful for visibility when debugging this tool
         // Console.ForegroundColor = ConsoleColor.Cyan;
         // Console.WriteLine(data);
         // Console.ForegroundColor = ConsoleColor.White;
         // Log all standard output message of procdump in diag files.
         // Otherwise they end up coming on console in pipleine.
-        EqtTrace.Info("ProcDumpDumper.OutputReceivedCallback: Output received from procdump process: " + data);
+        EqtTrace.Info($"ProcDumpDumper.OutputReceivedCallback: Output received from procdump process: {data ?? "<null>"}");
 
     /// <inheritdoc/>
     public void WaitForDumpToFinish()

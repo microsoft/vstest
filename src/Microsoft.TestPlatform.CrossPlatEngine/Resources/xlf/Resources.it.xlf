@@ -158,8 +158,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="NoTestHostProviderFound">
-        <source>No suitable test runtime provider found for this run.</source>
-        <target state="translated">Non è stato trovato alcun provider di runtime dei test adatto per questa esecuzione.</target>
+        <source>No suitable test runtime provider was found for any source in this run.</source>
+        <target state="translated">Non è stato trovato alcun provider di runtime di test appropriato per qualsiasi origine in questa esecuzione.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="NoProxyMatchesDescription">
@@ -175,6 +175,16 @@
       <trans-unit id="AttachmentsBanner">
         <source>Attachments:</source>
         <target state="translated">Allegati:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoSuitableRuntimeProviderFound">
+        <source>No suitable test runtime provider was found:</source>
+        <target state="translated">Non è stato trovato alcun provider di runtime di test appropriato:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SkippingSource">
+        <source>Skipping source:</source>
+        <target state="translated">L'origine verrà ignorata:</target>
         <note></note>
       </trans-unit>
     </body>

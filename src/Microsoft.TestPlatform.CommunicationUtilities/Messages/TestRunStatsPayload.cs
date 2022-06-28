@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 /// <summary>
@@ -18,10 +16,10 @@ public class TestRunStatsPayload
     /// <summary>
     /// Gets or sets the test run changed event args.
     /// </summary>
-    public TestRunChangedEventArgs TestRunChangedArgs { get; set; }
+    public TestRunChangedEventArgs? TestRunChangedArgs { get; set; }
 
     /// <summary>
     /// Gets or sets the in progress test cases.
     /// </summary>
-    public IEnumerable<TestCase> InProgressTestCases { get; set; }
+    public IEnumerable<TestCase>? InProgressTestCases { get; set; }
 }

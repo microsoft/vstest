@@ -9,7 +9,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-using Microsoft.VisualStudio.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -27,14 +26,14 @@ internal class WindowsHangDumper : IHangDumper
         _processHelper = processHelper;
     }
 
-    private static Action<object?, string> OutputReceivedCallback => (process, data) =>
+    private static Action<object?, string?> OutputReceivedCallback => (process, data) =>
         // useful for visibility when debugging this tool
         // Console.ForegroundColor = ConsoleColor.Cyan;
         // Console.WriteLine(data);
         // Console.ForegroundColor = ConsoleColor.White;
         // Log all standard output message of procdump in diag files.
         // Otherwise they end up coming on console in pipleine.
-        EqtTrace.Info("ProcDumpDumper.OutputReceivedCallback: Output received from procdump process: " + data);
+        EqtTrace.Info($"ProcDumpDumper.OutputReceivedCallback: Output received from procdump process: {data ?? "<null>"}");
 
     public void Dump(int processId, string outputDirectory, DumpTypeOption type)
     {

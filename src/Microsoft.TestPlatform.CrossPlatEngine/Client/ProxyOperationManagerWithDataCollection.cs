@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
@@ -19,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 /// </summary>
 public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
 {
-    private IDictionary<string, string> _dataCollectionEnvironmentVariables;
+    private IDictionary<string, string?>? _dataCollectionEnvironmentVariables;
     private readonly IRequestData _requestData;
     private int _dataCollectionPort;
 
@@ -27,7 +25,7 @@ public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
     /// Initializes a new instance of the <see cref="ProxyOperationManagerWithDataCollection"/>
     /// class.
     /// </summary>
-    /// 
+    ///
     /// <param name="requestData">The request data.</param>
     /// <param name="requestSender">The request sender.</param>
     /// <param name="testHostManager">The test host manager.</param>
@@ -47,7 +45,7 @@ public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
         ProxyDataCollectionManager = proxyDataCollectionManager;
         DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
         _requestData = requestData;
-        _dataCollectionEnvironmentVariables = new Dictionary<string, string>();
+        _dataCollectionEnvironmentVariables = new Dictionary<string, string?>();
 
         testHostManager.HostLaunched += TestHostLaunchedHandler;
     }
@@ -90,7 +88,7 @@ public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
         {
             testProcessStartInfo.EnvironmentVariables = _dataCollectionEnvironmentVariables;
         }
-        else
+        else if (_dataCollectionEnvironmentVariables is not null)
         {
             foreach (var kvp in _dataCollectionEnvironmentVariables)
             {
@@ -100,8 +98,7 @@ public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
 
         // Update telemetry opt in status because by default test host telemetry is opted out.
         var telemetryOptedIn = _requestData.IsTelemetryOptedIn ? "true" : "false";
-        testProcessStartInfo.Arguments += " --datacollectionport " + _dataCollectionPort
-                                                                   + " --telemetryoptedin " + telemetryOptedIn;
+        testProcessStartInfo.Arguments += $" --datacollectionport {_dataCollectionPort} --telemetryoptedin {telemetryOptedIn}";
 
         return testProcessStartInfo;
     }
@@ -142,7 +139,7 @@ public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
         get; private set;
     }
 
-    private void TestHostLaunchedHandler(object sender, HostProviderEventArgs e)
+    private void TestHostLaunchedHandler(object? sender, HostProviderEventArgs e)
     {
         ProxyDataCollectionManager.TestHostLaunched(e.ProcessId);
     }

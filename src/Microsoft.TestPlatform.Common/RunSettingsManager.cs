@@ -2,10 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common;
 
@@ -16,7 +15,7 @@ internal class RunSettingsManager : IRunSettingsProvider
 {
     private static readonly object LockObject = new();
 
-    private static RunSettingsManager s_runSettingsManagerInstance;
+    private static RunSettingsManager? s_runSettingsManagerInstance;
 
     /// <summary>
     /// Default constructor.
@@ -26,8 +25,6 @@ internal class RunSettingsManager : IRunSettingsProvider
         ActiveRunSettings = new RunSettings();
     }
 
-
-
     #region IRunSettingsProvider
 
     /// <summary>
@@ -36,6 +33,8 @@ internal class RunSettingsManager : IRunSettingsProvider
     public RunSettings ActiveRunSettings { get; private set; }
 
     #endregion
+
+    [AllowNull]
     public static RunSettingsManager Instance
     {
         get

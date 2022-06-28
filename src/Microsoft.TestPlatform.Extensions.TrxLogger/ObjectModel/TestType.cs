@@ -5,8 +5,6 @@ using System;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
 /// <summary>
@@ -32,7 +30,7 @@ internal sealed class TestType : IXmlTestStore
         get { return _typeId; }
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is TestType tt && _typeId.Equals(tt._typeId);
     }
@@ -54,7 +52,7 @@ internal sealed class TestType : IXmlTestStore
     /// <param name="parameters">
     /// The parameter
     /// </param>
-    public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
+    public void Save(System.Xml.XmlElement element, XmlTestStoreParameters? parameters)
     {
         XmlPersistence.SaveUsingReflection(element, this, null, parameters);
     }

@@ -203,7 +203,7 @@ public class InProcDataCollectionExtensionManagerTests
     [TestMethod]
     public void TriggerSessionStartShouldBeCalledWithCorrectTestSources()
     {
-        var properties = new Dictionary<string, object>
+        var properties = new Dictionary<string, object?>
         {
             { "TestSources", new List<string>() { "testsource1.dll", "testsource2.dll" } }
         };

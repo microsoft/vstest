@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
@@ -10,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 /// </summary>
 public abstract class BasicTransferInformation
 {
-    private string _description;
+    private string? _description;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BasicTransferInformation"/> class.
@@ -40,31 +38,26 @@ public abstract class BasicTransferInformation
     /// <summary>
     /// Gets or sets a short description of the data being sent.
     /// </summary>
-    public string Description
+    public string? Description
     {
-        get
-        {
-            return _description;
-        }
+        get => _description;
 
-        set
-        {
+        set =>
             // If we don't have a description, use an empty string.
             _description = value ?? string.Empty;
-        }
     }
 
     /// <summary>
     /// Gets or sets the token which will be included with the callback to identify this file transfer.
     /// </summary>
-    public object UserToken { get; set; }
+    public object? UserToken { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the request that this file should be associated with. This is used
     /// for sending transient data which will be associated only with this
     /// data request and not the session or test cases that are currently running.
     /// </summary>
-    public RequestId RequestId { get; set; }
+    public RequestId? RequestId { get; set; }
 
     /// <summary>
     /// Gets a value indicating whether cleanup should be performed after transferring the resource. This

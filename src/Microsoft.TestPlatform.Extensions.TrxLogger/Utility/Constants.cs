@@ -6,8 +6,6 @@ using System;
 using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
 internal static class Constants

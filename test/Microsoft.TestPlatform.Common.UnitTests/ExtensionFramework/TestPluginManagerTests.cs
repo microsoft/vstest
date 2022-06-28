@@ -17,8 +17,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 
 [TestClass]
@@ -27,7 +25,7 @@ public class TestPluginManagerTests
     [TestMethod]
     public void GetTestExtensionTypeShouldReturnExtensionType()
     {
-        var type = TestPluginManager.GetTestExtensionType(typeof(TestPluginManagerTests).AssemblyQualifiedName);
+        var type = TestPluginManager.GetTestExtensionType(typeof(TestPluginManagerTests).AssemblyQualifiedName!);
 
         Assert.AreEqual(typeof(TestPluginManagerTests), type);
     }
@@ -141,12 +139,12 @@ public class TestPluginManagerTests
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }

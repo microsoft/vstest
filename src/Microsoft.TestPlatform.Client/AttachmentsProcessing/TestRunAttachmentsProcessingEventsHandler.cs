@@ -9,14 +9,12 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
 
 /// <summary>
 /// The test run attachments processing events handler.
 /// </summary>
-/// 
+///
 public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProcessingEventsHandler
 {
     private readonly ICommunicationManager _communicationManager;
@@ -31,11 +29,11 @@ public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProc
     }
 
     /// <inheritdoc/>
-    public void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk)
+    public void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet>? lastChunk)
     {
         EqtTrace.Info("Test run attachments processing completed.");
 
-        var payload = new TestRunAttachmentsProcessingCompletePayload()
+        var payload = new TestRunAttachmentsProcessingCompletePayload
         {
             AttachmentsProcessingCompleteEventArgs = attachmentsProcessingCompleteEventArgs,
             Attachments = lastChunk
@@ -62,7 +60,7 @@ public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProc
     }
 
     /// <inheritdoc/>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         var testMessagePayload = new TestMessagePayload { MessageLevel = level, Message = message };
         _communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);

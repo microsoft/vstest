@@ -20,11 +20,11 @@ public class InferHelperTests
     private readonly InferHelper _inferHelper;
     private readonly Framework _defaultFramework = Framework.DefaultFramework;
     private readonly Architecture _defaultArchitecture = Architecture.X64;
-    private readonly Framework _frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5");
-    private readonly Framework _frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6");
-    private readonly Framework _frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7");
-    private readonly Framework _frameworkCore10 = Framework.FromString(".NETCoreApp,Version=1.0");
-    private readonly Framework _frameworkCore11 = Framework.FromString(".NETCoreApp,Version=1.1");
+    private readonly Framework _frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5")!;
+    private readonly Framework _frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6")!;
+    private readonly Framework _frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7")!;
+    private readonly Framework _frameworkCore10 = Framework.FromString(".NETCoreApp,Version=1.0")!;
+    private readonly Framework _frameworkCore11 = Framework.FromString(".NETCoreApp,Version=1.1")!;
 
     public InferHelperTests()
     {
@@ -41,40 +41,40 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnEmptySources()
     {
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string?>(0), _defaultArchitecture, out _));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>(0), _defaultArchitecture, out _));
     }
 
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnNullItemInSources()
     {
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string?>() { null! }, _defaultArchitecture, out _));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { null! }, _defaultArchitecture, out _));
     }
 
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnWhiteSpaceItemInSources()
     {
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string?>() { " " }, _defaultArchitecture, out _));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { " " }, _defaultArchitecture, out _));
     }
 
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnCorrectArchForOneSource()
     {
         _mockAssemblyHelper.Setup(ah => ah.GetArchitecture(It.IsAny<string>())).Returns(Architecture.X86);
-        Assert.AreEqual(Architecture.X86, _inferHelper.AutoDetectArchitecture(new List<string?>() { "1.dll" }, _defaultArchitecture, out _));
+        Assert.AreEqual(Architecture.X86, _inferHelper.AutoDetectArchitecture(new List<string>() { "1.dll" }, _defaultArchitecture, out _));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()));
     }
 
     [TestMethod]
     public void AutoDetectArchitectureShouldReturnCorrectDefaultArchForNotDotNetAssembly()
     {
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string?>() { "NotDotNetAssebly.appx" }, _defaultArchitecture, out _));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "NotDotNetAssebly.appx" }, _defaultArchitecture, out _));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Never);
     }
 
     [TestMethod]
     public void AutoDetectArchitectureShouldSetDefaultArchForNotDotNetAssembly()
     {
-        _inferHelper.AutoDetectArchitecture(new List<string?>() { "NotDotNetAssebly.appx" }, _defaultArchitecture, out var sourceArchitectures);
+        _inferHelper.AutoDetectArchitecture(new List<string>() { "NotDotNetAssebly.appx" }, _defaultArchitecture, out var sourceArchitectures);
         Assert.AreEqual(_defaultArchitecture, sourceArchitectures["NotDotNetAssebly.appx"]);
     }
 
@@ -83,7 +83,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU);
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string?>() { "AnyCPU1.dll", "AnyCPU2.exe", "AnyCPU3.dll" }, _defaultArchitecture, out _));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "AnyCPU2.exe", "AnyCPU3.dll" }, _defaultArchitecture, out _));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -92,7 +92,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU).Returns(Architecture.X86);
-        Assert.AreEqual(Architecture.X86, _inferHelper.AutoDetectArchitecture(new List<string?>() { "AnyCPU1.dll", "AnyCPU2.exe", "x86.dll" }, _defaultArchitecture, out _));
+        Assert.AreEqual(Architecture.X86, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "AnyCPU2.exe", "x86.dll" }, _defaultArchitecture, out _));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -101,7 +101,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.ARM).Returns(Architecture.ARM).Returns(Architecture.ARM);
-        Assert.AreEqual(Architecture.ARM, _inferHelper.AutoDetectArchitecture(new List<string?>() { "ARM1.dll", "ARM2.dll", "ARM3.dll" }, _defaultArchitecture, out _));
+        Assert.AreEqual(Architecture.ARM, _inferHelper.AutoDetectArchitecture(new List<string>() { "ARM1.dll", "ARM2.dll", "ARM3.dll" }, _defaultArchitecture, out _));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -110,7 +110,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU).Returns(Architecture.X64);
-        Assert.AreEqual(Architecture.X64, _inferHelper.AutoDetectArchitecture(new List<string?>() { "x64.dll", "AnyCPU2.exe", "x64-2.dll" }, _defaultArchitecture, out _));
+        Assert.AreEqual(Architecture.X64, _inferHelper.AutoDetectArchitecture(new List<string>() { "x64.dll", "AnyCPU2.exe", "x64-2.dll" }, _defaultArchitecture, out _));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -119,7 +119,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU).Returns(Architecture.X64).Returns(Architecture.X86);
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string?>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, _defaultArchitecture, out _));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, _defaultArchitecture, out _));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -129,7 +129,7 @@ public class InferHelperTests
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU).Returns(Architecture.X64).Returns(Architecture.X86);
 
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string?>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, _defaultArchitecture, out var sourceArchitectures));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, _defaultArchitecture, out var sourceArchitectures));
         Assert.AreEqual(3, sourceArchitectures.Count);
         Assert.AreEqual(_defaultArchitecture, sourceArchitectures["AnyCPU1.dll"]);
         Assert.AreEqual(Architecture.X64, sourceArchitectures["x64.exe"]);
@@ -143,7 +143,7 @@ public class InferHelperTests
     {
         _mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
             .Returns(Architecture.AnyCPU);
-        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string?>() { "AnyCPU1.dll", "NotDotNetAssebly.appx" }, _defaultArchitecture, out var sourceArchitectures));
+        Assert.AreEqual(_defaultArchitecture, _inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "NotDotNetAssebly.appx" }, _defaultArchitecture, out var sourceArchitectures));
         _mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(1));
     }
 
@@ -162,7 +162,7 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnDefaultFrameworkOnNullItemInSources()
     {
-        Assert.AreEqual(_defaultFramework, _inferHelper.AutoDetectFramework(new List<string?>() { null }, out _));
+        Assert.AreEqual(_defaultFramework, _inferHelper.AutoDetectFramework(new List<string?>() { null! }, out _));
     }
 
     [TestMethod]
@@ -190,7 +190,7 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnFrameworkUap10ForAppxFiles()
     {
-        var fx = Framework.FromString(Constants.DotNetFrameworkUap10);
+        var fx = Framework.FromString(Constants.DotNetFrameworkUap10)!;
         var assemblyName = "uwp10.appx";
         SetupAndValidateForSingleAssembly(assemblyName, fx, false);
     }
@@ -198,7 +198,7 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnFrameworkUap10ForMsixFiles()
     {
-        var fx = Framework.FromString(Constants.DotNetFrameworkUap10);
+        var fx = Framework.FromString(Constants.DotNetFrameworkUap10)!;
         var assemblyName = "uwp10.msix";
         SetupAndValidateForSingleAssembly(assemblyName, fx, false);
     }
@@ -206,7 +206,7 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnFrameworkUap10ForAppxrecipeFiles()
     {
-        var fx = Framework.FromString(Constants.DotNetFrameworkUap10);
+        var fx = Framework.FromString(Constants.DotNetFrameworkUap10)!;
         var assemblyName = "uwp10.appxrecipe";
         SetupAndValidateForSingleAssembly(assemblyName, fx, false);
     }
@@ -214,7 +214,7 @@ public class InferHelperTests
     [TestMethod]
     public void AutoDetectFrameworkShouldReturnDefaultFullFrameworkForJsFiles()
     {
-        var fx = Framework.FromString(Constants.DotNetFramework40);
+        var fx = Framework.FromString(Constants.DotNetFramework40)!;
         var assemblyName = "vstests.js";
         SetupAndValidateForSingleAssembly(assemblyName, fx, false);
     }

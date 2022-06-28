@@ -65,13 +65,10 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\x86\msdia140.dll" target="lib\netcoreapp1.0\x86\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\x64\msdia140.dll" target="lib\netcoreapp1.0\x64\" />
   
-    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\netcoreapp1.0\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x64\testhost.dll" target="build\netcoreapp1.0\x64\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x64\testhost.exe" target="build\netcoreapp1.0\x64\" />
-    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x64\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\netcoreapp1.0\x64\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x86\testhost.x86.dll" target="build\netcoreapp1.0\x86\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x86\testhost.x86.exe" target="build\netcoreapp1.0\x86\" />
-    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x86\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\netcoreapp1.0\x86\" />
 
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.TestHost.props" target="build\netcoreapp1.0\" />
 
@@ -83,7 +80,6 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\x86\msdia140.dll" target="lib\netcoreapp2.1\x86\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\x64\msdia140.dll" target="lib\netcoreapp2.1\x64\" />
     
-    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\netcoreapp2.1\" />
     <!-- 
           We move AnyCPU version of testhost.dll, at the moment we don't have native code that needs particular architecture inside testhost.dll.
           This prevent possible issue related to override x64(testshost.dll) compilation inside Microsoft.TestPlatform.TestHost.NetCore.prop netcoreapp2.1\x64\testhost.dll to the bin folder
@@ -97,10 +93,8 @@
     -->
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\testhost.dll" target="build\netcoreapp2.1\x64\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x64\testhost.exe" target="build\netcoreapp2.1\x64\" />
-    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x64\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\netcoreapp2.1\x64\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x86\testhost.x86.dll" target="build\netcoreapp2.1\x86\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x86\testhost.x86.exe" target="build\netcoreapp2.1\x86\" />
-    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x86\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\netcoreapp2.1\x86\" />
 
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.TestHost.props" target="build\netcoreapp2.1\" />
     

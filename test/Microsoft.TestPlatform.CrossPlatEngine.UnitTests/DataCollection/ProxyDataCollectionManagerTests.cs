@@ -61,7 +61,7 @@ public class ProxyDataCollectionManagerTests
         _mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000)).Returns(true);
         _proxyDataCollectionManager.Initialize();
 
-        _mockDataCollectionLauncher.Verify(x => x.LaunchDataCollector(It.IsAny<IDictionary<string, string>>(), It.IsAny<IList<string>>()), Times.Once);
+        _mockDataCollectionLauncher.Verify(x => x.LaunchDataCollector(It.IsAny<IDictionary<string, string?>>(), It.IsAny<IList<string>>()), Times.Once);
         _mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000), Times.Once);
     }
 
@@ -122,7 +122,7 @@ public class ProxyDataCollectionManagerTests
             _mockDataCollectionLauncher.Verify(
                 x =>
                     x.LaunchDataCollector(
-                        It.IsAny<IDictionary<string, string>>(),
+                        It.IsAny<IDictionary<string, string?>>(),
                         It.Is<IList<string>>(list => list.Contains("--diag") && list.Contains("--tracelevel") && list.Contains(expectedTraceLevel.ToString()))),
                 Times.Once);
         }
@@ -154,7 +154,7 @@ public class ProxyDataCollectionManagerTests
         _proxyDataCollectionManager = new ProxyDataCollectionManager(_mockRequestData.Object, runsettings, sourceList, _mockDataCollectionRequestSender.Object, _mockProcessHelper.Object, _mockDataCollectionLauncher.Object);
         _mockRequestData.Setup(r => r.IsTelemetryOptedIn).Returns(true);
 
-        BeforeTestRunStartResult res = new(new Dictionary<string, string>(), 123);
+        BeforeTestRunStartResult res = new(new Dictionary<string, string?>(), 123);
         _mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
 
         var result = _proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
@@ -168,7 +168,7 @@ public class ProxyDataCollectionManagerTests
     [TestMethod]
     public void BeforeTestRunStartShouldReturnDataCollectorParameters()
     {
-        BeforeTestRunStartResult res = new(new Dictionary<string, string>(), 123);
+        BeforeTestRunStartResult res = new(new Dictionary<string, string?>(), 123);
         var sourceList = new List<string>() { "testsource1.dll" };
         _mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
 
@@ -178,7 +178,7 @@ public class ProxyDataCollectionManagerTests
             x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), sourceList, false, It.IsAny<ITestMessageEventHandler>()), Times.Once);
         Assert.IsNotNull(result);
         Assert.AreEqual(res.DataCollectionEventsPort, result.DataCollectionEventsPort);
-        Assert.AreEqual(res.EnvironmentVariables.Count, result.EnvironmentVariables.Count);
+        Assert.AreEqual(res.EnvironmentVariables.Count, result.EnvironmentVariables!.Count);
     }
 
     [TestMethod]
@@ -192,7 +192,7 @@ public class ProxyDataCollectionManagerTests
         var result = _proxyDataCollectionManager.BeforeTestRunStart(true, true, mockRunEventsHandler.Object);
 
         mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.IsRegex("Exception of type 'System.Exception' was thrown..*")), Times.Once);
-        Assert.AreEqual(0, result.EnvironmentVariables.Count);
+        Assert.AreEqual(0, result.EnvironmentVariables!.Count);
         Assert.IsFalse(result.AreTestCaseLevelEventsRequired);
         Assert.AreEqual(0, result.DataCollectionEventsPort);
     }
@@ -203,7 +203,7 @@ public class ProxyDataCollectionManagerTests
         var testSources = new List<string>() { "abc.dll", "efg.dll" };
         _proxyDataCollectionManager = new ProxyDataCollectionManager(_mockRequestData.Object, string.Empty, testSources, _mockDataCollectionRequestSender.Object, _mockProcessHelper.Object, _mockDataCollectionLauncher.Object);
 
-        BeforeTestRunStartResult res = new(new Dictionary<string, string>(), 123);
+        BeforeTestRunStartResult res = new(new Dictionary<string, string?>(), 123);
         _mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
 
         var result = _proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
@@ -212,7 +212,7 @@ public class ProxyDataCollectionManagerTests
             x => x.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, false, It.IsAny<ITestMessageEventHandler>()), Times.Once);
         Assert.IsNotNull(result);
         Assert.AreEqual(res.DataCollectionEventsPort, result.DataCollectionEventsPort);
-        Assert.AreEqual(res.EnvironmentVariables.Count, result.EnvironmentVariables.Count);
+        Assert.AreEqual(res.EnvironmentVariables.Count, result.EnvironmentVariables!.Count);
     }
 
     [TestMethod]
@@ -238,7 +238,7 @@ public class ProxyDataCollectionManagerTests
         var result = _proxyDataCollectionManager.AfterTestRunEnd(false, null);
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Attachments.Count);
+        Assert.AreEqual(1, result.Attachments!.Count);
         Assert.IsNotNull(result.Attachments[0]);
         Assert.AreEqual(dispName, result.Attachments[0].DisplayName);
         Assert.AreEqual(uri, result.Attachments[0].Uri);

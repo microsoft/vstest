@@ -152,7 +152,6 @@ public class HtmlLogger : ITestLoggerWithParameters
     public void TestMessageHandler(object? sender, TestRunMessageEventArgs e)
     {
         ValidateArg.NotNull(e, nameof(e));
-
         TPDebug.Assert(TestRunDetails != null, "Initialize must be called before this method.");
 
         switch (e.Level)
@@ -189,7 +188,6 @@ public class HtmlLogger : ITestLoggerWithParameters
     public void TestResultHandler(object? sender, TestResultEventArgs e)
     {
         ValidateArg.NotNull(e, nameof(e));
-
         TPDebug.Assert(ResultCollectionDictionary != null && TestRunDetails != null && Results != null, "Initialize must be called before this method.");
 
         var testResult = new ObjectModel.TestResult
@@ -255,7 +253,6 @@ public class HtmlLogger : ITestLoggerWithParameters
     private void AddToParentResult(Guid parentExecutionId, ObjectModel.TestResult testResult)
     {
         TPDebug.Assert(Results != null, "Initialize must be called before this method.");
-
 
         if (Results.TryGetValue(parentExecutionId, out var parentTestResult))
         {

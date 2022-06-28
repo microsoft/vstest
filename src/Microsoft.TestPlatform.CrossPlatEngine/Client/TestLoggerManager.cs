@@ -23,8 +23,6 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
@@ -46,12 +44,12 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <summary>
     /// Test run directory.
     /// </summary>
-    private string _testRunDirectory;
+    private string? _testRunDirectory;
 
     /// <summary>
     /// Target framework.
     /// </summary>
-    private string _targetFramework;
+    private string? _targetFramework;
 
     /// <summary>
     /// TreatNoTestsAsError value;
@@ -76,7 +74,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <summary>
     /// Logger extension manager.
     /// </summary>
-    private TestLoggerExtensionManager _testLoggerExtensionManager;
+    private TestLoggerExtensionManager? _testLoggerExtensionManager;
 
     /// <summary>
     /// AssemblyLoadContext for current platform
@@ -131,7 +129,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <summary>
     /// Initializes all the loggers passed by user
     /// </summary>
-    public void Initialize(string runSettings)
+    public void Initialize(string? runSettings)
     {
         // Enable logger events
         EnableLogging();
@@ -155,14 +153,14 @@ internal class TestLoggerManager : ITestLoggerManager
             var loggerInitialized = false;
 
             // Try initializing logger by type.
-            if (!string.IsNullOrWhiteSpace(logger.AssemblyQualifiedName))
+            if (!StringUtils.IsNullOrWhiteSpace(logger.AssemblyQualifiedName))
             {
-                loggerInitialized = InitializeLoggerByType(logger.AssemblyQualifiedName, logger.CodeBase, parameters);
+                loggerInitialized = InitializeLoggerByType(logger.AssemblyQualifiedName, logger.CodeBase!, parameters);
             }
 
             // Try initializing logger by uri.
             if (!loggerInitialized &&
-                !string.IsNullOrWhiteSpace(logger.Uri?.ToString()))
+                !StringUtils.IsNullOrWhiteSpace(logger.Uri?.ToString()))
             {
                 loggerInitialized = InitializeLoggerByUri(logger.Uri, parameters);
             }
@@ -178,9 +176,9 @@ internal class TestLoggerManager : ITestLoggerManager
             // Output error if logger is not initialized.
             if (!loggerInitialized)
             {
-                var value = !string.IsNullOrWhiteSpace(logger.AssemblyQualifiedName)
+                var value = !StringUtils.IsNullOrWhiteSpace(logger.AssemblyQualifiedName)
                     ? logger.AssemblyQualifiedName
-                    : !string.IsNullOrWhiteSpace(logger.Uri?.ToString())
+                    : !StringUtils.IsNullOrWhiteSpace(logger.Uri?.ToString())
                         ? logger.Uri.ToString()
                         : logger.FriendlyName;
 
@@ -222,7 +220,7 @@ internal class TestLoggerManager : ITestLoggerManager
             return;
         }
 
-        foreach (TestResult result in e.NewTestResults)
+        foreach (TestResult result in e.NewTestResults!)
         {
             _loggerEvents.RaiseTestResult(new TestResultEventArgs(result));
         }
@@ -356,7 +354,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <param name="uri">URI of the logger to add.</param>
     /// <param name="parameters">Logger parameters.</param>
     /// <returns>Logger Initialized flag.</returns>
-    internal bool InitializeLoggerByUri(Uri uri, Dictionary<string, string> parameters)
+    internal bool InitializeLoggerByUri(Uri uri, Dictionary<string, string?>? parameters)
     {
         ValidateArg.NotNull(uri, nameof(uri));
         CheckDisposed();
@@ -395,30 +393,32 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <param name="friendlyName">The friendly Name.</param>
     /// <param name="loggerUri">The logger Uri.</param>
     /// <returns><see cref="bool"/></returns>
-    internal bool TryGetUriFromFriendlyName(string friendlyName, out Uri loggerUri)
+    internal bool TryGetUriFromFriendlyName(string? friendlyName, out Uri? loggerUri)
     {
         var extensionManager = TestLoggerExtensionManager;
         foreach (var extension in extensionManager.TestExtensions)
         {
-            if (string.Equals(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase))
             {
-                try
-                {
-                    loggerUri = new Uri(extension.Metadata.ExtensionUri);
-                }
-                catch (UriFormatException)
-                {
-                    loggerUri = null;
-
-                    throw new InvalidLoggerException(
-                        string.Format(
-                            CultureInfo.CurrentUICulture,
-                            CommonResources.LoggerUriInvalid,
-                            extension.Metadata.ExtensionUri));
-                }
-
-                return true;
+                continue;
             }
+
+            try
+            {
+                loggerUri = new Uri(extension.Metadata.ExtensionUri);
+            }
+            catch (UriFormatException)
+            {
+                loggerUri = null;
+
+                throw new InvalidLoggerException(
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommonResources.LoggerUriInvalid,
+                        extension.Metadata.ExtensionUri));
+            }
+
+            return true;
         }
 
         loggerUri = null;
@@ -430,9 +430,9 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="runSettings">Test run settings.</param>
     /// <returns>Test results directory</returns>
-    internal string GetResultsDirectory(string runSettings)
+    internal string? GetResultsDirectory(string? runSettings)
     {
-        string resultsDirectory = null;
+        string? resultsDirectory = null;
         if (runSettings != null)
         {
             try
@@ -454,9 +454,9 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="runSettings">Test run settings.</param>
     /// <returns>Target framework</returns>
-    internal Framework GetTargetFramework(string runSettings)
+    internal Framework? GetTargetFramework(string? runSettings)
     {
-        Framework targetFramework = null;
+        Framework? targetFramework = null;
         if (runSettings != null)
         {
             try
@@ -478,7 +478,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="runSettings"></param>
     /// <returns></returns>
-    internal bool GetTreatNoTestsAsError(string runSettings)
+    internal bool GetTreatNoTestsAsError(string? runSettings)
     {
         return RunSettingsUtilities.GetTreatNoTestsAsError(runSettings);
     }
@@ -522,7 +522,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="configuration"></param>
     /// <returns></returns>
-    private Dictionary<string, string> GetParametersFromConfigurationElement(XmlElement configuration)
+    private static Dictionary<string, string?> GetParametersFromConfigurationElement(XmlElement? configuration)
     {
         var configurationManager = new LoggerNameValueConfigurationManager(configuration);
         return configurationManager.NameValuePairs;
@@ -535,7 +535,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <param name="codeBase">Code base.</param>
     /// <param name="parameters">Logger parameters.</param>
     /// <returns>Logger Initialized flag.</returns>
-    private bool InitializeLoggerByType(string assemblyQualifiedName, string codeBase, Dictionary<string, string> parameters)
+    private bool InitializeLoggerByType(string assemblyQualifiedName, string codeBase, Dictionary<string, string?> parameters)
     {
         CheckDisposed();
         try
@@ -544,7 +544,7 @@ internal class TestLoggerManager : ITestLoggerManager
             Assembly assembly = _assemblyLoadContext.LoadAssemblyFromPath(codeBase);
             var loggerType =
                 assembly?.GetTypes()
-                    .FirstOrDefault(x => x.AssemblyQualifiedName.Equals(assemblyQualifiedName));
+                    .FirstOrDefault(x => string.Equals(x.AssemblyQualifiedName, assemblyQualifiedName));
 
             // Create logger instance
             var constructorInfo = loggerType?.GetConstructor(Type.EmptyTypes);
@@ -582,7 +582,7 @@ internal class TestLoggerManager : ITestLoggerManager
         }
     }
 
-    private bool InitializeLogger(object logger, string extensionUri, Dictionary<string, string> parameters)
+    private bool InitializeLogger(object? logger, string? extensionUri, Dictionary<string, string?>? parameters)
     {
         if (logger == null)
         {
@@ -594,12 +594,11 @@ internal class TestLoggerManager : ITestLoggerManager
             switch (logger)
             {
                 case ITestLoggerWithParameters _:
-                    ((ITestLoggerWithParameters)logger).Initialize(_loggerEvents,
-                        UpdateLoggerParameters(parameters));
+                    ((ITestLoggerWithParameters)logger).Initialize(_loggerEvents, UpdateLoggerParameters(parameters));
                     break;
 
                 case ITestLogger _:
-                    ((ITestLogger)logger).Initialize(_loggerEvents, _testRunDirectory);
+                    ((ITestLogger)logger).Initialize(_loggerEvents, _testRunDirectory!);
                     break;
 
                 default:
@@ -611,7 +610,7 @@ internal class TestLoggerManager : ITestLoggerManager
         }
         catch (Exception ex)
         {
-            var loggerUri = string.IsNullOrEmpty(extensionUri) ? logger.GetType().ToString() : extensionUri;
+            var loggerUri = extensionUri.IsNullOrEmpty() ? logger.GetType().ToString() : extensionUri;
             EqtTrace.Error(
                 "TestLoggerManager: Error while initializing logger: {0}, Exception details: {1}", loggerUri, ex);
 
@@ -620,8 +619,8 @@ internal class TestLoggerManager : ITestLoggerManager
                 string.Format(
                     CultureInfo.CurrentUICulture,
                     CommonResources.LoggerInitializationError,
-                    string.IsNullOrEmpty(extensionUri) ? "type" : "uri",
-                    string.IsNullOrEmpty(extensionUri) ? logger.GetType().ToString() : extensionUri,
+                    extensionUri.IsNullOrEmpty() ? "type" : "uri",
+                    extensionUri.IsNullOrEmpty() ? logger.GetType().ToString() : extensionUri,
                     ex));
 
             throw new InvalidLoggerException($"Error while initializing logger: {loggerUri}, Exception details: {ex.Message}");
@@ -633,13 +632,11 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <summary>
     /// Populates user supplied and default logger parameters.
     /// </summary>
-    private Dictionary<string, string> UpdateLoggerParameters(Dictionary<string, string> parameters)
+    private Dictionary<string, string?> UpdateLoggerParameters(Dictionary<string, string?>? parameters)
     {
-        var loggerParams = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        if (parameters != null)
-        {
-            loggerParams = new Dictionary<string, string>(parameters, StringComparer.OrdinalIgnoreCase);
-        }
+        var loggerParams = parameters is not null
+            ? new Dictionary<string, string?>(parameters, StringComparer.OrdinalIgnoreCase)
+            : new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
 
         // Add default logger parameters...
         loggerParams[DefaultLoggerParameterNames.TestRunDirectory] = _testRunDirectory;

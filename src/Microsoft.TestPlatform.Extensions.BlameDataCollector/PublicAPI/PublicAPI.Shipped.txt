@@ -60,9 +60,6 @@ Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcessDumpUtility.DetachF
 Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcessDumpUtility.GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed) -> System.Collections.Generic.IEnumerable<string!>!
 Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcessDumpUtility.StartHangBasedProcessDump(int processId, string! testResultsDirectory, bool isFullDump, string! targetFramework, System.Action<string!>? logWarning = null) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcessDumpUtility.StartTriggerBasedProcessDump(int processId, string! testResultsDirectory, bool isFullDump, string! targetFramework, bool collectAlways, System.Action<string!>! logWarning) -> void
-Microsoft.TestPlatform.Extensions.BlameDataCollector.NativeMethodsHelper
-Microsoft.TestPlatform.Extensions.BlameDataCollector.NativeMethodsHelper.Is64Bit(System.IntPtr processHandle) -> bool
-Microsoft.TestPlatform.Extensions.BlameDataCollector.NativeMethodsHelper.NativeMethodsHelper() -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpArgsBuilder
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpArgsBuilder.BuildHangBasedProcDumpArgs(int processId, string! filename, bool isFullDump) -> string!
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpArgsBuilder.BuildTriggerBasedProcDumpArgs(int processId, string! filename, System.Collections.Generic.IEnumerable<string!>! procDumpExceptionsList, bool isFullDump) -> string!
@@ -72,9 +69,9 @@ Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.AttachToTarg
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.DetachFromTargetProcess(int targetProcessId) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.Dump(int processId, string! outputDirectory, Microsoft.TestPlatform.Extensions.BlameDataCollector.DumpTypeOption dumpType) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.GetDumpFiles(bool processCrashed) -> System.Collections.Generic.IEnumerable<string!>!
-Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.OutputReceivedCallback.get -> System.Action<object?, string!>!
+Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.OutputReceivedCallback.get -> System.Action<object?, string?>!
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.ProcDumpDumper() -> void
-Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.ProcDumpDumper(Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper! processHelper, Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper! fileHelper, Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment! environment, Microsoft.TestPlatform.Extensions.BlameDataCollector.INativeMethodsHelper? nativeMethodsHelper) -> void
+Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.ProcDumpDumper(Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper! processHelper, Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper! fileHelper, Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment! environment) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.WaitForDumpToFinish() -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.Win32NamedEvent
 Microsoft.TestPlatform.Extensions.BlameDataCollector.Win32NamedEvent.Set() -> void
@@ -83,4 +80,4 @@ Microsoft.TestPlatform.Extensions.BlameDataCollector.XmlReaderWriter
 Microsoft.TestPlatform.Extensions.BlameDataCollector.XmlReaderWriter.ReadTestSequence(string! filePath) -> System.Collections.Generic.List<Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameTestObject!>!
 Microsoft.TestPlatform.Extensions.BlameDataCollector.XmlReaderWriter.WriteTestSequence(System.Collections.Generic.List<System.Guid>! testSequence, System.Collections.Generic.Dictionary<System.Guid, Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameTestObject!>! testObjectDictionary, string! filePath) -> string!
 Microsoft.TestPlatform.Extensions.BlameDataCollector.XmlReaderWriter.XmlReaderWriter(Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper! fileHelper) -> void
-override Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameCollector.Initialize(System.Xml.XmlElement? configurationElement, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionEvents! events, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionSink! dataSink, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionLogger! logger, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionEnvironmentContext! environmentContext) -> void
+override Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameCollector.Initialize(System.Xml.XmlElement? configurationElement, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionEvents! events, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionSink! dataSink, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionLogger! logger, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionEnvironmentContext? environmentContext) -> void

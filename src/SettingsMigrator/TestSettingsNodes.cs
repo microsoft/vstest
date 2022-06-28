@@ -3,8 +3,6 @@
 
 using System.Xml;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator;
 
 /// <summary>
@@ -12,19 +10,19 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator;
 /// </summary>
 public class TestSettingsNodes
 {
-    public XmlNode Deployment { get; set; }
+    public XmlNode? Deployment { get; set; }
 
-    public XmlNode Script { get; set; }
+    public XmlNode? Script { get; set; }
 
-    public XmlNode WebSettings { get; set; }
+    public XmlNode? WebSettings { get; set; }
 
-    public XmlNodeList Datacollectors { get; set; }
+    public XmlNodeList? Datacollectors { get; set; }
 
-    public XmlNode Timeout { get; set; }
+    public XmlNode? Timeout { get; set; }
 
-    public XmlNode UnitTestConfig { get; set; }
+    public XmlNode? UnitTestConfig { get; set; }
 
-    public XmlNode Hosts { get; set; }
+    public XmlNode? Hosts { get; set; }
 
-    public XmlNode Execution { get; set; }
+    public XmlNode? Execution { get; set; }
 }

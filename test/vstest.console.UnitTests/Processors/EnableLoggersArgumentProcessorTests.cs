@@ -241,7 +241,7 @@ public class EnableLoggersArgumentProcessorTests
       </Logger>
     </Loggers>
   </LoggerRunSettings>";
-        Assert.IsTrue(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml.Contains(expectedSettingsXml));
+        Assert.IsTrue(RunSettingsManager.Instance.ActiveRunSettings!.SettingsXml!.Contains(expectedSettingsXml));
     }
 
     [TestMethod]

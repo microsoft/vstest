@@ -3,12 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
@@ -20,19 +19,20 @@ public class FilterExpressionWrapper
     /// <summary>
     /// FilterExpression corresponding to filter criteria
     /// </summary>
-    private readonly FilterExpression _filterExpression;
+    private readonly FilterExpression? _filterExpression;
 
     /// <remarks>
     /// Exposed for testing purpose.
     /// </remarks>
-    internal readonly FastFilter FastFilter;
+    internal readonly FastFilter? FastFilter;
 
+    [MemberNotNullWhen(true, nameof(FastFilter))]
     private bool UseFastFilter => FastFilter != null;
 
     /// <summary>
     /// Initializes FilterExpressionWrapper with given filterString and options.
     /// </summary>
-    public FilterExpressionWrapper(string filterString, FilterOptions options)
+    public FilterExpressionWrapper(string filterString, FilterOptions? options)
     {
         ValidateArg.NotNullOrEmpty(filterString, nameof(filterString));
 
@@ -55,7 +55,7 @@ public class FilterExpressionWrapper
                 var regexString = options?.FilterRegEx;
                 if (!regexString.IsNullOrEmpty())
                 {
-                    TPDebug.Assert(options.FilterRegExReplacement == null || options.FilterRegEx != null);
+                    TPDebug.Assert(options!.FilterRegExReplacement == null || options.FilterRegEx != null);
                     FastFilter.PropertyValueRegex = new Regex(regexString, RegexOptions.Compiled);
                     FastFilter.PropertyValueRegexReplacement = options.FilterRegExReplacement;
                 }
@@ -93,7 +93,7 @@ public class FilterExpressionWrapper
     /// <summary>
     /// User specified additional filter options.
     /// </summary>
-    public FilterOptions FilterOptions
+    public FilterOptions? FilterOptions
     {
         get;
         private set;
@@ -102,7 +102,7 @@ public class FilterExpressionWrapper
     /// <summary>
     /// Parsing error (if any), when parsing 'FilterString' with built-in parser.
     /// </summary>
-    public string ParseError
+    public string? ParseError
     {
         get;
         private set;
@@ -111,15 +111,15 @@ public class FilterExpressionWrapper
     /// <summary>
     /// Validate if underlying filter expression is valid for given set of supported properties.
     /// </summary>
-    public string[] ValidForProperties(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
-    {
-        return UseFastFilter ? FastFilter.ValidForProperties(supportedProperties) : _filterExpression?.ValidForProperties(supportedProperties, propertyProvider);
-    }
+    public string[]? ValidForProperties(IEnumerable<string>? supportedProperties, Func<string, TestProperty?>? propertyProvider)
+        => UseFastFilter
+            ? FastFilter.ValidForProperties(supportedProperties)
+            : _filterExpression?.ValidForProperties(supportedProperties, propertyProvider);
 
     /// <summary>
     /// Evaluate filterExpression with given propertyValueProvider.
     /// </summary>
-    public bool Evaluate(Func<string, object> propertyValueProvider)
+    public bool Evaluate(Func<string, object?> propertyValueProvider)
     {
         ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
 

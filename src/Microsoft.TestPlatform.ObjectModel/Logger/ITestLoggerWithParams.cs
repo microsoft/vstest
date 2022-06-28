@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -19,5 +17,5 @@ public interface ITestLoggerWithParameters : ITestLogger
     /// </summary>
     /// <param name="events">Events that can be registered for.</param>
     /// <param name="parameters">Collection of parameters</param>
-    void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters);
+    void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters);
 }

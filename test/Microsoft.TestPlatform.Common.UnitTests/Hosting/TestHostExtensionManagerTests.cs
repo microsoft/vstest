@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.Logging;
 
 [TestClass]
@@ -20,12 +18,13 @@ public class TestHostExtensionManagerTests
     {
         TestPluginCacheHelper.SetupMockExtensions(typeof(TestHostExtensionManagerTests));
     }
+
     [TestMethod]
     public void CreateShouldThrowExceptionIfMessageLoggerIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
         {
-            var testLoggerExtensionManager = TestRuntimeExtensionManager.Create(null);
+            var testLoggerExtensionManager = TestRuntimeExtensionManager.Create(null!);
         });
     }
 

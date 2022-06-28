@@ -4,8 +4,6 @@
 using System;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
@@ -31,18 +29,9 @@ public sealed class TestExecId
     [DataMember]
     public Guid Id { get; }
 
-    public override bool Equals(object obj)
-    {
-        return obj is TestExecId testExecId && Id.Equals(testExecId.Id);
-    }
+    public override bool Equals(object? obj) => obj is TestExecId testExecId && Id.Equals(testExecId.Id);
 
-    public override int GetHashCode()
-    {
-        return Id.GetHashCode();
-    }
+    public override int GetHashCode() => Id.GetHashCode();
 
-    public override string ToString()
-    {
-        return Id.ToString("B");
-    }
+    public override string ToString() => Id.ToString("B");
 }

@@ -263,9 +263,9 @@ public class TestRunRequestTests
         Assert.IsNotNull(receivedArgs);
         Assert.AreEqual(testRunChangedEventArgs.TestRunStatistics, receivedArgs.TestRunStatistics);
         CollectionAssert.AreEqual(
-            testRunChangedEventArgs.NewTestResults.ToList(),
-            receivedArgs.NewTestResults.ToList());
-        CollectionAssert.AreEqual(testRunChangedEventArgs.ActiveTests.ToList(), receivedArgs.ActiveTests.ToList());
+            testRunChangedEventArgs.NewTestResults!.ToList(),
+            receivedArgs.NewTestResults!.ToList());
+        CollectionAssert.AreEqual(testRunChangedEventArgs.ActiveTests!.ToList(), receivedArgs.ActiveTests!.ToList());
     }
 
     [TestMethod]

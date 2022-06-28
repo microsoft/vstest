@@ -40,8 +40,8 @@ internal class Fixture : IDisposable
     public TestRequestManager? TestRequestManager { get; private set; }
     public ProtocolConfig ProtocolConfig { get; internal set; }
 
-    public List<TestResult> ExecutedTests => TestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults).ToList();
-    public List<TestCase> DiscoveredTests => TestDiscoveryEventsRegistrar.DiscoveredTestsEvents.SelectMany(er => er.Data.DiscoveredTestCases).ToList();
+    public List<TestResult> ExecutedTests => TestRunEventsRegistrar.RunChangedEvents.SelectMany(er => er.Data.NewTestResults!).ToList();
+    public List<TestCase> DiscoveredTests => TestDiscoveryEventsRegistrar.DiscoveredTestsEvents.SelectMany(er => er.Data.DiscoveredTestCases!).ToList();
 
     public List<string> LoggedWarnings => TestRunEventsRegistrar.LoggedWarnings.Concat(TestDiscoveryEventsRegistrar.LoggedWarnings).ToList();
 
@@ -107,7 +107,7 @@ internal class Fixture : IDisposable
             throw new InvalidOperationException("There are runtime providers registered for FakeTestRuntimeProviderManager.");
 
 
-        TestEngine = new TestEngine(TestRuntimeProviderManager, ProcessHelper);
+        TestEngine = new TestEngine(TestRuntimeProviderManager, ProcessHelper, Environment);
         TestPlatform = new TestPlatform(TestEngine, FileHelper, TestRuntimeProviderManager);
 
         TestRunResultAggregator = new TestRunResultAggregator();

@@ -3,8 +3,6 @@
 
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -16,22 +14,22 @@ public class TestPlatformOptions
     /// <summary>
     /// Gets or sets the filter criteria for test cases.
     /// </summary>
-    /// 
+    ///
     /// <remarks>
     /// This is only used when running tests with sources.
     /// </remarks>
     [DataMember]
-    public string TestCaseFilter { get; set; }
+    public string? TestCaseFilter { get; set; }
 
     /// <summary>
     /// Gets or sets the filter options if there are any.
     /// </summary>
-    /// 
+    ///
     /// <remarks>
     /// This will be valid only if TestCase filter is present.
     /// </remarks>
     [DataMember]
-    public FilterOptions FilterOptions { get; set; }
+    public FilterOptions? FilterOptions { get; set; }
 
     /// <summary>
     /// Gets or sets whether metrics should be collected or not.

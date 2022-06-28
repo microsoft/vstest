@@ -11,7 +11,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
     using System;
     using System.Reflection;
-
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -277,7 +277,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No suitable test runtime provider found for this run..
+        ///   Looks up a localized string similar to No suitable test runtime provider was found:.
+        /// </summary>
+        internal static string NoSuitableRuntimeProviderFound {
+            get {
+                return ResourceManager.GetString("NoSuitableRuntimeProviderFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No suitable test runtime provider was found for any source in this run..
         /// </summary>
         internal static string NoTestHostProviderFound {
             get {
@@ -318,6 +327,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         internal static string ProxyIsAlreadyAvailable {
             get {
                 return ResourceManager.GetString("ProxyIsAlreadyAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skipping source:.
+        /// </summary>
+        internal static string SkippingSource {
+            get {
+                return ResourceManager.GetString("SkippingSource", resourceCulture);
             }
         }
         

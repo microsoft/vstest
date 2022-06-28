@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Common.UnitTests.Filtering;
 
 [TestClass]
@@ -22,10 +20,11 @@ public class TestCaseFilterExpressionTests
         var filterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
         var testCaseFilterExpression = new TestCaseFilterExpression(filterExpressionWrapper);
 
-        Assert.AreEqual("highlyunlikelyproperty", testCaseFilterExpression.ValidForProperties(new List<string>() { "TestCategory" }, (s) => null).Single());
+        Assert.AreEqual("highlyunlikelyproperty",
+            testCaseFilterExpression.ValidForProperties(new List<string>() { "TestCategory" }, s => null)!.Single());
 
         TestCase dummyTestCase = new();
-        bool result = testCaseFilterExpression.MatchTestCase(dummyTestCase, (s) => "unused");
+        bool result = testCaseFilterExpression.MatchTestCase(dummyTestCase, s => "unused");
 
         Assert.IsTrue(result);
     }

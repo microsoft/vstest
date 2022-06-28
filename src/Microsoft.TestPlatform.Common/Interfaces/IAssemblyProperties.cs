@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
 /// <summary>

@@ -7,7 +7,7 @@ namespace TestPlatform.Playground;
 
 internal class EnvironmentVariables
 {
-    public static readonly Dictionary<string, string> Variables = new()
+    public static readonly Dictionary<string, string?> Variables = new()
     {
         ["VSTEST_CONNECTION_TIMEOUT"] = "999",
         ["VSTEST_DEBUG_NOBP"] = "1",

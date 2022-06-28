@@ -4,8 +4,6 @@
 using System;
 using System.Text;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 /// <summary>
@@ -18,7 +16,7 @@ public class ExceptionUtilities
     /// </summary>
     /// <param name="exception"> The exception. </param>
     /// <returns> The formatted string message of the exception. </returns>
-    public static string GetExceptionMessage(Exception exception)
+    public static string GetExceptionMessage(Exception? exception)
     {
         if (exception == null)
         {

@@ -20,19 +20,19 @@ internal class NullPathConverter : IPathConverter
 
     Collection<AttachmentSet> IPathConverter.UpdateAttachmentSets(Collection<AttachmentSet> attachmentSets, PathConversionDirection _) => attachmentSets;
 
-    ICollection<AttachmentSet> IPathConverter.UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, PathConversionDirection _) => attachmentSets;
+    ICollection<AttachmentSet> IPathConverter.UpdateAttachmentSets(ICollection<AttachmentSet>? attachmentSets, PathConversionDirection _) => attachmentSets!;
 
     DiscoveryCriteria IPathConverter.UpdateDiscoveryCriteria(DiscoveryCriteria discoveryCriteria, PathConversionDirection _) => discoveryCriteria;
 
     string? IPathConverter.UpdatePath(string? path, PathConversionDirection _) => path;
 
-    IEnumerable<string?> IPathConverter.UpdatePaths(IEnumerable<string?> paths, PathConversionDirection _) => paths;
+    IEnumerable<string> IPathConverter.UpdatePaths(IEnumerable<string> paths, PathConversionDirection _) => paths;
 
     TestCase IPathConverter.UpdateTestCase(TestCase testCase, PathConversionDirection _) => testCase;
 
-    IEnumerable<TestCase> IPathConverter.UpdateTestCases(IEnumerable<TestCase> testCases, PathConversionDirection _) => testCases;
+    IEnumerable<TestCase> IPathConverter.UpdateTestCases(IEnumerable<TestCase>? testCases, PathConversionDirection _) => testCases!;
 
-    TestRunChangedEventArgs IPathConverter.UpdateTestRunChangedEventArgs(TestRunChangedEventArgs testRunChangedArgs, PathConversionDirection _) => testRunChangedArgs;
+    TestRunChangedEventArgs IPathConverter.UpdateTestRunChangedEventArgs(TestRunChangedEventArgs? testRunChangedArgs, PathConversionDirection _) => testRunChangedArgs!;
 
     TestRunCompleteEventArgs IPathConverter.UpdateTestRunCompleteEventArgs(TestRunCompleteEventArgs testRunCompleteEventArgs, PathConversionDirection _) => testRunCompleteEventArgs;
 

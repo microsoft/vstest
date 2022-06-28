@@ -79,7 +79,7 @@ public class TestSessionPoolTests
 
         mockProxyTestSessionManager.SetupSequence(tsm => tsm.DequeueProxy(It.IsAny<string>(), It.IsAny<string>()))
             .Throws(new InvalidOperationException("Test Exception"))
-            .Returns(new ProxyOperationManager(null, null, null, Framework.DefaultFramework));
+            .Returns(new ProxyOperationManager(null, null!, null!, Framework.DefaultFramework));
 
         Assert.IsNotNull(TestSessionPool.Instance);
         // Take proxy fails because test session is invalid.

@@ -27,7 +27,7 @@ public class DiscoveryContextTests
     {
         _discoveryContext.FilterExpressionWrapper = null;
 
-        Assert.IsNull(_discoveryContext.GetTestCaseFilter(null, (s) => null));
+        Assert.IsNull(_discoveryContext.GetTestCaseFilter(null, s => null));
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public class DiscoveryContextTests
     {
         _discoveryContext.FilterExpressionWrapper = new FilterExpressionWrapper("Infinity");
 
-        var filter = _discoveryContext.GetTestCaseFilter(new List<string> { "FullyQualifiedName" }, (s) => null);
+        var filter = _discoveryContext.GetTestCaseFilter(new List<string> { "FullyQualifiedName" }, s => null);
 
         Assert.IsNotNull(filter);
     }
@@ -51,7 +51,7 @@ public class DiscoveryContextTests
     {
         _discoveryContext.FilterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
 
-        var filter = _discoveryContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => null);
+        var filter = _discoveryContext.GetTestCaseFilter(new List<string> { "TestCategory" }, s => null);
 
         Assert.IsNotNull(filter);
     }
@@ -64,7 +64,7 @@ public class DiscoveryContextTests
     {
         _discoveryContext.FilterExpressionWrapper = new FilterExpressionWrapper("TestCategory=Important");
 
-        var filter = _discoveryContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => null);
+        var filter = _discoveryContext.GetTestCaseFilter(new List<string> { "TestCategory" }, s => null);
 
         Assert.IsNotNull(filter);
         Assert.AreEqual("TestCategory=Important", filter.TestCaseFilterValue);

@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 /// <summary>
@@ -25,7 +23,7 @@ public interface ITestExecutor2 : ITestExecutor
     /// <see cref="true"/> if the default test host process should be attached to,
     /// <see cref="false"/> otherwise.
     /// </returns>
-    bool ShouldAttachToTestHost(IEnumerable<string> sources, IRunContext runContext);
+    bool ShouldAttachToTestHost(IEnumerable<string>? sources, IRunContext runContext);
 
     /// <summary>
     /// Indicates whether or not the default test host process should be attached to.
@@ -36,5 +34,5 @@ public interface ITestExecutor2 : ITestExecutor
     /// <see cref="true"/> if the default test host process should be attached to,
     /// <see cref="false"/> otherwise.
     /// </returns>
-    bool ShouldAttachToTestHost(IEnumerable<TestCase> tests, IRunContext runContext);
+    bool ShouldAttachToTestHost(IEnumerable<TestCase>? tests, IRunContext runContext);
 }

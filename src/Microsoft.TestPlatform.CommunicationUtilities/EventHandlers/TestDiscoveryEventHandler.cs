@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
@@ -32,7 +30,7 @@ public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler2
     /// Handles discovered tests
     /// </summary>
     /// <param name="discoveredTestCases">List of test cases</param>
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+    public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
     {
         EqtTrace.Info("Test Cases found ");
         _requestHandler.SendTestCases(discoveredTestCases);
@@ -43,7 +41,7 @@ public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler2
     /// </summary>
     /// <param name="discoveryCompleteEventArgs"> Discovery Complete Events Args. </param>
     /// <param name="lastChunk"> The last chunk. </param>
-    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
     {
         EqtTrace.Info(discoveryCompleteEventArgs.IsAborted ? "Discover Aborted." : "Discover Finished.");
 
@@ -55,9 +53,9 @@ public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler2
     /// </summary>
     /// <param name="level"> Logging level. </param>
     /// <param name="message"> Logging message. </param>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
-        switch ((TestMessageLevel)level)
+        switch (level)
         {
             case TestMessageLevel.Informational:
                 EqtTrace.Info(message);

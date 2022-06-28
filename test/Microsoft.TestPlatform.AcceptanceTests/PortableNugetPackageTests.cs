@@ -8,14 +8,12 @@ using System.Linq;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 public class PortableNugetPackageTests : AcceptanceTestBase
 {
-    private static string s_portablePackageFolder;
+    private static string s_portablePackageFolder = string.Empty;
 
     [ClassInitialize]
     public static void ClassInit(TestContext _)

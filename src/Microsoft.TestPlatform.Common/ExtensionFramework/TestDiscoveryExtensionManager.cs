@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
@@ -19,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 /// </summary>
 internal class TestDiscoveryExtensionManager
 {
-    private static TestDiscoveryExtensionManager s_testDiscoveryExtensionManager;
+    private static TestDiscoveryExtensionManager? s_testDiscoveryExtensionManager;
 
     /// <summary>
     /// Default constructor.
@@ -143,7 +141,7 @@ internal class TestDiscovererMetadata : ITestDiscovererCapabilities
     /// </summary>
     /// <param name="fileExtensions"> The file Extensions. </param>
     /// <param name="defaultExecutorUri"> The default Executor Uri. </param>
-    public TestDiscovererMetadata(IReadOnlyCollection<string> fileExtensions, string defaultExecutorUri, AssemblyType assemblyType = default)
+    public TestDiscovererMetadata(IReadOnlyCollection<string>? fileExtensions, string? defaultExecutorUri, AssemblyType assemblyType = default)
     {
         if (fileExtensions != null && fileExtensions.Count > 0)
         {
@@ -161,7 +159,7 @@ internal class TestDiscovererMetadata : ITestDiscovererCapabilities
     /// <summary>
     /// Gets file extensions supported by the discoverer.
     /// </summary>
-    public IEnumerable<string> FileExtension
+    public IEnumerable<string>? FileExtension
     {
         get;
         private set;
@@ -170,7 +168,7 @@ internal class TestDiscovererMetadata : ITestDiscovererCapabilities
     /// <summary>
     /// Gets the default executor Uri for this discoverer
     /// </summary>
-    public Uri DefaultExecutorUri
+    public Uri? DefaultExecutorUri
     {
         get;
         private set;

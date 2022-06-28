@@ -16,7 +16,7 @@ internal class FakeDataCollectorAttachmentsProcessorsFactory : IDataCollectorAtt
 
     public FakeErrorAggregator FakeErrorAggregator { get; }
 
-    public DataCollectorAttachmentProcessor[] Create(InvokedDataCollector[] invokedDataCollectors, IMessageLogger logger)
+    public DataCollectorAttachmentProcessor[] Create(InvokedDataCollector[]? invokedDataCollectors, IMessageLogger logger)
     {
         throw new NotImplementedException();
     }

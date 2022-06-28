@@ -2,7 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+#if !NET5_0_OR_GREATER
 using System.Diagnostics;
+#endif
 
 using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
@@ -120,12 +122,18 @@ public class PortArgumentProcessorTests
     {
         _executor = new PortArgumentExecutor(CommandLineOptions.Instance, _testRequestManager.Object, _mockProcessHelper.Object);
         int port = 2345;
-        int processId = Process.GetCurrentProcess().Id;
-        CommandLineOptions.Instance.ParentProcessId = processId;
+#if NET5_0_OR_GREATER
+        var pid = Environment.ProcessId;
+#else
+        int pid;
+        using (var p = Process.GetCurrentProcess())
+            pid = p.Id;
+#endif
+        CommandLineOptions.Instance.ParentProcessId = pid;
 
         _executor.Initialize(port.ToString());
 
-        _mockProcessHelper.Verify(ph => ph.SetExitCallback(processId, It.IsAny<Action<object?>>()), Times.Once);
+        _mockProcessHelper.Verify(ph => ph.SetExitCallback(pid, It.IsAny<Action<object?>>()), Times.Once);
     }
 
     [TestMethod]

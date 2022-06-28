@@ -10,7 +10,7 @@ using System.IO;
 using System.Threading;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -18,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources;
 
 using Resources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
@@ -52,17 +50,17 @@ internal class VsTestConsoleProcessManager : IProcessManager
 
     private readonly string _vstestConsolePath;
     private readonly object _syncObject = new();
+    private readonly bool _isNetCoreRunner;
+    private readonly string? _dotnetExePath;
+    private readonly ManualResetEvent _processExitedEvent = new(false);
+    private Process? _process;
     private bool _vstestConsoleStarted;
     private bool _vstestConsoleExited;
-    private readonly bool _isNetCoreRunner;
-    private readonly string _dotnetExePath;
-    private Process _process;
-    private readonly ManualResetEvent _processExitedEvent = new(false);
 
     internal IFileHelper FileHelper { get; set; }
 
     /// <inheritdoc/>
-    public event EventHandler ProcessExited;
+    public event EventHandler? ProcessExited;
 
     /// <summary>
     /// Creates an instance of VsTestConsoleProcessManager class.
@@ -158,7 +156,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
             _vstestConsoleStarted = true;
         }
 
-        _process.EnableRaisingEvents = true;
+        _process!.EnableRaisingEvents = true;
         _process.Exited += Process_Exited;
 
         _process.OutputDataReceived += Process_OutputDataReceived;
@@ -178,11 +176,14 @@ internal class VsTestConsoleProcessManager : IProcessManager
         {
             EqtTrace.Info($"VsTestConsoleProcessManager.ShutDownProcess : Terminating vstest.console process after waiting for {Endsessiontimeout} milliseconds.");
             _vstestConsoleExited = true;
-            _process.OutputDataReceived -= Process_OutputDataReceived;
-            _process.ErrorDataReceived -= Process_ErrorDataReceived;
-            SafelyTerminateProcess();
-            _process.Dispose();
-            _process = null;
+            if (_process is not null)
+            {
+                _process.OutputDataReceived -= Process_OutputDataReceived;
+                _process.ErrorDataReceived -= Process_ErrorDataReceived;
+                SafelyTerminateProcess();
+                _process.Dispose();
+                _process = null;
+            }
         }
     }
 
@@ -201,7 +202,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         }
     }
 
-    private void Process_Exited(object sender, EventArgs e)
+    private void Process_Exited(object? sender, EventArgs e)
     {
         lock (_syncObject)
         {
@@ -236,7 +237,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
             string.Format(CultureInfo.InvariantCulture, PortArgument, parameters.PortNumber)
         };
 
-        if (!string.IsNullOrEmpty(parameters.LogFilePath))
+        if (!parameters.LogFilePath.IsNullOrEmpty())
         {
             // Extra args: --diag|/diag:<PathToLogFile>;tracelevel=<tracelevel>
             args.Add(string.Format(CultureInfo.InvariantCulture, DiagArgument, parameters.LogFilePath, parameters.TraceLevel));
@@ -251,8 +252,12 @@ internal class VsTestConsoleProcessManager : IProcessManager
     }
 
     private string GetConsoleRunner()
-        => _isNetCoreRunner ? (string.IsNullOrEmpty(_dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : _dotnetExePath) : GetEscapeSequencedPath(_vstestConsolePath);
+        => _isNetCoreRunner
+            ? _dotnetExePath.IsNullOrEmpty()
+                ? new DotnetHostHelper().GetDotnetPath()
+                : _dotnetExePath
+            : GetEscapeSequencedPath(_vstestConsolePath);
 
-    private string GetEscapeSequencedPath(string path)
-        => string.IsNullOrEmpty(path) ? path : $"\"{path.Trim('"')}\"";
+    private static string GetEscapeSequencedPath(string path)
+        => path.IsNullOrEmpty() ? path : $"\"{path.Trim('"')}\"";
 }

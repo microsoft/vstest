@@ -15,15 +15,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class ProxyTestSessionManagerTests
 {
     private readonly IList<string> _fakeTestSources = new List<string>() { @"C:\temp\FakeTestAsset.dll" };
-    private Dictionary<string, TestRuntimeProviderInfo> _fakeTestSourcesToRuntimeProviderMap;
+    private readonly Dictionary<string, TestRuntimeProviderInfo> _fakeTestSourcesToRuntimeProviderMap;
     private readonly IList<string> _fakeTestMultipleSources = new List<string>() {
         @"C:\temp\FakeTestAsset1.dll",
         @"C:\temp\FakeTestAsset2.dll",
@@ -72,12 +70,11 @@ public class ProxyTestSessionManagerTests
             </RunSettings>";
     private readonly string _fakeRunSettings = "FakeRunSettings";
     private readonly ProtocolConfig _protocolConfig = new() { Version = 1 };
-    private Mock<ITestSessionEventsHandler> _mockEventsHandler;
-    private Mock<IRequestData> _mockRequestData;
-    private Mock<IMetricsCollection> _mockMetricsCollection;
+    private readonly Mock<ITestSessionEventsHandler> _mockEventsHandler;
+    private readonly Mock<IRequestData> _mockRequestData;
+    private readonly Mock<IMetricsCollection> _mockMetricsCollection;
 
-    [TestInitialize]
-    public void TestInitialize()
+    public ProxyTestSessionManagerTests()
     {
         TestSessionPool.Instance = null;
 
@@ -135,7 +132,7 @@ public class ProxyTestSessionManagerTests
         // First call to StartSession should succeed.
         Assert.IsTrue(proxyManager.StartSession(_mockEventsHandler.Object, _mockRequestData.Object));
         mockProxyOperationManager.Verify(pom => pom.SetupChannel(
-                testSessionCriteria.Sources,
+                testSessionCriteria.Sources!,
                 testSessionCriteria.RunSettings),
             Times.Once);
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
@@ -145,7 +142,7 @@ public class ProxyTestSessionManagerTests
         // Second call to StartSession should fail.
         Assert.IsFalse(proxyManager.StartSession(_mockEventsHandler.Object, _mockRequestData.Object));
         mockProxyOperationManager.Verify(pom => pom.SetupChannel(
-                testSessionCriteria.Sources,
+                testSessionCriteria.Sources!,
                 testSessionCriteria.RunSettings),
             Times.Once);
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
@@ -178,7 +175,7 @@ public class ProxyTestSessionManagerTests
     public void StartSessionShouldFailIfProxyCreatorIsNull()
     {
         var testSessionCriteria = CreateTestSession(_fakeTestSources, _fakeRunSettings);
-        var proxyManager = CreateProxy(testSessionCriteria, null);
+        var proxyManager = CreateProxy(testSessionCriteria, null!);
 
         Assert.IsFalse(proxyManager.StartSession(_mockEventsHandler.Object, _mockRequestData.Object));
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
@@ -251,7 +248,7 @@ public class ProxyTestSessionManagerTests
         // Call to StartSession should fail because AddSession fails.
         Assert.IsFalse(proxyManager.StartSession(_mockEventsHandler.Object, _mockRequestData.Object));
         mockProxyOperationManager.Verify(pom => pom.SetupChannel(
-                testSessionCriteria.Sources,
+                testSessionCriteria.Sources!,
                 testSessionCriteria.RunSettings),
             Times.Once);
         mockProxyOperationManager.Verify(pom => pom.Close(), Times.Once);
@@ -274,7 +271,7 @@ public class ProxyTestSessionManagerTests
         // StartSession should succeed.
         Assert.IsTrue(proxyManager.StartSession(_mockEventsHandler.Object, _mockRequestData.Object));
         mockProxyOperationManager.Verify(pom => pom.SetupChannel(
-                testSessionCriteria.Sources,
+                testSessionCriteria.Sources!,
                 testSessionCriteria.RunSettings),
             Times.Once);
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
@@ -312,7 +309,7 @@ public class ProxyTestSessionManagerTests
         mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                 It.IsAny<IEnumerable<string>>(),
                 testSessionCriteria.RunSettings),
-            Times.Exactly(testSessionCriteria.Sources.Count));
+            Times.Exactly(testSessionCriteria.Sources!.Count));
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                 It.IsAny<StartTestSessionCompleteEventArgs>()),
             Times.Once);
@@ -340,7 +337,7 @@ public class ProxyTestSessionManagerTests
         mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                 It.IsAny<IEnumerable<string>>(),
                 testSessionCriteria.RunSettings),
-            Times.Exactly(testSessionCriteria.Sources.Count));
+            Times.Exactly(testSessionCriteria.Sources!.Count));
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                 It.IsAny<StartTestSessionCompleteEventArgs>()),
             Times.Once);
@@ -382,7 +379,7 @@ public class ProxyTestSessionManagerTests
         mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                 It.IsAny<IEnumerable<string>>(),
                 testSessionCriteria.RunSettings),
-            Times.Exactly(testSessionCriteria.Sources.Count));
+            Times.Exactly(testSessionCriteria.Sources!.Count));
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                 It.IsAny<StartTestSessionCompleteEventArgs>()),
             Times.Once);
@@ -417,7 +414,7 @@ public class ProxyTestSessionManagerTests
         mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                 It.IsAny<IEnumerable<string>>(),
                 testSessionCriteria.RunSettings),
-            Times.Exactly(testSessionCriteria.Sources.Count));
+            Times.Exactly(testSessionCriteria.Sources!.Count));
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                 It.IsAny<StartTestSessionCompleteEventArgs>()),
             Times.Once);
@@ -443,7 +440,7 @@ public class ProxyTestSessionManagerTests
         mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                 It.IsAny<IEnumerable<string>>(),
                 testSessionCriteria.RunSettings),
-            Times.Exactly(testSessionCriteria.Sources.Count));
+            Times.Exactly(testSessionCriteria.Sources!.Count));
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                 It.IsAny<StartTestSessionCompleteEventArgs>()),
             Times.Once);
@@ -469,7 +466,7 @@ public class ProxyTestSessionManagerTests
         mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                 It.IsAny<IEnumerable<string>>(),
                 testSessionCriteria.RunSettings),
-            Times.Exactly(testSessionCriteria.Sources.Count));
+            Times.Exactly(testSessionCriteria.Sources!.Count));
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                 It.IsAny<StartTestSessionCompleteEventArgs>()),
             Times.Once);
@@ -499,7 +496,7 @@ public class ProxyTestSessionManagerTests
         mockProxyOperationManager.Verify(pom => pom.SetupChannel(
                 It.IsAny<IEnumerable<string>>(),
                 testSessionCriteria.RunSettings),
-            Times.Exactly(testSessionCriteria.Sources.Count));
+            Times.Exactly(testSessionCriteria.Sources!.Count));
         _mockEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(
                 It.IsAny<StartTestSessionCompleteEventArgs>()),
             Times.Once);
@@ -515,7 +512,7 @@ public class ProxyTestSessionManagerTests
         Assert.IsTrue(proxyManager.EnqueueProxy(0));
     }
 
-    private StartTestSessionCriteria CreateTestSession(IList<string> sources, string runSettings)
+    private static StartTestSessionCriteria CreateTestSession(IList<string> sources, string runSettings)
     {
         return new StartTestSessionCriteria()
         {
@@ -534,7 +531,7 @@ public class ProxyTestSessionManagerTests
             typeof(ITestRuntimeProvider),
             shared: false,
             runSettings,
-            testSessionCriteria.Sources.Select(s => new SourceDetail
+            testSessionCriteria.Sources!.Select(s => new SourceDetail
             {
                 Source = s,
                 Architecture = Architecture.X86,
@@ -545,7 +542,7 @@ public class ProxyTestSessionManagerTests
         var runtimeProviders = new List<TestRuntimeProviderInfo> { runtimeProviderInfo };
         return new ProxyTestSessionManager(
             testSessionCriteria,
-            testSessionCriteria.Sources.Count,
+            testSessionCriteria.Sources!.Count,
             _ => proxyOperationManager,
             runtimeProviders
             );

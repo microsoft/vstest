@@ -63,7 +63,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         _isParallel = parallelLevel > 1;
         _parallelOperationManager = new(actualProxyManagerCreator, parallelLevel);
         _sourceToTestHostProviderMap = testHostProviders
-            .SelectMany(provider => provider.SourceDetails.Select(s => new KeyValuePair<string, TestRuntimeProviderInfo>(s.Source, provider)))
+            .SelectMany(provider => provider.SourceDetails.Select(s => new KeyValuePair<string, TestRuntimeProviderInfo>(s.Source!, provider)))
             .ToDictionary(pair => pair.Key, pair => pair.Value);
     }
 
@@ -83,7 +83,9 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
 
         var workloads = SplitToWorkloads(discoveryCriteria, _sourceToTestHostProviderMap);
         _availableTestSources = workloads.SelectMany(w => w.Work.Sources).Count();
-        _availableWorkloads = workloads.Count();
+        var runnableWorkloads = workloads.Where(workload => workload.HasProvider).ToList();
+        _availableWorkloads = runnableWorkloads.Count;
+        var nonRunnableWorkloads = workloads.Where(workload => !workload.HasProvider).ToList();
 
         EqtTrace.Verbose("ParallelProxyDiscoveryManager.DiscoverTests: Start discovery. Total sources: " + _availableTestSources);
 
@@ -95,7 +97,17 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         // marked as NotDiscovered.
         _dataAggregator.MarkSourcesWithStatus(discoveryCriteria.Sources, DiscoveryStatus.NotDiscovered);
 
-        _parallelOperationManager.StartWork(workloads, eventHandler, GetParallelEventHandler, DiscoverTestsOnConcurrentManager);
+        if (nonRunnableWorkloads.Count > 0)
+        {
+            // We found some sources that don't associate to any runtime provider and so they cannot run.
+            // Mark the sources as skipped.
+
+            _dataAggregator.MarkSourcesWithStatus(nonRunnableWorkloads.SelectMany(w => w.Work.Sources), DiscoveryStatus.SkippedDiscovery);
+            // TODO: in strict mode keep them as non-discovered, and mark the run as aborted.
+            // _dataAggregator.MarkAsAborted();
+        }
+
+        _parallelOperationManager.StartWork(runnableWorkloads, eventHandler, GetParallelEventHandler, DiscoverTestsOnConcurrentManager);
     }
 
     private ITestDiscoveryEventsHandler2 GetParallelEventHandler(ITestDiscoveryEventsHandler2 eventHandler, IProxyDiscoveryManager concurrentManager)
@@ -131,7 +143,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
     #region IParallelProxyDiscoveryManager methods
 
     /// <inheritdoc/>
-    public bool HandlePartialDiscoveryComplete(IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
+    public bool HandlePartialDiscoveryComplete(IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, IEnumerable<TestCase>? lastChunk, bool isAborted)
     {
 #if DEBUG
         // Ensures that the total count of sources remains the same between each discovery
@@ -139,11 +151,12 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
         var notDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count;
         var partiallyDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count;
         var fullyDiscoveredCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count;
+        var skippedCount = _dataAggregator.GetSourcesWithStatus(DiscoveryStatus.SkippedDiscovery).Count;
         var expectedCount = _availableTestSources;
         // When this fails, look at the _dataAggregator and look at the sources that it holds. It is possible that adapter incorrectly reports
         // the source on the testcase object. Each distinct source that will appear on TestCase will be considered a file.
-        TPDebug.Assert(notDiscoveredCount + partiallyDiscoveredCount + fullyDiscoveredCount == expectedCount,
-            $"Total count of sources ({expectedCount}) should match the count of sources with status not discovered ({notDiscoveredCount}), partially discovered ({partiallyDiscoveredCount}) and fully discovered ({fullyDiscoveredCount}).");
+        TPDebug.Assert(notDiscoveredCount + partiallyDiscoveredCount + fullyDiscoveredCount + skippedCount == expectedCount,
+            $"Total count of sources ({expectedCount}) should match the count of sources with status not discovered ({notDiscoveredCount}), partially discovered ({partiallyDiscoveredCount}), fully discovered ({fullyDiscoveredCount}) and skipped ({skippedCount}).");
 #endif
 
         var allDiscoverersCompleted = false;
@@ -217,8 +230,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
 
             foreach (var sourcesToDiscover in sourceBatches)
             {
-                var runsettings = testhostProviderInfo.RunSettings;
-                var updatedCriteria = NewDiscoveryCriteriaFromSourceAndSettings(sourcesToDiscover, discoveryCriteria, runsettings);
+                var updatedCriteria = NewDiscoveryCriteriaFromSourceAndSettings(sourcesToDiscover, discoveryCriteria, testhostProviderInfo.RunSettings);
                 var workload = new ProviderSpecificWorkload<DiscoveryCriteria>(updatedCriteria, testhostProviderInfo);
                 workloads.Add(workload);
             }
@@ -226,7 +238,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
 
         return workloads;
 
-        static DiscoveryCriteria NewDiscoveryCriteriaFromSourceAndSettings(IEnumerable<string> sources, DiscoveryCriteria discoveryCriteria, string runsettingsXml)
+        static DiscoveryCriteria NewDiscoveryCriteriaFromSourceAndSettings(IEnumerable<string> sources, DiscoveryCriteria discoveryCriteria, string? runsettingsXml)
         {
             var criteria = new DiscoveryCriteria(
                 sources,
@@ -265,9 +277,10 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
                     EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
 
                     var handler = eventHandler;
-                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
+                    var exceptionToString = t.Exception?.ToString();
+                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exceptionToString };
                     handler.HandleRawMessage(_dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
-                    handler.HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
+                    handler.HandleLogMessage(TestMessageLevel.Error, exceptionToString);
 
                     // Send discovery complete. Similar logic is also used in ProxyDiscoveryManager.DiscoverTests.
                     // Differences:

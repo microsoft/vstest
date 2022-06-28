@@ -5,8 +5,6 @@ using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -24,41 +22,41 @@ public abstract class TestLoggerEvents
     /// <summary>
     /// Raised when a test message is received.
     /// </summary>
-    public abstract event EventHandler<TestRunMessageEventArgs> TestRunMessage;
+    public abstract event EventHandler<TestRunMessageEventArgs>? TestRunMessage;
 
     /// <summary>
     /// Raised when a test run starts.
     /// </summary>
-    public abstract event EventHandler<TestRunStartEventArgs> TestRunStart;
+    public abstract event EventHandler<TestRunStartEventArgs>? TestRunStart;
 
     /// <summary>
     /// Raised when a test result is received.
     /// </summary>
-    public abstract event EventHandler<TestResultEventArgs> TestResult;
+    public abstract event EventHandler<TestResultEventArgs>? TestResult;
 
     /// <summary>
     /// Raised when a test run is complete.
     /// </summary>
-    public abstract event EventHandler<TestRunCompleteEventArgs> TestRunComplete;
+    public abstract event EventHandler<TestRunCompleteEventArgs>? TestRunComplete;
 
     /// <summary>
     /// Raised when test discovery starts
     /// </summary>
-    public abstract event EventHandler<DiscoveryStartEventArgs> DiscoveryStart;
+    public abstract event EventHandler<DiscoveryStartEventArgs>? DiscoveryStart;
 
     /// <summary>
     /// Raised when a discovery message is received.
     /// </summary>
-    public abstract event EventHandler<TestRunMessageEventArgs> DiscoveryMessage;
+    public abstract event EventHandler<TestRunMessageEventArgs>? DiscoveryMessage;
 
     /// <summary>
     /// Raised when discovered tests are received
     /// </summary>
-    public abstract event EventHandler<DiscoveredTestsEventArgs> DiscoveredTests;
+    public abstract event EventHandler<DiscoveredTestsEventArgs>? DiscoveredTests;
 
     /// <summary>
     /// Raised when test discovery is complete
     /// </summary>
-    public abstract event EventHandler<DiscoveryCompleteEventArgs> DiscoveryComplete;
+    public abstract event EventHandler<DiscoveryCompleteEventArgs>? DiscoveryComplete;
 
 }

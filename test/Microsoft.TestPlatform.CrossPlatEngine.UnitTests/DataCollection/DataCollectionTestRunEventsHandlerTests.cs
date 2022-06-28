@@ -47,8 +47,8 @@ public class DataCollectionTestRunEventsHandlerTests
     public void HandleRawMessageShouldSendMessageToBaseTestRunEventsHandler()
     {
         _mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.BeforeTestRunStart });
-        _testRunEventHandler.HandleRawMessage(null);
-        _baseTestRunEventsHandler.Verify(th => th.HandleRawMessage(null), Times.AtLeast(1));
+        _testRunEventHandler.HandleRawMessage(null!);
+        _baseTestRunEventsHandler.Verify(th => th.HandleRawMessage(null!), Times.AtLeast(1));
     }
 
     [TestMethod]
@@ -110,7 +110,7 @@ public class DataCollectionTestRunEventsHandlerTests
     {
         var invokedDataCollectors = new Collection<InvokedDataCollector>
         {
-            new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, true)
+            new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location, true)
         };
 
         var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
@@ -121,8 +121,10 @@ public class DataCollectionTestRunEventsHandlerTests
             .Returns(new DataCollectionResult(null, invokedDataCollectors));
         _mockDataSerializer.Setup(r => r.SerializePayload(It.IsAny<string>(), It.IsAny<object>())).Callback((string message, object o) =>
         {
-            Assert.AreEqual(1, ((TestRunCompletePayload)o).TestRunCompleteArgs.InvokedDataCollectors.Count);
-            Assert.AreEqual(invokedDataCollectors[0], ((TestRunCompletePayload)o).TestRunCompleteArgs.InvokedDataCollectors[0]);
+            var testRunCompleteArgs = o as TestRunCompletePayload;
+            Assert.IsNotNull(testRunCompleteArgs);
+            Assert.AreEqual(1, testRunCompleteArgs.TestRunCompleteArgs!.InvokedDataCollectors.Count);
+            Assert.AreEqual(invokedDataCollectors[0], testRunCompleteArgs.TestRunCompleteArgs.InvokedDataCollectors[0]);
         });
 
         _testRunEventHandler = new DataCollectionTestRunEventsHandler(_baseTestRunEventsHandler.Object, _proxyDataCollectionManager.Object, _mockDataSerializer.Object, CancellationToken.None);

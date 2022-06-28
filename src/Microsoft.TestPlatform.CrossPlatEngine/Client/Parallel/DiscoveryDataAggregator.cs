@@ -143,7 +143,7 @@ internal sealed class DiscoveryDataAggregator
             {
                 var newValue = Convert.ToDouble(metric.Value);
 
-                if (_metricsAggregator.TryGetValue(metric.Key, out object oldValue))
+                if (_metricsAggregator.TryGetValue(metric.Key, out object? oldValue))
                 {
                     double oldDoubleValue = Convert.ToDouble(oldValue);
                     _metricsAggregator[metric.Key] = newValue + oldDoubleValue;
@@ -212,7 +212,7 @@ internal sealed class DiscoveryDataAggregator
                 (_, previousStatus) =>
                 {
                     if (previousStatus == DiscoveryStatus.FullyDiscovered && status != DiscoveryStatus.FullyDiscovered
-                        || previousStatus == DiscoveryStatus.PartiallyDiscovered && status == DiscoveryStatus.NotDiscovered)
+                        || previousStatus == DiscoveryStatus.PartiallyDiscovered && (status == DiscoveryStatus.NotDiscovered || status == DiscoveryStatus.SkippedDiscovery))
                     {
                         EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Downgrading source {source} status from '{previousStatus}' to '{status}'.");
                     }

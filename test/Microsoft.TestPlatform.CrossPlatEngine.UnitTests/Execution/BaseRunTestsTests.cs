@@ -501,11 +501,11 @@ public class BaseRunTestsTests
         Assert.IsNotNull(_receivedRunCompleteArgs);
         Assert.IsNull(_receivedRunCompleteArgs.Error);
         Assert.IsFalse(_receivedRunCompleteArgs.IsAborted);
-        Assert.AreEqual(_runTestsInstance.GetTestRunCache.TestRunStatistics.ExecutedTests, _receivedRunCompleteArgs.TestRunStatistics.ExecutedTests);
+        Assert.AreEqual(_runTestsInstance.GetTestRunCache.TestRunStatistics.ExecutedTests, _receivedRunCompleteArgs.TestRunStatistics!.ExecutedTests);
 
         // Test run changed event assertions
         Assert.IsNotNull(_receivedRunStatusArgs);
-        Assert.AreEqual(_runTestsInstance.GetTestRunCache.TestRunStatistics.ExecutedTests, _receivedRunStatusArgs.TestRunStatistics.ExecutedTests);
+        Assert.AreEqual(_runTestsInstance.GetTestRunCache.TestRunStatistics.ExecutedTests, _receivedRunStatusArgs.TestRunStatistics!.ExecutedTests);
         Assert.IsNotNull(_receivedRunStatusArgs.NewTestResults);
         Assert.IsTrue(_receivedRunStatusArgs.NewTestResults.Any());
         Assert.IsTrue(_receivedRunStatusArgs.ActiveTests == null || !_receivedRunStatusArgs.ActiveTests.Any());
@@ -596,7 +596,7 @@ public class BaseRunTestsTests
         _runTestsInstance.RunTests();
 
         Assert.IsNotNull(_receivedRunStatusArgs?.NewTestResults);
-        Assert.AreEqual(1, _receivedRunStatusArgs.ActiveTests.Count());
+        Assert.AreEqual(1, _receivedRunStatusArgs.ActiveTests!.Count());
 
         _mockDataSerializer.Verify(d => d.Clone(It.IsAny<OMTestResult>()), Times.Exactly(2));
     }
@@ -952,7 +952,7 @@ public class BaseRunTestsTests
         /// <summary>
         /// Gets the run settings.
         /// </summary>
-        public string GetRunSettings => RunSettings;
+        public string? GetRunSettings => RunSettings;
 
         /// <summary>
         /// Gets the test execution context.
@@ -999,7 +999,7 @@ public class BaseRunTestsTests
 
         protected override void SendSessionStart()
         {
-            _testCaseEventsHandler?.SendSessionStart(new Dictionary<string, object> { { "TestSources", new List<string>() { "1.dll" } } });
+            _testCaseEventsHandler?.SendSessionStart(new Dictionary<string, object?> { { "TestSources", new List<string>() { "1.dll" } } });
         }
 
         protected override bool ShouldAttachDebuggerToTestHost(
@@ -1018,11 +1018,11 @@ public class BaseRunTestsTests
         {
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
         }
     }
@@ -1035,12 +1035,12 @@ public class BaseRunTestsTests
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }

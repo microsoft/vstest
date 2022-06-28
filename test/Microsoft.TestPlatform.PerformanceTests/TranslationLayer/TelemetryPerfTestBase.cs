@@ -71,7 +71,18 @@ public class TelemetryPerfTestBase : PerformanceTestBase
 
         foreach (var entry in perfAnalyzer.Events)
         {
-            metrics.Add(entry.Name, entry.TimeSinceStart);
+            // TODO: Jajares: What do we want to do in case of duplicated metric key?
+            // It used to be a metrics.Add() call but it was causing the errors below when running tests in parallel:
+            //  Test method Microsoft.TestPlatform.PerformanceTests.TranslationLayer.DiscoveryPerfTests.DiscoverTests threw exception:
+            // System.ArgumentException: An item with the same key has already been added.
+            // Stack Trace:
+            //  ThrowHelper.ThrowArgumentException(ExceptionResource resource)
+            //  Dictionary`2.Insert(TKey key, TValue value, Boolean add)
+            //  TelemetryPerfTestBase.PostTelemetry(IDictionary`2 handlerMetrics, PerfAnalyzer perfAnalyzer, String projectName, String scenario) line 74
+            //  DiscoveryPerfTests.DiscoverTests(String projectName, Double expectedNumberOfTests) line 49
+            // It was both for DiscoveryPerfTests and ExecutionPerfTests.
+            // I am doing a set call instead but that means we would override previous value.
+            metrics[entry.Name] = entry.TimeSinceStart;
         }
 
         _client.TrackEvent($"{scenario}{projectName}", properties, metrics);

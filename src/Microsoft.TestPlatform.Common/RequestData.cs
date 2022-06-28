@@ -6,8 +6,6 @@ using System;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common;
 
 /// <inheritdoc />
@@ -24,14 +22,14 @@ public class RequestData : IRequestData
     /// <summary>
     /// The protocol config.
     /// </summary>
-    private ProtocolConfig _protocolConfig;
+    private ProtocolConfig? _protocolConfig;
 
     /// <summary>
     /// The default constructor for request data.
     /// </summary>
     public RequestData()
     {
-        MetricsCollection = new NoOpMetricsCollection();
+        _metricsCollection = new NoOpMetricsCollection();
         IsTelemetryOptedIn = false;
     }
 
@@ -47,7 +45,7 @@ public class RequestData : IRequestData
     /// <summary>
     /// Gets or sets the protocol config.
     /// </summary>
-    public ProtocolConfig ProtocolConfig
+    public ProtocolConfig? ProtocolConfig
     {
         get => _protocolConfig;
         set => _protocolConfig = value ?? throw new ArgumentNullException(nameof(value));

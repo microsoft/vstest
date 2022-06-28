@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
 
 /// <summary>
@@ -18,7 +16,7 @@ public interface IDiscoveryManager
     /// Initializes the discovery manager.
     /// </summary>
     /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-    void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestDiscoveryEventsHandler2 eventHandler);
+    void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestDiscoveryEventsHandler2? eventHandler);
 
     /// <summary>
     /// Discovers tests

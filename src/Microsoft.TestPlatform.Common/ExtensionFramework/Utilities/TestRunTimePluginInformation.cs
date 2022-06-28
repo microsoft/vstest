@@ -8,8 +8,6 @@ using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 
 /// <summary>
@@ -21,7 +19,7 @@ internal class TestRuntimePluginInformation : TestExtensionPluginInformation
     /// Default constructor
     /// </summary>
     /// <param name="testHostType"> The testhost Type. </param>
-    public TestRuntimePluginInformation(Type testHostType)
+    public TestRuntimePluginInformation(Type? testHostType)
         : base(testHostType)
     {
         FriendlyName = GetFriendlyName(testHostType);
@@ -39,11 +37,11 @@ internal class TestRuntimePluginInformation : TestExtensionPluginInformation
     /// <summary>
     /// Metadata for the testhost plugin
     /// </summary>
-    public override ICollection<Object> Metadata
+    public override ICollection<object?> Metadata
     {
         get
         {
-            return new Object[] { ExtensionUri, FriendlyName };
+            return new object?[] { ExtensionUri, FriendlyName };
         }
     }
 
@@ -52,11 +50,11 @@ internal class TestRuntimePluginInformation : TestExtensionPluginInformation
     /// </summary>
     /// <param name="testHostType">Data type of the testhost</param>
     /// <returns>FriendlyName identifying the testhost</returns>
-    private static string GetFriendlyName(Type testHostType)
+    private static string GetFriendlyName(Type? testHostType)
     {
         string friendlyName = string.Empty;
 
-        object[] attributes = testHostType.GetTypeInfo().GetCustomAttributes(typeof(FriendlyNameAttribute), false).ToArray();
+        object[]? attributes = testHostType?.GetTypeInfo().GetCustomAttributes(typeof(FriendlyNameAttribute), false).ToArray();
         if (attributes != null && attributes.Length > 0)
         {
             FriendlyNameAttribute friendlyNameAttribute = (FriendlyNameAttribute)attributes[0];

@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 
 [TestClass]
@@ -26,7 +24,7 @@ public class TestLoggerExtensionManagerTests
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
         {
-            var testLoggerExtensionManager = TestLoggerExtensionManager.Create(null);
+            var testLoggerExtensionManager = TestLoggerExtensionManager.Create(null!);
         });
     }
 

@@ -164,7 +164,7 @@ public class InferRunSettingsHelper
         var shouldUpdatePlatform = true;
 
         TryGetPlatformXml(runSettingsNavigator, out var nodeXml);
-        if (!string.IsNullOrEmpty(nodeXml))
+        if (!nodeXml.IsNullOrEmpty())
         {
             architecture = (Architecture)Enum.Parse(typeof(Architecture), nodeXml, true);
             shouldUpdatePlatform = false;
@@ -174,9 +174,11 @@ public class InferRunSettingsHelper
         var shouldUpdateFramework = true;
         TryGetFrameworkXml(runSettingsNavigator, out nodeXml);
 
-        if (!string.IsNullOrEmpty(nodeXml))
+        if (!nodeXml.IsNullOrEmpty())
         {
-            framework = Framework.FromString(nodeXml);
+            var fwkFromString = Framework.FromString(nodeXml);
+            TPDebug.Assert(fwkFromString is not null, "fwkFromString is null");
+            framework = fwkFromString;
             shouldUpdateFramework = false;
         }
 
@@ -389,9 +391,14 @@ public class InferRunSettingsHelper
     /// </summary>
     /// <param name="runsettingsXml">The run settings xml string</param>
     /// <returns>Environment Variables Dictionary</returns>
-    public static Dictionary<string, string?>? GetEnvironmentVariables(string runSettings)
+    public static Dictionary<string, string?>? GetEnvironmentVariables(string? runSettings)
     {
         Dictionary<string, string?>? environmentVariables = null;
+        if (runSettings is null)
+        {
+            return environmentVariables;
+        }
+
         try
         {
             using var stream = new StringReader(runSettings);
@@ -666,7 +673,7 @@ public class InferRunSettingsHelper
 
         if (incompatiblityFound)
         {
-            incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, defaultArchitecture, warnings.ToString(), MultiTargetingForwardLink);
+            incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, chosenPlatform, warnings.ToString(), MultiTargetingForwardLink);
         }
 
         return compatibleSources;

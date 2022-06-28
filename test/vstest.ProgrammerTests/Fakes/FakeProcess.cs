@@ -13,7 +13,7 @@ internal class FakeProcess
     public string Path { get; }
     public string? Arguments { get; set; }
     public string WorkingDirectory { get; }
-    public IDictionary<string, string> EnvironmentVariables { get; }
+    public IDictionary<string, string?> EnvironmentVariables { get; }
     // TODO: Throw if already set
     public Action<object, string>? ErrorCallback { get; set; }
     // TODO: Throw if already set
@@ -28,14 +28,14 @@ internal class FakeProcess
     public bool Exited { get; private set; }
     public TestProcessStartInfo TestProcessStartInfo { get; internal set; }
 
-    public FakeProcess(FakeErrorAggregator fakeErrorAggregator, string path, string? arguments = null, string? workingDirectory = null, IDictionary<string, string>? environmentVariables = null, Action<object, string>? errorCallback = null, Action<object>? exitCallBack = null, Action<object, string>? outputCallback = null)
+    public FakeProcess(FakeErrorAggregator fakeErrorAggregator, string path, string? arguments = null, string? workingDirectory = null, IDictionary<string, string?>? environmentVariables = null, Action<object, string>? errorCallback = null, Action<object>? exitCallBack = null, Action<object, string>? outputCallback = null)
     {
         FakeErrorAggregator = fakeErrorAggregator;
         Path = path;
         Name = System.IO.Path.GetFileName(path);
         Arguments = arguments;
         WorkingDirectory = workingDirectory ?? System.IO.Path.GetDirectoryName(path) ?? throw new InvalidOperationException($"Path {path} does not have a parent directory.");
-        EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
+        EnvironmentVariables = environmentVariables ?? new Dictionary<string, string?>();
         ErrorCallback = errorCallback;
         ExitCallback = exitCallBack;
         OutputCallback = outputCallback;

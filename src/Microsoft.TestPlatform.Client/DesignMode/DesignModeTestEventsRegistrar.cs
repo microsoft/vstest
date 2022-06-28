@@ -2,12 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 
@@ -62,8 +58,9 @@ public class DesignModeTestEventsRegistrar : ITestDiscoveryEventsRegistrar, ITes
         _designModeClient.SendRawMessage(rawMessage);
     }
 
-    public void LogWarning(string message)
+    public void LogWarning(string? message)
     {
         _designModeClient.SendTestMessage(TestMessageLevel.Warning, message);
     }
 }
+

@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
@@ -53,11 +51,13 @@ internal class DefaultDataCollectionLauncher : DataCollectionLauncher
     /// <param name="environmentVariables">Environment variables for the process.</param>
     /// <param name="commandLineArguments">The command line arguments to pass to the process.</param>
     /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
-    public override int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
+    public override int LaunchDataCollector(IDictionary<string, string?>? environmentVariables, IList<string> commandLineArguments)
     {
         var dataCollectorDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
+        TPDebug.Assert(dataCollectorDirectory is not null, "dataCollectorDirectory is not null");
 
         var currentProcessPath = _processHelper.GetCurrentProcessFileName();
+        TPDebug.Assert(currentProcessPath is not null, "currentProcessPath is not null");
 
         // If current process is dotnet/dotnet.exe and you are here, datacollector.exe/datacollector.arm64.exe is present in TestHost folder.
         string dataCollectorProcessName = _processHelper.GetCurrentProcessArchitecture() == PlatformArchitecture.ARM64 ? DataCollectorProcessNameArm64 : DataCollectorProcessName;

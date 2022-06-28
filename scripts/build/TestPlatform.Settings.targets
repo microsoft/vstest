@@ -116,21 +116,11 @@
           <FromP2P>true</FromP2P>
         </ProjectReference>
 
-        <PackageReference Include="MSTest.TestFramework">
-          <Version>$(MSTestFrameworkVersion)</Version>
-        </PackageReference>
-        <PackageReference Include="MSTest.TestAdapter">
-          <Version>$(MSTestAdapterVersion)</Version>
-        </PackageReference>
-        <PackageReference Include="Moq">
-          <Version>$(MoqVersion)</Version>
-        </PackageReference>
-        <PackageReference Include="MSTest.Assert.Extensions">
-          <Version>$(MSTestAssertExtensionVersion)</Version>
-        </PackageReference>
-        <PackageReference Include="Microsoft.CodeCoverage">
-          <Version>$(MicrosoftCodeCoverageVersion)</Version>
-        </PackageReference>
+        <PackageReference Include="MSTest.TestFramework" Version="$(MSTestFrameworkVersion)" />
+        <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestAdapterVersion)" />
+        <PackageReference Include="MSTest.Assert.Extensions" Version="$(MSTestAssertExtensionVersion)" />
+        <PackageReference Include="Moq" Version="$(MoqVersion)" />
+        <PackageReference Include="Microsoft.CodeCoverage" Version="$(MicrosoftCodeCoverageVersion)" />
       </ItemGroup>
     </When>
   </Choose>

@@ -21,7 +21,7 @@ function Verify-Nuget-Packages($packageDirectory, $version)
         "Microsoft.TestPlatform.ObjectModel" = 238;
         "Microsoft.TestPlatform.AdapterUtilities" = 62;
         "Microsoft.TestPlatform.Portable" = 648;
-        "Microsoft.TestPlatform.TestHost" = 214;
+        "Microsoft.TestPlatform.TestHost" = 208;
         "Microsoft.TestPlatform.TranslationLayer" = 123;
         "Microsoft.TestPlatform.Internal.Uwp" = 86;
     }

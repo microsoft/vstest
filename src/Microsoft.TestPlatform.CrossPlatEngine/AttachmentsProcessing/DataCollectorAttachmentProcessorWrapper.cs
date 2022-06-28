@@ -85,13 +85,14 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
     {
         var dataCollectorExtensionManager = DataCollectorExtensionManager.Create(filePath, true, new MessageLogger(this, nameof(LoadExtension)));
         var dataCollectorExtension = dataCollectorExtensionManager.TryGetTestExtension(dataCollectorUri);
-        if (dataCollectorExtension is null || dataCollectorExtension?.Metadata.HasAttachmentProcessor == false)
+        if (dataCollectorExtension is null || dataCollectorExtension.Metadata.HasAttachmentProcessor == false)
         {
             TraceInfo($"DataCollectorAttachmentsProcessorsFactory: DataCollectorExtension not found for uri '{dataCollectorUri}'");
             return false;
         }
 
-        Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension!.TestPluginInfo).AttachmentsProcessorType;
+        TPDebug.Assert(dataCollectorExtension.TestPluginInfo is not null, "dataCollectorExtension.TestPluginInfo is null");
+        Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension.TestPluginInfo).AttachmentsProcessorType!;
         try
         {
             _dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);

@@ -19,8 +19,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common;
 
 /// <summary>
@@ -49,31 +47,25 @@ public class RunSettings : IRunSettings
     /// <summary>
     /// Gets the settings in the form of Xml string.
     /// </summary>
-    public string SettingsXml { get; private set; }
+    public string? SettingsXml { get; private set; }
 
     /// <summary>
     /// Get the settings for the provided settings name.
     /// </summary>
     /// <param name="settingsName">Name of the settings section to get.</param>
     /// <returns>The settings provider for the settings or null if one was not found.</returns>
-    public ISettingsProvider GetSettings(string settingsName)
+    public ISettingsProvider? GetSettings(string settingsName)
     {
-        if (StringUtilities.IsNullOrWhiteSpace(settingsName))
+        if (settingsName.IsNullOrWhiteSpace())
         {
             throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(settingsName));
         }
 
         // Try and lookup the settings provider.
-        ISettingsProvider result = null;
         _settings.TryGetValue(settingsName, out var provider);
 
         // If a provider was found, return it.
-        if (provider != null)
-        {
-            result = provider.Value;
-        }
-
-        return result;
+        return provider?.Value;
     }
 
     /// <summary>
@@ -244,7 +236,7 @@ public class RunSettings : IRunSettings
     private static LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> CreateLazyThrower(
         string message,
         ISettingsProviderCapabilities metadata,
-        Exception innerException = null)
+        Exception? innerException = null)
     {
         return new LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>(
             () => throw new SettingsException(message, innerException),

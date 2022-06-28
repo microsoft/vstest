@@ -17,8 +17,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>
@@ -37,7 +35,7 @@ internal class DataCollectionManager : IDataCollectionManager
     /// <summary>
     /// Data collection environment context.
     /// </summary>
-    private DataCollectionEnvironmentContext _dataCollectionEnvironmentContext;
+    private DataCollectionEnvironmentContext? _dataCollectionEnvironmentContext;
 
     /// <summary>
     /// Attachment manager for performing file transfers for datacollectors.
@@ -62,7 +60,7 @@ internal class DataCollectionManager : IDataCollectionManager
     /// <summary>
     /// Extension manager for data collectors.
     /// </summary>
-    private DataCollectorExtensionManager _dataCollectorExtensionManager;
+    private DataCollectorExtensionManager? _dataCollectorExtensionManager;
 
     /// <summary>
     /// Request data
@@ -104,7 +102,7 @@ internal class DataCollectionManager : IDataCollectionManager
     /// <summary>
     /// Gets the instance of DataCollectionManager.
     /// </summary>
-    public static DataCollectionManager Instance { get; private set; }
+    public static DataCollectionManager? Instance { get; private set; }
 
     /// <summary>
     /// Gets cache of data collectors associated with the run.
@@ -154,12 +152,12 @@ internal class DataCollectionManager : IDataCollectionManager
     }
 
     /// <inheritdoc/>
-    public IDictionary<string, string> InitializeDataCollectors(string settingsXml)
+    public IDictionary<string, string?> InitializeDataCollectors(string settingsXml)
     {
         ValidateArg.NotNull(settingsXml, nameof(settingsXml));
-        if (settingsXml.IsNullOrEmpty())
+        if (settingsXml.Length == 0)
         {
-            EqtTrace.Info("DataCollectionManager.InitializeDataCollectors: Runsettings is null or empty.");
+            EqtTrace.Info("DataCollectionManager.InitializeDataCollectors: Runsettings is empty.");
         }
 
         var sessionId = new SessionId(Guid.NewGuid());
@@ -173,11 +171,11 @@ internal class DataCollectionManager : IDataCollectionManager
 
         // Environment variables are passed to testhost process, through ProcessStartInfo.EnvironmentVariables, which handles the key in a case-insensitive manner, which is translated to lowercase.
         // Therefore, using StringComparer.OrdinalIgnoreCase so that same keys with different cases are treated as same.
-        var executionEnvironmentVariables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var executionEnvironmentVariables = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
 
         var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settingsXml);
 
-        _isDataCollectionEnabled = dataCollectionRunSettings.IsCollectionEnabled;
+        _isDataCollectionEnabled = dataCollectionRunSettings?.IsCollectionEnabled ?? false;
 
         // If dataCollectionRunSettings is null, that means datacollectors are not configured.
         if (dataCollectionRunSettings == null || !dataCollectionRunSettings.IsCollectionEnabled)
@@ -233,6 +231,7 @@ internal class DataCollectionManager : IDataCollectionManager
             return new Collection<AttachmentSet>();
         }
 
+        TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
         var endEvent = new SessionEndEventArgs(_dataCollectionEnvironmentContext.SessionDataCollectionContext);
         SendEvent(endEvent);
 
@@ -262,10 +261,10 @@ internal class DataCollectionManager : IDataCollectionManager
         List<InvokedDataCollector> invokedDataCollector = new();
         foreach (DataCollectorInformation dataCollectorInformation in RunDataCollectors.Values)
         {
-            invokedDataCollector.Add(new InvokedDataCollector(dataCollectorInformation.DataCollectorConfig.TypeUri,
+            invokedDataCollector.Add(new InvokedDataCollector(dataCollectorInformation.DataCollectorConfig.TypeUri!,
                 dataCollectorInformation.DataCollectorConfig.FriendlyName,
-                dataCollectorInformation.DataCollectorConfig.DataCollectorType.AssemblyQualifiedName,
-                dataCollectorInformation.DataCollectorConfig.FilePath,
+                dataCollectorInformation.DataCollectorConfig.DataCollectorType.AssemblyQualifiedName!,
+                dataCollectorInformation.DataCollectorConfig.FilePath!,
                 dataCollectorInformation.DataCollectorConfig.HasAttachmentsProcessor()));
         }
 
@@ -280,6 +279,7 @@ internal class DataCollectionManager : IDataCollectionManager
             return;
         }
 
+        TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
         var testHostLaunchedEventArgs = new TestHostLaunchedEventArgs(_dataCollectionEnvironmentContext.SessionDataCollectionContext, processId);
 
         SendEvent(testHostLaunchedEventArgs);
@@ -294,6 +294,7 @@ internal class DataCollectionManager : IDataCollectionManager
             return false;
         }
 
+        TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
         sessionStartEventArgs.Context = new DataCollectionContext(_dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId);
         SendEvent(sessionStartEventArgs);
 
@@ -308,6 +309,8 @@ internal class DataCollectionManager : IDataCollectionManager
             return;
         }
 
+        TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
+        TPDebug.Assert(testCaseStartEventArgs.TestElement is not null, "testCaseStartEventArgs.TestElement is null");
         var context = new DataCollectionContext(_dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseStartEventArgs.TestElement);
         testCaseStartEventArgs.Context = context;
 
@@ -322,12 +325,14 @@ internal class DataCollectionManager : IDataCollectionManager
             return new Collection<AttachmentSet>();
         }
 
+        TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
+        TPDebug.Assert(testCaseEndEventArgs.TestElement is not null, "testCaseEndEventArgs.TestElement is null");
         var context = new DataCollectionContext(_dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseEndEventArgs.TestElement);
         testCaseEndEventArgs.Context = context;
 
         SendEvent(testCaseEndEventArgs);
 
-        List<AttachmentSet> result = null;
+        List<AttachmentSet>? result = null;
         try
         {
             result = _attachmentManager.GetAttachments(testCaseEndEventArgs.Context);
@@ -335,7 +340,8 @@ internal class DataCollectionManager : IDataCollectionManager
         catch (Exception ex)
         {
             EqtTrace.Error("DataCollectionManager.TestCaseEnded: Failed to get attachments: {0}", ex);
-            return new Collection<AttachmentSet>(result);
+            // TODO: It's possible we throw ArgumentNullException from catch, is it expected?
+            return new Collection<AttachmentSet>(result!);
         }
 
         if (EqtTrace.IsVerboseEnabled)
@@ -387,10 +393,10 @@ internal class DataCollectionManager : IDataCollectionManager
     /// <param name="friendlyName">The friendly Name.</param>
     /// <param name="dataCollectorUri">The data collector Uri.</param>
     /// <returns><see cref="bool"/></returns>
-    protected virtual bool TryGetUriFromFriendlyName(string friendlyName, out string dataCollectorUri)
+    protected virtual bool TryGetUriFromFriendlyName(string? friendlyName, out string? dataCollectorUri)
     {
-        var extensionManager = _dataCollectorExtensionManager;
-        foreach (var extension in extensionManager.TestExtensions)
+        TPDebug.Assert(_dataCollectorExtensionManager is not null, "_dataCollectorExtensionManager is null");
+        foreach (var extension in _dataCollectorExtensionManager.TestExtensions)
         {
             if (string.Equals(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase))
             {
@@ -412,29 +418,29 @@ internal class DataCollectionManager : IDataCollectionManager
     /// <returns>
     /// The <see cref="DataCollectorConfig"/>.
     /// </returns>
-    protected virtual DataCollectorConfig TryGetDataCollectorConfig(string extensionUri)
+    protected virtual DataCollectorConfig? TryGetDataCollectorConfig(string extensionUri)
     {
-        var extensionManager = _dataCollectorExtensionManager;
-        foreach (var extension in extensionManager.TestExtensions)
+        TPDebug.Assert(_dataCollectorExtensionManager is not null, "_dataCollectorExtensionManager is null");
+        foreach (var extension in _dataCollectorExtensionManager.TestExtensions)
         {
-            if (string.Equals(extension.TestPluginInfo.IdentifierData, extensionUri, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(extension.TestPluginInfo?.IdentifierData, extensionUri, StringComparison.OrdinalIgnoreCase))
             {
-                return (DataCollectorConfig)extension.TestPluginInfo;
+                return (DataCollectorConfig)extension.TestPluginInfo!;
             }
         }
 
         return null;
     }
 
-    protected virtual bool IsUriValid(string uri)
+    protected virtual bool IsUriValid(string? uri)
     {
         if (uri.IsNullOrEmpty())
         {
             return false;
         }
 
-        var extensionManager = _dataCollectorExtensionManager;
-        foreach (var extension in extensionManager.TestExtensions)
+        TPDebug.Assert(_dataCollectorExtensionManager is not null, "_dataCollectorExtensionManager is null");
+        foreach (var extension in _dataCollectorExtensionManager.TestExtensions)
         {
             if (string.Equals(uri, extension.Metadata.ExtensionUri, StringComparison.OrdinalIgnoreCase))
             {
@@ -455,7 +461,9 @@ internal class DataCollectionManager : IDataCollectionManager
     /// </returns>
     protected virtual ObjectModel.DataCollection.DataCollector TryGetTestExtension(string extensionUri)
     {
-        return DataCollectorExtensionManager.TryGetTestExtension(extensionUri).Value;
+        var extension = DataCollectorExtensionManager.TryGetTestExtension(extensionUri);
+        TPDebug.Assert(extension is not null, "extension is null");
+        return extension.Value;
     }
 
     /// <summary>
@@ -468,7 +476,7 @@ internal class DataCollectionManager : IDataCollectionManager
     private void LoadAndInitialize(DataCollectorSettings dataCollectorSettings, string settingsXml)
     {
         DataCollectorInformation dataCollectorInfo;
-        DataCollectorConfig dataCollectorConfig;
+        DataCollectorConfig? dataCollectorConfig;
 
         try
         {
@@ -481,7 +489,7 @@ internal class DataCollectionManager : IDataCollectionManager
                 LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.UnableToFetchUriString, dataCollectorSettings.FriendlyName));
             }
 
-            ObjectModel.DataCollection.DataCollector dataCollector = null;
+            ObjectModel.DataCollection.DataCollector? dataCollector = null;
             if (!dataCollectorUri.IsNullOrWhiteSpace())
             {
                 dataCollector = TryGetTestExtension(dataCollectorUri);
@@ -499,7 +507,9 @@ internal class DataCollectionManager : IDataCollectionManager
                 return;
             }
 
-            dataCollectorConfig = TryGetDataCollectorConfig(dataCollectorUri);
+            dataCollectorConfig = TryGetDataCollectorConfig(dataCollectorUri!);
+            TPDebug.Assert(dataCollectorConfig is not null, "dataCollectorConfig is null");
+            TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
 
             // Attempt to get the data collector information verifying that all of the required metadata for the collector is available.
             dataCollectorInfo = new DataCollectorInformation(
@@ -524,6 +534,7 @@ internal class DataCollectionManager : IDataCollectionManager
         try
         {
             dataCollectorInfo.InitializeDataCollector();
+            TPDebug.Assert(dataCollectorConfig is not null, "dataCollectorConfig is null");
             lock (RunDataCollectors)
             {
                 // Add data collectors to run cache.
@@ -535,6 +546,8 @@ internal class DataCollectionManager : IDataCollectionManager
             EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while initializing data collector {0} : {1}", dataCollectorSettings.FriendlyName, ex);
 
             // Log error.
+            TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
+            TPDebug.Assert(dataCollectorConfig is not null, "dataCollectorConfig is null");
             dataCollectorInfo.Logger.LogError(_dataCollectionEnvironmentContext.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorInitializationError, dataCollectorConfig.FriendlyName, ex));
 
             // Dispose datacollector.
@@ -630,6 +643,7 @@ internal class DataCollectionManager : IDataCollectionManager
 
                 var friendlyName = dataCollectorInfo.DataCollectorConfig.FriendlyName;
                 failedCollectors.Add(dataCollectorInfo);
+                TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
                 dataCollectorInfo.Logger.LogError(
                     _dataCollectionEnvironmentContext.SessionDataCollectionContext,
                     string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorErrorOnGetVariable, friendlyName, ex));
@@ -656,54 +670,57 @@ internal class DataCollectionManager : IDataCollectionManager
         DataCollectorInformation dataCollectionWrapper,
         Dictionary<string, DataCollectionEnvironmentVariable> dataCollectorEnvironmentVariables)
     {
-        if (dataCollectionWrapper.TestExecutionEnvironmentVariables != null)
+        if (dataCollectionWrapper.TestExecutionEnvironmentVariables == null)
         {
-            var collectorFriendlyName = dataCollectionWrapper.DataCollectorConfig.FriendlyName;
-            foreach (var namevaluepair in dataCollectionWrapper.TestExecutionEnvironmentVariables)
+            return;
+        }
+
+        var collectorFriendlyName = dataCollectionWrapper.DataCollectorConfig.FriendlyName;
+        foreach (var namevaluepair in dataCollectionWrapper.TestExecutionEnvironmentVariables)
+        {
+            if (dataCollectorEnvironmentVariables.TryGetValue(namevaluepair.Key, out var alreadyRequestedVariable))
             {
-                if (dataCollectorEnvironmentVariables.TryGetValue(namevaluepair.Key, out var alreadyRequestedVariable))
+                // Dev10 behavior is to consider environment variables values as case sensitive.
+                if (string.Equals(namevaluepair.Value, alreadyRequestedVariable.Value, StringComparison.Ordinal))
                 {
-                    // Dev10 behavior is to consider environment variables values as case sensitive.
-                    if (string.Equals(namevaluepair.Value, alreadyRequestedVariable.Value, StringComparison.Ordinal))
-                    {
-                        alreadyRequestedVariable.AddRequestingDataCollector(collectorFriendlyName);
-                    }
-                    else
-                    {
-                        // Data collector is overriding an already requested variable, possibly an error.
-                        var message = string.Format(
-                            CultureInfo.CurrentUICulture,
-                            Resources.Resources.DataCollectorRequestedDuplicateEnvironmentVariable,
-                            collectorFriendlyName,
-                            namevaluepair.Key,
-                            namevaluepair.Value,
-                            alreadyRequestedVariable.FirstDataCollectorThatRequested,
-                            alreadyRequestedVariable.Value);
-
-                        if (collectorFriendlyName.Equals(CodeCoverageFriendlyName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Do not treat this as error for Code Coverage Data Collector. This is expected in some Fakes integration scenarios
-                            EqtTrace.Info(message);
-                        }
-                        else
-                        {
-                            dataCollectionWrapper.Logger.LogError(_dataCollectionEnvironmentContext.SessionDataCollectionContext, message);
-                        }
-                    }
-
-                    _dataCollectionTelemetryManager.RecordEnvironmentVariableConflict(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value, alreadyRequestedVariable.Value);
+                    alreadyRequestedVariable.AddRequestingDataCollector(collectorFriendlyName);
                 }
                 else
                 {
-                    // new variable, add to the list.
-                    EqtTrace.Verbose("DataCollectionManager.AddCollectionEnvironmentVariables: Adding Environment variable '{0}' value '{1}'", namevaluepair.Key, namevaluepair.Value);
-
-                    dataCollectorEnvironmentVariables.Add(
+                    // Data collector is overriding an already requested variable, possibly an error.
+                    var message = string.Format(
+                        CultureInfo.CurrentUICulture,
+                        Resources.Resources.DataCollectorRequestedDuplicateEnvironmentVariable,
+                        collectorFriendlyName,
                         namevaluepair.Key,
-                        new DataCollectionEnvironmentVariable(namevaluepair, collectorFriendlyName));
+                        namevaluepair.Value,
+                        alreadyRequestedVariable.FirstDataCollectorThatRequested,
+                        alreadyRequestedVariable.Value);
 
-                    _dataCollectionTelemetryManager.RecordEnvironmentVariableAddition(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value);
+                    if (collectorFriendlyName.Equals(CodeCoverageFriendlyName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Do not treat this as error for Code Coverage Data Collector. This is expected in some Fakes integration scenarios
+                        EqtTrace.Info(message);
+                    }
+                    else
+                    {
+                        TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
+                        dataCollectionWrapper.Logger.LogError(_dataCollectionEnvironmentContext.SessionDataCollectionContext, message);
+                    }
                 }
+
+                _dataCollectionTelemetryManager.RecordEnvironmentVariableConflict(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value, alreadyRequestedVariable.Value);
+            }
+            else
+            {
+                // new variable, add to the list.
+                EqtTrace.Verbose("DataCollectionManager.AddCollectionEnvironmentVariables: Adding Environment variable '{0}' value '{1}'", namevaluepair.Key, namevaluepair.Value);
+
+                dataCollectorEnvironmentVariables.Add(
+                    namevaluepair.Key,
+                    new DataCollectionEnvironmentVariable(namevaluepair, collectorFriendlyName));
+
+                _dataCollectionTelemetryManager.RecordEnvironmentVariableAddition(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value);
             }
         }
     }
@@ -736,7 +753,7 @@ internal class DataCollectionManager : IDataCollectionManager
         }
     }
 
-    private void LogAttachments(List<AttachmentSet> attachmentSets)
+    private static void LogAttachments(List<AttachmentSet> attachmentSets)
     {
         if (attachmentSets is null)
         {

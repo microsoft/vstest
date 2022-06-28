@@ -7,8 +7,6 @@ using Microsoft.TestPlatform.TestUtilities;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.SmokeTests;
 
 [TestClass]
@@ -42,7 +40,7 @@ public class DataCollectorTests : IntegrationTestBase
 
     private string GetInProcDataCollectionRunsettingsFile()
     {
-        var runSettings = Path.Combine(Path.GetDirectoryName(_testEnvironment.GetTestAsset(InProDataCollectorTestProject)), "runsettingstest.runsettings");
+        var runSettings = Path.Combine(Path.GetDirectoryName(_testEnvironment.GetTestAsset(InProDataCollectorTestProject))!, "runsettingstest.runsettings");
         var inprocasm = _testEnvironment.GetTestAsset("SimpleDataCollector.dll");
         var fileContents = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>

@@ -4,8 +4,6 @@
 using System.Globalization;
 using System.Xml;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 /// <summary>

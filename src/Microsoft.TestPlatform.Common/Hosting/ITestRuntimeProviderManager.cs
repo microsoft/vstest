@@ -9,6 +9,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 
 internal interface ITestRuntimeProviderManager
 {
-    ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration, List<string> sources);
-    ITestRuntimeProvider GetTestHostManagerByUri(string hostUri);
+    ITestRuntimeProvider? GetTestHostManagerByRunConfiguration(string? runConfiguration, List<string> sources);
+    ITestRuntimeProvider? GetTestHostManagerByUri(string hostUri);
 }

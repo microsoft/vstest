@@ -7,8 +7,6 @@ using System.Globalization;
 using System.Linq;
 using System.Xml;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>

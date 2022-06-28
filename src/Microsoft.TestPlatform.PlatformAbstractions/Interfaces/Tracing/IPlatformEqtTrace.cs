@@ -23,7 +23,7 @@ public partial interface IPlatformEqtTrace
     /// </summary>
     /// <param name="level">Trace level.</param>
     /// <param name="message">The message to add to trace.</param>
-    void WriteLine(PlatformTraceLevel level, string message);
+    void WriteLine(PlatformTraceLevel level, string? message);
 
     /// <summary>
     /// Initializes the verbose tracing with custom log file
@@ -35,7 +35,7 @@ public partial interface IPlatformEqtTrace
     /// <returns>
     /// The <see cref="bool"/>.
     /// </returns>
-    bool InitializeVerboseTrace(string customLogFile);
+    bool InitializeVerboseTrace(string? customLogFile);
 
     /// <summary>
     /// Initializes the tracing with custom log file and trace level.
@@ -44,7 +44,7 @@ public partial interface IPlatformEqtTrace
     /// <param name="customLogFile">Custom log file for trace messages.</param>
     /// <param name="traceLevel">Trace level.</param>
     /// <returns>Trace initialized flag.</returns>
-    bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel);
+    bool InitializeTrace(string? customLogFile, PlatformTraceLevel traceLevel);
 
     /// <summary>
     /// Gets a value indicating if tracing is enabled for a trace level.

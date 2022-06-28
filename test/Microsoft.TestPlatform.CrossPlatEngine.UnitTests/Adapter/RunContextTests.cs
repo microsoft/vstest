@@ -24,7 +24,7 @@ public class RunContextTests
     {
         _runContext.FilterExpressionWrapper = null;
 
-        Assert.IsNull(_runContext.GetTestCaseFilter(null, (s) => null));
+        Assert.IsNull(_runContext.GetTestCaseFilter(null, s => null));
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class RunContextTests
     {
         _runContext.FilterExpressionWrapper = new FilterExpressionWrapper("Infinity");
 
-        var filter = _runContext.GetTestCaseFilter(new List<string> { "FullyQualifiedName" }, (s) => null);
+        var filter = _runContext.GetTestCaseFilter(new List<string> { "FullyQualifiedName" }, s => null);
 
         Assert.IsNotNull(filter);
     }
@@ -45,7 +45,7 @@ public class RunContextTests
     {
         _runContext.FilterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
 
-        var filter = _runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => null);
+        var filter = _runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, s => null);
 
         Assert.IsNotNull(filter);
     }
@@ -54,7 +54,7 @@ public class RunContextTests
     public void GetTestCaseFilterShouldReturnTestCaseFilter()
     {
         _runContext.FilterExpressionWrapper = new FilterExpressionWrapper("TestCategory=Important");
-        var filter = _runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => null);
+        var filter = _runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, s => null);
 
         Assert.IsNotNull(filter);
         Assert.AreEqual("TestCategory=Important", filter.TestCaseFilterValue);

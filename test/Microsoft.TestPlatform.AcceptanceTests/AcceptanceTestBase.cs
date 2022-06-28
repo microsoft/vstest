@@ -7,8 +7,6 @@ using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 public class AcceptanceTestBase : IntegrationTestBase
@@ -76,10 +74,10 @@ public class AcceptanceTestBase : IntegrationTestBase
     {
         testEnvironment.VSTestConsoleInfo = runnerInfo.VSTestConsoleInfo;
         // The order here matters, it changes how the resulting path is built when we resolve test dlls and other assets.
-        testEnvironment.DllInfos = new[] { runnerInfo.AdapterInfo, runnerInfo.TestHostInfo }.Where(d => d != null).ToList();
+        testEnvironment.DllInfos = new[] { runnerInfo.AdapterInfo, runnerInfo.TestHostInfo }.Where(d => d != null).Select(x => x!).ToList();
         testEnvironment.DebugInfo = runnerInfo.DebugInfo;
 
-        testEnvironment.RunnerFramework = runnerInfo.RunnerFramework;
+        testEnvironment.RunnerFramework = runnerInfo.RunnerFramework!;
         testEnvironment.TargetFramework = runnerInfo.TargetFramework;
         testEnvironment.InIsolationValue = runnerInfo.InIsolationValue;
     }

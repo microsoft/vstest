@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -10,8 +11,6 @@ using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
@@ -21,9 +20,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 [TestClass]
 public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private RunEventHandler _runEventHandler;
+    private IVsTestConsoleWrapper? _vstestConsoleWrapper;
+    private RunEventHandler? _runEventHandler;
 
+    [MemberNotNull(nameof(_vstestConsoleWrapper), nameof(_runEventHandler))]
     private void Setup()
     {
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();
@@ -66,11 +66,11 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         // Release builds optimize code, hence line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
         {
-            Assert.AreEqual(14, testCase.FirstOrDefault().TestCase.LineNumber);
+            Assert.AreEqual(14, testCase.First().TestCase.LineNumber);
         }
         else
         {
-            Assert.AreEqual(13, testCase.FirstOrDefault().TestCase.LineNumber);
+            Assert.AreEqual(13, testCase.First().TestCase.LineNumber);
         }
     }
 
@@ -85,12 +85,12 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         Setup();
 
         // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
-        string testAssemblyPath = _testEnvironment.TargetFramework.Equals("net451")
+        string testAssemblyPath = _testEnvironment.TargetFramework!.Equals("net451")
             ? _testEnvironment.GetTestAsset("XUTestProject.dll", "net46")
             : _testEnvironment.GetTestAsset("XUTestProject.dll");
         var sources = new List<string> { testAssemblyPath };
         var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(UnitTestFramework.XUnit), "*.TestAdapter.dll").ToList();
-        _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
+        _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.First() });
 
         _vstestConsoleWrapper.RunTests(
             sources,
@@ -108,11 +108,11 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         // Release builds optimize code, hence line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
         {
-            Assert.AreEqual(15, testCase.FirstOrDefault().TestCase.LineNumber);
+            Assert.AreEqual(15, testCase.First().TestCase.LineNumber);
         }
         else
         {
-            Assert.AreEqual(14, testCase.FirstOrDefault().TestCase.LineNumber);
+            Assert.AreEqual(14, testCase.First().TestCase.LineNumber);
         }
     }
 
@@ -133,7 +133,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         var jsInTemp = TempDirectory.CopyFile(jsSource);
 
         var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(UnitTestFramework.Chutzpah), "*.TestAdapter.dll").ToList();
-        _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
+        _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.First() });
 
         _vstestConsoleWrapper.RunTests(
             new[] { jsInTemp },
@@ -146,6 +146,6 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         Assert.AreEqual(2, _runEventHandler.TestResults.Count);
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-        Assert.AreEqual(1, testCase.FirstOrDefault().TestCase.LineNumber);
+        Assert.AreEqual(1, testCase.First().TestCase.LineNumber);
     }
 }

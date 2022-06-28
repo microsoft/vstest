@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+#if NETFRAMEWORK
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+#endif
 using Microsoft.VisualStudio.TestPlatform.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -48,24 +51,26 @@ public class Program
     }
 
     // In UWP(App models) Run will act as entry point from Application end, so making this method public
-    public static void Run(string[]? args)
+    public static void Run(string[]? args) => Run(args, new());
+
+    internal static void Run(string[]? args, UiLanguageOverride uiLanguageOverride)
     {
         DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_HOST_DEBUG_ATTACHVS");
         DebuggerBreakpoint.WaitForNativeDebugger("VSTEST_HOST_NATIVE_DEBUG");
         DebuggerBreakpoint.WaitForDebugger("VSTEST_HOST_DEBUG");
-        UiLanguageOverride.SetCultureSpecifiedByUser();
+        uiLanguageOverride.SetCultureSpecifiedByUser();
         var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
 
         // Invoke the engine with arguments
         GetEngineInvoker(argsDictionary).Invoke(argsDictionary);
     }
 
-    private static IEngineInvoker GetEngineInvoker(IDictionary<string, string> argsDictionary)
+    private static IEngineInvoker GetEngineInvoker(IDictionary<string, string?> argsDictionary)
     {
         IEngineInvoker? invoker = null;
 #if NETFRAMEWORK
         // If Args contains test source argument, invoker Engine in new appdomain
-        if (argsDictionary.TryGetValue(TestSourceArgumentString, out var testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))
+        if (argsDictionary.TryGetValue(TestSourceArgumentString, out var testSourcePath) && !testSourcePath.IsNullOrWhiteSpace())
         {
             // remove the test source arg from dictionary
             argsDictionary.Remove(TestSourceArgumentString);

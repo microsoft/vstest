@@ -54,7 +54,7 @@ public class CommunicationLayerIntegrationTests
 
         var result = proxyDataCollectionManager.BeforeTestRunStart(true, true, _mockTestMessageEventHandler.Object);
 
-        Assert.AreEqual(1, result.EnvironmentVariables.Count);
+        Assert.AreEqual(1, result.EnvironmentVariables?.Count);
     }
 
     [TestMethod]
@@ -69,7 +69,7 @@ public class CommunicationLayerIntegrationTests
 
         var dataCollectionResult = proxyDataCollectionManager.AfterTestRunEnd(false, _mockTestMessageEventHandler.Object);
 
-        Assert.AreEqual("CustomDataCollector", dataCollectionResult.Attachments[0].DisplayName);
+        Assert.AreEqual("CustomDataCollector", dataCollectionResult.Attachments![0].DisplayName);
         Assert.AreEqual("my://custom/datacollector", dataCollectionResult.Attachments[0].Uri.ToString());
         Assert.IsTrue(dataCollectionResult.Attachments[0].Attachments[0].Uri.ToString().Contains("filename.txt"));
     }

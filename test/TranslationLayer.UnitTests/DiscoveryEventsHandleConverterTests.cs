@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TranslationLayer.UnitTests;
 
 [TestClass]
@@ -26,7 +24,7 @@ public class DiscoveryEventsHandleConverterTests
     [TestMethod]
     public void ConstructorShouldThrowArgumentExceptionIfTestDiscoveryEventHandlerIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => new DiscoveryEventsHandleConverter(null));
+        Assert.ThrowsException<ArgumentNullException>(() => new DiscoveryEventsHandleConverter(null!));
     }
 
     [TestMethod]

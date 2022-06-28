@@ -85,16 +85,6 @@ public class DesignModeClientTests
     }
 
     [TestMethod]
-    public void TestRunMessageHandlerShouldNotCallCommmunicationManagerIfMessageisInformational()
-    {
-        _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
-
-        _designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Informational, "message"));
-
-        _mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<TestMessagePayload>()), Times.Never());
-    }
-
-    [TestMethod]
     public void DesignModeClientConnectShouldSetupChannel()
     {
         var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = _protocolVersion };
@@ -453,6 +443,7 @@ public class DesignModeClientTests
         var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JToken.FromObject(payload) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
+        _mockCommunicationManager.Setup(cm => cm.DeserializePayload<TestRunAttachmentsProcessingPayload>(It.IsAny<Message>())).Returns(payload);
 
         _mockTestRequestManager
             .Setup(
@@ -550,7 +541,7 @@ public class DesignModeClientTests
             .Callback((string _, object actualPayload) =>
             {
                 _completeEvent.Set();
-                Assert.IsNull(((StartTestSessionAckPayload)actualPayload).EventArgs.TestSessionInfo);
+                Assert.IsNull(((StartTestSessionAckPayload)actualPayload).EventArgs!.TestSessionInfo);
             });
         _mockCommunicationManager.Setup(
                 cm => cm.DeserializePayload<StartTestSessionPayload>(
@@ -601,8 +592,8 @@ public class DesignModeClientTests
             {
                 _completeEvent.Set();
 
-                Assert.AreEqual(((StopTestSessionAckPayload)actualPayload).EventArgs.TestSessionInfo, testSessionInfo);
-                Assert.IsFalse(((StopTestSessionAckPayload)actualPayload).EventArgs.IsStopped);
+                Assert.AreEqual(((StopTestSessionAckPayload)actualPayload).EventArgs!.TestSessionInfo, testSessionInfo);
+                Assert.IsFalse(((StopTestSessionAckPayload)actualPayload).EventArgs!.IsStopped);
             });
 
         _mockCommunicationManager.Setup(

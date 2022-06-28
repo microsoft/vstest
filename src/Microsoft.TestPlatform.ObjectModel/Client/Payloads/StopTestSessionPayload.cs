@@ -3,8 +3,6 @@
 
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 
 /// <summary>
@@ -18,11 +16,11 @@ public class StopTestSessionPayload
     /// Gets or sets the test session info.
     /// </summary>
     [DataMember]
-    public TestSessionInfo TestSessionInfo { get; set; } = null;
+    public TestSessionInfo? TestSessionInfo { get; set; }
 
     /// <summary>
     /// Gets or sets a flag indicating if metrics should be collected.
     /// </summary>
     [DataMember]
-    public bool CollectMetrics { get; set; } = false;
+    public bool CollectMetrics { get; set; }
 }

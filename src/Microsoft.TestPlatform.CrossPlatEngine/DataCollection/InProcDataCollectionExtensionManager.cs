@@ -18,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
@@ -27,22 +25,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 /// </summary>
 internal class InProcDataCollectionExtensionManager
 {
-    internal IDictionary<string, IInProcDataCollector> InProcDataCollectors;
-
-    private readonly IDataCollectionSink _inProcDataCollectionSink;
-
     private const string DataCollectorEndsWithPattern = @"Collector.dll";
 
-    private readonly string _defaultCodeBase;
-
-    private readonly List<string> _codeBasePaths;
-
+    private readonly IDataCollectionSink _inProcDataCollectionSink;
+    private readonly string? _defaultCodeBase;
+    private readonly List<string?> _codeBasePaths;
     private readonly IFileHelper _fileHelper;
+
+    internal IDictionary<string, IInProcDataCollector> InProcDataCollectors;
 
     /// <summary>
     /// Loaded in-proc datacollectors collection
     /// </summary>
-    private IEnumerable<DataCollectorSettings> _inProcDataCollectorSettingsCollection;
+    private IEnumerable<DataCollectorSettings>? _inProcDataCollectorSettingsCollection;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InProcDataCollectionExtensionManager"/> class.
@@ -56,23 +51,23 @@ internal class InProcDataCollectionExtensionManager
     /// <param name="defaultCodeBase">
     /// The default code base to be used by in-proc data collector
     /// </param>
-    public InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase, TestPluginCache testPluginCache)
+    public InProcDataCollectionExtensionManager(string? runSettings, ITestEventsPublisher testEventsPublisher, string? defaultCodeBase, TestPluginCache testPluginCache)
         : this(runSettings, testEventsPublisher, defaultCodeBase, testPluginCache, new FileHelper())
     { }
 
-    protected InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase, TestPluginCache testPluginCache, IFileHelper fileHelper)
+    protected InProcDataCollectionExtensionManager(string? runSettings, ITestEventsPublisher testEventsPublisher, string? defaultCodeBase, TestPluginCache testPluginCache, IFileHelper fileHelper)
     {
         InProcDataCollectors = new Dictionary<string, IInProcDataCollector>();
         _inProcDataCollectionSink = new InProcDataCollectionSink();
         _defaultCodeBase = defaultCodeBase;
         _fileHelper = fileHelper;
-        _codeBasePaths = new List<string> { _defaultCodeBase };
+        _codeBasePaths = new List<string?> { _defaultCodeBase };
 
         // Get Datacollector code base paths from test plugin cache
         var extensionPaths = testPluginCache.GetExtensionPaths(DataCollectorEndsWithPattern);
         foreach (var extensionPath in extensionPaths)
         {
-            _codeBasePaths.Add(Path.GetDirectoryName(extensionPath));
+            _codeBasePaths.Add(Path.GetDirectoryName(extensionPath)!);
         }
 
         // Initialize InProcDataCollectors
@@ -127,7 +122,7 @@ internal class InProcDataCollectionExtensionManager
     /// <param name="e">
     /// The e.
     /// </param>
-    private void TriggerTestSessionStart(object sender, SessionStartEventArgs e)
+    private void TriggerTestSessionStart(object? sender, SessionStartEventArgs e)
     {
         TestSessionStartArgs testSessionStartArgs = new(GetSessionStartProperties(e));
         TriggerInProcDataCollectionMethods(Constants.TestSessionStartMethodName, testSessionStartArgs);
@@ -142,7 +137,7 @@ internal class InProcDataCollectionExtensionManager
     /// <param name="e">
     /// The e.
     /// </param>
-    private void TriggerTestSessionEnd(object sender, SessionEndEventArgs e)
+    private void TriggerTestSessionEnd(object? sender, SessionEndEventArgs e)
     {
         var testSessionEndArgs = new TestSessionEndArgs();
         TriggerInProcDataCollectionMethods(Constants.TestSessionEndMethodName, testSessionEndArgs);
@@ -157,7 +152,7 @@ internal class InProcDataCollectionExtensionManager
     /// <param name="e">
     /// The e.
     /// </param>
-    private void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)
+    private void TriggerTestCaseStart(object? sender, TestCaseStartEventArgs e)
     {
         var testCaseStartArgs = new TestCaseStartArgs(e.TestElement);
         TriggerInProcDataCollectionMethods(Constants.TestCaseStartMethodName, testCaseStartArgs);
@@ -172,7 +167,7 @@ internal class InProcDataCollectionExtensionManager
     /// <param name="e">
     /// The e.
     /// </param>
-    private void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)
+    private void TriggerTestCaseEnd(object? sender, TestCaseEndEventArgs e)
     {
         var dataCollectionContext = new DataCollectionContext(e.TestElement);
         var testCaseEndArgs = new TestCaseEndArgs(dataCollectionContext, e.TestOutcome);
@@ -188,7 +183,7 @@ internal class InProcDataCollectionExtensionManager
     /// <param name="e">
     /// The e.
     /// </param>
-    private void TriggerUpdateTestResult(object sender, TestResultEventArgs e)
+    private void TriggerUpdateTestResult(object? sender, TestResultEventArgs e)
     {
         // Just set the cached in-proc data if already exists
         SetInProcDataCollectionDataInTestResult(e.TestResult);
@@ -200,7 +195,7 @@ internal class InProcDataCollectionExtensionManager
     /// <param name="runSettings">
     /// The run Settings.
     /// </param>
-    private void InitializeInProcDataCollectors(string runSettings)
+    private void InitializeInProcDataCollectors(string? runSettings)
     {
         try
         {
@@ -210,22 +205,24 @@ internal class InProcDataCollectionExtensionManager
 
             // Verify if it has any valid in-proc datacollectors or just a dummy element
             inProcDataCollectionSettingsPresentInRunSettings = inProcDataCollectionSettingsPresentInRunSettings &&
-                                                               inProcDataCollectionRunSettings.DataCollectorSettingsList.Any();
+                                                               inProcDataCollectionRunSettings!.DataCollectorSettingsList.Any();
 
             // Initialize if we have at least one
-            if (inProcDataCollectionSettingsPresentInRunSettings)
+            if (!inProcDataCollectionSettingsPresentInRunSettings)
             {
-                _inProcDataCollectorSettingsCollection = inProcDataCollectionRunSettings.DataCollectorSettingsList;
+                return;
+            }
 
-                var interfaceTypeInfo = typeof(InProcDataCollection).GetTypeInfo();
-                foreach (var inProcDc in _inProcDataCollectorSettingsCollection)
-                {
-                    var codeBase = GetCodebase(inProcDc.CodeBase);
-                    var assemblyQualifiedName = inProcDc.AssemblyQualifiedName;
-                    var configuration = inProcDc.Configuration;
-                    var inProcDataCollector = CreateDataCollector(assemblyQualifiedName, codeBase, configuration, interfaceTypeInfo);
-                    InProcDataCollectors[inProcDataCollector.AssemblyQualifiedName] = inProcDataCollector;
-                }
+            _inProcDataCollectorSettingsCollection = inProcDataCollectionRunSettings!.DataCollectorSettingsList;
+
+            var interfaceTypeInfo = typeof(InProcDataCollection).GetTypeInfo();
+            foreach (var inProcDc in _inProcDataCollectorSettingsCollection)
+            {
+                var codeBase = GetCodebase(inProcDc.CodeBase!);
+                var assemblyQualifiedName = inProcDc.AssemblyQualifiedName!;
+                var configuration = inProcDc.Configuration!;
+                var inProcDataCollector = CreateDataCollector(assemblyQualifiedName, codeBase, configuration, interfaceTypeInfo);
+                InProcDataCollectors[inProcDataCollector.AssemblyQualifiedName!] = inProcDataCollector;
             }
         }
         catch (Exception ex)
@@ -246,24 +243,31 @@ internal class InProcDataCollectionExtensionManager
     /// <returns> Code base </returns>
     private string GetCodebase(string codeBase)
     {
-        if (!Path.IsPathRooted(codeBase))
+        if (Path.IsPathRooted(codeBase))
         {
-            foreach (var extensionPath in _codeBasePaths)
+            return codeBase;
+        }
+
+        foreach (var extensionPath in _codeBasePaths)
+        {
+            if (extensionPath is null)
             {
-                var assemblyPath = Path.Combine(extensionPath, codeBase);
-                if (_fileHelper.Exists(assemblyPath))
-                {
-                    return assemblyPath;
-                }
+                continue;
+            }
+
+            var assemblyPath = Path.Combine(extensionPath, codeBase);
+            if (_fileHelper.Exists(assemblyPath))
+            {
+                return assemblyPath;
             }
         }
 
         return codeBase;
     }
 
-    private IDictionary<string, object> GetSessionStartProperties(SessionStartEventArgs sessionStartEventArgs)
+    private static IDictionary<string, object?> GetSessionStartProperties(SessionStartEventArgs sessionStartEventArgs)
     {
-        var properties = new Dictionary<string, object>
+        var properties = new Dictionary<string, object?>
         {
             { Constants.TestSourcesPropertyName, sessionStartEventArgs.GetPropertyValue<IEnumerable<string>>(Constants.TestSourcesPropertyName) }
         };

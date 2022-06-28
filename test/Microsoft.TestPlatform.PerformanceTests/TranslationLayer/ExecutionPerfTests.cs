@@ -46,7 +46,7 @@ public class ExecutionPerfTests : TelemetryPerfTestBase
             vstestConsoleWrapper.EndSession();
         }
 
-        Assert.AreEqual(expectedNumberOfTests, runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
+        Assert.AreEqual(expectedNumberOfTests, runEventHandler.Metrics![TelemetryDataConstants.TotalTestsRun]);
         PostTelemetry(runEventHandler.Metrics, perfAnalyzer, projectName);
     }
 
@@ -87,7 +87,7 @@ public class ExecutionPerfTests : TelemetryPerfTestBase
             vstestConsoleWrapper.EndSession();
         }
 
-        Assert.AreEqual(expectedNumberOfTests, runEventHandler.Metrics[TelemetryDataConstants.TotalTestsRun]);
+        Assert.AreEqual(expectedNumberOfTests, runEventHandler.Metrics![TelemetryDataConstants.TotalTestsRun]);
         PostTelemetry(runEventHandler.Metrics, perfAnalyzer, projectName);
     }
 }

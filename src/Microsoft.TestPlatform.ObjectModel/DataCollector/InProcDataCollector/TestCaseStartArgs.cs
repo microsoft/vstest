@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
 
 /// <summary>
@@ -16,7 +14,7 @@ public class TestCaseStartArgs : InProcDataCollectionArgs
     /// <param name="testCase">
     /// The test case.
     /// </param>
-    public TestCaseStartArgs(TestCase testCase)
+    public TestCaseStartArgs(TestCase? testCase)
     {
         TestCase = testCase;
     }
@@ -24,5 +22,5 @@ public class TestCaseStartArgs : InProcDataCollectionArgs
     /// <summary>
     /// Gets the test case.
     /// </summary>
-    public TestCase TestCase { get; private set; }
+    public TestCase? TestCase { get; private set; }
 }

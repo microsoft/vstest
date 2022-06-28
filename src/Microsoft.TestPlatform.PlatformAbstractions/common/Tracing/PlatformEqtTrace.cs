@@ -9,6 +9,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 
+using Microsoft.TestPlatform.PlatformAbstractions;
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -161,13 +163,13 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     }
 
     /// <inheritdoc/>
-    public bool InitializeVerboseTrace(string customLogFile)
+    public bool InitializeVerboseTrace(string? customLogFile)
     {
         return InitializeTrace(customLogFile, PlatformTraceLevel.Verbose);
     }
 
     /// <inheritdoc/>
-    public bool InitializeTrace(string customLogFile, PlatformTraceLevel platformTraceLevel)
+    public bool InitializeTrace(string? customLogFile, PlatformTraceLevel platformTraceLevel)
     {
         s_isInitialized = false;
 
@@ -212,10 +214,10 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     }
 
     /// <inheritdoc/>
-    public void WriteLine(PlatformTraceLevel level, string message)
+    public void WriteLine(PlatformTraceLevel level, string? message)
     {
-        Debug.Assert(message != null, "message != null");
-        Debug.Assert(!string.IsNullOrEmpty(ProcessName), "!string.IsNullOrEmpty(ProcessName)");
+        TPDebug.Assert(message != null, "message != null");
+        TPDebug.Assert(!string.IsNullOrEmpty(ProcessName), "!string.IsNullOrEmpty(ProcessName)");
 
         if (EnsureTraceIsInitialized())
         {
@@ -300,7 +302,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     /// <param name="e">The exception to log.</param>
     private static void LogIgnoredException(Exception e)
     {
-        Debug.Assert(e != null, "e != null");
+        TPDebug.Assert(e != null, "e != null");
 
         try
         {
@@ -336,7 +338,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
             }
 
             using var process = Process.GetCurrentProcess();
-            string runnerLogFileName = $"{Path.GetFileNameWithoutExtension(process.MainModule.FileName)}_{process.Id}.{DateTime.Now:yy-MM-dd_HH-mm-ss_fffff}.diag";
+            string runnerLogFileName = $"{Path.GetFileNameWithoutExtension(process.MainModule!.FileName)}_{process.Id}.{DateTime.Now:yy-MM-dd_HH-mm-ss_fffff}.diag";
             string logsDirectory = Path.GetTempPath();
 
             // Set the trace level and add the trace listener
@@ -365,6 +367,12 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
                 else
                 {
                     runnerLogFileName = LogFile;
+                }
+
+                var runnerLogFileInfo = new FileInfo(runnerLogFileName);
+                if (!Directory.Exists(runnerLogFileInfo.DirectoryName))
+                {
+                    Directory.CreateDirectory(runnerLogFileInfo.DirectoryName!);
                 }
 
                 Source.Listeners.Add(new RollingFileTraceListener(runnerLogFileName, ListenerName, s_traceFileSize));

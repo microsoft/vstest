@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -22,13 +20,13 @@ public interface IInternalTestRunEventsHandler : ITestMessageEventHandler
     /// <param name="lastChunkArgs">Last set of test results</param>
     /// <param name="runContextAttachments">Attachments of the test run</param>
     /// <param name="executorUris">ExecutorURIs of the adapters involved in test run</param>
-    void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris);
+    void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris);
 
     /// <summary>
     /// Handle a change in TestRun i.e. new testresults and stats
     /// </summary>
     /// <param name="testRunChangedArgs">TestRunChanged Data</param>
-    void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs);
+    void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs);
 
     /// <summary>
     /// Launches a process with a given process info under debugger
