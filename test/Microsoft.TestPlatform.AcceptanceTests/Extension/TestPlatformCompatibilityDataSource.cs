@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 ///
 /// When that adds up to no configuration exception is thrown.
 /// </summary>
-public class TestPlatformCompatibilityDataSource : TestDataSource<RunnerInfo>
+public class TestPlatformCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
 {
     private readonly CompatibilityRowsBuilder _builder;
 

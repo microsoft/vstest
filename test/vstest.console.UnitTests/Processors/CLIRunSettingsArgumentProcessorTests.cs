@@ -113,7 +113,7 @@ public class CliRunSettingsArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldNotThrowExceptionIfArgumentIsEmpty()
     {
-        _executor.Initialize(new string[0]);
+        _executor.Initialize(Array.Empty<string>());
 
         Assert.IsNull(_settingsProvider.ActiveRunSettings);
     }
@@ -307,7 +307,7 @@ public class CliRunSettingsArgumentProcessorTests
         runSettings.LoadSettingsXml(_defaultRunSettings);
         _settingsProvider.SetActiveRunSettings(runSettings);
 
-        var args = new string[] { };
+        var args = Array.Empty<string>();
         _executor.Initialize(args);
 
         Assert.IsFalse(_commandLineOptions.ArchitectureSpecified);

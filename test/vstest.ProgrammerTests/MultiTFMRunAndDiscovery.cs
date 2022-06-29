@@ -661,7 +661,7 @@ internal static class MessageExtensions
             s_messageProperty = request.GetType().GetProperty("RawMessage")!.GetGetMethod();
         }
 
-        return (string)s_messageProperty!.Invoke(request, new object[0])!;
+        return (string)s_messageProperty!.Invoke(request, Array.Empty<object>())!;
     }
 }
 

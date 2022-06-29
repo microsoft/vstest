@@ -20,8 +20,8 @@ public class TelemetryTests : AcceptanceTestBase
     private const string LOG_TELEMETRY_PATH = "VSTEST_LOGTELEMETRY_PATH";
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void RunTestsShouldPublishMetrics(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -30,8 +30,8 @@ public class TelemetryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void DiscoverTestsShouldPublishMetrics(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

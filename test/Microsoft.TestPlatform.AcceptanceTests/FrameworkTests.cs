@@ -11,8 +11,8 @@ public class FrameworkTests : AcceptanceTestBase
 {
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void FrameworkArgumentShouldWork(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -25,8 +25,8 @@ public class FrameworkTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void FrameworkShortNameArgumentShouldWork(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -41,8 +41,8 @@ public class FrameworkTests : AcceptanceTestBase
     [TestMethod]
     // framework runner not available on Linux
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
-    //[NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute(useCoreRunner: false)]
+    //[NetCoreTargetFrameworkDataSourceAttribute]
     public void OnWrongFrameworkPassedTestRunShouldNotRun(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -72,8 +72,8 @@ public class FrameworkTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void RunSpecificTestsShouldWorkWithFrameworkInCompatibleWarning(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

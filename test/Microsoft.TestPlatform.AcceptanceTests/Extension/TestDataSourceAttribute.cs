@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [AttributeUsage(AttributeTargets.Method)]
-public abstract class TestDataSource<T1> : Attribute, ITestDataSource where T1 : notnull
+public abstract class TestDataSourceAttribute<T1> : Attribute, ITestDataSource where T1 : notnull
 {
     private readonly List<object[]> _data = new();
 
@@ -39,7 +39,7 @@ public abstract class TestDataSource<T1> : Attribute, ITestDataSource where T1 :
 }
 
 [AttributeUsage(AttributeTargets.Method)]
-public abstract class TestDataSource<T1, T2> : Attribute, ITestDataSource
+public abstract class TestDataSourceAttribute<T1, T2> : Attribute, ITestDataSource
     where T1 : notnull
     where T2 : notnull
 {
@@ -70,7 +70,7 @@ public abstract class TestDataSource<T1, T2> : Attribute, ITestDataSource
 }
 
 [AttributeUsage(AttributeTargets.Method)]
-public abstract class TestDataSource<T1, T2, T3> : Attribute, ITestDataSource
+public abstract class TestDataSourceAttribute<T1, T2, T3> : Attribute, ITestDataSource
     where T1 : notnull
     where T2 : notnull
     where T3 : notnull
@@ -102,7 +102,7 @@ public abstract class TestDataSource<T1, T2, T3> : Attribute, ITestDataSource
 }
 
 [AttributeUsage(AttributeTargets.Method)]
-public abstract class TestDataSource<T1, T2, T3, T4> : Attribute, ITestDataSource
+public abstract class TestDataSourceAttribute<T1, T2, T3, T4> : Attribute, ITestDataSource
     where T1 : notnull
     where T2 : notnull
     where T3 : notnull

@@ -18,7 +18,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// If runner framework is net46 then vstest.console.exe will run the tests.
 /// Second argument (target framework) = The framework for which test will run
 /// </summary>
-public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
+[AttributeUsage(AttributeTargets.Method)]
+public class NetFullTargetFrameworkDataSourceAttribute : Attribute, ITestDataSource
 {
     private readonly bool _inIsolation;
     private readonly bool _inProcess;
@@ -26,13 +27,13 @@ public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
     private readonly bool _useCoreRunner;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="NetFullTargetFrameworkDataSource"/> class.
+    /// Initializes a new instance of the <see cref="NetFullTargetFrameworkDataSourceAttribute"/> class.
     /// </summary>
     /// <param name="inIsolation">Run test in isolation</param>
     /// <param name="inProcess">Run tests in process</param>
     /// <param name="useDesktopRunner">To run tests with desktop runner(vstest.console.exe)</param>
     /// <param name="useCoreRunner">To run tests with core runner(dotnet vstest.console.dll)</param>
-    public NetFullTargetFrameworkDataSource(bool inIsolation = true, bool inProcess = false, bool useDesktopRunner = true, bool useCoreRunner = true)
+    public NetFullTargetFrameworkDataSourceAttribute(bool inIsolation = true, bool inProcess = false, bool useDesktopRunner = true, bool useCoreRunner = true)
     {
         _inIsolation = inIsolation;
         _inProcess = inProcess;

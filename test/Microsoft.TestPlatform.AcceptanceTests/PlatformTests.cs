@@ -15,8 +15,8 @@ public class PlatformTests : AcceptanceTestBase
     /// The run test execution with platform x64.
     /// </summary>
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void RunTestExecutionWithPlatformx64(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -29,8 +29,8 @@ public class PlatformTests : AcceptanceTestBase
     /// The run test execution with platform x86.
     /// </summary>
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void RunTestExecutionWithPlatformx86(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

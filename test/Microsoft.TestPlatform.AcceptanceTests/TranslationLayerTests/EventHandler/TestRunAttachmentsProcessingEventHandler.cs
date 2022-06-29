@@ -68,7 +68,7 @@ public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProce
         return -1;
     }
 
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(int _)
     {
         // No op
         return true;

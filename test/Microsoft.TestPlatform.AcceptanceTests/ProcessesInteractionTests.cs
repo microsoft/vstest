@@ -16,7 +16,7 @@ public class ProcessesInteractionTests : AcceptanceTestBase
     /// flush its output and error streams).See https://github.com/microsoft/vstest/issues/3375
     /// </summary>
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void WhenTestHostProcessExitsBecauseTheTargetedRuntimeIsNoFoundThenTheMessageIsCapturedFromTheErrorOutput(RunnerInfo runnerInfo)
     {
         // Arrange
