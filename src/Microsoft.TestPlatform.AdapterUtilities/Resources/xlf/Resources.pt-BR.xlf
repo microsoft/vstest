@@ -10,7 +10,7 @@
       <trans-unit id="ErrorMethodArityMustBeNumeric">
         <source>Method arity must be numeric.</source>
         <note></note>
-        <target state="new">Method arity must be numeric.</target>
+        <target state="translated">A aridade do método deve ser numérica.</target>
       </trans-unit>
       <trans-unit id="ErrorMethodNotFound">
         <source>Method '{0}' not found on type '{1}'</source>
@@ -41,12 +41,12 @@ Example: 'System.Reflection.MethodBase' is not implemented on this platform!</no
       </trans-unit>
       <trans-unit id="ErrorInvalidSequenceAt">
         <source>Invalid escape sequence! (segment: {0}, pos: {1})</source>
-        <target state="new">Invalid escape sequence! (segment: {0}, pos: {1})</target>
+        <target state="translated">Sequência de escape inválida. (segmento: {0}, posição: {1})</target>
         <note>An escape sequence started with '\', but it wasn't legal. {0}: Invalid string, {1}: starting position of invalid sequence.</note>
       </trans-unit>
       <trans-unit id="ErrorNoClosingQuote">
         <source>A closing single quote was expected at the end of the segment! (segment: {0})</source>
-        <target state="new">A closing single quote was expected at the end of the segment! (segment: {0})</target>
+        <target state="translated">Uma aspa simples de fechamento era esperada no final do segmento. (segmento: {0})</target>
         <note>An error thrown when the type name ended but opened single quote was not matched.</note>
       </trans-unit>
     </body>
