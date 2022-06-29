@@ -81,7 +81,7 @@ public class TelemetryTests : AcceptanceTestBase
         ValidateOutput("Discovery", TempDirectory);
     }
 
-    private void ValidateOutput(string command, TempDirectory tempDirectory)
+    private static void ValidateOutput(string command, TempDirectory tempDirectory)
     {
         if (!Directory.Exists(tempDirectory.Path))
         {

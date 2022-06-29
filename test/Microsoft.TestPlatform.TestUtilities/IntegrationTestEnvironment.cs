@@ -68,7 +68,7 @@ public class IntegrationTestEnvironment
         }
     }
 
-    public Dictionary<string, string> DependencyVersions
+    public static Dictionary<string, string> DependencyVersions
         => s_dependencyVersions ??= GetDependencies(TestPlatformRootDirectory);
 
     /// <summary>

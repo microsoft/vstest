@@ -244,7 +244,7 @@ public class DataCollectionTests : AcceptanceTestBase
         Assert.AreEqual(3, diaglogsFileCount);
     }
 
-    private string GetRunsettingsFilePath(string resultsDir)
+    private static string GetRunsettingsFilePath(string resultsDir)
     {
         var runsettingsPath = Path.Combine(resultsDir, "test_" + Guid.NewGuid() + ".runsettings");
         var dataCollectionAttributes = new Dictionary<string, string>

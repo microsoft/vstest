@@ -104,7 +104,7 @@ public class CompatibilityTests
         );
     }
 
-    private void IdGeneration_TestVector(string testName, string expected)
+    private static void IdGeneration_TestVector(string testName, string expected)
     {
         // Arrange
         expected = expected.Replace(" ", "").ToLowerInvariant();
@@ -118,7 +118,7 @@ public class CompatibilityTests
         Assert.AreEqual(expected, actual, $"Test Id for '{testName}' is invalid!");
     }
 
-    private void IdGeneration_TestRepetitionVector(string input, int repetition, string expected)
+    private static void IdGeneration_TestRepetitionVector(string input, int repetition, string expected)
     {
         // Arrange
         var idProvider = new AdapterUtilities.TestIdProvider();

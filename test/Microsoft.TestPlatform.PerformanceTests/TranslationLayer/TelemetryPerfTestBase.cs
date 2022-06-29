@@ -130,5 +130,5 @@ public class TelemetryPerfTestBase : PerformanceTestBase
     /// <returns></returns>
 
     // DONT make this just <RunSettings></RunSettings> it makes Translation layer hang... https://github.com/microsoft/vstest/issues/3519
-    public string GetDefaultRunSettings() => "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+    public static string GetDefaultRunSettings() => "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
 }
