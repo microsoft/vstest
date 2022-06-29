@@ -46,8 +46,8 @@ internal struct TestParameters
 public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 {
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void CollectCodeCoverageWithCollectOptionForx86(RunnerInfo runnerInfo)
     {
         var parameters = new TestParameters()
@@ -65,8 +65,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void CollectCodeCoverageWithCollectOptionForx64(RunnerInfo runnerInfo)
     {
         var parameters = new TestParameters()
@@ -84,8 +84,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void CollectCodeCoverageX86WithRunSettings(RunnerInfo runnerInfo)
     {
         var parameters = new TestParameters()
@@ -103,8 +103,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void CollectCodeCoverageX64WithRunSettings(RunnerInfo runnerInfo)
     {
         var parameters = new TestParameters()
@@ -122,8 +122,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void CodeCoverageShouldAvoidExclusionsX86(RunnerInfo runnerInfo)
     {
         var parameters = new TestParameters()
@@ -144,8 +144,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void CodeCoverageShouldAvoidExclusionsX64(RunnerInfo runnerInfo)
     {
         var parameters = new TestParameters()
@@ -166,8 +166,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void CollectCodeCoverageSpecifyOutputFormatXml(RunnerInfo runnerInfo)
     {
         var parameters = new TestParameters()
@@ -185,8 +185,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void CollectCodeCoverageSpecifyOutputFormatCoberturaOverrideRunSettingsConfiguration(RunnerInfo runnerInfo)
     {
         var parameters = new TestParameters()

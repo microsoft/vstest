@@ -44,8 +44,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void TestRunWithCodeCoverage(RunnerInfo runnerInfo)
     {
         // arrange
@@ -68,8 +68,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void TestRunWithCodeCoverageUsingClrIe(RunnerInfo runnerInfo)
     {
         // arrange
@@ -92,8 +92,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void TestRunWithCodeCoverageParallel(RunnerInfo runnerInfo)
     {
         // arrange
@@ -179,8 +179,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingNoMetrics(RunnerInfo runnerInfo)
     {
         // System.Environment.SetEnvironmentVariable("VSTEST_RUNNER_DEBUG_ATTACHVS", "1");
@@ -232,8 +232,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingModuleDuplicated(RunnerInfo runnerInfo)
     {
         // arrange
@@ -288,8 +288,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingSameReportFormat(RunnerInfo runnerInfo)
     {
         // arrange
@@ -345,8 +345,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingDifferentReportFormats(RunnerInfo runnerInfo)
     {
         // arrange
@@ -408,8 +408,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     [DoNotParallelize]
     public async Task EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
     {

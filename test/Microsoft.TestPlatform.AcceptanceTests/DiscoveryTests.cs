@@ -17,8 +17,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class DiscoveryTests : AcceptanceTestBase
 {
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void DiscoverAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -31,8 +31,8 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void MultipleSourcesDiscoverAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -54,7 +54,7 @@ public class DiscoveryTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
     public void DiscoverFullyQualifiedTests(RunnerInfo runnerInfo)
     {
         var dummyFilePath = Path.Combine(TempDirectory.Path, $"{Guid.NewGuid()}.txt");
@@ -72,8 +72,8 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void DiscoverTestsShouldShowProperWarningIfNoTestsOnTestCaseFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

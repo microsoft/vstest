@@ -21,8 +21,8 @@ public class RunsettingsTests : AcceptanceTestBase
     /// Command line run settings should have high precedence among settings file, cli runsettings and cli switches
     /// </summary>
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void CommandLineRunSettingsShouldWinAmongAllOptions(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -62,8 +62,8 @@ public class RunsettingsTests : AcceptanceTestBase
     /// Command line run settings should have high precedence between cli runsettings and cli switches.
     /// </summary>
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void CLIRunsettingsShouldWinBetweenCLISwitchesAndCLIRunsettings(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -100,8 +100,8 @@ public class RunsettingsTests : AcceptanceTestBase
     /// <param name="targetFramework"></param>
     /// <param name="targetRuntime"></param>
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void CommandLineSwitchesShouldWinBetweenSettingsFileAndCommandLineSwitches(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -129,8 +129,8 @@ public class RunsettingsTests : AcceptanceTestBase
     #endregion
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void RunSettingsWithoutParallelAndPlatformX86(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -154,8 +154,8 @@ public class RunsettingsTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void RunSettingsParamsAsArguments(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -182,8 +182,8 @@ public class RunsettingsTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void RunSettingsAndRunSettingsParamsAsArguments(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -218,8 +218,8 @@ public class RunsettingsTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void RunSettingsWithParallelAndPlatformX64(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -466,8 +466,8 @@ public class RunsettingsTests : AcceptanceTestBase
     #region RunSettings With EnvironmentVariables Settings Tests
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void EnvironmentVariablesSettingsShouldSetEnvironmentVariables(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

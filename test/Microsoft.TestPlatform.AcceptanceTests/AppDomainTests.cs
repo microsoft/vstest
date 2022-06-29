@@ -21,7 +21,7 @@ public class AppDomainTests : AcceptanceTestBase
 {
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
     public void RunTestExecutionWithDisableAppDomain(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

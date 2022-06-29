@@ -12,7 +12,7 @@ public class CuitTest : AcceptanceTestBase
 {
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
     public void CuitRunAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

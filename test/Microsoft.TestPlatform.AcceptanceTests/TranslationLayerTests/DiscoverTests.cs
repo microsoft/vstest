@@ -84,8 +84,8 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -103,8 +103,8 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void DiscoverTestsUsingEventHandler2AndBatchSize(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -133,8 +133,8 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void DiscoverTestsUsingEventHandler1AndBatchSize(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -162,8 +162,8 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
-    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSourceAttribute]
     public void DisoverTestUsingEventHandler2ShouldContainAllSourcesAsFullyDiscovered(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -182,8 +182,8 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSourceAttribute]
     public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
