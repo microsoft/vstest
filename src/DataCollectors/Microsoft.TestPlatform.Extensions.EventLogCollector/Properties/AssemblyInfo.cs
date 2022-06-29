@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Reflection;
+using System.Resources;
 using System.Runtime.InteropServices;
 
 using Microsoft.TestPlatform.Extensions.EventLogCollector;
@@ -15,6 +16,7 @@ using Microsoft.VisualStudio.TestPlatform;
 [assembly: AssemblyCopyright("© Microsoft Corporation. All rights reserved.")]
 [assembly: AssemblyProduct("Microsoft.TestPlatform.Extensions.EventLogCollector")]
 [assembly: AssemblyTrademark("")]
+[assembly: NeutralResourcesLanguage("en-US")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
