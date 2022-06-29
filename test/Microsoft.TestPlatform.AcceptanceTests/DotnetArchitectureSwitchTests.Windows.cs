@@ -85,7 +85,7 @@ public class UnitTest1
         Assert.AreEqual(0, exitCode, stdOut);
     }
 
-    private string GetLatestSdkVersion(string dotnetPath)
+    private static string GetLatestSdkVersion(string dotnetPath)
         => Path.GetFileName(Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(dotnetPath)!, @"shared/Microsoft.NETCore.App")).OrderByDescending(x => x).First());
 }
 

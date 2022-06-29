@@ -441,7 +441,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         return GetProjects().Select(p => GetAssetFullPath(p)).ToList();
     }
 
-    private IList<string> GetProjects()
+    private static IList<string> GetProjects()
     {
         return new List<string> { "SimpleTestProject.dll", "SimpleTestProject2.dll" };
     }

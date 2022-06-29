@@ -1232,12 +1232,12 @@ public class ConsoleLoggerTests
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryTotalTests, 2), OutputLevel.Information), Times.Once());
     }
 
-    private TestCase CreateTestCase(string testCaseName)
+    private static TestCase CreateTestCase(string testCaseName)
     {
         return new TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");
     }
 
-    private List<ObjectModel.TestResult> GetTestResultsObject()
+    private static List<ObjectModel.TestResult> GetTestResultsObject()
     {
         var testcase = new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSource")
         {
@@ -1282,7 +1282,7 @@ public class ConsoleLoggerTests
         return testresultList;
     }
 
-    private List<ObjectModel.TestResult> GetPassedTestResultsObject()
+    private static List<ObjectModel.TestResult> GetPassedTestResultsObject()
     {
         var testcase = new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSourcePassed")
         {
@@ -1309,7 +1309,7 @@ public class ConsoleLoggerTests
     }
 
 
-    private List<ObjectModel.TestResult> GetTestResultObject(TestOutcome outcome)
+    private static List<ObjectModel.TestResult> GetTestResultObject(TestOutcome outcome)
     {
         var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
         var testresult = new ObjectModel.TestResult(testcase)

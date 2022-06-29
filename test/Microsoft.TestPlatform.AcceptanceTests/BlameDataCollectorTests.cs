@@ -354,7 +354,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         Assert.IsTrue(isValid, "Sequence attachment is not valid.");
     }
 
-    private bool IsValidXml(string xmlFilePath)
+    private static bool IsValidXml(string xmlFilePath)
     {
         var file = File.OpenRead(xmlFilePath);
         var reader = XmlReader.Create(file);

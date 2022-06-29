@@ -310,7 +310,7 @@ public class CompatibilityRowsBuilder
         };
     }
 
-    private RunnerInfo GetRunnerInfo(string batch, string runnerFramework, string hostFramework, bool inIsolation)
+    private static RunnerInfo GetRunnerInfo(string batch, string runnerFramework, string hostFramework, bool inIsolation)
     {
         return new RunnerInfo
         {
@@ -321,7 +321,7 @@ public class CompatibilityRowsBuilder
         };
     }
 
-    private DllInfo GetMSTestInfo(string msTestVersion)
+    private static DllInfo GetMSTestInfo(string msTestVersion)
     {
         var depsXml = GetDependenciesXml();
 

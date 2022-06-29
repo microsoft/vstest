@@ -301,7 +301,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         return arguments;
     }
 
-    private void AssertSkippedMethod(XmlDocument document)
+    private static void AssertSkippedMethod(XmlDocument document)
     {
         var module = GetModuleNode(document.DocumentElement!, "codecoveragetest.dll");
         Assert.IsNotNull(module);
@@ -321,7 +321,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         Assert.IsNotNull(testAbsFunction);
     }
 
-    private void ValidateCoverageData(XmlDocument document, string moduleName, bool validateSourceFileNames)
+    private static void ValidateCoverageData(XmlDocument document, string moduleName, bool validateSourceFileNames)
     {
         var module = GetModuleNode(document.DocumentElement!, moduleName.ToLower());
 
@@ -340,7 +340,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         }
     }
 
-    private void AssertSourceFileName(XmlNode module)
+    private static void AssertSourceFileName(XmlNode module)
     {
         const string expectedFileName = "UnitTest1.cs";
 

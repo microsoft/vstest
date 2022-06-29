@@ -155,7 +155,7 @@ public class ResultsDirectoryArgumentProcessorTests
 
     #endregion
 
-    private string TranslatePath(string path)
+    private static string TranslatePath(string path)
     {
         // RuntimeInformation has conflict when used
         if (Environment.OSVersion.Platform.ToString().StartsWith("Win"))

@@ -202,7 +202,7 @@ public class XmlUtilitiesTests
 
     #region Private Methods
 
-    private XmlDocument GetXmlDocument(string settingsXml)
+    private static XmlDocument GetXmlDocument(string settingsXml)
     {
         var doc = new XmlDocument();
         doc.LoadXml(settingsXml);

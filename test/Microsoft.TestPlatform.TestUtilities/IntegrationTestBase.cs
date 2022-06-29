@@ -279,7 +279,7 @@ public class IntegrationTestBase
     /// <param name="runnerFramework">Runner Framework</param>
     /// <param name="framework">Framework for which Tests are not supported</param>
     /// <param name="message">Message to be shown</param>
-    public void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
+    public static void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
     {
         if (runnerFramework.StartsWith(framework))
         {
@@ -578,19 +578,19 @@ public class IntegrationTestBase
 
         if (testFramework == UnitTestFramework.MSTest)
         {
-            adapterRelativePath = string.Format(_testAdapterRelativePath, _testEnvironment.DependencyVersions["MSTestAdapterVersion"]);
+            adapterRelativePath = string.Format(_testAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["MSTestAdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.NUnit)
         {
-            adapterRelativePath = string.Format(_nUnitTestAdapterRelativePath, _testEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
+            adapterRelativePath = string.Format(_nUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.XUnit)
         {
-            adapterRelativePath = string.Format(_xUnitTestAdapterRelativePath, _testEnvironment.DependencyVersions["XUnitAdapterVersion"]);
+            adapterRelativePath = string.Format(_xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.Chutzpah)
         {
-            adapterRelativePath = string.Format(_chutzpahTestAdapterRelativePath, _testEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
+            adapterRelativePath = string.Format(_chutzpahTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
         }
 
         return _testEnvironment.GetNugetPackage(adapterRelativePath);

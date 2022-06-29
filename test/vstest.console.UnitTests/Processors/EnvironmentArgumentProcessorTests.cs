@@ -169,7 +169,7 @@ public class EnvironmentArgumentProcessorTests
         _mockOutput.VerifyAll();
     }
 
-    private XmlParseResult ParseSettingsXml(IRunSettingsProvider provider)
+    private static XmlParseResult ParseSettingsXml(IRunSettingsProvider provider)
     {
         var document = XDocument.Parse(provider.ActiveRunSettings!.SettingsXml!);
 
