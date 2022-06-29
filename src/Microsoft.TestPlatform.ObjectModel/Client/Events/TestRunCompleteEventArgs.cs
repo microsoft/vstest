@@ -38,7 +38,7 @@ public class TestRunCompleteEventArgs : EventArgs
         bool isCanceled,
         bool isAborted,
         Exception? error,
-        Collection<AttachmentSet> attachmentSets,
+        Collection<AttachmentSet>? attachmentSets,
         TimeSpan elapsedTime)
         : this(
               stats,

@@ -161,7 +161,7 @@ public static class ValidateArgProperty
     /// <param name="parameterName">The parameter name of the argument.</param>
     /// <param name="propertyName">The property name of the argument.</param>
     [DebuggerStepThrough]
-    public static void NotNull([ValidatedNotNull] object arg, string parameterName, string propertyName)
+    public static void NotNull([ValidatedNotNull] object? arg, string parameterName, string propertyName)
     {
         if (arg == null)
         {
@@ -193,7 +193,7 @@ public static class ValidateArgProperty
     /// <param name="parameterName">The parameter name of the argument.</param>
     /// <param name="propertyName">The property name of the argument.</param>
     [DebuggerStepThrough]
-    public static void NotNullOrEmpty([ValidatedNotNull] string arg, string parameterName, string propertyName)
+    public static void NotNullOrEmpty([ValidatedNotNull] string? arg, string parameterName, string propertyName)
     {
         NotNull(arg, parameterName, propertyName);
 
@@ -212,7 +212,7 @@ public static class ValidateArgProperty
     /// <param name="propertyName">The property name of the argument.</param>
     /// <typeparam name="T">The type of the expected argument.</typeparam>
     [DebuggerStepThrough]
-    public static void TypeOf<T>([ValidatedNotNull] object arg, string parameterName, string propertyName)
+    public static void TypeOf<T>([ValidatedNotNull] object? arg, string parameterName, string propertyName)
         where T : class
     {
         NotNull(arg, parameterName, propertyName);

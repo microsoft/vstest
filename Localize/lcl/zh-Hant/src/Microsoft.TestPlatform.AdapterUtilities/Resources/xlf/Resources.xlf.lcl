@@ -29,10 +29,13 @@
       </Item>
       <Item ItemId=";ErrorMethodArityMustBeNumeric" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Method arity must be numeric]]></Val>
+          <Val><![CDATA[Method arity must be numeric.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[方法 arity 必須為數值]]></Val>
+            <Val><![CDATA[方法 arity 必須為數值。]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Method arity must be numeric]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
