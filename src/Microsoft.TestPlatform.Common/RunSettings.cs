@@ -54,7 +54,7 @@ public class RunSettings : IRunSettings
     /// </summary>
     /// <param name="settingsName">Name of the settings section to get.</param>
     /// <returns>The settings provider for the settings or null if one was not found.</returns>
-    public ISettingsProvider? GetSettings(string settingsName)
+    public ISettingsProvider? GetSettings(string? settingsName)
     {
         if (settingsName.IsNullOrWhiteSpace())
         {

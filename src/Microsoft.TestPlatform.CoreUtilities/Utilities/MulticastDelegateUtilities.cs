@@ -24,7 +24,7 @@ public static class MulticastDelegateUtilities
     /// <param name="traceDisplayName">Name to use when tracing out errors.</param>
     // Using [CallerMemberName] for the traceDisplayName is a possibility, but in few places we call through other
     // methods until we reach here. And it would change the public API.
-    public static void SafeInvoke(this Delegate? delegates, object sender, EventArgs args, string traceDisplayName)
+    public static void SafeInvoke(this Delegate? delegates, object? sender, EventArgs args, string traceDisplayName)
     {
         SafeInvoke(delegates, sender, (object)args, traceDisplayName);
     }
@@ -37,7 +37,7 @@ public static class MulticastDelegateUtilities
     /// <param name="sender">Sender to use when raising the event.</param>
     /// <param name="args">Arguments to provide.</param>
     /// <param name="traceDisplayName">Name to use when tracing out errors.</param>
-    public static void SafeInvoke(this Delegate? delegates, object sender, object args, string traceDisplayName)
+    public static void SafeInvoke(this Delegate? delegates, object? sender, object args, string traceDisplayName)
     {
         ValidateArg.NotNull(args, nameof(args));
         ValidateArg.NotNullOrWhiteSpace(traceDisplayName, nameof(traceDisplayName));

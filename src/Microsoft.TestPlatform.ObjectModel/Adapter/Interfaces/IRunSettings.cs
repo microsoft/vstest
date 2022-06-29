@@ -13,7 +13,7 @@ public interface IRunSettings
     /// </summary>
     /// <param name="settingsName">Name of the settings section to get.</param>
     /// <returns>The settings provider for the settings or null if one was not found.</returns>
-    ISettingsProvider? GetSettings(string settingsName);
+    ISettingsProvider? GetSettings(string? settingsName);
 
     /// <summary>
     /// Settings used for this run.

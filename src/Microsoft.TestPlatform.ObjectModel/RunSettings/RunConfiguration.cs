@@ -804,15 +804,10 @@ public class RunConfiguration : TestRunSettings
                     case "TestAdapterLoadingStrategy":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         value = reader.ReadElementContentAsString();
-                        if (Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy))
-                        {
-                            runConfiguration.TestAdapterLoadingStrategy = loadingStrategy;
-                        }
-                        else
-                        {
-                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                        runConfiguration.TestAdapterLoadingStrategy = Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy)
+                            ? loadingStrategy
+                            : throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
-                        }
 
                         break;
 

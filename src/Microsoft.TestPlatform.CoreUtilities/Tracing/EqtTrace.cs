@@ -28,12 +28,12 @@ public static class EqtTrace
     private static readonly IPlatformEqtTrace TraceImpl = new PlatformEqtTrace();
 
 #if NETFRAMEWORK
-    public static void SetupRemoteEqtTraceListeners(AppDomain childDomain)
+    public static void SetupRemoteEqtTraceListeners(AppDomain? childDomain)
     {
         TraceImpl.SetupRemoteEqtTraceListeners(childDomain);
     }
 
-    public static void SetupListener(TraceListener listener)
+    public static void SetupListener(TraceListener? listener)
     {
         TraceImpl.SetupListener(listener);
     }
@@ -178,9 +178,10 @@ public static class EqtTrace
     /// </summary>
     /// <param name="message">the error message</param>
     [Conditional("TRACE")]
-    public static void Fail(string message)
+    public static void Fail(string? message)
     {
-        Fail(message, new object[0]);
+        Error(message);
+        FailDebugger(message);
     }
 
     /// <summary>
@@ -193,9 +194,7 @@ public static class EqtTrace
     public static void Fail(string format, params object?[] args)
     {
         string message = string.Format(CultureInfo.InvariantCulture, format, args);
-
-        Error(message);
-        FailDebugger(message);
+        Fail(message);
     }
 
     /// <summary>
@@ -217,7 +216,7 @@ public static class EqtTrace
     /// <param name="condition">Condition for tracing.</param>
     /// <param name="message">Trace error message.</param>
     [Conditional("TRACE")]
-    public static void ErrorIf(bool condition, string message)
+    public static void ErrorIf(bool condition, string? message)
     {
         if (condition)
         {
@@ -231,7 +230,7 @@ public static class EqtTrace
     /// <param name="condition">Condition for tracing.</param>
     /// <param name="message">Trace error message.</param>
     [Conditional("TRACE")]
-    public static void ErrorUnless(bool condition, string message)
+    public static void ErrorUnless(bool condition, string? message)
     {
         ErrorIf(!condition, message);
     }
@@ -244,7 +243,7 @@ public static class EqtTrace
     /// <param name="bumpLevel">Level for trace.</param>
     /// <param name="message">Trace message.</param>
     [Conditional("TRACE")]
-    public static void ErrorUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string message)
+    public static void ErrorUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string? message)
     {
         if (condition)
         {
@@ -372,7 +371,7 @@ public static class EqtTrace
     /// <param name="condition">Condition to evaluate for tracing.</param>
     /// <param name="message">Message to trace.</param>
     [Conditional("TRACE")]
-    public static void WarningIf(bool condition, string message)
+    public static void WarningIf(bool condition, string? message)
     {
         if (condition)
         {
@@ -386,7 +385,7 @@ public static class EqtTrace
     /// <param name="condition">Condition to evaluate for tracing.</param>
     /// <param name="message">Message to trace.</param>
     [Conditional("TRACE")]
-    public static void WarningUnless(bool condition, string message)
+    public static void WarningUnless(bool condition, string? message)
     {
         WarningIf(!condition, message);
     }
@@ -399,7 +398,7 @@ public static class EqtTrace
     /// <param name="bumpLevel">Trace message level.</param>
     /// <param name="message">Message to trace.</param>
     [Conditional("TRACE")]
-    public static void WarningUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string message)
+    public static void WarningUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string? message)
     {
         if (condition)
         {
@@ -495,7 +494,7 @@ public static class EqtTrace
     /// <param name="condition">Condition for tracing.</param>
     /// <param name="message">Trace message.</param>
     [Conditional("TRACE")]
-    public static void InfoIf(bool condition, string message)
+    public static void InfoIf(bool condition, string? message)
     {
         if (condition)
         {
@@ -509,7 +508,7 @@ public static class EqtTrace
     /// <param name="condition">Condition for tracing.</param>
     /// <param name="message">Trace message.</param>
     [Conditional("TRACE")]
-    public static void InfoUnless(bool condition, string message)
+    public static void InfoUnless(bool condition, string? message)
     {
         InfoIf(!condition, message);
     }
@@ -522,7 +521,7 @@ public static class EqtTrace
     /// <param name="bumpLevel">Trace message level.</param>
     /// <param name="message">Trace message.</param>
     [Conditional("TRACE")]
-    public static void InfoUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string message)
+    public static void InfoUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string? message)
     {
         if (condition)
         {
@@ -604,7 +603,7 @@ public static class EqtTrace
     /// </summary>
     /// <param name="message">Trace message.</param>
     [Conditional("TRACE")]
-    public static void Verbose(string message)
+    public static void Verbose(string? message)
     {
         if (TraceImpl.ShouldTrace(PlatformTraceLevel.Verbose))
         {
@@ -618,7 +617,7 @@ public static class EqtTrace
     /// <param name="condition">Condition for tracing.</param>
     /// <param name="message">Trace message.</param>
     [Conditional("TRACE")]
-    public static void VerboseIf(bool condition, string message)
+    public static void VerboseIf(bool condition, string? message)
     {
         if (condition)
         {
@@ -632,7 +631,7 @@ public static class EqtTrace
     /// <param name="condition">Condition for tracing.</param>
     /// <param name="message">Trace message.</param>
     [Conditional("TRACE")]
-    public static void VerboseUnless(bool condition, string message)
+    public static void VerboseUnless(bool condition, string? message)
     {
         VerboseIf(!condition, message);
     }
@@ -645,7 +644,7 @@ public static class EqtTrace
     /// <param name="level">Trace message level.</param>
     /// <param name="message">Trace message.</param>
     [Conditional("TRACE")]
-    public static void VerboseUnlessAlterTrace(bool condition, PlatformTraceLevel level, string message)
+    public static void VerboseUnlessAlterTrace(bool condition, PlatformTraceLevel level, string? message)
     {
         if (condition)
         {
@@ -791,7 +790,7 @@ public static class EqtTrace
         return message.ToString();
     }
 
-    private static void WriteAtLevel(PlatformTraceLevel level, string message)
+    private static void WriteAtLevel(PlatformTraceLevel level, string? message)
     {
         switch (level)
         {
@@ -821,7 +820,7 @@ public static class EqtTrace
         WriteAtLevel(level, string.Format(CultureInfo.InvariantCulture, format, args));
     }
 
-    private static void FailDebugger(string message)
+    private static void FailDebugger(string? message)
     {
 #if DEBUG
 #if NETSTANDARD1_0
