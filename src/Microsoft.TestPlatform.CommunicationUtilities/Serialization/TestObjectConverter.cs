@@ -55,12 +55,17 @@ public class TestObjectConverter : JsonConverter
         // key value pairs.
         foreach (var property in properties)
         {
-            var testProperty = property["Key"]!.ToObject<TestProperty>(serializer)!;
+            var testProperty = property["Key"]?.ToObject<TestProperty>(serializer);
+
+            if (testProperty == null)
+            {
+                continue;
+            }
 
             // Let the null values be passed in as null data
-            var token = property["Value"]!;
+            var token = property["Value"];
             object? propertyData = null;
-            if (token.Type != JTokenType.Null)
+            if (token != null && token.Type != JTokenType.Null)
             {
                 // If the property is already a string. No need to convert again.
                 if (token.Type == JTokenType.String)
