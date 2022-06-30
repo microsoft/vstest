@@ -57,7 +57,7 @@
     <!-- This version also needs to be updated in src\package\nuspec\TestPlatform.ObjectModel.nuspec -->
     <NuGetFrameworksVersion>5.11.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
-    <JsonNetVersion>9.0.1</JsonNetVersion>
+    <JsonNetVersion>13.0.1</JsonNetVersion>
 
     <TestPlatformExternalsVersion>17.3.0-preview-2-32502-021</TestPlatformExternalsVersion>
     <!-- <TestPlatformMSDiaVersion>$(TestPlatformExternalsVersion)</TestPlatformMSDiaVersion> -->

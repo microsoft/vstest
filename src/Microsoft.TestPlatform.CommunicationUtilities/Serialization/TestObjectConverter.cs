@@ -30,7 +30,7 @@ public class TestObjectConverter : JsonConverter
     }
 
     /// <inheritdoc/>
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         if (objectType != typeof(List<KeyValuePair<TestProperty, object>>))
         {
@@ -55,12 +55,17 @@ public class TestObjectConverter : JsonConverter
         // key value pairs.
         foreach (var property in properties)
         {
-            var testProperty = property["Key"].ToObject<TestProperty>(serializer);
+            var testProperty = property?["Key"]?.ToObject<TestProperty>(serializer);
+
+            if (testProperty == null)
+            {
+                continue;
+            }
 
             // Let the null values be passed in as null data
-            var token = property["Value"];
+            var token = property?["Value"];
             object? propertyData = null;
-            if (token.Type != JTokenType.Null)
+            if (token != null && token.Type != JTokenType.Null)
             {
                 // If the property is already a string. No need to convert again.
                 if (token.Type == JTokenType.String)
@@ -82,7 +87,7 @@ public class TestObjectConverter : JsonConverter
     }
 
     /// <inheritdoc/>
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         // Create an array of <Property, Value> dictionary
     }
@@ -122,7 +127,7 @@ internal class TestObjectConverter7 : JsonConverter
     }
 
     /// <inheritdoc/>
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         if (objectType != typeof(List<KeyValuePair<TestProperty, object>>))
         {
@@ -135,7 +140,7 @@ internal class TestObjectConverter7 : JsonConverter
             return new List<KeyValuePair<TestProperty, object>>();
         }
 
-        var deserializedProperties = serializer.Deserialize<List<KeyValuePair<TestPropertyTemplate, JToken>>>(reader);
+        var deserializedProperties = serializer.Deserialize<List<KeyValuePair<TestPropertyTemplate, JToken>>>(reader)!;
         // Initialize the list capacity to be the number of properties we might add.
         var propertyList = new List<KeyValuePair<TestProperty, object?>>(deserializedProperties.Count);
 
@@ -177,7 +182,7 @@ internal class TestObjectConverter7 : JsonConverter
     }
 
     /// <inheritdoc/>
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         // Create an array of <Property, Value> dictionary
     }

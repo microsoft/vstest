@@ -150,6 +150,7 @@ TPB_LocalizedBuild=$DISABLE_LOCALIZED_BUILD
 TPB_Verbose=$VERBOSE
 TPB_EXTERNALS_VERSION=$(grep TestPlatformExternalsVersion $TP_ROOT_DIR/scripts/build/TestPlatform.Dependencies.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
 TPB_CC_EXTERNALS_VERSION=$(grep MicrosoftInternalCodeCoverageVersion $TP_ROOT_DIR/eng/Versions.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
+TPB_NEWTONSOFT_JSON_VERSION=$(grep NewtonsoftJsonVersion $TP_ROOT_DIR/eng/Versions.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
 
 TPB_BRANCH="$(git -C "." rev-parse --abbrev-ref HEAD 2>/dev/null)" || TPB_BRANCH="LOCALBRANCH" # detached HEAD
 TPB_COMMIT="$(git -C "." rev-parse HEAD 2>/dev/null)"              || TPB_COMMIT="LOCALBUILD" # detached HEAD
@@ -436,7 +437,7 @@ function publish_package()
         done
         #*************************************************************************************************************#
 
-        newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/9.0.1/lib/netstandard1.0/Newtonsoft.Json.dll
+        newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/$TPB_NEWTONSOFT_JSON_VERSION/lib/netstandard1.0/Newtonsoft.Json.dll
         cp $newtonsoft $packageDir
     done
 

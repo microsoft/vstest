@@ -22,7 +22,7 @@ public class TestCaseConverter : JsonConverter
     }
 
     /// <inheritdoc/>
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         var testCase = new TestCase();
 
@@ -38,11 +38,22 @@ public class TestCaseConverter : JsonConverter
         // key value pairs.
         foreach (var property in properties.Values<JToken>())
         {
-            var testProperty = property["Key"].ToObject<TestProperty>(serializer);
+            var testProperty = property?["Key"]?.ToObject<TestProperty>(serializer);
+
+            if (testProperty == null)
+            {
+                return null;
+            }
 
             // Let the null values be passed in as null data
-            var token = property["Value"];
+            var token = property?["Value"];
             string? propertyData = null;
+
+            if (token == null)
+            {
+                return null;
+            }
+
             if (token.Type != JTokenType.Null)
             {
                 // If the property is already a string. No need to convert again.
@@ -86,8 +97,13 @@ public class TestCaseConverter : JsonConverter
     }
 
     /// <inheritdoc/>
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
+        if (value == null)
+        {
+            return;
+        }
+
         // P2 to P1
         var testCase = (TestCase)value;
 
