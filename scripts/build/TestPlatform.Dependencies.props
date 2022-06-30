@@ -29,7 +29,7 @@
 
     <NuGetFrameworksVersion>5.0.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
-    <JsonNetVersion>9.0.1</JsonNetVersion>
+    <JsonNetVersion>13.0.1</JsonNetVersion>
     <MoqVersion>4.8.3</MoqVersion>
 
     <TestPlatformExternalsVersion>17.0.0-previews-4-31630-230</TestPlatformExternalsVersion>
