@@ -157,7 +157,8 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
         cancellationToken.Register(() => _wrapper.CancelProcessAttachment());
         _processAttachmentSetsLogger = logger;
         _progressReporter = progressReporter;
-        return JsonDataSerializer.Instance.Deserialize<AttachmentSet[]>(await Task.Run(() => _wrapper.ProcessAttachment(configurationElement.OuterXml, JsonDataSerializer.Instance.Serialize(attachments.ToArray()))).ConfigureAwait(false));
+        var result = await Task.Run(() => _wrapper.ProcessAttachment(configurationElement.OuterXml, JsonDataSerializer.Instance.Serialize(attachments.ToArray()))).ConfigureAwait(false);
+        return JsonDataSerializer.Instance.Deserialize<AttachmentSet[]>(result)!;
     }
 
     public void Dispose()
