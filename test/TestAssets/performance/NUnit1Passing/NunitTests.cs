@@ -1,5 +1,4 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace Tests
 {
@@ -17,5 +16,5 @@ namespace Tests
         #region FailingTests
         #endregion
     }
- 
+
 }
