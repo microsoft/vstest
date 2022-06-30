@@ -62,7 +62,7 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
     {
         var doc = new XmlDocument();
         doc.LoadXml(configurationElement);
-        AttachmentSet[] attachmentSets = JsonDataSerializer.Instance.Deserialize<AttachmentSet[]>(attachments);
+        AttachmentSet[] attachmentSets = JsonDataSerializer.Instance.Deserialize<AttachmentSet[]>(attachments)!;
         SynchronousProgress progress = new(Report);
         _processAttachmentCts = new CancellationTokenSource();
 

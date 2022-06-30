@@ -179,7 +179,7 @@ Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.MessageRec
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.MessageReceivedEventArgs.MessageReceivedEventArgs() -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer.Clone<T>(T? obj) -> T?
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer.Deserialize<T>(string! json, int version = 1) -> T
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer.Deserialize<T>(string! json, int version = 1) -> T?
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer.DeserializeMessage(string! rawMessage) -> Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message!
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer.DeserializePayload<T>(Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message? message) -> T?
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer.Serialize<T>(T data, int version = 1) -> string!
@@ -361,20 +361,20 @@ Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.VersionedMessage.Vers
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message.ToString() -> string!
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.DefaultTestPlatformContractResolver.CreateContract(System.Type! objectType) -> Newtonsoft.Json.Serialization.JsonContract!
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestCaseConverter.CanConvert(System.Type! objectType) -> bool
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestCaseConverter.ReadJson(Newtonsoft.Json.JsonReader! reader, System.Type! objectType, object! existingValue, Newtonsoft.Json.JsonSerializer! serializer) -> object!
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestCaseConverter.WriteJson(Newtonsoft.Json.JsonWriter! writer, object! value, Newtonsoft.Json.JsonSerializer! serializer) -> void
+override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestCaseConverter.ReadJson(Newtonsoft.Json.JsonReader! reader, System.Type! objectType, object? existingValue, Newtonsoft.Json.JsonSerializer! serializer) -> object?
+override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestCaseConverter.WriteJson(Newtonsoft.Json.JsonWriter! writer, object? value, Newtonsoft.Json.JsonSerializer! serializer) -> void
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter.CanConvert(System.Type! objectType) -> bool
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter.CanRead.get -> bool
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter.CanWrite.get -> bool
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter.ReadJson(Newtonsoft.Json.JsonReader! reader, System.Type! objectType, object! existingValue, Newtonsoft.Json.JsonSerializer! serializer) -> object!
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter.WriteJson(Newtonsoft.Json.JsonWriter! writer, object! value, Newtonsoft.Json.JsonSerializer! serializer) -> void
+override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter.ReadJson(Newtonsoft.Json.JsonReader! reader, System.Type! objectType, object? existingValue, Newtonsoft.Json.JsonSerializer! serializer) -> object!
+override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter.WriteJson(Newtonsoft.Json.JsonWriter! writer, object? value, Newtonsoft.Json.JsonSerializer! serializer) -> void
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestPlatformContractResolver1.CreateContract(System.Type! objectType) -> Newtonsoft.Json.Serialization.JsonContract!
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter.CanConvert(System.Type! objectType) -> bool
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter.ReadJson(Newtonsoft.Json.JsonReader! reader, System.Type! objectType, object! existingValue, Newtonsoft.Json.JsonSerializer! serializer) -> object!
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter.WriteJson(Newtonsoft.Json.JsonWriter! writer, object! value, Newtonsoft.Json.JsonSerializer! serializer) -> void
+override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter.ReadJson(Newtonsoft.Json.JsonReader! reader, System.Type! objectType, object? existingValue, Newtonsoft.Json.JsonSerializer! serializer) -> object!
+override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter.WriteJson(Newtonsoft.Json.JsonWriter! writer, object? value, Newtonsoft.Json.JsonSerializer! serializer) -> void
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestRunStatisticsConverter.CanConvert(System.Type! objectType) -> bool
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestRunStatisticsConverter.ReadJson(Newtonsoft.Json.JsonReader! reader, System.Type! objectType, object! existingValue, Newtonsoft.Json.JsonSerializer! serializer) -> object!
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestRunStatisticsConverter.WriteJson(Newtonsoft.Json.JsonWriter! writer, object! value, Newtonsoft.Json.JsonSerializer! serializer) -> void
+override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestRunStatisticsConverter.ReadJson(Newtonsoft.Json.JsonReader! reader, System.Type! objectType, object? existingValue, Newtonsoft.Json.JsonSerializer! serializer) -> object?
+override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestRunStatisticsConverter.WriteJson(Newtonsoft.Json.JsonWriter! writer, object? value, Newtonsoft.Json.JsonSerializer! serializer) -> void
 static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollectionTestCaseEventSender.Create() -> Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollectionTestCaseEventSender!
 static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollectionTestCaseEventSender.Instance.get -> Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollectionTestCaseEventSender?
 static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer.Instance.get -> Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer!
