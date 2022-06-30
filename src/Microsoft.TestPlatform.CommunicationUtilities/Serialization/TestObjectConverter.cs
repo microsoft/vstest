@@ -55,7 +55,7 @@ public class TestObjectConverter : JsonConverter
         // key value pairs.
         foreach (var property in properties)
         {
-            var testProperty = property["Key"]?.ToObject<TestProperty>(serializer);
+            var testProperty = property?["Key"]?.ToObject<TestProperty>(serializer);
 
             if (testProperty == null)
             {
