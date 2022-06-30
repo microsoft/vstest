@@ -63,7 +63,7 @@ public class TestObjectConverter : JsonConverter
             }
 
             // Let the null values be passed in as null data
-            var token = property["Value"];
+            var token = property?["Value"];
             object? propertyData = null;
             if (token != null && token.Type != JTokenType.Null)
             {
