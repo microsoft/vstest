@@ -213,6 +213,9 @@ dotnet_diagnostic.CA1837.severity = warning # not default, increased severity to
 # TODO: Move resx as internal OR use new resx generator (nullable aware) when available
 dotnet_diagnostic.RS0041.severity = none # not default, decreased severity because of public resources (resx) not being nullable aware
 
+# CA1824: Mark assemblies with NeutralResourcesLanguageAttribute
+dotnet_diagnostic.CA1824.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
