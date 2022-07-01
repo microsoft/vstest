@@ -245,6 +245,9 @@ dotnet_diagnostic.CA1069.severity = warning # not default, increased severity to
 # CA1070: Do not declare event fields as virtual
 dotnet_diagnostic.CA1070.severity = warning # not default, increased severity to ensure it is applied
 
+# IDE0064: Make struct fields writable
+dotnet_diagnostic.IDE0064.severity = warning # not default, increased severity to ensure it is applied
+
 # CA1304: Specify CultureInfo
 dotnet_diagnostic.CA1304.severity = warning # not default, increased severity to ensure it is applied
 
