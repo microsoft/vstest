@@ -212,6 +212,7 @@ public class DiscoverTests : AcceptanceTestBase
     [TestMethod]
     [NetFullTargetFrameworkDataSource(inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
+    [Ignore("Flaky on CI")]
     public async Task CancelTestDiscovery(RunnerInfo runnerInfo)
     {
         var sw = Stopwatch.StartNew();
