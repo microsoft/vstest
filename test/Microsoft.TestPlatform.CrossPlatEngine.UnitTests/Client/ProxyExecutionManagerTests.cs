@@ -785,14 +785,6 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         }
     }
 
-    private static void SignalEvent(ManualResetEvent manualResetEvent)
-    {
-        // Wait for the 100 ms.
-        Task.Delay(200).Wait();
-
-        manualResetEvent.Set();
-    }
-
     private void InvokeAndVerifyStartTestRun(bool skipDefaultAdapters)
     {
         TestPluginCache.Instance = null;

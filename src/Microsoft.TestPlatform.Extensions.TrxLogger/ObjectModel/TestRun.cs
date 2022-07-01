@@ -19,6 +19,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 /// </summary>
 internal sealed class TestRun
 {
+    private TestRunConfiguration? _runConfig;
+
     // These fields will be valid when the test run summary is loaded from a results file.
     // The summary fields need to be first in the class so they get serialized first. When we
     // read the summary we don't want to parse the XML tags for other fields because they can
@@ -30,15 +32,14 @@ internal sealed class TestRun
     //
     // The summary parsing code is in XmlTestReader.ReadTestRunSummary.
     [StoreXmlSimpleField("@id")]
-    private Guid _id;
+    private readonly Guid _id;
 
     [StoreXmlSimpleField("@name")]
     private string _name;
 
     [StoreXmlSimpleField("@runUser", "")]
+#pragma warning disable IDE0052 // Remove unread private members
     private readonly string _runUser;
-
-    private TestRunConfiguration? _runConfig;
 
     [StoreXmlSimpleField("Times/@creation")]
     private readonly DateTime _created;
@@ -51,6 +52,7 @@ internal sealed class TestRun
 
     [StoreXmlSimpleField("Times/@finish")]
     private DateTime _finished;
+#pragma warning restore IDE0052 // Remove unread private members
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRun"/> class.

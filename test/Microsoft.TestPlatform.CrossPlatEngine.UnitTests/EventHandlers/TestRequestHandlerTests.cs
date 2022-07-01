@@ -484,11 +484,6 @@ public class TestRequestHandlerTests
         SendMessageOnChannel(new Message { MessageType = MessageType.SessionEnd, Payload = string.Empty });
     }
 
-    private Task ProcessRequestsAsync()
-    {
-        return Task.Run(() => _requestHandler.ProcessRequests(new Mock<ITestHostManagerFactory>().Object));
-    }
-
     private Task ProcessRequestsAsync(ITestHostManagerFactory testHostManagerFactory)
     {
         return Task.Run(() => _requestHandler.ProcessRequests(testHostManagerFactory));

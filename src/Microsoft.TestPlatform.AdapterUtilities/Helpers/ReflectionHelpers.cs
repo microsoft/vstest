@@ -11,6 +11,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 internal static partial class ReflectionHelpers
 {
+#if NETSTANDARD1_0 || NETSTANDARD1_3 || WINDOWS_UWP
     private static void AssertSupport<T>(T obj, string methodName, string className)
         where T : class
     {
@@ -19,6 +20,7 @@ internal static partial class ReflectionHelpers
             throw new NotImplementedException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.MethodNotImplementedOnPlatform, className, methodName));
         }
     }
+#endif
 
     internal static string ParseEscapedString(string escapedString)
     {

@@ -22,7 +22,9 @@ internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
     private readonly TrxFileHelper _trxFileHelper;
 
     [StoreXmlSimpleField("@name", DefaultValue = "")]
+#pragma warning disable IDE0052 // Remove unread private members
     private readonly string _name;
+#pragma warning restore IDE0052 // Remove unread private members
 
     private string _runDeploymentRoot;
 

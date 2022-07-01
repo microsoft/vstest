@@ -14,6 +14,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 internal class TestRunSummary : IXmlTestStore
 {
     [StoreXmlSimpleField("Counters/@total")]
+#pragma warning disable IDE0052 // Remove unread private members
     private readonly int _totalTests;
     [StoreXmlSimpleField("Counters/@executed")]
     private readonly int _executedTests;
@@ -49,6 +50,7 @@ internal class TestRunSummary : IXmlTestStore
     private readonly TestOutcome _outcome = TestOutcome.Pending;
     [StoreXmlSimpleField("Output/StdOut", "")]
     private readonly string _stdOut = string.Empty;
+#pragma warning restore IDE0052 // Remove unread private members
 
     private readonly List<RunInfo> _runLevelErrorsAndWarnings;
 

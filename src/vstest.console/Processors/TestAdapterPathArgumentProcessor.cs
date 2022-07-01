@@ -84,16 +84,6 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     private readonly IRunSettingsProvider _runSettingsManager;
 
     /// <summary>
-    /// Used for sending output.
-    /// </summary>
-    private readonly IOutput _output;
-
-    /// <summary>
-    /// For file related operation
-    /// </summary>
-    private readonly IFileHelper _fileHelper;
-
-    /// <summary>
     /// Separators for multiple paths in argument.
     /// </summary>
     internal readonly static char[] ArgumentSeparators = new[] { ';' };
@@ -109,8 +99,6 @@ internal class TestAdapterPathArgumentExecutor : IArgumentExecutor
     {
         _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
         _runSettingsManager = runSettingsManager ?? throw new ArgumentNullException(nameof(runSettingsManager));
-        _output = output ?? throw new ArgumentNullException(nameof(output));
-        _fileHelper = fileHelper ?? throw new ArgumentNullException(nameof(fileHelper));
     }
 
     #region IArgumentExecutor

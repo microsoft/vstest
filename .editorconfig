@@ -377,13 +377,11 @@ csharp_preserve_single_line_statements = true
 
 #### .NET Naming styles ####
 
-# not default, we have a lot of multiplatform code in compiler directives that defines methods, but keeps the bodies empty
 # IDE0052: Remove unused private members
-dotnet_diagnostic.IDE0051.severity = silent
+dotnet_diagnostic.IDE0051.severity = warning
 
-# not default, we have a lot of multiplatform code in compiler directives that defines methods, but keeps the bodies empty
 # IDE0052: Remove unread private members
-dotnet_diagnostic.IDE0052.severity = silent
+dotnet_diagnostic.IDE0052.severity = warning
 
 # IDE1006: Naming Styles
 dotnet_diagnostic.IDE1006.severity = warning

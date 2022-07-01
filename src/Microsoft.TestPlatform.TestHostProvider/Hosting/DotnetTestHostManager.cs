@@ -59,7 +59,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private readonly IProcessHelper _processHelper;
     private readonly IRunSettingsHelper _runsettingHelper;
     private readonly IFileHelper _fileHelper;
-    private readonly IWindowsRegistryHelper _windowsRegistryHelper;
     private readonly IEnvironmentVariableHelper _environmentVariableHelper;
 
     private ITestHostLauncher? _customTestHostLauncher;
@@ -82,7 +81,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             new DotnetHostHelper(),
             new PlatformEnvironment(),
             RunSettingsHelper.Instance,
-            new WindowsRegistryHelper(),
             new EnvironmentVariableHelper())
     {
     }
@@ -95,7 +93,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     /// <param name="dotnetHostHelper">DotnetHostHelper helper instance.</param>
     /// <param name="platformEnvironment">Platform Environment</param>
     /// <param name="runsettingHelper">RunsettingHelper instance</param>
-    /// <param name="windowsRegistryHelper">WindowsRegistryHelper instance</param>
     /// <param name="environmentVariableHelper">EnvironmentVariableHelper instance</param>
     internal DotnetTestHostManager(
         IProcessHelper processHelper,
@@ -103,7 +100,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         IDotnetHostHelper dotnetHostHelper,
         IEnvironment platformEnvironment,
         IRunSettingsHelper runsettingHelper,
-        IWindowsRegistryHelper windowsRegistryHelper,
         IEnvironmentVariableHelper environmentVariableHelper)
     {
         _processHelper = processHelper;
@@ -111,7 +107,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         _dotnetHostHelper = dotnetHostHelper;
         _platformEnvironment = platformEnvironment;
         _runsettingHelper = runsettingHelper;
-        _windowsRegistryHelper = windowsRegistryHelper;
         _environmentVariableHelper = environmentVariableHelper;
     }
 

@@ -78,8 +78,8 @@ internal class Fixture : IDisposable
         TestRuntimeProviderManager = new FakeTestRuntimeProviderManager(ErrorAggregator);
         TestRunEventsRegistrar = new FakeTestRunEventsRegistrar(ErrorAggregator);
         Environment = new FakeEnvironment();
-        TestDiscoveryEventsRegistrar = new FakeTestDiscoveryEventsRegistrar(ErrorAggregator);
-        TestSessionEventsHandler = new FakeTestSessionEventsHandler(ErrorAggregator);
+        TestDiscoveryEventsRegistrar = new FakeTestDiscoveryEventsRegistrar();
+        TestSessionEventsHandler = new FakeTestSessionEventsHandler();
         ProtocolConfig = new ProtocolConfig();
     }
 

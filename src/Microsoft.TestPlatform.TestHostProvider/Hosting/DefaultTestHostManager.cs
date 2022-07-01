@@ -19,7 +19,6 @@ using Microsoft.TestPlatform.TestHostProvider;
 using Microsoft.TestPlatform.TestHostProvider.Hosting;
 using Microsoft.TestPlatform.TestHostProvider.Resources;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider;
@@ -56,7 +55,6 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private readonly IFileHelper _fileHelper;
     private readonly IEnvironment _environment;
     private readonly IDotnetHostHelper _dotnetHostHelper;
-    private readonly IEnvironmentVariableHelper _environmentVariableHelper;
 
     private Architecture _architecture;
     private Framework? _targetFramework;
@@ -74,8 +72,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             new ProcessHelper(),
             new FileHelper(),
             new DotnetHostHelper(),
-            new PlatformEnvironment(),
-            new EnvironmentVariableHelper())
+            new PlatformEnvironment())
     {
     }
 
@@ -90,14 +87,12 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         IProcessHelper processHelper,
         IFileHelper fileHelper,
         IDotnetHostHelper dotnetHostHelper,
-        IEnvironment environment,
-        IEnvironmentVariableHelper environmentVariableHelper)
+        IEnvironment environment)
     {
         _processHelper = processHelper;
         _fileHelper = fileHelper;
         _dotnetHostHelper = dotnetHostHelper;
         _environment = environment;
-        _environmentVariableHelper = environmentVariableHelper;
     }
 
     /// <inheritdoc/>

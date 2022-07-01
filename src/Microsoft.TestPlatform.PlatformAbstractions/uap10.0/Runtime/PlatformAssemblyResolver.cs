@@ -4,6 +4,7 @@
 #if WINDOWS_UWP
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -29,9 +30,9 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     {
     }
 
+    [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Required to avoid compilation warning about unused event")]
     private void DummyEventThrower()
     {
-        // need to raise this event, else compiler throws error
         AssemblyResolve?.Invoke(this, null);
     }
 }

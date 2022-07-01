@@ -76,7 +76,6 @@ public class DotnetTestHostManagerTests
             new DotnetHostHelper(_mockFileHelper.Object, _mockEnvironment.Object, _mockWindowsRegistry.Object, _mockEnvironmentVariable.Object, _mockProcessHelper.Object),
             _mockEnvironment.Object,
             _mockRunsettingHelper.Object,
-            _mockWindowsRegistry.Object,
             _mockEnvironmentVariable.Object);
         _dotnetHostManager.Initialize(_mockMessageLogger.Object, string.Empty);
 
@@ -1107,9 +1106,8 @@ public class DotnetTestHostManagerTests
             IDotnetHostHelper dotnetTestHostHelper,
             IEnvironment environment,
             IRunSettingsHelper runsettingsHelper,
-            IWindowsRegistryHelper windowsRegistryHelper,
             IEnvironmentVariableHelper environmentVariableHelper)
-            : base(processHelper, fileHelper, dotnetTestHostHelper, environment, runsettingsHelper, windowsRegistryHelper, environmentVariableHelper)
+            : base(processHelper, fileHelper, dotnetTestHostHelper, environment, runsettingsHelper, environmentVariableHelper)
         {
         }
     }

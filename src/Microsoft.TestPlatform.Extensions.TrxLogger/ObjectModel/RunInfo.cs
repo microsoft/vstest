@@ -14,19 +14,18 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 /// </summary>
 internal sealed class RunInfo : IXmlTestStore
 {
+#pragma warning disable IDE0052 // Remove unread private members
     [StoreXmlSimpleField("Text", "")]
     private readonly string _text;
-
-    private readonly Exception? _exception;
-
     [StoreXmlSimpleField("@computerName", "")]
     private readonly string _computer;
-
     [StoreXmlSimpleField("@outcome")]
     private readonly TestOutcome _outcome;
-
     [StoreXmlSimpleField("@timestamp")]
     private readonly DateTime _timestamp;
+#pragma warning restore IDE0052 // Remove unread private members
+
+    private readonly Exception? _exception;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RunInfo"/> class.

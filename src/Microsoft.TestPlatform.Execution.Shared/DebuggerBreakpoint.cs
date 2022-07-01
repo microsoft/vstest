@@ -3,7 +3,9 @@
 
 using System;
 using System.Diagnostics;
+#if !NETCOREAPP1_0
 using System.IO;
+#endif
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -55,11 +57,9 @@ internal static class DebuggerBreakpoint
 #endif
     }
 
+#if !NETCOREAPP1_0
     private static bool AttachVs(Process process, int? vsPid)
     {
-#if NETCOREAPP1_0
-        return false;
-#else
         // The way we attach VS is not compatible with .NET Core 2.1 and .NET Core 3.1, but works in .NET Framework and .NET.
         // We could call the library code directly here for .NET, and .NET Framework, but then we would also need to package it
         // together with testhost. So instead we always run the executable, and pass path to it using env variable.
@@ -83,15 +83,10 @@ internal static class DebuggerBreakpoint
         attachVsProcess.WaitForExit();
 
         return attachVsProcess.ExitCode == 0;
-#endif
     }
 
     private static string? FindAttachVs()
     {
-#if NETCOREAPP1_0
-        return null;
-#else
-
         var fromPath = FindOnPath("AttachVS.exe");
         if (fromPath != null)
         {
@@ -111,7 +106,6 @@ internal static class DebuggerBreakpoint
         }
 
         return parent;
-#endif
     }
 
     private static string? FindOnPath(string exeName)
@@ -128,6 +122,7 @@ internal static class DebuggerBreakpoint
 
         return null;
     }
+#endif
 
     internal static void WaitForDebugger(string environmentVariable)
     {

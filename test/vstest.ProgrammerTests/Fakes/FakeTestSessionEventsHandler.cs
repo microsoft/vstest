@@ -8,11 +8,8 @@ namespace vstest.ProgrammerTests.Fakes;
 
 internal class FakeTestSessionEventsHandler : ITestSessionEventsHandler
 {
-    private readonly FakeErrorAggregator _fakeErrorAggregator;
-
-    public FakeTestSessionEventsHandler(FakeErrorAggregator fakeErrorAggregator)
+    public FakeTestSessionEventsHandler()
     {
-        _fakeErrorAggregator = fakeErrorAggregator;
     }
 
     public List<object?> AllEvents { get; } = new();

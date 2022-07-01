@@ -41,7 +41,6 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
     private static readonly object SyncObject = new();
 
     private readonly ICommunicationManager _communicationManager;
-    private readonly IMessageSink _messageSink;
     private readonly IDataCollectionManager _dataCollectionManager;
     private readonly IDataCollectionTestCaseEventHandler _dataCollectionTestCaseEventHandler;
     private readonly IDataSerializer _dataSerializer;
@@ -74,7 +73,6 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
             new FileHelper(),
             requestData)
     {
-        _messageSink = messageSink;
     }
 
     /// <summary>
@@ -111,7 +109,6 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
         IRequestData requestData)
     {
         _communicationManager = communicationManager;
-        _messageSink = messageSink;
         _dataCollectionManager = dataCollectionManager;
         _dataSerializer = dataSerializer;
         _dataCollectionTestCaseEventHandler = dataCollectionTestCaseEventHandler;

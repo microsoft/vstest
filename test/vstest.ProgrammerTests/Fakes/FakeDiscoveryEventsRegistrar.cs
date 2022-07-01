@@ -9,8 +9,6 @@ namespace vstest.ProgrammerTests.Fakes;
 
 internal class FakeTestDiscoveryEventsRegistrar : ITestDiscoveryEventsRegistrar
 {
-    private readonly FakeErrorAggregator _fakeErrorAggregator;
-
     public List<object> AllEvents { get; } = new();
     public List<string> LoggedWarnings { get; } = new();
     public List<EventRecord<DiscoveryCompleteEventArgs>> DiscoveryCompleteEvents { get; } = new();
@@ -18,9 +16,8 @@ internal class FakeTestDiscoveryEventsRegistrar : ITestDiscoveryEventsRegistrar
     public List<EventRecord<DiscoveryStartEventArgs>> DiscoveryStartEvents { get; } = new();
     public List<EventRecord<TestRunMessageEventArgs>> DiscoveryMessageEvents { get; } = new();
 
-    public FakeTestDiscoveryEventsRegistrar(FakeErrorAggregator fakeErrorAggregator)
+    public FakeTestDiscoveryEventsRegistrar()
     {
-        _fakeErrorAggregator = fakeErrorAggregator;
     }
 
     public void LogWarning(string message)

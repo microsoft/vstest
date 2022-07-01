@@ -538,7 +538,6 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
             new DotnetHostHelper(fileHelper, environment, windowsRegistryHelper, environmentVariableHelper, processHelper),
             environment,
             runsettingHelper,
-            windowsRegistryHelper,
             environmentVariableHelper)
         {
             _isVersionCheckRequired = checkRequired;

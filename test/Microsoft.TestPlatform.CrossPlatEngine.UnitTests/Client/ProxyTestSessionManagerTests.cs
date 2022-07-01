@@ -21,7 +21,6 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.Client;
 public class ProxyTestSessionManagerTests
 {
     private readonly IList<string> _fakeTestSources = new List<string>() { @"C:\temp\FakeTestAsset.dll" };
-    private readonly Dictionary<string, TestRuntimeProviderInfo> _fakeTestSourcesToRuntimeProviderMap;
     private readonly IList<string> _fakeTestMultipleSources = new List<string>() {
         @"C:\temp\FakeTestAsset1.dll",
         @"C:\temp\FakeTestAsset2.dll",
@@ -105,18 +104,6 @@ public class ProxyTestSessionManagerTests
         _mockMetricsCollection.Setup(mc => mc.Metrics).Returns(metrics);
         _mockMetricsCollection.Setup(mc => mc.Add(It.IsAny<string>(), It.IsAny<object>()))
             .Callback((string metric, object value) => metrics.Add(metric, value));
-
-        _fakeTestSourcesToRuntimeProviderMap = new Dictionary<string, TestRuntimeProviderInfo>
-        {
-            [_fakeTestSources[0]] = new TestRuntimeProviderInfo(typeof(ITestRuntimeProvider), false, _fakeRunSettings, new List<SourceDetail>
-            {
-                new SourceDetail {
-                    Source = _fakeTestSources[0],
-                    Architecture = Architecture.X86,
-                    Framework = Framework.DefaultFramework
-                }
-            })
-        };
     }
 
     [TestMethod]

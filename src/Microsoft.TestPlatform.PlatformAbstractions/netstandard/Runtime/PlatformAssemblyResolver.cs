@@ -4,6 +4,7 @@
 #if NETSTANDARD && !NETSTANDARD2_0
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -31,6 +32,7 @@ public class PlatformAssemblyResolver : IAssemblyResolver
         throw new NotImplementedException();
     }
 
+    [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Required to avoid compilation warning about unused event")]
     private void DummyEventThrower()
     {
         AssemblyResolve?.Invoke(this, null);

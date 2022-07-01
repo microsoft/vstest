@@ -13,8 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -50,7 +48,7 @@ internal class EnableBlameArgumentProcessor : IArgumentProcessor
     public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
-            new EnableBlameArgumentExecutor(RunSettingsManager.Instance, new PlatformEnvironment(), new FileHelper()));
+            new EnableBlameArgumentExecutor(RunSettingsManager.Instance, new FileHelper()));
 
         set => _executor = value;
     }
@@ -90,19 +88,13 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     private readonly IRunSettingsProvider _runSettingsManager;
 
     /// <summary>
-    /// Platform environment
-    /// </summary>
-    private readonly IEnvironment _environment;
-
-    /// <summary>
     /// For file related operation
     /// </summary>
     private readonly IFileHelper _fileHelper;
 
-    internal EnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IEnvironment environment, IFileHelper fileHelper)
+    internal EnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
     {
         _runSettingsManager = runSettingsManager;
-        _environment = environment;
         Output = ConsoleOutput.Instance;
         _fileHelper = fileHelper;
     }

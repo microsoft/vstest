@@ -19,7 +19,6 @@ public class VSTestTask : Task, ICancelableTask
     // The process which is invoking vstest.console
     private VSTestForwardingApp? _vsTestForwardingApp;
 
-    private const string VsTestAppName = "vstest.console.dll";
     private const string CodeCovergaeString = "Code Coverage";
 
     public string? TestFileFullPath { get; set; }

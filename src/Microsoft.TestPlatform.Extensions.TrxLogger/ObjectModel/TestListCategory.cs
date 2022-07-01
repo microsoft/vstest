@@ -18,8 +18,11 @@ internal class TestListCategory : IXmlTestStore
     private static TestListCategory? s_allResults;
 
     private static readonly object ReservedCategoryLock = new();
+
+#pragma warning disable IDE0052 // Remove unread private members
     [StoreXmlSimpleField("@name", DefaultValue = "")]
     private readonly string _name = string.Empty;
+#pragma warning restore IDE0052 // Remove unread private members
 
     private TestListCategoryId _parentCategoryId;
 

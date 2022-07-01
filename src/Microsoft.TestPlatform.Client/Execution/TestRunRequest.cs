@@ -62,8 +62,6 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// </summary>
     private long _testSessionTimeout;
 
-    private Timer? _timer;
-
     /// <summary>
     /// Execution Start Time
     /// </summary>
@@ -144,7 +142,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                 {
                     EqtTrace.Verbose("TestRunRequest.ExecuteAsync: TestSessionTimeout is {0} milliseconds.", _testSessionTimeout);
 
-                    _timer = new Timer(OnTestSessionTimeout, null, TimeSpan.FromMilliseconds(_testSessionTimeout), TimeSpan.FromMilliseconds(0));
+                    _ = new Timer(OnTestSessionTimeout, null, TimeSpan.FromMilliseconds(_testSessionTimeout), TimeSpan.FromMilliseconds(0));
                 }
 
                 // Start the stop watch for calculating the test run time taken overall

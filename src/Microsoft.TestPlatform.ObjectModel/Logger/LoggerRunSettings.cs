@@ -16,9 +16,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 /// </summary>
 public class LoggerRunSettings : TestRunSettings
 {
+#if !NETSTANDARD1_0
     private readonly string _loggerRunSettingsName = string.Empty;
     private readonly string _loggersSettingName = string.Empty;
     private readonly string _loggerSettingName = string.Empty;
+#endif
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoggerRunSettings"/> class.
@@ -26,9 +28,11 @@ public class LoggerRunSettings : TestRunSettings
     public LoggerRunSettings() : base(Constants.LoggerRunSettingsName)
     {
         LoggerSettingsList = new Collection<LoggerSettings>();
+#if !NETSTANDARD1_0
         _loggerRunSettingsName = Constants.LoggerRunSettingsName;
         _loggersSettingName = Constants.LoggersSettingName;
         _loggerSettingName = Constants.LoggerSettingName;
+#endif
     }
 
     /// <summary>

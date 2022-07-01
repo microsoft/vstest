@@ -34,7 +34,9 @@ public abstract class TestObject
     /// other hand provides a clean Key, Value entries for <c>TestProperty</c> and it's value.
     /// </summary>
     [DataMember(Name = "Properties")]
+#pragma warning disable IDE0051 // Remove unused private members
     private List<KeyValuePair<TestProperty, object?>> StoreKeyValuePairs
+#pragma warning restore IDE0051 // Remove unused private members
     {
         get => _store.ToList();
 

@@ -42,7 +42,7 @@ public class EnableBlameArgumentProcessorTests
         _mockEnvronment = new Mock<IEnvironment>();
         _mockOutput = new Mock<IOutput>();
 
-        _executor = new TestableEnableBlameArgumentExecutor(_settingsProvider, _mockEnvronment.Object, _mockOutput.Object);
+        _executor = new TestableEnableBlameArgumentExecutor(_settingsProvider, _mockOutput.Object);
         CollectArgumentExecutor.EnabledDataCollectors.Clear();
     }
 
@@ -420,8 +420,8 @@ public class EnableBlameArgumentProcessorTests
 
     internal class TestableEnableBlameArgumentExecutor : EnableBlameArgumentExecutor
     {
-        internal TestableEnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IEnvironment environment, IOutput output)
-            : base(runSettingsManager, environment, new Mock<IFileHelper>().Object)
+        internal TestableEnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IOutput output)
+            : base(runSettingsManager, new Mock<IFileHelper>().Object)
         {
             Output = output;
         }

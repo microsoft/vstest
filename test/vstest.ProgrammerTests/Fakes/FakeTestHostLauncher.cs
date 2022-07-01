@@ -8,12 +8,9 @@ namespace vstest.ProgrammerTests.Fakes;
 
 internal class FakeTestHostLauncher : ITestHostLauncher
 {
-    private readonly FakeProcessHelper _fakeProcessHelper;
-
-    public FakeTestHostLauncher(FakeProcessHelper fakeProcessHelper, bool isDebug = false)
+    public FakeTestHostLauncher(bool isDebug = false)
     {
         IsDebug = isDebug;
-        _fakeProcessHelper = fakeProcessHelper;
     }
 
     public bool IsDebug { get; }

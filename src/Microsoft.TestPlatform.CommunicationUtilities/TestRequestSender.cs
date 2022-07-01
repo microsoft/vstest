@@ -786,6 +786,7 @@ internal class MessageConverter
         };
     }
 
+    // TODO: Use or remove
     //private static int GetVersion(Message message)
     //{
     //    return (message as VersionedMessage)?.Version ?? 0;

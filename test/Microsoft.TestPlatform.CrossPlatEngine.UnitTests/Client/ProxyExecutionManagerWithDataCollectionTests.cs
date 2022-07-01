@@ -16,7 +16,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
@@ -26,27 +25,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 [TestClass]
 public class ProxyExecutionManagerWithDataCollectionTests
 {
-    private readonly ProxyExecutionManager _testExecutionManager;
     private readonly Mock<ITestRuntimeProvider> _mockTestHostManager;
     private readonly Mock<ITestRequestSender> _mockRequestSender;
     private readonly Mock<IProxyDataCollectionManager> _mockDataCollectionManager;
     private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly ProxyExecutionManagerWithDataCollection _proxyExecutionManager;
-    private readonly Mock<IDataSerializer> _mockDataSerializer;
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
-    private readonly Mock<IFileHelper> _mockFileHelper;
 
     public ProxyExecutionManagerWithDataCollectionTests()
     {
         _mockTestHostManager = new Mock<ITestRuntimeProvider>();
         _mockRequestSender = new Mock<ITestRequestSender>();
-        _mockDataSerializer = new Mock<IDataSerializer>();
         _mockRequestData = new Mock<IRequestData>();
         _mockMetricsCollection = new Mock<IMetricsCollection>();
-        _mockFileHelper = new Mock<IFileHelper>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
-        _testExecutionManager = new ProxyExecutionManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, Framework.DefaultFramework, _mockDataSerializer.Object, _mockFileHelper.Object);
         _mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
         _mockProcessHelper = new Mock<IProcessHelper>();
         _proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, Framework.DefaultFramework, _mockDataCollectionManager.Object);
