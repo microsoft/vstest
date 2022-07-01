@@ -16,7 +16,7 @@ public class DisableAppdomainTests : AcceptanceTestBase
 {
     [TestMethod]
     [TestCategory("Windows")]
-    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
     public void DisableAppdomainTest(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -29,7 +29,7 @@ public class DisableAppdomainTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows")]
-    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
     public void NewtonSoftDependencyWithDisableAppdomainTest(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
