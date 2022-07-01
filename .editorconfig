@@ -239,6 +239,9 @@ dotnet_diagnostic.CA1050.severity = warning # not default, increased severity to
 # CA1061: Do not hide base class methods
 dotnet_diagnostic.CA1061.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1069: Enums should not have duplicate values
+dotnet_diagnostic.CA1069.severity = warning # not default, increased severity to ensure it is applied
+
 # CA1304: Specify CultureInfo
 dotnet_diagnostic.CA1304.severity = warning # not default, increased severity to ensure it is applied
 
