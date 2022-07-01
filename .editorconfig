@@ -133,6 +133,23 @@ dotnet_diagnostic.IDE0065.severity = warning
 # Keep this in sync with th related C# rule: csharp_prefer_simple_using_statement
 dotnet_diagnostic.IDE0063.severity = warning
 
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
+dotnet_style_prefer_auto_properties = true:warning
+dotnet_style_object_initializer = false:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
+dotnet_style_prefer_conditional_expression_over_return = true:suggestion
+dotnet_style_explicit_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
+dotnet_style_prefer_compound_assignment = true:warning
+dotnet_style_prefer_simplified_interpolation = true:suggestion
+dotnet_style_namespace_match_folder = true:suggestion
+
 # CA2208: Instantiate argument exceptions correctly
 dotnet_diagnostic.CA2208.severity = warning # not default, increased severity to ensure it is always applied
 
@@ -241,6 +258,10 @@ dotnet_diagnostic.CA1051.severity = warning # not default, increased severity to
 
 #### C# Coding Conventions ####
 
+csharp_style_prefer_method_group_conversion = true:silent
+csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
+csharp_style_prefer_tuple_swap = true:suggestion
+
 # var preferences
 csharp_style_var_elsewhere = false:silent               # not default, turned off for now
 csharp_style_var_for_built_in_types = false:silent      # not default, turned off for now
@@ -270,12 +291,17 @@ csharp_style_prefer_switch_expression = true:warning
 
 # Null-checking preferences
 csharp_style_conditional_delegate_call = true:suggestion
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+# IDE0190: Null check can be simplified
+# Keep this in sync with the related .NET rule: IDE0190
+csharp_style_prefer_parameter_null_checking = false # not default, disabled as no longer supported
 
 # Modifier preferences
 csharp_prefer_static_local_function = true:warning
 csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:silent
 
 # Code-block preferences
+csharp_style_namespace_declarations = file_scoped:warning # not default, default is block_scoped:silent, changed to follow modern preferences
 csharp_prefer_braces = true:silent
 # Keep this in sync with the related .NET rule: IDE0063
 csharp_prefer_simple_using_statement = true:warning # not default, default is true:suggestion, increased severity to ensure it is used
@@ -294,10 +320,8 @@ csharp_style_unused_value_expression_statement_preference = discard_variable:sil
 # 'using' directive preferences
 # Keep this in sync with the related .NET rule: IDE0065
 csharp_using_directive_placement = outside_namespace:warning
+csharp_style_prefer_top_level_statements = true:silent
 
-# IDE0190: Null check can be simplified
-# Keep this in sync with the related .NET rule: IDE0190
-csharp_style_prefer_parameter_null_checking = false # not default, disabled as no longer supported
 
 #### .NET Formatting Rules ####
 
@@ -557,11 +581,3 @@ dotnet_naming_style.s_camelcase.capitalization = camel_case
 
 #### C# Naming styles ####
 
-csharp_style_prefer_method_group_conversion = true:silent
-csharp_style_prefer_null_check_over_type_check = true:suggestion
-csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
-csharp_style_prefer_tuple_swap = true:suggestion
-
-# Naming rules
-
-csharp_style_namespace_declarations = file_scoped:warning # not default, default is block_scoped:silent, changed to follow modern preferences
