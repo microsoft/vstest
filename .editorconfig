@@ -236,6 +236,9 @@ dotnet_diagnostic.CA1816.severity = warning # not default, increased severity to
 # CA1018: Mark attributes with AttributeUsageAttribute
 dotnet_diagnostic.CA1018.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1051: Do not declare visible instance fields
+dotnet_diagnostic.CA1051.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences

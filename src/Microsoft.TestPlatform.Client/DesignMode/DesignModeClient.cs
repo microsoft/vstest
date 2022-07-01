@@ -44,9 +44,11 @@ public class DesignModeClient : IDesignModeClient
     private readonly IEnvironment _platformEnvironment;
     private readonly TestSessionMessageLogger _testSessionMessageLogger;
     private readonly object _lockObject = new();
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
+    [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Part of the public API")]
     protected Action<Message>? onCustomTestHostLaunchAckReceived;
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
+    [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Part of the public API")]
     protected Action<Message>? onAttachDebuggerAckRecieved;
 
     /// <summary>
