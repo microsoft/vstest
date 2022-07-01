@@ -5,6 +5,7 @@ using System;
 using System.Collections.ObjectModel;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -38,6 +39,8 @@ public class ProxyOutOfProcDataCollectionManagerTests
         _testcase = new TestCase();
         _testcase.Id = Guid.NewGuid();
         _mockDataCollectionTestCaseEventSender.Setup(x => x.SendTestCaseEnd(It.IsAny<TestCaseEndEventArgs>())).Returns(_attachmentSets);
+        // Required for the tests to work
+        _ = new ProxyOutOfProcDataCollectionManager(_mockDataCollectionTestCaseEventSender.Object, _mockTestEventsPublisher.Object);
         _mockTestEventsPublisher.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(_testcase, TestOutcome.Passed));
         _testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(_testcase);
     }
