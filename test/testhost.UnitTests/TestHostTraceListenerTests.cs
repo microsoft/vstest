@@ -31,7 +31,7 @@ public class TestHostTraceListenerTests
         Trace.Listeners.Add(new TestHostTraceListener());
     }
 
-    [TestCleanup()]
+    [TestCleanup]
     public void Cleanup()
     {
         Trace.Listeners.Clear();
@@ -105,7 +105,7 @@ public class TestHostTraceListenerRegistrationTests
         Trace.Listeners.CopyTo(_listeners, 0);
     }
 
-    [TestCleanup()]
+    [TestCleanup]
     public void Cleanup()
     {
         Trace.Listeners.Clear();

@@ -1,5 +1,4 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace Tests
 {
@@ -30,7 +29,7 @@ namespace Tests
         {
         }
 
-<#        
+<#
     }
 #>
         #endregion
@@ -46,12 +45,12 @@ namespace Tests
         {
             Assert.Fail();
         }
-<#        
+<#
     }
 #>
         #endregion
     }
-<#        
+<#
     }
-#> 
+#>
 }

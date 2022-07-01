@@ -302,7 +302,7 @@ public class TestRequestSenderTests
     [TestMethod]
     public void InitializeDiscoveryShouldSendCommunicationMessageWithCorrectParametersWithVersion()
     {
-        SetupFakeChannelWithVersionNegotiation(Dummynegotiatedprotocolversion);
+        SetupFakeChannelWithVersionNegotiation();
 
         _testRequestSender.InitializeDiscovery(_pathToAdditionalExtensions);
 
@@ -325,7 +325,7 @@ public class TestRequestSenderTests
     [TestMethod]
     public void DiscoverTestsShouldSendStartDiscoveryMessageOnChannelWithVersion()
     {
-        SetupFakeChannelWithVersionNegotiation(Dummynegotiatedprotocolversion);
+        SetupFakeChannelWithVersionNegotiation();
 
         _testRequestSender.DiscoverTests(new DiscoveryCriteria(), _mockDiscoveryEventsHandler.Object);
 
@@ -498,7 +498,7 @@ public class TestRequestSenderTests
     [TestMethod]
     public void InitializeExecutionShouldSendCommunicationMessageWithCorrectParametersWithVersion()
     {
-        SetupFakeChannelWithVersionNegotiation(Dummynegotiatedprotocolversion);
+        SetupFakeChannelWithVersionNegotiation();
 
         _testRequestSender.InitializeExecution(_pathToAdditionalExtensions);
 
@@ -519,7 +519,7 @@ public class TestRequestSenderTests
     [TestMethod]
     public void StartTestRunShouldSendStartTestExecutionWithSourcesOnChannelWithVersion()
     {
-        SetupFakeChannelWithVersionNegotiation(Dummynegotiatedprotocolversion);
+        SetupFakeChannelWithVersionNegotiation();
 
         _testRequestSender.StartTestRun(_testRunCriteriaWithSources, _mockExecutionEventsHandler.Object);
 
@@ -542,7 +542,7 @@ public class TestRequestSenderTests
     public void StartTestRunWithTestsShouldSendStartTestExecutionWithTestsOnChannelWithVersion()
     {
         var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], "runsettings", null, null!);
-        SetupFakeChannelWithVersionNegotiation(Dummynegotiatedprotocolversion);
+        SetupFakeChannelWithVersionNegotiation();
 
         _testRequestSender.StartTestRun(runCriteria, _mockExecutionEventsHandler.Object);
 
@@ -664,7 +664,7 @@ public class TestRequestSenderTests
     public void StartTestRunShouldSendLaunchDebuggerAttachedCallbackOnMessageReceivedWithVersion()
     {
         var launchMessagePayload = new TestProcessStartInfo();
-        SetupFakeChannelWithVersionNegotiation(Dummynegotiatedprotocolversion);
+        SetupFakeChannelWithVersionNegotiation();
         SetupDeserializeMessage(MessageType.LaunchAdapterProcessWithDebuggerAttached, launchMessagePayload);
 
         _testRequestSender.StartTestRun(_testRunCriteriaWithSources, _mockExecutionEventsHandler.Object);
@@ -799,7 +799,7 @@ public class TestRequestSenderTests
         return _testRequestSender.InitializeCommunication().ToString();
     }
 
-    private void SetupFakeChannelWithVersionNegotiation(int protocolVersion)
+    private void SetupFakeChannelWithVersionNegotiation()
     {
         // Sends a check version message to setup the negotiated protocol version.
         // This method is only required in specific tests.

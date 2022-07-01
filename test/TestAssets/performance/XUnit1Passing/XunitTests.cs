@@ -1,5 +1,4 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 
 namespace Tests
 {
@@ -16,5 +15,4 @@ namespace Tests
         #region FailingTests
         #endregion
     }
- 
 }

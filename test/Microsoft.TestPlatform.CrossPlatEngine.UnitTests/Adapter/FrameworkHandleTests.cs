@@ -47,8 +47,8 @@ public class FrameworkHandleTests
         Assert.ThrowsException<ObjectDisposedException>(() => frameworkHandle.LaunchProcessWithDebuggerAttached(null!, null!, null!, null!));
     }
 
-    // TODO: Enable method once we fix the "IsDebug" in TestExecutionContext
-    // [TestMethod]
+    [TestMethod]
+    [Ignore("TODO: Enable method once we fix the \"IsDebug\" in TestExecutionContext")]
     public void LaunchProcessWithDebuggerAttachedShouldThrowIfNotInDebugContext()
     {
         var tec = GetTestExecutionContext();

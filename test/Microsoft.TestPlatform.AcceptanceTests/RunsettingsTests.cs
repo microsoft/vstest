@@ -238,7 +238,7 @@ public class RunsettingsTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     public void RunSettingsWithInvalidValueShouldLogError(RunnerInfo runnerInfo)
     {
@@ -259,7 +259,7 @@ public class RunsettingsTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     public void TestAdapterPathFromRunSettings(RunnerInfo runnerInfo)
     {
@@ -283,7 +283,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithPlatform(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -314,7 +314,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -360,7 +360,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithDeploymentItem(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -397,7 +397,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsTestTimeout(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -424,7 +424,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsAssemblyResolution(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -505,8 +505,8 @@ public class RunsettingsTests : AcceptanceTestBase
     [TestMethod]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void RunSettingsAreLoadedFromProject(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

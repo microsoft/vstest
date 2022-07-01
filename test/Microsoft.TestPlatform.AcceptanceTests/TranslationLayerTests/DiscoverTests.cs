@@ -62,7 +62,7 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource()]
+    [RunnerCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

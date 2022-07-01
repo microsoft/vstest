@@ -25,7 +25,7 @@ public class FakesUtilitiesTests
     [TestMethod]
     public void FakesSettingsShouldThrowExceptionIfRunSettingsIsPassedAsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(new string[] { }, null!));
+        Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(Array.Empty<string>(), null!));
     }
 
     [TestMethod]

@@ -35,7 +35,7 @@ public class ExecutionTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [TestPlatformCompatibilityDataSource()]
+    [TestPlatformCompatibilityDataSource]
     public void RunTestsFromMultipleMSTestAssemblies(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

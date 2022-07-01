@@ -114,13 +114,13 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource()]
+    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingWithInvokedDataCollectors(RunnerInfo runnerInfo)
         => await TestRunWithCodeCoverageAndAttachmentsProcessingInternal(runnerInfo, true);
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource()]
+    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingWithoutInvokedDataCollectors(RunnerInfo runnerInfo)
         => await TestRunWithCodeCoverageAndAttachmentsProcessingInternal(runnerInfo, false);
