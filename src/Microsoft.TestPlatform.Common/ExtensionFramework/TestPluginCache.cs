@@ -25,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 /// The test plugin cache.
 /// </summary>
 /// <remarks>Making this a singleton to offer better unit testing.</remarks>
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class TestPluginCache
 {
     private readonly Dictionary<string, Assembly?> _resolvedAssemblies = new();

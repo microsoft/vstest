@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
@@ -16,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 /// <summary>
 /// Communication client implementation over sockets.
 /// </summary>
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class SocketClient : ICommunicationEndPoint
 {
     private readonly CancellationTokenSource _cancellation;

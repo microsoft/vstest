@@ -15,6 +15,9 @@ dotnet_diagnostic.IDE0060.severity = warning
 # CA1018: Mark attributes with AttributeUsageAttribute
 dotnet_diagnostic.CA1018.severity = warning
 
+# CA1001: Types that own disposable fields should be disposable
+dotnet_diagnostic.CA1001.severity = silent # Disabled on tests as it does not matter
+
 #### C# Coding Conventions ####
 
 #### .NET Formatting Rules ####
