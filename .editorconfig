@@ -250,6 +250,9 @@ dotnet_diagnostic.CA1010.severity = warning # not default, increased severity to
 # CA1047: Do not declare protected members in sealed types
 dotnet_diagnostic.CA1047.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1050: Declare types in namespaces
+dotnet_diagnostic.CA1050.severity = warning # not default, increased severity to ensure it is applied
+
 # CA1304: Specify CultureInfo
 dotnet_diagnostic.CA1304.severity = warning # not default, increased severity to ensure it is applied
 
