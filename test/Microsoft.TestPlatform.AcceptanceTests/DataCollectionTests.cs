@@ -20,8 +20,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class DataCollectionTests : AcceptanceTestBase
 {
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void ExecuteTestsWithDataCollection(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -50,8 +50,8 @@ public class DataCollectionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void ExecuteTestsWithDataCollectionUsingCollectArgument(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -80,7 +80,7 @@ public class DataCollectionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSource]
     public void DataCollectorAssemblyLoadingShouldNotThrowErrorForNetCore(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -93,7 +93,7 @@ public class DataCollectionTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
     public void DataCollectorAssemblyLoadingShouldNotThrowErrorForFullFramework(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -105,8 +105,8 @@ public class DataCollectionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void DataCollectorAttachmentProcessor(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

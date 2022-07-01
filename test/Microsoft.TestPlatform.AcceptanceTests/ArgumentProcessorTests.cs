@@ -12,7 +12,7 @@ public class ArgumentProcessorTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
     public void PassingNoArgumentsToVsTestConsoleShouldPrintHelpMessage(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -33,7 +33,7 @@ public class ArgumentProcessorTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
     public void PassingInvalidArgumentsToVsTestConsoleShouldNotPrintHelpMessage(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

@@ -13,7 +13,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [TestMethod]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunDotnetTestWithCsproj(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -30,7 +30,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [TestMethod]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunDotnetTestWithDll(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -47,7 +47,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [TestMethod]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunDotnetTestWithCsprojPassInlineSettings(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -62,7 +62,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [TestMethod]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunDotnetTestWithDllPassInlineSettings(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -77,7 +77,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [TestMethod]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunDotnetTestWithNativeDll(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

@@ -62,7 +62,7 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource()]
+    [RunnerCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -84,8 +84,8 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -103,8 +103,8 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingEventHandler2AndBatchSize(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -133,8 +133,8 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingEventHandler1AndBatchSize(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -162,8 +162,8 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSourceAttribute]
-    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSource]
     public void DisoverTestUsingEventHandler2ShouldContainAllSourcesAsFullyDiscovered(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -182,8 +182,8 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -210,8 +210,8 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute(inProcess: true)]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource(inProcess: true)]
+    [NetCoreTargetFrameworkDataSource]
     public async Task CancelTestDiscovery(RunnerInfo runnerInfo)
     {
         var sw = Stopwatch.StartNew();

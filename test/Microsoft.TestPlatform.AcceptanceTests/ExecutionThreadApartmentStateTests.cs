@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
 {
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
+    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void UITestShouldPassIfApartmentStateIsSTA(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -24,7 +24,7 @@ public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSource]
     public void WarningShouldBeShownWhenValueIsSTAForNetCore(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -39,7 +39,7 @@ public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
+    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void UITestShouldFailWhenDefaultApartmentStateIsMTA(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -54,7 +54,7 @@ public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
 
     [Ignore(@"Issue with TestSessionTimeout:  https://github.com/Microsoft/vstest/issues/980")]
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
+    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void CancelTestExectionShouldWorkWhenApartmentStateIsSTA(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

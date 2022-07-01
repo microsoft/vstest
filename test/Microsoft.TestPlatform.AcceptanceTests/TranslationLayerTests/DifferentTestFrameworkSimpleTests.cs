@@ -38,8 +38,8 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithNunitAdapter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -77,8 +77,8 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [TestMethod]
     // there are logs in the diagnostic log, it is failing with NullReferenceException because path is null
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithXunitAdapter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -118,7 +118,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
     public void RunTestsWithChutzpahAdapter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

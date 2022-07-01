@@ -21,7 +21,7 @@ public class TelemetryTests : AcceptanceTestBase
 
     [TestMethod]
     [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSource]
     public void RunTestsShouldPublishMetrics(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -31,7 +31,7 @@ public class TelemetryTests : AcceptanceTestBase
 
     [TestMethod]
     [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsShouldPublishMetrics(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

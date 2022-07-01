@@ -1,5 +1,4 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 
 namespace Tests
 {
@@ -29,7 +28,7 @@ namespace Tests
         {
         }
 
-<#        
+<#
     }
 #>
         #endregion
@@ -45,12 +44,12 @@ namespace Tests
         {
             Assert.Fail();
         }
-<#        
+<#
     }
 #>
         #endregion
     }
-<#        
+<#
     }
-#> 
+#>
 }

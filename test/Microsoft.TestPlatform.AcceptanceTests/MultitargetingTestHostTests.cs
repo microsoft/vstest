@@ -15,8 +15,8 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
     [TestCategory("Windows-Review")]
     // the underlying test is using xUnit to avoid AppDomain enhancements in MSTest that make this pass even without multitargetting
     // xUnit supports net452 onwards, so that is why this starts at net452, I also don't test all framework versions
-    [NetCoreRunnerAttribute(NETFX452_48)]
-    [NetFrameworkRunnerAttribute(NETFX452_48)]
+    [NetCoreRunner(NETFX452_48)]
+    [NetFrameworkRunner(NETFX452_48)]
     public void TestRunInATesthostThatTargetsTheirChosenNETFramework(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

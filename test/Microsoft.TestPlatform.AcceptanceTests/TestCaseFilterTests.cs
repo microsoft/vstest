@@ -13,7 +13,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
 {
     [TestMethod]
     [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithAndOperatorTrait(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -29,8 +29,8 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithCategoryTraitInMixCase(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -46,8 +46,8 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithClassNameTrait(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -63,8 +63,8 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithFullyQualifiedNameTrait(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -82,8 +82,8 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithNameTrait(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -99,8 +99,8 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithOrOperatorTrait(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -116,8 +116,8 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithPriorityTrait(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -137,8 +137,8 @@ public class TestCaseFilterTests : AcceptanceTestBase
     /// this command should provide same results as /TestCaseFilter:"FullyQualifiedName~UnitTest1".
     /// </summary>
     [TestMethod]
-    [NetFullTargetFrameworkDataSourceAttribute]
-    [NetCoreTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void TestCaseFilterShouldWorkIfOnlyPropertyValueGivenInExpression(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -158,7 +158,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     /// </summary>
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
     public void DiscoverMstestV1TestsWithAndOperatorTrait(RunnerInfo runnerInfo)
     {
         if (runnerInfo.IsNetRunner)
@@ -190,7 +190,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [Ignore("Temporary ignoring, because of incomplete interop work for legacy TP")]
-    [NetFullTargetFrameworkDataSourceAttribute]
+    [NetFullTargetFrameworkDataSource]
     public void DiscoverTmiTestsWithOnlyPropertyValue(RunnerInfo runnerInfo)
     {
         if (runnerInfo.IsNetRunner)
