@@ -247,6 +247,9 @@ dotnet_diagnostic.CA1051.severity = warning # not default, increased severity to
 # CA1010: Collections should implement generic interface
 dotnet_diagnostic.CA1010.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1047: Do not declare protected members in sealed types
+dotnet_diagnostic.CA1047.severity = warning # not default, increased severity to ensure it is applied
+
 # CA1304: Specify CultureInfo
 dotnet_diagnostic.CA1304.severity = warning # not default, increased severity to ensure it is applied
 
