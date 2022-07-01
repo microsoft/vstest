@@ -224,6 +224,9 @@ dotnet_diagnostic.CA1001.severity = warning # not default, increased severity to
 # CA1000: Do not declare static members on generic types
 dotnet_diagnostic.CA1000.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1051: Do not declare visible instance fields
+dotnet_diagnostic.CA1051.severity = warning # not default, increased severity to ensure it is applied
+
 # CA1304: Specify CultureInfo
 dotnet_diagnostic.CA1304.severity = warning # not default, increased severity to ensure it is applied
 
