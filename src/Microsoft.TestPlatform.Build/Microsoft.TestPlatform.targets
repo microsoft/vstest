@@ -14,6 +14,7 @@ Copyright (c) .NET Foundation. All rights reserved.
   <PropertyGroup>
     <VSTestTaskAssemblyFile Condition="$(VSTestTaskAssemblyFile) == ''">Microsoft.TestPlatform.Build.dll</VSTestTaskAssemblyFile>
     <VSTestConsolePath Condition="$(VSTestConsolePath) == ''">$([System.IO.Path]::Combine($(MSBuildThisFileDirectory),"vstest.console.dll"))</VSTestConsolePath>
+    <VSTestNoBuild Condition="'$(VSTestNoBuild)' == ''">False</VSTestNoBuild>
   </PropertyGroup>
   <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestForwardingTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
   <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestLogsTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />

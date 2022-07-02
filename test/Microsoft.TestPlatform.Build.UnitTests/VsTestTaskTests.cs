@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Linq;
+using System.Text.RegularExpressions;
 
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 using Microsoft.TestPlatform.Build.Tasks;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.Build.UnitTests;
@@ -19,7 +19,7 @@ public class VsTestTaskTests
     {
         _vsTestTask = new VSTestForwardingTask
         {
-            TestFileFullPath = @"C:\path\to\test-assembly.dll",
+            TestFileFullPath = new TaskItem(@"C:\path\to\test-assembly.dll"),
             VSTestFramework = ".NETCoreapp,Version2.0"
         };
     }
@@ -34,22 +34,20 @@ public class VsTestTaskTests
         _vsTestTask.VSTestCLIRunSettings[0] = arg1;
         _vsTestTask.VSTestCLIRunSettings[1] = arg2;
 
-        var result = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.AreEqual(5, result.Length);
-
-        // First, second and third args would be framework:".NETCoreapp,Version2.0", testfilepath and -- respectively.
-        Assert.AreEqual($"\"{arg1}\"", result[3]);
-        Assert.AreEqual($"{arg2}", result[4]);
+        StringAssert.Contains(commandline, " -- ");
+        StringAssert.Contains(commandline, $"\"{arg1}\"");
+        StringAssert.Contains(commandline, $"{arg2}");
     }
 
     [TestMethod]
-    public void CreateArgumentShouldAddCliRunSettingsArgAtEnd()
+    public void CreateArgumentShouldAddCLIRunSettingsArgAtEnd()
     {
         const string codeCoverageOption = "Code Coverage";
 
         _vsTestTask.VSTestCollect = new string[] { codeCoverageOption };
-        _vsTestTask.VSTestBlame = "Blame";
+        _vsTestTask.VSTestBlame = true;
 
         const string arg1 = "RunConfiguration.ResultsDirectory=Path having Space";
         const string arg2 = "MSTest.DeploymentEnabled";
@@ -58,24 +56,22 @@ public class VsTestTaskTests
         _vsTestTask.VSTestCLIRunSettings[0] = arg1;
         _vsTestTask.VSTestCLIRunSettings[1] = arg2;
 
-        var result = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.AreEqual(7, result.Length);
-
-        // Following are expected  --framework:".NETCoreapp,Version2.0", testfilepath, blame, collect:"Code coverage" -- respectively.
-        Assert.AreEqual($"\"{arg1}\"", result[5]);
-        Assert.AreEqual($"{arg2}", result[6]);
+        StringAssert.Contains(commandline, " -- ");
+        StringAssert.Contains(commandline, $"\"{arg1}\"");
+        StringAssert.Contains(commandline, $"{arg2}");
     }
 
     [TestMethod]
     public void CreateArgumentShouldPassResultsDirectoryCorrectly()
     {
         const string resultsDirectoryValue = @"C:\tmp\Results Directory";
-        _vsTestTask.VSTestResultsDirectory = resultsDirectoryValue;
+        _vsTestTask.VSTestResultsDirectory = new TaskItem(resultsDirectoryValue);
 
-        var result = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.AreEqual($"--resultsDirectory:\"{resultsDirectoryValue}\"", result[1]);
+        StringAssert.Contains(commandline, $"--resultsDirectory:\"{_vsTestTask.VSTestResultsDirectory?.ItemSpec}\"");
     }
 
     [TestMethod]
@@ -84,10 +80,10 @@ public class VsTestTaskTests
         _vsTestTask.VSTestVerbosity = "diag";
         _vsTestTask.VSTestLogger = new string[] { "Console;Verbosity=quiet" };
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+        StringAssert.DoesNotMatch(commandline, new Regex("(--logger:\"Console;Verbosity=normal\")"));
+        StringAssert.Contains(commandline, "--logger:\"Console;Verbosity=quiet\"");
     }
 
     [TestMethod]
@@ -95,9 +91,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestVerbosity = "n";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
     }
 
     [TestMethod]
@@ -105,9 +101,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestVerbosity = "normal";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
     }
 
     [TestMethod]
@@ -115,9 +111,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestVerbosity = "d";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
     }
 
     [TestMethod]
@@ -125,9 +121,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestVerbosity = "detailed";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
     }
 
     [TestMethod]
@@ -135,9 +131,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestVerbosity = "diag";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
     }
 
     [TestMethod]
@@ -145,9 +141,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestVerbosity = "diagnostic";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
     }
 
     [TestMethod]
@@ -155,9 +151,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestVerbosity = "q";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+        StringAssert.Contains(commandline, "--logger:Console;Verbosity=quiet");
     }
 
     [TestMethod]
@@ -165,9 +161,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestVerbosity = "quiet";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+        StringAssert.Contains(commandline, "--logger:Console;Verbosity=quiet");
     }
 
     [TestMethod]
@@ -175,9 +171,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestVerbosity = "m";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=minimal")));
+        StringAssert.Contains(commandline, "--logger:Console;Verbosity=minimal");
     }
 
     [TestMethod]
@@ -185,9 +181,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestVerbosity = "minimal";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=minimal")));
+        StringAssert.Contains(commandline, "--logger:Console;Verbosity=minimal");
     }
 
     [TestMethod]
@@ -195,9 +191,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestVerbosity = "Normal";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
     }
 
     [TestMethod]
@@ -205,9 +201,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestVerbosity = "Quiet";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+        StringAssert.Contains(commandline, "--logger:Console;Verbosity=quiet");
     }
 
     [TestMethod]
@@ -215,9 +211,9 @@ public class VsTestTaskTests
     {
         _vsTestTask.VSTestLogger = new string[] { "trx;LogFileName=foo bar.trx" };
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:\"trx;LogFileName=foo bar.trx\"")));
+        StringAssert.Contains(commandline, "--logger:\"trx;LogFileName=foo bar.trx\"");
     }
 
     [TestMethod]
@@ -228,103 +224,91 @@ public class VsTestTaskTests
         _vsTestTask.VSTestCollect[0] = "name1";
         _vsTestTask.VSTestCollect[1] = "name 2";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--collect:name1")));
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--collect:\"name 2\"")));
+        StringAssert.Contains(commandline, "--collect:name1");
+        StringAssert.Contains(commandline, "--collect:\"name 2\"");
     }
 
     [TestMethod]
     public void CreateArgumentShouldAddMultipleTestAdapterPaths()
     {
-        _vsTestTask.VSTestTestAdapterPath = new string[] { "path1", "path2" };
+        _vsTestTask.VSTestTestAdapterPath = new ITaskItem[] { new TaskItem("path1"), new TaskItem("path2") };
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--testAdapterPath:path1")));
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--testAdapterPath:path2")));
+        StringAssert.Contains(commandline, "--testAdapterPath:path1");
+        StringAssert.Contains(commandline, "--testAdapterPath:path2");
     }
 
     [TestMethod]
     public void CreateArgumentShouldAddMultipleLoggers()
     {
         _vsTestTask.VSTestLogger = new string[] { "trx;LogFileName=foo bar.trx", "console" };
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:\"trx;LogFileName=foo bar.trx\"")));
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:console")));
+        StringAssert.Contains(commandline, "--logger:\"trx;LogFileName=foo bar.trx\"");
+        StringAssert.Contains(commandline, "--logger:console");
     }
 
     [TestMethod]
     public void CreateArgumentShouldAddTraceCollectorDirectoryPathAsTestAdapterForCodeCoverageCollect()
     {
         const string traceDataCollectorDirectoryPath = @"c:\path\to\tracedata collector";
-        _vsTestTask.VSTestTraceDataCollectorDirectoryPath = traceDataCollectorDirectoryPath;
+        _vsTestTask.VSTestTraceDataCollectorDirectoryPath = new TaskItem(traceDataCollectorDirectoryPath);
         _vsTestTask.VSTestCollect = new string[] { "code coverage" };
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        const string expectedArg = "--testAdapterPath:\"c:\\path\\to\\tracedata collector\"";
-        CollectionAssert.Contains(allArguments, expectedArg, $"Expected argument: '''{expectedArg}''' not present in [{string.Join(", ", allArguments)}]");
-    }
-
-    [TestMethod]
-    public void CreateArgumentShouldAddTraceCollectorDirectoryPathAsTestAdapterForCodeCoverageCollectWithExtraConfigurations()
-    {
-        const string traceDataCollectorDirectoryPath = @"c:\path\to\tracedata collector";
-        _vsTestTask.VSTestTraceDataCollectorDirectoryPath = traceDataCollectorDirectoryPath;
-        _vsTestTask.VSTestCollect = new string[] { "code coverage;someParameter=someValue" };
-
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
-
-        const string expectedArg = "--testAdapterPath:\"c:\\path\\to\\tracedata collector\"";
-        CollectionAssert.Contains(allArguments, expectedArg, $"Expected argument: '''{expectedArg}''' not present in [{string.Join(", ", allArguments)}]");
+        string expectedArg = $"--testAdapterPath:\"{_vsTestTask.VSTestTraceDataCollectorDirectoryPath?.ItemSpec}\"";
+        StringAssert.Contains(commandline, expectedArg);
     }
 
     [TestMethod]
     public void CreateArgumentShouldNotAddTraceCollectorDirectoryPathAsTestAdapterForNonCodeCoverageCollect()
     {
         const string traceDataCollectorDirectoryPath = @"c:\path\to\tracedata collector";
-        _vsTestTask.VSTestTraceDataCollectorDirectoryPath = traceDataCollectorDirectoryPath;
+        _vsTestTask.VSTestTraceDataCollectorDirectoryPath = new TaskItem(traceDataCollectorDirectoryPath);
         _vsTestTask.VSTestCollect = new string[] { "not code coverage" };
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        const string notExpectedArg = "--testAdapterPath:\"c:\\path\\to\\tracedata collector\"";
-        CollectionAssert.DoesNotContain(allArguments, notExpectedArg, $"Not expected argument: '''{notExpectedArg}''' present in [{string.Join(", ", allArguments)}]");
+        string notExpectedArg = $"--testAdapterPath:\"{this._vsTestTask.VSTestTraceDataCollectorDirectoryPath?.ItemSpec}\"";
+        StringAssert.DoesNotMatch(commandline, new Regex(Regex.Escape(notExpectedArg)));
     }
 
     [TestMethod]
     public void CreateArgumentShouldAddTraceCollectorDirectoryPathAsTestAdapterIfSettingsGiven()
     {
         const string traceDataCollectorDirectoryPath = @"c:\path\to\tracedatacollector\";
-        _vsTestTask.VSTestTraceDataCollectorDirectoryPath = traceDataCollectorDirectoryPath;
+        _vsTestTask.VSTestTraceDataCollectorDirectoryPath = new TaskItem(traceDataCollectorDirectoryPath);
         _vsTestTask.VSTestSetting = @"c:\path\to\sample.runsettings";
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        const string expectedArg = "--testAdapterPath:c:\\path\\to\\tracedatacollector\\";
-        CollectionAssert.Contains(allArguments, expectedArg, $"Expected argument: '''{expectedArg}''' not present in [{string.Join(", ", allArguments)}]");
+        string expectedArg = $"--testAdapterPath:{_vsTestTask.VSTestTraceDataCollectorDirectoryPath?.ItemSpec}";
+        StringAssert.Contains(commandline, expectedArg);
     }
 
     [TestMethod]
-    public void CreateArgumentShouldNotAddTestAdapterPathIfVsTestTraceDataCollectorDirectoryPathIsEmpty()
+    public void CreateArgumentShouldNotAddTestAdapterPathIfVSTestTraceDataCollectorDirectoryPathIsEmpty()
     {
-        _vsTestTask.VSTestTraceDataCollectorDirectoryPath = string.Empty;
+        _vsTestTask.VSTestTraceDataCollectorDirectoryPath = null;
         _vsTestTask.VSTestSetting = @"c:\path\to\sample.runsettings";
         _vsTestTask.VSTestCollect = new string[] { "code coverage" };
 
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        var commandline = _vsTestTask.CreateArguments();
 
-        Assert.IsNull(Array.Find(allArguments, arg => arg.Contains("--testAdapterPath:")));
+        StringAssert.DoesNotMatch(commandline, new Regex(@"(--testAdapterPath:)"));
     }
 
     [TestMethod]
     public void CreateArgumentShouldAddNoLogoOptionIfSpecifiedByUser()
     {
-        _vsTestTask.VSTestNoLogo = "--nologo";
-        var allArguments = _vsTestTask.CreateArgument().ToArray();
+        _vsTestTask.VSTestNoLogo = true;
 
-        Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--nologo")));
+        var commandline = _vsTestTask.CreateArguments();
+
+        StringAssert.Contains(commandline, "--nologo");
     }
 }
