@@ -13,7 +13,7 @@ using Microsoft.TestPlatform.Build.Utils;
 
 namespace Microsoft.TestPlatform.Build.Tasks;
 
-public class VSTestTask : Task, ICancelableTask
+public class VSTestForwardingTask : Task, ICancelableTask
 {
     // The process which is invoking vstest.console
     private VSTestForwardingApp? _vsTestForwardingApp;

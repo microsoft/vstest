@@ -13,11 +13,11 @@ namespace Microsoft.TestPlatform.Build.UnitTests;
 [TestClass]
 public class VsTestTaskTests
 {
-    private readonly VSTestTask _vsTestTask;
+    private readonly VSTestForwardingTask _vsTestTask;
 
     public VsTestTaskTests()
     {
-        _vsTestTask = new VSTestTask
+        _vsTestTask = new VSTestForwardingTask
         {
             TestFileFullPath = @"C:\path\to\test-assembly.dll",
             VSTestFramework = ".NETCoreapp,Version2.0"
