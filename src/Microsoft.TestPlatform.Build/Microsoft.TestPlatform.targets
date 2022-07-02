@@ -15,9 +15,11 @@ Copyright (c) .NET Foundation. All rights reserved.
     <VSTestTaskAssemblyFile Condition="$(VSTestTaskAssemblyFile) == ''">Microsoft.TestPlatform.Build.dll</VSTestTaskAssemblyFile>
     <VSTestConsolePath Condition="$(VSTestConsolePath) == ''">$([System.IO.Path]::Combine($(MSBuildThisFileDirectory),"vstest.console.dll"))</VSTestConsolePath>
     <VSTestNoBuild Condition="'$(VSTestNoBuild)' == ''">False</VSTestNoBuild>
+    <VSTestUseConsole Condition="'$(VSTestUseConsole)' == ''">False</VSTestUseConsole>
   </PropertyGroup>
   <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestForwardingTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
   <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestLogsTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
+  <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
 
   <!--
     ============================================================
@@ -26,6 +28,47 @@ Copyright (c) .NET Foundation. All rights reserved.
     ============================================================
   -->
   <Target Name="VSTest" DependsOnTargets="ShowInfoMessageIfProjectHasNoIsTestProjectProperty">
+    <!-- Unloggable colorized output (cf. https://github.com/microsoft/vstest/issues/680) -->
+    <CallTarget Targets="_VSTestConsole" Condition="$(VSTestUseConsole)" />
+    <!-- Proper MSBuild integration, but no custom colorization -->
+    <CallTarget Targets="_VSTestMSBuild" Condition="!$(VSTestUseConsole)" />
+  </Target>
+
+  <!-- Used when called from dotnet msbuild command line: uses MSBuild logs but does not allow for console colorization -->
+  <Target Name="_VSTestMSBuild" Condition="'$(IsTestProject)' == 'true'">
+    <CallTarget Condition="!$(VSTestNoBuild)" Targets="BuildProject" />
+
+    <VSTestTask
+      TestFileFullPath="$(TargetPath)"
+      VSTestSetting="$([MSBuild]::ValueOrDefault($(VSTestSetting), '$(RunSettingsFilePath)'))"
+      VSTestTestAdapterPath="$(VSTestTestAdapterPath)"
+      VSTestFramework="$(TargetFrameworkMoniker)"
+      VSTestPlatform="$(PlatformTarget)"
+      VSTestTestCaseFilter="$(VSTestTestCaseFilter)"
+      VSTestLogger="$(VSTestLogger)"
+      VSTestListTests="$(VSTestListTests)"
+      VSTestDiag="$(VSTestDiag)"
+      VSTestCLIRunSettings="$(VSTestCLIRunSettings)"
+      VSTestConsolePath="$(VSTestConsolePath)"
+      VSTestResultsDirectory="$(VSTestResultsDirectory)"
+      VSTestVerbosity="$(VSTestVerbosity)"
+      VSTestCollect="$(VSTestCollect)"
+      VSTestBlame="$(VSTestBlame)"
+      VSTestBlameCrash="$(VSTestBlameCrash)"
+      VSTestBlameCrashDumpType="$(VSTestBlameCrashDumpType)"
+      VSTestBlameCrashCollectAlways="$(VSTestBlameCrashCollectAlways)"
+      VSTestBlameHang="$(VSTestBlameHang)"
+      VSTestBlameHangDumpType="$(VSTestBlameHangDumpType)"
+      VSTestBlameHangTimeout="$(VSTestBlameHangTimeout)"
+      VSTestTraceDataCollectorDirectoryPath="$(TraceDataCollectorDirectoryPath)"
+      VSTestArtifactsProcessingMode="$(VSTestArtifactsProcessingMode)"
+      VSTestSessionCorrelationId="$(VSTestSessionCorrelationId)"
+      VSTestNoLogo="$(VSTestNoLogo)"
+    />
+  </Target>
+
+  <!-- Used when called from dotnet test command line: does not use MSBuild logs to allow for console colorization -->
+  <Target Name="_VSTestConsole">
     <CallTarget Condition="'$(VSTestNoBuild)' != 'true' AND '$(IsTestProject)' == 'true'" Targets="BuildProject" />
     
     <CallTarget Targets="ShowCallOfVSTestTaskWithParameter" />

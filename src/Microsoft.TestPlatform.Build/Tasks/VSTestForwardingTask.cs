@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
@@ -12,13 +11,11 @@ using Microsoft.TestPlatform.Build.Trace;
 
 namespace Microsoft.TestPlatform.Build.Tasks;
 
-public class VSTestForwardingTask : Task, ICancelableTask
+public class VSTestForwardingTask : Task, ITestTask
 {
     private int _activeProcessId;
 
     private const string DotnetExe = "dotnet";
-    private const string VsTestAppName = "vstest.console.dll";
-    private const string CodeCoverageString = "Code Coverage";
 
     public ITaskItem? TestFileFullPath { get; set; }
     public string? VSTestSetting { get; set; }
@@ -76,7 +73,7 @@ public class VSTestForwardingTask : Task, ICancelableTask
         var processInfo = new ProcessStartInfo
         {
             FileName = DotnetExe,
-            Arguments = CreateArguments(),
+            Arguments = this.CreateCommandLineArguments(),
             UseShellExecute = false,
         };
 
@@ -107,235 +104,6 @@ public class VSTestForwardingTask : Task, ICancelableTask
         catch (ArgumentException ex)
         {
             Tracing.Trace(string.Format("VSTest: Killing process throws ArgumentException with the following message {0}. It may be that process is not running", ex));
-        }
-    }
-
-    internal string CreateArguments()
-    {
-        var builder = new CommandLineBuilder();
-        builder.AppendSwitch("exec");
-        if (VSTestConsolePath != null && !VSTestConsolePath.ItemSpec.IsNullOrEmpty())
-        {
-            builder.AppendSwitchIfNotNull("", VSTestConsolePath);
-        }
-        else
-        {
-            builder.AppendSwitch(VsTestAppName);
-        }
-
-        CreateCommandLineArguments(builder);
-
-        // VSTestCLIRunSettings should be last argument in allArgs as vstest.console ignore options after "--"(CLIRunSettings option).
-        AddCliRunSettingsArgs(builder);
-
-        return builder.ToString();
-    }
-
-    private void AddCliRunSettingsArgs(CommandLineBuilder builder)
-    {
-        if (VSTestCLIRunSettings != null && VSTestCLIRunSettings.Any())
-        {
-            builder.AppendSwitch("--");
-            foreach (var arg in VSTestCLIRunSettings)
-            {
-                builder.AppendSwitchIfNotNull(string.Empty, arg);
-            }
-        }
-    }
-
-    private void CreateCommandLineArguments(CommandLineBuilder builder)
-    {
-        var isConsoleLoggerSpecifiedByUser = false;
-        var isCollectCodeCoverageEnabled = false;
-        var isRunSettingsEnabled = false;
-
-        // TODO log arguments in task
-        if (!VSTestSetting.IsNullOrEmpty())
-        {
-            isRunSettingsEnabled = true;
-            builder.AppendSwitchIfNotNull("--settings:", VSTestSetting);
-        }
-
-        if (VSTestTestAdapterPath != null && VSTestTestAdapterPath.Any())
-        {
-            foreach (var arg in VSTestTestAdapterPath)
-            {
-                builder.AppendSwitchIfNotNull("--testAdapterPath:", arg);
-            }
-        }
-
-        if (!VSTestFramework.IsNullOrEmpty())
-        {
-            builder.AppendSwitchIfNotNull("--framework:", VSTestFramework);
-        }
-
-        // vstest.console only support x86 and x64 for argument platform
-        if (!VSTestPlatform.IsNullOrEmpty() && !VSTestPlatform.Contains("AnyCPU"))
-        {
-            builder.AppendSwitchIfNotNull("--platform:", VSTestPlatform);
-        }
-
-        if (!VSTestTestCaseFilter.IsNullOrEmpty())
-        {
-            builder.AppendSwitchIfNotNull("--testCaseFilter:", VSTestTestCaseFilter);
-        }
-
-        if (VSTestLogger != null && VSTestLogger.Length > 0)
-        {
-            foreach (var arg in VSTestLogger)
-            {
-                builder.AppendSwitchIfNotNull("--logger:", arg);
-
-                if (arg.StartsWith("console", StringComparison.OrdinalIgnoreCase))
-                {
-                    isConsoleLoggerSpecifiedByUser = true;
-                }
-            }
-        }
-
-        if (VSTestResultsDirectory != null && !VSTestResultsDirectory.ItemSpec.IsNullOrEmpty())
-        {
-            builder.AppendSwitchIfNotNull("--resultsDirectory:", VSTestResultsDirectory);
-        }
-
-        if (VSTestListTests)
-        {
-            builder.AppendSwitch("--listTests");
-        }
-
-        if (!VSTestDiag.IsNullOrEmpty())
-        {
-            builder.AppendSwitchIfNotNull("--Diag:", VSTestDiag);
-        }
-
-        if (TestFileFullPath == null)
-        {
-            Log.LogError("Test file path cannot be empty or null.");
-        }
-        else
-        {
-            builder.AppendFileNameIfNotNull(TestFileFullPath);
-        }
-
-        // Console logger was not specified by user, but verbosity was, hence add default console logger with verbosity as specified
-        if (!VSTestVerbosity.IsNullOrWhiteSpace() && !isConsoleLoggerSpecifiedByUser)
-        {
-            var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
-            var quietTestLogging = new List<string>() { "q", "quiet" };
-
-            string vsTestVerbosity = "minimal";
-            if (normalTestLogging.Contains(VSTestVerbosity.ToLowerInvariant()))
-            {
-                vsTestVerbosity = "normal";
-            }
-            else if (quietTestLogging.Contains(VSTestVerbosity.ToLowerInvariant()))
-            {
-                vsTestVerbosity = "quiet";
-            }
-
-            builder.AppendSwitchUnquotedIfNotNull("--logger:", $"Console;Verbosity={vsTestVerbosity}");
-        }
-
-        if (VSTestBlame || VSTestBlameCrash || VSTestBlameHang)
-        {
-            var dumpArgs = new List<string>();
-            if (VSTestBlameCrash || VSTestBlameHang)
-            {
-                if (VSTestBlameCrash)
-                {
-                    dumpArgs.Add("CollectDump");
-                    if (VSTestBlameCrashCollectAlways)
-                    {
-                        dumpArgs.Add($"CollectAlways={VSTestBlameCrashCollectAlways}");
-                    }
-
-                    if (!VSTestBlameCrashDumpType.IsNullOrEmpty())
-                    {
-                        dumpArgs.Add($"DumpType={VSTestBlameCrashDumpType}");
-                    }
-                }
-
-                if (VSTestBlameHang)
-                {
-                    dumpArgs.Add("CollectHangDump");
-
-                    if (!VSTestBlameHangDumpType.IsNullOrEmpty())
-                    {
-                        dumpArgs.Add($"HangDumpType={VSTestBlameHangDumpType}");
-                    }
-
-                    if (!VSTestBlameHangTimeout.IsNullOrEmpty())
-                    {
-                        dumpArgs.Add($"TestTimeout={VSTestBlameHangTimeout}");
-                    }
-                }
-            }
-
-            if (dumpArgs.Any())
-            {
-                builder.AppendSwitchIfNotNull("--Blame:", string.Join(";", dumpArgs));
-            }
-            else
-            {
-                builder.AppendSwitch("--Blame");
-            }
-        }
-
-        if (VSTestCollect != null && VSTestCollect.Any())
-        {
-            foreach (var arg in VSTestCollect)
-            {
-                // For collecting code coverage, argument value can be either "Code Coverage" or "Code Coverage;a=b;c=d".
-                // Split the argument with ';' and compare first token value.
-                var tokens = arg.Split(';');
-
-                if (arg.Equals(CodeCoverageString, StringComparison.OrdinalIgnoreCase) ||
-                    tokens[0].Equals(CodeCoverageString, StringComparison.OrdinalIgnoreCase))
-                {
-                    isCollectCodeCoverageEnabled = true;
-                }
-
-                builder.AppendSwitchIfNotNull("--collect:", arg);
-            }
-        }
-
-        if (isCollectCodeCoverageEnabled || isRunSettingsEnabled)
-        {
-            // Pass TraceDataCollector path to vstest.console as TestAdapterPath if --collect "Code Coverage"
-            // or --settings (User can enable code coverage from runsettings) option given.
-            // Not parsing the runsettings for two reason:
-            //    1. To keep no knowledge of runsettings structure in VSTestTask.
-            //    2. Impact of adding adapter path always is minimal. (worst case: loads additional data collector assembly in datacollector process.)
-            // This is required due to currently trace datacollector not ships with dotnet sdk, can be remove once we have
-            // go code coverage x-plat.
-            if (VSTestTraceDataCollectorDirectoryPath != null && !VSTestTraceDataCollectorDirectoryPath.ItemSpec.IsNullOrEmpty())
-            {
-                builder.AppendSwitchIfNotNull("--testAdapterPath:", VSTestTraceDataCollectorDirectoryPath);
-            }
-            else
-            {
-                if (isCollectCodeCoverageEnabled)
-                {
-                    // Not showing message in runsettings scenario, because we are not sure that code coverage is enabled.
-                    // User might be using older Microsoft.NET.Test.Sdk which don't have CodeCoverage infra.
-                    Console.WriteLine(Resources.Resources.UpdateTestSdkForCollectingCodeCoverage);
-                }
-            }
-        }
-
-        if (VSTestNoLogo)
-        {
-            builder.AppendSwitch("--nologo");
-        }
-
-        if (!VSTestArtifactsProcessingMode.IsNullOrEmpty() && VSTestArtifactsProcessingMode.Equals("collect", StringComparison.OrdinalIgnoreCase))
-        {
-            builder.AppendSwitch("--artifactsProcessingMode-collect");
-        }
-
-        if (!VSTestSessionCorrelationId.IsNullOrEmpty())
-        {
-            builder.AppendSwitchIfNotNull("--testSessionCorrelationId:", VSTestSessionCorrelationId);
         }
     }
 }
