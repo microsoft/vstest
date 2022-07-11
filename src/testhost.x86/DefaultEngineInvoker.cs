@@ -194,7 +194,7 @@ internal class DefaultEngineInvoker :
                 dcPort);
             throw new TestPlatformException(
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                     CoreUtilitiesConstants.TesthostProcessName,
                     CoreUtilitiesConstants.DatacollectorProcessName,

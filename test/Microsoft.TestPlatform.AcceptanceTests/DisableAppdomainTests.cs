@@ -24,7 +24,7 @@ public class DisableAppdomainTests : AcceptanceTestBase
         var diableAppdomainTest1 = _testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
         var diableAppdomainTest2 = _testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
 
-        RunTests(runnerInfo, string.Format("{0}\" \"{1}", diableAppdomainTest1, diableAppdomainTest2), 2);
+        RunTests(runnerInfo, $"{diableAppdomainTest1}\" \"{diableAppdomainTest2}", 2);
     }
 
     [TestMethod]
@@ -64,7 +64,7 @@ public class DisableAppdomainTests : AcceptanceTestBase
 
     private static string GetRunsettingsFilePath(TempDirectory tempDirectory, Dictionary<string, string> runConfigurationDictionary)
     {
-        var runsettingsPath = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
+        var runsettingsPath = Path.Combine(tempDirectory.Path, $"test_{Guid.NewGuid()}.runsettings");
         CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
         return runsettingsPath;
     }

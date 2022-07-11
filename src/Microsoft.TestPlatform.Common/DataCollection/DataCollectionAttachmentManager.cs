@@ -206,7 +206,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
         {
             throw new FileNotFoundException(
                 string.Format(
-                    CultureInfo.CurrentCulture,
+                    CultureInfo.InvariantCulture,
                     "Could not find source file '{0}'.",
                     fileTransferInfo.FileName));
         }

@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
@@ -140,9 +139,7 @@ internal class HelpArgumentExecutor : IArgumentExecutor
         {
             try
             {
-                result = string.Format(
-                    CultureInfo.CurrentUICulture,
-                    argumentProcessor.Metadata.Value.HelpContentResourceName);
+                result = argumentProcessor.Metadata.Value.HelpContentResourceName;
                 //ResourceHelper.GetString(argumentProcessor.Metadata.HelpContentResourceName, assembly, CultureInfo.CurrentUICulture);
             }
             catch (Exception e)

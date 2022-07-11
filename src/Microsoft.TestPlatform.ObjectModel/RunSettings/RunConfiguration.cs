@@ -459,15 +459,15 @@ public class RunConfiguration : TestRunSettings
         }
 
         XmlElement maxCpuCount = doc.CreateElement("MaxCpuCount");
-        maxCpuCount.InnerXml = MaxCpuCount.ToString();
+        maxCpuCount.InnerXml = MaxCpuCount.ToString(CultureInfo.CurrentCulture);
         root.AppendChild(maxCpuCount);
 
         XmlElement batchSize = doc.CreateElement("BatchSize");
-        batchSize.InnerXml = BatchSize.ToString();
+        batchSize.InnerXml = BatchSize.ToString(CultureInfo.CurrentCulture);
         root.AppendChild(batchSize);
 
         XmlElement testSessionTimeout = doc.CreateElement("TestSessionTimeout");
-        testSessionTimeout.InnerXml = TestSessionTimeout.ToString();
+        testSessionTimeout.InnerXml = TestSessionTimeout.ToString(CultureInfo.CurrentCulture);
         root.AppendChild(testSessionTimeout);
 
         XmlElement designMode = doc.CreateElement("DesignMode");

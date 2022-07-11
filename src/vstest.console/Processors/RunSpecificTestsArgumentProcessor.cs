@@ -185,7 +185,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
 
         if (!_commandLineOptions.Sources.Any())
         {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
+            throw new CommandLineException(CommandLineResources.MissingTestSourceFile);
         }
 
         _effectiveRunSettings = _runSettingsManager.ActiveRunSettings.SettingsXml;
@@ -251,7 +251,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
             else
             {
                 // No tests were discovered from the given sources.
-                warningMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", _commandLineOptions.Sources));
+                warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", _commandLineOptions.Sources));
 
                 if (!_commandLineOptions.TestAdapterPathsSet)
                 {

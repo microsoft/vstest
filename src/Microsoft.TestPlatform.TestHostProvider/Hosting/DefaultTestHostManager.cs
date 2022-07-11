@@ -429,7 +429,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         // Log warning if conflicting version extensions are found
         if (conflictingExtensions.Any())
         {
-            var extensionsString = string.Join("\n", conflictingExtensions.Select(kv => string.Format("  {0} : {1}", kv.Key, kv.Value)));
+            var extensionsString = string.Join("\n", conflictingExtensions.Select(kv => $"  {kv.Key} : {kv.Value}"));
             string message = string.Format(CultureInfo.CurrentCulture, Resources.MultipleFileVersions, extensionsString);
             _messageLogger.SendMessage(TestMessageLevel.Warning, message);
         }

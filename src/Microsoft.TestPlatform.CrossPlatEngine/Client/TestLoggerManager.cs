@@ -183,10 +183,7 @@ internal class TestLoggerManager : ITestLoggerManager
                         : logger.FriendlyName;
 
                 throw new InvalidLoggerException(
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CommonResources.LoggerNotFound,
-                        value));
+                    string.Format(CultureInfo.CurrentCulture, CommonResources.LoggerNotFound, value));
             }
         }
 
@@ -413,7 +410,7 @@ internal class TestLoggerManager : ITestLoggerManager
 
                 throw new InvalidLoggerException(
                     string.Format(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         CommonResources.LoggerUriInvalid,
                         extension.Metadata.ExtensionUri));
             }
@@ -617,7 +614,7 @@ internal class TestLoggerManager : ITestLoggerManager
             _messageLogger.SendMessage(
                 TestMessageLevel.Error,
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommonResources.LoggerInitializationError,
                     extensionUri.IsNullOrEmpty() ? "type" : "uri",
                     extensionUri.IsNullOrEmpty() ? logger.GetType().ToString() : extensionUri,

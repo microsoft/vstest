@@ -229,10 +229,7 @@ public class ProxyOperationManager
             EqtTrace.Error("ProxyOperationManager: Failed to launch testhost :{0}", ex);
 
             CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
-            throw new TestPlatformException(string.Format(
-                CultureInfo.CurrentUICulture,
-                CrossPlatEngineResources.FailedToLaunchTestHost,
-                ex.ToString()));
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.FailedToLaunchTestHost, ex.ToString()));
         }
 
         // Warn the user that execution will wait for debugger attach.
@@ -251,6 +248,7 @@ public class ProxyOperationManager
 
             ConsoleOutput.Instance.WriteLine(
                 string.Format(
+                    CultureInfo.InvariantCulture,
                     "Process Id: {0}, Name: {1}",
                     _testHostProcessId,
                     _processHelper.GetProcessName(_testHostProcessId)),
@@ -412,8 +410,9 @@ public class ProxyOperationManager
             : Path.ChangeExtension(
                 logFile,
                 string.Format(
+                    CultureInfo.InvariantCulture,
                     "host.{0}_{1}{2}",
-                    DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
+                    DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff", CultureInfo.InvariantCulture),
                     new PlatformEnvironment().GetCurrentManagedThreadId(),
                     Path.GetExtension(logFile))).AddDoubleQuote();
     }
@@ -465,7 +464,7 @@ public class ProxyOperationManager
         {
             // We might consider passing standard output here in case standard error is not
             // available because some errors don't end up in the standard error output.
-            throw new TestPlatformException(string.Format(CrossPlatEngineResources.TestHostExitedWithError, _testHostProcessStdError));
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, _testHostProcessStdError));
         }
     }
 
@@ -478,6 +477,7 @@ public class ProxyOperationManager
         if (_testHostLaunched)
         {
             errorMsg = string.Format(
+                CultureInfo.CurrentCulture,
                 CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                 CoreUtilitiesConstants.VstestConsoleProcessName,
                 CoreUtilitiesConstants.TesthostProcessName,
@@ -489,9 +489,9 @@ public class ProxyOperationManager
         if (!StringUtils.IsNullOrWhiteSpace(_testHostProcessStdError))
         {
             // Testhost failed with error.
-            errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, _testHostProcessStdError);
+            errorMsg = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, _testHostProcessStdError);
         }
 
-        throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
+        throw new TestPlatformException(errorMsg);
     }
 }

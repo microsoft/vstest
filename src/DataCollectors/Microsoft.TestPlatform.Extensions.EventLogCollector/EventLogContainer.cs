@@ -151,7 +151,7 @@ internal class EventLogContainer : IEventLogContainer
                         _dataCollectionLogger.LogWarning(
                             _dataCollectionContext,
                             string.Format(
-                                CultureInfo.InvariantCulture,
+                                CultureInfo.CurrentCulture,
                                 Resource.EventsLostWarning,
                                 EventLog.Log));
 
@@ -203,7 +203,7 @@ internal class EventLogContainer : IEventLogContainer
                 _dataCollectionLogger.LogError(
                     _dataCollectionContext,
                     string.Format(
-                        CultureInfo.InvariantCulture,
+                        CultureInfo.CurrentCulture,
                         Resource.EventsLostError,
                         EventLog.Log,
                         exception), exception);

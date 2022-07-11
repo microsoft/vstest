@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
@@ -247,6 +248,7 @@ public class RunConfigurationTests
     public void RunConfigurationShouldReadValueForDesignMode(bool designModeValue)
     {
         string settingsXml = string.Format(
+            CultureInfo.CurrentCulture,
             @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
@@ -289,6 +291,7 @@ public class RunConfigurationTests
     public void RunConfigurationShouldReadValueForCollectSourceInformation(bool val)
     {
         string settingsXml = string.Format(
+            CultureInfo.CurrentCulture,
             @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>

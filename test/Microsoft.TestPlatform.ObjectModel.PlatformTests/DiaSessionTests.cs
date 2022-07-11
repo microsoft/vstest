@@ -121,7 +121,7 @@ public class DiaSessionTests : IntegrationTestBase
         ValidateMinLineNumber(9, diaNavigationData.MinLineNumber);
         Assert.AreEqual(10, diaNavigationData.MaxLineNumber);
         var expectedTime = 150;
-        Assert.IsTrue(watch.Elapsed.Milliseconds < expectedTime, string.Format("DiaSession Perf test Actual time:{0} ms Expected time:{1} ms", watch.Elapsed.Milliseconds, expectedTime));
+        Assert.IsTrue(watch.Elapsed.Milliseconds < expectedTime, $"DiaSession Perf test Actual time:{watch.Elapsed.Milliseconds} ms Expected time:{expectedTime} ms");
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
     }

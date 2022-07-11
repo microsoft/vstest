@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -85,7 +86,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
 
         if (!TryGetProcDumpExecutable(processId, out var procDumpPath))
         {
-            var procdumpNotFound = string.Format(Resources.Resources.ProcDumpNotFound, procDumpPath);
+            var procdumpNotFound = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ProcDumpNotFound, procDumpPath);
             logWarning(procdumpNotFound);
             EqtTrace.Warning($"ProcDumpDumper.AttachToTargetProcess: {procdumpNotFound}");
             return;

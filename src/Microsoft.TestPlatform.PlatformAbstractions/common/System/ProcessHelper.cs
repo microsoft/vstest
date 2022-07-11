@@ -1,11 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NETFRAMEWORK || NETCOREAPP ||  NETSTANDARD2_0
+#if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+#if !NETCOREAPP1_0
+using System.Globalization;
+#endif
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -229,9 +232,17 @@ public partial class ProcessHelper : IProcessHelper
     {
         var osArchitecture = new PlatformEnvironment().Architecture;
         return osArchitecture is PlatformArchitecture.ARM or PlatformArchitecture.ARM64
-            ? Path.Combine(GetCurrentProcessLocation(), GetCurrentProcessArchitecture().ToString().ToLower(), Arm)
-            : Path.Combine(GetCurrentProcessLocation(), GetCurrentProcessArchitecture().ToString().ToLower());
+            ? Path.Combine(GetCurrentProcessLocation(), GetFormattedCurrentProcessArchitecture(), Arm)
+            : Path.Combine(GetCurrentProcessLocation(), GetFormattedCurrentProcessArchitecture());
     }
+
+    private string GetFormattedCurrentProcessArchitecture()
+        => GetCurrentProcessArchitecture().ToString()
+            .ToLower(
+#if !NETCOREAPP1_0
+        CultureInfo.InvariantCulture
+#endif
+            );
 
     /// <inheritdoc/>
     public void WaitForProcessExit(object? process)

@@ -108,11 +108,11 @@ public class EventLogCollectorTests : AcceptanceTestBase
         };
 
         // Since there is no guaranty that test will run in a particular order, we will check file for all available list of ids
-        Assert.IsTrue(VerifyOrder2(fileContent1, eventIdsDics), string.Format("Event log file content: {0}", fileContent1));
-        Assert.IsTrue(VerifyOrder2(fileContent2, eventIdsDics), string.Format("Event log file content: {0}", fileContent2));
-        Assert.IsTrue(VerifyOrder2(fileContent3, eventIdsDics), string.Format("Event log file content: {0}", fileContent3));
+        Assert.IsTrue(VerifyOrder2(fileContent1, eventIdsDics), $"Event log file content: {fileContent1}");
+        Assert.IsTrue(VerifyOrder2(fileContent2, eventIdsDics), $"Event log file content: {fileContent2}");
+        Assert.IsTrue(VerifyOrder2(fileContent3, eventIdsDics), $"Event log file content: {fileContent3}");
 
-        Assert.IsTrue(VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), string.Format("Event log file content: {0}", fileContent4));
+        Assert.IsTrue(VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), $"Event log file content: {fileContent4}");
     }
 
     private static bool VerifyOrder2(string content, Dictionary<string[], bool> eventIdsDics)

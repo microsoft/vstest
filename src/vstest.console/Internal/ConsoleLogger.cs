@@ -38,6 +38,11 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     private const string TestResultPrefix = "  ";
 
     /// <summary>
+    /// Suffix used for formatting the result output
+    /// </summary>
+    private const string TestResultSuffix = " ";
+
+    /// <summary>
     /// Bool to decide whether Verbose level should be added as prefix or not in log messages.
     /// </summary>
     internal static bool AppendPrefix;
@@ -301,7 +306,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         if (!result.ErrorMessage.IsNullOrEmpty())
         {
             addAdditionalNewLine = true;
-            Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.ErrorMessageBanner));
+            Output.Information(false, ConsoleColor.Red, TestResultPrefix + CommandLineResources.ErrorMessageBanner);
             var errorMessage = string.Format(CultureInfo.CurrentCulture, "{0}{1}{2}", TestResultPrefix, TestMessageFormattingPrefix, result.ErrorMessage);
             Output.Information(false, ConsoleColor.Red, errorMessage);
         }
@@ -309,7 +314,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         if (!result.ErrorStackTrace.IsNullOrEmpty())
         {
             addAdditionalNewLine = false;
-            Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StacktraceBanner));
+            Output.Information(false, ConsoleColor.Red, TestResultPrefix + CommandLineResources.StacktraceBanner);
             var stackTrace = string.Format(CultureInfo.CurrentCulture, "{0}{1}", TestResultPrefix, result.ErrorStackTrace);
             Output.Information(false, ConsoleColor.Red, stackTrace);
         }
@@ -322,7 +327,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
             if (!stdOutMessages.IsNullOrEmpty())
             {
-                Output.Information(false, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StdOutMessagesBanner));
+                Output.Information(false, TestResultPrefix + CommandLineResources.StdOutMessagesBanner);
                 Output.Information(false, stdOutMessages);
             }
         }
@@ -335,7 +340,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
             if (!stdErrMessages.IsNullOrEmpty())
             {
-                Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StdErrMessagesBanner));
+                Output.Information(false, ConsoleColor.Red, TestResultPrefix + CommandLineResources.StdErrMessagesBanner);
                 Output.Information(false, ConsoleColor.Red, stdErrMessages);
             }
         }
@@ -348,7 +353,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
             if (!dbgTrcMessages.IsNullOrEmpty())
             {
-                Output.Information(false, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.DbgTrcMessagesBanner));
+                Output.Information(false, TestResultPrefix + CommandLineResources.DbgTrcMessagesBanner);
                 Output.Information(false, dbgTrcMessages);
             }
         }
@@ -361,7 +366,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
             if (!addnlInfoMessages.IsNullOrEmpty())
             {
-                Output.Information(false, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.AddnlInfoMessagesBanner));
+                Output.Information(false, TestResultPrefix + CommandLineResources.AddnlInfoMessagesBanner);
                 Output.Information(false, addnlInfoMessages);
             }
         }
@@ -510,7 +515,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         string? formattedDuration = GetFormattedDurationString(e.Result.Duration);
         if (!formattedDuration.IsNullOrEmpty())
         {
-            testDisplayName = string.Format("{0} [{1}]", testDisplayName, formattedDuration);
+            testDisplayName = $"{testDisplayName} [{formattedDuration}]";
         }
 
         var executionId = GetExecutionId(e.Result);
@@ -544,7 +549,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     // Pause the progress indicator before displaying test result information
                     _progressIndicator?.Pause();
 
-                    Output.Write(string.Format("{0}{1} ", TestResultPrefix, CommandLineResources.SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
+                    Output.Write(GetFormattedTestIndicator(CommandLineResources.SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
                     Output.WriteLine(testDisplayName, OutputLevel.Information);
                     if (VerbosityLevel == Verbosity.Detailed)
                     {
@@ -567,7 +572,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     // Pause the progress indicator before displaying test result information
                     _progressIndicator?.Pause();
 
-                    Output.Write(string.Format("{0}{1} ", TestResultPrefix, CommandLineResources.FailedTestIndicator), OutputLevel.Information, ConsoleColor.Red);
+                    Output.Write(GetFormattedTestIndicator(CommandLineResources.FailedTestIndicator), OutputLevel.Information, ConsoleColor.Red);
                     Output.WriteLine(testDisplayName, OutputLevel.Information);
                     DisplayFullInformation(e.Result);
 
@@ -584,7 +589,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                         // Pause the progress indicator before displaying test result information
                         _progressIndicator?.Pause();
 
-                        Output.Write(string.Format("{0}{1} ", TestResultPrefix, CommandLineResources.PassedTestIndicator), OutputLevel.Information, ConsoleColor.Green);
+                        Output.Write(GetFormattedTestIndicator(CommandLineResources.PassedTestIndicator), OutputLevel.Information, ConsoleColor.Green);
                         Output.WriteLine(testDisplayName, OutputLevel.Information);
                         if (VerbosityLevel == Verbosity.Detailed)
                         {
@@ -608,7 +613,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     // Pause the progress indicator before displaying test result information
                     _progressIndicator?.Pause();
 
-                    Output.Write(string.Format("{0}{1} ", TestResultPrefix, CommandLineResources.SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
+                    Output.Write(GetFormattedTestIndicator(CommandLineResources.SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
                     Output.WriteLine(testDisplayName, OutputLevel.Information);
                     if (VerbosityLevel == Verbosity.Detailed)
                     {
@@ -621,6 +626,9 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     break;
                 }
         }
+
+        // Local functions
+        static string GetFormattedTestIndicator(string indicator) => TestResultPrefix + indicator + TestResultSuffix;
     }
 
     private string? GetFormattedDurationString(TimeSpan duration)
@@ -749,10 +757,10 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     TestOutcome.Skipped => (CommandLineResources.SkippedTestIndicator + "!").PadRight(LongestResultIndicator),
                     _ => CommandLineResources.None.PadRight(LongestResultIndicator),
                 };
-                var failed = sourceSummary.FailedTests.ToString().PadLeft(5);
-                var passed = sourceSummary.PassedTests.ToString().PadLeft(5);
-                var skipped = sourceSummary.SkippedTests.ToString().PadLeft(5);
-                var total = sourceSummary.TotalTests.ToString().PadLeft(5);
+                var failed = sourceSummary.FailedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
+                var passed = sourceSummary.PassedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
+                var skipped = sourceSummary.SkippedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
+                var total = sourceSummary.TotalTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
 
 
                 var frameworkString = _targetFramework.IsNullOrEmpty()

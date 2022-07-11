@@ -67,7 +67,7 @@ public class Migrator
     {
         if (!Path.IsPathRooted(oldFilePath))
         {
-            Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
+            Console.WriteLine(CommandLineResources.ValidUsage);
         }
 
         if (string.Equals(Path.GetExtension(oldFilePath), TestSettingsExtension, StringComparison.OrdinalIgnoreCase))
@@ -80,7 +80,7 @@ public class Migrator
         }
         else
         {
-            Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
+            Console.WriteLine(CommandLineResources.ValidUsage);
         }
     }
 
@@ -124,7 +124,7 @@ public class Migrator
         }
         else
         {
-            Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoEmbeddedSettings));
+            Console.WriteLine(CommandLineResources.NoEmbeddedSettings);
         }
     }
 
@@ -224,7 +224,7 @@ public class Migrator
             if (testSettingsNodes.Timeout != null && (testSettingsNodes.Timeout.Attributes[AgentNotRespondingTimeoutAttribute] != null ||
                                                       testSettingsNodes.Timeout.Attributes[DeploymentTimeoutAttribute] != null || testSettingsNodes.Timeout.Attributes[ScriptTimeoutAttribute] != null))
             {
-                Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.UnsupportedAttributes));
+                Console.WriteLine(CommandLineResources.UnsupportedAttributes);
             }
         }
 
@@ -289,7 +289,7 @@ public class Migrator
         var legacyNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/LegacySettings");
         if (legacyNode != null)
         {
-            Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.IgnoringLegacySettings));
+            Console.WriteLine(CommandLineResources.IgnoringLegacySettings);
             legacyNode.ParentNode.RemoveChild(legacyNode);
         }
 

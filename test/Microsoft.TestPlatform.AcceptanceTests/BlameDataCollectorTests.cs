@@ -3,6 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+#if NET
+using System.Globalization;
+#endif
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -310,13 +313,21 @@ public class BlameDataCollectorTests : AcceptanceTestBase
             err.AppendLine("Expected all dumps in the list of attachments to exist, and not be empty, but:");
             if (nonExistingDumps.Any())
             {
-                err.AppendLine($"{nonExistingDumps.Count} don't exist:")
+                err.AppendLine(
+#if NET
+                    CultureInfo.InvariantCulture,
+#endif
+                    $"{nonExistingDumps.Count} don't exist:")
                 .AppendLine(string.Join(Environment.NewLine, nonExistingDumps));
             }
 
             if (emptyDumps.Any())
             {
-                err.AppendLine($"{emptyDumps.Count} are empty:")
+                err.AppendLine(
+#if NET
+                    CultureInfo.InvariantCulture,
+#endif
+                    $"{emptyDumps.Count} are empty:")
                 .AppendLine(string.Join(Environment.NewLine, emptyDumps));
             }
 

@@ -86,7 +86,7 @@ internal class TrxFileHelper
         string replaced = result.ToString().TrimEnd();
         if (replaced.Length == 0)
         {
-            Debug.Fail(string.Format(CultureInfo.InvariantCulture, "After replacing invalid chars in file '{0}' there's nothing left...", fileName));
+            Debug.Fail($"After replacing invalid chars in file '{fileName}' there's nothing left...");
             throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_NothingLeftAfterReplaciingBadCharsInName, fileName));
         }
 

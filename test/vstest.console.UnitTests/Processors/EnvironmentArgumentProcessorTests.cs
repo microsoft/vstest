@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -151,8 +152,8 @@ public class EnvironmentArgumentProcessorTests
         // Arrange
         _settingsProvider.UpdateRunSettingsNode("RunConfiguration.EnvironmentVariables.VARIABLE",
             "Initial value");
-        var warningMessage = string.Format(CommandLineResources.CommandLineWarning,
-            string.Format(CommandLineResources.EnvironmentVariableXIsOverriden, "VARIABLE")
+        var warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.CommandLineWarning,
+            string.Format(CultureInfo.CurrentCulture, CommandLineResources.EnvironmentVariableXIsOverriden, "VARIABLE")
         );
         _mockOutput.Setup(mock =>
             mock.WriteLine(

@@ -176,13 +176,13 @@ internal sealed class TestRun
         if (RunConfiguration == null)
         {
             Debug.Fail("'RunConfiguration' is null");
-            throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunConfigInRun));
+            throw new Exception(TrxLoggerResources.Common_MissingRunConfigInRun);
         }
 
         if (string.IsNullOrEmpty(RunConfiguration.RunDeploymentRootDirectory))
         {
             Debug.Fail("'RunConfiguration.RunDeploymentRootDirectory' is null or empty");
-            throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunDeploymentRootInRunConfig));
+            throw new Exception(TrxLoggerResources.Common_MissingRunDeploymentRootInRunConfig);
         }
 
         return RunConfiguration.RunDeploymentInDirectory;

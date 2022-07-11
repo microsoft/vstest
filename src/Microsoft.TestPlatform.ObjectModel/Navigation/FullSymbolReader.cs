@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -138,7 +139,7 @@ internal class FullSymbolReader : ISymbolReader
             int hResult = _source.LoadDataForExe(filename, searchPath, IntPtr.Zero);
             if (HResult.Failed(hResult))
             {
-                throw new COMException(string.Format(Resources.Resources.FailedToCreateDiaSession, hResult));
+                throw new COMException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.FailedToCreateDiaSession, hResult));
             }
 
             // Open the session and return it

@@ -112,7 +112,7 @@ public class ExecutorUnitTests
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
-        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message!.Contains(string.Format(CommandLineResources.InvalidArgument, badArg))));
+        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message!.Contains(string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidArgument, badArg))));
     }
 
     [TestMethod]
@@ -124,7 +124,7 @@ public class ExecutorUnitTests
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
-        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message!.Contains(string.Format(CommandLineResources.InvalidArgument, badArg))));
+        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message!.Contains(string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidArgument, badArg))));
     }
 
     [TestMethod]
@@ -136,7 +136,7 @@ public class ExecutorUnitTests
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
-        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message!.Contains(string.Format(CommandLineResources.InvalidArgument, badArg))));
+        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message!.Contains(string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidArgument, badArg))));
     }
 
     /// <summary>

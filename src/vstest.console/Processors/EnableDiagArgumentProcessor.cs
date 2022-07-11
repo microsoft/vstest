@@ -112,7 +112,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     /// <param name="argument">Argument that was provided with the command.</param>
     public void Initialize(string? argument)
     {
-        string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidDiagArgument, argument);
+        string exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagArgument, argument);
 
         // Throw error if argument is null or empty.
         if (argument.IsNullOrWhiteSpace())

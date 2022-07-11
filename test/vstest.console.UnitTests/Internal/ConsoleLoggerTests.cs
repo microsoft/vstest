@@ -615,10 +615,10 @@ public class ConsoleLoggerTests
 
         _mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
             (CommandLineResources.PassedTestIndicator + "!").PadRight(8),
-            0.ToString().PadLeft(5),
-            1.ToString().PadLeft(5),
-            1.ToString().PadLeft(5), 2
-                .ToString().PadLeft(5),
+            0.ToString(CultureInfo.InvariantCulture).PadLeft(5),
+            1.ToString(CultureInfo.InvariantCulture).PadLeft(5),
+            1.ToString(CultureInfo.InvariantCulture).PadLeft(5),
+            2.ToString(CultureInfo.InvariantCulture).PadLeft(5),
             "1 m 2 s"), OutputLevel.Information), Times.Once);
 
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework,
@@ -627,10 +627,10 @@ public class ConsoleLoggerTests
 
         _mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
             (CommandLineResources.FailedTestIndicator + "!").PadRight(8),
-            1.ToString().PadLeft(5),
-            1.ToString().PadLeft(5),
-            1.ToString().PadLeft(5),
-            3.ToString().PadLeft(5),
+            1.ToString(CultureInfo.InvariantCulture).PadLeft(5),
+            1.ToString(CultureInfo.InvariantCulture).PadLeft(5),
+            1.ToString(CultureInfo.InvariantCulture).PadLeft(5),
+            3.ToString(CultureInfo.InvariantCulture).PadLeft(5),
             "1 h 2 m"), OutputLevel.Information), Times.Once);
 
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework,

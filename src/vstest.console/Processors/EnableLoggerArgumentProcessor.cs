@@ -108,7 +108,7 @@ internal class EnableLoggerArgumentExecutor : IArgumentExecutor
     /// <param name="argument">Argument that was provided with the command.</param>
     public void Initialize(string? argument)
     {
-        string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.LoggerUriInvalid, argument);
+        string exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.LoggerUriInvalid, argument);
 
         // Throw error in case logger argument null or empty.
         if (argument.IsNullOrWhiteSpace())

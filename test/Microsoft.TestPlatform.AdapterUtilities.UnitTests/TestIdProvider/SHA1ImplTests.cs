@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -166,5 +167,5 @@ public class Sha1ImplTests
         Assert.AreEqual(expected, digest2, $"Test vector '{input}'*{repetition} failed! (padding path)");
     }
 
-    private static string ToHex(byte[] digest) => string.Concat(digest.Select(i => i.ToString("x2")));
+    private static string ToHex(byte[] digest) => string.Concat(digest.Select(i => i.ToString("x2", CultureInfo.CurrentCulture)));
 }

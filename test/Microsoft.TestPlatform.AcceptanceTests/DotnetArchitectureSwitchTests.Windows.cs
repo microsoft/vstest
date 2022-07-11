@@ -4,6 +4,7 @@
 #if !NETFRAMEWORK
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -62,7 +63,7 @@ public class UnitTest1
     }
 }");
 
-        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out string stdOut, out _, out int exitCode, environmentVariables, TempDirectory.Path);
+        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower(CultureInfo.InvariantCulture)} --diag:log.txt", out string stdOut, out _, out int exitCode, environmentVariables, TempDirectory.Path);
         Assert.AreEqual(0, exitCode, stdOut);
 
         environmentVariables = new Dictionary<string, string?>
@@ -71,7 +72,7 @@ public class UnitTest1
             ["DOTNET_ROOT"] = Path.GetDirectoryName(dotnetPathTo),
             ["ExpectedArchitecture"] = architectureTo
         };
-        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out stdOut, out _, out exitCode, environmentVariables, TempDirectory.Path);
+        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower(CultureInfo.InvariantCulture)} --diag:log.txt", out stdOut, out _, out exitCode, environmentVariables, TempDirectory.Path);
         Assert.AreEqual(0, exitCode, stdOut);
 
         environmentVariables = new Dictionary<string, string?>
@@ -81,7 +82,7 @@ public class UnitTest1
             ["DOTNET_ROOT"] = "WE SHOULD PICK THE ABOVE ONE BEFORE FALLBACK TO DOTNET_ROOT",
             ["ExpectedArchitecture"] = architectureTo
         };
-        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out stdOut, out _, out exitCode, environmentVariables, TempDirectory.Path);
+        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower(CultureInfo.InvariantCulture)} --diag:log.txt", out stdOut, out _, out exitCode, environmentVariables, TempDirectory.Path);
         Assert.AreEqual(0, exitCode, stdOut);
     }
 

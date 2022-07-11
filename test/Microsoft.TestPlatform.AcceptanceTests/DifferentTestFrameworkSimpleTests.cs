@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -192,8 +193,8 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
         string assemblyRelativePathFormat = @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\{0}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
         var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
-            ? string.Format(assemblyRelativePathFormat, platform)
-            : string.Format(assemblyRelativePathFormat, "");
+            ? string.Format(CultureInfo.CurrentCulture, assemblyRelativePathFormat, platform)
+            : string.Format(CultureInfo.CurrentCulture, assemblyRelativePathFormat, "");
         var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
         var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
 

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 
@@ -449,7 +450,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
         var nonExistingExtensions = extensions.Where(extension => !_fileHelper.Exists(extension));
         if (nonExistingExtensions.Any())
         {
-            LogMessage(TestMessageLevel.Warning, string.Format(Resources.Resources.NonExistingExtensions, string.Join(",", nonExistingExtensions)));
+            LogMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, Resources.Resources.NonExistingExtensions, string.Join(",", nonExistingExtensions)));
         }
 
         var sourceList = sources.ToList();

@@ -120,7 +120,7 @@ public class DesignModeClient : IDesignModeClient
             Dispose();
             throw new TimeoutException(
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                     CoreUtilities.Constants.VstestConsoleProcessName,
                     "translation layer",

@@ -127,11 +127,7 @@ internal class PortableSymbolReader : ISymbolReader
                     }
                     else
                     {
-                        EqtTrace.Error(
-                            string.Format(
-                                "Unable to find source information for method: {0} type: {1}",
-                                methodInfo.Name,
-                                type.FullName));
+                        EqtTrace.Error($"Unable to find source information for method: {methodInfo.Name} type: {type.FullName}");
                     }
                 }
 
