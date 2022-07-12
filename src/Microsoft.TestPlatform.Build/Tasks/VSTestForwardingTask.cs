@@ -47,10 +47,10 @@ public class VSTestForwardingTask : Task, ITestTask
     public override bool Execute()
     {
         var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
-        Tracing.traceEnabled = !traceEnabledValue.IsNullOrEmpty() && traceEnabledValue.Equals("1", StringComparison.OrdinalIgnoreCase);
+        Tracing.traceEnabled = string.Equals(traceEnabledValue, "1", StringComparison.OrdinalIgnoreCase);
 
         var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_BUILD_DEBUG");
-        if (!debugEnabled.IsNullOrEmpty() && debugEnabled.Equals("1", StringComparison.Ordinal))
+        if (string.Equals(debugEnabled, "1", StringComparison.Ordinal))
         {
             Console.WriteLine("Waiting for debugger attach...");
 
@@ -67,13 +67,13 @@ public class VSTestForwardingTask : Task, ITestTask
 
         // Avoid logging "Task returned false but did not log an error." on test failure, because we don't
         // write MSBuild error. https://github.com/dotnet/msbuild/blob/51a1071f8871e0c93afbaf1b2ac2c9e59c7b6491/src/Framework/IBuildEngine7.cs#L12
-        var allowfailureWithoutError = BuildEngine.GetType().GetProperty("AllowFailureWithoutError");
-        allowfailureWithoutError?.SetValue(BuildEngine, true);
+        var allowFailureWithoutError = BuildEngine.GetType().GetProperty("AllowFailureWithoutError");
+        allowFailureWithoutError?.SetValue(BuildEngine, true);
 
         var processInfo = new ProcessStartInfo
         {
             FileName = DotnetExe,
-            Arguments = this.CreateCommandLineArguments(),
+            Arguments = TestTaskUtils.CreateCommandLineArguments(this),
             UseShellExecute = false,
         };
 
@@ -83,14 +83,14 @@ public class VSTestForwardingTask : Task, ITestTask
         }
 
         Tracing.Trace("VSTest: Starting vstest.console...");
-        Tracing.Trace("VSTest: Arguments: " + processInfo.FileName + " " + processInfo.Arguments);
+        Tracing.Trace($"VSTest: Arguments: {processInfo.FileName} {processInfo.Arguments}");
 
         using var activeProcess = new Process { StartInfo = processInfo };
         activeProcess.Start();
         _activeProcessId = activeProcess.Id;
 
         activeProcess.WaitForExit();
-        Tracing.Trace("VSTest: Exit code: " + activeProcess.ExitCode);
+        Tracing.Trace($"VSTest: Exit code: {activeProcess.ExitCode}");
         return activeProcess.ExitCode == 0;
     }
 
@@ -103,7 +103,7 @@ public class VSTestForwardingTask : Task, ITestTask
         }
         catch (ArgumentException ex)
         {
-            Tracing.Trace(string.Format("VSTest: Killing process throws ArgumentException with the following message {0}. It may be that process is not running", ex));
+            Tracing.Trace($"VSTest: Killing process throws ArgumentException with the following message {ex}. It may be that process is not running");
         }
     }
 }

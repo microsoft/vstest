@@ -12,7 +12,6 @@ namespace Microsoft.TestPlatform.Build.Tasks;
 
 public class VSTestTask : ToolTask, ITestTask
 {
-
     public ITaskItem? TestFileFullPath { get; set; }
     public string? VSTestSetting { get; set; }
     public ITaskItem[]? VSTestTestAdapterPath { get; set; }
@@ -59,7 +58,7 @@ public class VSTestTask : ToolTask, ITestTask
 
     protected override string? GenerateCommandLineCommands()
     {
-        return this.CreateCommandLineArguments();
+        return TestTaskUtils.CreateCommandLineArguments(this);
     }
 
     protected override string? GenerateFullPathToTool()

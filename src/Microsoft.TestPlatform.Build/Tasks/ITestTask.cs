@@ -8,7 +8,6 @@ namespace Microsoft.TestPlatform.Build.Tasks;
 
 internal interface ITestTask : ITask, ICancelableTask
 {
-
     ITaskItem? TestFileFullPath { get; set; }
     string? VSTestSetting { get; set; }
     ITaskItem[]? VSTestTestAdapterPath { get; set; }

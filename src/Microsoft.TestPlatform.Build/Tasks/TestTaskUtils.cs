@@ -9,10 +9,9 @@ using Microsoft.Build.Utilities;
 
 namespace Microsoft.TestPlatform.Build.Tasks;
 
-internal static class TestTaskExtensions
+internal static class TestTaskUtils
 {
-
-    public static string CreateCommandLineArguments(this ITestTask task)
+    public static string CreateCommandLineArguments(ITestTask task)
     {
         const string codeCoverageString = "Code Coverage";
         const string vsTestAppName = "vstest.console.dll";
@@ -25,11 +24,11 @@ internal static class TestTaskExtensions
         builder.AppendSwitch("exec");
         if (task.VSTestConsolePath != null && !task.VSTestConsolePath.ItemSpec.IsNullOrEmpty())
         {
-            builder.AppendSwitchIfNotNull("", task.VSTestConsolePath);
+            builder.AppendFileNameIfNotNull(task.VSTestConsolePath);
         }
         else
         {
-            builder.AppendSwitch(vsTestAppName);
+            builder.AppendFileNameIfNotNull(vsTestAppName);
         }
 
         // TODO log arguments in task
@@ -63,13 +62,13 @@ internal static class TestTaskExtensions
             builder.AppendSwitchIfNotNull("--testCaseFilter:", task.VSTestTestCaseFilter);
         }
 
-        if (task.VSTestLogger != null && task.VSTestLogger.Length > 0)
+        if (task.VSTestLogger != null && task.VSTestLogger.Any())
         {
             foreach (var arg in task.VSTestLogger)
             {
                 builder.AppendSwitchIfNotNull("--logger:", arg);
 
-                if (arg.StartsWith("console", StringComparison.OrdinalIgnoreCase))
+                if ((arg != null) && arg.StartsWith("console", StringComparison.OrdinalIgnoreCase))
                 {
                     isConsoleLoggerSpecifiedByUser = true;
                 }
@@ -88,7 +87,7 @@ internal static class TestTaskExtensions
 
         if (!task.VSTestDiag.IsNullOrEmpty())
         {
-            builder.AppendSwitchIfNotNull("--Diag:", task.VSTestDiag);
+            builder.AppendSwitchIfNotNull("--diag:", task.VSTestDiag);
         }
 
         if (task.TestFileFullPath == null)
@@ -168,16 +167,18 @@ internal static class TestTaskExtensions
         {
             foreach (var arg in task.VSTestCollect)
             {
-                // For collecting code coverage, argument value can be either "Code Coverage" or "Code Coverage;a=b;c=d".
-                // Split the argument with ';' and compare first token value.
-                var tokens = arg.Split(';');
-
-                if (arg.Equals(codeCoverageString, StringComparison.OrdinalIgnoreCase) ||
-                    tokens[0].Equals(codeCoverageString, StringComparison.OrdinalIgnoreCase))
+                if (arg != null)
                 {
-                    isCollectCodeCoverageEnabled = true;
-                }
+                    // For collecting code coverage, argument value can be either "Code Coverage" or "Code Coverage;a=b;c=d".
+                    // Split the argument with ';' and compare first token value.
+                    var tokens = arg.Split(';');
 
+                    if (arg.Equals(codeCoverageString, StringComparison.OrdinalIgnoreCase) ||
+                        tokens[0].Equals(codeCoverageString, StringComparison.OrdinalIgnoreCase))
+                    {
+                        isCollectCodeCoverageEnabled = true;
+                    }
+                }
                 builder.AppendSwitchIfNotNull("--collect:", arg);
             }
         }
