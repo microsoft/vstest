@@ -28,7 +28,7 @@ internal class DiscoveryHandlerToEventsRegistrarAdapter : ITestDiscoveryEventsRe
 
     public void LogWarning(string message)
     {
-        throw new System.NotImplementedException();
+        _handler.HandleLogMessage(TestMessageLevel.Warning, message);
     }
 
     public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
@@ -62,6 +62,7 @@ internal class RunHandlerToEventsRegistrarAdapter : ITestRunEventsRegistrar
         _handleLogMessage = (_, e) => _handler.HandleLogMessage(e.Level, e.Message);
         _handleRawMessage = (_, e) => _handler.HandleRawMessage(e);
         _handleTestRunComplete = (_, e) => _handler.HandleTestRunComplete(e, null, null, null);
+        _handleTestRunStatsChange = (_, e) => _handler.HandleTestRunStatsChange(e);
     }
 
     public void LogWarning(string message)
@@ -75,7 +76,6 @@ internal class RunHandlerToEventsRegistrarAdapter : ITestRunEventsRegistrar
         testRunRequest.OnRawMessageReceived += _handleRawMessage;
         testRunRequest.OnRunStatsChange += _handleTestRunStatsChange;
         testRunRequest.OnRunCompletion += _handleTestRunComplete;
-        // where is launch debugger?
     }
 
     public void UnregisterTestRunEvents(ITestRunRequest testRunRequest)
