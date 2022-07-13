@@ -111,7 +111,6 @@
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.sxs.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.sxs.manifest" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.sxs.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.sxs.manifest" />
-    <file src="net451\$Runtime$\msdia140typelib_clr0200.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\msdia140typelib_clr0200.dll" />
     <file src="net462\$Runtime$\Newtonsoft.Json.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Newtonsoft.Json.dll" />
     <file src="net451\$Runtime$\QTAgent.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent.exe" />
     <file src="net451\$Runtime$\QTAgent.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent.exe.Config" />
