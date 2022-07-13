@@ -768,7 +768,7 @@ function Publish-VsixPackage {
     Write-Log "Publish-VsixPackage: Started."
     $timer = Start-Timer
 
-    $packageDir = Get-FullCLRPackageDirectory451
+    $packageDir = Get-FullCLRPackageDirectory462
     $extensionsPackageDir = Join-Path $packageDir "Extensions"
     $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
     $legacyTestImpactComComponentsDir = Join-Path $extensionsPackageDir "V1\TestImpact"

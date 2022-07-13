@@ -42,7 +42,7 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string NETCORE21_50 = "netcoreapp2.1;netcoreapp3.1;net5.0";
     public const string NETFX462_NET50 = "net462;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0";
     public const string NETFX462_NET31 = "net462;net472;net48;netcoreapp2.1;netcoreapp3.1";
-    public const string DEFAULT_RUNNER_NETFX = "net462";
+    public const string DEFAULT_RUNNER_NETFX = Net462TargetFramework;
     /// <summary>
     /// Our current defaults for .NET and .NET Framework.
     /// </summary>
