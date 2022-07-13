@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
@@ -60,6 +61,23 @@ internal class Executor
     /// </summary>
     public Executor(IOutput output) : this(output, TestPlatformEventSource.Instance, new ProcessHelper(), new PlatformEnvironment())
     {
+        // TODO: Get rid of this by making vstest.console code properly async.
+        // The current implementation of vstest.console is blocking many threads that just wait
+        // for completion in non-async way. Because threadpool is setting the limit based on processor count,
+        // we exhaust the threadpool threads quickly when we set maxCpuCount to use as many workers as we have threads.
+        //
+        // This setting allow the threadpool to start start more threads than it normally would without any delay.
+        // This won't pre-start the threads, it just pushes the limit of how many are allowed to start without waiting,
+        // and in effect makes callbacks processed earlier, because we don't have to wait that much to receive the callback.
+        // The correct fix would be to re-visit all code that offloads work to threadpool and avoid blocking any thread,
+        // and also use async await when we need to await a completion of an action. But that is a far away goal, so this
+        // is a "temporary" measure to remove the threadpool contention.
+        //
+        // The increase to 5* (1* is the standard + 4*) the standard limit is arbitrary. I saw that making it 2* did not help
+        // and there are usually 2-3 threads blocked by waiting for other actions, so 5 seemed like a good limit.
+        var additionalThreadsCount = Environment.ProcessorCount * 4;
+        ThreadPool.GetMinThreads(out var workerThreads, out var completionPortThreads);
+        ThreadPool.SetMinThreads(workerThreads + additionalThreadsCount, completionPortThreads + additionalThreadsCount);
     }
 
     internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource, IProcessHelper processHelper, IEnvironment environment)
