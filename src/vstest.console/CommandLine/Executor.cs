@@ -72,6 +72,9 @@ internal class Executor
         // The correct fix would be to re-visit all code that offloads work to threadpool and avoid blocking any thread,
         // and also use async await when we need to await a completion of an action. But that is a far away goal, so this
         // is a "temporary" measure to remove the threadpool contention.
+        //
+        // The increase to 5* (1* is the standard + 4*) the standard limit is arbitrary. I saw that making it 2* did not help
+        // and there are usually 2-3 threads blocked by waiting for other actions, so 5 seemed like a good limit.
         var additionalThreadsCount = Environment.ProcessorCount * 4;
         ThreadPool.GetMinThreads(out var workerThreads, out var completionPortThreads);
         ThreadPool.SetMinThreads(workerThreads + additionalThreadsCount, completionPortThreads + additionalThreadsCount);
