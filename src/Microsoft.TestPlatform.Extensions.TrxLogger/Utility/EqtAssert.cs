@@ -4,7 +4,6 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
@@ -46,7 +45,7 @@ internal sealed class EqtAssert
     public static void ParameterNotNull([ValidatedNotNull] object? parameter, [ValidatedNotNull] string parameterName)
     {
         AssertParameterNameNotNullOrEmpty(parameterName);
-        TPDebug.Assert(parameter != null, string.Format(CultureInfo.InvariantCulture, "'{0}' is null", parameterName));
+        TPDebug.Assert(parameter != null, $"'{nameof(parameterName)}' is null");
         if (parameter == null)
         {
             throw new ArgumentNullException(parameterName);
@@ -61,10 +60,10 @@ internal sealed class EqtAssert
     public static void StringNotNullOrEmpty([ValidatedNotNull] string? parameter, [ValidatedNotNull] string parameterName)
     {
         AssertParameterNameNotNullOrEmpty(parameterName);
-        TPDebug.Assert(!parameter.IsNullOrEmpty(), string.Format(CultureInfo.InvariantCulture, "'{0}' is null or empty", parameterName));
+        TPDebug.Assert(!parameter.IsNullOrEmpty(), $"'{nameof(parameterName)}' is null or empty");
         if (parameter.IsNullOrEmpty())
         {
-            throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_CannotBeNullOrEmpty));
+            throw new ArgumentException(TrxLoggerResources.Common_CannotBeNullOrEmpty);
         }
     }
 

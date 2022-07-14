@@ -232,8 +232,8 @@ internal class DiscovererEnumerator
             // Record Total Tests Discovered By each Discoverer.
             var totalTestsDiscoveredByCurrentDiscoverer = _discoveryResultCache.TotalDiscoveredTests - currentTotalTests;
             _requestData.MetricsCollection.Add(
-                string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsByAdapter,
-                    discoverer.Metadata.DefaultExecutorUri), totalTestsDiscoveredByCurrentDiscoverer);
+                $"{TelemetryDataConstants.TotalTestsByAdapter}.{discoverer.Metadata.DefaultExecutorUri}",
+                totalTestsDiscoveredByCurrentDiscoverer);
 
             totalAdaptersUsed++;
 
@@ -249,14 +249,14 @@ internal class DiscovererEnumerator
 
             // Collecting Data Point for Time Taken to Discover Tests by each Adapter
             _requestData.MetricsCollection.Add(
-                string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter,
-                    discoverer.Metadata.DefaultExecutorUri), totalAdapterRunTime.TotalSeconds);
+                $"{TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter}.{discoverer.Metadata.DefaultExecutorUri}",
+                totalAdapterRunTime.TotalSeconds);
             totalTimeTakenByAdapters += totalAdapterRunTime.TotalSeconds;
         }
         catch (Exception e)
         {
             var message = string.Format(
-                CultureInfo.CurrentUICulture,
+                CultureInfo.CurrentCulture,
                 CrossPlatEngineResources.ExceptionFromLoadTests,
                 discovererType.Name,
                 e.Message);
@@ -277,10 +277,7 @@ internal class DiscovererEnumerator
         }
         catch (Exception e)
         {
-            var mesage = string.Format(
-                CultureInfo.CurrentUICulture,
-                CrossPlatEngineResources.DiscovererInstantiationException,
-                e.Message);
+            var mesage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DiscovererInstantiationException, e.Message);
             logger.SendMessage(TestMessageLevel.Warning, mesage);
             EqtTrace.Error("DiscovererEnumerator.LoadTestsFromAnExtension: {0} ", e);
 
@@ -316,16 +313,13 @@ internal class DiscovererEnumerator
 
             logger.SendMessage(
                 TestMessageLevel.Warning,
-                string.Format(CrossPlatEngineResources.NoTestsAvailableForGivenTestCaseFilter, testCaseFilterToShow, sourcesString));
+                string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.NoTestsAvailableForGivenTestCaseFilter, testCaseFilterToShow, sourcesString));
         }
         else
         {
             logger.SendMessage(
                 TestMessageLevel.Warning,
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
-                    sourcesString));
+                string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources, sourcesString));
         }
     }
 

@@ -32,7 +32,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
         string sdkVersion = GetLatestSdkVersion(dotnetPath);
         string runtimeConfigFile = Path.Combine(dotnetRunnerPath.FullName, "vstest.console.runtimeconfig.json");
         JObject patchRuntimeConfig = JObject.Parse(File.ReadAllText(runtimeConfigFile));
-        patchRuntimeConfig["runtimeOptions"]["framework"]["version"] = sdkVersion;
+        patchRuntimeConfig!["runtimeOptions"]!["framework"]!["version"] = sdkVersion;
         File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToString());
 
         var environmentVariables = new Dictionary<string, string?>

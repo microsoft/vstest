@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
@@ -25,7 +26,7 @@ public class DefaultEngineInvokerTests
         { "--port", "21291" },
         { "--endpoint", "127.0.0.1:021291"  },
         { "--role", "client"},
-        { "--parentprocessid", ParentProcessId.ToString() },
+        { "--parentprocessid", ParentProcessId.ToString(CultureInfo.InvariantCulture) },
         { "--diag", "temp.txt"},
         { "--tracelevel", "3"},
         { "--telemetryoptedin", "false"},
@@ -70,7 +71,7 @@ public class DefaultEngineInvokerTests
     public void InvokeShouldWaitBasedOnTimeoutEnvVariableDuringDataCollectorConnection()
     {
         var timeout = 10;
-        Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, timeout.ToString());
+        Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, timeout.ToString(CultureInfo.InvariantCulture));
         _engineInvoker.Invoke(ArgsDictionary);
 
         _mockDataCollectionTestCaseEventSender.Verify(s => s.WaitForRequestSenderConnection(timeout * 1000));

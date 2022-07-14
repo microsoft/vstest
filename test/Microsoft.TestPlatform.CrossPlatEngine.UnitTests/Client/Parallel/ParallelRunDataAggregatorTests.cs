@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -310,7 +311,7 @@ public class ParallelRunDataAggregatorTests
         var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
         Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsRanByAdapter, out var value));
-        Assert.AreEqual(4, Convert.ToInt32(value));
+        Assert.AreEqual(4, Convert.ToInt32(value, CultureInfo.InvariantCulture));
     }
 
     [TestMethod]

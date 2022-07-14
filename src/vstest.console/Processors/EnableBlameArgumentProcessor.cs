@@ -120,10 +120,10 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     {
         var enableDump = false;
         var enableHangDump = false;
-        var exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidBlameArgument, argument);
+        var exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidBlameArgument, argument);
         Dictionary<string, string>? collectDumpParameters = null;
 
-        if (!StringUtils.IsNullOrWhiteSpace(argument))
+        if (!argument.IsNullOrWhiteSpace())
         {
             // Get blame argument list.
             var blameArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
@@ -142,7 +142,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
 
             if (!enableDump && !enableHangDump)
             {
-                Output.Warning(false, string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, argument));
+                Output.Warning(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.BlameIncorrectOption, argument));
             }
             else
             {
@@ -228,7 +228,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
 
             if (!hangDumpParameters.ContainsKey("TestTimeout"))
             {
-                hangDumpParameters.Add("TestTimeout", TimeSpan.FromHours(1).TotalMilliseconds.ToString());
+                hangDumpParameters.Add("TestTimeout", TimeSpan.FromHours(1).TotalMilliseconds.ToString(CultureInfo.CurrentCulture));
             }
 
             if (!hangDumpParameters.ContainsKey("HangDumpType"))

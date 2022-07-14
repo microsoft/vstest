@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
@@ -113,7 +114,7 @@ public class CliRunSettingsArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldNotThrowExceptionIfArgumentIsEmpty()
     {
-        _executor.Initialize(new string[0]);
+        _executor.Initialize(Array.Empty<string>());
 
         Assert.IsNull(_settingsProvider.ActiveRunSettings);
     }
@@ -154,7 +155,7 @@ public class CliRunSettingsArgumentProcessorTests
     public void InitializeShouldThrowErrorIfArgumentIsInValid(string arg)
     {
         var args = new string[] { arg };
-        var str = string.Format(CommandLineResources.MalformedRunSettingsKey);
+        var str = CommandLineResources.MalformedRunSettingsKey;
 
         CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(args));
 
@@ -307,7 +308,7 @@ public class CliRunSettingsArgumentProcessorTests
         runSettings.LoadSettingsXml(_defaultRunSettings);
         _settingsProvider.SetActiveRunSettings(runSettings);
 
-        var args = new string[] { };
+        var args = Array.Empty<string>();
         _executor.Initialize(args);
 
         Assert.IsFalse(_commandLineOptions.ArchitectureSpecified);
@@ -331,7 +332,7 @@ public class CliRunSettingsArgumentProcessorTests
     public void InitializeShouldThrowErrorIfTestRunParameterNodeIsInValid(string arg)
     {
         var args = new string[] { arg };
-        var str = string.Format(CommandLineResources.InvalidTestRunParameterArgument, arg);
+        var str = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestRunParameterArgument, arg);
 
         CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(args));
 

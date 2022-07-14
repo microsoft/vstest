@@ -152,7 +152,7 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
                 {
                     _logger.SendMessage(
                         TestMessageLevel.Warning,
-                        string.Format(CultureInfo.CurrentUICulture, CommonResources.InvalidExtensionUriFormat, extension.Metadata.ExtensionUri, e));
+                        string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidExtensionUriFormat, extension.Metadata.ExtensionUri, e));
                 }
             }
 
@@ -170,7 +170,7 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
             {
                 _logger.SendMessage(
                     TestMessageLevel.Warning,
-                    string.Format(CultureInfo.CurrentUICulture, CommonResources.DuplicateExtensionUri, extension.Metadata.ExtensionUri));
+                    string.Format(CultureInfo.CurrentCulture, CommonResources.DuplicateExtensionUri, extension.Metadata.ExtensionUri));
             }
         }
     }

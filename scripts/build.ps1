@@ -519,9 +519,6 @@ function Publish-Package {
     Copy-Item -Recurse $comComponentsDirectory\* $testhostUapPackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $coreCLR20TestHostPackageDir -Force
 
-    $microsoftInternalDiaInterop = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia.Interop\$testPlatformMsDiaVersion\tools\net451"
-    Copy-Item -Recurse $microsoftInternalDiaInterop\* $coreCLR20TestHostPackageDir -Force
-
     # Copy over the logger assemblies to the Extensions folder.
     $extensions_Dir = "Extensions"
     $fullCLRExtensionsDir = Join-Path $fullCLRPackage451Dir $extensions_Dir
@@ -641,11 +638,12 @@ function Publish-Package {
     }
 
     # Copy dependency of Microsoft.TestPlatform.TestHostRuntimeProvider
-    $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\9.0.1\lib\net45\Newtonsoft.Json.dll"
+    $newtonsoftJsonVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.NewtonsoftJsonVersion
+    $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\$newtonsoftJsonVersion\lib\net45\Newtonsoft.Json.dll"
     Write-Verbose "Copy-Item $newtonsoft $fullCLRPackage451Dir -Force"
     Copy-Item $newtonsoft $fullCLRPackage451Dir -Force
 
-    $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\9.0.1\lib\netstandard1.0\Newtonsoft.Json.dll"
+    $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\$newtonsoftJsonVersion\lib\netstandard1.0\Newtonsoft.Json.dll"
     Write-Verbose "Copy-Item $newtonsoft $coreCLR20PackageDir -Force"
     Copy-Item $newtonsoft $coreCLR20PackageDir -Force
 
@@ -816,10 +814,6 @@ function Publish-VsixPackage {
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformMsDiaVersion\tools\net451"
     Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
-
-    # Copy Microsoft.Internal.Dia.Interop
-    $internalDiaInterop = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia.Interop\$testPlatformMsDiaVersion\tools\net451"
-    Copy-Item -Recurse $internalDiaInterop\* $packageDir -Force
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
     $comComponentsDirectoryTIA = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformMsDiaVersion\tools\net451"

@@ -19,7 +19,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// AcceptanceTestBase.NETFX452_NET50 = "net452;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0" to determine which target framework of the project
 /// to test. The target project must list those TFMs in the TargetFrameworks property in csproj.
 /// </summary>
-public class NetCoreRunner : Attribute, ITestDataSource
+[AttributeUsage(AttributeTargets.Method)]
+public class NetCoreRunnerAttribute : Attribute, ITestDataSource
 {
     private readonly string _targetFrameworks;
 
@@ -27,7 +28,7 @@ public class NetCoreRunner : Attribute, ITestDataSource
     /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSource"/> class.
     /// </summary>
     /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net452TargetFramework or alike values.</param>
-    public NetCoreRunner(string targetFrameworks = AcceptanceTestBase.NETFX452_NET50)
+    public NetCoreRunnerAttribute(string targetFrameworks = AcceptanceTestBase.NETFX452_NET50)
     {
         _targetFrameworks = targetFrameworks;
     }

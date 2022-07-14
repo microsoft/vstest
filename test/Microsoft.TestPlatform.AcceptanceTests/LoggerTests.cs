@@ -163,7 +163,7 @@ public class LoggerTests : AcceptanceTestBase
         Assert.AreEqual("Completed", outcomeValue);
     }
 
-    private bool IsValidXml(string xmlFilePath)
+    private static bool IsValidXml(string xmlFilePath)
     {
         try
         {

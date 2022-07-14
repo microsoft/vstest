@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -159,7 +160,7 @@ internal class Program
 
         public void HandleLogMessage(TestMessageLevel level, string? message)
         {
-            Console.WriteLine($"[DISCOVERY.{level.ToString().ToUpper()}] {message}");
+            Console.WriteLine($"[DISCOVERY.{level.ToString().ToUpper(CultureInfo.InvariantCulture)}] {message}");
         }
 
         public void HandleRawMessage(string rawMessage)
@@ -187,7 +188,7 @@ internal class Program
 
         public void HandleLogMessage(TestMessageLevel level, string? message)
         {
-            Console.WriteLine($"[{level.ToString().ToUpper()}]: {message}");
+            Console.WriteLine($"[{level.ToString().ToUpper(CultureInfo.InvariantCulture)}]: {message}");
         }
 
         public void HandleRawMessage(string rawMessage)

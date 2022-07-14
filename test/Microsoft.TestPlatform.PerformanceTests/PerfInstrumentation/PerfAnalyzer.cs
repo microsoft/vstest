@@ -10,6 +10,7 @@ using System.Linq;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
+using System.Globalization;
 
 namespace Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 
@@ -84,8 +85,8 @@ public class PerfAnalyzer
             {
                 if (data.ProviderName.Equals("TestPlatform") && !data.EventName.Equals("ManifestData"))
                 {
-                    Console.WriteLine("Received Event : {0}", data.ToString());
-                    var key = data.ProcessID + "_" + data.ThreadID.ToString() + "_" + data.TaskName;
+                    Console.WriteLine("Received Event : {0}", data.ToString(CultureInfo.CurrentCulture));
+                    var key = $"{data.ProcessID}_{data.ThreadID}_{data.TaskName}";
                     Events.Add(new TestPlatformEvent(data.EventName, data.TimeStampRelativeMSec));
 
                     if (!_testPlatformTaskMap.ContainsKey(key))

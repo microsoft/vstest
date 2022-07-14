@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -640,7 +639,7 @@ public class TestEngine : ITestEngine
         if (testHostManager == null)
         {
             EqtTrace.Error($"{nameof(TestEngine)}.{nameof(ThrowExceptionIfTestHostManagerIsNull)}: No suitable testHostProvider found for runsettings: {settingsXml}");
-            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.NoTestHostProviderFound));
+            throw new TestPlatformException(Resources.Resources.NoTestHostProviderFound);
         }
     }
 
@@ -656,7 +655,7 @@ public class TestEngine : ITestEngine
         if (missingRuntimeProviders.Any())
         {
             var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine(string.Format(CultureInfo.CurrentCulture, Resources.Resources.NoSuitableRuntimeProviderFound));
+            stringBuilder.AppendLine(Resources.Resources.NoTestHostProviderFound);
             foreach (var missingRuntimeProvider in missingRuntimeProviders)
             {
                 var text = $"{nameof(TestEngine)}.{nameof(WarnAboutNotFoundRuntimeProvidersOrThrowWhenNoneAreFound)}: No suitable testHostProvider found for sources {string.Join(", ", missingRuntimeProvider.SourceDetails.Select(s => s.Source))} and runsettings: {missingRuntimeProvider.RunSettings}";
@@ -674,7 +673,11 @@ public class TestEngine : ITestEngine
                     {
                         stringBuilder.Append(Resources.Resources.SkippingSource).Append(' ');
                     }
-                    stringBuilder.AppendLine($"{detail.Source} ({detail.Framework}, {detail.Architecture})");
+                    stringBuilder.AppendLine(
+#if NET6_0_OR_GREATER
+                        System.Globalization.CultureInfo.InvariantCulture,
+#endif
+                        $"{detail.Source} ({detail.Framework}, {detail.Architecture})");
                 });
             }
 

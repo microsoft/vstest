@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -194,11 +195,11 @@ internal class ParallelRunDataAggregator
         {
             if (metric.Key.Contains(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter) || metric.Key.Contains(TelemetryDataConstants.TimeTakenByAllAdaptersInSec) || (metric.Key.Contains(TelemetryDataConstants.TotalTestsRun) || metric.Key.Contains(TelemetryDataConstants.TotalTestsRanByAdapter)))
             {
-                var newValue = Convert.ToDouble(metric.Value);
+                var newValue = Convert.ToDouble(metric.Value, CultureInfo.InvariantCulture);
 
                 if (_metricsAggregator.TryGetValue(metric.Key, out var oldValue))
                 {
-                    var oldDoubleValue = Convert.ToDouble(oldValue);
+                    var oldDoubleValue = Convert.ToDouble(oldValue, CultureInfo.InvariantCulture);
                     _metricsAggregator[metric.Key] = newValue + oldDoubleValue;
                 }
                 else

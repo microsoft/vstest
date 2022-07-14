@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading;
 
 using Microsoft.TestPlatform.Extensions.BlameDataCollector;
@@ -22,7 +23,7 @@ internal class Program
         }
 
         var outputFile = args[1];
-        var processId = int.Parse(args[3]);
+        var processId = int.Parse(args[3], CultureInfo.InvariantCulture);
         var dumpType = (MiniDumpTypeOption)Enum.Parse(typeof(MiniDumpTypeOption), args[5]);
 
         Console.WriteLine($"Output file: '{outputFile}'");

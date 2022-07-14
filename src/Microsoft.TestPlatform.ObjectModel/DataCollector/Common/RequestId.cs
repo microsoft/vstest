@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -132,7 +133,7 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
 
         RequestId? other = obj as RequestId;
         return other == null
-            ? throw new ArgumentException(string.Format(Resources.Resources.Common_ObjectMustBeOfType, new object[] { typeof(RequestId).Name }), nameof(obj))
+            ? throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.Common_ObjectMustBeOfType, new object[] { typeof(RequestId).Name }), nameof(obj))
             : Id.CompareTo(other.Id);
     }
 

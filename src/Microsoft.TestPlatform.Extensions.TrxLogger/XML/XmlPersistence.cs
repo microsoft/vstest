@@ -689,7 +689,7 @@ internal class XmlPersistence
     private static string ReplaceInvalidCharacterWithUniCodeEscapeSequence(Match match)
     {
         char x = match.Value[0];
-        return string.Format(@"\u{0:x4}", (ushort)x);
+        return $@"\u{(ushort)x:x4}";
     }
 
     private XmlNode? EnsureLocationExists(XmlElement xml, string location, string? nameSpaceUri)

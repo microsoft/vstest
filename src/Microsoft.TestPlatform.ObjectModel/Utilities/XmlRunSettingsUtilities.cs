@@ -88,10 +88,10 @@ public static class XmlRunSettingsUtilities
     /// </summary>
     /// <param name="runsettingsXml">runsettings xml string</param>
     /// <returns>List of friendly name</returns>
-    public static IList<string> GetDataCollectorsFriendlyName(string runsettingsXml)
+    public static IList<string> GetDataCollectorsFriendlyName(string? runsettingsXml)
     {
         var friendlyNameList = new List<string>();
-        if (!StringUtils.IsNullOrWhiteSpace(runsettingsXml))
+        if (!runsettingsXml.IsNullOrWhiteSpace())
         {
             using var stream = new StringReader(runsettingsXml);
             using var reader = XmlReader.Create(stream, ReaderSettings);

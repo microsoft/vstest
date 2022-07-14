@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -347,6 +348,7 @@ public class BaseRunTestsTests
         var runtimeVersion = " ";
 
         var expectedWarningMessage = string.Format(
+            CultureInfo.InvariantCulture,
             expectedWarningMessageFormat,
             "executor://nonexistent/",
             runtimeVersion);
@@ -395,7 +397,7 @@ public class BaseRunTestsTests
 
         _runTestsInstance.RunTests();
 
-        var expectedUris = new string[] { BaseRunTestsExecutorUri.ToLower() };
+        var expectedUris = new string[] { BaseRunTestsExecutorUri.ToLower(CultureInfo.InvariantCulture) };
         CollectionAssert.AreEqual(expectedUris, _runTestsInstance.GetExecutorUrisThatRanTests.ToArray());
     }
 
@@ -416,7 +418,7 @@ public class BaseRunTestsTests
         _runTestsInstance.RunTests();
 
         var messageFormat = "An exception occurred while invoking executor '{0}': {1}";
-        var message = string.Format(messageFormat, BaseRunTestsExecutorUri.ToLower(), "Test influenced.");
+        var message = string.Format(CultureInfo.InvariantCulture, messageFormat, BaseRunTestsExecutorUri.ToLower(CultureInfo.InvariantCulture), "Test influenced.");
         _mockTestRunEventsHandler.Verify(
             treh => treh.HandleLogMessage(TestMessageLevel.Error, It.Is<string>(s => s.StartsWith(message))),
             Times.Once);
@@ -459,7 +461,7 @@ public class BaseRunTestsTests
 
         _runTestsInstance.RunTests();
 
-        var expectedUris = new string[] { BaseRunTestsExecutorUri.ToLower() };
+        var expectedUris = new string[] { BaseRunTestsExecutorUri.ToLower(CultureInfo.InvariantCulture) };
         CollectionAssert.AreEqual(expectedUris, _runTestsInstance.GetExecutorUrisThatRanTests.ToArray());
     }
 
@@ -485,7 +487,7 @@ public class BaseRunTestsTests
 
         _runTestsInstance.RunTests();
 
-        var expectedUris = new string[] { BadBaseRunTestsExecutorUri.ToLower(), BaseRunTestsExecutorUri.ToLower() };
+        var expectedUris = new string[] { BadBaseRunTestsExecutorUri.ToLower(CultureInfo.InvariantCulture), BaseRunTestsExecutorUri.ToLower(CultureInfo.InvariantCulture) };
         CollectionAssert.AreEqual(expectedUris, _runTestsInstance.GetExecutorUrisThatRanTests.ToArray());
     }
 
@@ -514,7 +516,7 @@ public class BaseRunTestsTests
         Assert.IsNotNull(_receivedattachments);
 
         // Executor Uris
-        var expectedUris = new string[] { BadBaseRunTestsExecutorUri.ToLower(), BaseRunTestsExecutorUri.ToLower() };
+        var expectedUris = new string[] { BadBaseRunTestsExecutorUri.ToLower(CultureInfo.InvariantCulture), BaseRunTestsExecutorUri.ToLower(CultureInfo.InvariantCulture) };
         CollectionAssert.AreEqual(expectedUris, _receivedExecutorUris!.ToArray());
     }
 

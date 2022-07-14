@@ -205,8 +205,8 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(useCoreRunner: false)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useCoreRunner: false)]
     public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

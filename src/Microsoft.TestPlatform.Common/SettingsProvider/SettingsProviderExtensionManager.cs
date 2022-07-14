@@ -72,7 +72,7 @@ public class SettingsProviderExtensionManager
                 _logger.SendMessage(
                     TestMessageLevel.Error,
                     string.Format(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         CommonResources.DuplicateSettingsName,
                         settingsName));
             }

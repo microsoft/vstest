@@ -209,6 +209,19 @@ dotnet_diagnostic.CA1041.severity = warning # not default, increased severity to
 # CA1837: Use Environment.ProcessId instead of Process.GetCurrentProcess().Id
 dotnet_diagnostic.CA1837.severity = warning # not default, increased severity to ensure it is applied
 
+# RS0041: Public members should not use oblivious types
+# TODO: Move resx as internal OR use new resx generator (nullable aware) when available
+dotnet_diagnostic.RS0041.severity = none # not default, decreased severity because of public resources (resx) not being nullable aware
+
+# CA1824: Mark assemblies with NeutralResourcesLanguageAttribute
+dotnet_diagnostic.CA1824.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1304: Specify CultureInfo
+dotnet_diagnostic.CA1304.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1305: Specify IFormatProvider
+dotnet_diagnostic.CA1305.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences

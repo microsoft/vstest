@@ -18,7 +18,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// If runner framework is net46 then vstest.console.exe will run the tests.
 /// Second argument (target framework) = The framework for which test will run
 /// </summary>
-public class NetCoreTargetFrameworkDataSource : Attribute, ITestDataSource
+[AttributeUsage(AttributeTargets.Method)]
+public class NetCoreTargetFrameworkDataSourceAttribute : Attribute, ITestDataSource
 {
     private readonly bool _useDesktopRunner;
     private readonly bool _useCoreRunner;
@@ -26,11 +27,11 @@ public class NetCoreTargetFrameworkDataSource : Attribute, ITestDataSource
     private readonly bool _useNetCore31Target;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSource"/> class.
+    /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSourceAttribute"/> class.
     /// </summary>
     /// <param name="useDesktopRunner">To run tests with desktop runner(vstest.console.exe)</param>
     /// <param name="useCoreRunner">To run tests with core runner(dotnet vstest.console.dll)</param>
-    public NetCoreTargetFrameworkDataSource(
+    public NetCoreTargetFrameworkDataSourceAttribute(
         bool useDesktopRunner = true,
         // adding another runner is not necessary until we need to start building against another
         // sdk, because the netcoreapp2.1 executable is forward compatible

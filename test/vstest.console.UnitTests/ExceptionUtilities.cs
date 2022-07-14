@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -25,7 +26,7 @@ public static class ExceptionUtilities
         {
             Assert.AreEqual(typeof(T), ex.GetType());
             isExceptionThrown = true;
-            var message = string.Format(format, args);
+            var message = string.Format(CultureInfo.CurrentCulture, format, args);
             StringAssert.Contains(ex.Message, message);
         }
 

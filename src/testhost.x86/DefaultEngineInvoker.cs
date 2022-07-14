@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+#if NETCOREAPP2_0_OR_GREATER || NETFRAMEWORK
 using System.IO;
+#endif
 using System.Net;
 using System.Reflection;
 using System.Threading;
@@ -192,7 +194,7 @@ internal class DefaultEngineInvoker :
                 dcPort);
             throw new TestPlatformException(
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                     CoreUtilitiesConstants.TesthostProcessName,
                     CoreUtilitiesConstants.DatacollectorProcessName,

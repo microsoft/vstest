@@ -181,7 +181,7 @@ public class CompatibilityRowsBuilder
                 {
                     foreach (var adapterVersion in _adapterVersions)
                     {
-                        AddRow(dataRows, "In process", runnerVersion, runnerFramework, runnerVersion, runnerFramework, adapter, adapterVersion, inIsolation: false);
+                        AddRow(dataRows, "In process", runnerVersion, runnerFramework, runnerVersion, runnerFramework, adapterVersion, inIsolation: false);
                     }
                 }
             }
@@ -200,10 +200,10 @@ public class CompatibilityRowsBuilder
                 {
                     var isNetFramework = hostFramework.StartsWith("net4");
                     var hostVersion = runnerVersion;
-                    foreach (var adapter in _adapters)
+                    foreach (var _ in _adapters)
                     {
                         var adapterVersion = _adapterVersions[0];
-                        AddRow(dataRows, "Older", runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
+                        AddRow(dataRows, "Older", runnerVersion, runnerFramework, hostVersion, hostFramework, adapterVersion, inIsolation: true);
                     }
                 }
             }
@@ -225,7 +225,7 @@ public class CompatibilityRowsBuilder
                 {
                     foreach (var adapterVersion in _adapterVersions)
                     {
-                        AddRow(dataRows, "Every adapter", runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
+                        AddRow(dataRows, "Every adapter", runnerVersion, runnerFramework, hostVersion, hostFramework, adapterVersion, inIsolation: true);
                     }
                 }
             }
@@ -247,11 +247,11 @@ public class CompatibilityRowsBuilder
                 var hostVersions = isNetFramework ? Array.Empty<string>() : _hostVersions.ToArray();
                 foreach (var hostVersion in hostVersions)
                 {
-                    foreach (var adapter in _adapters)
+                    foreach (var _ in _adapters)
                     {
                         // use the newest
                         var adapterVersion = _adapterVersions[0];
-                        AddRow(dataRows, "Every host", runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
+                        AddRow(dataRows, "Every host", runnerVersion, runnerFramework, hostVersion, hostFramework, adapterVersion, inIsolation: true);
                     }
                 }
             }
@@ -270,11 +270,11 @@ public class CompatibilityRowsBuilder
                     // .NET Framework testhost ships with the runner, and the version from the
                     // runner directory is always selected, otherwise select the newest version from _hostFrameworks.
                     var hostVersion = isNetFramework ? runnerVersion : _hostVersions[0];
-                    foreach (var adapter in _adapters)
+                    foreach (var _ in _adapters)
                     {
                         // use the newest
                         var adapterVersion = _adapterVersions[0];
-                        AddRow(dataRows, "Every runner", runnerVersion, runnerFramework, hostVersion, hostFramework, adapter, adapterVersion, inIsolation: true);
+                        AddRow(dataRows, "Every runner", runnerVersion, runnerFramework, hostVersion, hostFramework, adapterVersion, inIsolation: true);
                     }
                 }
             }
@@ -282,7 +282,7 @@ public class CompatibilityRowsBuilder
     }
 
     private void AddRow(List<RunnerInfo> dataRows, string batch,
-        string runnerVersion, string runnerFramework, string hostVersion, string hostFramework, string adapter, string adapterVersion, bool inIsolation)
+        string runnerVersion, string runnerFramework, string hostVersion, string hostFramework, string adapterVersion, bool inIsolation)
     {
         RunnerInfo runnerInfo = GetRunnerInfo(batch, runnerFramework, hostFramework, inIsolation);
         runnerInfo.DebugInfo = GetDebugInfo();
@@ -310,7 +310,7 @@ public class CompatibilityRowsBuilder
         };
     }
 
-    private RunnerInfo GetRunnerInfo(string batch, string runnerFramework, string hostFramework, bool inIsolation)
+    private static RunnerInfo GetRunnerInfo(string batch, string runnerFramework, string hostFramework, bool inIsolation)
     {
         return new RunnerInfo
         {
@@ -321,7 +321,7 @@ public class CompatibilityRowsBuilder
         };
     }
 
-    private DllInfo GetMSTestInfo(string msTestVersion)
+    private static DllInfo GetMSTestInfo(string msTestVersion)
     {
         var depsXml = GetDependenciesXml();
 
@@ -347,7 +347,7 @@ public class CompatibilityRowsBuilder
         var depsXml = GetDependenciesXml();
 
         // When version is Latest, we built it locally, but it gets restored into our nuget cache on build
-        // same as other versions, we just need to grab the version from a different property. 
+        // same as other versions, we just need to grab the version from a different property.
 
         var propertyName = vstestConsoleVersion == AcceptanceTestBase.LATEST
             ? "NETTestSdkVersion"
@@ -386,7 +386,7 @@ public class CompatibilityRowsBuilder
         var depsXml = GetDependenciesXml();
 
         // When version is Latest, we built it locally, but it gets restored into our nuget cache on build
-        // same as other versions, we just need to grab the version from a different property. 
+        // same as other versions, we just need to grab the version from a different property.
 
         var propertyName = testhostVersionType == AcceptanceTestBase.LATEST
             ? "NETTestSdkVersion"

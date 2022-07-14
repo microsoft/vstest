@@ -358,7 +358,7 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
                             _dataCollectionTestCaseEventHandler.Close();
                             throw new TestPlatformException(
                                 string.Format(
-                                    CultureInfo.CurrentUICulture,
+                                    CultureInfo.CurrentCulture,
                                     CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                                     CoreUtilitiesConstants.DatacollectorProcessName,
                                     CoreUtilitiesConstants.TesthostProcessName,

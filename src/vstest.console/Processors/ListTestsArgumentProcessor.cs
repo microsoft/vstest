@@ -166,7 +166,7 @@ internal class ListTestsArgumentExecutor : IArgumentExecutor
 
         if (!_commandLineOptions.Sources.Any())
         {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
+            throw new CommandLineException(CommandLineResources.MissingTestSourceFile);
         }
 
         Output.WriteLine(CommandLineResources.ListTestsHeaderMessage, OutputLevel.Information);
@@ -215,9 +215,8 @@ internal class ListTestsArgumentExecutor : IArgumentExecutor
             // List out each of the tests.
             foreach (var test in args.DiscoveredTestCases!)
             {
-                _output.WriteLine(string.Format(CultureInfo.CurrentUICulture,
-                        CommandLineResources.AvailableTestsFormat,
-                        test.DisplayName),
+                _output.WriteLine(
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.AvailableTestsFormat, test.DisplayName),
                     OutputLevel.Information);
             }
         }

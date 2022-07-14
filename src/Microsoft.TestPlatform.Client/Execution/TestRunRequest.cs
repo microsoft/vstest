@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 
@@ -169,7 +170,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     {
         EqtTrace.Verbose("TestRunRequest.OnTestSessionTimeout: calling cancellation as test run exceeded testSessionTimeout {0} milliseconds", _testSessionTimeout);
 
-        string message = string.Format(ClientResources.TestSessionTimeoutMessage, _testSessionTimeout);
+        string message = string.Format(CultureInfo.CurrentCulture, ClientResources.TestSessionTimeoutMessage, _testSessionTimeout);
         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
         var rawMessage = _dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
 

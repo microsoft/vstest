@@ -199,7 +199,7 @@ public static class Constants
     /// </summary>
     public static readonly string DefaultResultsDirectory =
 #if NETSTANDARD1_0
-            Path.Combine(".", ResultsDirectoryName);
+        Path.Combine(".", ResultsDirectoryName);
 #else
         Path.Combine(Directory.GetCurrentDirectory(), ResultsDirectoryName);
 #endif

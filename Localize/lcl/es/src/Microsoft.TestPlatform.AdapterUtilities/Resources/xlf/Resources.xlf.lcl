@@ -21,15 +21,21 @@
       <Item ItemId=";ErrorInvalidSequenceAt" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid escape sequence! (segment: {0}, pos: {1})]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Secuencia de escape no válida. (Segmento: {0}. Posición: {1})]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";ErrorMethodArityMustBeNumeric" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Method arity must be numeric]]></Val>
+          <Val><![CDATA[Method arity must be numeric.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[La aridad del método debe ser numérica]]></Val>
+            <Val><![CDATA[La aridad del método debe ser numérica.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Method arity must be numeric]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -45,6 +51,9 @@
       <Item ItemId=";ErrorNoClosingQuote" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[A closing single quote was expected at the end of the segment! (segment: {0})]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Se esperaba una comilla simple de cierre al final del segmento. (Segmento: {0})]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>

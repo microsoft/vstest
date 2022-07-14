@@ -21,15 +21,21 @@
       <Item ItemId=";ErrorInvalidSequenceAt" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid escape sequence! (segment: {0}, pos: {1})]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Neplatná řídicí sekvence. (Segment: {0}, pozice: {1})]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";ErrorMethodArityMustBeNumeric" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Method arity must be numeric]]></Val>
+          <Val><![CDATA[Method arity must be numeric.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Arita metody musí být číselná.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Method arity must be numeric]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -45,6 +51,9 @@
       <Item ItemId=";ErrorNoClosingQuote" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[A closing single quote was expected at the end of the segment! (segment: {0})]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Na konci segmentu se očekávala ukončovací jednoduchá uvozovka. (Segment: {0})]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>

@@ -164,7 +164,7 @@ internal static class RunSettingsProviderExtensions
     internal static XmlNode? GetXmlNode(XmlDocument xmlDocument, string key)
     {
         var xPath = key.Replace('.', '/');
-        var node = xmlDocument.SelectSingleNode(string.Format("//RunSettings/{0}", xPath));
+        var node = xmlDocument.SelectSingleNode($"//RunSettings/{xPath}");
         return node;
     }
 

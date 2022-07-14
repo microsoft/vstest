@@ -115,7 +115,7 @@ public class AcceptanceTestBase : IntegrationTestBase
     /// Empty runsettings, just with the RunSettings tag that we require.
     /// </summary>
     /// <returns></returns>
-    public string GetEmptyRunsettings()
+    public static string GetEmptyRunsettings()
     {
         return "<RunSettings></RunSettings>";
     }
@@ -133,7 +133,7 @@ public class AcceptanceTestBase : IntegrationTestBase
     /// Use the overload without any parameters to get the target framework from the currently set test environment.
     /// </summary>
     /// <returns></returns>
-    public string GetRunSettingsWithTargetFramework(string targetFramework)
+    public static string GetRunSettingsWithTargetFramework(string targetFramework)
     {
         string runSettingsXml =
             $@"<?xml version=""1.0"" encoding=""utf-8""?>

@@ -5,6 +5,10 @@ using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 #if !NETSTANDARD1_0
 
+#if !NETCOREAPP1_0 && !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
+using System.Globalization;
+#endif
+
 using NuGet.Frameworks;
 
 using static NuGet.Frameworks.FrameworkConstants;
@@ -74,7 +78,13 @@ public class Framework
         {
             // IDE always sends framework in form of ENUM, which always throws exception
             // This throws up in first chance exception, refer Bug https://devdiv.visualstudio.com/DefaultCollection/DevDiv/_workitems/edit/591142
-            switch (frameworkString.Trim().ToLower())
+            var formattedFrameworkString = frameworkString.Trim()
+                .ToLower(
+#if !NETCOREAPP1_0 && !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
+                    CultureInfo.InvariantCulture
+#endif
+                );
+            switch (formattedFrameworkString)
             {
                 case "framework35":
                     name = CommonFrameworks.Net35.DotNetFrameworkName;
