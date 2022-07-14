@@ -8,17 +8,15 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace Microsoft.VisualStudio.TestPlatform.Client;
 
-// TODO: Public because there's an attribute definition clash for "MemberNotNullAttribute" and a few other
-// attributes. This should really be internal.
-public class InProcessTestSessionEventsHandler : ITestSessionEventsHandler
+internal class InProcessTestSessionEventsHandler : ITestSessionEventsHandler
 {
     private readonly ITestSessionEventsHandler _testSessionEventsHandler;
 
-    public EventHandler<StartTestSessionCompleteEventArgs?>? StartTestSessionCompleteEventHandler { get; set; }
+    internal EventHandler<StartTestSessionCompleteEventArgs?>? StartTestSessionCompleteEventHandler { get; set; }
 
-    public EventHandler<StopTestSessionCompleteEventArgs?>? StopTestSessionCompleteEventHandler { get; set; }
+    internal EventHandler<StopTestSessionCompleteEventArgs?>? StopTestSessionCompleteEventHandler { get; set; }
 
-    public InProcessTestSessionEventsHandler(ITestSessionEventsHandler testSessionEventsHandler)
+    internal InProcessTestSessionEventsHandler(ITestSessionEventsHandler testSessionEventsHandler)
     {
         _testSessionEventsHandler = testSessionEventsHandler;
     }

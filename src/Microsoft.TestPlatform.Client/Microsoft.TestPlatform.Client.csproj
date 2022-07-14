@@ -54,8 +54,5 @@
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
-  </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
