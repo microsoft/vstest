@@ -33,7 +33,7 @@
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Concord.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Concord.dll" />
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Concord.vsdconfig" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Concord.vsdconfig" />
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.ConfigUI.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.ConfigUI.dll" />
-    <file src="net451\$Runtime$\Microsoft.IntelliTrace.Core.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Core.dll" />
+    <file src="net462\$Runtime$\Microsoft.IntelliTrace.Core.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Core.dll" />
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Debugger.Common.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Debugger.Common.dll" />
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Debugger.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Debugger.dll" />
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.DebuggerMargin.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.DebuggerMargin.dll" />
@@ -48,7 +48,7 @@
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.TelemetryObserver.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.TelemetryObserver.dll" />
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.DefaultDataQueries.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.DefaultDataQueries.dll" />
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.Diagnostics.TfsSymbolResolver.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.Diagnostics.TfsSymbolResolver.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.Diagnostics.Utilities.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.Diagnostics.Utilities.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.Diagnostics.Utilities.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.Diagnostics.Utilities.dll" />
     <file src="Intellitrace\x64\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.VIL.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.VIL.dll" />
     <file src="Intellitrace\x64\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.VIL.NotifyPointInProcHost.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.VIL.NotifyPointInProcHost.dll" />
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProcessSnapshotCleanup.exe" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProcessSnapshotCleanup.exe" />
@@ -56,8 +56,8 @@
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\TDEnvCleanup.exe" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\TDEnvCleanup.exe" />
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\TDEnvCleanup.exe.config" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\TDEnvCleanup.exe.config" />
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\1033\Microsoft.IntelliTrace.Profilerui.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\1033\Microsoft.IntelliTrace.Profilerui.dll" />
-    <file src="net451\$Runtime$\Microsoft.DiaSymReader.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\deps\Microsoft.DiaSymReader.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\deps\Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" />
+    <file src="net462\$Runtime$\Microsoft.DiaSymReader.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\deps\Microsoft.DiaSymReader.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\deps\Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" />
     <file src="Intellitrace\x86\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\en\collectionplan.xml" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\en\collectionplan.xml" />
     <file src="Intellitrace\x64\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\x64\Microsoft.IntelliTrace.Profiler.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\x64\Microsoft.IntelliTrace.Profiler.dll" />
     <file src="Intellitrace\x64\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\x64\1033\Microsoft.IntelliTrace.Profilerui.dll" target="tools\net462\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\x64\1033\Microsoft.IntelliTrace.Profilerui.dll" />
@@ -67,13 +67,13 @@
     <file src="net462\$Runtime$\datacollector.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\datacollector.exe.config" />
     <file src="net462\$Runtime$\datacollector.arm64.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\datacollector.arm64.exe" />
     <file src="net462\$Runtime$\datacollector.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\datacollector.arm64.exe.config" />
-    <file src="net451\$Runtime$\LegacyTypes.testtype" target="tools\net462\Common7\IDE\Extensions\TestPlatform\LegacyTypes.testtype" />
-    <file src="net451\$Runtime$\ManualTests.testtype" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ManualTests.testtype" />
-    <file src="net451\$Runtime$\Microsoft.DiaSymReader.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.DiaSymReader.dll" />
+    <file src="net462\$Runtime$\LegacyTypes.testtype" target="tools\net462\Common7\IDE\Extensions\TestPlatform\LegacyTypes.testtype" />
+    <file src="net462\$Runtime$\ManualTests.testtype" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ManualTests.testtype" />
+    <file src="net462\$Runtime$\Microsoft.DiaSymReader.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.DiaSymReader.dll" />
     <file src="net462\$Runtime$\NuGet.Frameworks.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\NuGet.Frameworks.dll" />
     <file src="net462\$Runtime$\Microsoft.Extensions.DependencyModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.Extensions.DependencyModel.dll" />
     <file src="net462\$Runtime$\Microsoft.Extensions.FileSystemGlobbing.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.Extensions.FileSystemGlobbing.dll" />
-    <file src="net451\$Runtime$\Microsoft.IntelliTrace.Core.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.IntelliTrace.Core.dll" />
+    <file src="net462\$Runtime$\Microsoft.IntelliTrace.Core.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.IntelliTrace.Core.dll" />
     <file src="net462\$Runtime$\Microsoft.TestPlatform.CommunicationUtilities.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.TestPlatform.CommunicationUtilities.dll" />
     <file src="net462\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.TestPlatform.CoreUtilities.dll" />
     <file src="net462\$Runtime$\Microsoft.TestPlatform.CrossPlatEngine.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.TestPlatform.CrossPlatEngine.dll" />
@@ -81,53 +81,53 @@
     <file src="net462\$Runtime$\Microsoft.TestPlatform.Utilities.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.TestPlatform.Utilities.dll" />
     <file src="net462\$Runtime$\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" />
     <file src="net462\$Runtime$\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.xml" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.xml" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.Diagnostics.Utilities.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Diagnostics.Utilities.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.AgentObject.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.AgentObject.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.AgentProcessManager.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.AgentProcessManager.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.Common.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Common.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.ControllerObject.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.ControllerObject.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.DataCollectionAgentObject.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.DataCollectionAgentObject.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.ExecutionCommon.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.ExecutionCommon.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAdapter.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAdapter.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAgent.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAgent.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.LoadTest.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.LoadTest.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.LoadTestFramework.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.LoadTestFramework.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.Resource.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Resource.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.WebTestFramework.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.WebTestFramework.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.TMI.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.TMI.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.ManualTest.Adapter.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.ManualTest.Adapter.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.ManualTest.ObjectModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.ManualTest.ObjectModel.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.ManualTest.Tip.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.ManualTest.Tip.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.AssemblyResolver.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.AssemblyResolver.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Tip.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Tip.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.WebLoadTest.Tip.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.WebLoadTest.Tip.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.Diagnostics.Utilities.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Diagnostics.Utilities.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.AgentObject.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.AgentObject.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.AgentProcessManager.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.AgentProcessManager.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.Common.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Common.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.ControllerObject.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.ControllerObject.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.DataCollectionAgentObject.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.DataCollectionAgentObject.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.ExecutionCommon.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.ExecutionCommon.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAdapter.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAdapter.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAgent.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAgent.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.LoadTest.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.LoadTest.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.LoadTestFramework.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.LoadTestFramework.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.Resource.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Resource.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.WebTestFramework.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.WebTestFramework.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.TMI.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.TMI.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.ManualTest.Adapter.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.ManualTest.Adapter.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.ManualTest.ObjectModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.ManualTest.ObjectModel.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.ManualTest.Tip.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.ManualTest.Tip.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.AssemblyResolver.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.AssemblyResolver.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Tip.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Tip.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.Tips.WebLoadTest.Tip.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Tips.WebLoadTest.Tip.dll" />
     <file src="net462\$Runtime$\Microsoft.VisualStudio.TestPlatform.Client.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Client.dll" />
     <file src="net462\$Runtime$\Microsoft.VisualStudio.TestPlatform.Common.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Common.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.sxs.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.sxs.manifest" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.sxs.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.sxs.manifest" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.sxs.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.sxs.manifest" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.sxs.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.sxs.manifest" />
     <file src="net462\$Runtime$\Newtonsoft.Json.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Newtonsoft.Json.dll" />
-    <file src="net451\$Runtime$\QTAgent.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent.exe" />
-    <file src="net451\$Runtime$\QTAgent.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent.exe.Config" />
-    <file src="net451\$Runtime$\QTAgent32.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent32.exe" />
-    <file src="net451\$Runtime$\QTAgent32.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent32.exe.Config" />
-    <file src="net451\$Runtime$\QTAgent32_35.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent32_35.exe" />
-    <file src="net451\$Runtime$\QTAgent32_35.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent32_35.exe.Config" />
-    <file src="net451\$Runtime$\QTAgent32_40.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent32_40.exe" />
-    <file src="net451\$Runtime$\QTAgent32_40.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent32_40.exe.Config" />
-    <file src="net451\$Runtime$\QTAgent_35.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent_35.exe" />
-    <file src="net451\$Runtime$\QTAgent_35.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent_35.exe.Config" />
-    <file src="net451\$Runtime$\QTAgent_40.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent_40.exe" />
-    <file src="net451\$Runtime$\QTAgent_40.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent_40.exe.Config" />
-    <file src="net451\$Runtime$\QTDCAgent.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTDCAgent.exe" />
-    <file src="net451\$Runtime$\QTDCAgent.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTDCAgent.exe.Config" />
-    <file src="net451\$Runtime$\QTDCAgent32.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTDCAgent32.exe" />
-    <file src="net451\$Runtime$\QTDCAgent32.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTDCAgent32.exe.Config" />
+    <file src="net462\$Runtime$\QTAgent.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent.exe" />
+    <file src="net462\$Runtime$\QTAgent.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent.exe.Config" />
+    <file src="net462\$Runtime$\QTAgent32.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent32.exe" />
+    <file src="net462\$Runtime$\QTAgent32.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent32.exe.Config" />
+    <file src="net462\$Runtime$\QTAgent32_35.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent32_35.exe" />
+    <file src="net462\$Runtime$\QTAgent32_35.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent32_35.exe.Config" />
+    <file src="net462\$Runtime$\QTAgent32_40.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent32_40.exe" />
+    <file src="net462\$Runtime$\QTAgent32_40.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent32_40.exe.Config" />
+    <file src="net462\$Runtime$\QTAgent_35.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent_35.exe" />
+    <file src="net462\$Runtime$\QTAgent_35.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent_35.exe.Config" />
+    <file src="net462\$Runtime$\QTAgent_40.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent_40.exe" />
+    <file src="net462\$Runtime$\QTAgent_40.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent_40.exe.Config" />
+    <file src="net462\$Runtime$\QTDCAgent.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTDCAgent.exe" />
+    <file src="net462\$Runtime$\QTDCAgent.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTDCAgent.exe.Config" />
+    <file src="net462\$Runtime$\QTDCAgent32.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTDCAgent32.exe" />
+    <file src="net462\$Runtime$\QTDCAgent32.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTDCAgent32.exe.Config" />
     <file src="net462\$Runtime$\System.Collections.Immutable.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Collections.Immutable.dll" />
     <file src="net462\$Runtime$\System.Reflection.Metadata.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Reflection.Metadata.dll" />
     <file src="net462\$Runtime$\System.Runtime.InteropServices.RuntimeInformation.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Runtime.InteropServices.RuntimeInformation.dll" />
@@ -164,13 +164,13 @@
     <file src="net462\$Runtime$\testhost.net48.arm64.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.arm64.exe" />
     <file src="net462\$Runtime$\testhost.net48.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.arm64.exe.config" />
 
-    <file src="net451\$Runtime$\ThirdPartyNotices.txt" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ThirdPartyNotices.txt" />
+    <file src="net462\$Runtime$\ThirdPartyNotices.txt" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ThirdPartyNotices.txt" />
     <file src="net462\$Runtime$\vstest.console.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\vstest.console.exe" />
     <file src="net462\$Runtime$\vstest.console.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\vstest.console.exe.config" />
     <file src="net462\$Runtime$\vstest.console.arm64.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\vstest.console.arm64.exe" />
     <file src="net462\$Runtime$\vstest.console.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\vstest.console.arm64.exe.config" />
     <file src="net462\$Runtime$\SettingsMigrator.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\SettingsMigrator.exe" />
-    <file src="net451\$Runtime$\Webloadtest.testtype" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Webloadtest.testtype" />
+    <file src="net462\$Runtime$\Webloadtest.testtype" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Webloadtest.testtype" />
     <file src="net462\$Runtime$\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net462\$Runtime$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net462\$Runtime$\cs\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\cs\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -219,18 +219,18 @@
     <file src="net462\$Runtime$\Extensions\dump\DumpMinitool.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\dump\DumpMinitool.arm64.exe.config" />
     <file src="net462\$Runtime$\Extensions\Microsoft.TestPlatform.Extensions.EventLogCollector.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.TestPlatform.Extensions.EventLogCollector.dll" />
     <file src="net462\$Runtime$\Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
-    <file src="net451\$Runtime$\Extensions\VideoRecorder\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\VideoRecorder\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" />
-    <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.CodedWebTestAdapter.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.CodedWebTestAdapter.dll" />
-    <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TmiAdapter.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TmiAdapter.dll" />
+    <file src="net462\$Runtime$\Extensions\VideoRecorder\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\VideoRecorder\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" />
+    <file src="net462\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.CodedWebTestAdapter.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.CodedWebTestAdapter.dll" />
+    <file src="net462\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TmiAdapter.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TmiAdapter.dll" />
     <file src="net462\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
     <file src="net462\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" />
-    <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.VSTestIntegration.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.VSTestIntegration.dll" />
-    <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.WebTestAdapter.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.WebTestAdapter.dll" />
-    <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.ComInterfaces.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.ComInterfaces.dll" />
-    <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" />
-    <file src="net451\$Runtime$\Extensions\VideoRecorder\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\VideoRecorder\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
-    <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
-    <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorderCollector.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorderCollector.dll" />
+    <file src="net462\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.VSTestIntegration.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.VSTestIntegration.dll" />
+    <file src="net462\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.WebTestAdapter.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.WebTestAdapter.dll" />
+    <file src="net462\$Runtime$\Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.ComInterfaces.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.ComInterfaces.dll" />
+    <file src="net462\$Runtime$\Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" />
+    <file src="net462\$Runtime$\Extensions\VideoRecorder\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\VideoRecorder\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
+    <file src="net462\$Runtime$\Extensions\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
+    <file src="net462\$Runtime$\Extensions\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorderCollector.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorderCollector.dll" />
 
     <file src="Microsoft.CodeCoverage.Extensions\Microsoft.VisualStudio.TraceDataCollector.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TraceDataCollector.dll" />
     <file src="Microsoft.CodeCoverage.Extensions\cs\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\cs\Microsoft.VisualStudio.TraceDataCollector.dll" />
@@ -253,63 +253,63 @@
     <file src="Microsoft.CodeCoverage\Mono.Cecil.Pdb.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Mono.Cecil.Pdb.dll" />
     <file src="Microsoft.CodeCoverage\Microsoft.CodeCoverage.Core.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.CodeCoverage.Core.dll" />
 
-    <file src="net451\$Runtime$\Microsoft.CodeCoverage.IO.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\cs\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\cs\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\de\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\de\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\es\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\es\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\fr\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\fr\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\it\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\it\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\ja\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ja\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\ko\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ko\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\pl\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pl\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\pt-BR\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pt-BR\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\ru\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ru\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\tr\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\zh-Hans\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\zh-Hant\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hant\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\Microsoft.CodeCoverage.IO.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\cs\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\cs\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\de\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\de\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\es\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\es\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\fr\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\fr\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\it\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\it\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\ja\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ja\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\ko\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ko\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\pl\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pl\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\pt-BR\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pt-BR\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\ru\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ru\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\tr\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\zh-Hans\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\zh-Hant\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hant\Microsoft.CodeCoverage.IO.dll" />
 
-    <file src="net451\$Runtime$\Extensions\VideoRecorder\VSTestVideoRecorder.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\VideoRecorder\VSTestVideoRecorder.exe" />
-    <file src="net451\$Runtime$\Extensions\Cpp\dbghelp.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\dbghelp.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll.manifest" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Arm.Resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Arm.Resources.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll.manifest" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll.manifest" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Arm.Resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Arm.Resources.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.arm64.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.arm64.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\x64\dbghelp.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\x64\dbghelp.dll" />
-    <file src="net451\$Runtime$\Extensions\Cpp\arm64\dbghelp.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\arm64\dbghelp.dll" />
-    <file src="net451\$Runtime$\Extensions\TestImpact\x64\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\TestImpact\ComComponents\x64\msdia140.dll" />
-    <file src="net451\$Runtime$\Extensions\TestImpact\x64\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\TestImpact\ComComponents\x64\msdia140.dll.manifest" />
-    <file src="net451\$Runtime$\Extensions\TestImpact\x86\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\TestImpact\ComComponents\x86\msdia140.dll" />
-    <file src="net451\$Runtime$\Extensions\TestImpact\x86\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\TestImpact\ComComponents\x86\msdia140.dll.manifest" />
-    <file src="net451\$Runtime$\Extensions\V1\Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage.dll" />
-    <file src="net451\$Runtime$\Extensions\V1\Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage.dll.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage.dll.config" />
-    <file src="net451\$Runtime$\Extensions\VideoRecorder\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" />
-    <file src="net451\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll" />
-    <file src="net451\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll.config" />
-    <file src="net451\$Runtime$\Extensions\VideoRecorder\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
-    <file src="net451\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.SystemInfo.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.SystemInfo.dll" />
-    <file src="net451\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll" />
-    <file src="net451\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll.config" />
-    <file src="net451\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll" />
-    <file src="net451\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll.config" />
-    <file src="net451\$Runtime$\Extensions\VideoRecorder\VSTestVideoRecorder.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\VSTestVideoRecorder.exe" />
-    <file src="net451\$Runtime$\Extensions\V1\VSTestVideoRecorder.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\VSTestVideoRecorder.exe.config" />
-    <file src="net451\$Runtime$\Extensions\V1\TestImpact\x64\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\TestImpact\ComComponents\x64\msdia140.dll" />
-    <file src="net451\$Runtime$\Extensions\V1\TestImpact\x64\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\TestImpact\ComComponents\x64\msdia140.dll.manifest" />
-    <file src="net451\$Runtime$\Extensions\V1\TestImpact\x86\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\TestImpact\ComComponents\x86\msdia140.dll" />
-    <file src="net451\$Runtime$\Extensions\V1\TestImpact\x86\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\TestImpact\ComComponents\x86\msdia140.dll.manifest" />
-    <file src="net451\$Runtime$\Extensions\V1\x64\Microsoft.VisualStudio.Coverage.Monitor.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\x64\Microsoft.VisualStudio.Coverage.Monitor.dll" />
-    <file src="net451\$Runtime$\Extensions\V1\x86\Microsoft.VisualStudio.Coverage.Monitor.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\x86\Microsoft.VisualStudio.Coverage.Monitor.dll" />
+    <file src="net462\$Runtime$\Extensions\VideoRecorder\VSTestVideoRecorder.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\VideoRecorder\VSTestVideoRecorder.exe" />
+    <file src="net462\$Runtime$\Extensions\Cpp\dbghelp.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\dbghelp.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll.manifest" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Arm.Resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Arm.Resources.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll.manifest" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll.manifest" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Arm.Resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Arm.Resources.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.arm64.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.arm64.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\x64\dbghelp.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\x64\dbghelp.dll" />
+    <file src="net462\$Runtime$\Extensions\Cpp\arm64\dbghelp.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\arm64\dbghelp.dll" />
+    <file src="net462\$Runtime$\Extensions\TestImpact\x64\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\TestImpact\ComComponents\x64\msdia140.dll" />
+    <file src="net462\$Runtime$\Extensions\TestImpact\x64\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\TestImpact\ComComponents\x64\msdia140.dll.manifest" />
+    <file src="net462\$Runtime$\Extensions\TestImpact\x86\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\TestImpact\ComComponents\x86\msdia140.dll" />
+    <file src="net462\$Runtime$\Extensions\TestImpact\x86\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\TestImpact\ComComponents\x86\msdia140.dll.manifest" />
+    <file src="net462\$Runtime$\Extensions\V1\Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage.dll" />
+    <file src="net462\$Runtime$\Extensions\V1\Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage.dll.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage.dll.config" />
+    <file src="net462\$Runtime$\Extensions\VideoRecorder\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" />
+    <file src="net462\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll" />
+    <file src="net462\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll.config" />
+    <file src="net462\$Runtime$\Extensions\VideoRecorder\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
+    <file src="net462\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.SystemInfo.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.SystemInfo.dll" />
+    <file src="net462\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll" />
+    <file src="net462\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll.config" />
+    <file src="net462\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll" />
+    <file src="net462\$Runtime$\Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll.config" />
+    <file src="net462\$Runtime$\Extensions\VideoRecorder\VSTestVideoRecorder.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\VSTestVideoRecorder.exe" />
+    <file src="net462\$Runtime$\Extensions\V1\VSTestVideoRecorder.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\VSTestVideoRecorder.exe.config" />
+    <file src="net462\$Runtime$\Extensions\V1\TestImpact\x64\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\TestImpact\ComComponents\x64\msdia140.dll" />
+    <file src="net462\$Runtime$\Extensions\V1\TestImpact\x64\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\TestImpact\ComComponents\x64\msdia140.dll.manifest" />
+    <file src="net462\$Runtime$\Extensions\V1\TestImpact\x86\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\TestImpact\ComComponents\x86\msdia140.dll" />
+    <file src="net462\$Runtime$\Extensions\V1\TestImpact\x86\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\TestImpact\ComComponents\x86\msdia140.dll.manifest" />
+    <file src="net462\$Runtime$\Extensions\V1\x64\Microsoft.VisualStudio.Coverage.Monitor.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\x64\Microsoft.VisualStudio.Coverage.Monitor.dll" />
+    <file src="net462\$Runtime$\Extensions\V1\x86\Microsoft.VisualStudio.Coverage.Monitor.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\V1\x86\Microsoft.VisualStudio.Coverage.Monitor.dll" />
     <file src="net462\$Runtime$\fr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\fr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net462\$Runtime$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net462\$Runtime$\fr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\fr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -414,10 +414,10 @@
     <file src="net462\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net462\$Runtime$\tr\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\vstest.console.resources.dll" />
     <file src="net462\$Runtime$\tr\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\SettingsMigrator.resources.dll" />
-    <file src="net451\$Runtime$\x64\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x64\msdia140.dll" />
-    <file src="net451\$Runtime$\x64\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x64\msdia140.dll.manifest" />
-    <file src="net451\$Runtime$\x86\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x86\msdia140.dll" />
-    <file src="net451\$Runtime$\x86\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x86\msdia140.dll.manifest" />
+    <file src="net462\$Runtime$\x64\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x64\msdia140.dll" />
+    <file src="net462\$Runtime$\x64\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x64\msdia140.dll.manifest" />
+    <file src="net462\$Runtime$\x86\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x86\msdia140.dll" />
+    <file src="net462\$Runtime$\x86\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x86\msdia140.dll.manifest" />
     <file src="net462\$Runtime$\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net462\$Runtime$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net462\$Runtime$\zh-Hans\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -444,9 +444,9 @@
     <file src="net462\$Runtime$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net462\$Runtime$\zh-Hant\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hant\vstest.console.resources.dll" />
     <file src="net462\$Runtime$\zh-Hant\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hant\SettingsMigrator.resources.dll" />
-    <file src="net451\$Runtime$\Microsoft.IntelliTrace.Core.dll" target="tools\net462\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.Core.dll" />
+    <file src="net462\$Runtime$\Microsoft.IntelliTrace.Core.dll" target="tools\net462\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.Core.dll" />
     <file src="Intellitrace\x86\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.ObjectModel.dll" target="tools\net462\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.ObjectModel.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" target="tools\net462\Common7\IDE\PrivateAssemblies\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" target="tools\net462\Common7\IDE\PrivateAssemblies\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" />
 
     <file src="Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.config" target="tools\net462\Team Tools\Dynamic Code Coverage Tools\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.exe" target="tools\net462\Team Tools\Dynamic Code Coverage Tools\" />
@@ -469,38 +469,38 @@
     <file src="Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.CodeCoverage.Shim.dll" />
 
     <!-- CUIT -->
-    <file src="net451\$Runtime$\Interop.UIAutomationClient.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Interop.UIAutomationClient.dll" />
-    <file src="net451\$Runtime$\Microsoft.ShDocVw.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.ShDocVw.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.Diagnostics.Measurement.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Diagnostics.Measurement.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.Interop.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Interop.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.Sqm.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Sqm.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Common.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Common.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Framework.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Framework.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Logging.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Logging.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Playback.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Playback.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITesting.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITesting.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll" />
-    <file src="net451\$Runtime$\UIAComWrapper.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\UIAComWrapper.dll" />
+    <file src="net462\$Runtime$\Interop.UIAutomationClient.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Interop.UIAutomationClient.dll" />
+    <file src="net462\$Runtime$\Microsoft.ShDocVw.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.ShDocVw.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.Diagnostics.Measurement.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Diagnostics.Measurement.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.Interop.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Interop.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.QualityTools.Sqm.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.Sqm.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Common.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Common.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Framework.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Framework.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Logging.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Logging.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Playback.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Playback.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITesting.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITesting.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.dll" />
+    <file src="net462\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll" />
+    <file src="net462\$Runtime$\UIAComWrapper.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\UIAComWrapper.dll" />
 
-    <file src="net451\$Runtime$\CUITPlugins\IEPropertyConfiguration.xml" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\IEPropertyConfiguration.xml" />
-    <file src="net451\$Runtime$\CUITPlugins\IEPropertyConfiguration.xsd" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\IEPropertyConfiguration.xsd" />
-    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll" />
-    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll" />
-    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll" />
-    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll" />
-    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
-    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
-    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" />
-    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" />
-    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
+    <file src="net462\$Runtime$\CUITPlugins\IEPropertyConfiguration.xml" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\IEPropertyConfiguration.xml" />
+    <file src="net462\$Runtime$\CUITPlugins\IEPropertyConfiguration.xsd" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\IEPropertyConfiguration.xsd" />
+    <file src="net462\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll" />
+    <file src="net462\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll" />
+    <file src="net462\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll" />
+    <file src="net462\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll" />
+    <file src="net462\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+    <file src="net462\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+    <file src="net462\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" />
+    <file src="net462\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" />
+    <file src="net462\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
 
     <!-- .NET Core testhost and CPP adapter -->
     <file src="net462\$Runtime$\TestHost\dbghelp.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHost\dbghelp.dll" />

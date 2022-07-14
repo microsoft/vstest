@@ -43,20 +43,20 @@
     <file src="net462\$Runtime$\Microsoft.VisualStudio.TestPlatform.Client.dll"	target="tools\net462\Microsoft.VisualStudio.TestPlatform.Client.dll" />
     <file src="net462\$Runtime$\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\net462\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="net462\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\net462\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-    <file src="net451\$Runtime$\Microsoft.CodeCoverage.IO.dll"	target="tools\net462\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\cs\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\cs\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\de\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\de\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\es\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\es\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\fr\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\fr\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\it\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\it\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\ja\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\ja\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\ko\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\ko\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\pl\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\pl\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\pt-BR\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\pt-BR\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\ru\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\ru\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\tr\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\tr\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\zh-Hans\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\zh-Hans\Microsoft.CodeCoverage.IO.dll" />
-    <file src="net451\$Runtime$\zh-Hant\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\zh-Hant\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\Microsoft.CodeCoverage.IO.dll"	target="tools\net462\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\cs\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\cs\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\de\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\de\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\es\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\es\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\fr\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\fr\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\it\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\it\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\ja\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\ja\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\ko\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\ko\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\pl\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\pl\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\pt-BR\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\pt-BR\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\ru\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\ru\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\tr\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\tr\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\zh-Hans\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\zh-Hans\Microsoft.CodeCoverage.IO.dll" />
+    <file src="net462\$Runtime$\zh-Hant\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\zh-Hant\Microsoft.CodeCoverage.IO.dll" />
     <file src="net462\$Runtime$\Newtonsoft.Json.dll"	target="tools\net462\Newtonsoft.Json.dll" />
     <file src="net462\$Runtime$\System.Collections.Immutable.dll"	target="tools\net462\System.Collections.Immutable.dll" />
     <file src="net462\$Runtime$\System.Reflection.Metadata.dll"	target="tools\net462\System.Reflection.Metadata.dll" />
