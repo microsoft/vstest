@@ -79,8 +79,6 @@ $TPB_TestAssets = Join-Path $env:TP_ROOT_DIR "test\TestAssets\"
 $TPB_Solution = Join-Path $env:TP_ROOT_DIR "TestPlatform.sln"
 $TPB_TestAssets_Solution = Join-Path $TPB_TestAssets "TestAssets.sln"
 $TPB_TestAssets_CILAssets = Join-Path $TPB_TestAssets "CILProject\CILProject.proj"
-$TPB_TargetFramework45 = "net45"
-$TPB_TargetFramework451 = "net451"
 $TPB_TargetFramework462 = "net462"
 $TPB_TargetFramework472 = "net472"
 $TPB_TargetFramework48 = "net48"
@@ -296,11 +294,8 @@ function Publish-PatchedDotnet {
 function Publish-Package {
     $timer = Start-Timer
     Write-Log "Publish-Package: Started."
-    $fullCLRPackage462Dir = Get-FullCLRPackageDirectory462
-    $fullCLRPackage451Dir = Get-FullCLRPackageDirectory451
-    $fullCLRPackage45Dir = Get-FullCLRPackageDirectory45
+    $net462PackageDir = Get-FullCLR462PackageDirectory
     $uap100PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkUap100");
-    $net45PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\net45");
     $netstandard10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS10");
     $netstandard13PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS13");
     $netstandard20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS20");
@@ -335,7 +330,7 @@ function Publish-Package {
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
 
     Write-Log "Package: Publish src\package\package\package.csproj"
-    Publish-PackageInternal $packageProject $TPB_TargetFramework462 $fullCLRPackage462Dir
+    Publish-PackageInternal $packageProject $TPB_TargetFramework462 $net462PackageDir
     Publish-PackageInternal $packageProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
 
@@ -344,17 +339,17 @@ function Publish-Package {
     Write-Log "Package: Publish src\vstest.console\vstest.console.csproj"
 
     # We build vstest.console.arm64.exe before building vstest.console.exe and we put it in the same folder, so they end up shipping together.
-    Publish-PackageWithRuntimeInternal $vstestConsoleProject $TPB_TargetFramework462 $TPB_ARM64_Runtime false $fullCLRPackage462Dir
-    Publish-PackageWithRuntimeInternal $vstestConsoleProject $TPB_TargetFramework462 $TPB_X64_Runtime false $fullCLRPackage462Dir
+    Publish-PackageWithRuntimeInternal $vstestConsoleProject $TPB_TargetFramework462 $TPB_ARM64_Runtime false $net462PackageDir
+    Publish-PackageWithRuntimeInternal $vstestConsoleProject $TPB_TargetFramework462 $TPB_X64_Runtime false $net462PackageDir
     Publish-PackageInternal $vstestConsoleProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
     Write-Log "Package: Publish src\SettingsMigrator\SettingsMigrator.csproj"
-    Publish-PackageInternal $settingsMigratorProject $TPB_TargetFramework462 $fullCLRPackage462Dir
+    Publish-PackageInternal $settingsMigratorProject $TPB_TargetFramework462 $net462PackageDir
 
     Write-Log "Package: Publish src\datacollector\datacollector.csproj"
     # We build datacollector.arm64.exe before building datacollector.exe and we put it in the same folder, so they end up shipping together.
-    Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_ARM64_Runtime false $fullCLRPackage462Dir
-    Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_X64_Runtime false $fullCLRPackage462Dir
+    Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_ARM64_Runtime false $net462PackageDir
+    Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_X64_Runtime false $net462PackageDir
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
     ################################################################################
@@ -428,8 +423,8 @@ function Publish-Package {
     Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_ARM64_Runtime false $fullDestDir
     Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_X64_Runtime false $fullDestDir
 
-    New-Item -ItemType directory -Path $fullCLRPackage462Dir -Force | Out-Null
-    Copy-Item $testhostFullPackageDir\* $fullCLRPackage462Dir -Force -Recurse
+    New-Item -ItemType directory -Path $net462PackageDir -Force | Out-Null
+    Copy-Item $testhostFullPackageDir\* $net462PackageDir -Force -Recurse
 
     ################################################################################
     # Publish Microsoft.TestPlatform.ObjectModel
@@ -439,8 +434,7 @@ function Publish-Package {
 
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.ObjectModel\bin\$TPB_Configuration") `
         -files @{
-        $TPB_TargetFramework45     = $fullCLRPackage45Dir           # net45
-        $TPB_TargetFramework451    = $fullCLRPackage451Dir          # net451
+        $TPB_TargetFramework462    = $net462PackageDir          # net462
         $TPB_TargetFrameworkCore10 = $coreCLR10PackageDir           # netcoreapp1.0
         $TPB_TargetFrameworkCore20 = $coreCLR20PackageDir           # netcoreapp2.1
         $TPB_TargetFrameworkNS10   = $netstandard10PackageDir       # netstandard1_0
@@ -458,8 +452,7 @@ function Publish-Package {
     # Publish Microsoft.TestPlatform.PlatformAbstractions
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration") `
         -files @{
-        $TPB_TargetFramework45     = $fullCLRPackage45Dir          # net45
-        $TPB_TargetFramework451    = $fullCLRPackage451Dir         # net451
+        $TPB_TargetFramework462    = $net462PackageDir         # net462
         $TPB_TargetFrameworkCore20 = $coreCLR20PackageDir          # netcoreapp2.1
         $TPB_TargetFrameworkNS10   = $netstandard10PackageDir      # netstandard1_0
         $TPB_TargetFrameworkNS13   = $netstandard13PackageDir      # netstandard1_3
@@ -475,8 +468,7 @@ function Publish-Package {
     # Publish Microsoft.TestPlatform.CoreUtilities
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.CoreUtilities\bin\$TPB_Configuration") `
         -files @{
-        $TPB_TargetFramework45     = $fullCLRPackage45Dir           # net45
-        $TPB_TargetFramework451    = $fullCLRPackage451Dir          # net451
+        $TPB_TargetFramework462    = $net462PackageDir          # net462
         $TPB_TargetFrameworkNS10   = $netstandard10PackageDir       # netstandard1_0
         $TPB_TargetFrameworkNS13   = $netstandard13PackageDir       # netstandard1_3
         $TPB_TargetFrameworkNS20   = $netstandard20PackageDir       # netstandard2_0
@@ -492,11 +484,10 @@ function Publish-Package {
     # Publish Microsoft.TestPlatform.AdapterUtilities
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.AdapterUtilities\bin\$TPB_Configuration") `
         -files @{
-        # "net20"                     = $net20PackageDir               # net20
-        "net45/any"                = $net45PackageDir               # $net4
-        $TPB_TargetFrameworkNS10   = $netstandard10PackageDir       # netstandard1_0
-        $TPB_TargetFrameworkNS20   = $netstandard20PackageDir       # netstandard2_0
-        $TPB_TargetFrameworkUap100 = $uap100PackageDir              # uap10.0
+        "$TPB_TargetFramework462/any"   = $net462PackageDir          # net462
+        $TPB_TargetFrameworkNS10        = $netstandard10PackageDir       # netstandard1_0
+        $TPB_TargetFrameworkNS20        = $netstandard20PackageDir       # netstandard2_0
+        $TPB_TargetFrameworkUap100      = $uap100PackageDir              # uap10.0
     }
 
     ################################################################################
@@ -518,7 +509,7 @@ function Publish-Package {
 
     # Copy over the logger assemblies to the Extensions folder.
     $extensions_Dir = "Extensions"
-    $fullCLRExtensionsDir = Join-Path $fullCLRPackage462Dir $extensions_Dir
+    $fullCLRExtensionsDir = Join-Path $net462PackageDir $extensions_Dir
     $coreCLRExtensionsDir = Join-Path $coreCLR20PackageDir $extensions_Dir
 
     # Create an extensions directory.
@@ -533,8 +524,8 @@ function Publish-Package {
     )
 
     foreach ($file in $loggers) {
-        Write-Verbose "Move-Item $fullCLRPackage462Dir\$file $fullCLRExtensionsDir -Force"
-        Move-Item $fullCLRPackage462Dir\$file $fullCLRExtensionsDir -Force
+        Write-Verbose "Move-Item $net462PackageDir\$file $fullCLRExtensionsDir -Force"
+        Move-Item $net462PackageDir\$file $fullCLRExtensionsDir -Force
 
         Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
@@ -542,9 +533,9 @@ function Publish-Package {
 
     # Move logger resource dlls
     if ($TPB_LocalizedBuild) {
-        Move-Loc-Files $fullCLRPackage462Dir $fullCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
+        Move-Loc-Files $net462PackageDir $fullCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
         Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
-        Move-Loc-Files $fullCLRPackage462Dir $fullCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"
+        Move-Loc-Files $net462PackageDir $fullCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"
         Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"
     }
 
@@ -621,8 +612,8 @@ function Publish-Package {
     # If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
     $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
     foreach ($file in $runtimeproviders) {
-        Write-Verbose "Move-Item $fullCLRPackage462Dir\$file $fullCLRExtensionsDir -Force"
-        Move-Item $fullCLRPackage462Dir\$file $fullCLRExtensionsDir -Force
+        Write-Verbose "Move-Item $net462PackageDir\$file $fullCLRExtensionsDir -Force"
+        Move-Item $net462PackageDir\$file $fullCLRExtensionsDir -Force
 
         Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
@@ -630,23 +621,23 @@ function Publish-Package {
 
     # Move TestHostRuntimeProvider resource dlls
     if ($TPB_LocalizedBuild) {
-        Move-Loc-Files $fullCLRPackage462Dir $fullCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
+        Move-Loc-Files $net462PackageDir $fullCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
         Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
     }
 
     # Copy dependency of Microsoft.TestPlatform.TestHostRuntimeProvider
     $newtonsoftJsonVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.NewtonsoftJsonVersion
     $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\$newtonsoftJsonVersion\lib\net45\Newtonsoft.Json.dll"
-    Write-Verbose "Copy-Item $newtonsoft $fullCLRPackage451Dir -Force"
-    Copy-Item $newtonsoft $fullCLRPackage462Dir -Force
+    Write-Verbose "Copy-Item $newtonsoft $net462PackageDir -Force"
+    Copy-Item $newtonsoft $net462PackageDir -Force
 
     $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\$newtonsoftJsonVersion\lib\netstandard1.0\Newtonsoft.Json.dll"
     Write-Verbose "Copy-Item $newtonsoft $coreCLR20PackageDir -Force"
     Copy-Item $newtonsoft $coreCLR20PackageDir -Force
 
     # Copy .NET Standard CPP Test adapter
-    New-Item "$fullCLRPackage462Dir\TestHost" -ItemType Directory -Force | Out-Null
-    $fullCLRTestHostDir = "$fullCLRPackage462Dir\TestHost"
+    New-Item "$net462PackageDir\TestHost" -ItemType Directory -Force | Out-Null
+    $fullCLRTestHostDir = "$net462PackageDir\TestHost"
 
     $testPlatformRemoteExternalsVersion = ([xml](Get-Content "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props")).Project.PropertyGroup.TestPlatformRemoteExternalsVersion
     $testPlatformRemoteExternalsSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Remote\$testPlatformRemoteExternalsVersion\tools\netstandard\Extensions\*"
@@ -768,7 +759,7 @@ function Publish-VsixPackage {
     Write-Log "Publish-VsixPackage: Started."
     $timer = Start-Timer
 
-    $packageDir = Get-FullCLRPackageDirectory462
+    $packageDir = Get-FullCLR462PackageDirectory
     $extensionsPackageDir = Join-Path $packageDir "Extensions"
     $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
     $legacyTestImpactComComponentsDir = Join-Path $extensionsPackageDir "V1\TestImpact"
@@ -1044,8 +1035,8 @@ function Copy-CodeCoverage-Package-Artifacts {
 
 function Copy-PackageItems($packageName) {
     # Packages published separately are copied into their own artifacts directory
-    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net451\* is copied
-    # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net451
+    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net462\* is copied
+    # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net462
     $binariesDirectory = [System.IO.Path]::Combine($env:TP_ROOT_DIR, "src", "$packageName", "bin", "$TPB_Configuration")
     $binariesDirectory = $(Join-Path $binariesDirectory "*")
     $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
@@ -1084,16 +1075,8 @@ function Get-DotNetPath {
     return $dotnetPath
 }
 
-function Get-FullCLRPackageDirectory462 {
+function Get-FullCLR462PackageDirectory {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework462\$TPB_TargetRuntime")
-}
-
-function Get-FullCLRPackageDirectory451 {
-    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework451\$TPB_TargetRuntime")
-}
-
-function Get-FullCLRPackageDirectory45 {
-    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework45\$TPB_TargetRuntime")
 }
 
 function Get-CoreCLR20PackageDirectory {
@@ -1192,7 +1175,7 @@ function Build-SpecificProjects {
     Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
     # FrameworksAndOutDirs format ("<target_framework>", "<output_dir>").
     $FrameworksAndOutDirs = (
-        ("net451", "net451\win7-x64"),
+        ("net462", "net462\win7-x64"),
         ("netstandard1.0", "netstandard1.0"),
         ("netstandard1.3", "netstandard1.3"),
         ("netstandard2.0", "netcoreapp2.1"),

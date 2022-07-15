@@ -16,7 +16,7 @@
     <ArtifactsBaseDirectory Condition="'$(ArtifactsBaseDirectory)' == ''">$(RootDirectory)artifacts\$(BuildConfiguration)\</ArtifactsBaseDirectory>
 
     <!-- Directory with .NET binaries -->
-    <ArtifactsFw45Directory Condition="'$(ArtifactsFw45Directory)' == ''">$(ArtifactsBaseDirectory)net45\</ArtifactsFw45Directory>
+    <ArtifactsFw462Directory Condition="'$(ArtifactsFw462Directory)' == ''">$(ArtifactsBaseDirectory)net462\</ArtifactsFw462Directory>
 
     <!-- Directory with .NET binaries -->
     <ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(ArtifactsBaseDirectory)$(TargetFramework)\$(TargetRuntime)\</ArtifactsDirectory>
@@ -72,16 +72,16 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.TMI.dll" />
     </ItemGroup>
 
-    <!-- Sign .Net 4.5 assemblies -->
+    <!-- Sign .NET 4.6.2 assemblies -->
     <ItemGroup>
-      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)\Microsoft.TestPlatform.AdapterUtilities.dll" />
-      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)$(TargetRuntime)\Microsoft.TestPlatform.CoreUtilities.dll" />
-      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)$(TargetRuntime)\Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw462Directory)\Microsoft.TestPlatform.AdapterUtilities.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\Microsoft.TestPlatform.CoreUtilities.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
 
       <!-- Localized resources -->
-      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)\%(ResxLang.Identity)\*.*" />
-      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw462Directory)\%(ResxLang.Identity)\*.*" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET 4.6-->
@@ -451,7 +451,7 @@
 
     <Message Text="Signing using authenticode certificate Fw45AssembliesToSign:'%(Fw45AssembliesToSign.Authenticode)' for @(Fw45AssembliesToSign)"/>
     <SignFiles Files="@(Fw45AssembliesToSign)"
-               BinariesDirectory="$(ArtifactsFw45Directory)"
+               BinariesDirectory="$(ArtifactsFw462Directory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 

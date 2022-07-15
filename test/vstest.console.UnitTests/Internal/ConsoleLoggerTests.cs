@@ -584,12 +584,12 @@ public class ConsoleLoggerTests
         _mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(5));
     }
 
-    [DataRow(".NETFramework,version=v4.5.1", "(net451)", "quiet")]
-    [DataRow(".NETFramework,version=v4.5.1", "(net451)", "minimal")]
+    [DataRow(".NETFramework,version=v4.6.2", "(net462)", "quiet")]
+    [DataRow(".NETFramework,version=v4.6.2", "(net462)", "minimal")]
     [DataRow(null, null, "quiet")]
     [DataRow(null, null, "minimal")]
     [TestMethod]
-    public void TestResultHandlerShouldShowFailedTestsAndPassedTestsForQuietVebosity(string framework, string expectedFramework, string verbosityLevel)
+    public void TestResultHandlerShouldShowFailedTestsAndPassedTestsForQuietVerbosity(string framework, string expectedFramework, string verbosityLevel)
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
