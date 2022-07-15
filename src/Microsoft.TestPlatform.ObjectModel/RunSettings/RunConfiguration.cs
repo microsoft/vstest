@@ -891,7 +891,6 @@ public class RunConfiguration : TestRunSettings
 
                     case "DotNetHostPath":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                        
                         string? dotnetHostPath = reader.ReadElementContentAsString();
 
 #if !NETSTANDARD1_0
