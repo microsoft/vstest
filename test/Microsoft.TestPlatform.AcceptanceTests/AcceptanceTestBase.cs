@@ -11,26 +11,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 public class AcceptanceTestBase : IntegrationTestBase
 {
-    public const string Net451TargetFramework = "net451";
-    public const string Net452TargetFramework = "net452";
-    public const string Net46TargetFramework = "net46";
-    public const string Net461TargetFramework = "net461";
+    public const string DesktopTargetFramework = Net462TargetFramework;
     public const string Net462TargetFramework = "net462";
     public const string Net47TargetFramework = "net47";
     public const string Net471TargetFramework = "net471";
     public const string Net472TargetFramework = "net472";
     public const string Net48TargetFramework = "net48";
-    public const string DesktopTargetFramework = "net451";
     public const string Core21TargetFramework = "netcoreapp2.1";
     public const string Core31TargetFramework = "netcoreapp3.1";
     public const string Core50TargetFramework = "net5.0";
     public const string Core60TargetFramework = "net6.0";
 
-    public const string DesktopFrameworkArgValue = ".NETFramework,Version=v4.5.1";
-    public const string Net451FrameworkArgValue = ".NETFramework,Version=v4.5.1";
-    public const string Net452FrameworkArgValue = ".NETFramework,Version=v4.5.2";
-    public const string Net46FrameworkArgValue = ".NETFramework,Version=v4.6";
-    public const string Net461FrameworkArgValue = ".NETFramework,Version=v4.6.1";
+    public const string DesktopFrameworkArgValue = Net462FrameworkArgValue;
     public const string Net462FrameworkArgValue = ".NETFramework,Version=v4.6.2";
     public const string Net47FrameworkArgValue = ".NETFramework,Version=v4.7";
     public const string Net471FrameworkArgValue = ".NETFramework,Version=v4.7.1";
@@ -46,17 +38,16 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string CoreRunnerTargetRuntime = "";
     public const string InIsolation = "/InIsolation";
 
-    public const string NETFX452_48 = "net452;net461;net472;net48";
-    public const string NETFX451_48 = "net452;net461;net472;net48";
+    public const string NETFX462_48 = "net462;net472;net48";
     public const string NETCORE21_50 = "netcoreapp2.1;netcoreapp3.1;net5.0";
-    public const string NETFX452_NET50 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0";
-    public const string NETFX452_NET31 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1";
-    public const string DEFAULT_RUNNER_NETFX = "net451";
+    public const string NETFX462_NET50 = "net462;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0";
+    public const string NETFX462_NET31 = "net462;net472;net48;netcoreapp2.1;netcoreapp3.1";
+    public const string DEFAULT_RUNNER_NETFX = Net462TargetFramework;
     /// <summary>
     /// Our current defaults for .NET and .NET Framework.
     /// </summary>
     public const string DEFAULT_RUNNER_NETFX_AND_NET = $"{DEFAULT_RUNNER_NETFX};netcoreapp2.1";
-    public const string DEFAULT_HOST_NETFX_AND_NET = "net451;netcoreapp2.1";
+    public const string DEFAULT_HOST_NETFX_AND_NET = "net462;netcoreapp2.1";
     public const string LATEST_TO_LEGACY = "Latest;LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
     public const string LATESTPREVIEW_TO_LEGACY = "LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
     public const string LATEST = "Latest";
@@ -89,10 +80,6 @@ public class AcceptanceTestBase : IntegrationTestBase
             Core31TargetFramework => Core31FrameworkArgValue,
             Core50TargetFramework => Core50FrameworkArgValue,
             Core60TargetFramework => Core60FrameworkArgValue,
-            Net451TargetFramework => Net451FrameworkArgValue,
-            Net452TargetFramework => Net452FrameworkArgValue,
-            Net46TargetFramework => Net46FrameworkArgValue,
-            Net461TargetFramework => Net461FrameworkArgValue,
             Net462TargetFramework => Net462FrameworkArgValue,
             Net47TargetFramework => Net47FrameworkArgValue,
             Net471TargetFramework => Net471FrameworkArgValue,

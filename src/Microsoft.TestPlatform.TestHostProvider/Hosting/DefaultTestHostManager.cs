@@ -48,9 +48,9 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private const string DefaultTestHostFriendlyName = "DefaultTestHost";
     private const string TestAdapterEndsWithPattern = @"TestAdapter.dll";
 
-    // Any version (older or newer) that is not in this list will use the default testhost.exe that is built using net451.
+    // Any version (older or newer) that is not in this list will use the default testhost.exe that is built using net462.
     // TODO: Add net481 when it is published, if it uses a new moniker.
-    private static readonly ImmutableArray<string> SupportedTargetFrameworks = ImmutableArray.Create("net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48");
+    private static readonly ImmutableArray<string> SupportedTargetFrameworks = ImmutableArray.Create("net47", "net471", "net472", "net48");
 
     private readonly IProcessHelper _processHelper;
     private readonly IFileHelper _fileHelper;

@@ -71,7 +71,7 @@ public class RunTests : AcceptanceTestBase
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
+        var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_RUNNER_NETFX);
         var incompatibleDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
 
         // Act
@@ -94,7 +94,7 @@ public class RunTests : AcceptanceTestBase
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
+        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_RUNNER_NETFX);
         var netDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
 
         // Act
@@ -196,7 +196,7 @@ public class RunTests : AcceptanceTestBase
             new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
             _runEventHandler);
 
-        var errorMessage = runnerInfo.TargetFramework == "net451"
+        var errorMessage = runnerInfo.TargetFramework == "net462"
             ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.{Environment.NewLine}"
             : $"The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.{Environment.NewLine}";
 
@@ -205,8 +205,8 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSourceAttribute(useCoreRunner: false)]
-    [NetCoreTargetFrameworkDataSourceAttribute(useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
+    [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
     public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

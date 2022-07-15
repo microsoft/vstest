@@ -55,7 +55,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
     }
 
     [TestMethod]
-    [DataRow("net451")]
+    [DataRow("net462")]
     [DataRow("netcoreapp2.1")]
     public void GetArchitectureShouldReturnCorrentArchForx64Assembly(string framework)
     {
@@ -63,7 +63,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
     }
 
     [TestMethod]
-    [DataRow("net451")]
+    [DataRow("net462")]
     [DataRow("netcoreapp2.1")]
     public void GetArchitectureShouldReturnCorrentArchForx86Assembly(string framework)
     {
@@ -71,7 +71,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
     }
 
     [TestMethod]
-    [DataRow("net451")]
+    [DataRow("net462")]
     [DataRow("netcoreapp2.1")]
     public void GetArchitectureShouldReturnCorrentArchForAnyCpuAssembly(string framework)
     {
@@ -79,7 +79,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
     }
 
     [TestMethod]
-    [DataRow("net451")]
+    [DataRow("net462")]
     [DataRow("netcoreapp2.1")]
     public void GetArchitectureShouldReturnCorrentArchForArmAssembly(string framework)
     {
@@ -108,7 +108,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
     }
 
     [TestMethod]
-    [DataRow("net451")]
+    [DataRow("net462")]
     [DataRow("netcoreapp2.1")]
     public void GetFrameWorkForDotNetAssembly(string framework)
     {
@@ -119,11 +119,11 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
         var actualFx = _assemblyMetadataProvider.GetFrameworkName(assemblyPath);
         stopWatch.Stop();
 
-        if (framework.Equals("net451"))
+        if (framework.Equals("net462"))
         {
             // Reason is unknown for why full framework it is taking more time. Need to investigate.
             expectedElapsedTime = 100;
-            Assert.AreEqual(Constants.DotNetFramework451, actualFx.FullName);
+            Assert.AreEqual(".NETFramework,Version=v4.6.2", actualFx.FullName);
         }
         else
         {

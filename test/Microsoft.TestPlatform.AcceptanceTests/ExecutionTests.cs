@@ -95,9 +95,7 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll");
-        var xunitAssemblyPath = _testEnvironment.TargetFramework.Equals("net451") ?
-            _testEnvironment.GetTestAsset("XUTestProject.dll", "net46") :
-            _testEnvironment.GetTestAsset("XUTestProject.dll");
+        var xunitAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll");
 
         assemblyPaths = string.Join(" ", assemblyPaths, xunitAssemblyPath.AddDoubleQuote());
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: string.Empty, FrameworkArgValue, string.Empty);
@@ -257,7 +255,7 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X64 platform. SimpleTestProjectx86.dll would use Framework .NETFramework,Version=v4.5.1 and Platform X86";
+        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.6.2 framework and X64 platform. SimpleTestProjectx86.dll would use Framework .NETFramework,Version=v4.6.2 and Platform X86";
         var assemblyPaths =
             BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProjectx86.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -279,7 +277,7 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProjectx86 would use Framework .NETFramework,Version=v4.5.1 and Platform X86";
+        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.6.2 framework and X86 platform. SimpleTestProjectx86 would use Framework .NETFramework,Version=v4.6.2 and Platform X86";
         var assemblyPaths =
             BuildMultipleAssemblyPath("SimpleTestProjectx86.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -299,7 +297,7 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProject2.dll would use Framework .NETFramework,Version=v4.5.1 and Platform X64";
+        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.6.2 framework and X86 platform. SimpleTestProject2.dll would use Framework .NETFramework,Version=v4.6.2 and Platform X64";
         var assemblyPaths =
             BuildMultipleAssemblyPath("SimpleTestProject2.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);

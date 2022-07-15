@@ -10,7 +10,7 @@
     <Target Name="CreateManifestResourceNames" Condition="'@(EmbeddedResource)' != ''" />
 
     <PropertyGroup>
-        <TargetFramework>net451</TargetFramework>
+        <TargetFramework>net462</TargetFramework>
         <OutputPath>bin\$(Configuration)</OutputPath>
         <RunningOnUnix Condition="$([MSBuild]::IsOSUnixLike())">true</RunningOnUnix>
         <RunningOnUnix Condition="'$(RunningOnUnix)' == ''">false</RunningOnUnix>

@@ -17,7 +17,7 @@ public class SpecialNameTests
     public void VerifyThatInvalidIdentifierNamesAreParsed()
     {
         var environment = new IntegrationTestEnvironment();
-        var asset = environment.GetTestAsset("CILProject.dll", "net451");
+        var asset = environment.GetTestAsset("CILProject.dll", "net462");
         var assembly = Assembly.LoadFrom(asset);
         var types = assembly.GetTypes();
 

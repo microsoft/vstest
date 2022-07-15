@@ -28,7 +28,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
 
     protected static string GetNetFrameworkAdapterPath()
     {
-        return Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "net451", "win7-x64", "Extensions");
+        return Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, DEFAULT_RUNNER_NETFX, "win7-x64", "Extensions");
     }
 
     protected static string GetCodeCoverageExePath()

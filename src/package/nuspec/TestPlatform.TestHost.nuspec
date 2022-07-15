@@ -14,11 +14,11 @@
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
-    <repository type="git" 
-                url="https://github.com/microsoft/vstest" 
-                branch="$BranchName$" 
+    <repository type="git"
+                url="https://github.com/microsoft/vstest"
+                branch="$BranchName$"
                 commit="$CommitId$" />
-                
+
     <dependencies>
       <group targetFramework="netcoreapp1.0">
         <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
@@ -43,8 +43,8 @@
         <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
         <dependency id="System.Xml.ReaderWriter" version="4.0.11" />
       </group>
-      
-      <group targetFramework="net45"></group>
+
+      <group targetFramework="net462"></group>
     </dependencies>
   </metadata>
 
@@ -54,8 +54,8 @@
     <!-- Add a third party notice file -->
     <file src="ThirdPartyNotices.txt" target="" />
 
-    <!-- net45 -->
-    <file src="_._" target="lib\net45\" />
+    <!-- net462 -->
+    <file src="_._" target="lib\net462\" />
 
     <!-- netcoreapp1.0 -->
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.*.dll" target="lib\netcoreapp1.0\" />
@@ -64,7 +64,7 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\testhost.deps.json" target="lib\netcoreapp1.0\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\x86\msdia140.dll" target="lib\netcoreapp1.0\x86\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\x64\msdia140.dll" target="lib\netcoreapp1.0\x64\" />
-  
+
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x64\testhost.dll" target="build\netcoreapp1.0\x64\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x64\testhost.exe" target="build\netcoreapp1.0\x64\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x86\testhost.x86.dll" target="build\netcoreapp1.0\x86\" />
@@ -79,16 +79,16 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\testhost.deps.json" target="lib\netcoreapp2.1\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\x86\msdia140.dll" target="lib\netcoreapp2.1\x86\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\x64\msdia140.dll" target="lib\netcoreapp2.1\x64\" />
-    
-    <!-- 
+
+    <!--
           We move AnyCPU version of testhost.dll, at the moment we don't have native code that needs particular architecture inside testhost.dll.
           This prevent possible issue related to override x64(testshost.dll) compilation inside Microsoft.TestPlatform.TestHost.NetCore.prop netcoreapp2.1\x64\testhost.dll to the bin folder
           that contains AnyCPU version.
-          In case of -arch arm64/x86 with a x64 SDK on arm where we use only dotnet muxer+testhost.dll to do arch switch, 
+          In case of -arch arm64/x86 with a x64 SDK on arm where we use only dotnet muxer+testhost.dll to do arch switch,
           if we copy x64 testshost.dll we'll fail to load with `arm64/dotnet.exe exec testhost.dll`.
           Another possible way to keep x64 version if needed is to understand if we're on -arch scenario and act as expected
           and avoid to copy testhost.dll if we're switching to a non x64 arch.
-          This means parse/understand -arch inside msbuild, not trivial, so for now we simply copy the AnyCPU version and we keep 
+          This means parse/understand -arch inside msbuild, not trivial, so for now we simply copy the AnyCPU version and we keep
           the package authoring as-is for back compatibiliy.
     -->
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\testhost.dll" target="build\netcoreapp2.1\x64\" />
@@ -97,7 +97,7 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x86\testhost.x86.exe" target="build\netcoreapp2.1\x86\" />
 
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.TestHost.props" target="build\netcoreapp2.1\" />
-    
+
     <!-- UWP -->
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\testhost.dll" target="lib\uap10.0\" />
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.TestPlatform.*.dll" target="lib\uap10.0\" />
@@ -193,7 +193,7 @@
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\tr" />
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\zh-Hans" />
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\zh-Hant" />
-    
+
     <!-- Add localized resources netcoreapp1.0 -->
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\cs" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\de" />
