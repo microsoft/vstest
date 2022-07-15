@@ -49,7 +49,7 @@ public class TextFileTelemetryPublisher : IMetricsPublisher
     /// <param name="fileHelper">
     /// The file Helper.
     /// </param>
-    internal void LogToFile(string eventName, IDictionary<string, object?> metrics, IFileHelper fileHelper)
+    internal static void LogToFile(string eventName, IDictionary<string, object?> metrics, IFileHelper fileHelper)
     {
         string resultDirectory = Environment.GetEnvironmentVariable("VSTEST_LOGTELEMETRY_PATH")
             ?? Path.GetTempPath() + "TelemetryLogs";

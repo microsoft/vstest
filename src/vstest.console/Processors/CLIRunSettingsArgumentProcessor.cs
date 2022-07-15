@@ -198,7 +198,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
         }
     }
 
-    private bool UpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
+    private static bool UpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
     {
         if (!node.Contains(Constants.TestRunParametersName))
         {

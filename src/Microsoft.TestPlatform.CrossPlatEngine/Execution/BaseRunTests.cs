@@ -574,7 +574,7 @@ internal abstract class BaseRunTests
         }
     }
 
-    private void SetAdapterLoggingSettings()
+    private static void SetAdapterLoggingSettings()
     {
         // TODO: enable the below once runsettings is in.
         // var sessionMessageLogger = testExecutorFrameworkHandle as TestSessionMessageLogger;

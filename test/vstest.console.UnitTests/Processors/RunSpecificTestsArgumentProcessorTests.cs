@@ -117,7 +117,7 @@ public class RunSpecificTestsArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldThrowIfArgumentIsNull()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
 
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _mockEnvironment.Object);
         var executor = GetExecutor(testRequestManager);
@@ -128,7 +128,7 @@ public class RunSpecificTestsArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldThrowIfArgumentIsEmpty()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
 
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _mockEnvironment.Object);
         var executor = GetExecutor(testRequestManager);
@@ -139,7 +139,7 @@ public class RunSpecificTestsArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldThrowIfArgumentIsWhiteSpace()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
 
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _mockEnvironment.Object);
         var executor = GetExecutor(testRequestManager);
@@ -150,7 +150,7 @@ public class RunSpecificTestsArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldThrowIfArgumentsAreEmpty()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
 
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _mockEnvironment.Object);
         var executor = GetExecutor(testRequestManager);
@@ -161,7 +161,7 @@ public class RunSpecificTestsArgumentProcessorTests
     [TestMethod]
     public void ExecutorShouldSplitTestsSeparatedByComma()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
 
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _mockEnvironment.Object);
         var executor = GetExecutor(testRequestManager);
@@ -172,7 +172,7 @@ public class RunSpecificTestsArgumentProcessorTests
     [TestMethod]
     public void ExecutorExecuteForNoSourcesShouldThrowCommandLineException()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
 
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _mockEnvironment.Object);
         var executor = GetExecutor(testRequestManager);
@@ -601,7 +601,7 @@ public class RunSpecificTestsArgumentProcessorTests
 
     private void ResetAndAddSourceToCommandLineOptions()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.TestCaseFilterValue = null;
         CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, _mockFileHelper.Object);
         CommandLineOptions.Instance.FileHelper = _mockFileHelper.Object;

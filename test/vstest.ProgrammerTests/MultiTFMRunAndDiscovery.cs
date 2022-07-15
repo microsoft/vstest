@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace vstest.ProgrammerTests;
 
@@ -27,6 +28,7 @@ public class MultiTFM
 
             Then two testhosts should be started that target the same framework as each assembly.
         ")]
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
         public async Task A()
         {
             // -- arrange
@@ -127,6 +129,7 @@ public class MultiTFM
 
             Then two testhosts should be started that target the framework chosen by runsettings.
         ")]
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
         public async Task B()
         {
             // -- arrange
@@ -227,6 +230,7 @@ public class MultiTFM
 
             Then two testhosts should be started that target the same framework as each assembly.
         ")]
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
         public async Task C()
         {
             // -- arrange
@@ -327,6 +331,7 @@ public class MultiTFM
 
             Then two testhosts should be started that target the framework chosen by runsettings.
         ")]
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
         public async Task D()
         {
             // -- arrange
@@ -429,6 +434,7 @@ public class MultiTFM
 
             Then two testhosts should be started that target the framework chosen by runsettings.
         ")]
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
         public async Task E()
         {
             // -- arrange
@@ -546,6 +552,7 @@ public class MultiTFMRunAndDiscoveryCompatibilityMode
 
         Then two testhosts are both started for the same TFM.
     ")]
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
     public async Task E()
     {
         // -- arrange

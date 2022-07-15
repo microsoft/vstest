@@ -5,6 +5,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -16,6 +17,7 @@ public sealed class RemoteEqtTrace : MarshalByRefObject
     /// <summary>
     /// Gets or sets the trace level.
     /// </summary>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public TraceLevel TraceLevel
     {
         get
@@ -33,7 +35,7 @@ public sealed class RemoteEqtTrace : MarshalByRefObject
     /// Register listeners from parent domain in current domain.
     /// </summary>
     /// <param name="listener">Trace listener instance.</param>
-    internal void SetupRemoteListeners(TraceListener? listener)
+    internal static void SetupRemoteListeners(TraceListener? listener)
     {
         PlatformEqtTrace.SetupRemoteListeners(listener);
     }

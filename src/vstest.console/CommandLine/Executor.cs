@@ -349,7 +349,7 @@ internal class Executor
     /// </summary>
     /// <param name="argumentProcessors">The arguments that are being processed.</param>
     /// <param name="processorFactory">A factory for creating argument processors.</param>
-    private void EnsureActionArgumentIsPresent(List<IArgumentProcessor> argumentProcessors, ArgumentProcessorFactory processorFactory)
+    private static void EnsureActionArgumentIsPresent(List<IArgumentProcessor> argumentProcessors, ArgumentProcessorFactory processorFactory)
     {
         ValidateArg.NotNull(argumentProcessors, nameof(argumentProcessors));
         ValidateArg.NotNull(processorFactory, nameof(processorFactory));

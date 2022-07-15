@@ -175,7 +175,7 @@ public class PlatformEqtTrace : IPlatformEqtTrace
         }
     }
 
-    private void UnInitializeTrace()
+    private static void UnInitializeTrace()
     {
         s_isInitialized = false;
         LogFile = null;

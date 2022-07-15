@@ -75,7 +75,7 @@ public static class AssemblyHelper
                         null, null, null);
                 }
 
-                return worker.CheckAssemblyReference(source, referenceAssemblyName, referenceAssemblyPublicKeyToken);
+                return AssemblyLoadWorker.CheckAssemblyReference(source, referenceAssemblyName, referenceAssemblyPublicKeyToken);
             }
             finally
             {
@@ -121,7 +121,7 @@ public static class AssemblyHelper
                 false, BindingFlags.Default, null,
                 null, null, null);
 
-            worker.GetPlatformAndFrameworkSettings(testSource, out var procArchType, out var frameworkVersion);
+            AssemblyLoadWorker.GetPlatformAndFrameworkSettings(testSource, out var procArchType, out var frameworkVersion);
 
             Architecture targetPlatform = (Architecture)Enum.Parse(typeof(Architecture), procArchType);
             var targetFramework = frameworkVersion.ToUpperInvariant() switch
@@ -191,7 +191,7 @@ public static class AssemblyHelper
                     null, null, null);
             }
 
-            return worker.GetReferencedAssemblies(source);
+            return AssemblyLoadWorker.GetReferencedAssemblies(source);
         }
         finally
         {
@@ -270,7 +270,7 @@ public static class AssemblyHelper
                     null, null, null);
             }
 
-            return worker.GetTargetFrameworkVersionStringFromPath(path);
+            return AssemblyLoadWorker.GetTargetFrameworkVersionStringFromPath(path);
         }
         finally
         {

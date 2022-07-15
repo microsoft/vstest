@@ -320,8 +320,8 @@ public class TestPluginCache
         }
 
         // Check if extensions from this assembly have already been discovered.
-        var extensions = TestExtensions?.GetExtensionsDiscoveredFromAssembly(
-            TestExtensions.GetTestExtensionCache<TPluginInfo>(),
+        var extensions = TestExtensions.GetExtensionsDiscoveredFromAssembly(
+            TestExtensions?.GetTestExtensionCache<TPluginInfo>(),
             extensionAssembly);
 
         if (extensions?.Count > 0)
@@ -347,7 +347,7 @@ public class TestPluginCache
     /// </summary>
     /// <param name="extensionAssembly">The extension assembly.</param>
     /// <returns>Resolution paths for the assembly.</returns>
-    internal IList<string> GetResolutionPaths(string extensionAssembly)
+    internal static IList<string> GetResolutionPaths(string extensionAssembly)
     {
         var resolutionPaths = new List<string>();
 
@@ -463,7 +463,7 @@ public class TestPluginCache
             SetupAssemblyResolver(extensionPath);
         }
 
-        return new TestPluginDiscoverer().GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
+        return TestPluginDiscoverer.GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
     }
 
     protected void SetupAssemblyResolver(string? extensionAssembly)

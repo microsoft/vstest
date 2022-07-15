@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 
@@ -19,6 +20,7 @@ public class PathResolver
     /// </summary>
     /// <param name="args">User inputs</param>
     /// <returns>New file path to create</returns>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public string? GetTargetPath(string[] args)
     {
         string? newFilePath = null;

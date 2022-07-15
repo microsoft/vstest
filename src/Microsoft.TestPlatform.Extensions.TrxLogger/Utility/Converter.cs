@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -46,7 +47,7 @@ internal class Converter
     /// <param name="testType"></param>
     /// <param name="rockSteadyTestCase"></param>
     /// <returns>Trx test element</returns>
-    public ITestElement ToTestElement(
+    public static ITestElement ToTestElement(
         Guid testId,
         Guid executionId,
         Guid parentExecutionId,
@@ -141,7 +142,7 @@ internal class Converter
     /// <returns>
     /// The <see cref="TestOutcome"/>.
     /// </returns>
-    public TrxObjectModel.TestOutcome ToOutcome(VisualStudio.TestPlatform.ObjectModel.TestOutcome rockSteadyOutcome)
+    public static TrxObjectModel.TestOutcome ToOutcome(VisualStudio.TestPlatform.ObjectModel.TestOutcome rockSteadyOutcome)
     {
         TrxObjectModel.TestOutcome outcome = TrxObjectModel.TestOutcome.Failed;
 
@@ -229,7 +230,7 @@ internal class Converter
     /// </summary>
     /// <param name="unitTestResult">TRX TestResult</param>
     /// <param name="testResult"> rock steady test result</param>
-    private void UpdateResultMessages(TrxObjectModel.TestResult unitTestResult, VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
+    private static void UpdateResultMessages(TrxObjectModel.TestResult unitTestResult, VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
     {
         StringBuilder debugTrace = new();
         StringBuilder stdErr = new();
@@ -270,7 +271,7 @@ internal class Converter
     /// <param name="testCase">TestCase object extracted from the TestResult</param>
     /// <param name="categoryId">Property Name from the list of properties in TestCase</param>
     /// <returns> list of properties</returns>
-    public List<string> GetCustomPropertyValueFromTestCase(TestCase testCase, string categoryId)
+    public static List<string> GetCustomPropertyValueFromTestCase(TestCase testCase, string categoryId)
     {
         var customProperty = testCase.Properties.FirstOrDefault(t => t.Id.Equals(categoryId));
 
@@ -289,7 +290,7 @@ internal class Converter
     /// </summary>
     /// <param name="rockSteadyTestCase"></param>
     /// <returns>Test id</returns>
-    public Guid GetTestId(TestCase rockSteadyTestCase)
+    public static Guid GetTestId(TestCase rockSteadyTestCase)
     {
         Guid testId = Guid.Empty;
 
@@ -312,6 +313,7 @@ internal class Converter
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns>Parent execution id.</returns>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public Guid GetParentExecutionId(VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
     {
         TestProperty? parentExecutionIdProperty = testResult.Properties.FirstOrDefault(
@@ -327,7 +329,7 @@ internal class Converter
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns>Execution id.</returns>
-    public Guid GetExecutionId(VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
+    public static Guid GetExecutionId(VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
     {
         TestProperty? executionIdProperty = testResult.Properties.FirstOrDefault(
             property => property.Id.Equals(Constants.ExecutionIdPropertyIdentifier));
@@ -345,7 +347,7 @@ internal class Converter
     /// </summary>
     /// <param name="testResult"></param>
     /// <returns>Test type</returns>
-    public TestType GetTestType(VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
+    public static TestType GetTestType(VisualStudio.TestPlatform.ObjectModel.TestResult testResult)
     {
         var testTypeGuid = Constants.UnitTestTypeGuid;
 
@@ -461,7 +463,7 @@ internal class Converter
             TPDebug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
 
             // copy the source file to the target location
-            string targetFileName = _trxFileHelper.GetNextIterationFileName(targetDirectory, Path.GetFileName(sourceFile), false);
+            string targetFileName = TrxFileHelper.GetNextIterationFileName(targetDirectory, Path.GetFileName(sourceFile), false);
 
             try
             {
@@ -518,7 +520,7 @@ internal class Converter
 
             TPDebug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
             // copy the source file to the target location
-            string targetFileName = _trxFileHelper.GetNextIterationFileName(testResultDirectory, Path.GetFileName(sourceFile), false);
+            string targetFileName = TrxFileHelper.GetNextIterationFileName(testResultDirectory, Path.GetFileName(sourceFile), false);
 
             try
             {

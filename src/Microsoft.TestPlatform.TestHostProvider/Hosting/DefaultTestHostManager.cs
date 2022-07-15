@@ -112,6 +112,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <summary>
     /// Gets the properties of the test executor launcher. These could be the targetID for emulator/phone specific scenarios.
     /// </summary>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public IDictionary<string, string> Properties => new Dictionary<string, string>();
 
     /// <summary>
@@ -208,7 +209,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         };
     }
 
-    private string GetTestHostName(Architecture architecture, Framework targetFramework, PlatformArchitecture processArchitecture)
+    private static string GetTestHostName(Architecture architecture, Framework targetFramework, PlatformArchitecture processArchitecture)
     {
         // We ship multiple executables for testhost that follow this naming schema:
         // testhost<.tfm><.architecture>.exe

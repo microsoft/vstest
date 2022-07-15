@@ -13,8 +13,6 @@ public class TrxFileHelperTests
     [TestMethod]
     public void ReplaceInvalidFileNameCharsShouldReplaceSpace()
     {
-        var fileHelper = new TrxFileHelper();
-
-        Assert.AreEqual("samadala_SAMADALA_2017-10-13_18_33_17", fileHelper.ReplaceInvalidFileNameChars("samadala_SAMADALA 2017-10-13 18_33_17"));
+        Assert.AreEqual("samadala_SAMADALA_2017-10-13_18_33_17", TrxFileHelper.ReplaceInvalidFileNameChars("samadala_SAMADALA 2017-10-13 18_33_17"));
     }
 }

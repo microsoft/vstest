@@ -292,6 +292,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="version">Version of serializer to be used.</param>
     /// <typeparam name="T">Target type to deserialize.</typeparam>
     /// <returns>An instance of <see cref="T"/>.</returns>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public T? Deserialize<T>(string json, int version = 1)
     {
         var payloadSerializer = GetPayloadSerializer(version);
@@ -355,6 +356,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="data">Instance of the object to serialize.</param>
     /// <param name="version">Version to be stamped.</param>
     /// <returns>JSON string.</returns>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public string Serialize<T>(T data, int version = 1)
     {
         var payloadSerializer = GetPayloadSerializer(version);

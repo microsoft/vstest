@@ -67,7 +67,7 @@ internal class TrxFileHelper
     /// </summary>
     /// <param name="fileName">the name of the file</param>
     /// <returns>Replaced string.</returns>
-    public string ReplaceInvalidFileNameChars(string fileName)
+    public static string ReplaceInvalidFileNameChars(string fileName)
     {
         EqtAssert.StringNotNullOrEmpty(fileName, nameof(fileName));
 
@@ -115,7 +115,7 @@ internal class TrxFileHelper
     /// <returns>
     /// The <see cref="string"/>.
     /// </returns>
-    public string GetNextIterationFileName(string parentDirectoryName, string originalFileName, bool checkMatchingDirectory)
+    public static string GetNextIterationFileName(string parentDirectoryName, string originalFileName, bool checkMatchingDirectory)
     {
         EqtAssert.StringNotNullOrEmpty(parentDirectoryName, nameof(parentDirectoryName));
         EqtAssert.StringNotNullOrEmpty(originalFileName, nameof(originalFileName));
@@ -162,12 +162,12 @@ internal class TrxFileHelper
         throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_CannotGetNextTimestampFileName, fileName, directoryName, timestampFormat));
     }
 
-    public string MakePathRelative(string path, string basePath)
+    public static string MakePathRelative(string path, string basePath)
     {
         EqtAssert.StringNotNullOrEmpty(path, nameof(path));
 
         // Can't be relative to nothing
-        if (string.IsNullOrEmpty(basePath))
+        if (basePath.IsNullOrEmpty())
         {
             return path;
         }

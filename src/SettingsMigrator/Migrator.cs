@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Xml;
@@ -63,6 +64,7 @@ public class Migrator
     /// </summary>
     /// <param name="oldFilePath">Path to old file</param>
     /// <param name="newFilePath">Path to new file</param>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public void Migrate(string oldFilePath, string newFilePath)
     {
         if (!Path.IsPathRooted(oldFilePath))
@@ -89,7 +91,7 @@ public class Migrator
     /// </summary>
     /// <param name="oldRunSettingsPath"> Path to old runsettings.</param>
     /// <param name="newRunSettingsPath">Path to new runsettings.</param>
-    private void MigrateRunSettings(string oldRunSettingsPath, string newRunSettingsPath)
+    private static void MigrateRunSettings(string oldRunSettingsPath, string newRunSettingsPath)
     {
         string? testSettingsPath = null;
         using XmlTextReader reader = new(oldRunSettingsPath);
@@ -133,7 +135,7 @@ public class Migrator
     /// </summary>
     /// <param name="oldTestSettingsPath">Path to old testsettings.</param>
     /// <param name="newRunSettingsPath">Path to new runsettings.</param>
-    private void MigrateTestSettings(string oldTestSettingsPath, string newRunSettingsPath)
+    private static void MigrateTestSettings(string oldTestSettingsPath, string newRunSettingsPath)
     {
         var runSettingsXmlDoc = new XmlDocument();
         runSettingsXmlDoc.LoadXml(SampleRunSettingsContent);
@@ -149,7 +151,7 @@ public class Migrator
     /// </summary>
     /// <param name="testSettingsPath">Path to test settings</param>
     /// <param name="runSettingsXmlDoc">Runsettings Xml</param>
-    private void MigrateTestSettingsNodesToRunSettings(string testSettingsPath, XmlDocument runSettingsXmlDoc)
+    private static void MigrateTestSettingsNodesToRunSettings(string testSettingsPath, XmlDocument runSettingsXmlDoc)
     {
         var testSettingsNodes = ReadTestSettingsNodes(testSettingsPath);
 
@@ -199,7 +201,7 @@ public class Migrator
         }
     }
 
-    private TestSettingsNodes ReadTestSettingsNodes(string testSettingsPath)
+    private static TestSettingsNodes ReadTestSettingsNodes(string testSettingsPath)
     {
         var testSettingsNodes = new TestSettingsNodes();
 
@@ -235,7 +237,7 @@ public class Migrator
     /// Removes the embedded testSettings node if present.
     /// </summary>
     /// <param name="newXmlDoc">Xml doc to process</param>
-    private void RemoveEmbeddedTestSettings(XmlDocument newXmlDoc)
+    private static void RemoveEmbeddedTestSettings(XmlDocument newXmlDoc)
     {
         var testSettingsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
         if (testSettingsNode != null)
@@ -252,7 +254,7 @@ public class Migrator
     /// <param name="parallelTestCount">parallelTestCount</param>
     /// <param name="hostProcessPlatform">hostProcessPlatform</param>
     /// <param name="newXmlDoc">newXmlDoc</param>
-    private void AddLegacyNodes(TestSettingsNodes testSettingsNodes, string? testTimeout, string? parallelTestCount, string? hostProcessPlatform, XmlDocument newXmlDoc)
+    private static void AddLegacyNodes(TestSettingsNodes testSettingsNodes, string? testTimeout, string? parallelTestCount, string? hostProcessPlatform, XmlDocument newXmlDoc)
     {
         if (testSettingsNodes.Deployment == null
             && testSettingsNodes.Script == null
@@ -356,7 +358,7 @@ public class Migrator
     /// </summary>
     /// <param name="oldDatacollectorNodes"> Datacollector Nodes</param>
     /// <param name="newXmlDoc">Xml doc to process</param>
-    private void AddDataCollectorNodes(XmlNodeList oldDatacollectorNodes, XmlDocument newXmlDoc)
+    private static void AddDataCollectorNodes(XmlNodeList oldDatacollectorNodes, XmlDocument newXmlDoc)
     {
         var dataCollectionRunSettingsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings");
         if (dataCollectionRunSettingsNode == null)
@@ -384,7 +386,7 @@ public class Migrator
     /// </summary>
     /// <param name="runTimeout">Run Timeout</param>
     /// <param name="newXmlDoc">Xml doc to process</param>
-    private void AddRunTimeoutNode(string runTimeout, XmlDocument newXmlDoc)
+    private static void AddRunTimeoutNode(string runTimeout, XmlDocument newXmlDoc)
     {
         var runConfigurationNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/RunConfiguration");
         if (runConfigurationNode == null)

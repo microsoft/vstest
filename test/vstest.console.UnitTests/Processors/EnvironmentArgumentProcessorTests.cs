@@ -40,7 +40,7 @@ public class EnvironmentArgumentProcessorTests
     [TestCleanup]
     public void Cleanup()
     {
-        _commandLineOptions.Reset();
+        CommandLineOptions.Reset();
     }
 
     [TestMethod]

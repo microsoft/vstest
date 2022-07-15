@@ -56,7 +56,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
                 }
             }
 
-            remoteEqtTrace.SetupRemoteListeners(tptListner);
+            RemoteEqtTrace.SetupRemoteListeners(tptListner);
         }
         else
         {

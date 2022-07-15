@@ -92,7 +92,7 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
         return attachments;
     }
 
-    private async Task<IList<string>?> MergeCodeCoverageFilesAsync(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
+    private static async Task<IList<string>?> MergeCodeCoverageFilesAsync(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
     {
         try
         {
@@ -120,7 +120,7 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
         return null;
     }
 
-    private async Task<IList<string>?> MergeCodeCoverageFilesAsync(IList<string> files, CancellationToken cancellationToken)
+    private static async Task<IList<string>?> MergeCodeCoverageFilesAsync(IList<string> files, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

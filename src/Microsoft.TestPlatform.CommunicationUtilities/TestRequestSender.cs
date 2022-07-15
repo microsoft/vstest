@@ -751,7 +751,7 @@ public class TestRequestSender : ITestRequestSender
         Interlocked.CompareExchange(ref _operationCompleted, 1, 0);
     }
 
-    private ICommunicationEndPoint SetCommunicationEndPoint(TestHostConnectionInfo testhostConnectionInfo)
+    private static ICommunicationEndPoint SetCommunicationEndPoint(TestHostConnectionInfo testhostConnectionInfo)
     {
         // TODO: Use factory to get the communication endpoint. It will abstract out the type of communication endpoint like socket, shared memory or named pipe etc.,
         // The connectionInfo here is what is provided to testhost, but we are in runner, and so the role needs

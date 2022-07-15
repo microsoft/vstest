@@ -267,7 +267,7 @@ internal class XmlPersistence
     /// <param name="parameters">
     /// The parameters.
     /// </param>
-    public void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters? parameters)
+    public static void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters? parameters)
     {
         SaveObject(objectToSave, nodeToSaveAt, parameters, null);
     }
@@ -287,7 +287,7 @@ internal class XmlPersistence
     /// <param name="defaultValue">
     /// The default value.
     /// </param>
-    public void SaveObject(object? objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters? parameters, object? defaultValue)
+    public static void SaveObject(object? objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters? parameters, object? defaultValue)
     {
         if (objectToSave == null)
         {

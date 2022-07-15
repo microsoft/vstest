@@ -95,7 +95,7 @@ public class TestSourceArgumentProcessorTests
         mockFileHelper.Setup(x => x.GetCurrentDirectory()).Returns("");
 
         var options = CommandLineOptions.Instance;
-        options.Reset();
+        CommandLineOptions.Reset();
         options.FileHelper = mockFileHelper.Object;
         options.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, mockFileHelper.Object);
         var executor = new TestSourceArgumentExecutor(options);
