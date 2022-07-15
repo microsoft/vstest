@@ -21,17 +21,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 /// <summary>
 /// Discovers test extensions in a directory.
 /// </summary>
-internal class TestPluginDiscoverer
+internal static class TestPluginDiscoverer
 {
     private static readonly HashSet<string> UnloadableFiles = new();
-    private readonly MetadataReaderExtensionsHelper _extensionHelper = new();
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class.
-    /// </summary>
-    public TestPluginDiscoverer()
-    {
-    }
 
 #if WINDOWS_UAP
         private static HashSet<string> platformAssemblies = new HashSet<string>(new string[] {
@@ -58,7 +50,7 @@ internal class TestPluginDiscoverer
     /// <returns>
     /// A dictionary of assembly qualified name and test plugin information.
     /// </returns>
-    public Dictionary<string, TPluginInfo> GetTestExtensionsInformation<TPluginInfo, TExtension>(IEnumerable<string> extensionPaths) where TPluginInfo : TestPluginInformation
+    public static Dictionary<string, TPluginInfo> GetTestExtensionsInformation<TPluginInfo, TExtension>(IEnumerable<string> extensionPaths) where TPluginInfo : TestPluginInformation
     {
         TPDebug.Assert(extensionPaths != null);
 
@@ -98,9 +90,10 @@ internal class TestPluginDiscoverer
     /// <param name="pluginInfos">
     /// Test plugins collection to add to.
     /// </param>
-    private void GetTestExtensionsFromFiles<TPluginInfo, TExtension>(
+    private static void GetTestExtensionsFromFiles<TPluginInfo, TExtension>(
         string[] files,
-        Dictionary<string, TPluginInfo> pluginInfos) where TPluginInfo : TestPluginInformation
+        Dictionary<string, TPluginInfo> pluginInfos)
+        where TPluginInfo : TestPluginInformation
     {
         TPDebug.Assert(files != null, "null files");
         TPDebug.Assert(pluginInfos != null, "null pluginInfos");
@@ -147,7 +140,8 @@ internal class TestPluginDiscoverer
     /// <typeparam name="TExtension">
     /// Type of Extensions.
     /// </typeparam>
-    private void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath) where TPluginInfo : TestPluginInformation
+    private static void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath)
+        where TPluginInfo : TestPluginInformation
     {
         TPDebug.Assert(assembly != null, "null assembly");
         TPDebug.Assert(pluginInfos != null, "null pluginInfos");
@@ -157,7 +151,7 @@ internal class TestPluginDiscoverer
 
         try
         {
-            var discoveredExtensions = _extensionHelper.DiscoverTestExtensionTypesV2Attribute(assembly, filePath);
+            var discoveredExtensions = MetadataReaderExtensionsHelper.DiscoverTestExtensionTypesV2Attribute(assembly, filePath);
             if (discoveredExtensions?.Length > 0)
             {
                 types.AddRange(discoveredExtensions);

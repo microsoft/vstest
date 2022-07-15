@@ -284,7 +284,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// <param name="parameters">Parameters.</param>
     /// <param name="xmlDocument">Xml document.</param>
     /// <param name="outernode">Outer node.</param>
-    private void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
+    private static void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
     {
         var dumpNode = xmlDocument.CreateElement(Constants.BlameCollectDumpKey);
         if (parameters != null && parameters.Count > 0)
@@ -305,7 +305,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// <param name="parameters">Parameters.</param>
     /// <param name="xmlDocument">Xml document.</param>
     /// <param name="outernode">Outer node.</param>
-    private void AddCollectHangDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
+    private static void AddCollectHangDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
     {
         var dumpNode = xmlDocument.CreateElement(Constants.CollectDumpOnTestSessionHang);
         if (parameters != null && parameters.Count > 0)

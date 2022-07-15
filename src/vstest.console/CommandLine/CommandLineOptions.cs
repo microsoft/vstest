@@ -293,7 +293,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Resets the options. Clears the sources.
     /// </summary>
-    internal void Reset()
+    internal static void Reset()
     {
         s_instance = null;
     }

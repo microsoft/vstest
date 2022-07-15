@@ -418,7 +418,7 @@ public class TestExtensions
     /// <returns>
     /// The <see cref="Dictionary"/>. of extensions discovered in assembly
     /// </returns>
-    internal Dictionary<string, TPluginInfo> GetExtensionsDiscoveredFromAssembly<TPluginInfo>(
+    internal static Dictionary<string, TPluginInfo> GetExtensionsDiscoveredFromAssembly<TPluginInfo>(
         Dictionary<string, TPluginInfo>? extensionCollection,
         string? extensionAssembly)
     {

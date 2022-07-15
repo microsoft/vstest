@@ -190,7 +190,7 @@ internal class AssemblyResolver : IDisposable
     /// <returns>
     /// The <see cref="bool"/>.
     /// </returns>
-    private bool RequestedAssemblyNameMatchesFound(AssemblyName requestedName, AssemblyName foundName)
+    private static bool RequestedAssemblyNameMatchesFound(AssemblyName requestedName, AssemblyName foundName)
     {
         TPDebug.Assert(requestedName != null);
         TPDebug.Assert(foundName != null);

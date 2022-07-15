@@ -427,7 +427,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="runSettings">Test run settings.</param>
     /// <returns>Test results directory</returns>
-    internal string? GetResultsDirectory(string? runSettings)
+    internal static string? GetResultsDirectory(string? runSettings)
     {
         string? resultsDirectory = null;
         if (runSettings != null)
@@ -451,7 +451,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="runSettings">Test run settings.</param>
     /// <returns>Target framework</returns>
-    internal Framework? GetTargetFramework(string? runSettings)
+    internal static Framework? GetTargetFramework(string? runSettings)
     {
         Framework? targetFramework = null;
         if (runSettings != null)
@@ -475,7 +475,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="runSettings"></param>
     /// <returns></returns>
-    internal bool GetTreatNoTestsAsError(string? runSettings)
+    internal static bool GetTreatNoTestsAsError(string? runSettings)
     {
         return RunSettingsUtilities.GetTreatNoTestsAsError(runSettings);
     }

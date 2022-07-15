@@ -39,6 +39,7 @@ internal class ProcessDumpUtility : IProcessDumpUtility
         _crashDumperFactory = crashDumperFactory;
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     protected Action<object?, string?> OutputReceivedCallback => (process, data) =>
         // Log all standard output message of procdump in diag files.
         // Otherwise they end up coming on console in pipleine.

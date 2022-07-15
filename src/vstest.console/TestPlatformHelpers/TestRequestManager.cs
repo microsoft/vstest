@@ -150,7 +150,7 @@ internal class TestRequestManager : ITestRequestManager
     /// <inheritdoc />
     public void ResetOptions()
     {
-        _commandLineOptions.Reset();
+        CommandLineOptions.Reset();
     }
 
     /// <inheritdoc />

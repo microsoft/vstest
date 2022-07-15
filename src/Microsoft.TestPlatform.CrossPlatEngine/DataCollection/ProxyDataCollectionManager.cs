@@ -281,7 +281,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         return connectionTimeout;
     }
 
-    private void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler? runEventsHandler)
+    private static void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler? runEventsHandler)
     {
         try
         {

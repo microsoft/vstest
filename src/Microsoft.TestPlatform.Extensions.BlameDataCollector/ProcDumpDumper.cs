@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -48,6 +49,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         _environment = environment;
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     protected Action<object?, string?> OutputReceivedCallback => (process, data) =>
         // useful for visibility when debugging this tool
         // Console.ForegroundColor = ConsoleColor.Cyan;

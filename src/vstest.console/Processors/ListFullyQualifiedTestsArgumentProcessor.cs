@@ -97,11 +97,6 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
     private readonly ITestDiscoveryEventsRegistrar _discoveryEventsRegistrar;
 
     /// <summary>
-    /// Test case filter instance
-    /// </summary>
-    private readonly TestCaseFilter _testCasefilter;
-
-    /// <summary>
     /// List to store the discovered tests
     /// </summary>
     private readonly List<string> _discoveredTests = new();
@@ -139,8 +134,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         _testRequestManager = testRequestManager;
 
         _runSettingsManager = runSettingsProvider;
-        _testCasefilter = new TestCaseFilter();
-        _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output, _testCasefilter, _discoveredTests, _commandLineOptions);
+        _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output, _discoveredTests, _commandLineOptions);
     }
 
     #region IArgumentExecutor
@@ -196,13 +190,11 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
 
     private class DiscoveryEventsRegistrar : ITestDiscoveryEventsRegistrar
     {
-        private readonly TestCaseFilter _testCasefilter;
         private readonly List<string> _discoveredTests;
         private readonly CommandLineOptions _options;
 
-        public DiscoveryEventsRegistrar(IOutput output, TestCaseFilter filter, List<string> discoveredTests, CommandLineOptions cmdOptions)
+        public DiscoveryEventsRegistrar(IOutput output, List<string> discoveredTests, CommandLineOptions cmdOptions)
         {
-            _testCasefilter = filter;
             _discoveredTests = discoveredTests;
             _options = cmdOptions;
         }
@@ -229,9 +221,9 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
             }
 
             // Initializing the test case filter here because the filter value is read late.
-            _testCasefilter.Initialize(_options.TestCaseFilterValue);
+            TestCaseFilter.Initialize(_options.TestCaseFilterValue);
             var discoveredTests = args.DiscoveredTestCases.ToList();
-            var filteredTests = _testCasefilter.FilterTests(discoveredTests).ToList();
+            var filteredTests = TestCaseFilter.FilterTests(discoveredTests).ToList();
 
             // remove any duplicate tests
             filteredTests = filteredTests.Select(test => test.FullyQualifiedName)
@@ -242,19 +234,14 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         }
     }
 
-    private class TestCaseFilter
+    private static class TestCaseFilter
     {
         private static TestCaseFilterExpression? s_filterExpression;
         private const string TestCategory = "TestCategory";
         private const string Category = "Category";
         private const string Traits = "Traits";
 
-        public TestCaseFilter()
-        {
-
-        }
-
-        public void Initialize(string? filterString)
+        public static void Initialize(string? filterString)
         {
             ValidateFilter(filterString);
         }
@@ -262,7 +249,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         /// <summary>
         /// Filter tests
         /// </summary>
-        public IEnumerable<TestCase> FilterTests(IEnumerable<TestCase> testCases)
+        public static IEnumerable<TestCase> FilterTests(IEnumerable<TestCase> testCases)
         {
             EqtTrace.Verbose("TestCaseFilter.FilterTests : Test Filtering invoked.");
 

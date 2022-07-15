@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 
@@ -258,6 +259,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         return (PlatformTraceLevel)SourceTraceLevelsMap[Source.Switch.Level];
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public TraceLevel MapPlatformTraceToTrace(PlatformTraceLevel traceLevel)
     {
         switch (traceLevel)

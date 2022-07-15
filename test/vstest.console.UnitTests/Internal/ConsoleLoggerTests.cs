@@ -959,7 +959,7 @@ public class ConsoleLoggerTests
         loggerEvents.EnableEvents();
 
         var fileHelper = new Mock<IFileHelper>();
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.FileHelper = fileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
         string testFilePath = Path.Combine(Path.GetTempPath(), "DmmyTestFile.dll");
@@ -987,7 +987,7 @@ public class ConsoleLoggerTests
         loggerEvents.EnableEvents();
 
         var fileHelper = new Mock<IFileHelper>();
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.FileHelper = fileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
         var temp = Path.GetTempPath();
@@ -1021,7 +1021,7 @@ public class ConsoleLoggerTests
         loggerEvents.EnableEvents();
 
         var fileHelper = new Mock<IFileHelper>();
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.FileHelper = fileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
         var temp = Path.GetTempPath();

@@ -743,8 +743,7 @@ public class TrxLoggerTests
 
         testCase1.SetPropertyValue(testProperty, new[] { "ClassLevel", "AsmLevel" });
 
-        var converter = new Converter(new Mock<IFileHelper>().Object, new TrxFileHelper());
-        List<string> listCategoriesActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
+        List<string> listCategoriesActual = Converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
 
         List<string> listCategoriesExpected = new()
         {
@@ -763,8 +762,7 @@ public class TrxLoggerTests
 
         testCase1.SetPropertyValue(testProperty, new[] { "99999", "0" });
 
-        var converter = new Converter(new Mock<IFileHelper>().Object, new TrxFileHelper());
-        List<string> listWorkItemsActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "WorkItemIds");
+        List<string> listWorkItemsActual = Converter.GetCustomPropertyValueFromTestCase(testCase1, "WorkItemIds");
 
         List<string> listWorkItemsExpected = new()
         {

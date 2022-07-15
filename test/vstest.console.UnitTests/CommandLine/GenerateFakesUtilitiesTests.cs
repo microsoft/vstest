@@ -19,7 +19,7 @@ public class GenerateFakesUtilitiesTests
     public GenerateFakesUtilitiesTests()
     {
         _fileHelper = new Mock<IFileHelper>();
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.FileHelper = _fileHelper.Object;
         _fileHelper.Setup(fh => fh.GetCurrentDirectory()).Returns(_currentDirectory);
         _runSettings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.netstandard,Version=5.0</TargetFrameworkVersion></RunConfiguration ></RunSettings>";

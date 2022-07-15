@@ -162,7 +162,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="diagFilePath">Diag file path.</param>
     /// <param name="diagParameters">Diag parameters</param>
-    private void InitializeDiagLogging(string diagFilePath, Dictionary<string, string> diagParameters)
+    private static void InitializeDiagLogging(string diagFilePath, Dictionary<string, string> diagParameters)
     {
         // Get trace level from diag parameters.
         var traceLevel = GetDiagTraceLevel(diagParameters);
@@ -183,7 +183,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="diagParameters">Diag parameters.</param>
     /// <returns>Diag trace level.</returns>
-    private PlatformTraceLevel GetDiagTraceLevel(Dictionary<string, string> diagParameters)
+    private static PlatformTraceLevel GetDiagTraceLevel(Dictionary<string, string> diagParameters)
     {
         // If diag parameters is null, set value of trace level as verbose.
         if (diagParameters == null)
