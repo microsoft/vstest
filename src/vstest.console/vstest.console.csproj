@@ -17,6 +17,11 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>Microsoft.VisualStudio.TestPlatform.CommandLine</RootNamespace>
     <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
+    <!--
+      Prevents adding a bunch of binding redirects causing exception
+      (e.g. System.Runtime 4.1.2 instead of 4.0.0)
+    -->
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net462'">
     <RuntimeIdentifiers>win7-x64;win10-arm64</RuntimeIdentifiers>
