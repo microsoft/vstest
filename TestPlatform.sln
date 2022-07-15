@@ -175,8 +175,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "playground", "playground", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestPlatform.Playground", "playground\TestPlatform.Playground\TestPlatform.Playground.csproj", "{545A88D3-1AE2-4D39-9B7C-C691768AD17F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perfy.TestAdapter", "playground\MSTest1\Perfy.TestAdapter.csproj", "{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AttachmentProcessorDataCollector", "test\TestAssets\AttachmentProcessorDataCollector\AttachmentProcessorDataCollector.csproj", "{B6AF6BCD-64C6-4F4E-ABCA-C8AA2AA66B7B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vstest.ProgrammerTests", "test\vstest.ProgrammerTests\vstest.ProgrammerTests.csproj", "{B1F84FD8-6150-4ECA-9AD7-C316E04E17D8}"
@@ -189,6 +187,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "testhost.arm64", "src\testh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpMinitool.arm64", "src\DataCollectors\DumpMinitool.arm64\DumpMinitool.arm64.csproj", "{62E9D32B-B989-43CF-81A2-B38B3367FCA3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSTest1", "playground\MSTest1\MSTest1.csproj", "{4DA57968-F547-4019-8381-03A218B6C385}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -860,18 +859,6 @@ Global
 		{545A88D3-1AE2-4D39-9B7C-C691768AD17F}.Release|x64.Build.0 = Release|Any CPU
 		{545A88D3-1AE2-4D39-9B7C-C691768AD17F}.Release|x86.ActiveCfg = Release|Any CPU
 		{545A88D3-1AE2-4D39-9B7C-C691768AD17F}.Release|x86.Build.0 = Release|Any CPU
-		{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}.Debug|x64.Build.0 = Debug|Any CPU
-		{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}.Debug|x86.Build.0 = Debug|Any CPU
-		{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}.Release|x64.ActiveCfg = Release|Any CPU
-		{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}.Release|x64.Build.0 = Release|Any CPU
-		{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}.Release|x86.ActiveCfg = Release|Any CPU
-		{57A61A09-10AD-44BE-8DF4-A6FD108F7DF7}.Release|x86.Build.0 = Release|Any CPU
 		{B6AF6BCD-64C6-4F4E-ABCA-C8AA2AA66B7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B6AF6BCD-64C6-4F4E-ABCA-C8AA2AA66B7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6AF6BCD-64C6-4F4E-ABCA-C8AA2AA66B7B}.Debug|x64.ActiveCfg = Debug|Any CPU
