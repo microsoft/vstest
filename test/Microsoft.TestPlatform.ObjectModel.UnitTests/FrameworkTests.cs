@@ -59,9 +59,9 @@ public class FrameworkTests
     [TestMethod]
     public void FrameworkFromStringShouldWorkForShortNames()
     {
-        var fx = Framework.FromString("net451")!;
-        Assert.AreEqual(".NETFramework,Version=v4.5.1", fx.Name);
-        Assert.AreEqual("4.5.1.0", fx.Version);
+        var fx = Framework.FromString("net462")!;
+        Assert.AreEqual(".NETFramework,Version=v4.6.2", fx.Name);
+        Assert.AreEqual("4.6.2.0", fx.Version);
 
         var corefx = Framework.FromString("netcoreapp2.0")!;
         Assert.AreEqual(".NETCoreApp,Version=v2.0", corefx.Name);

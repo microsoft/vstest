@@ -84,10 +84,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
-        // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
-        string testAssemblyPath = _testEnvironment.TargetFramework!.Equals("net451")
-            ? _testEnvironment.GetTestAsset("XUTestProject.dll", "net46")
-            : _testEnvironment.GetTestAsset("XUTestProject.dll");
+        string testAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll");
         var sources = new List<string> { testAssemblyPath };
         var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(UnitTestFramework.XUnit), "*.TestAdapter.dll").ToList();
         _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.First() });

@@ -291,9 +291,9 @@ public class CompatibilityRowsBuilder
         // The order in which we add them matters. We end up both modifying the same path
         // and adding to it. So the first one added will be later in the path. E.g.:
         // Adding testSdk first:
-        // C:\p\vstest\test\TestAssets\MSTestProject1\bin\MSTestLatestPreview-2.2.9-preview-20220210-07\NETTestSdkLatest-17.2.0-dev\Debug\net451\MSTestProject1.dll
+        // C:\p\vstest\test\TestAssets\MSTestProject1\bin\MSTestLatestPreview-2.2.9-preview-20220210-07\NETTestSdkLatest-17.2.0-dev\Debug\net462\MSTestProject1.dll
         // versus adding testSdk second:
-        // C:\p\vstest\test\TestAssets\MSTestProject1\bin\NETTestSdkLatest-17.2.0-dev\MSTestLatestPreview-2.2.9-preview-20220210-07\Debug\net451\MSTestProject1.dll
+        // C:\p\vstest\test\TestAssets\MSTestProject1\bin\NETTestSdkLatest-17.2.0-dev\MSTestLatestPreview-2.2.9-preview-20220210-07\Debug\net462\MSTestProject1.dll
         runnerInfo.TestHostInfo = GetNetTestSdkInfo(hostVersion);
         runnerInfo.AdapterInfo = GetMSTestInfo(adapterVersion);
         dataRows.Add(runnerInfo);
@@ -362,16 +362,14 @@ public class CompatibilityRowsBuilder
         // And we can easily find out what is going on because --WRONG-VERSION-- sticks out, and is easy to find in the codebase.
         XmlNode? node = depsXml.DocumentElement?.SelectSingleNode($"PropertyGroup/{propertyName}");
         var version = node?.InnerText.Replace("[", "").Replace("]", "") ?? "--WRONG-VERSION--";
-        var vstestConsolePath = runnerInfo.IsNetFrameworkRunner
-            ? Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "packages", packageName, version,
-                "tools", "net451", "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe")
-            : Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "packages", packageName, version,
-                "contentFiles", "any", "netcoreapp2.1", "vstest.console.dll");
-
-        if (version.StartsWith("15."))
+        var vstestConsolePath = runnerInfo.IsNetFrameworkRunner switch
         {
-            vstestConsolePath = vstestConsolePath.Replace("netcoreapp2.1", "netcoreapp2.0");
-        }
+            true when NuGetVersion.TryParse(version, out var v)
+                && new NuGetVersion(v.Major, v.Minor, v.Patch) < new NuGetVersion("17.3.0") => GetToolsPath("net451"),
+            true => GetToolsPath("net462"),
+            false when version.StartsWith("15.") => GetContentFilesPath("netcoreapp2.0"),
+            false => GetContentFilesPath("netcoreapp2.1"),
+        };
 
         return new VSTestConsoleInfo
         {
@@ -379,6 +377,12 @@ public class CompatibilityRowsBuilder
             Version = version,
             Path = vstestConsolePath,
         };
+
+        string GetToolsPath(string fwkVersion) => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "packages",
+            packageName, version, "tools", fwkVersion, "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe");
+
+        string GetContentFilesPath(string fwkVersion) => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "packages",
+            packageName, version, "contentFiles", "any", fwkVersion, "vstest.console.dll");
     }
 
     private static NetTestSdkInfo GetNetTestSdkInfo(string testhostVersionType)
