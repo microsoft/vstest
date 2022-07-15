@@ -33,7 +33,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// <summary>
     /// Specifies whether the run is disposed or not
     /// </summary>
-    private bool _disposed;
+    private bool _isDisposed;
 
     /// <summary>
     /// Sync object for various operations
@@ -108,7 +108,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException("testRunRequest");
             }
@@ -186,7 +186,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     {
         EqtTrace.Verbose("TestRunRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
 
-        if (_disposed)
+        if (_isDisposed)
         {
             throw new ObjectDisposedException("testRunRequest");
         }
@@ -215,7 +215,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         lock (_cancelSyncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("Ignoring TestRunRequest.CancelAsync() as testRunRequest object has already been disposed.");
                 return;
@@ -244,7 +244,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         lock (_cancelSyncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("Ignoring TestRunRequest.Abort() as testRunRequest object has already been disposed");
                 return;
@@ -365,7 +365,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         lock (_syncObject)
         {
             // If this object is disposed, don't do anything
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("TestRunRequest.TestRunComplete: Ignoring as the object is disposed.");
                 return;
@@ -481,7 +481,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         lock (_syncObject)
         {
             // If this object is disposed, don't do anything
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("TestRunRequest.SendTestRunStatsChange: Ignoring as the object is disposed.");
                 return;
@@ -506,7 +506,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         lock (_syncObject)
         {
             // If this object is disposed, don't do anything
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("TestRunRequest.SendTestRunMessage: Ignoring as the object is disposed.");
                 return;
@@ -684,7 +684,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         lock (_syncObject)
         {
-            if (!_disposed)
+            if (!_isDisposed)
             {
                 if (disposing)
                 {
@@ -693,7 +693,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
                 // Indicate that object has been disposed
                 _runCompletionEvent = null!;
-                _disposed = true;
+                _isDisposed = true;
             }
         }
 

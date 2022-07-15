@@ -27,6 +27,8 @@ public class DiaSession : INavigationSession
     /// </summary>
     private readonly ISymbolReader _symbolReader;
 
+    private bool _isDisposed;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DiaSession"/> class.
     /// </summary>
@@ -70,10 +72,15 @@ public class DiaSession : INavigationSession
 
     protected virtual void Dispose(bool disposing)
     {
+        if (_isDisposed)
+            return;
+
         if (disposing)
         {
             _symbolReader.Dispose();
         }
+
+        _isDisposed = true;
     }
 
     /// <summary>

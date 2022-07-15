@@ -61,27 +61,21 @@ public sealed class SocketTransport : ITransport
 
     public void Dispose()
     {
-        Dispose(true);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (!_disposed)
+        if (_disposed)
         {
-            if (disposing)
-            {
-                if (_connectionInfo.Role == ConnectionRole.Client)
-                {
-                    _communicationManager?.StopClient();
-                }
-                else
-                {
-                    _communicationManager?.StopServer();
-                }
-            }
-
-            _disposed = true;
+            return;
         }
+
+        if (_connectionInfo.Role == ConnectionRole.Client)
+        {
+            _communicationManager.StopClient();
+        }
+        else
+        {
+            _communicationManager.StopServer();
+        }
+
+        _disposed = true;
     }
 
     /// <summary>

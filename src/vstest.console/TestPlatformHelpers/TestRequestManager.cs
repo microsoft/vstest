@@ -633,23 +633,22 @@ internal class TestRequestManager : ITestRequestManager
     public void Dispose()
     {
         Dispose(true);
-
-        // Use SupressFinalize in case a subclass
-        // of this type implements a finalizer.
         GC.SuppressFinalize(this);
     }
 
-    private void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
-        if (!_isDisposed)
+        if (_isDisposed)
         {
-            if (disposing)
-            {
-                _metricsPublisher.Result.Dispose();
-            }
-
-            _isDisposed = true;
+            return;
         }
+
+        if (disposing)
+        {
+            _metricsPublisher.Result.Dispose();
+        }
+
+        _isDisposed = true;
     }
 
     private bool UpdateRunSettingsIfRequired(

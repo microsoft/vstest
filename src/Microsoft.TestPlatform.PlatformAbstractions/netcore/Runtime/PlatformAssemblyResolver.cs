@@ -44,15 +44,17 @@ public class PlatformAssemblyResolver : IAssemblyResolver
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (_disposed)
         {
-            if (disposing)
-            {
-                AssemblyLoadContext.Default.Resolving -= AssemblyResolverEvent;
-            }
-
-            _disposed = true;
+            return;
         }
+
+        if (disposing)
+        {
+            AssemblyLoadContext.Default.Resolving -= AssemblyResolverEvent;
+        }
+
+        _disposed = true;
     }
 
     /// <summary>

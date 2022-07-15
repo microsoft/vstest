@@ -245,6 +245,7 @@ public class PerfAnalyzer
     public class PerfTracker : IDisposable
     {
         private readonly PerfAnalyzer _perfAnalyzer;
+        private bool _isDisposed;
 
         public PerfTracker(PerfAnalyzer perfAnalyzer)
         {
@@ -260,11 +261,16 @@ public class PerfAnalyzer
 
         protected virtual void Dispose(bool disposing)
         {
+            if (_isDisposed)
+                return;
+
             if (disposing)
             {
                 _perfAnalyzer.DisableProvider();
                 _perfAnalyzer.AnalyzeEventsData();
             }
+
+            _isDisposed = true;
         }
     }
 }

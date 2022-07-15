@@ -73,7 +73,11 @@ public class TestSession : ITestSession
             return;
         }
 
-        StopTestSession();
+        if (disposing)
+        {
+            StopTestSession();
+        }
+
         _disposed = true;
     }
 

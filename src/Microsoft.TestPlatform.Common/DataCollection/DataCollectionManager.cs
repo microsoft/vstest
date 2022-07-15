@@ -55,7 +55,7 @@ internal class DataCollectionManager : IDataCollectionManager
     /// <summary>
     /// Specifies whether the object is disposed or not.
     /// </summary>
-    private bool _disposed;
+    private bool _isDisposed;
 
     /// <summary>
     /// Extension manager for data collectors.
@@ -360,14 +360,14 @@ internal class DataCollectionManager : IDataCollectionManager
     /// </param>
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (!_isDisposed)
         {
             if (disposing)
             {
                 CleanupPlugins();
             }
 
-            _disposed = true;
+            _isDisposed = true;
         }
     }
 

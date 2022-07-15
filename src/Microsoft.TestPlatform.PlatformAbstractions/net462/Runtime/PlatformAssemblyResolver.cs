@@ -16,7 +16,7 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     /// <summary>
     /// Specifies whether the resolver is disposed or not
     /// </summary>
-    private bool _disposed;
+    private bool _isDisposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlatformAssemblyResolver"/> class.
@@ -42,15 +42,17 @@ public class PlatformAssemblyResolver : IAssemblyResolver
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (_isDisposed)
         {
-            if (disposing)
-            {
-                AppDomain.CurrentDomain.AssemblyResolve -= AssemblyResolverEvent;
-            }
-
-            _disposed = true;
+            return;
         }
+
+        if (disposing)
+        {
+            AppDomain.CurrentDomain.AssemblyResolve -= AssemblyResolverEvent;
+        }
+
+        _isDisposed = true;
     }
 
     /// <summary>
