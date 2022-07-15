@@ -25,7 +25,7 @@ public class PlatformAssemblyResolver : IAssemblyResolver
         GC.SuppressFinalize(this);
     }
 
-    public virtual void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
     }
 

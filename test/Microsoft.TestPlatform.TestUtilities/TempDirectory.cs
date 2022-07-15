@@ -27,9 +27,12 @@ public class TempDirectory : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public virtual void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
-        TryRemoveDirectory(Path);
+        if (disposing)
+        {
+            TryRemoveDirectory(Path);
+        }
     }
 
     public DirectoryInfo CreateDirectory(string dir)

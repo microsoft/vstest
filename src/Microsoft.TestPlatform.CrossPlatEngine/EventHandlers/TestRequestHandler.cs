@@ -159,10 +159,13 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
         GC.SuppressFinalize(this);
     }
 
-    public virtual void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
-        _communicationEndPoint?.Stop();
-        _channel?.Dispose();
+        if (disposing)
+        {
+            _communicationEndPoint?.Stop();
+            _channel?.Dispose();
+        }
     }
 
     /// <inheritdoc />
