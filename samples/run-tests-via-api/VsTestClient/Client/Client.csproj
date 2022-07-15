@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RollForward>LatestMajor</RollForward>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Translation layer contains a client for vstest.console which can be used to automat test discovery and run. -->
+    <PackageReference Include="Microsoft.TestPlatform.TranslationLayer" Version="17.2.0" />
+    <!-- ObjectModel contains common types and interfaces used to communicate with vstest.console. -->
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.2.0" />
+    <!-- Newtonsoft.Json is a hidden dependency of TranslationLayer. -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+</Project>
