@@ -23,7 +23,7 @@ using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using System.Linq;
 
-namespace vstest.console.UnitTests;
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 
 [TestClass]
 public class InProcessVsTestConsoleWrapperTests
