@@ -183,6 +183,7 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.DiaSession
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DiaSession.DiaSession(string! binaryPath) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DiaSession.DiaSession(string! binaryPath, string? searchPath) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DiaSession.Dispose() -> void
+virtual Microsoft.VisualStudio.TestPlatform.ObjectModel.DiaSession.Dispose(bool disposing) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DiaSession.GetNavigationData(string! declaringTypeName, string! methodName) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.DiaNavigationData?
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DiaSession.GetNavigationDataForMethod(string! declaringTypeName, string! methodName) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation.INavigationData?
 Microsoft.VisualStudio.TestPlatform.ObjectModel.InProcDataCollector.InProcDataCollection

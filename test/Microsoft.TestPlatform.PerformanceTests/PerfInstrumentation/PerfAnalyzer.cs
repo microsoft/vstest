@@ -254,6 +254,12 @@ public class PerfAnalyzer
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public virtual void Dispose(bool disposing)
+        {
             _perfAnalyzer.DisableProvider();
             _perfAnalyzer.AnalyzeEventsData();
         }

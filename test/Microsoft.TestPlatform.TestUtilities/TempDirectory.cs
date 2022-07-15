@@ -23,6 +23,12 @@ public class TempDirectory : IDisposable
 
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    public virtual void Dispose(bool disposing)
+    {
         TryRemoveDirectory(Path);
     }
 

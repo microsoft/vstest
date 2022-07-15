@@ -86,6 +86,7 @@ Microsoft.VisualStudio.TestPlatform.Utilities.IOutput.Write(string? message, Mic
 Microsoft.VisualStudio.TestPlatform.Utilities.IOutput.WriteLine(string? message, Microsoft.VisualStudio.TestPlatform.Utilities.OutputLevel level) -> void
 Microsoft.VisualStudio.TestPlatform.Utilities.JobQueue<T>
 Microsoft.VisualStudio.TestPlatform.Utilities.JobQueue<T>.Dispose() -> void
+virtual Microsoft.VisualStudio.TestPlatform.Utilities.JobQueue<T>.Dispose(bool disposing) -> void
 Microsoft.VisualStudio.TestPlatform.Utilities.JobQueue<T>.Flush() -> void
 Microsoft.VisualStudio.TestPlatform.Utilities.JobQueue<T>.JobQueue(System.Action<T?>! processJob, string! displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, System.Action<string!>! exceptionLogger) -> void
 Microsoft.VisualStudio.TestPlatform.Utilities.JobQueue<T>.Pause() -> void

@@ -33,6 +33,12 @@ public class TextFileTelemetryPublisher : IMetricsPublisher
     /// </summary>
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    public virtual void Dispose(bool disposing)
+    {
         // No operation
     }
 

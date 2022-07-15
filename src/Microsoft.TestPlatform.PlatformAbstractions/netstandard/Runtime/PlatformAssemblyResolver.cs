@@ -22,6 +22,12 @@ public class PlatformAssemblyResolver : IAssemblyResolver
 
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    public virtual void Dispose(bool disposing)
+    {
         throw new NotImplementedException();
     }
 
