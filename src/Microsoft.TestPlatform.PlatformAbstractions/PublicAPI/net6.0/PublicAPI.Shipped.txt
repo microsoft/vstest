@@ -4,7 +4,6 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.MapPlatformTrac
 Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.WriteLine(Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformTraceLevel level, string? message) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.RollingFileTraceListener
 Microsoft.VisualStudio.TestPlatform.ObjectModel.RollingFileTraceListener.RollingFileTraceListener(string! fileName, string! name, int rollSizeKB) -> void
-Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyResolver.Dispose(bool disposing) -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyResolver.~PlatformAssemblyResolver() -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformThread.Run(System.Action? action, Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformApartmentState apartmentState, bool waitForCompletion) -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.LaunchProcess(string! processPath, string? arguments, string? workingDirectory, System.Collections.Generic.IDictionary<string!, string?>? envVariables, System.Action<object?, string?>? errorCallback, System.Action<object?>? exitCallBack, System.Action<object?, string?>? outputCallBack) -> object!
