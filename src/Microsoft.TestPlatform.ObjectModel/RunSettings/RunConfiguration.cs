@@ -891,7 +891,14 @@ public class RunConfiguration : TestRunSettings
 
                     case "DotNetHostPath":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                        runConfiguration.DotnetHostPath = reader.ReadElementContentAsString();
+                        
+                        string? dotnetHostPath = reader.ReadElementContentAsString();
+
+#if !NETSTANDARD1_0
+                        dotnetHostPath = Environment.ExpandEnvironmentVariables(dotnetHostPath);
+#endif
+
+                        runConfiguration.DotnetHostPath = dotnetHostPath;
                         break;
                     case "TreatNoTestsAsError":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
