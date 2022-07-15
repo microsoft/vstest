@@ -46,17 +46,19 @@ public class SuspendCodeCoverage : IDisposable
     /// Disposes instance.
     /// </summary>
     /// <param name="disposing"> Should dispose. </param>
-    internal void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
-        if (!_isDisposed)
+        if (_isDisposed)
         {
-            if (disposing)
-            {
-                Environment.SetEnvironmentVariable(SuspendCodeCoverageEnvVarName, _prevEnvValue, EnvironmentVariableTarget.Process);
-            }
-
-            _isDisposed = true;
+            return;
         }
+
+        if (disposing)
+        {
+            Environment.SetEnvironmentVariable(SuspendCodeCoverageEnvVarName, _prevEnvValue, EnvironmentVariableTarget.Process);
+        }
+
+        _isDisposed = true;
     }
 }
 

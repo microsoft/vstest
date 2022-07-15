@@ -476,36 +476,38 @@ internal class FullSymbolReader : ISymbolReader
         }
     }
 
-    private void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
-        if (!_isDisposed)
+        if (_isDisposed)
         {
-            if (disposing)
+            return;
+        }
+
+        if (disposing)
+        {
+            foreach (Dictionary<string, IDiaSymbol> methodSymbolsForType in _methodSymbols.Values)
             {
-                foreach (Dictionary<string, IDiaSymbol> methodSymbolsForType in _methodSymbols.Values)
+                foreach (IDiaSymbol methodSymbol in methodSymbolsForType.Values)
                 {
-                    foreach (IDiaSymbol methodSymbol in methodSymbolsForType.Values)
-                    {
-                        IDiaSymbol? symToRelease = methodSymbol;
-                        ReleaseComObject(ref symToRelease);
-                    }
-
-                    methodSymbolsForType.Clear();
-                }
-
-                _methodSymbols.Clear();
-                foreach (IDiaSymbol typeSymbol in _typeSymbols.Values)
-                {
-                    IDiaSymbol? symToRelease = typeSymbol;
+                    IDiaSymbol? symToRelease = methodSymbol;
                     ReleaseComObject(ref symToRelease);
                 }
 
-                _typeSymbols.Clear();
-                ReleaseComObject(ref _session);
-                ReleaseComObject(ref _source);
+                methodSymbolsForType.Clear();
             }
 
-            _isDisposed = true;
+            _methodSymbols.Clear();
+            foreach (IDiaSymbol typeSymbol in _typeSymbols.Values)
+            {
+                IDiaSymbol? symToRelease = typeSymbol;
+                ReleaseComObject(ref symToRelease);
+            }
+
+            _typeSymbols.Clear();
+            ReleaseComObject(ref _session);
+            ReleaseComObject(ref _source);
         }
+
+        _isDisposed = true;
     }
 }

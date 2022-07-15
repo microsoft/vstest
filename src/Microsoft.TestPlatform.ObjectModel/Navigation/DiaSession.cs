@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
@@ -25,6 +26,8 @@ public class DiaSession : INavigationSession
     /// The symbol reader.
     /// </summary>
     private readonly ISymbolReader _symbolReader;
+
+    private bool _isDisposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DiaSession"/> class.
@@ -63,7 +66,21 @@ public class DiaSession : INavigationSession
     /// </summary>
     public void Dispose()
     {
-        _symbolReader?.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+
+        if (disposing)
+        {
+            _symbolReader.Dispose();
+        }
+
+        _isDisposed = true;
     }
 
     /// <summary>

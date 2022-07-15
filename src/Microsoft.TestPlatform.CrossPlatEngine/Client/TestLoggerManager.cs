@@ -501,7 +501,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <param name="disposing">
     /// The disposing.
     /// </param>
-    internal virtual void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         if (!_isDisposed)
         {

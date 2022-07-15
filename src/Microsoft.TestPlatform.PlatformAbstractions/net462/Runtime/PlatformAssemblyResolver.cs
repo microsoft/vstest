@@ -16,7 +16,7 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     /// <summary>
     /// Specifies whether the resolver is disposed or not
     /// </summary>
-    private bool _disposed;
+    private bool _isDisposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlatformAssemblyResolver"/> class.
@@ -37,23 +37,22 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     public void Dispose()
     {
         Dispose(true);
-
-        // Use SupressFinalize in case a subclass
-        // of this type implements a finalizer.
         GC.SuppressFinalize(this);
     }
 
-    protected void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (_isDisposed)
         {
-            if (disposing)
-            {
-                AppDomain.CurrentDomain.AssemblyResolve -= AssemblyResolverEvent;
-            }
-
-            _disposed = true;
+            return;
         }
+
+        if (disposing)
+        {
+            AppDomain.CurrentDomain.AssemblyResolve -= AssemblyResolverEvent;
+        }
+
+        _isDisposed = true;
     }
 
     /// <summary>

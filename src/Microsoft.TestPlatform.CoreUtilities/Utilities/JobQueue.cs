@@ -197,7 +197,14 @@ public class JobQueue<T> : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (_isDisposed)
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed
+            || !disposing)
         {
             return;
         }

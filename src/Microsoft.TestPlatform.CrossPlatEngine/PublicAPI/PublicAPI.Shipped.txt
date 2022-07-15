@@ -6,6 +6,7 @@ Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestHandler.Co
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestHandler.ConnectionInfo.set -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestHandler.DiscoveryComplete(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs! discoveryCompleteEventArgs, System.Collections.Generic.IEnumerable<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase!>? lastChunk) -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestHandler.Dispose() -> void
+virtual Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestHandler.Dispose(bool disposing) -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestHandler.LaunchProcessWithDebuggerAttached(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessStartInfo? testProcessStartInfo) -> int
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestHandler.OnMessageReceived(object? sender, Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.MessageReceivedEventArgs! messageReceivedArgs) -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestHandler.ProcessRequests(Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol.ITestHostManagerFactory! testHostManagerFactory) -> void

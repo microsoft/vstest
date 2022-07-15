@@ -39,23 +39,22 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     public void Dispose()
     {
         Dispose(true);
-
-        // Use SupressFinalize in case a subclass
-        // of this type implements a finalizer.
         GC.SuppressFinalize(this);
     }
 
-    protected void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (_disposed)
         {
-            if (disposing)
-            {
-                AssemblyLoadContext.Default.Resolving -= AssemblyResolverEvent;
-            }
-
-            _disposed = true;
+            return;
         }
+
+        if (disposing)
+        {
+            AssemblyLoadContext.Default.Resolving -= AssemblyResolverEvent;
+        }
+
+        _disposed = true;
     }
 
     /// <summary>

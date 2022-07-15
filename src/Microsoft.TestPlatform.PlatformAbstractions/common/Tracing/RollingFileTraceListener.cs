@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 public class RollingFileTraceListener : TextWriterTraceListener
 {
     private readonly int _rollSizeInBytes;
+    private bool _isDisposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RollingFileTraceListener"/> class.
@@ -89,9 +90,17 @@ public class RollingFileTraceListener : TextWriterTraceListener
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {
-        RollingHelper.Dispose();
+        if (_isDisposed)
+            return;
+
+        if (disposing)
+        {
+            RollingHelper.Dispose();
+        }
 
         base.Dispose(disposing);
+
+        _isDisposed = true;
     }
 
     private static Encoding GetEncodingWithFallback()
@@ -310,17 +319,19 @@ public class RollingFileTraceListener : TextWriterTraceListener
 
         private void Dispose(bool disposing)
         {
-            if (!_disposed)
+            if (_disposed)
             {
-                if (disposing && _managedWriter != null)
-                {
-#if TODO
-                        managedWriter.Close();
-#endif
-                }
-
-                _disposed = true;
+                return;
             }
+
+            if (disposing && _managedWriter != null)
+            {
+#if TODO
+                     managedWriter.Close();
+#endif
+            }
+
+            _disposed = true;
         }
     }
 

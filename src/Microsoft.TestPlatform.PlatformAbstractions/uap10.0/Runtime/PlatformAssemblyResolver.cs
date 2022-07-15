@@ -3,6 +3,8 @@
 
 #if WINDOWS_UWP
 
+using System;
+
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -18,6 +20,12 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     public event AssemblyResolveEventHandler? AssemblyResolve;
 
     public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
     {
     }
 

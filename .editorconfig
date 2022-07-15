@@ -225,6 +225,9 @@ dotnet_diagnostic.CA1305.severity = warning # not default, increased severity to
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1816: Dispose methods should call SuppressFinalize
+dotnet_diagnostic.CA1816.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences

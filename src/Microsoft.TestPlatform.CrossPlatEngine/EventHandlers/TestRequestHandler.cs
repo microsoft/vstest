@@ -50,6 +50,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     private Action<Message>? _onAttachDebuggerAckRecieved;
     private IPathConverter _pathConverter;
     private Exception? _messageProcessingUnrecoverableError;
+    private bool _isDisposed;
 
     public TestHostConnectionInfo ConnectionInfo { get; set; }
     string? IDeploymentAwareTestRequestHandler.LocalPath { get; set; }
@@ -155,8 +156,22 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     /// <inheritdoc />
     public void Dispose()
     {
-        _communicationEndPoint?.Stop();
-        _channel?.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+
+        if (disposing)
+        {
+            _communicationEndPoint?.Stop();
+            _channel?.Dispose();
+        }
+
+        _isDisposed = true;
     }
 
     /// <inheritdoc />

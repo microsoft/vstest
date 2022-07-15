@@ -642,18 +642,18 @@ public class DesignModeClient : IDesignModeClient
 
     #region IDisposable Support
 
-    private bool _disposedValue; // To detect redundant calls
+    private bool _isDisposed; // To detect redundant calls
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (!_isDisposed)
         {
             if (disposing)
             {
-                _communicationManager?.StopClient();
+                _communicationManager.StopClient();
             }
 
-            _disposedValue = true;
+            _isDisposed = true;
         }
     }
 
@@ -662,6 +662,7 @@ public class DesignModeClient : IDesignModeClient
     {
         // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
         Dispose(true);
+        GC.SuppressFinalize(this);
     }
     #endregion
 }
