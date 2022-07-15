@@ -16,6 +16,7 @@ public static class ClientUtilities
 {
     private const string TestSettingsFileXPath = "RunSettings/MSTest/SettingsFile";
     private const string ResultsDirectoryXPath = "RunSettings/RunConfiguration/ResultsDirectory";
+    private const string DotnetHostPathXPath = "RunSettings/RunConfiguration/DotnetHostPath";
     private const string RunsettingsDirectory = "RunSettingsDirectory";
 
     /// <summary>
@@ -42,6 +43,12 @@ public static class ClientUtilities
         if (resultsDirectoryNode != null)
         {
             FixNodeFilePath(resultsDirectoryNode, root);
+        }
+
+        var dotnetHostPathNode = xmlDocument.SelectSingleNode(DotnetHostPathXPath);
+        if (dotnetHostPathNode != null)
+        {
+            FixNodeFilePath(dotnetHostPathNode, root);
         }
     }
 
