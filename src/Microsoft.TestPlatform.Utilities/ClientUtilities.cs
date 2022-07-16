@@ -16,7 +16,7 @@ public static class ClientUtilities
 {
     private const string TestSettingsFileXPath = "RunSettings/MSTest/SettingsFile";
     private const string ResultsDirectoryXPath = "RunSettings/RunConfiguration/ResultsDirectory";
-    private const string DotnetHostPathXPath = "RunSettings/RunConfiguration/DotnetHostPath";
+    private const string DotnetHostPathXPath = "RunSettings/RunConfiguration/DotNetHostPath";
     private const string RunsettingsDirectory = "RunSettingsDirectory";
 
     /// <summary>
