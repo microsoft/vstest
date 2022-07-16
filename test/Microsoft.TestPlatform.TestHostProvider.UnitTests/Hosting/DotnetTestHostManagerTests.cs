@@ -289,7 +289,7 @@ public class DotnetTestHostManagerTests
         var dotnetHostPath = @"C:\dotnet.exe";
         _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
         _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
-        _dotnetHostManager.Initialize(_mockMessageLogger.Object, $"<RunSettings><RunConfiguration><DotnetHostPath>{dotnetHostPath}</DotnetHostPath></RunConfiguration></RunSettings>");
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, $"<RunSettings><RunConfiguration><DotNetHostPath>{dotnetHostPath}</DotNetHostPath></RunConfiguration></RunSettings>");
         var startInfo = GetDefaultStartInfo();
 
         StringAssert.Contains(startInfo.FileName, dotnetHostPath);
