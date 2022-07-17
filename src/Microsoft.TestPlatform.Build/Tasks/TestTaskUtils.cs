@@ -46,10 +46,7 @@ internal static class TestTaskUtils
             }
         }
 
-        if (!task.VSTestFramework.IsNullOrEmpty())
-        {
-            builder.AppendSwitchIfNotNull("--framework:", task.VSTestFramework);
-        }
+        builder.AppendSwitchIfNotNull("--framework:", task.VSTestFramework);
 
         // vstest.console only support x86 and x64 for argument platform
         if (!task.VSTestPlatform.IsNullOrEmpty() && !task.VSTestPlatform.Contains("AnyCPU"))
@@ -57,10 +54,7 @@ internal static class TestTaskUtils
             builder.AppendSwitchIfNotNull("--platform:", task.VSTestPlatform);
         }
 
-        if (!task.VSTestTestCaseFilter.IsNullOrEmpty())
-        {
-            builder.AppendSwitchIfNotNull("--testCaseFilter:", task.VSTestTestCaseFilter);
-        }
+        builder.AppendSwitchIfNotNull("--testCaseFilter:", task.VSTestTestCaseFilter);
 
         if (task.VSTestLogger != null && task.VSTestLogger.Any())
         {
@@ -75,24 +69,18 @@ internal static class TestTaskUtils
             }
         }
 
-        if (task.VSTestResultsDirectory != null && !task.VSTestResultsDirectory.ItemSpec.IsNullOrEmpty())
-        {
-            builder.AppendSwitchIfNotNull("--resultsDirectory:", task.VSTestResultsDirectory);
-        }
+        builder.AppendSwitchIfNotNull("--resultsDirectory:", task.VSTestResultsDirectory);
 
         if (task.VSTestListTests)
         {
             builder.AppendSwitch("--listTests");
         }
 
-        if (!task.VSTestDiag.IsNullOrEmpty())
-        {
-            builder.AppendSwitchIfNotNull("--diag:", task.VSTestDiag);
-        }
+        builder.AppendSwitchIfNotNull("--diag:", task.VSTestDiag);
 
-        if (task.TestFileFullPath == null)
+        if (task.TestFileFullPath == null || task.TestFileFullPath.ItemSpec.IsNullOrEmpty())
         {
-            task.Log.LogError("Test file path cannot be empty or null.");
+            task.Log.LogError(Resources.Resources.TestFilePathCannotBeEmptyOrNull);
         }
         else
         {
@@ -217,10 +205,7 @@ internal static class TestTaskUtils
             builder.AppendSwitch("--artifactsProcessingMode-collect");
         }
 
-        if (!task.VSTestSessionCorrelationId.IsNullOrEmpty())
-        {
-            builder.AppendSwitchIfNotNull("--testSessionCorrelationId:", task.VSTestSessionCorrelationId);
-        }
+        builder.AppendSwitchIfNotNull("--testSessionCorrelationId:", task.VSTestSessionCorrelationId);
 
         // VSTestCLIRunSettings should be last argument as vstest.console ignore options after "--"(CLIRunSettings option).
         if (task.VSTestCLIRunSettings != null && task.VSTestCLIRunSettings.Any())

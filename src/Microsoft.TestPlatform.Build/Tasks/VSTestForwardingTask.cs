@@ -17,6 +17,7 @@ public class VSTestForwardingTask : Task, ITestTask
 
     private const string DotnetExe = "dotnet";
 
+    [Required]
     public ITaskItem? TestFileFullPath { get; set; }
     public string? VSTestSetting { get; set; }
     public ITaskItem[]? VSTestTestAdapterPath { get; set; }
