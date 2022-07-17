@@ -190,7 +190,7 @@ internal static class TestTaskUtils
                 {
                     // Not showing message in runsettings scenario, because we are not sure that code coverage is enabled.
                     // User might be using older Microsoft.NET.Test.Sdk which don't have CodeCoverage infra.
-                    Console.WriteLine(Resources.Resources.UpdateTestSdkForCollectingCodeCoverage);
+                    task.Log.LogWarning(Resources.Resources.UpdateTestSdkForCollectingCodeCoverage);
                 }
             }
         }
