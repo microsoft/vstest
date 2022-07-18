@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -384,6 +385,7 @@ public class TestProperty : IEquatable<TestProperty>
         return false;
     }
 
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Part of the public API")]
     public object GetRealObject(StreamingContext context)
     {
         var registeredProperty = Find(Id);

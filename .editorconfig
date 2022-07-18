@@ -112,7 +112,9 @@ dotnet_diagnostic.IDE0032.severity = warning        # not default, set in accord
 dotnet_style_readonly_field = true:warning
 
 # Parameter preferences
-dotnet_code_quality_unused_parameters = all:suggestion
+dotnet_code_quality_unused_parameters = all:warning
+# IDE0060: Remove unused parameter
+dotnet_diagnostic.IDE0060.severity = warning
 
 # Suppression preferences
 dotnet_remove_unnecessary_suppression_exclusions = none

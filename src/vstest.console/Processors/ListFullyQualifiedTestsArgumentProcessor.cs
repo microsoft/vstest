@@ -134,7 +134,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         _testRequestManager = testRequestManager;
 
         _runSettingsManager = runSettingsProvider;
-        _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output, _discoveredTests, _commandLineOptions);
+        _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(_discoveredTests, _commandLineOptions);
     }
 
     #region IArgumentExecutor
@@ -193,7 +193,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         private readonly List<string> _discoveredTests;
         private readonly CommandLineOptions _options;
 
-        public DiscoveryEventsRegistrar(IOutput output, List<string> discoveredTests, CommandLineOptions cmdOptions)
+        public DiscoveryEventsRegistrar(List<string> discoveredTests, CommandLineOptions cmdOptions)
         {
             _discoveredTests = discoveredTests;
             _options = cmdOptions;

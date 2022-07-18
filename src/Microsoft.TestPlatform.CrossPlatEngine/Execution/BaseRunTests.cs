@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -116,6 +117,7 @@ internal abstract class BaseRunTests
     /// <param name="testEventsPublisher">Publisher for test events.</param>
     /// <param name="platformThread">Platform Thread.</param>
     /// <param name="dataSerializer">Data Serializer for cloning TestCase and test results object.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Part of the public API")]
     protected BaseRunTests(
         IRequestData requestData,
         string? package,
