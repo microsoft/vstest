@@ -27,7 +27,7 @@ public class TraitCollection : IEnumerable<Trait>
 #else
         Resources.Resources.TestCasePropertyTraitsLabel,
 #endif
-	    typeof(KeyValuePair<string, string>[]),
+        typeof(KeyValuePair<string, string>[]),
 #pragma warning disable 618
         TestPropertyAttributes.Hidden | TestPropertyAttributes.Trait,
 #pragma warning restore 618

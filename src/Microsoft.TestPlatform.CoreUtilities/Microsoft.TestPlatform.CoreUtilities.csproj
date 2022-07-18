@@ -74,8 +74,6 @@
     <!-- API that is common to all frameworks that we build for. -->
     <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
-    <AdditionalFiles Include="PublicAPI\netcoreapp3.1\PublicAPI.Shipped.txt" />
-    <AdditionalFiles Include="PublicAPI\netcoreapp3.1\PublicAPI.Unshipped.txt" />
     <!-- API that is common to all frameworks except for .NET Standard 1.0. -->
     <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' " Include="PublicAPI\net\PublicAPI.Shipped.txt" />
     <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' " Include="PublicAPI\net\PublicAPI.Unshipped.txt" />
