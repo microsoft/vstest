@@ -72,7 +72,7 @@ public class RunTests : AcceptanceTestBase
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
         var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_RUNNER_NETFX);
-        var incompatibleDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
+        var incompatibleDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp3.1");
 
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
@@ -95,7 +95,7 @@ public class RunTests : AcceptanceTestBase
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
         var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_RUNNER_NETFX);
-        var netDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
+        var netDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp3.1");
 
         // Act
         // We have no preference around what TFM is used. It will be autodetected.

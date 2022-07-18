@@ -269,7 +269,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="args"></param>
-    private void DiscoveryRequest_OnDiscoveredTests(object sender, DiscoveredTestsEventArgs args)
+    private void DiscoveryRequest_OnDiscoveredTests(object? sender, DiscoveredTestsEventArgs args)
     {
         TPDebug.Assert(_selectedTestNames != null, "Initialize should have been called");
 
@@ -348,7 +348,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e">RunCompletion args</param>
-        private void TestRunRequest_OnRunCompletion(object sender, TestRunCompleteEventArgs e)
+        private void TestRunRequest_OnRunCompletion(object? sender, TestRunCompleteEventArgs e)
         {
             // If run is not aborted/canceled then check the count of executed tests.
             // we need to check if there are any tests executed - to try show some help info to user to check for installed vsix extensions

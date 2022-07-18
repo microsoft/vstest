@@ -25,12 +25,7 @@
         <dependency id="NuGet.Frameworks" version="[5.11.0, )" />
       </group>
 
-      <group targetFramework="netcoreapp1.0">
-        <dependency id="System.Reflection.Metadata" version="[1.6.0, )" />
-        <dependency id="NuGet.Frameworks" version="4.6.4" />
-      </group>
-
-      <group targetFramework="netcoreapp2.1">
+      <group targetFramework="netcoreapp3.1">
         <dependency id="System.Reflection.Metadata" version="[1.6.0, )" />
         <dependency id="NuGet.Frameworks" version="[5.11.0, )" />
       </group>
@@ -124,25 +119,15 @@
       <file src="net462\$Runtime$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll"             target="lib\net462\zh-Hant" />
     <!-- /net462 -->
 
-    <!-- netcoreapp1.0 -->
-      <file src="netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netcoreapp1.0\" />
-      <file src="netcoreapp1.0\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\netcoreapp1.0\" />
-      <file src="netcoreapp1.0\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\netcoreapp1.0\" />
+    <!-- netcoreapp3.1 -->
+      <file src="netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netcoreapp3.1\" />
+      <file src="netcoreapp3.1\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\netcoreapp3.1\" />
+      <file src="netcoreapp3.1\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\netcoreapp3.1\" />
 
       <!-- Add localized resources -->
-      <file src="netcoreapp1.0\**\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"   exclude="**\TestHost\**\*.*" target="lib\netcoreapp1.0\" />
-      <file src="netcoreapp1.0\**\Microsoft.TestPlatform.CoreUtilities.resources.dll"               exclude="**\TestHost\**\*.*" target="lib\netcoreapp1.0\" />
-    <!-- /netcoreapp1.0 -->
-
-    <!-- netcoreapp2.1 -->
-      <file src="netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netcoreapp2.1\" />
-      <file src="netcoreapp2.1\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\netcoreapp2.1\" />
-      <file src="netcoreapp2.1\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\netcoreapp2.1\" />
-
-      <!-- Add localized resources -->
-      <file src="netcoreapp2.1\**\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"   exclude="**\TestHost\**\*.*" target="lib\netcoreapp2.1\" />
-      <file src="netcoreapp2.1\**\Microsoft.TestPlatform.CoreUtilities.resources.dll"               exclude="**\TestHost\**\*.*" target="lib\netcoreapp2.1\" />
-    <!-- /netcoreapp2.1 -->
+      <file src="netcoreapp3.1\**\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"   exclude="**\TestHost\**\*.*" target="lib\netcoreapp3.1\" />
+      <file src="netcoreapp3.1\**\Microsoft.TestPlatform.CoreUtilities.resources.dll"               exclude="**\TestHost\**\*.*" target="lib\netcoreapp3.1\" />
+    <!-- /netcoreapp3.1 -->
 
     <!-- netstandard 1.0 -->
       <file src="$NetStandard10Framework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.0\" />

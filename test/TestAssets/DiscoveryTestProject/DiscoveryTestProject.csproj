@@ -5,8 +5,8 @@
 
   <PropertyGroup>
     <AssemblyName>DiscoveryTestProject</AssemblyName>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;$(TargetNetFxVersion)</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">$(TargetNetCoreVersion)</TargetFrameworks>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 

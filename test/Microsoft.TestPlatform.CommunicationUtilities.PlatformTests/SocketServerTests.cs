@@ -35,13 +35,8 @@ public class SocketServerTests : SocketTestsBase, IDisposable
     public void Dispose()
     {
         _socketServer.Stop();
-#if NETFRAMEWORK
         // tcpClient.Close() calls tcpClient.Dispose().
         _tcpClient?.Close();
-#else
-        // tcpClient.Close() not available for netcoreapp1.0
-        _tcpClient?.Dispose();
-#endif
         GC.SuppressFinalize(this);
     }
 

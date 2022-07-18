@@ -79,7 +79,7 @@ internal class TestRunResultAggregator
     /// <summary>
     /// Called when a test run is complete.
     /// </summary>
-    private void TestRunCompletionHandler(object sender, TestRunCompleteEventArgs e)
+    private void TestRunCompletionHandler(object? sender, TestRunCompleteEventArgs e)
     {
         if (e.TestRunStatistics == null || e.IsCanceled || e.IsAborted)
         {
@@ -94,7 +94,7 @@ internal class TestRunResultAggregator
     /// <summary>
     /// Called when a test run message is sent.
     /// </summary>
-    private void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
+    private void TestRunMessageHandler(object? sender, TestRunMessageEventArgs e)
     {
         if (e.Level == TestMessageLevel.Error)
         {

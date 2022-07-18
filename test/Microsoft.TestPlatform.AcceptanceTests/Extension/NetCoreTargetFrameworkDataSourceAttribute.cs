@@ -23,7 +23,6 @@ public class NetCoreTargetFrameworkDataSourceAttribute : Attribute, ITestDataSou
 {
     private readonly bool _useDesktopRunner;
     private readonly bool _useCoreRunner;
-    private readonly bool _useNetCore21Target;
     private readonly bool _useNetCore31Target;
 
     /// <summary>
@@ -36,14 +35,10 @@ public class NetCoreTargetFrameworkDataSourceAttribute : Attribute, ITestDataSou
         // adding another runner is not necessary until we need to start building against another
         // sdk, because the netcoreapp2.1 executable is forward compatible
         bool useCoreRunner = true,
-        bool useNetCore21Target = true,
-        // laying the ground work here for tests to be able to run against 3.1 but not enabling it for
-        // all tests to avoid changing all acceptance tests right now
-        bool useNetCore31Target = false)
+        bool useNetCore31Target = true)
     {
         _useDesktopRunner = useDesktopRunner;
         _useCoreRunner = useCoreRunner;
-        _useNetCore21Target = useNetCore21Target;
         _useNetCore31Target = useNetCore31Target;
     }
 
@@ -77,10 +72,6 @@ public class NetCoreTargetFrameworkDataSourceAttribute : Attribute, ITestDataSou
         if (_useDesktopRunner && isWindows)
         {
             var runnerFramework = IntegrationTestBase.DesktopRunnerFramework;
-            if (_useNetCore21Target)
-            {
-                AddRunnerDataRow(dataRows, runnerFramework, AcceptanceTestBase.Core21TargetFramework);
-            }
 
             if (_useNetCore31Target)
             {
@@ -91,10 +82,6 @@ public class NetCoreTargetFrameworkDataSourceAttribute : Attribute, ITestDataSou
         if (_useCoreRunner)
         {
             var runnerFramework = IntegrationTestBase.CoreRunnerFramework;
-            if (_useNetCore21Target)
-            {
-                AddRunnerDataRow(dataRows, runnerFramework, AcceptanceTestBase.Core21TargetFramework);
-            }
 
             if (_useNetCore31Target)
             {

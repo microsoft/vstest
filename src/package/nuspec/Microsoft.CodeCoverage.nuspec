@@ -21,7 +21,7 @@
 
     <dependencies>
       <group targetFramework="net462"></group>
-      <group targetFramework="netcoreapp1.0"></group>
+      <group targetFramework="netcoreapp3.1"></group>
     </dependencies>
   </metadata>
 
@@ -46,7 +46,7 @@
     <file src="Microsoft.CodeCoverage\CodeCoverage\msdia140.dll" target="build\netstandard1.0\CodeCoverage\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\VanguardInstrumentationProfiler_x86.config" target="build\netstandard1.0\CodeCoverage\" />
 
-    <file src="Microsoft.CodeCoverage\Shim\netcoreapp1.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="build\netstandard1.0\CodeCoverage\coreclr\" />
+    <file src="Microsoft.CodeCoverage\Shim\netcoreapp3.1\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="build\netstandard1.0\CodeCoverage\coreclr\" />
 
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\CodeCoverage.exe" target="build\netstandard1.0\CodeCoverage\amd64\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\covrun64.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
@@ -73,7 +73,7 @@
     <file src="Microsoft.CodeCoverage\InstrumentationEngine\macos\x64\libInstrumentationEngine.dylib"	target="build\netstandard1.0\InstrumentationEngine\macos\x64\libInstrumentationEngine.dylib" />
     <file src="Microsoft.CodeCoverage\InstrumentationEngine\macos\x64\VanguardInstrumentationProfiler_x64.config"	target="build\netstandard1.0\InstrumentationEngine\macos\x64\VanguardInstrumentationProfiler_x64.config" />
 
-    <file src="Microsoft.CodeCoverage\Shim\netcoreapp1.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\netcoreapp1.0\" />
+    <file src="Microsoft.CodeCoverage\Shim\netcoreapp3.1\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\netcoreapp3.1\" />
     <file src="Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\net462\" />
 
     <!-- Add localized resources for trace data collector -->

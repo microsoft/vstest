@@ -27,11 +27,7 @@
         <!-- TestHost gets shipped as ExtensionSDKs with name TestPlatform.Universal. -->
         <!-- Currently code coverage not supported for uap10.0. -->
       </group>
-      <group targetFramework="netcoreapp1.0">
-        <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
-        <dependency id="Microsoft.CodeCoverage" version="$Version$" />
-      </group>
-      <group targetFramework="netcoreapp2.1">
+      <group targetFramework="netcoreapp3.1">
         <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
         <dependency id="Microsoft.CodeCoverage" version="$Version$" />
       </group>
@@ -44,18 +40,15 @@
   <files>
     <file src="Icon.png" target="" />
     <file src="licenses\LICENSE_NET.txt" target="" />
-    <file src="netcoreapp\*" target="buildTransitive\netcoreapp1.0\" />
-    <file src="netcoreapp\*" target="buildTransitive\netcoreapp2.1\" />
+    <file src="netcoreapp\*" target="buildTransitive\netcoreapp3.1\" />
     <file src="netfx\*" target="buildTransitive\net462\" />
 
     <file src="Microsoft.NET.Test.Sdk.props" target="buildMultiTargeting\" />
-    <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\netcoreapp1.0\" />
-    <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\netcoreapp2.1\" />
+    <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\netcoreapp3.1\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\net462\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\uap10.0\" />
 
-    <file src="_._" target="lib/netcoreapp1.0" />
-    <file src="_._" target="lib/netcoreapp2.1" />
+    <file src="_._" target="lib/netcoreapp3.1" />
     <file src="_._" target="lib/net462" />
     <file src="_._" target="lib/uap10.0" />
   </files>

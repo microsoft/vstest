@@ -17,7 +17,6 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string Net471TargetFramework = "net471";
     public const string Net472TargetFramework = "net472";
     public const string Net48TargetFramework = "net48";
-    public const string Core21TargetFramework = "netcoreapp2.1";
     public const string Core31TargetFramework = "netcoreapp3.1";
     public const string Core50TargetFramework = "net5.0";
     public const string Core60TargetFramework = "net6.0";
@@ -29,7 +28,6 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string Net472FrameworkArgValue = ".NETFramework,Version=v4.7.2";
     public const string Net48FrameworkArgValue = ".NETFramework,Version=v4.8";
 
-    public const string Core21FrameworkArgValue = ".NETCoreApp,Version=v2.1";
     public const string Core31FrameworkArgValue = ".NETCoreApp,Version=v3.1";
     public const string Core50FrameworkArgValue = ".NETCoreApp,Version=v5.0";
     public const string Core60FrameworkArgValue = ".NETCoreApp,Version=v6.0";
@@ -39,15 +37,16 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string InIsolation = "/InIsolation";
 
     public const string NETFX462_48 = "net462;net472;net48";
-    public const string NETCORE21_50 = "netcoreapp2.1;netcoreapp3.1;net5.0";
-    public const string NETFX462_NET50 = "net462;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0";
-    public const string NETFX462_NET31 = "net462;net472;net48;netcoreapp2.1;netcoreapp3.1";
+    public const string NETCORE21_50 = "netcoreapp3.1;net5.0";
+    public const string NETFX462_NET50 = "net462;net472;net48;netcoreapp3.1;net5.0";
+    public const string NETFX462_NET31 = "net462;net472;net48;netcoreapp3.1";
     public const string DEFAULT_RUNNER_NETFX = Net462TargetFramework;
+    public const string DEFAULT_RUNNER_NETCORE = Core31TargetFramework;
     /// <summary>
     /// Our current defaults for .NET and .NET Framework.
     /// </summary>
-    public const string DEFAULT_RUNNER_NETFX_AND_NET = $"{DEFAULT_RUNNER_NETFX};netcoreapp2.1";
-    public const string DEFAULT_HOST_NETFX_AND_NET = "net462;netcoreapp2.1";
+    public const string DEFAULT_RUNNER_NETFX_AND_NET = $"{DEFAULT_RUNNER_NETFX};{DEFAULT_RUNNER_NETCORE}";
+    public const string DEFAULT_HOST_NETFX_AND_NET = "net462;netcoreapp3.1";
     public const string LATEST_TO_LEGACY = "Latest;LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
     public const string LATESTPREVIEW_TO_LEGACY = "LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
     public const string LATEST = "Latest";
@@ -76,7 +75,6 @@ public class AcceptanceTestBase : IntegrationTestBase
     protected static string DeriveFrameworkArgValue(IntegrationTestEnvironment testEnvironment)
         => testEnvironment.TargetFramework switch
         {
-            Core21TargetFramework => Core21FrameworkArgValue,
             Core31TargetFramework => Core31FrameworkArgValue,
             Core50TargetFramework => Core50FrameworkArgValue,
             Core60TargetFramework => Core60FrameworkArgValue,

@@ -287,8 +287,8 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 testHostPath = GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
                 if (!testHostPath.IsNullOrWhiteSpace() && testHostPath.IndexOf("microsoft.testplatform.testhost", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    // testhost.dll is present in path {testHostNugetRoot}\lib\netcoreapp2.1\testhost.dll
-                    // testhost.(x86).exe is present in location {testHostNugetRoot}\build\netcoreapp2.1\{x86/x64}\{testhost.x86.exe/testhost.exe}
+                    // testhost.dll is present in path {testHostNugetRoot}\lib\netcoreapp3.1\testhost.dll
+                    // testhost.(x86).exe is present in location {testHostNugetRoot}\build\netcoreapp3.1\{x86/x64}\{testhost.x86.exe/testhost.exe}
                     var folderName = _architecture is Architecture.X64 or Architecture.Default or Architecture.AnyCPU
                         ? Architecture.X64.ToString().ToLowerInvariant()
                         : _architecture.ToString().ToLowerInvariant();
@@ -298,7 +298,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 #if DOTNET_BUILD_FROM_SOURCE
                     var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "net6.0", folderName, exeName);
 #else
-                    var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "netcoreapp2.1", folderName, exeName);
+                    var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "netcoreapp3.1", folderName, exeName);
 #endif
 
                     if (_fileHelper.Exists(testHostExeNugetPath))

@@ -96,7 +96,7 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 $TPT_TargetFrameworkNet462 = "net462"
 $TPT_TargetFrameworkNet48 = "net48"
-$TPT_TargetFrameworkCore21 = "netcoreapp2.1"
+$TPT_TargetFrameworkCore31 = "netcoreapp3.1"
 $TPT_TargetFrameworkNet60 = "net6.0"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
@@ -231,7 +231,7 @@ function Invoke-Test
             {
                 $vstestConsoleFileName = "vstest.console.dll"
                 $targetRunTime = ""
-                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkCore21 $targetRuntime) $vstestConsoleFileName
+                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkCore31 $targetRuntime) $vstestConsoleFileName
             }
             else
             {
