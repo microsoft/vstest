@@ -8,15 +8,15 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace Microsoft.VisualStudio.TestPlatform.Client;
 
-internal class InProcessTestSessionEventsHandler : ITestSessionEventsHandler
+public class InProcessTestSessionEventsHandler : ITestSessionEventsHandler
 {
     private readonly ITestSessionEventsHandler _testSessionEventsHandler;
 
-    internal EventHandler<StartTestSessionCompleteEventArgs?>? StartTestSessionCompleteEventHandler { get; set; }
+    public EventHandler<StartTestSessionCompleteEventArgs?>? StartTestSessionCompleteEventHandler { get; set; }
 
-    internal EventHandler<StopTestSessionCompleteEventArgs?>? StopTestSessionCompleteEventHandler { get; set; }
+    public EventHandler<StopTestSessionCompleteEventArgs?>? StopTestSessionCompleteEventHandler { get; set; }
 
-    internal InProcessTestSessionEventsHandler(ITestSessionEventsHandler testSessionEventsHandler)
+    public InProcessTestSessionEventsHandler(ITestSessionEventsHandler testSessionEventsHandler)
     {
         _testSessionEventsHandler = testSessionEventsHandler;
     }

@@ -83,11 +83,20 @@ public class DefaultTestHostManagerTests
     [TestMethod]
     public void GetTestHostProcessStartInfoShouldIncludeFileNameFromSubFolderTestHostWhenCurrentProcessIsDotnet()
     {
-        string subFoler = "TestHost";
-
+        _mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("dotnet.exe");
         var startInfo = _testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default);
 
-        Assert.IsTrue(startInfo.FileName!.EndsWith(Path.Combine(subFoler, "testhost.exe")));
+        Assert.IsTrue(startInfo.FileName!.EndsWith(Path.Combine("TestHost", "testhost.exe")));
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldNotIncludeFileNameFromSubFolderTestHostWhenCurrentProcessIsIde()
+    {
+        _mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("devenv.exe");
+        var startInfo = _testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default);
+
+        Assert.IsFalse(startInfo.FileName!.EndsWith(Path.Combine("TestHost", "testhost.exe")));
+        Assert.IsTrue(startInfo.FileName!.EndsWith("testhost.exe"));
     }
 
     [TestMethod]

@@ -175,12 +175,6 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies, in dotnet SDK.
             testHostProcessName = Path.Combine("TestHost", originalTestHostProcessName);
             testhostProcessPath = Path.Combine(currentWorkingDirectory!, "..", testHostProcessName);
-
-            // NOMERGE: Patching the relative path, so I can run in Playground.
-            if (!File.Exists(testhostProcessPath))
-            {
-                testhostProcessPath = Path.Combine(currentWorkingDirectory!, "..", originalTestHostProcessName);
-            }
         }
 
         if (!Shared)
@@ -192,12 +186,25 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
 
+        var processName = _processHelper.GetCurrentProcessFileName()!;
         var launcherPath = testhostProcessPath;
         if (!_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
-            !_processHelper.GetCurrentProcessFileName()!.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
+            !processName.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
         {
             launcherPath = _dotnetHostHelper.GetMonoPath();
             argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;
+        }
+        else
+        {
+            // Patching the relative path for IDE scenarios.
+            if (_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
+                && !(processName.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
+                    || processName.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
+                && !File.Exists(testhostProcessPath))
+            {
+                testhostProcessPath = Path.Combine(currentWorkingDirectory!, "..", originalTestHostProcessName);
+                launcherPath = testhostProcessPath;
+            }
         }
 
         // For IDEs and other scenario, current directory should be the
