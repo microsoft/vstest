@@ -74,14 +74,14 @@
 
     <!-- Sign .NET 4.6.2 assemblies -->
     <ItemGroup>
-      <Fw45AssembliesToSign Include="$(ArtifactsFw462Directory)\Microsoft.TestPlatform.AdapterUtilities.dll" />
-      <Fw45AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\Microsoft.TestPlatform.CoreUtilities.dll" />
-      <Fw45AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <Fw45AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <Fw462AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\Microsoft.TestPlatform.AdapterUtilities.dll" />
+      <Fw462AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\Microsoft.TestPlatform.CoreUtilities.dll" />
+      <Fw462AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <Fw462AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
 
       <!-- Localized resources -->
-      <Fw45AssembliesToSign Include="$(ArtifactsFw462Directory)\%(ResxLang.Identity)\*.*" />
-      <Fw45AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
+      <Fw462AssembliesToSign Include="$(ArtifactsFw462Directory)\%(ResxLang.Identity)\*.*" />
+      <Fw462AssembliesToSign Include="$(ArtifactsFw462Directory)$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET 4.6-->
@@ -367,10 +367,10 @@
         <StrongName>StrongName</StrongName>
       </AssembliesToSign>
 
-      <Fw45AssembliesToSign>
+      <Fw462AssembliesToSign>
         <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
-      </Fw45AssembliesToSign>
+      </Fw462AssembliesToSign>
 
       <Core21AssembliesToSign>
         <Authenticode>Microsoft400</Authenticode>
@@ -437,8 +437,8 @@
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate Fw45AssembliesToSign:'%(Fw45AssembliesToSign.Authenticode)' for @(Fw45AssembliesToSign)"/>
-    <SignFiles Files="@(Fw45AssembliesToSign)"
+    <Message Text="Signing using authenticode certificate Fw462AssembliesToSign:'%(Fw462AssembliesToSign.Authenticode)' for @(Fw462AssembliesToSign)"/>
+    <SignFiles Files="@(Fw462AssembliesToSign)"
                BinariesDirectory="$(ArtifactsFw462Directory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
