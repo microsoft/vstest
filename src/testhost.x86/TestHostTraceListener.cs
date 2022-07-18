@@ -32,6 +32,7 @@ internal class TestHostTraceListener : DefaultTraceListener
 
         EqtTrace.Verbose("TestPlatformTraceListener.Setup: Added test platform trace listener.");
 
+        // REVIEW ME: Shall we remove this fix?
         // this is a netcoreapp2.1 only fix, but because we always compile against netcoreapp2.1
         // and upgrade the executable as necessary this needs to be a runtime check and not a compile time
         // check. This call returns ".NET Core 4.6.xxx" on netcore 2.1 and older, and ".NET Core 3.1.xxx"

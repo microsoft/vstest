@@ -34,6 +34,7 @@ public class NetCoreTargetFrameworkDataSourceAttribute : Attribute, ITestDataSou
         bool useDesktopRunner = true,
         // adding another runner is not necessary until we need to start building against another
         // sdk, because the netcoreapp2.1 executable is forward compatible
+        // REVIEW ME: Does this comment needs to be updated?
         bool useCoreRunner = true,
         bool useNetCore31Target = true)
     {

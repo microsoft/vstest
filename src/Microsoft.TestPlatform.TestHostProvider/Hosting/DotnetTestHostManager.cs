@@ -257,14 +257,17 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             EqtTrace.Verbose("DotnetTestHostmanager: User specified custom path to dotnet host: '{0}'.", _dotnetHostPath);
         }
 
-        // Try find testhost.exe (or the architecture specific version). We ship those ngened executables for Windows because they have faster startup time. We ship them only for some platforms.
-        // When user specified path to dotnet.exe don't try to find the exexutable, because we will always use the testhost.dll together with their dotnet.exe.
+        // Try find testhost.exe (or the architecture specific version). We ship those ngened executables for Windows
+        // because they have faster startup time. We ship them only for some platforms.
+        // When user specified path to dotnet.exe don't try to find the exexutable, because we will always use the
+        // testhost.dll together with their dotnet.exe.
         bool testHostExeFound = false;
         if (!useCustomDotnetHostpath
             && _platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
-
-            // testhost*.exe are build for netcoreapp2.1 and are not able to search for the correct runtime in case of x64/x86 on arm because the new logic(registry lookup)
-            // was added in since netcoreapp3.0. On arm we cannot rely on apphost and we'll use dotnet.exe muxer
+            // REVIEW ME: @Marco Do we need to update the logic?
+            // testhost*.exe are build for netcoreapp2.1 and are not able to search for the correct runtime in case of
+            // x64/x86 on arm because the new logic (registry lookup) was added in since netcoreapp3.0.
+            // On arm we cannot rely on apphost and we'll use dotnet.exe muxer.
             && !IsWinOnArm())
         {
             // testhost.exe is 64-bit and has no suffix other versions have architecture suffix.

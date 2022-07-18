@@ -40,6 +40,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // REVIEW ME: Shall we make the test supporting Linux?
     // netcoreapp2.1 dump is not supported on Linux
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
@@ -57,6 +58,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // REVIEW ME: Shall we make the test supporting Linux?
     // netcoreapp2.1 dump is not supported on Linux
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
@@ -82,6 +84,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // REVIEW ME: Shall we make the test supporting Linux?
     // netcoreapp2.1 dump is not supported on Linux
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
@@ -107,6 +110,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // REVIEW ME: Shall we make the test supporting Linux?
     // netcoreapp2.1 dump is not supported on Linux
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
