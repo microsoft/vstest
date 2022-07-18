@@ -190,8 +190,9 @@ internal class CollectArgumentExecutor : IArgumentExecutor
             return;
         }
 
-        foreach (XmlNode existingConfiguration in existingConfigurations)
+        foreach (XmlNode? existingConfiguration in existingConfigurations)
         {
+            TPDebug.Assert(existingConfiguration is not null, "existingConfiguration is null");
             existingConfiguration.InnerText = configurationValue;
         }
     }

@@ -125,7 +125,7 @@ internal static class DebuggerBreakpoint
 
     private static string? FindOnPath(string exeName)
     {
-        var paths = Environment.GetEnvironmentVariable("PATH").Split(';');
+        var paths = Environment.GetEnvironmentVariable("PATH")!.Split(';');
         foreach (var p in paths)
         {
             var path = Path.Combine(p, exeName);

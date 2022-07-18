@@ -87,6 +87,10 @@ internal sealed class DoesNotReturnIfAttribute : Attribute
     public bool ParameterValue { get; }
 }
 
+#endif
+
+#if NETFRAMEWORK || WINDOWS_UWP || NETSTANDARD && !NETSTANDARD2_1 || NETCOREAPP && !NET5_0_OR_GREATER
+
 /// <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values.</summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
 internal sealed class MemberNotNullAttribute : Attribute

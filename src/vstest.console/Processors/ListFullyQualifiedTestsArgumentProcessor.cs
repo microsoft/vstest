@@ -391,7 +391,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
             if (!traitDictionary.ContainsKey(TestCategory) && traitDictionary.ContainsKey(Category))
             {
                 traitDictionary.TryGetValue(Category, out var categoryValue);
-                traitDictionary.Add(TestCategory, categoryValue);
+                traitDictionary.Add(TestCategory, categoryValue!);
             }
 
             return traitDictionary;

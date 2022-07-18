@@ -1198,8 +1198,7 @@ internal class TestRequestManager : ITestRequestManager
                 navigator,
                 out var platformXml);
 
-            bool runSettingsHaveValidPlatform = isValidPlatformXml && !platformXml.IsNullOrWhiteSpace();
-            if (runSettingsHaveValidPlatform)
+            if (isValidPlatformXml && !platformXml.IsNullOrWhiteSpace())
             {
                 // TODO: this should be checking if the enum has the value specified, or ideally just ask the runsettings to give that value
                 // so we parse the same way always

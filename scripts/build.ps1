@@ -1270,6 +1270,7 @@ function Build-SpecificProjects {
         ("net462", "net462\win7-x64"),
         ("netstandard1.0", "netstandard1.0"),
         ("netstandard1.3", "netstandard1.3"),
+        # REVIEW ME: Why do we copy netstandard2.0 into netcorecorapp2.1?
         ("netstandard2.0", "netcoreapp2.1"),
         ("netcoreapp3.1", "netcoreapp3.1")
     )

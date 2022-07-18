@@ -115,11 +115,13 @@ public class DiaSession : INavigationSession
 
         // For remote scenario, also look for pdb in current directory, (esp for UWP)
         // The alternate search path should be an input from Adapters, but since it is not so currently adding a HACK
-        pdbFilePath = !File.Exists(pdbFilePath) ? Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(pdbFilePath)!) : pdbFilePath;
+        pdbFilePath = !File.Exists(pdbFilePath)
+            ? Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(pdbFilePath)!)
+            : pdbFilePath;
 
         if (File.Exists(pdbFilePath))
         {
-            using var stream = new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read);
+            using var stream = new FileHelper().GetStream(pdbFilePath!, FileMode.Open, FileAccess.Read);
             return PortablePdbReader.IsPortable(stream) ? new PortableSymbolReader() : new FullSymbolReader();
         }
         else

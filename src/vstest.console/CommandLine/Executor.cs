@@ -488,7 +488,7 @@ internal class Executor
                 else
                 {
                     Output.WriteLine($"vstest.console.exe {responseFileArgs}", OutputLevel.Information);
-                    outputArguments.AddRange(nestedArgs);
+                    outputArguments.AddRange(nestedArgs!);
                 }
             }
             else

@@ -104,7 +104,7 @@ public static class XmlRunSettingsUtilities
             foreach (XPathNavigator? dataCollectorNavigator in nodes)
             {
                 var friendlyName = dataCollectorNavigator?.GetAttribute("friendlyName", string.Empty);
-                friendlyNameList.Add(friendlyName);
+                friendlyNameList.Add(friendlyName!);
             }
         }
 

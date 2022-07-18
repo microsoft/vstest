@@ -246,7 +246,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
             if (_discoveredTestCount > 0)
             {
                 // No tests that matched any of the given strings.
-                warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsAvailableAfterFiltering, _discoveredTestCount, string.Join(", ", _selectedTestNames));
+                warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsAvailableAfterFiltering, _discoveredTestCount, string.Join(", ", _selectedTestNames!));
             }
             else
             {
