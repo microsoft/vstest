@@ -47,9 +47,6 @@ internal class TestRequestManager : ITestRequestManager
 {
     private static ITestRequestManager? s_testRequestManagerInstance;
 
-    // Defines the default architecture to be used for AnyCPU or non-dll sources. This is just temporary, and unsupported, DO NOT use.
-    private static readonly string VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU = nameof(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU);
-
     private readonly ITestPlatform _testPlatform;
     private readonly ITestPlatformEventSource _testPlatformEventSource;
     // TODO: No idea what is Task supposed to buy us, Tasks start immediately on instantiation
@@ -820,23 +817,6 @@ internal class TestRequestManager : ITestRequestManager
             if (defaultArchitectureFromRunsettings != null)
             {
                 return defaultArchitectureFromRunsettings.Value;
-            }
-
-            // Returns null, where there are none.
-            Dictionary<string, string?>? environmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(runsettingsXml);
-            if (environmentVariables != null)
-            {
-                string? defaultArchitectureFromRunsettingsEnvironmentVariables = environmentVariables.TryGetValue(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU, out var architecture) ? architecture : null;
-
-                if (defaultArchitectureFromRunsettingsEnvironmentVariables != null)
-                {
-                    Architecture? defaultArchitecture = Enum.TryParse<Architecture>(defaultArchitectureFromRunsettingsEnvironmentVariables, out var arch) ? arch : null;
-
-                    if (defaultArchitecture != null)
-                    {
-                        return defaultArchitecture.Value;
-                    }
-                }
             }
 
             return TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture());
