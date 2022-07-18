@@ -300,7 +300,6 @@
     <file src="netcoreapp3.1\datacollector.dll.config"	target="tools\netcoreapp3.1\datacollector.dll.config" />
     <file src="netcoreapp3.1\datacollector.runtimeconfig.json"	target="tools\netcoreapp3.1\datacollector.runtimeconfig.json" />
     <file src="netcoreapp3.1\Microsoft.Extensions.DependencyModel.dll"	target="tools\netcoreapp3.1\Microsoft.Extensions.DependencyModel.dll" />
-    <file src="netcoreapp3.1\System.Runtime.CompilerServices.Unsafe.dll"   target="tools\netcoreapp3.1\System.Runtime.CompilerServices.Unsafe.dll" />
     <file src="netcoreapp3.1\Microsoft.Extensions.FileSystemGlobbing.dll"	target="tools\netcoreapp3.1\Microsoft.Extensions.FileSystemGlobbing.dll" />
     <file src="netcoreapp3.1\Microsoft.TestPlatform.CommunicationUtilities.dll"	target="tools\netcoreapp3.1\Microsoft.TestPlatform.CommunicationUtilities.dll" />
     <file src="netcoreapp3.1\Microsoft.TestPlatform.CoreUtilities.dll"	target="tools\netcoreapp3.1\Microsoft.TestPlatform.CoreUtilities.dll" />
