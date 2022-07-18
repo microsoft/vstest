@@ -720,7 +720,7 @@ internal class TestRequestManager : ITestRequestManager
             // it can be specified by user on the command line with --arch or through runsettings.
             // If it's not specified by user will be filled by current processor architecture;
             // should be the same as SDK.
-            defaultArchitecture = GetDefaultArchitecture(runConfiguration, runsettingsXml);
+            defaultArchitecture = GetDefaultArchitecture(runConfiguration);
         }
         else
         {
@@ -731,7 +731,7 @@ internal class TestRequestManager : ITestRequestManager
                 // As default architecture we specify the expected test host architecture,
                 // it can be specified by user on the command line with /Platform or through runsettings.
                 // If it's not specified by user will be filled by current processor architecture.
-                defaultArchitecture = GetDefaultArchitecture(runConfiguration, runsettingsXml);
+                defaultArchitecture = GetDefaultArchitecture(runConfiguration);
             }
 
             // Other scenarios, most notably .NET Framework with MultiTFM disabled, will use the old default X86 architecture.
@@ -806,7 +806,7 @@ internal class TestRequestManager : ITestRequestManager
 
         return settingsUpdated;
 
-        Architecture GetDefaultArchitecture(RunConfiguration runConfiguration, string runsettingsXml)
+        Architecture GetDefaultArchitecture(RunConfiguration runConfiguration)
         {
             if (!RunSettingsHelper.Instance.IsDefaultTargetArchitecture)
             {
