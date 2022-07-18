@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace Microsoft.VisualStudio.TestPlatform.Client;
 
-public class InProcessTestSessionEventsHandler : ITestSessionEventsHandler
+internal class InProcessTestSessionEventsHandler : ITestSessionEventsHandler
 {
     private readonly ITestSessionEventsHandler _testSessionEventsHandler;
 
