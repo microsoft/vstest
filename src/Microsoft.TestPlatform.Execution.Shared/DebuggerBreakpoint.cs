@@ -125,6 +125,7 @@ internal static class DebuggerBreakpoint
 
     private static string? FindOnPath(string exeName)
     {
+        // TODO: Skip when PATH is not defined.
         var paths = Environment.GetEnvironmentVariable("PATH")!.Split(';');
         foreach (var p in paths)
         {
