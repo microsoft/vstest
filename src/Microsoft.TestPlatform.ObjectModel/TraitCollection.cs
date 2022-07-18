@@ -19,9 +19,13 @@ public class TraitCollection : IEnumerable<Trait>
     internal const string TraitPropertyId = "TestObject.Traits";
     private static readonly TestProperty TraitsProperty = TestProperty.Register(
         TraitPropertyId,
+#if !NET462
         // TODO: Fix this with proper resourcing for UWP and Win 8.1 Apps
         // Trying to access resources will throw "MissingManifestResourceException" percolated as "TypeInitialization" exception
         "Traits",
+#else
+        Resources.Resources.TestCasePropertyTraitsLabel,
+#endif
         typeof(KeyValuePair<string, string>[]),
 #pragma warning disable 618
         TestPropertyAttributes.Hidden | TestPropertyAttributes.Trait,
