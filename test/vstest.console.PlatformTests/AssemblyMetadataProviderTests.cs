@@ -127,7 +127,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
         }
         else
         {
-            Assert.AreEqual(".NETCoreApp,Version=v2.1", actualFx.FullName);
+            Assert.AreEqual(".NETCoreApp,Version=v3.1", actualFx.FullName);
         }
 
         Console.WriteLine("Framework:{0}, {1}", framework, string.Format(CultureInfo.CurrentCulture, PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
