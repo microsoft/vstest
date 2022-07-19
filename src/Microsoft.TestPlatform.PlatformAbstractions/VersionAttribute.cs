@@ -7,6 +7,7 @@ using System.Diagnostics;
 namespace Microsoft.TestPlatform.PlatformAbstractions;
 
 [Conditional("DEBUG")]
+[AttributeUsage(AttributeTargets.Method)]
 internal class VersionAttribute : Attribute
 {
     public string? Description { get; set; }
