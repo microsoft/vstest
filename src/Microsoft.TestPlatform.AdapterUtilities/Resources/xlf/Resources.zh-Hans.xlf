@@ -51,7 +51,7 @@ Example: 'System.Reflection.MethodBase' is not implemented on this platform!</no
       </trans-unit>
       <trans-unit id="ErrorMethodExpectedAsAnArgument">
         <source>Argument must be a method. (Argument name: {0})</source>
-        <target state="new">Argument must be a method.</target>
+        <target state="new">Argument must be a method. (Argument name: {0})</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ErrorCannotAppendAfterHashCalculation">
