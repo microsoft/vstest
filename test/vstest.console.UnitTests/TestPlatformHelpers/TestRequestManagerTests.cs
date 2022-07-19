@@ -2581,7 +2581,7 @@ public class TestRequestManagerTests
     [DataRow("arm64")]
     // Don't parallelize because we can run into conflict with GetDefaultArchitecture -> RunSettingsHelper.Instance.IsDefaultTargetArchitecture
     // which is set by some other test.
-    [DoNotParallelize()] 
+    [DoNotParallelize] 
     public void SettingDefaultPlatformUsesItForAnyCPUSourceButNotForNonAnyCPUSource(string defaultPlatform)
     {
         // -- Arrange
