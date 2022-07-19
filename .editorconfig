@@ -230,6 +230,9 @@ dotnet_diagnostic.CA1822.severity = warning # not default, increased severity to
 # CA1816: Dispose methods should call SuppressFinalize
 dotnet_diagnostic.CA1816.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1018: Mark attributes with AttributeUsageAttribute
+dotnet_diagnostic.CA1018.severity = warning # not default, increased severity to ensure it is applied
+
 #### C# Coding Conventions ####
 
 # var preferences
