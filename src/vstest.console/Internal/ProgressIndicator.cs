@@ -120,6 +120,5 @@ internal sealed class ProgressIndicator : IProgressIndicator, IDisposable
     public void Dispose()
     {
         _timer?.Dispose();
-        _timer = null;
     }
 }
