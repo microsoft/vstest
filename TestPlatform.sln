@@ -8,6 +8,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.CoreUtilities", "src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj", "{50C00046-0DA3-4B5C-9F6F-7BE1145E156A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}"
+	ProjectSection(SolutionItems) = preProject
+		test\.editorconfig = test\.editorconfig
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.CoreUtilities.UnitTests", "test\Microsoft.TestPlatform.CoreUtilities.UnitTests\Microsoft.TestPlatform.CoreUtilities.UnitTests.csproj", "{01409D95-A5F1-4EBE-94B1-909D5D2D0DC3}"
 EndProject

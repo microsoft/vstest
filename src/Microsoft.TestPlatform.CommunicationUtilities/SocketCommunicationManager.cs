@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -19,6 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 /// <summary>
 /// Facilitates communication using sockets
 /// </summary>
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class SocketCommunicationManager : ICommunicationManager
 {
     /// <summary>

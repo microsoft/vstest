@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 /// we don't know how the user will implement the datacollector and they could send file out of events(wrong usage, no more expected sequential access AddAttachment->GetAttachments),
 /// so we prefer protect every collection. This not means that outcome will be "always correct"(file attached in a correct way) but at least we avoid exceptions.
 /// </summary>
-internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManager
+internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManager, IDisposable
 {
     private readonly object _attachmentTaskLock = new();
 
@@ -356,4 +356,17 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
         _messageSink?.SendMessage(args);
     }
 
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _cancellationTokenSource.Dispose();
+        }
+    }
 }

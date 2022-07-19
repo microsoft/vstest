@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
 /// It tries to load the extension and it receives calls from the DataCollectorAttachmentProcessorAppDomain that
 /// acts as a proxy for the main AppDomain(the runner one).
 /// </summary>
-internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObject
+internal sealed class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObject, IDisposable
 {
     private readonly AnonymousPipeServerStream _pipeServerStream = new(PipeDirection.Out, HandleInheritability.None);
     private readonly object _pipeClientLock = new();
