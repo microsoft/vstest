@@ -54,7 +54,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
-    <!-- Disabled auto code generation to support net20
+
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -64,7 +64,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    -->
   </ItemGroup>
 
   <ItemGroup>
