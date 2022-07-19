@@ -98,13 +98,8 @@ public class SocketClientTests : SocketTestsBase, IDisposable
 
         // Close the communication from server side
         _tcpClient?.GetStream().Dispose();
-#if NETFRAMEWORK
         // tcpClient.Close() calls tcpClient.Dispose().
         _tcpClient?.Close();
-#else
-        // tcpClient.Close() not available for netcoreapp1.0
-        _tcpClient?.Dispose();
-#endif
         Assert.IsTrue(waitEvent.WaitOne(Timeout));
     }
 

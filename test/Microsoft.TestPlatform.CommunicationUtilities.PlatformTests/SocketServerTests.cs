@@ -130,13 +130,9 @@ public class SocketServerTests : SocketTestsBase, IDisposable
         };
 
         // Close the client channel. Message loop should stop.
-#if NETFRAMEWORK
         // tcpClient.Close() calls tcpClient.Dispose().
         _tcpClient?.Close();
-#else
-        // tcpClient.Close() not available for netcoreapp1.0
-        _tcpClient?.Dispose();
-#endif
+
         Assert.IsTrue(waitEvent.WaitOne(1000));
         Assert.IsTrue(clientDisconnected!.Error is IOException);
     }
