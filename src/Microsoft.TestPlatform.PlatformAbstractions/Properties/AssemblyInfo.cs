@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft Corporation")]
-[assembly: AssemblyCopyright("© Microsoft Corporation. All rights reserved.")]
+[assembly: AssemblyCopyright("Â© Microsoft Corporation. All rights reserved.")]
 [assembly: AssemblyProduct("Microsoft.TestPlatform.PlatformAbstractions")]
 [assembly: AssemblyTrademark("")]
 

@@ -115,7 +115,7 @@ public static partial class ManagedNameHelper
 
         if (!ReflectionHelpers.IsMethod(method))
         {
-            throw new ArgumentException(Resources.Resources.ErrorMethodExpectedAsAnArgument, nameof(method));
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorMethodExpectedAsAnArgument, nameof(method)));
         }
 
         var semanticType = ReflectionHelpers.GetReflectedType(method)
@@ -151,12 +151,12 @@ public static partial class ManagedNameHelper
         var hierarchyPos = AppendTypeString(typeBuilder, semanticType, closedType: useClosedTypes);
         if (hierarchyPos is null || hierarchyPos.Length != 3)
         {
-            throw new ArgumentException(Resources.Resources.ErrorMethodExpectedAsAnArgument, nameof(method));
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorMethodExpectedAsAnArgument, nameof(method)));
         }
 
         // Method Name with method arity
         var arity = method.GetGenericArguments().Length;
-        AppendMethodString(methodBuilder, method.Name, arity, useClosedTypes);
+        AppendMethodString(methodBuilder, method.Name, arity);
         if (arity > 0)
         {
             if (useClosedTypes)
@@ -399,7 +399,7 @@ public static partial class ManagedNameHelper
         }
     }
 
-    private static void AppendMethodString(StringBuilder methodBuilder, string name, int methodArity, bool closedType)
+    private static void AppendMethodString(StringBuilder methodBuilder, string name, int methodArity)
     {
         var arityStart = name.LastIndexOf('`');
         var arity = 0;
@@ -493,7 +493,7 @@ public static partial class ManagedNameHelper
                     ? info.GenericTypeParameters.Length
                     : info.GenericTypeArguments.Length;
 
-        AppendMethodString(b, typeName, arity - outerArity, closedType);
+        AppendMethodString(b, typeName, arity - outerArity);
         b.Append('*', stars);
         return arity;
     }

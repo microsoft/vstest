@@ -62,7 +62,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot append to a TestIdProvider, after GetId or GetHash method is called.
+        ///   Looks up a localized string similar to Cannot append to a TestIdProvider, after GetId or GetHash method is called..
         /// </summary>
         internal static string ErrorCannotAppendAfterHashCalculation {
             get {
@@ -89,7 +89,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Method arity must be numeric.
+        ///   Looks up a localized string similar to Method arity must be numeric..
         /// </summary>
         internal static string ErrorMethodArityMustBeNumeric {
             get {
@@ -98,7 +98,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Argument must be a method..
+        ///   Looks up a localized string similar to Argument must be a method. (Argument name: {0}).
         /// </summary>
         internal static string ErrorMethodExpectedAsAnArgument {
             get {

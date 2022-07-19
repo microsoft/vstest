@@ -131,7 +131,7 @@
     <value>Method arity must be numeric.</value>
   </data>
   <data name="ErrorMethodExpectedAsAnArgument" xml:space="preserve">
-    <value>Argument must be a method.</value>
+    <value>Argument must be a method. (Argument name: {0})</value>
   </data>
   <data name="ErrorMethodNotFound" xml:space="preserve">
     <value>Method '{0}' not found on type '{1}'</value>
