@@ -214,7 +214,7 @@ public class ExecutionTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var errorMessage = "Process is terminated due to StackOverflowException.";
-        if (runnerInfo.TargetFramework.StartsWith("netcoreapp2."))
+        if (runnerInfo.TargetFramework.StartsWith("netcoreapp"))
         {
             errorMessage = "Process is terminating due to StackOverflowException.";
         }
@@ -243,7 +243,10 @@ public class ExecutionTests : AcceptanceTestBase
 
         InvokeVsTest(arguments);
 
-        var errorFirstLine = "Test host standard error line: Unhandled Exception: System.InvalidOperationException: Operation is not valid due to the current state of the object.";
+        var errorFirstLine =
+            runnerInfo.TargetFramework.StartsWith("netcoreapp")
+            ? "Test host standard error line: Unhandled exception. System.InvalidOperationException: Operation is not valid due to the current state of the object."
+            : "Test host standard error line: Unhandled Exception: System.InvalidOperationException: Operation is not valid due to the current state of the object.";
         FileAssert.Contains(diagLogFilePath, errorFirstLine);
         File.Delete(diagLogFilePath);
     }
