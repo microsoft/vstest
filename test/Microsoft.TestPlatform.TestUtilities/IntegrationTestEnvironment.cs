@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Xml;
 
+using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.TestUtilities;
@@ -31,8 +32,8 @@ public class IntegrationTestEnvironment
         // If the variables are not set, valid defaults are assumed.
         if (TargetFramework.IsNullOrEmpty())
         {
-            // Run integration tests for net451 by default.
-            TargetFramework = "net451";
+            // Run integration tests for net462 by default.
+            TargetFramework = "net462";
         }
 
         if (TestPlatformRootDirectory.IsNullOrEmpty())
@@ -49,7 +50,7 @@ public class IntegrationTestEnvironment
         PackageDirectory = Path.Combine(TestPlatformRootDirectory, @"packages");
         ToolsDirectory = Path.Combine(TestPlatformRootDirectory, @"tools");
         TestArtifactsDirectory = Path.Combine(TestPlatformRootDirectory, "artifacts", "testArtifacts");
-        RunnerFramework = "net451";
+        RunnerFramework = "net462";
     }
 
     /// <summary>
@@ -67,7 +68,7 @@ public class IntegrationTestEnvironment
         }
     }
 
-    public Dictionary<string, string> DependencyVersions
+    public static Dictionary<string, string> DependencyVersions
         => s_dependencyVersions ??= GetDependencies(TestPlatformRootDirectory);
 
     /// <summary>
@@ -105,7 +106,7 @@ public class IntegrationTestEnvironment
 
     /// <summary>
     /// Gets the target framework.
-    /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
+    /// Supported values = <c>net462</c>, <c>netcoreapp1.0</c>.
     /// </summary>
     [NotNull]
     public string? TargetFramework { get; set; }
@@ -161,7 +162,7 @@ public class IntegrationTestEnvironment
 
     /// <summary>
     /// Gets the application type.
-    /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
+    /// Supported values = <c>net462</c>, <c>netcoreapp1.0</c>.
     /// </summary>
     public string RunnerFramework { get; set; }
 
@@ -181,7 +182,7 @@ public class IntegrationTestEnvironment
     /// (a) They are built for supported frameworks. See <see cref="TargetFramework"/>.
     /// (b) They are built for provided build configuration.
     /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.csproj</c> must
-    /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net451\SimpleUnitTest.dll</c>
+    /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net462\SimpleUnitTest.dll</c>
     /// </remarks>
     public string GetTestAsset(string assetName)
     {
@@ -192,14 +193,14 @@ public class IntegrationTestEnvironment
     /// Gets the full path to a test asset.
     /// </summary>
     /// <param name="assetName">Name of the asset with extension. E.g. <c>SimpleUnitTest.dll</c></param>
-    /// <param name="targetFramework">asset project target framework. E.g <c>net451</c></param>
+    /// <param name="targetFramework">asset project target framework. E.g <c>net462</c></param>
     /// <returns>Full path to the test asset.</returns>
     /// <remarks>
     /// Test assets follow several conventions:
     /// (a) They are built for supported frameworks. See <see cref="TargetFramework"/>.
     /// (b) They are built for provided build configuration.
     /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.csproj</c> must
-    /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net451\SimpleUnitTest.dll</c>
+    /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net462\SimpleUnitTest.dll</c>
     /// </remarks>
     public string GetTestAsset(string assetName, string targetFramework)
     {

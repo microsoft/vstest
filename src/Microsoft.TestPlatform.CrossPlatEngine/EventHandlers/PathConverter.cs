@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -43,10 +44,11 @@ internal class PathConverter : IPathConverter
         _deploymentPath = normalizedDeploymentPath;
     }
 
+    [return: NotNullIfNotNull("path")]
     public string? UpdatePath(string? path, PathConversionDirection updateDirection)
     {
         if (path == null)
-            return path;
+            return null;
 
         string find;
         string replaceWith;
@@ -63,14 +65,14 @@ internal class PathConverter : IPathConverter
             replaceWith = _originalPath;
         }
 
-        var result = path?.Replace(find, replaceWith);
+        var result = path.Replace(find, replaceWith);
         return result;
     }
 
-    public IEnumerable<string?> UpdatePaths(IEnumerable<string?> paths, PathConversionDirection updateDirection)
+    public IEnumerable<string> UpdatePaths(IEnumerable<string> paths, PathConversionDirection updateDirection)
     {
         ValidateArg.NotNull(paths, nameof(paths));
-        return paths.Select(i => UpdatePath(i, updateDirection)).ToList();
+        return paths.Select(p => UpdatePath(p, updateDirection)).ToList();
     }
 
     public TestCase UpdateTestCase(TestCase testCase, PathConversionDirection updateDirection)
@@ -81,11 +83,11 @@ internal class PathConverter : IPathConverter
         return testCase;
     }
 
-    public IEnumerable<TestCase> UpdateTestCases(IEnumerable<TestCase> testCases, PathConversionDirection updateDirection)
+    public IEnumerable<TestCase> UpdateTestCases(IEnumerable<TestCase>? testCases, PathConversionDirection updateDirection)
     {
         ValidateArg.NotNull(testCases, nameof(testCases));
-        testCases.ToList().ForEach(tc => UpdateTestCase(tc, updateDirection));
-        return testCases;
+        testCases!.ToList().ForEach(tc => UpdateTestCase(tc, updateDirection));
+        return testCases!;
     }
 
     public TestRunCompleteEventArgs UpdateTestRunCompleteEventArgs(TestRunCompleteEventArgs testRunCompleteEventArgs, PathConversionDirection updateDirection)
@@ -95,10 +97,10 @@ internal class PathConverter : IPathConverter
         return testRunCompleteEventArgs;
     }
 
-    public TestRunChangedEventArgs UpdateTestRunChangedEventArgs(TestRunChangedEventArgs testRunChangedArgs, PathConversionDirection updateDirection)
+    public TestRunChangedEventArgs UpdateTestRunChangedEventArgs(TestRunChangedEventArgs? testRunChangedArgs, PathConversionDirection updateDirection)
     {
         ValidateArg.NotNull(testRunChangedArgs, nameof(testRunChangedArgs));
-        UpdateTestResults(testRunChangedArgs.NewTestResults, updateDirection);
+        UpdateTestResults(testRunChangedArgs!.NewTestResults!, updateDirection);
         UpdateTestCases(testRunChangedArgs.ActiveTests, updateDirection);
         return testRunChangedArgs;
     }
@@ -110,21 +112,21 @@ internal class PathConverter : IPathConverter
         return attachmentSets;
     }
 
-    public ICollection<AttachmentSet> UpdateAttachmentSets(ICollection<AttachmentSet> attachmentSets, PathConversionDirection updateDirection)
+    public ICollection<AttachmentSet> UpdateAttachmentSets(ICollection<AttachmentSet>? attachmentSets, PathConversionDirection updateDirection)
     {
         ValidateArg.NotNull(attachmentSets, nameof(attachmentSets));
-        attachmentSets.ToList().ForEach(i => UpdateAttachmentSet(i, updateDirection));
-        return attachmentSets;
+        attachmentSets!.ToList().ForEach(i => UpdateAttachmentSet(i, updateDirection));
+        return attachmentSets!;
     }
 
-    private AttachmentSet UpdateAttachmentSet(AttachmentSet attachmentSet, PathConversionDirection updateDirection)
+    private static AttachmentSet UpdateAttachmentSet(AttachmentSet attachmentSet, PathConversionDirection updateDirection)
     {
         ValidateArg.NotNull(attachmentSet, nameof(attachmentSet));
         attachmentSet.Attachments.ToList().ForEach(a => UpdateAttachment(a, updateDirection));
         return attachmentSet;
     }
 
-    private UriDataAttachment UpdateAttachment(UriDataAttachment attachment, PathConversionDirection _)
+    private static UriDataAttachment UpdateAttachment(UriDataAttachment attachment, PathConversionDirection _)
     {
         ValidateArg.NotNull(attachment, nameof(attachment));
         // todo: convert uri? https://github.com/microsoft/vstest/issues/3367
@@ -157,8 +159,9 @@ internal class PathConverter : IPathConverter
     public TestRunCriteriaWithSources UpdateTestRunCriteriaWithSources(TestRunCriteriaWithSources testRunCriteriaWithSources, PathConversionDirection updateDirection)
     {
         ValidateArg.NotNull(testRunCriteriaWithSources, nameof(testRunCriteriaWithSources));
-        testRunCriteriaWithSources.AdapterSourceMap.ToList().ForEach(adapter => testRunCriteriaWithSources.AdapterSourceMap[adapter.Key] = UpdatePaths(adapter.Value, updateDirection));
-        var package = UpdatePath(testRunCriteriaWithSources.Package, updateDirection);
+        testRunCriteriaWithSources.AdapterSourceMap.ToList().ForEach(adapter =>
+            testRunCriteriaWithSources.AdapterSourceMap[adapter.Key] = UpdatePaths(adapter.Value, updateDirection)!);
+        var package = UpdatePath(testRunCriteriaWithSources.Package, updateDirection)!;
         return new TestRunCriteriaWithSources(testRunCriteriaWithSources.AdapterSourceMap, package, testRunCriteriaWithSources.RunSettings, testRunCriteriaWithSources.TestExecutionContext);
     }
 
@@ -166,7 +169,7 @@ internal class PathConverter : IPathConverter
     {
         ValidateArg.NotNull(testRunCriteriaWithTests, nameof(testRunCriteriaWithTests));
         var tests = UpdateTestCases(testRunCriteriaWithTests.Tests, updateDirection);
-        var package = UpdatePath(testRunCriteriaWithTests.Package, updateDirection);
+        var package = UpdatePath(testRunCriteriaWithTests.Package, updateDirection)!;
         return new TestRunCriteriaWithTests(tests, package, testRunCriteriaWithTests.RunSettings, testRunCriteriaWithTests.TestExecutionContext);
     }
 }

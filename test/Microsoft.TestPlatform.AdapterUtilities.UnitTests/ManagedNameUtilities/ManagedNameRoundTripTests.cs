@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -818,6 +819,7 @@ public partial class ManagedNameRoundTripTests
     }
 
     #region Helpers
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Code using the parameters is commented out temporarly.")]
     private static void VerifyRoundTrip(
         MethodInfo methodInfo,
         INamedTypeSymbol containingTypeSymbol,
@@ -827,6 +829,7 @@ public partial class ManagedNameRoundTripTests
     {
         VerifyRoundTripFromMethodInfo(methodInfo, managedTypeName, managedMethodName);
         VerifyRoundTripFromName(managedTypeName, managedMethodName, methodInfo);
+        // TODO: Enable these checks and remove attributes on method
         // VerifyRoundTripFromMethodSymbol(containingTypeSymbol, methodSymbol, managedTypeName, managedMethodName);
         // VerifyRoundTripFromName(managedTypeName, managedMethodName, containingTypeSymbol, methodSymbol);
     }

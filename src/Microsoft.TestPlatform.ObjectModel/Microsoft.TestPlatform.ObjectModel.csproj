@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.ObjectModel</AssemblyName>
-    <TargetFrameworks>net45;net451;netcoreapp2.1;netcoreapp1.0;netstandard2.0;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>$(TargetNetFxVersion);netcoreapp2.1;netcoreapp1.0;netstandard2.0;netstandard1.3</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0;netstandard1.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <PackageId>Microsoft.TestPlatform.ObjectModel</PackageId>
@@ -26,7 +26,7 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' OR '$(TargetFramework)' == 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
     <Reference Include="System.Xml" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Runtime" />

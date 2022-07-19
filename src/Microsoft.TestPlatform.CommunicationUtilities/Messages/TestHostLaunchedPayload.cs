@@ -3,8 +3,6 @@
 
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 public class TestHostLaunchedPayload

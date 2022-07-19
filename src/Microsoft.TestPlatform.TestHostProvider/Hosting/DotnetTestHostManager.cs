@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,8 +53,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private const string DotnetTestHostFriendlyName = "DotnetTestHost";
     private const string TestAdapterRegexPattern = @"TestAdapter.dll";
     private const string PROCESSOR_ARCHITECTURE = nameof(PROCESSOR_ARCHITECTURE);
-
-    private static readonly Version Version6_0 = new(6, 0);
 
     private readonly IDotnetHostHelper _dotnetHostHelper;
     private readonly IEnvironment _platformEnvironment;
@@ -171,8 +171,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     };
 
     /// <inheritdoc/>
-    [MemberNotNull(nameof(_targetFramework), nameof(_dotnetHostPath))]
-    public void Initialize(IMessageLogger logger, string runsettingsXml)
+    public void Initialize(IMessageLogger? logger, string runsettingsXml)
     {
         _hostExitedEventRaised = false;
 
@@ -206,7 +205,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     /// <inheritdoc/>
     public virtual TestProcessStartInfo GetTestHostProcessStartInfo(
         IEnumerable<string> sources,
-        IDictionary<string, string>? environmentVariables,
+        IDictionary<string, string?>? environmentVariables,
         TestRunnerConnectionInfo connectionInfo)
     {
         TPDebug.Assert(_targetFramework is not null, "_targetFramework is null");
@@ -260,7 +259,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
         // Try find testhost.exe (or the architecture specific version). We ship those ngened executables for Windows because they have faster startup time. We ship them only for some platforms.
         // When user specified path to dotnet.exe don't try to find the exexutable, because we will always use the testhost.dll together with their dotnet.exe.
-        // We use dotnet.exe on Windows/ARM.
         bool testHostExeFound = false;
         if (!useCustomDotnetHostpath
             && _platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
@@ -408,7 +406,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
             // We silently force x64 only if the target architecture is the default one and is not specified by user
             // through --arch or runsettings or -- RunConfiguration.TargetPlatform=arch
-            bool forceToX64 = SilentlyForceToX64() && _runsettingHelper.IsDefaultTargetArchitecture;
+            bool forceToX64 = _runsettingHelper.IsDefaultTargetArchitecture && SilentlyForceToX64(sourcePath);
             EqtTrace.Verbose($"DotnetTestHostmanager: Current process architetcure '{_processHelper.GetCurrentProcessArchitecture()}'");
             bool isSameArchitecture = IsSameArchitecture(_architecture, _processHelper.GetCurrentProcessArchitecture());
             var currentProcessPath = _processHelper.GetCurrentProcessFileName()!;
@@ -434,9 +432,9 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 }
 
                 PlatformArchitecture finalTargetArchitecture = forceToX64 ? PlatformArchitecture.X64 : targetArchitecture;
-                if (!_dotnetHostHelper.TryGetDotnetPathByArchitecture(finalTargetArchitecture, out string muxerPath))
+                if (!_dotnetHostHelper.TryGetDotnetPathByArchitecture(finalTargetArchitecture, out string? muxerPath))
                 {
-                    string message = string.Format(Resources.NoDotnetMuxerFoundForArchitecture, $"dotnet{(_platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : string.Empty)}", finalTargetArchitecture.ToString());
+                    string message = string.Format(CultureInfo.CurrentCulture, Resources.NoDotnetMuxerFoundForArchitecture, $"dotnet{(_platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : string.Empty)}", finalTargetArchitecture.ToString());
                     EqtTrace.Error(message);
                     throw new TestPlatformException(message);
                 }
@@ -465,14 +463,31 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         // G:\nuget-package-path\microsoft.testplatform.testhost\version\**\testhost.dll
         // G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.dll
         startInfo.Arguments = args;
-        startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
+        startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string?>();
 
         // If we're running using custom apphost we need to set DOTNET_ROOT/DOTNET_ROOT(x86)
         // We're setting it inside SDK to support private install scenario.
         // i.e. I've got only private install and no global installation, in this case apphost needs to use env var to locate runtime.
         if (testHostExeFound)
         {
-            ForwardDotnetRootEnvironmentVariable(startInfo);
+            string prefix = "VSTEST_WINAPPHOST_";
+            string dotnetRootEnvName = $"{prefix}DOTNET_ROOT(x86)";
+            var dotnetRoot = _environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName);
+            if (dotnetRoot is null)
+            {
+                dotnetRootEnvName = $"{prefix}DOTNET_ROOT";
+                dotnetRoot = _environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName);
+            }
+
+            if (dotnetRoot != null)
+            {
+                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{dotnetRootEnvName}' in env variables, value '{dotnetRoot}', forwarding to '{dotnetRootEnvName.Replace(prefix, string.Empty)}'");
+                startInfo.EnvironmentVariables.Add(dotnetRootEnvName.Replace(prefix, string.Empty), dotnetRoot);
+            }
+            else
+            {
+                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Prefix '{prefix}*' not found in env variables");
+            }
         }
 
         startInfo.WorkingDirectory = sourceDirectory;
@@ -531,7 +546,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 _ => throw new TestPlatformException($"Invalid target architecture '{targetArchitecture}'"),
             };
 
-        bool SilentlyForceToX64()
+        bool SilentlyForceToX64(string sourcePath)
         {
             // We need to force x64 in some scenario
             // https://github.com/dotnet/sdk/blob/main/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.RuntimeIdentifierInference.targets#L140-L143
@@ -547,56 +562,26 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             // If we are running on win-arm64 and the TFM is < 5.0, we have to use a x64 apphost since there are no win-arm64 apphosts previous to .NET 5.0.
             return _platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows &&
                    _platformEnvironment.Architecture == PlatformArchitecture.ARM64 &&
-                   new Version(_targetFramework.Version).Major < 5;
+                   new Version(_targetFramework.Version).Major < 5 &&
+                   !IsNativeModule(sourcePath);
         }
-    }
 
-    internal /* for testing purposes */ void ForwardDotnetRootEnvironmentVariable(TestProcessStartInfo startInfo)
-    {
-        TPDebug.Assert(_targetFramework is not null, "Initialize must have been called before this method.");
-        const string prefix = "VSTEST_WINAPPHOST_";
-        const string dotnetRoot = "DOTNET_ROOT";
-        string vstestDotnetRootEnvName = $"{prefix}{dotnetRoot}(x86)";
-
-        // Check if VSTEST_WINAPPHOST_DOTNET_ROOT(x86) is set, if not then looks for VSTEST_WINAPPHOST_DOTNET_ROOT.
-        // If none of these variables is set we exit as we have nothing to forward.
-        var vstestDotnetRootEnvValue = _environmentVariableHelper.GetEnvironmentVariable(vstestDotnetRootEnvName);
-        if (vstestDotnetRootEnvValue is null)
+        bool IsNativeModule(string modulePath)
         {
-            vstestDotnetRootEnvName = $"{prefix}{dotnetRoot}";
-            vstestDotnetRootEnvValue = _environmentVariableHelper.GetEnvironmentVariable(vstestDotnetRootEnvName);
-
-            // None of the forwarding environment variables are set so exit.
-            if (vstestDotnetRootEnvValue is null)
+            // Scenario: dotnet test nativeArm64.dll for CppUnitTestFramework
+            // If the dll is native and we're not running in process(vstest.console.exe)
+            // the expected target framework is ".NETCoreApp,Version=v1.0".
+            // In this case we don't want to force x64 architecture
+            using var assemblyStream = _fileHelper.GetStream(sourcePath, FileMode.Open, FileAccess.Read);
+            using var peReader = new PEReader(assemblyStream);
+            if (!peReader.HasMetadata || (peReader.PEHeaders.CorHeader?.Flags & CorFlags.ILOnly) == 0)
             {
-                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Prefix '{prefix}*' not found in env variables");
-                return;
+                EqtTrace.Verbose($"DotnetTestHostmanager.IsNativeModule: Source '{sourcePath}' is native.");
+                return true;
             }
-        }
 
-        // For .NET 6.0 onward, the DOTNET_ROOT* environment variable to set was changed.
-        // This implementation is based on the logic defined in SDK:
-        // https://github.com/dotnet/sdk/blob/c3f8d746f4d5cd87f462d711a3caa7a4f6621826/src/Cli/dotnet/commands/dotnet-run/RunCommand.cs#L264-L279
-        string dotnetRootEnvName;
-        if (Version.Parse(_targetFramework.Version) >= Version6_0)
-        {
-            dotnetRootEnvName = $"{dotnetRoot}_{_processHelper.GetCurrentProcessArchitecture().ToString().ToUpperInvariant()}";
-
-            // SDK side of TP is not checking for the .NET6.0+ environment variables so we want to make sure we
-            // are not overriding user definition.
-            if (_environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName) is string dotnetRootEnvValue)
-            {
-                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{vstestDotnetRootEnvName}' in env variables but also found '{dotnetRootEnvName}' with value '{dotnetRootEnvValue}'. Skipping forwarding.");
-                return;
-            }
+            return false;
         }
-        else
-        {
-            dotnetRootEnvName = vstestDotnetRootEnvName.Replace(prefix, string.Empty);
-        }
-
-        EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{vstestDotnetRootEnvName}' in env variables, value '{vstestDotnetRootEnvValue}', forwarding to '{dotnetRootEnvName}' (target framework is {_targetFramework.Name}, Version={_targetFramework.Version}).");
-        startInfo.EnvironmentVariables.Add(dotnetRootEnvName, vstestDotnetRootEnvValue);
     }
 
     /// <inheritdoc/>
@@ -621,13 +606,13 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     }
 
     /// <inheritdoc/>
-    public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+    public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
     {
         var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
         var framework = config.TargetFramework;
 
         // This is expected to be called once every run so returning a new instance every time.
-        return framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+        return framework!.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
                || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
                || framework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0;
     }
@@ -710,7 +695,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             cancellationToken.ThrowIfCancellationRequested();
 
             _testHostProcess = _processHelper.LaunchProcess(
-                testHostStartInfo.FileName,
+                testHostStartInfo.FileName!,
                 testHostStartInfo.Arguments,
                 testHostStartInfo.WorkingDirectory,
                 testHostStartInfo.EnvironmentVariables,
@@ -730,7 +715,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             return false;
         }
 
-        DefaultTestHostManager.SetProcessPriority(_testHostProcess, _environmentVariableHelper);
+        DefaultTestHostManager.AdjustProcessPriorityBasedOnSettings(_testHostProcess, testHostStartInfo.EnvironmentVariables);
         OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
         return true;
     }
@@ -783,8 +768,8 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 using (JsonTextReader reader = new(file))
                 {
                     JObject context = (JObject)JToken.ReadFrom(reader);
-                    JObject runtimeOptions = (JObject)context.GetValue("runtimeOptions");
-                    JToken additionalProbingPaths = runtimeOptions.GetValue("additionalProbingPaths");
+                    JObject runtimeOptions = (JObject)context.GetValue("runtimeOptions")!;
+                    JToken additionalProbingPaths = runtimeOptions.GetValue("additionalProbingPaths")!;
                     foreach (var x in additionalProbingPaths)
                     {
                         EqtTrace.Verbose("DotnetTestHostmanager: Looking for path {0} in folder {1}", testHostPath, x.ToString());

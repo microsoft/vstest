@@ -102,13 +102,13 @@ public class InternalTestLoggerEventsBehaviors
     [TestMethod]
     public void RaiseTestResultShouldThrowExceptionIfNullTestResultEventArgsIsPassed()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseTestResult(null));
+        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseTestResult(null!));
     }
 
     [TestMethod]
     public void RaiseTestRunMessageShouldThrowExceptioIfNullTestRunMessageEventArgsIsPassed()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseTestRunMessage(null));
+        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseTestRunMessage(null!));
     }
 
     [TestMethod]
@@ -231,7 +231,7 @@ public class InternalTestLoggerEventsBehaviors
     [TestMethod]
     public void RaiseDiscoveryStartShouldThrowExceptionIfNullDiscoveryStartEventArgsIsPassed()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseDiscoveryStart(null));
+        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseDiscoveryStart(null!));
     }
 
     /// <summary>
@@ -240,7 +240,7 @@ public class InternalTestLoggerEventsBehaviors
     [TestMethod]
     public void RaiseDiscoveredTestsShouldThrowExceptionIfNullDiscoveredTestsEventArgsIsPassed()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseDiscoveredTests(null));
+        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseDiscoveredTests(null!));
     }
 
     /// <summary>
@@ -294,7 +294,7 @@ public class InternalTestLoggerEventsBehaviors
     [TestMethod]
     public void RaiseDiscoveryCompleteShouldThrowExceptionIfNullDiscoveryCompleteEventArgsIsPassed()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseDiscoveryComplete(null));
+        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseDiscoveryComplete(null!));
     }
 
     /// <summary>
@@ -392,7 +392,7 @@ public class InternalTestLoggerEventsBehaviors
     [TestMethod]
     public void RaiseTestRunStartShouldThrowExceptionIfNullTestRunStartEventArgsIsPassed()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseTestRunStart(null));
+        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseTestRunStart(null!));
     }
 
     /// <summary>
@@ -401,7 +401,7 @@ public class InternalTestLoggerEventsBehaviors
     [TestMethod]
     public void RaiseDiscoveryMessageShouldThrowExceptionIfNullTestRunMessageEventArgsIsPassed()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseDiscoveryMessage(null));
+        Assert.ThrowsException<ArgumentNullException>(() => _loggerEvents.RaiseDiscoveryMessage(null!));
     }
 
     /// <summary>

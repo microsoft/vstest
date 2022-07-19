@@ -2,7 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+#if !NETSTANDARD1_0
+using System.Collections.Concurrent;
+#endif
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -11,17 +15,19 @@ using System.Runtime.Serialization;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 #endif
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-public delegate bool ValidateValueCallback(object value);
+public delegate bool ValidateValueCallback(object? value);
 
 [DataContract]
 public class TestProperty : IEquatable<TestProperty>
 {
     private Type _valueType;
+#if !NETSTANDARD1_0
+    private static readonly ConcurrentDictionary<string, Type> TypeCache = new();
+#else
     private static readonly Dictionary<string, Type> TypeCache = new();
+#endif
 
 #if NETSTANDARD1_0
     private static bool DisableFastJson { get; set; } = true;
@@ -34,12 +40,14 @@ public class TestProperty : IEquatable<TestProperty>
     /// <summary>
     /// Initializes a new instance of the <see cref="TestProperty"/> class.
     /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     private TestProperty()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
         // Default constructor for Serialization.
     }
 
-    private TestProperty(string id, string label, string category, string description, Type valueType, ValidateValueCallback validateValueCallback, TestPropertyAttributes attributes)
+    private TestProperty(string id, string label, string category, string description, Type valueType, ValidateValueCallback? validateValueCallback, TestPropertyAttributes attributes)
     {
         ValidateArg.NotNullOrEmpty(id, nameof(id));
         ValidateArg.NotNull(label, nameof(label));
@@ -55,7 +63,7 @@ public class TestProperty : IEquatable<TestProperty>
         else if (valueType == typeof(string)
                  || valueType == typeof(Uri)
                  || valueType == typeof(string[])
-                 || valueType.AssemblyQualifiedName.Contains("System.Private")
+                 || valueType.AssemblyQualifiedName!.Contains("System.Private")
                  || valueType.AssemblyQualifiedName.Contains("mscorlib"))
         {
             // This comparison is a check to ensure assembly information is not embedded in data.
@@ -63,7 +71,7 @@ public class TestProperty : IEquatable<TestProperty>
             // are different in desktop and coreclr. Thus AQN in coreclr includes System.Private.CoreLib which
             // is not available on the desktop.
             // Note that this doesn't handle generic types. Such types will fail during serialization.
-            ValueType = valueType.FullName;
+            ValueType = valueType.FullName!;
         }
         else if (valueType.GetTypeInfo().IsValueType)
         {
@@ -114,7 +122,7 @@ public class TestProperty : IEquatable<TestProperty>
     /// </summary>
     /// <remarks>This property is not required at the client side.</remarks>
     [IgnoreDataMember]
-    public ValidateValueCallback ValidateValueCallback { get; }
+    public ValidateValueCallback? ValidateValueCallback { get; }
 
     /// <summary>
     /// Gets or sets the attributes for this property.
@@ -128,7 +136,6 @@ public class TestProperty : IEquatable<TestProperty>
     [DataMember]
     public string ValueType { get; set; }
 
-
     #region IEquatable
 
     /// <inheritdoc/>
@@ -138,13 +145,13 @@ public class TestProperty : IEquatable<TestProperty>
     }
 
     /// <inheritdoc/>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return base.Equals(obj as TestProperty);
     }
 
     /// <inheritdoc/>
-    public bool Equals(TestProperty other)
+    public bool Equals(TestProperty? other)
     {
         return (other != null) && (Id == other.Id);
     }
@@ -181,7 +188,7 @@ public class TestProperty : IEquatable<TestProperty>
             return t;
         }
 
-        Type type = null;
+        Type? type = null;
 
         try
         {
@@ -192,7 +199,11 @@ public class TestProperty : IEquatable<TestProperty>
             {
                 if (type != null)
                 {
+#if !NETSTANDARD1_0
+                    TypeCache.TryAdd(typeName, type);
+#else
                     TypeCache[typeName] = type;
+#endif
                     return type;
                 }
             }
@@ -260,7 +271,11 @@ public class TestProperty : IEquatable<TestProperty>
 
         if (!DisableFastJson)
         {
+#if !NETSTANDARD1_0
+            TypeCache.TryAdd(typeName, type);
+#else
             TypeCache[typeName] = type;
+#endif
         }
         return type;
     }
@@ -280,11 +295,11 @@ public class TestProperty : IEquatable<TestProperty>
         }
     }
 
-    public static TestProperty Find(string id)
+    public static TestProperty? Find(string id)
     {
         ValidateArg.NotNull(id, nameof(id));
 
-        TestProperty result = null;
+        TestProperty? result = null;
 
         lock (Properties)
         {
@@ -317,7 +332,7 @@ public class TestProperty : IEquatable<TestProperty>
         return Register(id, label, string.Empty, string.Empty, valueType, null, attributes, owner);
     }
 
-    public static TestProperty Register(string id, string label, string category, string description, Type valueType, ValidateValueCallback validateValueCallback, TestPropertyAttributes attributes, Type owner)
+    public static TestProperty Register(string id, string label, string category, string description, Type valueType, ValidateValueCallback? validateValueCallback, TestPropertyAttributes attributes, Type owner)
     {
         ValidateArg.NotNullOrEmpty(id, nameof(id));
         ValidateArg.NotNull(label, nameof(label));
@@ -385,6 +400,7 @@ public class TestProperty : IEquatable<TestProperty>
         return false;
     }
 
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Part of the public API")]
     public object GetRealObject(StreamingContext context)
     {
         var registeredProperty = Find(Id);

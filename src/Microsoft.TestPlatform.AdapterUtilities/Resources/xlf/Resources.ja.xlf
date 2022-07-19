@@ -8,9 +8,9 @@
         <target state="translated">ManagedName が不完全です</target>
       </trans-unit>
       <trans-unit id="ErrorMethodArityMustBeNumeric">
-        <source>Method arity must be numeric</source>
-        <note />
-        <target state="translated">メソッドのアリティは、数値でなければなりません。</target>
+        <source>Method arity must be numeric.</source>
+        <note></note>
+        <target state="translated">メソッドのアリティは数値である必要があります。</target>
       </trans-unit>
       <trans-unit id="ErrorMethodNotFound">
         <source>Method '{0}' not found on type '{1}'</source>

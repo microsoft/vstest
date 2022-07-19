@@ -13,7 +13,7 @@
     <AssemblyName Condition=" '$(RuntimeIdentifier)' == 'win10-arm64' ">datacollector.arm64</AssemblyName>
     <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' == 'WINDOWS_NT' ">$(TargetFrameworks);net472</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'WINDOWS_NT' ">$(TargetFrameworks);net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'WINDOWS_NT' ">$(TargetFrameworks);$(TargetNetFxVersion)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <PlatformTarget Condition=" $(TargetFramework.StartsWith('net4')) AND '$(RuntimeIdentifier)' == '' ">AnyCPU</PlatformTarget>
     <OutputType>Exe</OutputType>

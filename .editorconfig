@@ -112,7 +112,9 @@ dotnet_diagnostic.IDE0032.severity = warning        # not default, set in accord
 dotnet_style_readonly_field = true:warning
 
 # Parameter preferences
-dotnet_code_quality_unused_parameters = all:suggestion
+dotnet_code_quality_unused_parameters = all:warning
+# IDE0060: Remove unused parameter
+dotnet_diagnostic.IDE0060.severity = warning
 
 # Suppression preferences
 dotnet_remove_unnecessary_suppression_exclusions = none
@@ -205,6 +207,28 @@ dotnet_diagnostic.CA1840.severity = warning # not default, increased severity to
 
 # CA1041: Provide ObsoleteAttribute message
 dotnet_diagnostic.CA1041.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1837: Use Environment.ProcessId instead of Process.GetCurrentProcess().Id
+dotnet_diagnostic.CA1837.severity = warning # not default, increased severity to ensure it is applied
+
+# RS0041: Public members should not use oblivious types
+# TODO: Move resx as internal OR use new resx generator (nullable aware) when available
+dotnet_diagnostic.RS0041.severity = none # not default, decreased severity because of public resources (resx) not being nullable aware
+
+# CA1824: Mark assemblies with NeutralResourcesLanguageAttribute
+dotnet_diagnostic.CA1824.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1304: Specify CultureInfo
+dotnet_diagnostic.CA1304.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1305: Specify IFormatProvider
+dotnet_diagnostic.CA1305.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1822: Mark members as static
+dotnet_diagnostic.CA1822.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1816: Dispose methods should call SuppressFinalize
+dotnet_diagnostic.CA1816.severity = warning # not default, increased severity to ensure it is applied
 
 #### C# Coding Conventions ####
 

@@ -44,7 +44,7 @@ public class InProcessProxyDiscoveryManagerTests
             () => manualResetEvent.Set());
 
         var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
-        _inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, null);
+        _inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, null!);
 
         Assert.IsTrue(manualResetEvent.WaitOne(5000), "DiscoverTests should call Initialize");
     }
@@ -62,7 +62,7 @@ public class InProcessProxyDiscoveryManagerTests
         expectedResult.Add(path);
         var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
 
-        _inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, null);
+        _inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, null!);
 
         Assert.IsTrue(manualResetEvent.WaitOne(5000), "DiscoverTests should call Initialize");
         CollectionAssert.AreEquivalent(expectedResult, TestPluginCache.Instance.GetExtensionPaths(string.Empty));

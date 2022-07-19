@@ -3,10 +3,6 @@
 
 using System;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
-
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -24,11 +20,7 @@ public sealed class ExtensionUriAttribute : Attribute
     /// <param name="extensionUri">The Uri of the extension</param>
     public ExtensionUriAttribute(string extensionUri)
     {
-        if (string.IsNullOrWhiteSpace(extensionUri))
-        {
-            throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(extensionUri));
-        }
-
+        ValidateArg.NotNullOrWhiteSpace(extensionUri, nameof(extensionUri));
         ExtensionUri = extensionUri;
     }
 

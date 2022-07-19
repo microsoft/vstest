@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 
 /// <summary>
@@ -32,7 +30,7 @@ public class TestObjectConverter : JsonConverter
     }
 
     /// <inheritdoc/>
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         if (objectType != typeof(List<KeyValuePair<TestProperty, object>>))
         {
@@ -40,47 +38,56 @@ public class TestObjectConverter : JsonConverter
             throw new ArgumentException("the objectType was not a KeyValuePair list", nameof(objectType));
         }
 
-        var propertyList = new List<KeyValuePair<TestProperty, object>>();
+        var propertyList = new List<KeyValuePair<TestProperty, object?>>();
 
-        if (reader.TokenType == JsonToken.StartArray)
+        if (reader.TokenType != JsonToken.StartArray)
         {
-            var properties = JArray.Load(reader);
-            if (properties != null && properties.HasValues)
+            return propertyList;
+        }
+
+        var properties = JArray.Load(reader);
+        if (properties == null || !properties.HasValues)
+        {
+            return propertyList;
+        }
+
+        // Every class that inherits from TestObject uses a properties store for <Property, Object>
+        // key value pairs.
+        foreach (var property in properties)
+        {
+            var testProperty = property?["Key"]?.ToObject<TestProperty>(serializer);
+
+            if (testProperty == null)
             {
-                // Every class that inherits from TestObject uses a properties store for <Property, Object>
-                // key value pairs.
-                foreach (var property in properties)
+                continue;
+            }
+
+            // Let the null values be passed in as null data
+            var token = property?["Value"];
+            object? propertyData = null;
+            if (token != null && token.Type != JTokenType.Null)
+            {
+                // If the property is already a string. No need to convert again.
+                if (token.Type == JTokenType.String)
                 {
-                    var testProperty = property["Key"].ToObject<TestProperty>(serializer);
-
-                    // Let the null values be passed in as null data
-                    var token = property["Value"];
-                    object propertyData = null;
-                    if (token.Type != JTokenType.Null)
-                    {
-                        // If the property is already a string. No need to convert again.
-                        if (token.Type == JTokenType.String)
-                        {
-                            propertyData = token.ToObject(typeof(string), serializer);
-                        }
-                        else
-                        {
-                            // On deserialization, the value for each TestProperty is always a string. It is up
-                            // to the consumer to deserialize it further as appropriate.
-                            propertyData = token.ToString(Formatting.None).Trim('"');
-                        }
-                    }
-
-                    propertyList.Add(new KeyValuePair<TestProperty, object>(testProperty, propertyData));
+                    propertyData = token.ToObject(typeof(string), serializer);
+                }
+                else
+                {
+                    // On deserialization, the value for each TestProperty is always a string. It is up
+                    // to the consumer to deserialize it further as appropriate.
+                    propertyData = token.ToString(Formatting.None).Trim('"');
                 }
             }
+
+            propertyList.Add(new KeyValuePair<TestProperty, object?>(testProperty, propertyData));
         }
 
         return propertyList;
     }
 
     /// <inheritdoc/>
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         // Create an array of <Property, Value> dictionary
     }
@@ -111,7 +118,7 @@ internal class TestObjectConverter7 : JsonConverter
     /// <inheritdoc/>
     public override bool CanWrite => false;
 
-    public ConstructorInfo TestPropertyCtor { get; }
+    public ConstructorInfo? TestPropertyCtor { get; }
 
     /// <inheritdoc/>
     public override bool CanConvert(Type objectType)
@@ -120,7 +127,7 @@ internal class TestObjectConverter7 : JsonConverter
     }
 
     /// <inheritdoc/>
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         if (objectType != typeof(List<KeyValuePair<TestProperty, object>>))
         {
@@ -128,64 +135,65 @@ internal class TestObjectConverter7 : JsonConverter
             throw new ArgumentException("the objectType was not a KeyValuePair list", nameof(objectType));
         }
 
-        if (reader.TokenType == JsonToken.StartArray)
+        if (reader.TokenType != JsonToken.StartArray)
         {
-            var deserializedProperties = serializer.Deserialize<List<KeyValuePair<TestPropertyTemplate, JToken>>>(reader);
-            // Initialize the list capacity to be the number of properties we might add.
-            var propertyList = new List<KeyValuePair<TestProperty, object>>(deserializedProperties.Count);
-
-            // Every class that inherits from TestObject uses a properties store for <Property, Object>
-            // key value pairs.
-            foreach (var property in deserializedProperties)
-            {
-                var testProperty = (TestProperty)TestPropertyCtor.Invoke(EmptyObjectArray);
-                testProperty.Id = property.Key.Id;
-                testProperty.Label = property.Key.Label;
-                testProperty.Category = property.Key.Category;
-                testProperty.Description = property.Key.Description;
-                testProperty.Attributes = (TestPropertyAttributes)property.Key.Attributes;
-                testProperty.ValueType = property.Key.ValueType;
-
-
-                object propertyData = null;
-                JToken token = property.Value;
-                if (token.Type != JTokenType.Null)
-                {
-                    // If the property is already a string. No need to convert again.
-                    if (token.Type == JTokenType.String)
-                    {
-                        propertyData = token.ToObject(typeof(string), serializer);
-                    }
-                    else
-                    {
-                        // On deserialization, the value for each TestProperty is always a string. It is up
-                        // to the consumer to deserialize it further as appropriate.
-                        propertyData = token.ToString(Formatting.None).Trim('"');
-                    }
-                }
-
-                propertyList.Add(new KeyValuePair<TestProperty, object>(testProperty, propertyData));
-            }
-
-            return propertyList;
+            return new List<KeyValuePair<TestProperty, object>>();
         }
 
-        return new List<KeyValuePair<TestProperty, object>>();
+        var deserializedProperties = serializer.Deserialize<List<KeyValuePair<TestPropertyTemplate, JToken>>>(reader)!;
+        // Initialize the list capacity to be the number of properties we might add.
+        var propertyList = new List<KeyValuePair<TestProperty, object?>>(deserializedProperties.Count);
+
+        // Every class that inherits from TestObject uses a properties store for <Property, Object>
+        // key value pairs.
+        foreach (var property in deserializedProperties)
+        {
+            // This call will fail with NRE on .NET Standard 1.3
+            var testProperty = (TestProperty)TestPropertyCtor!.Invoke(EmptyObjectArray);
+            testProperty.Id = property.Key.Id!;
+            testProperty.Label = property.Key.Label!;
+            testProperty.Category = property.Key.Category!;
+            testProperty.Description = property.Key.Description!;
+            testProperty.Attributes = (TestPropertyAttributes)property.Key.Attributes;
+            testProperty.ValueType = property.Key.ValueType!;
+
+
+            object? propertyData = null;
+            JToken token = property.Value;
+            if (token.Type != JTokenType.Null)
+            {
+                // If the property is already a string. No need to convert again.
+                if (token.Type == JTokenType.String)
+                {
+                    propertyData = token.ToObject(typeof(string), serializer);
+                }
+                else
+                {
+                    // On deserialization, the value for each TestProperty is always a string. It is up
+                    // to the consumer to deserialize it further as appropriate.
+                    propertyData = token.ToString(Formatting.None).Trim('"');
+                }
+            }
+
+            propertyList.Add(new KeyValuePair<TestProperty, object?>(testProperty, propertyData));
+        }
+
+        return propertyList;
     }
 
     /// <inheritdoc/>
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         // Create an array of <Property, Value> dictionary
     }
 
     private class TestPropertyTemplate
     {
-        public string Id { get; set; }
-        public string Label { get; set; }
-        public string Category { get; set; }
-        public string Description { get; set; }
+        public string? Id { get; set; }
+        public string? Label { get; set; }
+        public string? Category { get; set; }
+        public string? Description { get; set; }
         public int Attributes { get; set; }
-        public string ValueType { get; set; }
+        public string? ValueType { get; set; }
     }
 }

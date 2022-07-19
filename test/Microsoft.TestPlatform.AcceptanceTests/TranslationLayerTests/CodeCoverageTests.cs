@@ -114,13 +114,13 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource()]
+    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingWithInvokedDataCollectors(RunnerInfo runnerInfo)
         => await TestRunWithCodeCoverageAndAttachmentsProcessingInternal(runnerInfo, true);
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource()]
+    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingWithoutInvokedDataCollectors(RunnerInfo runnerInfo)
         => await TestRunWithCodeCoverageAndAttachmentsProcessingInternal(runnerInfo, false);
@@ -169,7 +169,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             }
         }
 
-        Assert.AreEqual("Completed", _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.AttachmentsProcessingState]);
+        Assert.AreEqual("Completed", _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics![TelemetryDataConstants.AttachmentsProcessingState]);
         Assert.AreEqual(2L, _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing]);
         Assert.AreEqual(1L, _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing]);
         Assert.IsTrue(_testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing));
@@ -278,7 +278,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             }
         }
 
-        Assert.AreEqual("Completed", _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.AttachmentsProcessingState]);
+        Assert.AreEqual("Completed", _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics![TelemetryDataConstants.AttachmentsProcessingState]);
         Assert.AreEqual(3L, _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing]);
         Assert.AreEqual(1L, _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing]);
         Assert.IsTrue(_testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing));
@@ -335,7 +335,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             }
         }
 
-        Assert.AreEqual("Completed", _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.AttachmentsProcessingState]);
+        Assert.AreEqual("Completed", _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics![TelemetryDataConstants.AttachmentsProcessingState]);
         Assert.AreEqual(2L, _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing]);
         Assert.AreEqual(1L, _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing]);
         Assert.IsTrue(_testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing));
@@ -398,7 +398,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             }
         }
 
-        Assert.AreEqual("Completed", _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.AttachmentsProcessingState]);
+        Assert.AreEqual("Completed", _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics![TelemetryDataConstants.AttachmentsProcessingState]);
         Assert.AreEqual(4L, _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing]);
         Assert.AreEqual(1L, _testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing]);
         Assert.IsTrue(_testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing));
@@ -441,7 +441,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         return GetProjects().Select(p => GetAssetFullPath(p)).ToList();
     }
 
-    private IList<string> GetProjects()
+    private static IList<string> GetProjects()
     {
         return new List<string> { "SimpleTestProject.dll", "SimpleTestProject2.dll" };
     }

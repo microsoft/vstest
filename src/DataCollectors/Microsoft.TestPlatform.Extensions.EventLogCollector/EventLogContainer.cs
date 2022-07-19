@@ -24,8 +24,7 @@ internal class EventLogContainer : IEventLogContainer
     private readonly int _maxLogEntries;
 
     private readonly DataCollectionLogger _dataCollectionLogger;
-
-    private readonly DataCollectionContext? _dataCollectionContext;
+    private readonly DataCollectionContext _dataCollectionContext;
 
     /// <summary>
     /// Keeps track of if we are disposed.
@@ -53,7 +52,7 @@ internal class EventLogContainer : IEventLogContainer
     /// <param name="dataCollectionContext">
     /// Data Collection Context
     /// </param>
-    public EventLogContainer(string eventLogName, ISet<string>? eventSources, ISet<EventLogEntryType> entryTypes, int maxLogEntries, DataCollectionLogger dataCollectionLogger, DataCollectionContext? dataCollectionContext)
+    public EventLogContainer(string eventLogName, ISet<string>? eventSources, ISet<EventLogEntryType> entryTypes, int maxLogEntries, DataCollectionLogger dataCollectionLogger, DataCollectionContext dataCollectionContext)
     {
         EventLog = new EventLog(eventLogName);
         EventLog.EnableRaisingEvents = true;
@@ -152,7 +151,7 @@ internal class EventLogContainer : IEventLogContainer
                         _dataCollectionLogger.LogWarning(
                             _dataCollectionContext,
                             string.Format(
-                                CultureInfo.InvariantCulture,
+                                CultureInfo.CurrentCulture,
                                 Resource.EventsLostWarning,
                                 EventLog.Log));
 
@@ -204,7 +203,7 @@ internal class EventLogContainer : IEventLogContainer
                 _dataCollectionLogger.LogError(
                     _dataCollectionContext,
                     string.Format(
-                        CultureInfo.InvariantCulture,
+                        CultureInfo.CurrentCulture,
                         Resource.EventsLostError,
                         EventLog.Log,
                         exception), exception);

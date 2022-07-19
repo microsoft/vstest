@@ -71,14 +71,25 @@ public class TelemetryPerfTestBase : PerformanceTestBase
 
         foreach (var entry in perfAnalyzer.Events)
         {
-            metrics.Add(entry.Name, entry.TimeSinceStart);
+            // TODO: Jajares: What do we want to do in case of duplicated metric key?
+            // It used to be a metrics.Add() call but it was causing the errors below when running tests in parallel:
+            //  Test method Microsoft.TestPlatform.PerformanceTests.TranslationLayer.DiscoveryPerfTests.DiscoverTests threw exception:
+            // System.ArgumentException: An item with the same key has already been added.
+            // Stack Trace:
+            //  ThrowHelper.ThrowArgumentException(ExceptionResource resource)
+            //  Dictionary`2.Insert(TKey key, TValue value, Boolean add)
+            //  TelemetryPerfTestBase.PostTelemetry(IDictionary`2 handlerMetrics, PerfAnalyzer perfAnalyzer, String projectName, String scenario) line 74
+            //  DiscoveryPerfTests.DiscoverTests(String projectName, Double expectedNumberOfTests) line 49
+            // It was both for DiscoveryPerfTests and ExecutionPerfTests.
+            // I am doing a set call instead but that means we would override previous value.
+            metrics[entry.Name] = entry.TimeSinceStart;
         }
 
         _client.TrackEvent($"{scenario}{projectName}", properties, metrics);
         _client.Flush();
     }
 
-    private string GetAdapterName(string projectName)
+    private static string GetAdapterName(string projectName)
     {
         var name = projectName.ToLowerInvariant();
         if (name.Contains("xunit"))
@@ -105,12 +116,9 @@ public class TelemetryPerfTestBase : PerformanceTestBase
     public string[] GetPerfAssetFullPath(string name, string framework = "net6.0")
     {
         var dllPath = Path.Combine(_rootDirectory, "test", "TestAssets", "performance", name, "bin", BuildConfiguration, framework, $"{name}.dll");
-        if (!File.Exists(dllPath))
-        {
-            throw new FileNotFoundException(null, dllPath);
-        }
-
-        return new[] { dllPath };
+        return !File.Exists(dllPath)
+            ? throw new FileNotFoundException(null, dllPath)
+            : new[] { dllPath };
     }
 
     /// <summary>
@@ -119,5 +127,5 @@ public class TelemetryPerfTestBase : PerformanceTestBase
     /// <returns></returns>
 
     // DONT make this just <RunSettings></RunSettings> it makes Translation layer hang... https://github.com/microsoft/vstest/issues/3519
-    public string GetDefaultRunSettings() => "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+    public static string GetDefaultRunSettings() => "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
 }

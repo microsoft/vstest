@@ -40,31 +40,31 @@ public class ConverterTests
     [TestMethod]
     public void ToOutcomeShouldMapFailedToFailed()
     {
-        Assert.AreEqual(TrxLoggerOutcome.Failed, _converter.ToOutcome(TestOutcome.Failed));
+        Assert.AreEqual(TrxLoggerOutcome.Failed, Converter.ToOutcome(TestOutcome.Failed));
     }
 
     [TestMethod]
     public void ToOutcomeShouldMapPassedToPassed()
     {
-        Assert.AreEqual(TrxLoggerOutcome.Passed, _converter.ToOutcome(TestOutcome.Passed));
+        Assert.AreEqual(TrxLoggerOutcome.Passed, Converter.ToOutcome(TestOutcome.Passed));
     }
 
     [TestMethod]
     public void ToOutcomeShouldMapSkippedToNotExecuted()
     {
-        Assert.AreEqual(TrxLoggerOutcome.NotExecuted, _converter.ToOutcome(TestOutcome.Skipped));
+        Assert.AreEqual(TrxLoggerOutcome.NotExecuted, Converter.ToOutcome(TestOutcome.Skipped));
     }
 
     [TestMethod]
     public void ToOutcomeShouldMapNoneToNotExecuted()
     {
-        Assert.AreEqual(TrxLoggerOutcome.NotExecuted, _converter.ToOutcome(TestOutcome.None));
+        Assert.AreEqual(TrxLoggerOutcome.NotExecuted, Converter.ToOutcome(TestOutcome.None));
     }
 
     [TestMethod]
     public void ToOutcomeShouldMapNotFoundToNotExecuted()
     {
-        Assert.AreEqual(TrxLoggerOutcome.NotExecuted, _converter.ToOutcome(TestOutcome.NotFound));
+        Assert.AreEqual(TrxLoggerOutcome.NotExecuted, Converter.ToOutcome(TestOutcome.NotFound));
     }
 
     [TestMethod]
@@ -94,7 +94,7 @@ public class ConverterTests
 
         testCase.SetPropertyValue(testProperty, new[] { "AsmLevel", "ClassLevel", "MethodLevel" });
 
-        var unitTestElement = _converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
+        var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
 
         object[] expected = new[] { "MethodLevel", "ClassLevel", "AsmLevel" };
 
@@ -110,7 +110,7 @@ public class ConverterTests
 
         testCase.SetPropertyValue(testProperty, new[] { "3", "99999", "0" });
 
-        var unitTestElement = _converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
+        var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
 
         int[] expected = new[] { 0, 3, 99999 };
 
@@ -125,7 +125,7 @@ public class ConverterTests
     {
         TestCase testCase = CreateTestCase("TestCase1");
 
-        var unitTestElement = _converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
+        var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
 
         object[] expected = Enumerable.Empty<Object>().ToArray();
 
@@ -197,17 +197,17 @@ public class ConverterTests
         expectedClassName = expectedTestName = fullyQualifiedName = source = testName = "test1";
 
         TestCase testCase = new(fullyQualifiedName, new Uri("some://uri"), source);
-        var unitTestElement = (UnitTestElement)_converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase);
+        var unitTestElement = (UnitTestElement)Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase);
 
         Assert.AreEqual(expectedClassName, unitTestElement.TestMethod.ClassName);
         Assert.AreEqual(expectedTestName, unitTestElement.TestMethod.Name);
     }
 
-    private void ValidateTestMethodProperties(string testName, string fullyQualifiedName, string expectedClassName, string expectedTestName)
+    private static void ValidateTestMethodProperties(string testName, string fullyQualifiedName, string expectedClassName, string expectedTestName)
     {
         TestCase testCase = CreateTestCase(fullyQualifiedName);
 
-        var unitTestElement = (UnitTestElement)_converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase);
+        var unitTestElement = (UnitTestElement)Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase);
 
         Assert.AreEqual(expectedClassName, unitTestElement.TestMethod.ClassName);
         Assert.AreEqual(expectedTestName, unitTestElement.TestMethod.Name);

@@ -11,12 +11,12 @@
 
   <PropertyGroup>
     <AssemblyName>NewtonSoftDependency</AssemblyName>
-    <TargetFrameworks>net451</TargetFrameworks>
+    <TargetFrameworks>$(TargetNetFxVersion)</TargetFrameworks>
     <OutputType Condition="$(NetCoreAppTargetFramework) == 'true' ">Exe</OutputType>
   </PropertyGroup>
 
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
     <Reference Include="Microsoft.CSharp" />
@@ -26,7 +26,9 @@
   <ItemGroup>
     <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestAdapterVersion)" />
     <PackageReference Include="MSTest.TestFramework" Version="$(MSTestAdapterVersion)" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <!-- TODO: This version would ideally be higher than the newtonsoft version we use in TP to show that the higher version is used.
+    Currently there is no higher stable version. -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>

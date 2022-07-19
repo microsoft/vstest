@@ -4,7 +4,7 @@
 
   <PropertyGroup>
     <AssemblyName>ConsoleManagedApp</AssemblyName>
-    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;$(TargetNetFxVersion)</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>

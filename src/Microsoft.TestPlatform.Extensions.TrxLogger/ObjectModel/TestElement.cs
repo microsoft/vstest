@@ -255,6 +255,6 @@ internal abstract class TestElement : ITestElement, IXmlTestStore
 
         XmlTestStoreParameters testIdParameters = XmlTestStoreParameters.GetParameters();
         testIdParameters[TestId.IdLocationKey] = "@id";
-        h.SaveObject(_id, element, testIdParameters);
+        XmlPersistence.SaveObject(_id, element, testIdParameters);
     }
 }

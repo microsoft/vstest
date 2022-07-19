@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 /// <summary>
@@ -18,10 +16,10 @@ public class TestRunAttachmentsProcessingCompletePayload
     /// <summary>
     /// Gets or sets the test run attachments processing complete args.
     /// </summary>
-    public TestRunAttachmentsProcessingCompleteEventArgs AttachmentsProcessingCompleteEventArgs { get; set; }
+    public TestRunAttachmentsProcessingCompleteEventArgs? AttachmentsProcessingCompleteEventArgs { get; set; }
 
     /// <summary>
     /// Gets or sets the attachments.
     /// </summary>
-    public IEnumerable<AttachmentSet> Attachments { get; set; }
+    public IEnumerable<AttachmentSet>? Attachments { get; set; }
 }

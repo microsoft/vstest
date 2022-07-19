@@ -8,9 +8,9 @@
         <target state="translated">ManagedName tamamlanmadı</target>
       </trans-unit>
       <trans-unit id="ErrorMethodArityMustBeNumeric">
-        <source>Method arity must be numeric</source>
-        <note />
-        <target state="translated">Method sayısı sayısal bir değer olmalıdır</target>
+        <source>Method arity must be numeric.</source>
+        <note></note>
+        <target state="translated">Yöntem parametre sayısı, sayısal bir değer olmalıdır.</target>
       </trans-unit>
       <trans-unit id="ErrorMethodNotFound">
         <source>Method '{0}' not found on type '{1}'</source>

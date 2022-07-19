@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 /// <summary>
@@ -17,7 +15,7 @@ public interface ITestExtensionManager
     /// </summary>
     /// <param name="pathToAdditionalExtensions">List of extension paths</param>
     /// <param name="skipExtensionFilters">Skips filtering of extensions (if true)</param>
-    void UseAdditionalExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters);
+    void UseAdditionalExtensions(IEnumerable<string>? pathToAdditionalExtensions, bool skipExtensionFilters);
 
     /// <summary>
     /// Clear the extensions data

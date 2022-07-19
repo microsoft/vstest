@@ -4,8 +4,6 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -18,19 +16,19 @@ public class DiscoveryRequestPayload
     /// Settings used for the discovery request.
     /// </summary>
     [DataMember]
-    public IEnumerable<string> Sources { get; set; }
+    public IEnumerable<string>? Sources { get; set; }
 
     /// <summary>
     /// Settings used for the discovery request.
     /// </summary>
     [DataMember]
-    public string RunSettings { get; set; }
+    public string? RunSettings { get; set; }
 
     /// <summary>
     /// Gets or sets the test platform options
     /// </summary>
     [DataMember]
-    public TestPlatformOptions TestPlatformOptions
+    public TestPlatformOptions? TestPlatformOptions
     {
         get;
         set;
@@ -40,5 +38,5 @@ public class DiscoveryRequestPayload
     /// Gets or sets the test session info.
     /// </summary>
     [DataMember]
-    public TestSessionInfo TestSessionInfo { get; set; }
+    public TestSessionInfo? TestSessionInfo { get; set; }
 }

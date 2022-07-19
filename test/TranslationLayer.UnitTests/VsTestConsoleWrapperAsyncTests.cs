@@ -4,6 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+#if !NET5_0_OR_GREATER
+using System.Diagnostics;
+#endif
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -57,7 +60,13 @@ public class VsTestConsoleWrapperAsyncTests
     public async Task StartSessionAsyncShouldStartVsTestConsoleWithCorrectArguments()
     {
         var inputPort = 123;
-        int expectedParentProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
+#if NET5_0_OR_GREATER
+        var expectedParentProcessId = Environment.ProcessId;
+#else
+        int expectedParentProcessId;
+        using (var p = Process.GetCurrentProcess())
+            expectedParentProcessId = p.Id;
+#endif
         _mockRequestSender.Setup(rs => rs.InitializeCommunicationAsync(It.IsAny<int>())).Returns(Task.FromResult(inputPort));
 
         await _consoleWrapper.StartSessionAsync();
@@ -101,13 +110,13 @@ public class VsTestConsoleWrapperAsyncTests
                     null,
                     mockEventsHandler.Object,
                     null))
-            .Returns(Task.FromResult(testSessionInfo));
+            .Returns(Task.FromResult<TestSessionInfo?>(testSessionInfo));
 
         Assert.AreEqual(
             (await _consoleWrapper.StartTestSessionAsync(
                 _testSources,
                 null,
-                mockEventsHandler.Object).ConfigureAwait(false)).TestSessionInfo,
+                mockEventsHandler.Object).ConfigureAwait(false))?.TestSessionInfo,
             testSessionInfo);
 
         _mockRequestSender.Verify(
@@ -135,14 +144,14 @@ public class VsTestConsoleWrapperAsyncTests
                     testPlatformOptions,
                     mockEventsHandler.Object,
                     null))
-            .Returns(Task.FromResult(testSessionInfo));
+            .Returns(Task.FromResult<TestSessionInfo?>(testSessionInfo));
 
         Assert.AreEqual(
             (await _consoleWrapper.StartTestSessionAsync(
                 _testSources,
                 null,
                 testPlatformOptions,
-                mockEventsHandler.Object).ConfigureAwait(false)).TestSessionInfo,
+                mockEventsHandler.Object).ConfigureAwait(false))?.TestSessionInfo,
             testSessionInfo);
 
         _mockRequestSender.Verify(
@@ -171,7 +180,7 @@ public class VsTestConsoleWrapperAsyncTests
                     testPlatformOptions,
                     mockEventsHandler.Object,
                     mockTesthostLauncher.Object))
-            .Returns(Task.FromResult(testSessionInfo));
+            .Returns(Task.FromResult<TestSessionInfo?>(testSessionInfo));
 
         Assert.AreEqual(
             (await _consoleWrapper.StartTestSessionAsync(
@@ -179,7 +188,7 @@ public class VsTestConsoleWrapperAsyncTests
                 null,
                 testPlatformOptions,
                 mockEventsHandler.Object,
-                mockTesthostLauncher.Object).ConfigureAwait(false)).TestSessionInfo,
+                mockTesthostLauncher.Object).ConfigureAwait(false))?.TestSessionInfo,
             testSessionInfo);
 
         _mockRequestSender.Verify(

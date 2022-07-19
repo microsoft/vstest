@@ -72,7 +72,7 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeWithParametersShouldThrowExceptionIfEventsIsNull()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "param1", "value" },
         };
@@ -83,22 +83,22 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeWithParametersShouldThrowExceptionIfParametersIsEmpty()
     {
-        Assert.ThrowsException<ArgumentException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, new Dictionary<string, string>()));
+        Assert.ThrowsException<ArgumentException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, new Dictionary<string, string?>()));
     }
 
     [TestMethod]
     public void InitializeWithParametersShouldThrowExceptionIfParametersIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, (Dictionary<string, string>)null!));
+        Assert.ThrowsException<ArgumentNullException>(() => _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, (Dictionary<string, string?>)null!));
     }
 
     [TestMethod]
     public void InitializeWithParametersShouldSetVerbosityLevel()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "minimal" },
-            { DefaultLoggerParameterNames.TargetFramework , "net451"}
+            { DefaultLoggerParameterNames.TargetFramework , "net462"}
         };
         _consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
@@ -108,7 +108,7 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeWithParametersShouldDefaultToNormalVerbosityLevelForInvalidVerbosity()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "" },
         };
@@ -125,7 +125,7 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeWithParametersShouldSetPrefixValue()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "prefix", "true" },
         };
@@ -140,7 +140,7 @@ public class ConsoleLoggerTests
     [TestMethod]
     public void InitializeWithParametersShouldSetNoProgress()
     {
-        var parameters = new Dictionary<string, string>();
+        var parameters = new Dictionary<string, string?>();
 
         Assert.IsFalse(ConsoleLogger.EnableProgress);
 
@@ -158,7 +158,7 @@ public class ConsoleLoggerTests
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
 
-        Assert.ThrowsException<ArgumentNullException>(() => loggerEvents.RaiseTestRunMessage(default));
+        Assert.ThrowsException<ArgumentNullException>(() => loggerEvents.RaiseTestRunMessage(default!));
     }
 
     [TestMethod]
@@ -216,7 +216,7 @@ public class ConsoleLoggerTests
     {
         loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -229,7 +229,7 @@ public class ConsoleLoggerTests
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
 
-        Assert.ThrowsException<ArgumentNullException>(() => loggerEvents.RaiseTestResult(default));
+        Assert.ThrowsException<ArgumentNullException>(() => loggerEvents.RaiseTestResult(default!));
     }
 
     [TestMethod]
@@ -241,7 +241,7 @@ public class ConsoleLoggerTests
 
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -272,7 +272,7 @@ public class ConsoleLoggerTests
         // Setup
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -301,7 +301,7 @@ public class ConsoleLoggerTests
         // Setup
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "detailed" }
         };
@@ -333,7 +333,7 @@ public class ConsoleLoggerTests
         // Setup
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "detailed" }
         };
@@ -357,7 +357,7 @@ public class ConsoleLoggerTests
         // Setup
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "quiet" },
             { DefaultLoggerParameterNames.TargetFramework , "abc" }
@@ -381,7 +381,7 @@ public class ConsoleLoggerTests
         // Setup
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "quiet" },
             { DefaultLoggerParameterNames.TargetFramework , "abc" }
@@ -405,7 +405,7 @@ public class ConsoleLoggerTests
         // Setup
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -431,7 +431,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -456,7 +456,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -483,7 +483,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -508,7 +508,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -535,7 +535,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -562,7 +562,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -584,16 +584,16 @@ public class ConsoleLoggerTests
         _mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(5));
     }
 
-    [DataRow(".NETFramework,version=v4.5.1", "(net451)", "quiet")]
-    [DataRow(".NETFramework,version=v4.5.1", "(net451)", "minimal")]
+    [DataRow(".NETFramework,version=v4.6.2", "(net462)", "quiet")]
+    [DataRow(".NETFramework,version=v4.6.2", "(net462)", "minimal")]
     [DataRow(null, null, "quiet")]
     [DataRow(null, null, "minimal")]
     [TestMethod]
-    public void TestResultHandlerShouldShowFailedTestsAndPassedTestsForQuietVebosity(string framework, string expectedFramework, string verbosityLevel)
+    public void TestResultHandlerShouldShowFailedTestsAndPassedTestsForQuietVerbosity(string framework, string expectedFramework, string verbosityLevel)
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", verbosityLevel },
             { DefaultLoggerParameterNames.TargetFramework , framework}
@@ -615,10 +615,10 @@ public class ConsoleLoggerTests
 
         _mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
             (CommandLineResources.PassedTestIndicator + "!").PadRight(8),
-            0.ToString().PadLeft(5),
-            1.ToString().PadLeft(5),
-            1.ToString().PadLeft(5), 2
-                .ToString().PadLeft(5),
+            0.ToString(CultureInfo.InvariantCulture).PadLeft(5),
+            1.ToString(CultureInfo.InvariantCulture).PadLeft(5),
+            1.ToString(CultureInfo.InvariantCulture).PadLeft(5),
+            2.ToString(CultureInfo.InvariantCulture).PadLeft(5),
             "1 m 2 s"), OutputLevel.Information), Times.Once);
 
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework,
@@ -627,10 +627,10 @@ public class ConsoleLoggerTests
 
         _mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
             (CommandLineResources.FailedTestIndicator + "!").PadRight(8),
-            1.ToString().PadLeft(5),
-            1.ToString().PadLeft(5),
-            1.ToString().PadLeft(5),
-            3.ToString().PadLeft(5),
+            1.ToString(CultureInfo.InvariantCulture).PadLeft(5),
+            1.ToString(CultureInfo.InvariantCulture).PadLeft(5),
+            1.ToString(CultureInfo.InvariantCulture).PadLeft(5),
+            3.ToString(CultureInfo.InvariantCulture).PadLeft(5),
             "1 h 2 m"), OutputLevel.Information), Times.Once);
 
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework,
@@ -645,10 +645,10 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", verbosityLevel },
-            { DefaultLoggerParameterNames.TargetFramework , "net451"}
+            { DefaultLoggerParameterNames.TargetFramework , "net462"}
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
@@ -665,8 +665,8 @@ public class ConsoleLoggerTests
         loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), TimeSpan.FromSeconds(1)));
         loggerEvents.WaitForEventCompletion();
 
-        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, CommandLineResources.PassedTestIndicator, 2, 1, 0, 1, "1 m 2 s", "TestSourcePassed", "(net451)"), OutputLevel.Information), Times.Never);
-        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, CommandLineResources.FailedTestIndicator, 5, 1, 1, 1, "1 h 6 m", "TestSource", "(net451)"), OutputLevel.Information), Times.Never);
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, CommandLineResources.PassedTestIndicator, 2, 1, 0, 1, "1 m 2 s", "TestSourcePassed", "(net462)"), OutputLevel.Information), Times.Never);
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, CommandLineResources.FailedTestIndicator, 5, 1, 1, 1, "1 h 6 m", "TestSource", "(net462)"), OutputLevel.Information), Times.Never);
     }
 
     [TestMethod]
@@ -674,7 +674,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -701,7 +701,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -728,10 +728,10 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "minimal" },
-            { DefaultLoggerParameterNames.TargetFramework , "net451"}
+            { DefaultLoggerParameterNames.TargetFramework , "net462"}
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
@@ -754,10 +754,10 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "quiet" },
-            { DefaultLoggerParameterNames.TargetFramework , "net451"}
+            { DefaultLoggerParameterNames.TargetFramework , "net462"}
         };
         _consoleLogger.Initialize(loggerEvents, parameters);
 
@@ -785,7 +785,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -808,7 +808,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -831,7 +831,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -856,7 +856,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -880,7 +880,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -904,7 +904,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -920,7 +920,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -941,7 +941,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -959,7 +959,7 @@ public class ConsoleLoggerTests
         loggerEvents.EnableEvents();
 
         var fileHelper = new Mock<IFileHelper>();
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.FileHelper = fileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
         string testFilePath = Path.Combine(Path.GetTempPath(), "DmmyTestFile.dll");
@@ -967,7 +967,7 @@ public class ConsoleLoggerTests
 
         CommandLineOptions.Instance.AddSource(testFilePath);
 
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -987,7 +987,7 @@ public class ConsoleLoggerTests
         loggerEvents.EnableEvents();
 
         var fileHelper = new Mock<IFileHelper>();
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.FileHelper = fileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
         var temp = Path.GetTempPath();
@@ -999,7 +999,7 @@ public class ConsoleLoggerTests
         CommandLineOptions.Instance.AddSource(testFilePath);
         CommandLineOptions.Instance.AddSource(testFilePath2);
 
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "detailed" }
         };
@@ -1021,7 +1021,7 @@ public class ConsoleLoggerTests
         loggerEvents.EnableEvents();
 
         var fileHelper = new Mock<IFileHelper>();
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.FileHelper = fileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
         var temp = Path.GetTempPath();
@@ -1033,7 +1033,7 @@ public class ConsoleLoggerTests
         CommandLineOptions.Instance.AddSource(testFilePath);
         CommandLineOptions.Instance.AddSource(testFilePath2);
 
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -1053,7 +1053,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -1080,7 +1080,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -1106,7 +1106,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "detailed" }
         };
@@ -1132,7 +1132,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -1169,7 +1169,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", verbosityLevel }
         };
@@ -1195,7 +1195,7 @@ public class ConsoleLoggerTests
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
         loggerEvents.EnableEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             { "verbosity", "normal" }
         };
@@ -1232,12 +1232,12 @@ public class ConsoleLoggerTests
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryTotalTests, 2), OutputLevel.Information), Times.Once());
     }
 
-    private TestCase CreateTestCase(string testCaseName)
+    private static TestCase CreateTestCase(string testCaseName)
     {
         return new TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");
     }
 
-    private List<ObjectModel.TestResult> GetTestResultsObject()
+    private static List<ObjectModel.TestResult> GetTestResultsObject()
     {
         var testcase = new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSource")
         {
@@ -1282,7 +1282,7 @@ public class ConsoleLoggerTests
         return testresultList;
     }
 
-    private List<ObjectModel.TestResult> GetPassedTestResultsObject()
+    private static List<ObjectModel.TestResult> GetPassedTestResultsObject()
     {
         var testcase = new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSourcePassed")
         {
@@ -1309,7 +1309,7 @@ public class ConsoleLoggerTests
     }
 
 
-    private List<ObjectModel.TestResult> GetTestResultObject(TestOutcome outcome)
+    private static List<ObjectModel.TestResult> GetTestResultObject(TestOutcome outcome)
     {
         var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
         var testresult = new ObjectModel.TestResult(testcase)

@@ -4,15 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
@@ -54,7 +50,7 @@ internal class TestRunCache : ITestRunCache
     /// <summary>
     /// Timer for cache
     /// </summary>
-    private Timer _timer;
+    private readonly Timer _timer;
 
     /// <summary>
     /// Last time results were sent.
@@ -84,9 +80,9 @@ internal class TestRunCache : ITestRunCache
     /// <param name="onCacheHit"> The on cache hit. </param>
     internal TestRunCache(long cacheSize, TimeSpan cacheTimeout, OnCacheHit onCacheHit)
     {
-        Debug.Assert(cacheSize > 0, "Buffer size cannot be less than zero");
-        Debug.Assert(onCacheHit != null, "Callback which listens for cache size limit cannot be null.");
-        Debug.Assert(cacheTimeout > TimeSpan.MinValue, "The cache timeout must be greater than min value.");
+        TPDebug.Assert(cacheSize > 0, "Buffer size cannot be less than zero");
+        TPDebug.Assert(onCacheHit != null, "Callback which listens for cache size limit cannot be null.");
+        TPDebug.Assert(cacheTimeout > TimeSpan.MinValue, "The cache timeout must be greater than min value.");
 
         if (cacheTimeout.TotalMilliseconds > int.MaxValue)
         {
@@ -233,7 +229,7 @@ internal class TestRunCache : ITestRunCache
     /// The completed Test.
     /// </param>
     /// <returns> True if this test has been removed from the list of in progress tests. </returns>
-    public bool OnTestCompletion(TestCase completedTest)
+    public bool OnTestCompletion(TestCase? completedTest)
     {
         lock (_syncObject)
         {
@@ -299,7 +295,6 @@ internal class TestRunCache : ITestRunCache
             if (_timer != null)
             {
                 _timer.Dispose();
-                _timer = null;
             }
 
             // Indicate that the instance has been disposed.
@@ -352,7 +347,7 @@ internal class TestRunCache : ITestRunCache
         EqtTrace.Verbose("TestRunCache: OnNewTestResult: Notified the onCacheHit callback.");
     }
 
-    private void OnCacheTimeHit(object state)
+    private void OnCacheTimeHit(object? state)
     {
         lock (_syncObject)
         {

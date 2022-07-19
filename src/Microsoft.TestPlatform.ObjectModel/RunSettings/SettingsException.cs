@@ -6,8 +6,6 @@ using System;
 using System.Runtime.Serialization;
 #endif
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -30,7 +28,7 @@ public class SettingsException : Exception
     /// Initializes with the message.
     /// </summary>
     /// <param name="message">Message for the exception.</param>
-    public SettingsException(string message)
+    public SettingsException(string? message)
         : base(message)
     {
     }
@@ -40,7 +38,7 @@ public class SettingsException : Exception
     /// </summary>
     /// <param name="message">Message for the exception.</param>
     /// <param name="innerException">The inner exception.</param>
-    public SettingsException(string message, Exception innerException)
+    public SettingsException(string? message, Exception? innerException)
         : base(message, innerException)
     {
     }

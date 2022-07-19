@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
@@ -22,7 +21,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 /// </summary>
 internal sealed class TestResultId : IXmlTestStore
 {
-    private Guid _runId;
+    private readonly Guid _runId;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestResultId"/> class.
@@ -381,7 +380,7 @@ internal class TestResult : ITestResult, IXmlTestStore
             if (_testRun == null)
             {
                 Debug.Fail("'m_testRun' is null");
-                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunInResult));
+                throw new InvalidOperationException(TrxLoggerResources.Common_MissingRunInResult);
             }
 
             return _testRun.GetResultFilesDirectory(this);
@@ -458,7 +457,7 @@ internal class TestResult : ITestResult, IXmlTestStore
             TPDebug.Assert(!string.IsNullOrEmpty(resultFile), "'resultFile' is null or empty");
             TPDebug.Assert(resultFile.Trim() == resultFile, "'resultFile' has whitespace at the ends");
 
-            _resultFiles[_trxFileHelper.MakePathRelative(resultFile, testResultsDirectory)] = null;
+            _resultFiles[TrxFileHelper.MakePathRelative(resultFile, testResultsDirectory)] = null;
         }
     }
 

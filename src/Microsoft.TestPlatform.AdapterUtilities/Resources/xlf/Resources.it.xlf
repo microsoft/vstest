@@ -8,9 +8,9 @@
         <target state="translated">L'elemento ManagedName è incompleto</target>
       </trans-unit>
       <trans-unit id="ErrorMethodArityMustBeNumeric">
-        <source>Method arity must be numeric</source>
-        <note />
-        <target state="translated">Il grado del metodo deve essere numerico</target>
+        <source>Method arity must be numeric.</source>
+        <note></note>
+        <target state="translated">Il grado del metodo deve essere numerico.</target>
       </trans-unit>
       <trans-unit id="ErrorMethodNotFound">
         <source>Method '{0}' not found on type '{1}'</source>

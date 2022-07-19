@@ -1,10 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Globalization;
 using System.Xml;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -57,10 +54,7 @@ public static class XmlReaderUtilities
         // Verify that it is a "RunSettings" node.
         if (reader.Name != RunSettingsRootNodeName)
         {
-            throw new SettingsException(
-                string.Format(
-                    CultureInfo.CurrentCulture,
-                    Resources.Resources.InvalidRunSettingsRootNode));
+            throw new SettingsException(Resources.Resources.InvalidRunSettingsRootNode);
         }
     }
 

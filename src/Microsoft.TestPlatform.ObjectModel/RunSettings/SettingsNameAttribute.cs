@@ -3,10 +3,6 @@
 
 using System;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
-
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -22,11 +18,7 @@ public sealed class SettingsNameAttribute : Attribute
     /// <param name="settingsName">Name of the settings</param>
     public SettingsNameAttribute(string settingsName)
     {
-        if (string.IsNullOrWhiteSpace(settingsName))
-        {
-            throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(settingsName));
-        }
-
+        ValidateArg.NotNullOrWhiteSpace(settingsName, nameof(settingsName));
         SettingsName = settingsName;
     }
 

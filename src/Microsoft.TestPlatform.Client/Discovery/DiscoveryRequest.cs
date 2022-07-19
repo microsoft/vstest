@@ -68,7 +68,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException(nameof(DiscoveryRequest));
             }
@@ -110,7 +110,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException(nameof(DiscoveryRequest));
             }
@@ -149,7 +149,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     {
         EqtTrace.Verbose("DiscoveryRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
 
-        if (_disposed)
+        if (_isDisposed)
         {
             throw new ObjectDisposedException("DiscoveryRequest");
         }
@@ -221,7 +221,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("DiscoveryRequest.HandleDiscoveryComplete: Ignoring as the object is disposed.");
                 return;
@@ -262,7 +262,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 if (RequestData.IsTelemetryOptedIn)
                 {
                     TestExtensions.AddExtensionTelemetry(
-                        discoveryCompleteEventArgs.Metrics,
+                        discoveryCompleteEventArgs.Metrics!,
                         discoveryCompleteEventArgs.DiscoveredExtensions);
                 }
 
@@ -311,7 +311,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("DiscoveryRequest.HandleDiscoveredTests: Ignoring as the object is disposed.");
                 return;
@@ -330,19 +330,19 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// </summary>
     /// <param name="level">Output level of the message being sent.</param>
     /// <param name="message">Actual contents of the message</param>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         EqtTrace.Verbose("DiscoveryRequest.HandleLogMessage: Starting.");
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("DiscoveryRequest.HandleLogMessage: Ignoring as the object is disposed.");
                 return;
             }
 
-            var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
+            var testRunMessageEvent = new TestRunMessageEventArgs(level, message!);
             LoggerManager.HandleDiscoveryMessage(testRunMessageEvent);
             OnDiscoveryMessage.SafeInvoke(this, testRunMessageEvent, "DiscoveryRequest.OnTestMessageRecieved");
         }
@@ -362,7 +362,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             ? _dataSerializer.DeserializeMessage(rawMessage)
             : null;
 
-        if (string.Equals(message?.MessageType, MessageType.DiscoveryComplete))
+        if (MessageType.DiscoveryComplete.Equals(message?.MessageType))
         {
             var discoveryCompletePayload = _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
             rawMessage = UpdateRawMessageWithTelemetryInfo(discoveryCompletePayload, message) ?? rawMessage;
@@ -376,7 +376,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// Handles LoggerManager's DiscoveryComplete.
     /// </summary>
     /// <param name="discoveryCompletePayload">Discovery complete payload.</param>
-    private void HandleLoggerManagerDiscoveryComplete(DiscoveryCompletePayload discoveryCompletePayload)
+    private void HandleLoggerManagerDiscoveryComplete(DiscoveryCompletePayload? discoveryCompletePayload)
     {
         if (LoggerManager.LoggersInitialized && discoveryCompletePayload != null)
         {
@@ -477,30 +477,20 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// </summary>
     public void Dispose()
     {
-        Dispose(true);
-
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
         EqtTrace.Verbose("DiscoveryRequest.Dispose: Starting.");
 
         lock (_syncObject)
         {
-            if (!_disposed)
+            if (!_isDisposed)
             {
-                if (disposing)
+                if (_discoveryCompleted != null)
                 {
-                    if (_discoveryCompleted != null)
-                    {
-                        _discoveryCompleted.Dispose();
-                    }
+                    _discoveryCompleted.Dispose();
                 }
 
                 // Indicate that object has been disposed
                 _discoveryCompleted = null!;
-                _disposed = true;
+                _isDisposed = true;
             }
         }
 
@@ -516,7 +506,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <summary>
     /// If this request has been disposed.
     /// </summary>
-    private bool _disposed;
+    private bool _isDisposed;
 
     /// <summary>
     /// It get set when current discovery request is completed.

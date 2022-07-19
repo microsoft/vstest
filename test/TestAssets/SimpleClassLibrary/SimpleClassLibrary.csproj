@@ -3,7 +3,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.1;$(TargetNetFxVersion)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
@@ -18,10 +18,10 @@
   <PropertyGroup Condition="$(NetCoreAppTargetFramework) == 'true' and $(Configuration) == 'Release'">
     <DebugType>portable</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net451' and $(Configuration) == 'Debug'">
+  <PropertyGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' and $(Configuration) == 'Debug'">
     <DebugType>full</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net451' and $(Configuration) == 'Release'">
+  <PropertyGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' and $(Configuration) == 'Release'">
     <DebugType>portable</DebugType>
   </PropertyGroup>
 </Project>

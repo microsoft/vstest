@@ -22,4 +22,9 @@ public enum DiscoveryStatus
     /// Indicates that source was fully discovered.
     /// </summary>
     FullyDiscovered,
+
+    /// <summary>
+    /// Indicates that source was skipped in discovery.
+    /// </summary>
+    SkippedDiscovery
 }

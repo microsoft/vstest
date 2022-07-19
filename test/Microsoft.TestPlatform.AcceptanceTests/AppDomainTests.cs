@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 #if !NETFRAMEWORK
 using System.Runtime.Loader;
@@ -93,7 +94,7 @@ public class AppDomainTests : AcceptanceTestBase
                                     </RunConfiguration>
                                 </RunSettings>";
 
-        fileContents = string.Format(fileContents, assemblyName, inprocasm);
+        fileContents = string.Format(CultureInfo.CurrentCulture, fileContents, assemblyName, inprocasm);
         File.WriteAllText(runSettings, fileContents);
 
         return runSettings;

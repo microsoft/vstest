@@ -7,7 +7,7 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.Settings.targets" />
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;$(TargetNetFxVersion)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <OutputType Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">Exe</OutputType>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
@@ -16,7 +16,7 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
     <DebugType>portable</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net451'">
+  <PropertyGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)'">
     <DebugType>full</DebugType>
   </PropertyGroup>
   <ItemGroup>

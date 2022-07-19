@@ -15,13 +15,6 @@ internal static class KnownFrameworkNames
     public static FrameworkName Net5 = new(KnownFrameworkStrings.Net5);
     public static FrameworkName Net6 = new(KnownFrameworkStrings.Net6);
     public static FrameworkName Net7 = new(KnownFrameworkStrings.Net7);
-
-    public static FrameworkName Net4 = new(KnownFrameworkStrings.Net4);
-    public static FrameworkName Net45 = new(KnownFrameworkStrings.Net45);
-    public static FrameworkName Net451 = new(KnownFrameworkStrings.Net451);
-    public static FrameworkName Net452 = new(KnownFrameworkStrings.Net452);
-    public static FrameworkName Net46 = new(KnownFrameworkStrings.Net46);
-    public static FrameworkName Net461 = new(KnownFrameworkStrings.Net461);
     public static FrameworkName Net462 = new(KnownFrameworkStrings.Net462);
     public static FrameworkName Net47 = new(KnownFrameworkStrings.Net47);
     public static FrameworkName Net471 = new(KnownFrameworkStrings.Net471);

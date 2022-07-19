@@ -82,19 +82,19 @@ internal class DummyConsoleOutput : IOutput
     /// <summary>
     /// The lines.
     /// </summary>
-    internal List<string> Lines;
+    internal List<string?> Lines;
 
     public DummyConsoleOutput()
     {
-        Lines = new List<string>();
+        Lines = new List<string?>();
     }
 
-    public void WriteLine(string message, OutputLevel level)
+    public void WriteLine(string? message, OutputLevel level)
     {
         Lines.Add(message);
     }
 
-    public void Write(string message, OutputLevel level)
+    public void Write(string? message, OutputLevel level)
     {
         throw new NotImplementedException();
     }

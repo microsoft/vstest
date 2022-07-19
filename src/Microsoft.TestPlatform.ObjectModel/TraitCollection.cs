@@ -6,8 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -21,7 +19,7 @@ public class TraitCollection : IEnumerable<Trait>
     internal const string TraitPropertyId = "TestObject.Traits";
     private static readonly TestProperty TraitsProperty = TestProperty.Register(
         TraitPropertyId,
-#if !NET451
+#if WINDOWS_UWP
         // TODO: Fix this with proper resourcing for UWP and Win 8.1 Apps
         // Trying to access resources will throw "MissingManifestResourceException" percolated as "TypeInitialization" exception
         "Traits",

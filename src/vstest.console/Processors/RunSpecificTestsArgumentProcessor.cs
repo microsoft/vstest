@@ -181,11 +181,11 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         TPDebug.Assert(Output != null);
         TPDebug.Assert(_commandLineOptions != null);
         TPDebug.Assert(_testRequestManager != null);
-        TPDebug.Assert(!_runSettingsManager.ActiveRunSettings.SettingsXml.IsNullOrWhiteSpace());
+        TPDebug.Assert(!StringUtils.IsNullOrWhiteSpace(_runSettingsManager.ActiveRunSettings?.SettingsXml));
 
         if (!_commandLineOptions.Sources.Any())
         {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
+            throw new CommandLineException(CommandLineResources.MissingTestSourceFile);
         }
 
         _effectiveRunSettings = _runSettingsManager.ActiveRunSettings.SettingsXml;
@@ -251,7 +251,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
             else
             {
                 // No tests were discovered from the given sources.
-                warningMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", _commandLineOptions.Sources));
+                warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", _commandLineOptions.Sources));
 
                 if (!_commandLineOptions.TestAdapterPathsSet)
                 {
@@ -274,7 +274,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         TPDebug.Assert(_selectedTestNames != null, "Initialize should have been called");
 
         _discoveredTestCount += args.DiscoveredTestCases.Count();
-        foreach (var testCase in args.DiscoveredTestCases)
+        foreach (var testCase in args.DiscoveredTestCases!)
         {
             foreach (var nameCriteria in _selectedTestNames)
             {
@@ -366,6 +366,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
             // Collect tests session artifacts for post processing
             if (_commandLineOptions.ArtifactProcessingMode == ArtifactProcessingMode.Collect)
             {
+                TPDebug.Assert(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml is not null, "RunSettingsManager.Instance.ActiveRunSettings.SettingsXml is null");
                 _artifactProcessingManager.CollectArtifacts(e, RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
             }
         }

@@ -17,17 +17,17 @@ public class CustomDataCollector : ObjectModel.DataCollection.DataCollector, ITe
     public DataCollectionSink? DataSink { get; set; }
 
     public override void Initialize(
-        XmlElement configurationElement,
+        XmlElement? configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
         DataCollectionLogger logger,
-        DataCollectionEnvironmentContext environmentContext)
+        DataCollectionEnvironmentContext? environmentContext)
     {
     }
 
-    public IEnumerable<KeyValuePair<string, string>>? GetTestExecutionEnvironmentVariables()
+    public IEnumerable<KeyValuePair<string, string>> GetTestExecutionEnvironmentVariables()
     {
-        return default;
+        return default!;
     }
 }
 
@@ -35,11 +35,11 @@ public class CustomDataCollector : ObjectModel.DataCollection.DataCollector, ITe
 public class CustomDataCollectorWithoutUri : ObjectModel.DataCollection.DataCollector
 {
     public override void Initialize(
-        XmlElement configurationElement,
+        XmlElement? configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
         DataCollectionLogger logger,
-        DataCollectionEnvironmentContext environmentContext)
+        DataCollectionEnvironmentContext? environmentContext)
     {
     }
 }
@@ -48,11 +48,11 @@ public class CustomDataCollectorWithoutUri : ObjectModel.DataCollection.DataColl
 public class CustomDataCollectorWithoutFriendlyName : ObjectModel.DataCollection.DataCollector
 {
     public override void Initialize(
-        XmlElement configurationElement,
+        XmlElement? configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
         DataCollectionLogger logger,
-        DataCollectionEnvironmentContext environmentContext)
+        DataCollectionEnvironmentContext? environmentContext)
     {
     }
 }
@@ -62,11 +62,11 @@ public class CustomDataCollectorWithoutFriendlyName : ObjectModel.DataCollection
 public class CustomDataCollectorWithEmptyFriendlyName : ObjectModel.DataCollection.DataCollector
 {
     public override void Initialize(
-        XmlElement configurationElement,
+        XmlElement? configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
         DataCollectionLogger logger,
-        DataCollectionEnvironmentContext environmentContext)
+        DataCollectionEnvironmentContext? environmentContext)
     {
     }
 }

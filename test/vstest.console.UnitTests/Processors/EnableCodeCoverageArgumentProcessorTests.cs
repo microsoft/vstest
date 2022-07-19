@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
@@ -73,7 +74,7 @@ public class EnableCodeCoverageArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldSetEnableCodeCoverageOfCommandLineOption()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, "");
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -89,7 +90,7 @@ public class EnableCodeCoverageArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldCreateEntryForCodeCoverageInRunSettingsIfNotAlreadyPresent()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, "");
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -99,7 +100,7 @@ public class EnableCodeCoverageArgumentProcessorTests
         Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
         var dataCollectorsFriendlyNames =
             XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(_settingsProvider.ActiveRunSettings
-                .SettingsXml);
+                .SettingsXml!);
         Assert.IsTrue(dataCollectorsFriendlyNames.Contains("Code Coverage"),
             "Code coverage setting in not available in runsettings");
     }
@@ -107,7 +108,7 @@ public class EnableCodeCoverageArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldEnableCodeCoverageIfDisabledInRunSettings()
     {
-        var runsettingsString = string.Format(_defaultRunSettings,
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings,
             "<DataCollector friendlyName=\"Code Coverage\" enabled=\"False\" />");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
@@ -130,7 +131,7 @@ public class EnableCodeCoverageArgumentProcessorTests
     public void InitializeShouldNotDisableOtherDataCollectors()
     {
         CollectArgumentExecutor.EnabledDataCollectors.Add("mydatacollector1");
-        var runsettingsString = string.Format(_defaultRunSettings,
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings,
             "<DataCollector friendlyName=\"Code Coverage\" enabled=\"False\" /><DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
@@ -153,7 +154,7 @@ public class EnableCodeCoverageArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldNotEnableOtherDataCollectors()
     {
-        var runsettingsString = string.Format(_defaultRunSettings,
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings,
             "<DataCollector friendlyName=\"Code Coverage\" enabled=\"False\" /><DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);

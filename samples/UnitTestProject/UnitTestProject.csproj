@@ -2,9 +2,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\scripts\build\TestPlatform.Dependencies.props" />
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.0;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;$(TargetNetFxVersion)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
-    <OutputType Condition=" '$(TargetFramework)' != 'net451' ">Exe</OutputType>
+    <OutputType Condition=" '$(TargetFramework)' != '$(TargetNetFxVersion)' ">Exe</OutputType>
     <AssemblyName>UnitTestProject</AssemblyName>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
@@ -20,7 +20,7 @@
     <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestAdapterVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(NETTestSdkVersion)" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
     <Reference Include="System.Runtime" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />

@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
 
 /// <summary>
@@ -47,7 +45,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <param name="testRunCache"> The test run cache. </param>
     /// <param name="testExecutionContext"> The test execution context. </param>
     /// <param name="testRunEventsHandler">TestRun Events Handler</param>
-    public FrameworkHandle(ITestCaseEventsHandler testCaseEventsHandler, ITestRunCache testRunCache,
+    public FrameworkHandle(ITestCaseEventsHandler? testCaseEventsHandler, ITestRunCache testRunCache,
         TestExecutionContext testExecutionContext, IInternalTestRunEventsHandler testRunEventsHandler)
         : base(testCaseEventsHandler, testRunCache)
     {
@@ -71,7 +69,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <param name="arguments">Command line arguments the process should be launched with.</param>
     /// <param name="environmentVariables">Environment variables to be set in target process</param>
     /// <returns>Process ID of the started process.</returns>
-    public int LaunchProcessWithDebuggerAttached(string filePath, string workingDirectory, string arguments, IDictionary<string, string> environmentVariables)
+    public int LaunchProcessWithDebuggerAttached(string filePath, string? workingDirectory, string? arguments, IDictionary<string, string?>? environmentVariables)
     {
         // If an adapter attempts to launch a process after the run is complete (=> this object is disposed)
         // throw an error.
@@ -86,7 +84,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
             throw new InvalidOperationException(CrossPlatEngineResources.LaunchDebugProcessNotAllowedForANonDebugRun);
         }
 
-        var processInfo = new TestProcessStartInfo()
+        var processInfo = new TestProcessStartInfo
         {
             Arguments = arguments,
             EnvironmentVariables = environmentVariables,
@@ -119,9 +117,6 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     public void Dispose()
     {
         Dispose(true);
-
-        // Use SupressFinalize in case a subclass
-        // of this valueType implements a finalizer.
         GC.SuppressFinalize(this);
     }
 

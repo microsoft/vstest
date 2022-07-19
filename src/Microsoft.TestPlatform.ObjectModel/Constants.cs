@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -201,7 +199,7 @@ public static class Constants
     /// </summary>
     public static readonly string DefaultResultsDirectory =
 #if NETSTANDARD1_0
-            Path.Combine(".", ResultsDirectoryName);
+        Path.Combine(".", ResultsDirectoryName);
 #else
         Path.Combine(Directory.GetCurrentDirectory(), ResultsDirectoryName);
 #endif

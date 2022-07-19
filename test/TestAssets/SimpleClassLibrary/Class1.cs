@@ -21,7 +21,7 @@ namespace SimpleClassLibrary
         {
         }
 
-        public void OverLoadedMethod(string name)
+        public void OverLoadedMethod(string _)
         {
         }
     }

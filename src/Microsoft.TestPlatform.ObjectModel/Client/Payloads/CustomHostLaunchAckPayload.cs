@@ -3,8 +3,6 @@
 
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -22,5 +20,5 @@ public class CustomHostLaunchAckPayload
     /// ErrorMessage, in cases where custom launch fails
     /// </summary>
     [DataMember]
-    public string ErrorMessage { get; set; }
+    public string? ErrorMessage { get; set; }
 }

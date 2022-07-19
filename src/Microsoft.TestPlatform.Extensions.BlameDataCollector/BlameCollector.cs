@@ -110,13 +110,13 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// <param name="dataSink">A data collection sink for data transfer</param>
     /// <param name="logger">Data Collection Logger to send messages to the client </param>
     /// <param name="environmentContext">Context of data collector environment</param>
-    [MemberNotNull(nameof(_events), nameof(_dataCollectionSink), nameof(_context), nameof(_testSequence), nameof(_testObjectDictionary), nameof(_logger))]
+    [MemberNotNull(nameof(_events), nameof(_dataCollectionSink), nameof(_testSequence), nameof(_testObjectDictionary), nameof(_logger))]
     public override void Initialize(
         XmlElement? configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
         DataCollectionLogger logger,
-        DataCollectionEnvironmentContext environmentContext)
+        DataCollectionEnvironmentContext? environmentContext)
     {
         _events = events;
         _dataCollectionSink = dataSink;
@@ -134,12 +134,10 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
         if (_configurationElement != null)
         {
-            var collectDumpNode = _configurationElement[Constants.DumpModeKey];
-            _collectProcessDumpOnCrash = collectDumpNode != null;
-
-            if (_collectProcessDumpOnCrash)
+            if (_configurationElement[Constants.DumpModeKey] is XmlElement collectDumpNode)
             {
-                ValidateAndAddCrashProcessDumpParameters(collectDumpNode!);
+                _collectProcessDumpOnCrash = true;
+                ValidateAndAddCrashProcessDumpParameters(collectDumpNode);
 
                 // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
@@ -153,15 +151,22 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                 var dumpPath = Path.Combine(dumpDirectory, $"%e_%p_%t_crashdump.dmp");
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
             }
-
-            var collectHangBasedDumpNode = _configurationElement[Constants.CollectDumpOnTestSessionHang];
-            _collectProcessDumpOnHang = collectHangBasedDumpNode != null;
-            if (_collectProcessDumpOnHang)
+            else
             {
+                _collectProcessDumpOnCrash = false;
+            }
+
+            if (_configurationElement[Constants.CollectDumpOnTestSessionHang] is XmlElement collectHangBasedDumpNode)
+            {
+                _collectProcessDumpOnHang = true;
                 // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
                 _environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
 
                 ValidateAndAddHangProcessDumpParameters(collectHangBasedDumpNode!);
+            }
+            else
+            {
+                _collectProcessDumpOnHang = false;
             }
 
             var tfm = _configurationElement[Constants.TargetFramework]?.InnerText;
@@ -196,16 +201,16 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
         if (_inactivityTimespan.TotalSeconds <= 90)
         {
-            value = ((int)_inactivityTimespan.TotalSeconds).ToString();
+            value = ((int)_inactivityTimespan.TotalSeconds).ToString(CultureInfo.InvariantCulture);
             unit = Resources.Resources.Seconds;
         }
         else
         {
-            value = Math.Round(_inactivityTimespan.TotalMinutes, 2).ToString();
+            value = Math.Round(_inactivityTimespan.TotalMinutes, 2).ToString(CultureInfo.InvariantCulture);
             unit = Resources.Resources.Minutes;
         }
 
-        var message = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.InactivityTimeout, value, unit);
+        var message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.InactivityTimeout, value, unit);
 
         EqtTrace.Warning(message);
         _logger.LogWarning(_context.SessionDataCollectionContext, message);
@@ -335,7 +340,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
                 default:
 
-                    _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, blameAttribute.Name));
+                    _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.BlameParameterKeyIncorrect, blameAttribute.Name));
                     break;
             }
         }
@@ -343,7 +348,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
     internal static string FormatBlameParameterValueIncorrectMessage(XmlAttribute attribute, params string[] validValues)
     {
-        return string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, attribute.Value, string.Join(", ", validValues));
+        return string.Format(CultureInfo.CurrentCulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, attribute.Value, string.Join(", ", validValues));
     }
 
     private void ValidateAndAddHangProcessDumpParameters(XmlElement collectDumpNode)
@@ -361,7 +366,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                     }
                     else
                     {
-                        _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.UnexpectedValueForInactivityTimespanValue, attribute.Value));
+                        _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.UnexpectedValueForInactivityTimespanValue, attribute.Value));
                     }
 
                     break;
@@ -398,7 +403,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
                 default:
 
-                    _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, blameAttribute.Name));
+                    _logger.LogWarning(_context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.BlameParameterKeyIncorrect, blameAttribute.Name));
                     break;
             }
         }
@@ -414,8 +419,9 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         TPDebug.Assert(_testSequence != null && _testObjectDictionary != null, "Initialize must be called before calling this method");
         ResetInactivityTimer();
 
-        EqtTrace.Info("Blame Collector : Test Case Start");
+        EqtTrace.Info("BlameCollector.EventsTestCaseStart: Test Case Start");
 
+        TPDebug.Assert(e.TestElement is not null, "e.TestElement is null");
         var blameTestObject = new BlameTestObject(e.TestElement);
 
         // Add guid to list of test sequence to maintain the order.
@@ -438,11 +444,12 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         TPDebug.Assert(_testObjectDictionary != null, "Initialize must be called before calling this method");
         ResetInactivityTimer();
 
-        EqtTrace.Info("Blame Collector: Test Case End");
+        EqtTrace.Info("BlameCollector.EventsTestCaseEnd: Test Case End");
 
         _testEndCount++;
 
         // Update the test object in the dictionary as the test has completed.
+        TPDebug.Assert(e.TestElement is not null, "e.TestElement is null");
         if (_testObjectDictionary.ContainsKey(e.TestElement.Id))
         {
             _testObjectDictionary[e.TestElement.Id].IsCompleted = true;
@@ -554,12 +561,12 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         catch (TestPlatformException e)
         {
             EqtTrace.Warning("BlameCollector.TestHostLaunchedHandler: Could not start process dump. {0}", e);
-            _logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, e.Message));
+            _logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentCulture, Resources.Resources.ProcDumpCouldNotStart, e.Message));
         }
         catch (Exception e)
         {
             EqtTrace.Warning("BlameCollector.TestHostLaunchedHandler: Could not start process dump. {0}", e);
-            _logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, e.ToString()));
+            _logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentCulture, Resources.Resources.ProcDumpCouldNotStart, e.ToString()));
         }
     }
 

@@ -24,7 +24,7 @@ public class TestHostExtensionManagerTests
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
         {
-            var testLoggerExtensionManager = TestRuntimeExtensionManager.Create(null);
+            var testLoggerExtensionManager = TestRuntimeExtensionManager.Create(null!);
         });
     }
 

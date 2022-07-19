@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Globalization;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -54,7 +55,7 @@ public class DataCollectorTests : IntegrationTestBase
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-        fileContents = string.Format(fileContents, AssemblyUtility.GetAssemblyName(inprocasm), inprocasm);
+        fileContents = string.Format(CultureInfo.CurrentCulture, fileContents, AssemblyUtility.GetAssemblyName(inprocasm), inprocasm);
         File.WriteAllText(runSettings, fileContents);
 
         return runSettings;

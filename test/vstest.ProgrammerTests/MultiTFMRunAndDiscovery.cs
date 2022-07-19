@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace vstest.ProgrammerTests;
 
@@ -27,6 +28,7 @@ public class MultiTFM
 
             Then two testhosts should be started that target the same framework as each assembly.
         ")]
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
         public async Task A()
         {
             // -- arrange
@@ -127,6 +129,7 @@ public class MultiTFM
 
             Then two testhosts should be started that target the framework chosen by runsettings.
         ")]
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
         public async Task B()
         {
             // -- arrange
@@ -227,6 +230,7 @@ public class MultiTFM
 
             Then two testhosts should be started that target the same framework as each assembly.
         ")]
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
         public async Task C()
         {
             // -- arrange
@@ -327,6 +331,7 @@ public class MultiTFM
 
             Then two testhosts should be started that target the framework chosen by runsettings.
         ")]
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
         public async Task D()
         {
             // -- arrange
@@ -429,6 +434,7 @@ public class MultiTFM
 
             Then two testhosts should be started that target the framework chosen by runsettings.
         ")]
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
         public async Task E()
         {
             // -- arrange
@@ -501,7 +507,7 @@ public class MultiTFM
             await testRequestManager.ExecuteWithAbort(tm => tm.StartTestSession(startTestSessionPayload, testHostLauncher: null, fixture.TestSessionEventsHandler, fixture.ProtocolConfig));
 
             // You need to pass this on, otherwise it will ignore the test session that you just started. This is a by product of being able to start multiple test sessions.
-            var testSessionInfo = fixture.TestSessionEventsHandler.StartTestSessionCompleteEvents.Single().TestSessionInfo;
+            var testSessionInfo = fixture.TestSessionEventsHandler.StartTestSessionCompleteEvents.Single()!.TestSessionInfo;
 
             var testRunRequestPayload = new TestRunRequestPayload
             {
@@ -546,6 +552,7 @@ public class MultiTFMRunAndDiscoveryCompatibilityMode
 
         Then two testhosts are both started for the same TFM.
     ")]
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
     public async Task E()
     {
         // -- arrange
@@ -661,7 +668,7 @@ internal static class MessageExtensions
             s_messageProperty = request.GetType().GetProperty("RawMessage")!.GetGetMethod();
         }
 
-        return (string)s_messageProperty!.Invoke(request, new object[0])!;
+        return (string)s_messageProperty!.Invoke(request, Array.Empty<object>())!;
     }
 }
 

@@ -117,7 +117,7 @@ public class RunTestsArgumentProcessorTests
         var runSettingsProvider = new TestableRunSettingsProvider();
         runSettingsProvider.UpdateRunSettings("<RunSettings/>");
 
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.IsDesignMode = true;
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object);
         var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, _artifactProcessingManager.Object, _mockOutput.Object);
@@ -128,7 +128,7 @@ public class RunTestsArgumentProcessorTests
     [TestMethod]
     public void ExecutorExecuteForNoSourcesShouldThrowCommandLineException()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object);
         var executor = GetExecutor(testRequestManager);
 
@@ -156,7 +156,7 @@ public class RunTestsArgumentProcessorTests
         var mockTestRunRequest = new Mock<ITestRunRequest>();
 
         mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Throws(new TestPlatformException("DummyTestPlatformException"));
-        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockTestRunRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(mockTestRunRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions();
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object);
@@ -172,7 +172,7 @@ public class RunTestsArgumentProcessorTests
         var mockTestRunRequest = new Mock<ITestRunRequest>();
 
         mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Throws(new SettingsException("DummySettingsException"));
-        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockTestRunRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(mockTestRunRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions();
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object);
@@ -188,7 +188,7 @@ public class RunTestsArgumentProcessorTests
         var mockTestRunRequest = new Mock<ITestRunRequest>();
 
         mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Throws(new InvalidOperationException("DummyInvalidOperationException"));
-        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockTestRunRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(mockTestRunRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions();
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object);
@@ -204,7 +204,7 @@ public class RunTestsArgumentProcessorTests
         var mockTestRunRequest = new Mock<ITestRunRequest>();
 
         mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Throws(new Exception("DummyException"));
-        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(mockTestRunRequest.Object);
+        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(mockTestRunRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions();
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object);
@@ -260,7 +260,7 @@ public class RunTestsArgumentProcessorTests
 
         var args = new TestRunCompleteEventArgs(mockTestRunStats.Object, false, false, null, null, null, new TimeSpan());
 
-        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(testRunRequest);
+        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(testRunRequest);
 
         ResetAndAddSourceToCommandLineOptions();
 
@@ -272,7 +272,7 @@ public class RunTestsArgumentProcessorTests
 
     private void ResetAndAddSourceToCommandLineOptions()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
 
         CommandLineOptions.Instance.FileHelper = _mockFileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, _mockFileHelper.Object);

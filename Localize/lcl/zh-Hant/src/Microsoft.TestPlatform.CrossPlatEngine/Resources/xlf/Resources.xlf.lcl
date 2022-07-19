@@ -220,12 +220,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NoSuitableRuntimeProviderFound" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[No suitable test runtime provider was found:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[找不到適合的測試執行階段提供者:]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NoTestHostProviderFound" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[No suitable test runtime provider found for this run.]]></Val>
+          <Val><![CDATA[No suitable test runtime provider was found for any source in this run.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[找不到適用於此回合的測試執行階段提供者。]]></Val>
+            <Val><![CDATA[在此回合的任何來源中，找不到適合的測試執行階段提供者。]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[No suitable test runtime provider found for this run.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -270,6 +282,15 @@
           <Val><![CDATA[Proxy with id {0} is already available and cannot be re-enqueued.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[識別碼為 {0} 的 Proxy 已可供使用，但無法重新加入佇列。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";SkippingSource" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Skipping source:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[正在略過來源:]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

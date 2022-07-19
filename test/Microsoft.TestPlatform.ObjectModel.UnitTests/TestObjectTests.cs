@@ -37,7 +37,7 @@ public class TestObjectTests
     public void GetPropertiesShouldReturnListOfPropertiesInStore()
     {
         TestProperty tp = TestProperty.Register("dummyId", "dummyLabel", typeof(int), typeof(TestObjectTests));
-        var kvp = new KeyValuePair<TestProperty, object>(tp, 123);
+        var kvp = new KeyValuePair<TestProperty, object?>(tp, 123);
         TestCase.SetPropertyValue(kvp.Key, kvp.Value);
 
         var properties = TestCase.GetProperties().ToList();

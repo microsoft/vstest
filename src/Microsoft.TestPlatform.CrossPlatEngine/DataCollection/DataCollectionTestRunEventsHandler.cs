@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 
@@ -15,8 +16,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
@@ -27,10 +26,11 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
 {
     private readonly IProxyDataCollectionManager _proxyDataCollectionManager;
     private readonly IInternalTestRunEventsHandler _testRunEventsHandler;
-    private CancellationToken _cancellationToken;
+    private readonly CancellationToken _cancellationToken;
     private readonly IDataSerializer _dataSerializer;
-    private Collection<AttachmentSet> _dataCollectionAttachmentSets;
-    private Collection<InvokedDataCollector> _invokedDataCollectors;
+
+    private Collection<AttachmentSet>? _dataCollectionAttachmentSets;
+    private Collection<InvokedDataCollector>? _invokedDataCollectors;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DataCollectionTestRunEventsHandler"/> class.
@@ -75,7 +75,7 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
     /// <param name="message">
     /// The message.
     /// </param>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         _testRunEventsHandler.HandleLogMessage(level, message);
     }
@@ -102,7 +102,7 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
             if (_dataCollectionAttachmentSets != null && _dataCollectionAttachmentSets.Any())
             {
                 GetCombinedAttachmentSets(
-                    testRunCompletePayload.TestRunCompleteArgs.AttachmentSets,
+                    testRunCompletePayload?.TestRunCompleteArgs?.AttachmentSets,
                     _dataCollectionAttachmentSets);
             }
 
@@ -111,7 +111,7 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
             {
                 foreach (var dataCollector in _invokedDataCollectors)
                 {
-                    testRunCompletePayload.TestRunCompleteArgs.InvokedDataCollectors.Add(dataCollector);
+                    testRunCompletePayload?.TestRunCompleteArgs?.InvokedDataCollectors.Add(dataCollector);
                 }
             }
 
@@ -138,7 +138,7 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
     /// <param name="executorUris">
     /// The executor uris.
     /// </param>
-    public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
+    public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris)
     {
         if (_dataCollectionAttachmentSets != null && _dataCollectionAttachmentSets.Any())
         {
@@ -164,7 +164,7 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
     /// <param name="testRunChangedArgs">
     /// The test run changed args.
     /// </param>
-    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
     {
         _testRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
     }
@@ -198,7 +198,9 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
     /// <returns>
     /// The <see cref="Collection"/>.
     /// </returns>
-    internal static ICollection<AttachmentSet> GetCombinedAttachmentSets(Collection<AttachmentSet> originalAttachmentSets, ICollection<AttachmentSet> newAttachments)
+    [return: NotNullIfNotNull("originalAttachmentSets")]
+    [return: NotNullIfNotNull("newAttachments")]
+    internal static ICollection<AttachmentSet>? GetCombinedAttachmentSets(Collection<AttachmentSet>? originalAttachmentSets, ICollection<AttachmentSet>? newAttachments)
     {
         if (newAttachments == null || newAttachments.Count == 0)
         {

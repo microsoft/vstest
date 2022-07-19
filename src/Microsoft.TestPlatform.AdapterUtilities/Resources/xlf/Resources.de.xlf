@@ -8,8 +8,8 @@
         <target state="translated">ManagedName unvollständig</target>
       </trans-unit>
       <trans-unit id="ErrorMethodArityMustBeNumeric">
-        <source>Method arity must be numeric</source>
-        <note />
+        <source>Method arity must be numeric.</source>
+        <note></note>
         <target state="translated">Die Stelligkeit der Methode muss numerisch sein.</target>
       </trans-unit>
       <trans-unit id="ErrorMethodNotFound">

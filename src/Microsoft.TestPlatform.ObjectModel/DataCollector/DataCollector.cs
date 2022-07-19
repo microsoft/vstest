@@ -4,8 +4,6 @@
 using System;
 using System.Xml;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
@@ -29,11 +27,11 @@ public abstract class DataCollector : IDisposable
     /// </param>
     /// <param name="environmentContext">Provides contextual information about the agent environment</param>
     public abstract void Initialize(
-        XmlElement configurationElement,
+        XmlElement? configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
         DataCollectionLogger logger,
-        DataCollectionEnvironmentContext environmentContext
+        DataCollectionEnvironmentContext? environmentContext
     );
 
     /// <summary>

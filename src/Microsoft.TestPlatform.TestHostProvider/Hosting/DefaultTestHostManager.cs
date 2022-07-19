@@ -48,9 +48,9 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private const string DefaultTestHostFriendlyName = "DefaultTestHost";
     private const string TestAdapterEndsWithPattern = @"TestAdapter.dll";
 
-    // Any version (older or newer) that is not in this list will use the default testhost.exe that is built using net451.
+    // Any version (older or newer) that is not in this list will use the default testhost.exe that is built using net462.
     // TODO: Add net481 when it is published, if it uses a new moniker.
-    private static readonly ImmutableArray<string> SupportedTargetFrameworks = ImmutableArray.Create("net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48");
+    private static readonly ImmutableArray<string> SupportedTargetFrameworks = ImmutableArray.Create("net47", "net471", "net472", "net48");
 
     private readonly IProcessHelper _processHelper;
     private readonly IFileHelper _fileHelper;
@@ -112,6 +112,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <summary>
     /// Gets the properties of the test executor launcher. These could be the targetID for emulator/phone specific scenarios.
     /// </summary>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public IDictionary<string, string> Properties => new Dictionary<string, string>();
 
     /// <summary>
@@ -156,7 +157,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <inheritdoc/>
     public virtual TestProcessStartInfo GetTestHostProcessStartInfo(
         IEnumerable<string> sources,
-        IDictionary<string, string>? environmentVariables,
+        IDictionary<string, string?>? environmentVariables,
         TestRunnerConnectionInfo connectionInfo)
     {
         TPDebug.Assert(IsInitialized, "Initialize must have been called before GetTestHostProcessStartInfo");
@@ -203,12 +204,12 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         {
             FileName = launcherPath,
             Arguments = argumentsString,
-            EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>(),
+            EnvironmentVariables = environmentVariables ?? new Dictionary<string, string?>(),
             WorkingDirectory = processWorkingDirectory
         };
     }
 
-    private string GetTestHostName(Architecture architecture, Framework targetFramework, PlatformArchitecture processArchitecture)
+    private static string GetTestHostName(Architecture architecture, Framework targetFramework, PlatformArchitecture processArchitecture)
     {
         // We ship multiple executables for testhost that follow this naming schema:
         // testhost<.tfm><.architecture>.exe
@@ -282,7 +283,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     {
         if (sources != null && sources.Any())
         {
-            extensions = extensions.Concat(sources.SelectMany(s => _fileHelper.EnumerateFiles(Path.GetDirectoryName(s), SearchOption.TopDirectoryOnly, TestAdapterEndsWithPattern)));
+            extensions = extensions.Concat(sources.SelectMany(s => _fileHelper.EnumerateFiles(Path.GetDirectoryName(s)!, SearchOption.TopDirectoryOnly, TestAdapterEndsWithPattern)));
         }
 
         extensions = FilterExtensionsBasedOnVersion(extensions);
@@ -312,21 +313,20 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     }
 
     /// <inheritdoc/>
-    public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+    public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
     {
         var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
         var framework = config.TargetFramework;
 
         // This is expected to be called once every run so returning a new instance every time.
-        return framework.Name.IndexOf("NETFramework", StringComparison.OrdinalIgnoreCase) >= 0;
+        return framework!.Name.IndexOf("NETFramework", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
     [MemberNotNullWhen(true, nameof(_messageLogger), nameof(_targetFramework))]
     private bool IsInitialized { get; set; }
 
     /// <inheritdoc/>
-    [MemberNotNull(nameof(_messageLogger), nameof(_targetFramework))]
-    public void Initialize(IMessageLogger logger, string runsettingsXml)
+    public void Initialize(IMessageLogger? logger, string runsettingsXml)
     {
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
 
@@ -337,6 +337,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         Shared = !runConfiguration.DisableAppDomain;
         _hostExitedEventRaised = false;
+
         IsInitialized = true;
     }
 
@@ -380,7 +381,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         TPDebug.Assert(IsInitialized, "Initialize must be called before FilterExtensionsBasedOnVersion");
 
         Dictionary<string, string> selectedExtensions = new();
-        Dictionary<string, Version> highestFileVersions = new();
+        Dictionary<string, Version?> highestFileVersions = new();
         Dictionary<string, Version> conflictingExtensions = new();
 
         foreach (var extensionFullPath in extensions)
@@ -429,7 +430,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         // Log warning if conflicting version extensions are found
         if (conflictingExtensions.Any())
         {
-            var extensionsString = string.Join("\n", conflictingExtensions.Select(kv => string.Format("  {0} : {1}", kv.Key, kv.Value)));
+            var extensionsString = string.Join("\n", conflictingExtensions.Select(kv => $"  {kv.Key} : {kv.Value}"));
             string message = string.Format(CultureInfo.CurrentCulture, Resources.MultipleFileVersions, extensionsString);
             _messageLogger.SendMessage(TestMessageLevel.Warning, message);
         }
@@ -486,7 +487,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
             cancellationToken.ThrowIfCancellationRequested();
             _testHostProcess = _processHelper.LaunchProcess(
-                testHostStartInfo.FileName,
+                testHostStartInfo.FileName!,
                 testHostStartInfo.Arguments,
                 testHostStartInfo.WorkingDirectory,
                 testHostStartInfo.EnvironmentVariables,
@@ -506,20 +507,24 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             return false;
         }
 
-        SetProcessPriority(_testHostProcess, _environmentVariableHelper);
+        AdjustProcessPriorityBasedOnSettings(_testHostProcess, testHostStartInfo.EnvironmentVariables);
         OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, _testHostProcess.Id));
 
         return true;
     }
 
-    internal static void SetProcessPriority(Process testHostProcess, IEnvironmentVariableHelper environmentVariableHelper)
+    internal static void AdjustProcessPriorityBasedOnSettings(Process testHostProcess, IDictionary<string, string?>? testHostEnvironmentVariables)
     {
         ProcessPriorityClass testHostPriority = ProcessPriorityClass.BelowNormal;
         try
         {
-            testHostPriority = environmentVariableHelper.GetEnvironmentVariableAsEnum("VSTEST_HOST_INTERNAL_PRIORITY", testHostPriority);
-            testHostProcess.PriorityClass = testHostPriority;
-            EqtTrace.Verbose("Setting test host process priority to {0}", testHostProcess.PriorityClass);
+            if (testHostEnvironmentVariables is not null
+                && testHostEnvironmentVariables.TryGetValue("VSTEST_BACKGROUND_DISCOVERY", out var isBackgroundDiscoveryEnabled)
+                && isBackgroundDiscoveryEnabled == "1")
+            {
+                testHostProcess.PriorityClass = testHostPriority;
+                EqtTrace.Verbose("Setting test host process priority to {0}", testHostProcess.PriorityClass);
+            }
         }
         // Setting the process Priority can fail with Win32Exception, NotSupportedException or InvalidOperationException.
         catch (Exception ex)

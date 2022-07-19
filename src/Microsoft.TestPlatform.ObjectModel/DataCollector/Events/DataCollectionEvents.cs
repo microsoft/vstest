@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
@@ -22,26 +20,26 @@ public abstract class DataCollectionEvents
     /// <summary>
     /// Raised when test host initialized
     /// </summary>
-    public abstract event EventHandler<TestHostLaunchedEventArgs> TestHostLaunched;
+    public abstract event EventHandler<TestHostLaunchedEventArgs>? TestHostLaunched;
 
     /// <summary>
     /// Raised when a session is starting
     /// </summary>
-    public abstract event EventHandler<SessionStartEventArgs> SessionStart;
+    public abstract event EventHandler<SessionStartEventArgs>? SessionStart;
 
     /// <summary>
     /// Raised when a session is ending
     /// </summary>
-    public abstract event EventHandler<SessionEndEventArgs> SessionEnd;
+    public abstract event EventHandler<SessionEndEventArgs>? SessionEnd;
 
     /// <summary>
     /// Raised when a test case is starting
     /// </summary>
-    public abstract event EventHandler<TestCaseStartEventArgs> TestCaseStart;
+    public abstract event EventHandler<TestCaseStartEventArgs>? TestCaseStart;
 
     /// <summary>
     /// Raised when a test case is ending
     /// </summary>
-    public abstract event EventHandler<TestCaseEndEventArgs> TestCaseEnd;
+    public abstract event EventHandler<TestCaseEndEventArgs>? TestCaseEnd;
 
 }

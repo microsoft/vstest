@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 
 public abstract class TestPluginInformation
@@ -14,7 +12,7 @@ public abstract class TestPluginInformation
     /// Default constructor
     /// </summary>
     /// <param name="testExtensionType">Data type of the test plugin</param>
-    protected TestPluginInformation(Type testExtensionType)
+    protected TestPluginInformation(Type? testExtensionType)
     {
         if (testExtensionType != null)
         {
@@ -25,7 +23,7 @@ public abstract class TestPluginInformation
     /// <summary>
     /// Gets data value identifying the test plugin
     /// </summary>
-    public virtual string IdentifierData
+    public virtual string? IdentifierData
     {
         get
         {
@@ -36,18 +34,18 @@ public abstract class TestPluginInformation
     /// <summary>
     /// Metadata for the test plugin
     /// </summary>
-    public virtual ICollection<Object> Metadata
+    public virtual ICollection<object?> Metadata
     {
         get
         {
-            return new object[] { AssemblyQualifiedName };
+            return new object?[] { AssemblyQualifiedName };
         }
     }
 
     /// <summary>
     /// Gets the Assembly qualified name of the plugin
     /// </summary>
-    public string AssemblyQualifiedName
+    public string? AssemblyQualifiedName
     {
         get;
         private set;
@@ -56,7 +54,7 @@ public abstract class TestPluginInformation
     /// <summary>
     /// Gets the file path of the plugin
     /// </summary>
-    public string FilePath
+    public string? FilePath
     {
         get;
         internal set;

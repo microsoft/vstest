@@ -39,7 +39,7 @@ public class RunEventHandler : ITestRunEventsHandler
     /// </summary>
     public string? LogMessage { get; private set; }
 
-    public List<string> Errors { get; set; }
+    public List<string?> Errors { get; set; }
 
     /// <summary>
     /// Gets the test message level.
@@ -49,7 +49,7 @@ public class RunEventHandler : ITestRunEventsHandler
     public RunEventHandler()
     {
         TestResults = new List<TestResult>();
-        Errors = new List<string>();
+        Errors = new List<string?>();
         Attachments = new List<AttachmentSet>();
         InvokedDataCollectors = new List<InvokedDataCollector>();
     }
@@ -62,7 +62,7 @@ public class RunEventHandler : ITestRunEventsHandler
         }
     }
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         LogMessage = message;
         TestMessageLevel = level;
@@ -74,9 +74,9 @@ public class RunEventHandler : ITestRunEventsHandler
 
     public void HandleTestRunComplete(
         TestRunCompleteEventArgs testRunCompleteArgs,
-        TestRunChangedEventArgs lastChunkArgs,
-        ICollection<AttachmentSet> runContextAttachments,
-        ICollection<string> executorUris)
+        TestRunChangedEventArgs? lastChunkArgs,
+        ICollection<AttachmentSet>? runContextAttachments,
+        ICollection<string>? executorUris)
     {
         if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)
         {
@@ -96,7 +96,7 @@ public class RunEventHandler : ITestRunEventsHandler
         Metrics = testRunCompleteArgs.Metrics;
     }
 
-    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
     {
         if (testRunChangedArgs != null && testRunChangedArgs.NewTestResults != null)
         {

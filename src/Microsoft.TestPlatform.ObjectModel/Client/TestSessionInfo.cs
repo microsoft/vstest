@@ -4,8 +4,6 @@
 using System;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -32,7 +30,7 @@ public class TestSessionInfo : IEquatable<TestSessionInfo>
     /// <summary>
     /// Calculates the hash code for the current object.
     /// </summary>
-    /// 
+    ///
     /// <returns>An integer representing the computed hashcode value.</returns>
     public override int GetHashCode()
     {
@@ -42,11 +40,11 @@ public class TestSessionInfo : IEquatable<TestSessionInfo>
     /// <summary>
     /// Checks if the specified object is equal to the current instance.
     /// </summary>
-    /// 
+    ///
     /// <param name="obj">The object to be checked.</param>
-    /// 
+    ///
     /// <returns>True if the two objects are equal, false otherwise.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return Equals(obj as TestSessionInfo);
     }
@@ -54,11 +52,11 @@ public class TestSessionInfo : IEquatable<TestSessionInfo>
     /// <summary>
     /// Checks if the specified session is equal to the current instance.
     /// </summary>
-    /// 
+    ///
     /// <param name="other">The session to be checked.</param>
-    /// 
+    ///
     /// <returns>True if the two sessions are equal, false otherwise.</returns>
-    public bool Equals(TestSessionInfo other)
+    public bool Equals(TestSessionInfo? other)
     {
         return other != null && Id.Equals(other.Id);
     }

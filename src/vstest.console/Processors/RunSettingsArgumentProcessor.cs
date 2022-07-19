@@ -135,7 +135,7 @@ internal class RunSettingsArgumentExecutor : IArgumentExecutor
     private void ExtractFrameworkAndPlatform()
     {
         var framworkStr = _runSettingsManager.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath);
-        Framework framework = Framework.FromString(framworkStr);
+        Framework? framework = Framework.FromString(framworkStr);
         if (framework != null)
         {
             _commandLineOptions.TargetFrameworkVersion = framework;

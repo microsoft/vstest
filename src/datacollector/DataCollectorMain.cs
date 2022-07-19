@@ -51,21 +51,24 @@ public class DataCollectorMain
 
     private readonly IEnvironment _environment;
     private readonly IDataCollectionRequestHandler _requestHandler;
+    private readonly UiLanguageOverride _uiLanguageOverride;
 
     public DataCollectorMain() :
         this(
             new ProcessHelper(),
             new PlatformEnvironment(),
-            DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink())
+            DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink()),
+            new UiLanguageOverride()
         )
     {
     }
 
-    internal DataCollectorMain(IProcessHelper processHelper, IEnvironment environment, IDataCollectionRequestHandler requestHandler)
+    internal DataCollectorMain(IProcessHelper processHelper, IEnvironment environment, IDataCollectionRequestHandler requestHandler, UiLanguageOverride uiLanguageOverride)
     {
         _processHelper = processHelper;
         _environment = environment;
         _requestHandler = requestHandler;
+        _uiLanguageOverride = uiLanguageOverride;
     }
 
     public void Run(string[]? args)
@@ -108,7 +111,7 @@ public class DataCollectorMain
             EqtTrace.Verbose($"Version: {version}");
         }
 
-        UiLanguageOverride.SetCultureSpecifiedByUser();
+        _uiLanguageOverride.SetCultureSpecifiedByUser();
 
         EqtTrace.Info("DataCollectorMain.Run: Starting data collector run with args: {0}", args != null ? string.Join(",", args) : "null");
 
@@ -125,7 +128,7 @@ public class DataCollectorMain
             });
 
         // Get server port and initialize communication.
-        int port = argsDictionary.TryGetValue(PortArgument, out var portValue) ? int.Parse(portValue) : 0;
+        int port = argsDictionary.TryGetValue(PortArgument, out var portValue) ? int.Parse(portValue, CultureInfo.CurrentCulture) : 0;
 
         if (port <= 0)
         {
@@ -137,7 +140,7 @@ public class DataCollectorMain
         // Can only do this after InitializeCommunication because datacollector cannot "Send Log" unless communications are initialized
         if (!string.IsNullOrEmpty(EqtTrace.LogFile))
         {
-            (_requestHandler as DataCollectionRequestHandler)?.SendDataCollectionMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Informational, string.Format("Logging DataCollector Diagnostics in file: {0}", EqtTrace.LogFile)));
+            (_requestHandler as DataCollectionRequestHandler)?.SendDataCollectionMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Informational, $"Logging DataCollector Diagnostics in file: {EqtTrace.LogFile}"));
         }
 
         // Start processing async in a different task
@@ -165,7 +168,7 @@ public class DataCollectorMain
 
             throw new TestPlatformException(
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                     CoreUtilitiesConstants.DatacollectorProcessName,
                     CoreUtilitiesConstants.VstestConsoleProcessName,

@@ -6,8 +6,6 @@ using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
@@ -23,14 +21,14 @@ internal class LoggerNameValueConfigurationManager
     /// <param name="configurationElement">
     /// XML element containing the configuration
     /// </param>
-    public LoggerNameValueConfigurationManager(XmlElement configurationElement)
+    public LoggerNameValueConfigurationManager(XmlElement? configurationElement)
     {
         Initialize(configurationElement);
     }
 
-    public Dictionary<string, string> NameValuePairs { get; } = new Dictionary<string, string>();
+    public Dictionary<string, string?> NameValuePairs { get; } = new();
 
-    private void Initialize(XmlElement configurationElement)
+    private void Initialize(XmlElement? configurationElement)
     {
         if (configurationElement == null)
         {
@@ -54,7 +52,7 @@ internal class LoggerNameValueConfigurationManager
             // Get the setting value
             string settingValue = settingElement.InnerText;
 
-            if (string.IsNullOrWhiteSpace(settingValue))
+            if (settingValue.IsNullOrWhiteSpace())
             {
                 EqtTrace.Warning("Skipping configuration setting '{0}' due to missing value", settingName);
                 continue;

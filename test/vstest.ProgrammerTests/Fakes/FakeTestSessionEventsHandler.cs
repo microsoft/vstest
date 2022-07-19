@@ -15,13 +15,13 @@ internal class FakeTestSessionEventsHandler : ITestSessionEventsHandler
         _fakeErrorAggregator = fakeErrorAggregator;
     }
 
-    public List<object> AllEvents { get; } = new();
+    public List<object?> AllEvents { get; } = new();
     public List<TestMessage> LoggedMessages { get; } = new();
     public List<string> RawMessages { get; } = new();
-    public List<StartTestSessionCompleteEventArgs> StartTestSessionCompleteEvents { get; } = new();
-    public List<StopTestSessionCompleteEventArgs> StopTestSessionCompleteEvents { get; } = new();
+    public List<StartTestSessionCompleteEventArgs?> StartTestSessionCompleteEvents { get; } = new();
+    public List<StopTestSessionCompleteEventArgs?> StopTestSessionCompleteEvents { get; } = new();
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         var msg = new TestMessage(level, message);
         AllEvents.Add(msg);
@@ -34,13 +34,13 @@ internal class FakeTestSessionEventsHandler : ITestSessionEventsHandler
         RawMessages.Add(rawMessage);
     }
 
-    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs)
+    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs? eventArgs)
     {
         AllEvents.Add(eventArgs);
         StartTestSessionCompleteEvents.Add(eventArgs);
     }
 
-    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs eventArgs)
+    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs? eventArgs)
     {
         AllEvents.Add(eventArgs);
         StopTestSessionCompleteEvents.Add(eventArgs);

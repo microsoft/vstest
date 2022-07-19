@@ -267,7 +267,7 @@ internal class XmlPersistence
     /// <param name="parameters">
     /// The parameters.
     /// </param>
-    public void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters? parameters)
+    public static void SaveObject(object objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters? parameters)
     {
         SaveObject(objectToSave, nodeToSaveAt, parameters, null);
     }
@@ -287,7 +287,7 @@ internal class XmlPersistence
     /// <param name="defaultValue">
     /// The default value.
     /// </param>
-    public void SaveObject(object? objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters? parameters, object? defaultValue)
+    public static void SaveObject(object? objectToSave, XmlNode nodeToSaveAt, XmlTestStoreParameters? parameters, object? defaultValue)
     {
         if (objectToSave == null)
         {
@@ -446,6 +446,7 @@ internal class XmlPersistence
     /// <typeparam name="V"> Generic parameter
     /// </typeparam>
     public void SaveList<V>(IList<V> list, XmlElement element, string listXmlElement, string itemLocation, string itemElementName, XmlTestStoreParameters parameters)
+        where V : notnull
     {
         if (list == null || list.Count <= 0)
         {
@@ -456,7 +457,7 @@ internal class XmlPersistence
         TPDebug.Assert(listElement != null, "EnsureLocationExists should have returned a node");
         foreach (V item in list)
         {
-            XmlElement itemXml = CreateElement(listElement, itemElementName, item!);
+            XmlElement itemXml = CreateElement(listElement, itemElementName, item);
             SaveObject(item, itemXml, itemLocation, parameters);
         }
     }
@@ -688,7 +689,7 @@ internal class XmlPersistence
     private static string ReplaceInvalidCharacterWithUniCodeEscapeSequence(Match match)
     {
         char x = match.Value[0];
-        return string.Format(@"\u{0:x4}", (ushort)x);
+        return $@"\u{(ushort)x:x4}";
     }
 
     private XmlNode? EnsureLocationExists(XmlElement xml, string location, string? nameSpaceUri)

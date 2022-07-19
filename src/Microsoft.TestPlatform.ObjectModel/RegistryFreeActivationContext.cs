@@ -8,8 +8,6 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <remarks>
@@ -76,16 +74,18 @@ internal class RegistryFreeActivationContext : IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (_disposed)
         {
-            if (disposing)
-            {
-                // No managed resources to release
-            }
-
-            DeactivateContext();
-            _disposed = true;
+            return;
         }
+
+        if (disposing)
+        {
+            // No managed resources to release
+        }
+
+        DeactivateContext();
+        _disposed = true;
     }
 
     /// <summary>

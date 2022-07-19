@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 /// <summary>
@@ -22,7 +20,7 @@ public interface ITestExecutor
     /// <param name="tests">Tests to be run.</param>
     /// <param name="runContext">Context to use when executing the tests.</param>
     /// <param param name="frameworkHandle">Handle to the framework to record results and to do framework operations.</param>
-    void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle);
+    void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle);
 
     /// <summary>
     /// Runs 'all' the tests present in the specified 'sources'.
@@ -30,7 +28,7 @@ public interface ITestExecutor
     /// <param name="sources">Path to test container files to look for tests in.</param>
     /// <param name="runContext">Context to use when executing the tests.</param>
     /// <param param name="frameworkHandle">Handle to the framework to record results and to do framework operations.</param>
-    void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle);
+    void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle);
 
     /// <summary>
     /// Cancel the execution of the tests.

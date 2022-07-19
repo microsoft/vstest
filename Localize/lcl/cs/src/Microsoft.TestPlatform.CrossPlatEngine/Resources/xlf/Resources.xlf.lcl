@@ -220,12 +220,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NoSuitableRuntimeProviderFound" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[No suitable test runtime provider was found:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Nenašel se žádný vhodný zprostředkovatel testovacího modulu runtime:]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NoTestHostProviderFound" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[No suitable test runtime provider found for this run.]]></Val>
+          <Val><![CDATA[No suitable test runtime provider was found for any source in this run.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Pro tento běh se nenašel žádný vhodný zprostředkovatel testů v režimu runtime.]]></Val>
+            <Val><![CDATA[V tomto běhu se nenašel žádný vhodný zprostředkovatel testovacího modulu runtime pro žádný zdroj.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[No suitable test runtime provider found for this run.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -270,6 +282,15 @@
           <Val><![CDATA[Proxy with id {0} is already available and cannot be re-enqueued.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Proxy s ID {0} je už k dispozici a nedá se znovu zařadit do fronty.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";SkippingSource" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Skipping source:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Přeskočení zdroje:]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

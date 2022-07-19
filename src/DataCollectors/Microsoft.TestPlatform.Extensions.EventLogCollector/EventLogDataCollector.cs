@@ -91,6 +91,8 @@ public class EventLogDataCollector : DataCollector
     /// </summary>
     private readonly IDictionary<string, IEventLogContainer> _eventLogContainerMap = new Dictionary<string, IEventLogContainer>();
 
+    private bool _isDisposed;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="EventLogDataCollector"/> class.
     /// </summary>
@@ -147,13 +149,13 @@ public class EventLogDataCollector : DataCollector
     /// Used by the data collector to send warnings, errors, or other messages
     /// </param>
     /// <param name="dataCollectionEnvironmentContext">Provides contextual information about the agent environment</param>
-    [MemberNotNull(nameof(_events), nameof(_dataSink), nameof(_logger))]
+    [MemberNotNull(nameof(_events), nameof(_dataSink), nameof(_logger), nameof(_dataCollectorContext))]
     public override void Initialize(
         XmlElement? configurationElement,
         DataCollectionEvents events,
         DataCollectionSink dataSink,
         DataCollectionLogger logger,
-        DataCollectionEnvironmentContext dataCollectionEnvironmentContext)
+        DataCollectionEnvironmentContext? dataCollectionEnvironmentContext)
     {
         ValidateArg.NotNull(events, nameof(events));
         ValidateArg.NotNull(dataSink, nameof(dataSink));
@@ -163,7 +165,7 @@ public class EventLogDataCollector : DataCollector
         _events = events;
         _dataSink = dataSink;
         _logger = logger;
-        _dataCollectorContext = dataCollectionEnvironmentContext.SessionDataCollectionContext;
+        _dataCollectorContext = dataCollectionEnvironmentContext!.SessionDataCollectionContext;
 
         // Load the configuration
         CollectorNameValueConfigurationManager nameValueSettings =
@@ -173,7 +175,7 @@ public class EventLogDataCollector : DataCollector
         ConfigureEventSources(nameValueSettings);
         ConfigureEntryTypes(nameValueSettings);
         ConfigureMaxEntries(nameValueSettings);
-        ConfigureEventLogNames(nameValueSettings);
+        ConfigureEventLogNames(nameValueSettings, _dataCollectorContext);
 
         // Register for events
         events.SessionStart += _sessionStartEventHandler;
@@ -183,6 +185,7 @@ public class EventLogDataCollector : DataCollector
     }
 
     #endregion
+
     /// <summary>
     /// The write event logs.
     /// </summary>
@@ -289,25 +292,33 @@ public class EventLogDataCollector : DataCollector
     /// <param name="disposing">Not used since this class does not have a finalizer.</param>
     protected override void Dispose(bool disposing)
     {
+        if (_isDisposed)
+            return;
+
         base.Dispose(disposing);
 
-        // Unregister events
-        if (_events != null)
+        if (disposing)
         {
-            _events.SessionStart -= _sessionStartEventHandler;
-            _events.SessionEnd -= _sessionEndEventHandler;
-            _events.TestCaseStart -= _testCaseStartEventHandler;
-            _events.TestCaseEnd -= _testCaseEndEventHandler;
+            // Unregister events
+            if (_events != null)
+            {
+                _events.SessionStart -= _sessionStartEventHandler;
+                _events.SessionEnd -= _sessionEndEventHandler;
+                _events.TestCaseStart -= _testCaseStartEventHandler;
+                _events.TestCaseEnd -= _testCaseEndEventHandler;
+            }
+
+            // Unregister EventLogEntry Written.
+            foreach (var eventLogContainer in _eventLogContainerMap.Values)
+            {
+                eventLogContainer.Dispose();
+            }
+
+            // Delete all the temp event log directories
+            RemoveTempEventLogDirs(_eventLogDirectories);
         }
 
-        // Unregister EventLogEntry Written.
-        foreach (var eventLogContainer in _eventLogContainerMap.Values)
-        {
-            eventLogContainer.Dispose();
-        }
-
-        // Delete all the temp event log directories
-        RemoveTempEventLogDirs(_eventLogDirectories);
+        _isDisposed = true;
     }
 
     #endregion
@@ -444,7 +455,7 @@ public class EventLogDataCollector : DataCollector
     }
 
     [MemberNotNull(nameof(EventLogNames))]
-    private void ConfigureEventLogNames(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
+    private void ConfigureEventLogNames(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager, DataCollectionContext dataCollectorContext)
     {
         EventLogNames = new HashSet<string>();
         string? eventLogs = collectorNameValueConfigurationManager[EventLogConstants.SettingEventLogs];
@@ -476,7 +487,7 @@ public class EventLogDataCollector : DataCollector
                         EntryTypes,
                         int.MaxValue,
                         _logger,
-                        _dataCollectorContext);
+                        dataCollectorContext);
                     _eventLogContainerMap.Add(eventLogName, eventLogContainer);
                 }
 
@@ -485,7 +496,7 @@ public class EventLogDataCollector : DataCollector
             catch (Exception ex)
             {
                 _logger.LogError(
-                    _dataCollectorContext,
+                    dataCollectorContext,
                     new EventLogCollectorException(string.Format(CultureInfo.CurrentCulture, Resource.ReadError, eventLogName, Environment.MachineName), ex));
             }
         }
@@ -496,7 +507,7 @@ public class EventLogDataCollector : DataCollector
         string? eventSourcesStr = collectorNameValueConfigurationManager[EventLogConstants.SettingEventSources];
         if (!eventSourcesStr.IsNullOrEmpty())
         {
-            EventSources = ParseCommaSeparatedList(eventSourcesStr!);
+            EventSources = ParseCommaSeparatedList(eventSourcesStr);
             EqtTrace.Verbose(
                 $"EventLogDataCollector configuration: {EventLogConstants.SettingEventSources}={EventSources}");
         }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,7 +58,7 @@ internal sealed class FileEventListener : EventListener
 
         var lines = new List<string>();
 
-        var newFormatedLine = string.Format(_format, DateTime.Now, eventData.Level, eventData.EventId, eventData.Payload[0]);
+        var newFormatedLine = string.Format(CultureInfo.CurrentCulture, _format, DateTime.Now, eventData.Level, eventData.EventId, eventData.Payload[0]);
 
         Debug.WriteLine(newFormatedLine);
 

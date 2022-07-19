@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-public class MSTestCompatibilityDataSource : TestDataSource<RunnerInfo>
+public class MSTestCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
 {
     private readonly CompatibilityRowsBuilder _builder;
 

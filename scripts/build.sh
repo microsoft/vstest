@@ -140,7 +140,7 @@ DOTNET_CLI_VERSION=$_ReadGlobalVersion
 #
 TPB_Solution="TestPlatform.sln"
 TPB_Build_From_Source_Solution="TestPlatform_BuildFromSource.sln"
-TPB_TargetFramework="net451"
+TPB_TargetFramework="net462"
 TPB_TargetFrameworkCore="netcoreapp2.1"
 TPB_Configuration=$CONFIGURATION
 TPB_TargetRuntime=$TARGET_RUNTIME
@@ -150,6 +150,7 @@ TPB_LocalizedBuild=$DISABLE_LOCALIZED_BUILD
 TPB_Verbose=$VERBOSE
 TPB_EXTERNALS_VERSION=$(grep TestPlatformExternalsVersion $TP_ROOT_DIR/scripts/build/TestPlatform.Dependencies.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
 TPB_CC_EXTERNALS_VERSION=$(grep MicrosoftInternalCodeCoverageVersion $TP_ROOT_DIR/eng/Versions.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
+TPB_NEWTONSOFT_JSON_VERSION=$(grep NewtonsoftJsonVersion $TP_ROOT_DIR/eng/Versions.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
 
 TPB_BRANCH="$(git -C "." rev-parse --abbrev-ref HEAD 2>/dev/null)" || TPB_BRANCH="LOCALBRANCH" # detached HEAD
 TPB_COMMIT="$(git -C "." rev-parse HEAD 2>/dev/null)"              || TPB_COMMIT="LOCALBUILD" # detached HEAD
@@ -215,10 +216,10 @@ function install_cli()
         fi
         chmod u+x $install_script
         # Get netcoreapp1.1 shared components
-        $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "2.1" --version "2.1.30" 
-        $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "3.1" --version "3.1.24" 
-        $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "5.0" --version "5.0.16" 
-        $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "6.0" --version "6.0.4"  
+        $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "2.1" --version "2.1.30"
+        $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "3.1" --version "3.1.24"
+        $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "5.0" --version "5.0.16"
+        $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "6.0" --version "6.0.4"
 
         log "install_cli: Get the latest dotnet cli toolset..."
         $install_script --install-dir "$TP_DOTNET_DIR" --channel "7.0" --no-path --version $DOTNET_CLI_VERSION
@@ -339,8 +340,8 @@ function publish_package()
         mkdir -p $testhost
 
         if [[ $TP_USE_REPO_API = 0 ]]; then
-            cp -r src/testhost/bin/$TPB_Configuration/net451/win7-x64/* $testhost
-            cp -r src/testhost.x86/bin/$TPB_Configuration/net451/win7-x86/* $testhost
+            cp -r src/testhost/bin/$TPB_Configuration/$TPB_TargetFramework/win7-x64/* $testhost
+            cp -r src/testhost.x86/bin/$TPB_Configuration/$TPB_TargetFramework/win7-x86/* $testhost
         else
             cp -r src/testhost/bin/$TPB_Configuration/net6.0/* $testhost
             cp -r src/testhost.x86/bin/$TPB_Configuration/net6.0/* $testhost
@@ -436,7 +437,7 @@ function publish_package()
         done
         #*************************************************************************************************************#
 
-        newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/9.0.1/lib/netstandard1.0/Newtonsoft.Json.dll
+        newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/$TPB_NEWTONSOFT_JSON_VERSION/lib/netstandard1.0/Newtonsoft.Json.dll
         cp $newtonsoft $packageDir
     done
 

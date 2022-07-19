@@ -5,8 +5,6 @@ using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 
 /// <summary>

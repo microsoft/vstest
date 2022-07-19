@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -15,12 +13,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 #endif
 public class TestPlatformException : Exception
 {
-    public TestPlatformException(string message)
+    public TestPlatformException(string? message)
         : base(message)
     {
     }
 
-    public TestPlatformException(string message, Exception innerException)
+    public TestPlatformException(string? message, Exception? innerException)
         : base(message, innerException)
     {
     }
@@ -101,6 +99,6 @@ public class TestPlatformException : Exception
 #endif
 public class ProcessExitedException : TestPlatformException
 {
-    public ProcessExitedException(string message) : base(message) { }
-    public ProcessExitedException(string message, Exception inner) : base(message, inner) { }
+    public ProcessExitedException(string? message) : base(message) { }
+    public ProcessExitedException(string? message, Exception? inner) : base(message, inner) { }
 }

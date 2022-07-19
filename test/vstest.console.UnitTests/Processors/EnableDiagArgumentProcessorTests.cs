@@ -78,14 +78,14 @@ public class EnableDiagArgumentProcessorTests
     [DataRow("")]
     public void EnableDiagArgumentProcessorExecutorThrowsIfDiagArgumentIsNullOrEmpty(string argument)
     {
-        string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidDiagArgument, argument);
+        string exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagArgument, argument);
         EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(argument, exceptionMessage);
     }
 
     [TestMethod]
     public void EnableDiagArgumentProcessorExecutorDoesNotThrowsIfFileDotOpenThrow()
     {
-        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath))).Returns(true);
+        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath)!)).Returns(true);
 
         _diagProcessor.Executor!.Value.Initialize(_dummyFilePath);
     }
@@ -152,11 +152,11 @@ public class EnableDiagArgumentProcessorTests
     [TestMethod]
     public void EnableDiagArgumentProcessorExecutorShouldCreateDirectoryOfLogFileIfNotExists()
     {
-        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath))).Returns(false);
+        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath)!)).Returns(false);
 
         _diagProcessor.Executor!.Value.Initialize(_dummyFilePath);
 
-        _mockFileHelper.Verify(fh => fh.CreateDirectory(Path.GetDirectoryName(_dummyFilePath)), Times.Once);
+        _mockFileHelper.Verify(fh => fh.CreateDirectory(Path.GetDirectoryName(_dummyFilePath)!), Times.Once);
     }
 
     [TestMethod]

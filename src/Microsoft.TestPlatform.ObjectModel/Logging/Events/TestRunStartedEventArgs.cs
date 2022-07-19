@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 /// <summary>
@@ -22,7 +20,5 @@ public class TestRunStartedEventArgs : EventArgs
     }
 
     public override string ToString()
-    {
-        return "ProcessId = " + ProcessId;
-    }
+        => "ProcessId = " + ProcessId;
 }

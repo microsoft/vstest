@@ -13,13 +13,13 @@ internal class FakeOutput : IOutput
     public StringBuilder CurrentLine { get; } = new();
     public List<string> Lines { get; } = new();
 
-    public void Write(string message, OutputLevel level)
+    public void Write(string? message, OutputLevel level)
     {
         Messages.Add(new OutputMessage(message, level, isNewLine: false));
         CurrentLine.Append(message);
     }
 
-    public void WriteLine(string message, OutputLevel level)
+    public void WriteLine(string? message, OutputLevel level)
     {
         Lines.Add(CurrentLine + message);
         CurrentLine.Clear();

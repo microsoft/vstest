@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 /// <summary>
@@ -20,5 +18,5 @@ public interface ITestCaseFilterExpression
     /// <summary>
     /// Matched test case with test case filtering criteria.
     /// </summary>
-    bool MatchTestCase(TestCase testCase, Func<string, object> propertyValueProvider);
+    bool MatchTestCase(TestCase testCase, Func<string, object?> propertyValueProvider);
 }

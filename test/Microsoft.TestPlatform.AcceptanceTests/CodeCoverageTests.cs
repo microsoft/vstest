@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 
@@ -301,12 +302,12 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         return arguments;
     }
 
-    private void AssertSkippedMethod(XmlDocument document)
+    private static void AssertSkippedMethod(XmlDocument document)
     {
         var module = GetModuleNode(document.DocumentElement!, "codecoveragetest.dll");
         Assert.IsNotNull(module);
 
-        var coverage = double.Parse(module.Attributes!["block_coverage"]!.Value);
+        var coverage = double.Parse(module.Attributes!["block_coverage"]!.Value, CultureInfo.InvariantCulture);
         Assert.IsTrue(coverage > ExpectedMinimalModuleCoverage);
 
         var testSignFunction = GetNode(module, "skipped_function", "TestSign()");
@@ -321,9 +322,9 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         Assert.IsNotNull(testAbsFunction);
     }
 
-    private void ValidateCoverageData(XmlDocument document, string moduleName, bool validateSourceFileNames)
+    private static void ValidateCoverageData(XmlDocument document, string moduleName, bool validateSourceFileNames)
     {
-        var module = GetModuleNode(document.DocumentElement!, moduleName.ToLower());
+        var module = GetModuleNode(document.DocumentElement!, moduleName.ToLowerInvariant());
 
         if (module == null)
         {
@@ -340,7 +341,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         }
     }
 
-    private void AssertSourceFileName(XmlNode module)
+    private static void AssertSourceFileName(XmlNode module)
     {
         const string expectedFileName = "UnitTest1.cs";
 

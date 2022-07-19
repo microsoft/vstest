@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
 
 /// <summary>

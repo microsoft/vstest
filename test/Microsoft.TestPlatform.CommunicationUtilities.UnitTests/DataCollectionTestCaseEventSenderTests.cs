@@ -107,7 +107,7 @@ public class DataCollectionTestCaseEventSenderTests
 
         var attachmentSet = new AttachmentSet(new Uri("my://attachment"), "displayname");
         _mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.DataCollectionTestEndResult, Payload = JToken.FromObject(new Collection<AttachmentSet>() { attachmentSet }) });
-        var attachments = _dataCollectionTestCaseEventSender.SendTestCaseEnd(testCaseEndEventArgs);
+        var attachments = _dataCollectionTestCaseEventSender.SendTestCaseEnd(testCaseEndEventArgs)!;
 
         Assert.AreEqual(attachments[0].Uri, attachmentSet.Uri);
         Assert.AreEqual(attachments[0].DisplayName, attachmentSet.DisplayName);

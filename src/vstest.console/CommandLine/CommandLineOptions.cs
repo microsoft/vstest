@@ -284,7 +284,7 @@ internal class CommandLineOptions
         catch (TestSourceException ex) when (source.StartsWith("-") || source.StartsWith("/"))
         {
             throw new TestSourceException(
-                string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidArgument, source), ex);
+                string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidArgument, source), ex);
         }
         // Add the matching files to source list
         _sources = _sources.Union(matchingFiles).ToList();
@@ -293,7 +293,7 @@ internal class CommandLineOptions
     /// <summary>
     /// Resets the options. Clears the sources.
     /// </summary>
-    internal void Reset()
+    internal static void Reset()
     {
         s_instance = null;
     }

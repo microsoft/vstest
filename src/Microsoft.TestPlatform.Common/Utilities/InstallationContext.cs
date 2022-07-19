@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
@@ -41,11 +40,13 @@ public class InstallationContext
         return false;
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public string GetVisualStudioPath(string visualStudioDirectory)
     {
         return Path.Combine(visualStudioDirectory, DevenvExe);
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public string[] GetVisualStudioCommonLocations(string visualStudioDirectory)
     {
         return new[]

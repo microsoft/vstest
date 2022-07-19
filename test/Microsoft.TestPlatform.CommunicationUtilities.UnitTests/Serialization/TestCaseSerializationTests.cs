@@ -260,10 +260,10 @@ public class TestCaseSerializationTests
 
     private static T Deserialize<T>(string json, int version = 1)
     {
-        return JsonDataSerializer.Instance.Deserialize<T>(json, version);
+        return JsonDataSerializer.Instance.Deserialize<T>(json, version)!;
     }
 
-    private void VerifyDummyPropertyIsRegistered()
+    private static void VerifyDummyPropertyIsRegistered()
     {
         var dummyProperty = TestProperty.Find("DummyProperty");
         Assert.IsNotNull(dummyProperty);

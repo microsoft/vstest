@@ -128,7 +128,7 @@ public class ConditionTests
     [TestMethod]
     public void TokenizeNullThrowsArgumentNullException()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => Condition.TokenizeFilterConditionString(null), "str");
+        Assert.ThrowsException<ArgumentNullException>(() => Condition.TokenizeFilterConditionString(null!), "str");
     }
 
     [TestMethod]

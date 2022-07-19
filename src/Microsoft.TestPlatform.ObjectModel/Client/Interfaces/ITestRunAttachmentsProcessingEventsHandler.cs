@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -17,7 +15,7 @@ public interface ITestRunAttachmentsProcessingEventsHandler : ITestMessageEventH
     /// </summary>
     /// <param name="attachmentsProcessingCompleteEventArgs">AttachmentsProcessing Complete event args.</param>
     /// <param name="attachments">Last set of processed attachment sets.</param>
-    void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk);
+    void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet>? lastChunk);
 
     /// <summary>
     /// Dispatch ProcessedAttachmentsChunk event to listeners.

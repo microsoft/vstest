@@ -83,7 +83,7 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <summary>
     /// Parameters dictionary for logger. Ex: {"LogFileName":"TestResults.trx"}.
     /// </summary>
-    private Dictionary<string, string>? _parametersDictionary;
+    private Dictionary<string, string?>? _parametersDictionary;
 
     /// <summary>
     /// Gets the directory under which default trx file and test results attachments should be saved.
@@ -127,7 +127,7 @@ public class TrxLogger : ITestLoggerWithParameters
 
     /// <inheritdoc/>
     [MemberNotNull(nameof(_parametersDictionary))]
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters)
     {
         ValidateArg.NotNull(parameters, nameof(parameters));
         if (parameters.Count == 0)
@@ -140,15 +140,14 @@ public class TrxLogger : ITestLoggerWithParameters
 
         if (isLogFilePrefixParameterExists && isLogFileNameParameterExists)
         {
-            var trxParameterErrorMsg = string.Format(CultureInfo.CurrentCulture,
-                TrxLoggerResources.PrefixAndNameProvidedError);
+            var trxParameterErrorMsg = TrxLoggerResources.PrefixAndNameProvidedError;
 
             EqtTrace.Error(trxParameterErrorMsg);
             throw new ArgumentException(trxParameterErrorMsg);
         }
 
         _parametersDictionary = parameters;
-        Initialize(events, _parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]);
+        Initialize(events, _parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]!);
     }
     #endregion
 
@@ -264,8 +263,8 @@ public class TrxLogger : ITestLoggerWithParameters
         if (e.Result.Outcome == ObjectModel.TestOutcome.Skipped)
             HandleSkippedTest(e.Result);
 
-        var testType = _converter.GetTestType(e.Result);
-        var executionId = _converter.GetExecutionId(e.Result);
+        var testType = Converter.GetTestType(e.Result);
+        var executionId = Converter.GetExecutionId(e.Result);
 
         // Setting parent properties like parent result, parent test element, parent execution id.
         var parentExecutionId = _converter.GetParentExecutionId(e.Result);
@@ -524,7 +523,7 @@ public class TrxLogger : ITestLoggerWithParameters
         TPDebug.Assert(IsInitialized, "Logger is not initialized");
         var defaultTrxFileName = LoggerTestRun.RunConfiguration.RunDeploymentRootDirectory + ".trx";
 
-        return _trxFileHelper.GetNextIterationFileName(_testResultsDirPath, defaultTrxFileName, false);
+        return TrxFileHelper.GetNextIterationFileName(_testResultsDirPath, defaultTrxFileName, false);
     }
 
     /// <summary>
@@ -547,7 +546,7 @@ public class TrxLogger : ITestLoggerWithParameters
         LoggerTestRun.Started = TestRunStartTime;
 
         // Save default test settings
-        string runDeploymentRoot = _trxFileHelper.ReplaceInvalidFileNameChars(LoggerTestRun.Name);
+        string runDeploymentRoot = TrxFileHelper.ReplaceInvalidFileNameChars(LoggerTestRun.Name);
         TestRunConfiguration testrunConfig = new("default", _trxFileHelper);
         testrunConfig.RunDeploymentRootDirectory = runDeploymentRoot;
         LoggerTestRun.RunConfiguration = testrunConfig;
@@ -607,10 +606,10 @@ public class TrxLogger : ITestLoggerWithParameters
         }
 
         TestCase testCase = rockSteadyTestResult.TestCase;
-        Guid testId = _converter.GetTestId(testCase);
+        Guid testId = Converter.GetTestId(testCase);
 
         // Scenario for inner test case when parent test element is not present.
-        var testName = testCase.DisplayName;
+        string? testName = testCase.DisplayName;
         var adapter = testCase.ExecutorUri.ToString();
         if (adapter.Contains(TrxLoggerConstants.MstestAdapterString) &&
             parentTestElement == null &&
@@ -629,7 +628,7 @@ public class TrxLogger : ITestLoggerWithParameters
         // Create test element
         if (testElement == null)
         {
-            testElement = _converter.ToTestElement(testId, executionId, parentExecutionId, testName, testType, testCase);
+            testElement = Converter.ToTestElement(testId, executionId, parentExecutionId, testName!, testType, testCase);
             _testElements.TryAdd(testId, testElement);
         }
 
@@ -672,7 +671,7 @@ public class TrxLogger : ITestLoggerWithParameters
     {
         TPDebug.Assert(IsInitialized, "Logger is not initialized");
         // Create test result
-        TrxLoggerObjectModel.TestOutcome testOutcome = _converter.ToOutcome(rocksteadyTestResult.Outcome);
+        TrxLoggerObjectModel.TestOutcome testOutcome = Converter.ToOutcome(rocksteadyTestResult.Outcome);
         TPDebug.Assert(LoggerTestRun != null, "LoggerTestRun is null");
         var testResult = _converter.ToTestResult(testElement.Id.Id, executionId, parentExecutionId, testElement.Name,
             _testResultsDirPath, testType, testElement.CategoryId, testOutcome, LoggerTestRun, rocksteadyTestResult);

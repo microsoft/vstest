@@ -2,11 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
@@ -61,7 +60,7 @@ public class FileTransferInformation : BasicTransferInformation
         // Make sure the file exists.
         if (!_fileHelper.Exists(path))
         {
-            throw new FileNotFoundException(string.Format(Resources.Resources.Common_FileNotExist, new object[] { path }), path);
+            throw new FileNotFoundException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.Common_FileNotExist, new object[] { path }), path);
         }
 
         // Make sure the path we have is a full path (not relative).

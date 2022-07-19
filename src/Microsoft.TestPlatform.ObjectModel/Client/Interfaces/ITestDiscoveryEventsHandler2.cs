@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -17,11 +15,11 @@ public interface ITestDiscoveryEventsHandler2 : ITestMessageEventHandler
     /// </summary>
     /// <param name="discoveryCompleteEventArgs">Discovery Complete Event Args</param>
     /// <param name="lastChunk">Last set of test cases discovered.</param>
-    void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk);
+    void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk);
 
     /// <summary>
     /// Dispatch DiscoveredTest event to listeners.
     /// </summary>
     /// <param name="discoveredTestCases">Discovered  test cases.</param>
-    void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases);
+    void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases);
 }

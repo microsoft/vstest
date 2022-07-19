@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 public interface ICommunicationEndPoint
@@ -24,7 +22,7 @@ public interface ICommunicationEndPoint
     /// </summary>
     /// <param name="endPoint">Address to connect</param>
     /// <returns>Address of the connected endPoint</returns>
-    string Start(string endPoint);
+    string? Start(string endPoint);
 
     /// <summary>
     /// Stops the endPoint and closes the underlying communication channel.

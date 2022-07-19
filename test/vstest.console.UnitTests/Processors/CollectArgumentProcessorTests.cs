@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
@@ -133,7 +134,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldCreateEntryForDataCollectorInRunSettingsIfNotAlreadyPresent()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, "");
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -158,7 +159,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldEnableDataCollectorIfDisabledInRunSettings()
     {
-        var runsettingsString = string.Format(_defaultRunSettings,
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings,
             "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\" />");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
@@ -183,7 +184,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldNotDisableOtherDataCollectorsIfEnabled()
     {
-        var runsettingsString = string.Format(_defaultRunSettings,
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings,
             "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\" /><DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
@@ -211,7 +212,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldNotEnableOtherDataCollectorsIfDisabled()
     {
-        var runsettingsString = string.Format(_defaultRunSettings,
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings,
             "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\" /><DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
@@ -239,7 +240,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldEnableMultipleCollectorsWhenCalledMoreThanOnce()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, string.Empty);
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, string.Empty);
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -264,7 +265,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldAddOutProcAndInprocCollectorWhenXPlatCodeCoverageIsEnabled()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, string.Empty);
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, string.Empty);
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -292,7 +293,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void UpdageXPlatCodeCoverageCodebaseWithFullPathFromTestAdaptersPaths_Found()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, string.Empty);
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, string.Empty);
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -318,13 +319,13 @@ public class CollectArgumentProcessorTests
             $"      <InProcDataCollector assemblyQualifiedName=\"Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\" friendlyName=\"XPlat Code Coverage\" enabled=\"True\" codebase=\"c:\\AdapterFolderPath{Path.DirectorySeparatorChar}coverlet.collector.dll\" />",
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
-            "</RunSettings>").ShowWhiteSpace(), _settingsProvider.ActiveRunSettings!.SettingsXml.ShowWhiteSpace());
+            "</RunSettings>").ShowWhiteSpace(), _settingsProvider.ActiveRunSettings!.SettingsXml!.ShowWhiteSpace());
     }
 
     [TestMethod]
     public void UpdageXPlatCodeCoverageCodebaseWithFullPathFromTestAdaptersPaths_NotFound()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, string.Empty);
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, string.Empty);
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -367,7 +368,7 @@ public class CollectArgumentProcessorTests
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
             "</RunSettings>");
-        runsettingsString = string.Format(runsettingsString, string.Empty);
+        runsettingsString = string.Format(CultureInfo.CurrentCulture, runsettingsString, string.Empty);
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -407,7 +408,7 @@ public class CollectArgumentProcessorTests
             "    </DataCollectors>",
             "  </DataCollectionRunSettings>",
             "  </RunSettings>");
-        runsettingsString = string.Format(runsettingsString, string.Empty);
+        runsettingsString = string.Format(CultureInfo.CurrentCulture, runsettingsString, string.Empty);
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -452,7 +453,7 @@ public class CollectArgumentProcessorTests
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
             "</RunSettings>");
-        runsettingsString = string.Format(runsettingsString, string.Empty);
+        runsettingsString = string.Format(CultureInfo.CurrentCulture, runsettingsString, string.Empty);
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -496,7 +497,7 @@ public class CollectArgumentProcessorTests
             "    </InProcDataCollectors>",
             "  </InProcDataCollectionRunSettings>",
             "</RunSettings>");
-        runsettingsString = string.Format(runsettingsString, string.Empty);
+        runsettingsString = string.Format(CultureInfo.CurrentCulture, runsettingsString, string.Empty);
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -525,7 +526,7 @@ public class CollectArgumentProcessorTests
     public void InitializeXPlatCodeCoverageShouldAddXPlatInProcProcDataCollectoPropertiesIfNotPresent()
     {
         var runsettingsString = $"<?xml version =\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector2\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <InProcDataCollectionRunSettings>\r\n    <InProcDataCollectors>\r\n      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"False\" />\r\n    </InProcDataCollectors>\r\n  </InProcDataCollectionRunSettings>\r\n</RunSettings>";
-        runsettingsString = string.Format(runsettingsString, string.Empty);
+        runsettingsString = string.Format(CultureInfo.CurrentCulture, runsettingsString, string.Empty);
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -557,7 +558,7 @@ public class CollectArgumentProcessorTests
     public void InitializeXPlatCodeCoverageShouldAddXPlatInProcProcDataCollectoPropertiesIfNotPresent_NoTestAdaptersPaths()
     {
         var runsettingsString = $"<?xml version =\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <RunConfiguration>\r\n </RunConfiguration>\r\n <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector2\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <InProcDataCollectionRunSettings>\r\n    <InProcDataCollectors>\r\n      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"False\" />\r\n    </InProcDataCollectors>\r\n  </InProcDataCollectionRunSettings>\r\n</RunSettings>";
-        runsettingsString = string.Format(runsettingsString, string.Empty);
+        runsettingsString = string.Format(CultureInfo.CurrentCulture, runsettingsString, string.Empty);
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -591,7 +592,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldThrowExceptionWhenInvalidCollectorNameProvided()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, "");
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -602,7 +603,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldThrowExceptionWhenInvalidConfigurationsProvided()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, "");
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -613,7 +614,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldCreateConfigurationsForNewDataCollectorInRunSettings()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, "");
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -643,7 +644,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldCreateConfigurationsForExistingDataCollectorInRunSettings()
     {
-        var runsettingsString = string.Format(_defaultRunSettings,
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings,
             "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\">" +
             "  <Configuration>" +
             "    <SomeSetting>SomeValue</SomeSetting>" +
@@ -677,7 +678,7 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldUpdateConfigurationsForExistingDataCollectorInRunSettings()
     {
-        var runsettingsString = string.Format(_defaultRunSettings,
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings,
             "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\">" +
             "  <Configuration>" +
             "    <SomeSetting>SomeValue</SomeSetting>" +

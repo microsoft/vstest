@@ -6,8 +6,6 @@ using System;
 using System.Security.Cryptography;
 #endif
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 /// <summary>
@@ -163,7 +161,7 @@ internal static class Sha1Helper
             return digest;
         }
 
-        private void PadMessage(ref byte[] message)
+        private static void PadMessage(ref byte[] message)
         {
             var length = message.Length;
             var paddingBytes = BlockBytes - (length % BlockBytes);

@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 
 /// <summary>
@@ -16,7 +14,7 @@ internal class TestExecutorPluginInformation : TestExtensionPluginInformation
     /// Default constructor
     /// </summary>
     /// <param name="testExecutorType"> The test Executor Type. </param>
-    public TestExecutorPluginInformation(Type testExecutorType)
+    public TestExecutorPluginInformation(Type? testExecutorType)
         : base(testExecutorType)
     {
     }
@@ -31,7 +29,7 @@ internal class TestExecutorPluginInformation2 : TestExtensionPluginInformation
     /// Default constructor
     /// </summary>
     /// <param name="testExecutorType"> The test Executor Type. </param>
-    public TestExecutorPluginInformation2(Type testExecutorType)
+    public TestExecutorPluginInformation2(Type? testExecutorType)
         : base(testExecutorType)
     {
     }

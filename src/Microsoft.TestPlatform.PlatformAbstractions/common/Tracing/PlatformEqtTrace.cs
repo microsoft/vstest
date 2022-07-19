@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 
@@ -214,10 +215,10 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     }
 
     /// <inheritdoc/>
-    public void WriteLine(PlatformTraceLevel level, string message)
+    public void WriteLine(PlatformTraceLevel level, string? message)
     {
-        Debug.Assert(message != null, "message != null");
-        Debug.Assert(!string.IsNullOrEmpty(ProcessName), "!string.IsNullOrEmpty(ProcessName)");
+        TPDebug.Assert(message != null, "message != null");
+        TPDebug.Assert(!string.IsNullOrEmpty(ProcessName), "!string.IsNullOrEmpty(ProcessName)");
 
         if (EnsureTraceIsInitialized())
         {
@@ -258,6 +259,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         return (PlatformTraceLevel)SourceTraceLevelsMap[Source.Switch.Level];
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public TraceLevel MapPlatformTraceToTrace(PlatformTraceLevel traceLevel)
     {
         switch (traceLevel)
@@ -302,7 +304,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     /// <param name="e">The exception to log.</param>
     private static void LogIgnoredException(Exception e)
     {
-        Debug.Assert(e != null, "e != null");
+        TPDebug.Assert(e != null, "e != null");
 
         try
         {

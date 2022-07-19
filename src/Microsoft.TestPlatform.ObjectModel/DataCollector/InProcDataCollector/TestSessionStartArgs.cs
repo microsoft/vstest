@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
 
@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
 /// </summary>
 public class TestSessionStartArgs : InProcDataCollectionArgs
 {
-    private readonly IDictionary<string, object> _properties;
+    private readonly IDictionary<string, object?>? _properties;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestSessionStartArgs"/> class.
@@ -28,7 +28,7 @@ public class TestSessionStartArgs : InProcDataCollectionArgs
     /// <param name="properties">
     /// Properties.
     /// </param>
-    public TestSessionStartArgs(IDictionary<string, object> properties)
+    public TestSessionStartArgs(IDictionary<string, object?> properties)
     {
         Configuration = string.Empty;
         _properties = properties;
@@ -48,13 +48,14 @@ public class TestSessionStartArgs : InProcDataCollectionArgs
     /// <summary>
     /// Gets or sets the configuration.
     /// </summary>
-    public string Configuration { get; set; }
+    public string? Configuration { get; set; }
 
     /// <summary>
     /// Gets session start properties enumerator
     /// </summary>
-    public IEnumerator<KeyValuePair<string, object>> GetProperties()
+    public IEnumerator<KeyValuePair<string, object?>> GetProperties()
     {
+        TPDebug.Assert(_properties is not null, "_properties is null");
         return _properties.GetEnumerator();
     }
 
@@ -64,11 +65,11 @@ public class TestSessionStartArgs : InProcDataCollectionArgs
     /// <param name="property">
     /// Property name
     /// </param>
-    public T GetPropertyValue<T>(string property)
+    public T? GetPropertyValue<T>(string property)
     {
         ValidateArg.NotNullOrEmpty(property, nameof(property));
-
-        return _properties.ContainsKey(property) ? (T)_properties[property] : default;
+        TPDebug.Assert(_properties is not null, "_properties is null");
+        return _properties.ContainsKey(property) ? (T?)_properties[property] : default;
     }
 
     /// <summary>
@@ -77,10 +78,10 @@ public class TestSessionStartArgs : InProcDataCollectionArgs
     /// <param name="property">
     /// Property name
     /// </param>
-    public object GetPropertyValue(string property)
+    public object? GetPropertyValue(string property)
     {
         ValidateArg.NotNullOrEmpty(property, nameof(property));
-
+        TPDebug.Assert(_properties is not null, "_properties is null");
         _properties.TryGetValue(property, out var propertyValue);
 
         return propertyValue;

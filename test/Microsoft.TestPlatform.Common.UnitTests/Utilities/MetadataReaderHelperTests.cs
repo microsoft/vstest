@@ -15,8 +15,6 @@ namespace TestPlatform.Common.UnitTests.Utilities;
 [TestClass]
 public class MetadataReaderHelperTests
 {
-    private readonly MetadataReaderExtensionsHelper _metadataReaderHelper = new();
-
     [TestMethod]
     public void MetadataReaderHelper_GetCollectorExtensionTypes()
     {
@@ -25,7 +23,7 @@ public class MetadataReaderHelperTests
             Directory.GetFiles(testAssetsPath, "AttachmentProcessorDataCollector.dll", SearchOption.AllDirectories)
             .Where(x => x.Contains("bin") && x.Contains(IntegrationTestEnvironment.BuildConfiguration))
             .Single();
-        var types = _metadataReaderHelper.DiscoverTestExtensionTypesV2Attribute(Assembly.LoadFile(dataCollectorFilePath), dataCollectorFilePath);
+        var types = MetadataReaderExtensionsHelper.DiscoverTestExtensionTypesV2Attribute(Assembly.LoadFile(dataCollectorFilePath), dataCollectorFilePath);
         Assert.IsTrue(types.Any(), $"File {dataCollectorFilePath}");
         Assert.IsTrue(types[0].AssemblyQualifiedName!.StartsWith("AttachmentProcessorDataCollector.SampleDataCollectorV2"), $"File {dataCollectorFilePath}");
         Assert.AreEqual(dataCollectorFilePath.Replace("/", @"\"), types[0].Assembly.Location.Replace("/", @"\"), $"File {dataCollectorFilePath}");

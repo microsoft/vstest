@@ -8,7 +8,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>$(TargetNetFxVersion);net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <RootNamespace>child_hang</RootNamespace>
     <IsPackable>false</IsPackable>

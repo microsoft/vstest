@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
@@ -48,7 +46,7 @@ internal abstract class DataCollectionLauncher : IDataCollectionLauncher
     /// <summary>
     /// Gets callback on process exit
     /// </summary>
-    protected Action<object> ExitCallBack => (process) =>
+    protected Action<object?> ExitCallBack => process =>
     {
         var processStdErrorStr = _processStdError.ToString();
 
@@ -58,7 +56,7 @@ internal abstract class DataCollectionLauncher : IDataCollectionLauncher
         {
             EqtTrace.Error("DataCollectionLauncher.ExitCallBack: Data collector exited with exitcode:{0} error: '{1}'", exitCode, processStdErrorStr);
 
-            if (!string.IsNullOrWhiteSpace(processStdErrorStr))
+            if (!StringUtils.IsNullOrWhiteSpace(processStdErrorStr))
             {
                 _messageLogger.SendMessage(TestMessageLevel.Error, processStdErrorStr);
             }
@@ -72,7 +70,7 @@ internal abstract class DataCollectionLauncher : IDataCollectionLauncher
     /// <summary>
     /// Gets callback to read from process error stream
     /// </summary>
-    protected Action<object, string> ErrorReceivedCallback => (process, data) =>
+    protected Action<object?, string?> ErrorReceivedCallback => (process, data) =>
     {
         // Log all standard error message because on too much data we ignore starting part.
         // This is helpful in abnormal failure of datacollector.
@@ -94,6 +92,6 @@ internal abstract class DataCollectionLauncher : IDataCollectionLauncher
     /// The <see cref="int"/>.
     /// </returns>
     public abstract int LaunchDataCollector(
-        IDictionary<string, string> environmentVariables,
+        IDictionary<string, string?>? environmentVariables,
         IList<string> commandLineArguments);
 }

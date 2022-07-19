@@ -4,10 +4,7 @@
 using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
@@ -27,7 +24,7 @@ public interface ITestLoggerManager : IDisposable
     /// <summary>
     /// Initialize loggers.
     /// </summary>
-    void Initialize(string runSettings);
+    void Initialize(string? runSettings);
 
     /// <summary>
     /// Handles test run message.

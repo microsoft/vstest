@@ -9,7 +9,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -57,19 +57,19 @@ public sealed class TestResult : TestObject
     /// Gets or sets the exception message.
     /// </summary>
     [DataMember]
-    public string ErrorMessage { get; set; }
+    public string? ErrorMessage { get; set; }
 
     /// <summary>
     /// Gets or sets the exception stack trace.
     /// </summary>
     [DataMember]
-    public string ErrorStackTrace { get; set; }
+    public string? ErrorStackTrace { get; set; }
 
     /// <summary>
     /// Gets or sets the TestResult Display name. Used for Data Driven Test (i.e. Data Driven Test. E.g. InlineData in xUnit)
     /// </summary>
     [DataMember]
-    public string DisplayName { get; set; }
+    public string? DisplayName { get; set; }
 
     /// <summary>
     /// Gets the test messages.
@@ -81,7 +81,7 @@ public sealed class TestResult : TestObject
     /// Gets or sets test result ComputerName.
     /// </summary>
     [DataMember]
-    public string ComputerName { get; set; }
+    public string? ComputerName { get; set; }
 
     /// <summary>
     /// Gets or sets the test result Duration.
@@ -119,7 +119,7 @@ public sealed class TestResult : TestObject
 
         // Add the outcome of the test and the name of the test.
         result.AppendFormat(
-            CultureInfo.CurrentUICulture,
+            CultureInfo.CurrentCulture,
             Resources.Resources.BasicTestResultFormat,
             TestCase.DisplayName,
             TestOutcomeHelper.GetOutcomeString(Outcome));
@@ -129,14 +129,14 @@ public sealed class TestResult : TestObject
         {
             // Add Error message.
             result.AppendLine();
-            result.AppendFormat(CultureInfo.CurrentUICulture, Resources.Resources.TestFailureMessageFormat, ErrorMessage);
+            result.AppendFormat(CultureInfo.CurrentCulture, Resources.Resources.TestFailureMessageFormat, ErrorMessage);
 
             // Add stack trace if we have one.
-            if (!string.IsNullOrWhiteSpace(ErrorStackTrace))
+            if (!StringUtils.IsNullOrWhiteSpace(ErrorStackTrace))
             {
                 result.AppendLine();
                 result.AppendFormat(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     Resources.Resources.TestFailureStackTraceFormat,
                     ErrorStackTrace);
             }
@@ -148,10 +148,10 @@ public sealed class TestResult : TestObject
             StringBuilder testMessages = new();
             foreach (TestResultMessage message in Messages)
             {
-                if (!string.IsNullOrEmpty(message?.Category) && !string.IsNullOrEmpty(message.Text))
+                if (!StringUtils.IsNullOrEmpty(message?.Category) && !StringUtils.IsNullOrEmpty(message.Text))
                 {
                     testMessages.AppendFormat(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         Resources.Resources.TestResultMessageFormat,
                         message.Category,
                         message.Text);
@@ -160,7 +160,7 @@ public sealed class TestResult : TestObject
 
             result.AppendLine();
             result.AppendFormat(
-                CultureInfo.CurrentUICulture,
+                CultureInfo.CurrentCulture,
                 Resources.Resources.TestResultTextMessagesFormat,
                 testMessages.ToString());
         }
@@ -172,7 +172,7 @@ public sealed class TestResult : TestObject
     /// Return TestProperty's value
     /// </summary>
     /// <returns></returns>
-    protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
+    protected override object? ProtectedGetPropertyValue(TestProperty property, object? defaultValue)
     {
         ValidateArg.NotNull(property, nameof(property));
         return property.Id switch
@@ -192,27 +192,27 @@ public sealed class TestResult : TestObject
     /// <summary>
     /// Set TestProperty's value
     /// </summary>
-    protected override void ProtectedSetPropertyValue(TestProperty property, object value)
+    protected override void ProtectedSetPropertyValue(TestProperty property, object? value)
     {
         ValidateArg.NotNull(property, nameof(property));
         switch (property.Id)
         {
             case "TestResult.ComputerName":
-                ComputerName = (string)value; return;
+                ComputerName = (string?)value; return;
             case "TestResult.DisplayName":
-                DisplayName = (string)value; return;
+                DisplayName = (string?)value; return;
             case "TestResult.Duration":
-                Duration = (TimeSpan)value; return;
+                Duration = (TimeSpan)value!; return;
             case "TestResult.EndTime":
-                EndTime = (DateTimeOffset)value; return;
+                EndTime = (DateTimeOffset)value!; return;
             case "TestResult.ErrorMessage":
-                ErrorMessage = (string)value; return;
+                ErrorMessage = (string?)value; return;
             case "TestResult.ErrorStackTrace":
-                ErrorStackTrace = (string)value; return;
+                ErrorStackTrace = (string?)value; return;
             case "TestResult.Outcome":
-                Outcome = (TestOutcome)value; return;
+                Outcome = (TestOutcome)value!; return;
             case "TestResult.StartTime":
-                StartTime = (DateTimeOffset)value; return;
+                StartTime = (DateTimeOffset)value!; return;
         }
         base.ProtectedSetPropertyValue(property, value);
     }
@@ -253,7 +253,7 @@ public class TestResultMessage
     /// </summary>
     /// <param name="category">Category of the message.</param>
     /// <param name="text">Text of the message.</param>
-    public TestResultMessage(string category, string text)
+    public TestResultMessage(string category, string? text)
     {
         Category = category;
         Text = text;
@@ -273,7 +273,7 @@ public class TestResultMessage
     /// Gets the message text
     /// </summary>
     [DataMember]
-    public string Text
+    public string? Text
     {
         get;
         private set;
@@ -331,8 +331,8 @@ public static class TestResultProperties
         StartTime
     };
 
-    private static bool ValidateOutcome(object value)
+    private static bool ValidateOutcome(object? value)
     {
-        return (TestOutcome)value is <= TestOutcome.NotFound and >= TestOutcome.None;
+        return value is TestOutcome testOutcome && testOutcome <= TestOutcome.NotFound && testOutcome >= TestOutcome.None;
     }
 }

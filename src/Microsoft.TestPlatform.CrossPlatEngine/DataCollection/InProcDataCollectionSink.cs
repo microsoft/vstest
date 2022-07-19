@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 // <inheritdoc />
 internal class InProcDataCollectionSink : IDataCollectionSink
@@ -28,9 +26,9 @@ internal class InProcDataCollectionSink : IDataCollectionSink
     {
         ValidateArg.NotNullOrEmpty(key, nameof(key));
         ValidateArg.NotNullOrEmpty(value, nameof(value));
-        ValidateArg.NotNullOrEmpty(dataCollectionContext.TestCase.Id.ToString(), "dataCollectionContext.TestCase.Id");
+        ValidateArg.NotNullOrEmpty(dataCollectionContext?.TestCase?.Id.ToString(), "dataCollectionContext.TestCase.Id");
 
-        var testCaseId = dataCollectionContext.TestCase.Id;
+        var testCaseId = dataCollectionContext!.TestCase!.Id;
         AddKeyValuePairToDictionary(testCaseId, key, value);
     }
 
@@ -41,8 +39,7 @@ internal class InProcDataCollectionSink : IDataCollectionSink
     /// <returns>test data collection dictionary </returns>
     public IDictionary<string, string> GetDataCollectionDataSetForTestCase(Guid testCaseId)
     {
-
-        if (!_testCaseDataCollectionDataMap.TryGetValue(testCaseId, out TestCaseDataCollectionData testCaseDataCollection))
+        if (!_testCaseDataCollectionDataMap.TryGetValue(testCaseId, out TestCaseDataCollectionData? testCaseDataCollection))
         {
             EqtTrace.Warning("No DataCollection Data set for the test case {0}", testCaseId);
             return new Dictionary<string, string>();

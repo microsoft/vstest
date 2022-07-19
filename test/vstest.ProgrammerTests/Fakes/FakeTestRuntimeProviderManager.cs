@@ -35,16 +35,16 @@ internal class FakeTestRuntimeProviderManager : ITestRuntimeProviderManager
         }
     }
 
-    public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string _, List<string> sources)
+    public ITestRuntimeProvider? GetTestHostManagerByRunConfiguration(string? _, List<string>? sources)
     {
         var allMatchingProviders = TestRuntimeProviders
             .Where(r => r.TestDlls.Select(dll => dll.Path)
-            .Any(path => sources.Contains(path)))
+            .Any(path => sources?.Contains(path) == true))
             .ToList();
 
         if (allMatchingProviders.Count == 0)
         {
-            throw new InvalidOperationException($"There are no FakeTestRuntimeProviders associated with any of the incoming sources, make sure your testhost fixture has at least one dll: {sources.JoinByComma()}");
+            throw new InvalidOperationException($"There are no FakeTestRuntimeProviders associated with any of the incoming sources, make sure your testhost fixture has at least one dll: {sources?.JoinByComma()}");
         }
 
         if (allMatchingProviders.Count > 1)

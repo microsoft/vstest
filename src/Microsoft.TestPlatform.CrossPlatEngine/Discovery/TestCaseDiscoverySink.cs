@@ -4,8 +4,6 @@
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 
 /// <summary>
@@ -13,13 +11,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 /// </summary>
 internal class TestCaseDiscoverySink : ITestCaseDiscoverySink
 {
-    private readonly DiscoveryResultCache _discoveryRequestCache;
+    private readonly DiscoveryResultCache? _discoveryRequestCache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestCaseDiscoverySink"/> class.
     /// </summary>
     /// <param name="discoveryRequestCache"> The discovery request cache. </param>
-    internal TestCaseDiscoverySink(DiscoveryResultCache discoveryRequestCache)
+    internal TestCaseDiscoverySink(DiscoveryResultCache? discoveryRequestCache)
     {
         _discoveryRequestCache = discoveryRequestCache;
     }

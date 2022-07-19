@@ -19,13 +19,13 @@ public class FakesUtilitiesTests
     public void FakesSettingsShouldThrowExceptionIfSourcesArePassedAsNull()
     {
         string runSettingsXml = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.netstandard,Version=5.0</TargetFrameworkVersion></RunConfiguration ></RunSettings>";
-        Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(null, runSettingsXml));
+        Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(null!, runSettingsXml));
     }
 
     [TestMethod]
     public void FakesSettingsShouldThrowExceptionIfRunSettingsIsPassedAsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(new string[] { }, null));
+        Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(Array.Empty<string>(), null!));
     }
 
     [TestMethod]
@@ -56,7 +56,7 @@ public class FakesUtilitiesTests
             IsEnabled = true,
             Configuration = doc.FirstChild as XmlElement
         };
-        XmlRunSettingsUtilities.InsertDataCollectorsNode(doc.CreateNavigator(), dataCollectorNode);
+        XmlRunSettingsUtilities.InsertDataCollectorsNode(doc.CreateNavigator()!, dataCollectorNode);
 
         var dataCollectorNode2 = new DataCollectorSettings()
         {

@@ -164,7 +164,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
         var testProcessStartInfo = new TestProcessStartInfo
         {
             Arguments = string.Empty,
-            EnvironmentVariables = new Dictionary<string, string>
+            EnvironmentVariables = new Dictionary<string, string?>
             {
                 {"variable1", "value1" },
                 {"variable2", "value2" }
@@ -179,7 +179,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
         Assert.IsTrue(launchedStartInfo != null, "Failed to get the start info");
         foreach (var envVaribale in testProcessStartInfo.EnvironmentVariables)
         {
-            Assert.AreEqual(envVaribale.Value, launchedStartInfo.EnvironmentVariables[envVaribale.Key], $"Expected environment variable {envVaribale.Key} : {envVaribale.Value} not found");
+            Assert.AreEqual(envVaribale.Value, launchedStartInfo.EnvironmentVariables![envVaribale.Key], $"Expected environment variable {envVaribale.Key} : {envVaribale.Value} not found");
         }
     }
 

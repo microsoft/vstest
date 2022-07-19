@@ -164,7 +164,7 @@ public class InferRunSettingsHelper
         var shouldUpdatePlatform = true;
 
         TryGetPlatformXml(runSettingsNavigator, out var nodeXml);
-        if (!string.IsNullOrEmpty(nodeXml))
+        if (!nodeXml.IsNullOrEmpty())
         {
             architecture = (Architecture)Enum.Parse(typeof(Architecture), nodeXml, true);
             shouldUpdatePlatform = false;
@@ -174,9 +174,11 @@ public class InferRunSettingsHelper
         var shouldUpdateFramework = true;
         TryGetFrameworkXml(runSettingsNavigator, out nodeXml);
 
-        if (!string.IsNullOrEmpty(nodeXml))
+        if (!nodeXml.IsNullOrEmpty())
         {
-            framework = Framework.FromString(nodeXml);
+            var fwkFromString = Framework.FromString(nodeXml);
+            TPDebug.Assert(fwkFromString is not null, "fwkFromString is null");
+            framework = fwkFromString;
             shouldUpdateFramework = false;
         }
 
@@ -389,9 +391,14 @@ public class InferRunSettingsHelper
     /// </summary>
     /// <param name="runsettingsXml">The run settings xml string</param>
     /// <returns>Environment Variables Dictionary</returns>
-    public static Dictionary<string, string?>? GetEnvironmentVariables(string runSettings)
+    public static Dictionary<string, string?>? GetEnvironmentVariables(string? runSettings)
     {
         Dictionary<string, string?>? environmentVariables = null;
+        if (runSettings is null)
+        {
+            return environmentVariables;
+        }
+
         try
         {
             using var stream = new StringReader(runSettings);
@@ -636,6 +643,7 @@ public class InferRunSettingsHelper
     /// Returns the sources matching the specified platform and framework settings.
     /// For incompatible sources, warning is added to incompatibleSettingWarning.
     /// </summary>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Part of the public API")]
     public static IEnumerable<string> FilterCompatibleSources(Architecture chosenPlatform, Architecture defaultArchitecture, Framework chosenFramework, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, out string incompatibleSettingWarning)
     {
         incompatibleSettingWarning = string.Empty;

@@ -6,7 +6,7 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
-    <TargetFrameworks>net451</TargetFrameworks>
+    <TargetFrameworks>$(TargetNetFxVersion)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
@@ -15,7 +15,7 @@
     <RuntimeIdentifier Condition=" '$(DotNetBuildFromSource)' != 'true' ">win10-arm64</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <Compile Include="..\DumpMinitool.x86\Program.cs" Link="Program.cs" />
     <Compile Include="..\..\Microsoft.TestPlatform.Extensions.BlameDataCollector\MiniDumpWriteDump.cs" Link="MiniDumpWriteDump.cs" />
@@ -26,6 +26,6 @@
     <AdditionalFiles Include="..\DumpMinitool.x86\PublicAPI\PublicAPI.Shipped.txt" Link="PublicAPI\PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="..\DumpMinitool.x86\PublicAPI\PublicAPI.Unshipped.txt" Link="PublicAPI\PublicAPI.Unshipped.txt" />
   </ItemGroup>
-  
+
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

@@ -10,6 +10,7 @@ using System.Linq;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
+using System.Globalization;
 
 namespace Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 
@@ -84,8 +85,8 @@ public class PerfAnalyzer
             {
                 if (data.ProviderName.Equals("TestPlatform") && !data.EventName.Equals("ManifestData"))
                 {
-                    Console.WriteLine("Received Event : {0}", data.ToString());
-                    var key = data.ProcessID + "_" + data.ThreadID.ToString() + "_" + data.TaskName;
+                    Console.WriteLine("Received Event : {0}", data.ToString(CultureInfo.CurrentCulture));
+                    var key = $"{data.ProcessID}_{data.ThreadID}_{data.TaskName}";
                     Events.Add(new TestPlatformEvent(data.EventName, data.TimeStampRelativeMSec));
 
                     if (!_testPlatformTaskMap.ContainsKey(key))
@@ -244,6 +245,7 @@ public class PerfAnalyzer
     public class PerfTracker : IDisposable
     {
         private readonly PerfAnalyzer _perfAnalyzer;
+        private bool _isDisposed;
 
         public PerfTracker(PerfAnalyzer perfAnalyzer)
         {
@@ -253,8 +255,22 @@ public class PerfAnalyzer
 
         public void Dispose()
         {
-            _perfAnalyzer.DisableProvider();
-            _perfAnalyzer.AnalyzeEventsData();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed)
+                return;
+
+            if (disposing)
+            {
+                _perfAnalyzer.DisableProvider();
+                _perfAnalyzer.AnalyzeEventsData();
+            }
+
+            _isDisposed = true;
         }
     }
 }

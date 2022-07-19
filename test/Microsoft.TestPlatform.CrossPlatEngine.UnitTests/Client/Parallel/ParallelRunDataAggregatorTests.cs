@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -94,14 +95,14 @@ public class ParallelRunDataAggregatorTests
 
         var invokedDataCollectors = new Collection<InvokedDataCollector>()
         {
-            new InvokedDataCollector(new Uri("datacollector://sample"),"sample", typeof(string).AssemblyQualifiedName,typeof(string).Assembly.Location,false)
+            new InvokedDataCollector(new Uri("datacollector://sample"),"sample", typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location,false)
         };
         aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors, null);
         Assert.AreEqual(1, aggregator.InvokedDataCollectors.Count, "InvokedDataCollectors List must have data.");
 
         var invokedDataCollectors2 = new Collection<InvokedDataCollector>()
         {
-            new InvokedDataCollector(new Uri("datacollector://sample2"),"sample2", typeof(int).AssemblyQualifiedName,typeof(int).Assembly.Location,false)
+            new InvokedDataCollector(new Uri("datacollector://sample2"),"sample2", typeof(int).AssemblyQualifiedName!, typeof(int).Assembly.Location,false)
         };
         aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors2, null);
         Assert.AreEqual(2, aggregator.InvokedDataCollectors.Count, "InvokedDataCollectors List must have aggregated data.");
@@ -256,7 +257,7 @@ public class ParallelRunDataAggregatorTests
 
         runStats = aggregator.GetAggregatedRunStats();
         Assert.AreEqual(12, runStats.ExecutedTests, "RunStats must have aggregated data.");
-        Assert.AreEqual(2, runStats.Stats[TestOutcome.Passed], "RunStats must have aggregated data.");
+        Assert.AreEqual(2, runStats.Stats![TestOutcome.Passed], "RunStats must have aggregated data.");
         Assert.AreEqual(3, runStats.Stats[TestOutcome.Failed], "RunStats must have aggregated data.");
         Assert.AreEqual(1, runStats.Stats[TestOutcome.Skipped], "RunStats must have aggregated data.");
         Assert.AreEqual(4, runStats.Stats[TestOutcome.NotFound], "RunStats must have aggregated data.");
@@ -276,7 +277,7 @@ public class ParallelRunDataAggregatorTests
 
         runStats = aggregator.GetAggregatedRunStats();
         Assert.AreEqual(23, runStats.ExecutedTests, "RunStats must have aggregated data.");
-        Assert.AreEqual(5, runStats.Stats[TestOutcome.Passed], "RunStats must have aggregated data.");
+        Assert.AreEqual(5, runStats.Stats![TestOutcome.Passed], "RunStats must have aggregated data.");
         Assert.AreEqual(5, runStats.Stats[TestOutcome.Failed], "RunStats must have aggregated data.");
         Assert.AreEqual(3, runStats.Stats[TestOutcome.Skipped], "RunStats must have aggregated data.");
         Assert.AreEqual(5, runStats.Stats[TestOutcome.NotFound], "RunStats must have aggregated data.");
@@ -310,7 +311,7 @@ public class ParallelRunDataAggregatorTests
         var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
         Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsRanByAdapter, out var value));
-        Assert.AreEqual(4, Convert.ToInt32(value));
+        Assert.AreEqual(4, Convert.ToInt32(value, CultureInfo.InvariantCulture));
     }
 
     [TestMethod]

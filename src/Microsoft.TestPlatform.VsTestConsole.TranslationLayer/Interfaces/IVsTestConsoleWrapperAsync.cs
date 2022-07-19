@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
 /// <summary>
@@ -33,9 +31,9 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestSessionEventsHandler)"/>.
     /// </summary>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    Task<ITestSession> StartTestSessionAsync(
+    Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
-        string runSettings,
+        string? runSettings,
         ITestSessionEventsHandler eventsHandler);
 
     /// <summary>
@@ -47,10 +45,10 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestSessionEventsHandler)"/>.
     /// </summary>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    Task<ITestSession> StartTestSessionAsync(
+    Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler);
 
     /// <summary>
@@ -63,10 +61,10 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestHostLauncher)"/>.
     /// </summary>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    Task<ITestSession> StartTestSessionAsync(
+    Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler,
         ITestHostLauncher testHostLauncher);
 
@@ -78,7 +76,7 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     Task<bool> StopTestSessionAsync(
-        TestSessionInfo testSessionInfo,
+        TestSessionInfo? testSessionInfo,
         ITestSessionEventsHandler eventsHandler);
 
     /// <summary>
@@ -90,8 +88,8 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
     Task<bool> StopTestSessionAsync(
-        TestSessionInfo testSessionInfo,
-        TestPlatformOptions options,
+        TestSessionInfo? testSessionInfo,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler);
 
     /// <summary>
@@ -110,7 +108,7 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task DiscoverTestsAsync(
         IEnumerable<string> sources,
-        string discoverySettings,
+        string? discoverySettings,
         ITestDiscoveryEventsHandler discoveryEventsHandler);
 
     /// <summary>
@@ -123,8 +121,8 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task DiscoverTestsAsync(
         IEnumerable<string> sources,
-        string discoverySettings,
-        TestPlatformOptions options,
+        string? discoverySettings,
+        TestPlatformOptions? options,
         ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
     /// <summary>
@@ -138,9 +136,9 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task DiscoverTestsAsync(
         IEnumerable<string> sources,
-        string discoverySettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? discoverySettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
     /// <summary>
@@ -157,7 +155,7 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task RunTestsAsync(
         IEnumerable<string> sources,
-        string runSettings,
+        string? runSettings,
         ITestRunEventsHandler testRunEventsHandler);
 
     /// <summary>
@@ -170,8 +168,8 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task RunTestsAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler);
 
     /// <summary>
@@ -185,9 +183,9 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task RunTestsAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler);
 
     /// <summary>
@@ -199,7 +197,7 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
+        string? runSettings,
         ITestRunEventsHandler testRunEventsHandler);
 
     /// <summary>
@@ -212,8 +210,8 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler);
 
     /// <summary>
@@ -227,9 +225,9 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler);
 
     /// <summary>
@@ -242,7 +240,7 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
-        string runSettings,
+        string? runSettings,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher);
 
@@ -257,8 +255,8 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher);
 
@@ -274,9 +272,9 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher);
 
@@ -290,7 +288,7 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
+        string? runSettings,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher);
 
@@ -305,8 +303,8 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher);
 
@@ -322,9 +320,9 @@ public interface IVsTestConsoleWrapperAsync
     /// </summary>
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher);
 
@@ -341,7 +339,7 @@ public interface IVsTestConsoleWrapperAsync
     /// <summary>
     /// Gets back all attachments to test platform for additional processing (for example merging).
     /// </summary>
-    /// 
+    ///
     /// <param name="attachments">Collection of attachments.</param>
     /// <param name="processingSettings">XML processing settings.</param>
     /// <param name="isLastBatch">
@@ -352,7 +350,7 @@ public interface IVsTestConsoleWrapperAsync
     /// <param name="cancellationToken">Cancellation token.</param>
     Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
-        string processingSettings,
+        string? processingSettings,
         bool isLastBatch,
         bool collectMetrics,
         ITestRunAttachmentsProcessingEventsHandler eventsHandler,
@@ -361,7 +359,7 @@ public interface IVsTestConsoleWrapperAsync
     /// <summary>
     /// Gets back all attachments to test platform for additional processing (for example merging).
     /// </summary>
-    /// 
+    ///
     /// <param name="attachments">Collection of attachments.</param>
     /// <param name="invokedDataCollectors">Collection of invoked data collectors.</param>
     /// <param name="processingSettings">XML processing settings.</param>
@@ -373,8 +371,8 @@ public interface IVsTestConsoleWrapperAsync
     /// <param name="cancellationToken">Cancellation token.</param>
     Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
-        IEnumerable<InvokedDataCollector> invokedDataCollectors,
-        string processingSettings,
+        IEnumerable<InvokedDataCollector>? invokedDataCollectors,
+        string? processingSettings,
         bool isLastBatch,
         bool collectMetrics,
         ITestRunAttachmentsProcessingEventsHandler eventsHandler,

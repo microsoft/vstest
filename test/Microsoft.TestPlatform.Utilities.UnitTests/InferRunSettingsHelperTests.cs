@@ -23,9 +23,9 @@ public class InferRunSettingsHelperTests
 {
     private readonly IDictionary<string, Architecture> _sourceArchitectures;
     private readonly IDictionary<string, Framework> _sourceFrameworks;
-    private readonly Framework _frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5");
-    private readonly Framework _frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6");
-    private readonly Framework _frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7");
+    private readonly Framework _frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5")!;
+    private readonly Framework _frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6")!;
+    private readonly Framework _frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7")!;
     private const string MultiTargettingForwardLink = @"https://aka.ms/tp/vstest/multitargetingdoc?view=vs-2019";
 
     public InferRunSettingsHelperTests()
@@ -43,8 +43,7 @@ public class InferRunSettingsHelperTests
         Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X86, Framework.DefaultFramework, "temp");
 
         Assert.That.Throws<XmlException>(action)
-            .WithMessage(string.Format("An error occurred while loading the settings.  Error: {0}.",
-                "Could not find 'RunSettings' node."));
+            .WithMessage("An error occurred while loading the settings.  Error: Could not find 'RunSettings' node..");
     }
 
     [TestMethod]
@@ -56,11 +55,7 @@ public class InferRunSettingsHelperTests
         Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X86, Framework.DefaultFramework, "temp");
 
         Assert.That.Throws<XmlException>(action)
-            .WithMessage(string.Format("An error occurred while loading the settings.  Error: {0}.",
-                string.Format("Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'",
-                    "RunConfiguration",
-                    "foo",
-                    "TargetPlatform")));
+            .WithMessage("An error occurred while loading the settings.  Error: Invalid setting 'RunConfiguration'. Invalid value 'foo' specified for 'TargetPlatform'.");
     }
 
     [TestMethod]
@@ -72,11 +67,7 @@ public class InferRunSettingsHelperTests
         Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X86, Framework.DefaultFramework, "temp");
 
         Assert.That.Throws<XmlException>(action)
-            .WithMessage(string.Format("An error occurred while loading the settings.  Error: {0}.",
-                string.Format("Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'",
-                    "RunConfiguration",
-                    "foo",
-                    "TargetFrameworkVersion")));
+            .WithMessage("An error occurred while loading the settings.  Error: Invalid setting 'RunConfiguration'. Invalid value 'foo' specified for 'TargetFrameworkVersion'.");
     }
 
     [TestMethod]
@@ -211,7 +202,7 @@ public class InferRunSettingsHelperTests
         InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X64, Framework.DefaultFramework, "temp");
 
         var xml = xmlDocument.OuterXml;
-        var expectedRunSettings = string.Format("<RunSettings><RunConfiguration><ResultsDirectory>temp</ResultsDirectory><TargetPlatform>X64</TargetPlatform><TargetFrameworkVersion>{0}</TargetFrameworkVersion></RunConfiguration></RunSettings>", Framework.DefaultFramework.Name);
+        var expectedRunSettings = $"<RunSettings><RunConfiguration><ResultsDirectory>temp</ResultsDirectory><TargetPlatform>X64</TargetPlatform><TargetFrameworkVersion>{Framework.DefaultFramework.Name}</TargetFrameworkVersion></RunConfiguration></RunSettings>";
 
         Assert.AreEqual(expectedRunSettings, xml);
     }

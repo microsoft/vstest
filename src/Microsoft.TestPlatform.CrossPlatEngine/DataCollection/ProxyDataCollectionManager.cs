@@ -29,8 +29,6 @@ using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.Comm
 using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
@@ -54,7 +52,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     /// <summary>
     /// The settings xml
     /// </summary>
-    public string SettingsXml { get; }
+    public string? SettingsXml { get; }
 
     /// <summary>
     /// List of test sources
@@ -73,7 +71,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     /// <param name="sources">
     ///     Test Run sources
     /// </param>
-    public ProxyDataCollectionManager(IRequestData requestData, string settingsXml, IEnumerable<string> sources)
+    public ProxyDataCollectionManager(IRequestData requestData, string? settingsXml, IEnumerable<string> sources)
         : this(requestData, settingsXml, sources, new ProcessHelper())
     {
     }
@@ -93,7 +91,8 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     /// <param name="processHelper">
     ///     The process helper.
     /// </param>
-    internal ProxyDataCollectionManager(IRequestData requestData, string settingsXml, IEnumerable<string> sources, IProcessHelper processHelper) : this(requestData, settingsXml, sources, new DataCollectionRequestSender(), processHelper, DataCollectionLauncherFactory.GetDataCollectorLauncher(processHelper, settingsXml))
+    internal ProxyDataCollectionManager(IRequestData requestData, string? settingsXml, IEnumerable<string> sources, IProcessHelper processHelper)
+        : this(requestData, settingsXml, sources, new DataCollectionRequestSender(), processHelper, DataCollectionLauncherFactory.GetDataCollectorLauncher(processHelper, settingsXml))
     {
     }
 
@@ -118,7 +117,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     /// <param name="dataCollectionLauncher">
     ///     Launches datacollector process.
     /// </param>
-    internal ProxyDataCollectionManager(IRequestData requestData, string settingsXml,
+    internal ProxyDataCollectionManager(IRequestData requestData, string? settingsXml,
         IEnumerable<string> sources,
         IDataCollectionRequestSender dataCollectionRequestSender, IProcessHelper processHelper,
         IDataCollectionLauncher dataCollectionLauncher)
@@ -147,9 +146,9 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     /// <returns>
     /// The <see cref="DataCollectionResult"/>.
     /// </returns>
-    public DataCollectionResult AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler)
+    public DataCollectionResult AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler? runEventsHandler)
     {
-        AfterTestRunEndResult afterTestRunEnd = null;
+        AfterTestRunEndResult? afterTestRunEnd = null;
         InvokeDataCollectionServiceAction(
             () =>
             {
@@ -187,10 +186,10 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     public DataCollectionParameters BeforeTestRunStart(
         bool resetDataCollectors,
         bool isRunStartingNow,
-        ITestMessageEventHandler runEventsHandler)
+        ITestMessageEventHandler? runEventsHandler)
     {
         var areTestCaseLevelEventsRequired = false;
-        IDictionary<string, string> environmentVariables = new Dictionary<string, string>();
+        IDictionary<string, string?> environmentVariables = new Dictionary<string, string?>();
 
         var dataCollectionEventsPort = 0;
         InvokeDataCollectionServiceAction(
@@ -198,6 +197,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
             {
                 EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get environment variable and port for datacollector processId: {0} port: {1}", _dataCollectionProcessId, _dataCollectionPort);
                 var result = _dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(SettingsXml, Sources, _requestData.IsTelemetryOptedIn, runEventsHandler);
+                TPDebug.Assert(result is not null, "result is null");
                 environmentVariables = result.EnvironmentVariables;
                 dataCollectionEventsPort = result.DataCollectionEventsPort;
 
@@ -250,7 +250,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
             EqtTrace.Error("ProxyDataCollectionManager.Initialize: failed to connect to datacollector process, processId: {0} port: {1}", _dataCollectionProcessId, _dataCollectionPort);
             throw new TestPlatformException(
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                     CoreUtilitiesConstants.VstestConsoleProcessName,
                     CoreUtilitiesConstants.DatacollectorProcessName,
@@ -266,12 +266,12 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
 
         // Increase connection timeout when debugging is enabled.
         var dataCollectorDebugEnabled = Environment.GetEnvironmentVariable(DebugEnvironmentVaribleName);
-        if (!string.IsNullOrEmpty(dataCollectorDebugEnabled) &&
+        if (!StringUtils.IsNullOrEmpty(dataCollectorDebugEnabled) &&
             dataCollectorDebugEnabled.Equals("1", StringComparison.Ordinal))
         {
             ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.DataCollectorDebuggerWarning, OutputLevel.Warning);
             ConsoleOutput.Instance.WriteLine(
-                string.Format("Process Id: {0}, Name: {1}", processId, _processHelper.GetProcessName(processId)),
+                string.Format(CultureInfo.InvariantCulture, "Process Id: {0}, Name: {1}", processId, _processHelper.GetProcessName(processId)),
                 OutputLevel.Information);
 
             // Increase connection timeout when debugging is enabled.
@@ -281,7 +281,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         return connectionTimeout;
     }
 
-    private void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler runEventsHandler)
+    private static void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler? runEventsHandler)
     {
         try
         {
@@ -296,10 +296,10 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         }
     }
 
-    private void HandleExceptionMessage(ITestMessageEventHandler runEventsHandler, Exception exception)
+    private static void HandleExceptionMessage(ITestMessageEventHandler? runEventsHandler, Exception exception)
     {
         EqtTrace.Error(exception);
-        runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, exception.ToString());
+        runEventsHandler?.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, exception.ToString());
     }
 
     private IList<string> GetCommandLineArguments(int portNumber)
@@ -307,31 +307,32 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         var commandlineArguments = new List<string>
         {
             PortOption,
-            portNumber.ToString(),
+            portNumber.ToString(CultureInfo.CurrentCulture),
 
             ParentProcessIdOption,
-            _processHelper.GetCurrentProcessId().ToString()
+            _processHelper.GetCurrentProcessId().ToString(CultureInfo.CurrentCulture)
         };
 
-        if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+        if (!StringUtils.IsNullOrEmpty(EqtTrace.LogFile))
         {
             commandlineArguments.Add(DiagOption);
             commandlineArguments.Add(GetTimestampedLogFile(EqtTrace.LogFile));
 
             commandlineArguments.Add(TraceLevelOption);
-            commandlineArguments.Add(((int)EqtTrace.TraceLevel).ToString());
+            commandlineArguments.Add(((int)EqtTrace.TraceLevel).ToString(CultureInfo.CurrentCulture));
         }
 
         return commandlineArguments;
     }
 
-    private string GetTimestampedLogFile(string logFile)
+    private static string GetTimestampedLogFile(string logFile)
     {
         return Path.ChangeExtension(
             logFile,
             string.Format(
+                CultureInfo.InvariantCulture,
                 "datacollector.{0}_{1}{2}",
-                DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
+                DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff", CultureInfo.CurrentCulture),
                 new PlatformEnvironment().GetCurrentManagedThreadId(),
                 Path.GetExtension(logFile))).AddDoubleQuote();
     }
@@ -340,14 +341,14 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     /// Update Extensions path folder in test adapters paths in runsettings.
     /// </summary>
     /// <param name="settingsXml"></param>
-    private static string UpdateExtensionsFolderInRunSettings(string settingsXml)
+    private static string? UpdateExtensionsFolderInRunSettings(string? settingsXml)
     {
-        if (string.IsNullOrWhiteSpace(settingsXml))
+        if (settingsXml.IsNullOrWhiteSpace())
         {
             return settingsXml;
         }
 
-        var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(ITestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()), "Extensions");
+        var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(ITestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation())!, "Extensions");
 
         using var stream = new StringReader(settingsXml);
         using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
@@ -356,12 +357,12 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
 
         var tapNode = RunSettingsProviderExtensions.GetXmlNode(document, "RunConfiguration.TestAdaptersPaths");
 
-        if (tapNode != null && !string.IsNullOrWhiteSpace(tapNode.InnerText))
+        if (tapNode != null && !StringUtils.IsNullOrWhiteSpace(tapNode.InnerText))
         {
             extensionsFolder = string.Concat(tapNode.InnerText, ';', extensionsFolder);
         }
 
-        RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(document, "RunConfiguration.TestAdaptersPaths", extensionsFolder);
+        RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerText(document, "RunConfiguration.TestAdaptersPaths", extensionsFolder);
 
         return document.OuterXml;
     }

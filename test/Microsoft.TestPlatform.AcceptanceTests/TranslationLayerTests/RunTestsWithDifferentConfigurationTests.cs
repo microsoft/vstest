@@ -52,7 +52,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
         Setup();
 
         var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
-        _vstestConsoleWrapper.InitializeExtensions(new List<string?>() { testAdapterPath.FirstOrDefault() });
+        _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.First() });
 
         _vstestConsoleWrapper.RunTests(
             GetTestAssemblies(),

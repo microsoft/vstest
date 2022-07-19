@@ -3,6 +3,8 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -131,17 +133,17 @@ internal class DebuggerUtility
                     {
                         try
                         {
-                            dbg = dte.GetType().InvokeMember("Debugger", BindingFlags.GetProperty, null, dte, null);
-                            lps = dbg.GetType().InvokeMember("LocalProcesses", BindingFlags.GetProperty, null, dbg, null);
-                            var lpn = (System.Collections.IEnumerator)lps.GetType().InvokeMember("GetEnumerator", BindingFlags.InvokeMethod, null, lps, null);
+                            dbg = dte.GetType().InvokeMember("Debugger", BindingFlags.GetProperty, null, dte, null, CultureInfo.InvariantCulture);
+                            lps = dbg.GetType().InvokeMember("LocalProcesses", BindingFlags.GetProperty, null, dbg, null, CultureInfo.InvariantCulture);
+                            var lpn = (System.Collections.IEnumerator)lps.GetType().InvokeMember("GetEnumerator", BindingFlags.InvokeMethod, null, lps, null, CultureInfo.InvariantCulture);
 
                             while (lpn.MoveNext())
                             {
-                                var pn = Convert.ToInt32(lpn.Current.GetType().InvokeMember("ProcessID", BindingFlags.GetProperty, null, lpn.Current, null));
+                                var pn = Convert.ToInt32(lpn.Current.GetType().InvokeMember("ProcessID", BindingFlags.GetProperty, null, lpn.Current, null, CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
 
                                 if (pn == pid)
                                 {
-                                    lpn.Current.GetType().InvokeMember("Attach", BindingFlags.InvokeMethod, null, lpn.Current, null);
+                                    lpn.Current.GetType().InvokeMember("Attach", BindingFlags.InvokeMethod, null, lpn.Current, null, CultureInfo.InvariantCulture);
                                     return true;
                                 }
                             }
@@ -196,13 +198,13 @@ internal class DebuggerUtility
         var parent = process;
         while (!IsVsOrNull(parent))
         {
-            parent = GetParentProcess(parent!);
+            parent = GetParentProcess(parent);
         }
 
         return parent;
     }
 
-    private static bool IsVsOrNull(Process? process)
+    private static bool IsVsOrNull([NotNullWhen(false)] Process? process)
     {
         if (process == null)
         {

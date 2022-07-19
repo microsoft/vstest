@@ -112,7 +112,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     /// <param name="argument">Argument that was provided with the command.</param>
     public void Initialize(string? argument)
     {
-        string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidDiagArgument, argument);
+        string exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagArgument, argument);
 
         // Throw error if argument is null or empty.
         if (argument.IsNullOrWhiteSpace())
@@ -138,6 +138,13 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         // Write version to the log here, because that is the
         // first place where we know if we log or not.
         EqtTrace.Verbose($"Version: {Product.Version} Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}");
+        // https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location?view=net-6.0#remarks
+        // In .NET 5 and later versions, for bundled assemblies, the value returned is an empty string.
+        string objectTypeLocation = typeof(object).Assembly.Location;
+        if (!objectTypeLocation.IsNullOrEmpty())
+        {
+            EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(objectTypeLocation)}");
+        }
     }
 
     /// <summary>
@@ -155,7 +162,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="diagFilePath">Diag file path.</param>
     /// <param name="diagParameters">Diag parameters</param>
-    private void InitializeDiagLogging(string diagFilePath, Dictionary<string, string> diagParameters)
+    private static void InitializeDiagLogging(string diagFilePath, Dictionary<string, string> diagParameters)
     {
         // Get trace level from diag parameters.
         var traceLevel = GetDiagTraceLevel(diagParameters);
@@ -176,7 +183,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="diagParameters">Diag parameters.</param>
     /// <returns>Diag trace level.</returns>
-    private PlatformTraceLevel GetDiagTraceLevel(Dictionary<string, string> diagParameters)
+    private static PlatformTraceLevel GetDiagTraceLevel(Dictionary<string, string> diagParameters)
     {
         // If diag parameters is null, set value of trace level as verbose.
         if (diagParameters == null)

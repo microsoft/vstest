@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 
@@ -32,7 +33,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// <summary>
     /// Specifies whether the run is disposed or not
     /// </summary>
-    private bool _disposed;
+    private bool _isDisposed;
 
     /// <summary>
     /// Sync object for various operations
@@ -52,7 +53,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// <summary>
     /// Tracks the time taken by each run request
     /// </summary>
-    private Stopwatch? _runRequestTimeTracker;
+    private readonly Stopwatch _runRequestTimeTracker = new();
 
     private readonly IDataSerializer _dataSerializer;
 
@@ -107,7 +108,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException("testRunRequest");
             }
@@ -146,10 +147,8 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                     _timer = new Timer(OnTestSessionTimeout, null, TimeSpan.FromMilliseconds(_testSessionTimeout), TimeSpan.FromMilliseconds(0));
                 }
 
-                _runRequestTimeTracker = new Stopwatch();
-
                 // Start the stop watch for calculating the test run time taken overall
-                _runRequestTimeTracker.Start();
+                _runRequestTimeTracker.Restart();
                 var testRunStartEvent = new TestRunStartEventArgs(TestRunCriteria);
                 LoggerManager.HandleTestRunStart(testRunStartEvent);
                 OnRunStart.SafeInvoke(this, testRunStartEvent, "TestRun.TestRunStart");
@@ -171,7 +170,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     {
         EqtTrace.Verbose("TestRunRequest.OnTestSessionTimeout: calling cancellation as test run exceeded testSessionTimeout {0} milliseconds", _testSessionTimeout);
 
-        string message = string.Format(ClientResources.TestSessionTimeoutMessage, _testSessionTimeout);
+        string message = string.Format(CultureInfo.CurrentCulture, ClientResources.TestSessionTimeoutMessage, _testSessionTimeout);
         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
         var rawMessage = _dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
 
@@ -187,7 +186,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     {
         EqtTrace.Verbose("TestRunRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
 
-        if (_disposed)
+        if (_isDisposed)
         {
             throw new ObjectDisposedException("testRunRequest");
         }
@@ -216,7 +215,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         lock (_cancelSyncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("Ignoring TestRunRequest.CancelAsync() as testRunRequest object has already been disposed.");
                 return;
@@ -245,7 +244,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         lock (_cancelSyncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("Ignoring TestRunRequest.Abort() as testRunRequest object has already been disposed");
                 return;
@@ -366,7 +365,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         lock (_syncObject)
         {
             // If this object is disposed, don't do anything
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("TestRunRequest.TestRunComplete: Ignoring as the object is disposed.");
                 return;
@@ -383,7 +382,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
             try
             {
-                _runRequestTimeTracker?.Stop();
+                _runRequestTimeTracker.Stop();
 
                 if (lastChunkArgs != null)
                 {
@@ -401,7 +400,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                         // This is required as TMI adapter is sending attachments as List which cannot be type casted to Collection.
                         runContextAttachments != null ? new Collection<AttachmentSet>(runContextAttachments.ToList()) : null,
                         runCompleteArgs.InvokedDataCollectors,
-                        _runRequestTimeTracker!.Elapsed);
+                        _runRequestTimeTracker.Elapsed);
 
                 // Add extensions discovered by vstest.console.
                 //
@@ -415,7 +414,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                 if (_requestData.IsTelemetryOptedIn)
                 {
                     TestExtensions.AddExtensionTelemetry(
-                        runCompleteArgs.Metrics,
+                        runCompleteArgs.Metrics!,
                         runCompleteArgs.DiscoveredExtensions);
                 }
 
@@ -427,14 +426,11 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
             }
             finally
             {
-                if (isCanceled)
-                {
-                    State = TestRunState.Canceled;
-                }
-                else
-                {
-                    State = isAborted ? TestRunState.Aborted : TestRunState.Completed;
-                }
+                State = isCanceled
+                    ? TestRunState.Canceled
+                    : isAborted
+                        ? TestRunState.Aborted
+                        : TestRunState.Completed;
 
                 // Notify the waiting handle that run is complete
                 _runCompletionEvent.Set();
@@ -485,7 +481,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         lock (_syncObject)
         {
             // If this object is disposed, don't do anything
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("TestRunRequest.SendTestRunStatsChange: Ignoring as the object is disposed.");
                 return;
@@ -503,20 +499,20 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// <summary>
     /// Invoked when log messages are received
     /// </summary>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         EqtTrace.Verbose("TestRunRequest:SendTestRunMessage: Starting.");
 
         lock (_syncObject)
         {
             // If this object is disposed, don't do anything
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("TestRunRequest.SendTestRunMessage: Ignoring as the object is disposed.");
                 return;
             }
 
-            var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
+            var testRunMessageEvent = new TestRunMessageEventArgs(level, message!);
             LoggerManager.HandleTestRunMessage(testRunMessageEvent);
             TestRunMessage.SafeInvoke(this, testRunMessageEvent, "TestRun.LogMessages");
         }
@@ -535,7 +531,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         var message = LoggerManager.LoggersInitialized || _requestData.IsTelemetryOptedIn ?
             _dataSerializer.DeserializeMessage(rawMessage) : null;
 
-        if (string.Equals(message?.MessageType, MessageType.ExecutionComplete))
+        if (MessageType.ExecutionComplete.Equals(message?.MessageType))
         {
             var testRunCompletePayload = _dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
             rawMessage = UpdateRawMessageWithTelemetryInfo(testRunCompletePayload, message) ?? rawMessage;
@@ -549,7 +545,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// Handles LoggerManager's TestRunComplete.
     /// </summary>
     /// <param name="testRunCompletePayload">TestRun complete payload.</param>
-    private void HandleLoggerManagerTestRunComplete(TestRunCompletePayload testRunCompletePayload)
+    private void HandleLoggerManagerTestRunComplete(TestRunCompletePayload? testRunCompletePayload)
     {
         if (!LoggerManager.LoggersInitialized || testRunCompletePayload == null)
         {
@@ -567,7 +563,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         // Send test run complete to logger manager.
         TestRunCompleteEventArgs testRunCompleteArgs =
             new(
-                testRunCompletePayload.TestRunCompleteArgs.TestRunStatistics,
+                testRunCompletePayload.TestRunCompleteArgs!.TestRunStatistics,
                 testRunCompletePayload.TestRunCompleteArgs.IsCanceled,
                 testRunCompletePayload.TestRunCompleteArgs.IsAborted,
                 testRunCompletePayload.TestRunCompleteArgs.Error,
@@ -657,6 +653,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     {
         int processId = -1;
 
+        TPDebug.Assert(TestRunCriteria.TestHostLauncher is not null, "TestRunCriteria.TestHostLauncher is null");
         // Only launch while the test run is in progress and the launcher is a debug one
         if (State == TestRunState.InProgress && TestRunCriteria.TestHostLauncher.IsDebug)
         {
@@ -687,7 +684,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         lock (_syncObject)
         {
-            if (!_disposed)
+            if (!_isDisposed)
             {
                 if (disposing)
                 {
@@ -696,7 +693,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
                 // Indicate that object has been disposed
                 _runCompletionEvent = null!;
-                _disposed = true;
+                _isDisposed = true;
             }
         }
 

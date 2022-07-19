@@ -4,8 +4,6 @@
 using System;
 using System.Linq;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 
 /// <summary>
@@ -16,10 +14,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
 public class LazyExtension<TExtension, TMetadata>
 {
     private static readonly object Synclock = new();
-    private TExtension _extension;
-    private TMetadata _metadata;
-    private readonly Type _metadataType;
-    private readonly Func<TExtension> _extensionCreator;
+    private readonly Type? _metadataType;
+    private readonly Func<TExtension>? _extensionCreator;
+    private TExtension? _extension;
+    private TMetadata? _metadata;
 
     /// <summary>
     /// The constructor.
@@ -74,7 +72,7 @@ public class LazyExtension<TExtension, TMetadata>
     /// </summary>
     internal bool IsExtensionCreated { get; private set; }
 
-    internal TestPluginInformation TestPluginInfo { get; }
+    internal TestPluginInformation? TestPluginInfo { get; }
 
     /// <summary>
     /// Gets the test extension instance.
@@ -95,7 +93,9 @@ public class LazyExtension<TExtension, TMetadata>
                     {
                         if (_extension == null && TestPluginInfo != null)
                         {
+                            TPDebug.Assert(TestPluginInfo.AssemblyQualifiedName is not null, "TestPluginInfo.AssemblyQualifiedName is null");
                             var pluginType = TestPluginManager.GetTestExtensionType(TestPluginInfo.AssemblyQualifiedName);
+                            TPDebug.Assert(pluginType is not null, "pluginType is null");
                             _extension = TestPluginManager.CreateTestExtension<TExtension>(pluginType);
                         }
                     }
@@ -104,6 +104,7 @@ public class LazyExtension<TExtension, TMetadata>
                 IsExtensionCreated = true;
             }
 
+            TPDebug.Assert(_extension is not null, "_extension is null");
             return _extension;
         }
     }
@@ -122,12 +123,15 @@ public class LazyExtension<TExtension, TMetadata>
                     if (_metadata == null && TestPluginInfo != null)
                     {
                         var parameters = TestPluginInfo.Metadata?.ToArray();
+                        TPDebug.Assert(_metadataType is not null, "_metadataType is null");
                         var dataObject = Activator.CreateInstance(_metadataType, parameters);
+                        TPDebug.Assert(dataObject is not null, "dataObject is null");
                         _metadata = (TMetadata)dataObject;
                     }
                 }
             }
 
+            TPDebug.Assert(_metadata is not null, "_metadata is null");
             return _metadata;
         }
     }

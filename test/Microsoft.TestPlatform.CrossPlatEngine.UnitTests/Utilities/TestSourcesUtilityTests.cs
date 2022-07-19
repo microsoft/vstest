@@ -20,14 +20,14 @@ public class TestSourcesUtilityTests
     [TestMethod]
     public void GetSourcesShouldAggregateSourcesIfMultiplePresentInAdapterSourceMap()
     {
-        var adapterSourceMap = new Dictionary<string, IEnumerable<string>>
+        var adapterSourceMap = new Dictionary<string, IEnumerable<string>?>
         {
             { "adapter1", new List<string>() { "source1.dll", "source2.dll" } },
             { "adapter2", new List<string>() { "source1.dll", "source3.dll" } },
             { "adapter3", new List<string>() { "source1.dll" } }
         };
 
-        var sources = TestSourcesUtility.GetSources(adapterSourceMap);
+        var sources = TestSourcesUtility.GetSources(adapterSourceMap)!;
         Assert.AreEqual(5, sources.Count());
         Assert.IsTrue(sources.Contains("source1.dll"));
         Assert.IsTrue(sources.Contains("source2.dll"));
@@ -51,7 +51,7 @@ public class TestSourcesUtilityTests
     [TestMethod]
     public void GetDefaultCodeBasePathShouldReturnNullIfAdapterSourceMapIsEmpty()
     {
-        var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
+        var adapterSourceMap = new Dictionary<string, IEnumerable<string>?>();
 
         var defaultCodeBase = TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap);
         Assert.IsNull(defaultCodeBase);
@@ -69,7 +69,7 @@ public class TestSourcesUtilityTests
     [TestMethod]
     public void GetDefaultCodeBasePathShouldReturnDefaultDirectoryPathForAdapterSourceMap()
     {
-        var adapterSourceMap = new Dictionary<string, IEnumerable<string>>
+        var adapterSourceMap = new Dictionary<string, IEnumerable<string>?>
         {
             { "adapter1", new List<string>() { Path.Combine(Temp, "folder1", "source1.dll"), Path.Combine(Temp, "folder2", "source2.dll") } }
         };

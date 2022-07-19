@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <AssemblyName>SimpleTestProject2</AssemblyName>
-    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;$(TargetNetFxVersion)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <OutputType Condition="$(NetCoreAppTargetFrameWork) == 'true' ">Exe</OutputType>
@@ -24,7 +24,7 @@
   <PropertyGroup Condition="$(NetCoreAppTargetFrameWork) == 'true' ">
     <DebugType>portable</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net451'">
+  <PropertyGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)'">
     <DebugType>full</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

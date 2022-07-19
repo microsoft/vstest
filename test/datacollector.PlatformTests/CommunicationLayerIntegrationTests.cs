@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -37,8 +38,8 @@ public class CommunicationLayerIntegrationTests
         _mockRequestData = new Mock<IRequestData>();
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
-        _dataCollectorSettings = string.Format("<DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"{0}\" codebase=\"{1}\" />", typeof(CustomDataCollector).AssemblyQualifiedName, typeof(CustomDataCollector).GetTypeInfo().Assembly.Location);
-        _runSettings = string.Format(_defaultRunSettings, _dataCollectorSettings);
+        _dataCollectorSettings = string.Format(CultureInfo.InvariantCulture, "<DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"{0}\" codebase=\"{1}\" />", typeof(CustomDataCollector).AssemblyQualifiedName, typeof(CustomDataCollector).GetTypeInfo().Assembly.Location);
+        _runSettings = string.Format(CultureInfo.InvariantCulture, _defaultRunSettings, _dataCollectorSettings);
         _testSources = new List<string>() { "testsource1.dll" };
         _processHelper = new ProcessHelper();
         _dataCollectionLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(_processHelper, _runSettings);
@@ -54,7 +55,7 @@ public class CommunicationLayerIntegrationTests
 
         var result = proxyDataCollectionManager.BeforeTestRunStart(true, true, _mockTestMessageEventHandler.Object);
 
-        Assert.AreEqual(1, result.EnvironmentVariables.Count);
+        Assert.AreEqual(1, result.EnvironmentVariables?.Count);
     }
 
     [TestMethod]
@@ -69,7 +70,7 @@ public class CommunicationLayerIntegrationTests
 
         var dataCollectionResult = proxyDataCollectionManager.AfterTestRunEnd(false, _mockTestMessageEventHandler.Object);
 
-        Assert.AreEqual("CustomDataCollector", dataCollectionResult.Attachments[0].DisplayName);
+        Assert.AreEqual("CustomDataCollector", dataCollectionResult.Attachments![0].DisplayName);
         Assert.AreEqual("my://custom/datacollector", dataCollectionResult.Attachments[0].Uri.ToString());
         Assert.IsTrue(dataCollectionResult.Attachments[0].Attachments[0].Uri.ToString().Contains("filename.txt"));
     }

@@ -42,7 +42,7 @@ public class InProcDataCollectionSinkTests
         _testCase.SetPropertyValue(TestCaseProperties.Id, Guid.NewGuid());
 
         Assert.ThrowsException<ArgumentNullException>(
-            () => _dataCollectionSink.SendData(_dataCollectionContext, null, "DummyValue"));
+            () => _dataCollectionSink.SendData(_dataCollectionContext, null!, "DummyValue"));
     }
 
     [TestMethod]
@@ -51,7 +51,7 @@ public class InProcDataCollectionSinkTests
         _testCase.SetPropertyValue(TestCaseProperties.Id, Guid.NewGuid());
 
         Assert.ThrowsException<ArgumentNullException>(
-            () => _dataCollectionSink.SendData(_dataCollectionContext, "DummyKey", null));
+            () => _dataCollectionSink.SendData(_dataCollectionContext, "DummyKey", null!));
     }
 
     //[TestMethod]

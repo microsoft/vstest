@@ -220,12 +220,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NoSuitableRuntimeProviderFound" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[No suitable test runtime provider was found:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[適切なテスト ランタイム プロバイダーが見つかりませんでした。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NoTestHostProviderFound" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[No suitable test runtime provider found for this run.]]></Val>
+          <Val><![CDATA[No suitable test runtime provider was found for any source in this run.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[この実行に対して適切なテスト ランタイム プロバイダーが見つかりませんでした。]]></Val>
+            <Val><![CDATA[この実行のどのソースにも適切なテスト ランタイム プロバイダーが見つかりませんでした。]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[No suitable test runtime provider found for this run.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -270,6 +282,15 @@
           <Val><![CDATA[Proxy with id {0} is already available and cannot be re-enqueued.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[ID が {0} のプロキシは、既に使用可能になっているため、再度エンキューすることはできません。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";SkippingSource" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Skipping source:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[ソースをスキップしています:]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

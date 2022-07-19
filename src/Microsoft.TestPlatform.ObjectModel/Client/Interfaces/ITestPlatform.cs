@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -25,7 +23,7 @@ public interface ITestPlatform : IDisposable
     /// Flag indicating if we should skip the default adapters initialization.
     /// </param>
     void UpdateExtensions(
-        IEnumerable<string> pathToAdditionalExtensions,
+        IEnumerable<string>? pathToAdditionalExtensions,
         bool skipExtensionFilters);
 
     /// <summary>
@@ -45,8 +43,9 @@ public interface ITestPlatform : IDisposable
     IDiscoveryRequest CreateDiscoveryRequest(
         IRequestData requestData,
         DiscoveryCriteria discoveryCriteria,
-        TestPlatformOptions options,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
+        TestPlatformOptions? options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger);
 
     /// <summary>
     /// Creates a test run request.
@@ -60,8 +59,9 @@ public interface ITestPlatform : IDisposable
     ITestRunRequest CreateTestRunRequest(
         IRequestData requestData,
         TestRunCriteria testRunCriteria,
-        TestPlatformOptions options,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
+        TestPlatformOptions? options,
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger);
 
     /// <summary>
     /// Starts a test session.
@@ -78,5 +78,6 @@ public interface ITestPlatform : IDisposable
         IRequestData requestData,
         StartTestSessionCriteria criteria,
         ITestSessionEventsHandler eventsHandler,
-        Dictionary<string, SourceDetail> sourceToSourceDetailMap);
+        Dictionary<string, SourceDetail> sourceToSourceDetailMap,
+        IWarningLogger warningLogger);
 }

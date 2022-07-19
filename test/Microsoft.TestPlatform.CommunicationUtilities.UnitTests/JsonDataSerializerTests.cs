@@ -80,7 +80,7 @@ public class JsonDataSerializerTests
         var json = _jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
 
         // This line should deserialize properly
-        var result = _jsonDataSerializer.Deserialize<ClassWithSelfReferencingLoop>(json, 1);
+        var result = _jsonDataSerializer.Deserialize<ClassWithSelfReferencingLoop>(json, 1)!;
 
         Assert.AreEqual(typeof(ClassWithSelfReferencingLoop), result.GetType());
         Assert.IsNull(result.InfiniteRefernce);
@@ -108,7 +108,7 @@ public class JsonDataSerializerTests
     {
         var testCase = GetSampleTestCase(out var expectedTrait);
 
-        var clonedTestCase = _jsonDataSerializer.Clone(testCase);
+        var clonedTestCase = _jsonDataSerializer.Clone(testCase)!;
 
         VerifyTestCaseClone(clonedTestCase, testCase, expectedTrait);
     }
@@ -123,7 +123,7 @@ public class JsonDataSerializerTests
         var startTime = DateTimeOffset.UtcNow;
         testResult.StartTime = startTime;
 
-        var clonedTestResult = _jsonDataSerializer.Clone(testResult);
+        var clonedTestResult = _jsonDataSerializer.Clone(testResult)!;
 
         Assert.IsFalse(ReferenceEquals(testResult, clonedTestResult));
 

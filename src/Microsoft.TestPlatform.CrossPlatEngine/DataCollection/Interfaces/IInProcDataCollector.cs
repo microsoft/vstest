@@ -4,8 +4,6 @@
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 
 internal interface IInProcDataCollector
@@ -13,7 +11,7 @@ internal interface IInProcDataCollector
     /// <summary>
     /// AssemblyQualifiedName of the datacollector type
     /// </summary>
-    string AssemblyQualifiedName { get; }
+    string? AssemblyQualifiedName { get; }
 
     /// <summary>
     /// Loads the DataCollector type

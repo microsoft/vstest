@@ -2,15 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
 
 /// <summary>
-/// Provides user specified runSettings and framework provided context of the run. 
+/// Provides user specified runSettings and framework provided context of the run.
 /// </summary>
 public class RunContext : DiscoveryContext, IRunContext
 {
@@ -30,17 +27,17 @@ public class RunContext : DiscoveryContext, IRunContext
     public bool IsDataCollectionEnabled { get; internal set; }
 
     /// <summary>
-    /// Gets a value indicating whether the test is being debugged. 
+    /// Gets a value indicating whether the test is being debugged.
     /// </summary>
     public bool IsBeingDebugged { get; internal set; }
 
     /// <summary>
     /// Gets the directory which should be used for storing result files/deployment files etc.
     /// </summary>
-    public string TestRunDirectory { get; internal set; }
+    public string? TestRunDirectory { get; internal set; }
 
     /// <summary>
     /// Gets the directory for Solution.
     /// </summary>
-    public string SolutionDirectory { get; internal set; }
+    public string? SolutionDirectory { get; internal set; }
 }

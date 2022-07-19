@@ -13,12 +13,12 @@ public interface IOutput
     /// </summary>
     /// <param name="message">Message to be output.</param>
     /// <param name="level">Level of the message.</param>
-    void WriteLine(string message, OutputLevel level);
+    void WriteLine(string? message, OutputLevel level);
 
     /// <summary>
     /// Writes the message with no new line.
     /// </summary>
     /// <param name="message">Message to be output.</param>
     /// <param name="level">Level of the message.</param>
-    void Write(string message, OutputLevel level);
+    void Write(string? message, OutputLevel level);
 }

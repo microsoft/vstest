@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// used only to test the most common scenarios, or special configurations that are candidates for their own
 /// specialized source.
 ///
-/// By default net451 and netcoreapp2.1 are used for both runner and host. (4 combinations)
+/// By default net462 and netcoreapp2.1 are used for both runner and host. (4 combinations)
 /// Then run with every version of runner is added.
 /// Then run with every version of test.sdk is added.
 /// Then run with every combination of testhost and adapter is added.
@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 ///
 /// When that adds up to no configuration exception is thrown.
 /// </summary>
-public class TestPlatformCompatibilityDataSource : TestDataSource<RunnerInfo>
+public class TestPlatformCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
 {
     private readonly CompatibilityRowsBuilder _builder;
 

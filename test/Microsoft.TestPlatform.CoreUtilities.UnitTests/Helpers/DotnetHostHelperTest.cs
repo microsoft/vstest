@@ -85,11 +85,11 @@ public sealed class DotnetHostHelperTest : IDisposable
         _environmentHelper.SetupGet(x => x.OperatingSystem).Returns(platformSystem);
         _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(envVar)).Returns(Path.GetDirectoryName(envVars[envVar])!);
         _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable("ProgramFiles")).Returns("notfound");
-        _fileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(envVars[envVar]))).Returns(true);
+        _fileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(envVars[envVar])!)).Returns(true);
         _fileHelper.Setup(x => x.Exists(envVars[envVar])).Returns(true);
         if (found)
         {
-            _fileHelper.Setup(x => x.GetStream(envVars[envVar], FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(envVars[envVar]!));
+            _fileHelper.Setup(x => x.GetStream(envVars[envVar]!, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(envVars[envVar]!));
         }
 
         // Act & Assert
@@ -120,7 +120,7 @@ public sealed class DotnetHostHelperTest : IDisposable
         _environmentHelper.SetupGet(x => x.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
         _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(notExists)).Returns(Path.GetDirectoryName(envVars[notExists])!);
         _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(nextEnv)).Returns(Path.GetDirectoryName(envVars[nextEnv])!);
-        _fileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(envVars[nextEnv]))).Returns(true);
+        _fileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(envVars[nextEnv])!)).Returns(true);
         _fileHelper.Setup(x => x.Exists(envVars[nextEnv])).Returns(true);
         _fileHelper.Setup(x => x.GetStream(envVars[nextEnv], FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(envVars[nextEnv]));
 

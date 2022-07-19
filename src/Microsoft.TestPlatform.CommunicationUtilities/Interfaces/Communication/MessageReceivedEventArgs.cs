@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 /// <summary>
@@ -15,5 +13,5 @@ public class MessageReceivedEventArgs : EventArgs
     /// <summary>
     /// Gets or sets the data contained in message frame.
     /// </summary>
-    public string Data { get; set; }
+    public string? Data { get; set; }
 }

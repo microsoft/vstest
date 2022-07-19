@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -200,11 +201,11 @@ public class DataCollectorAttachmentProcessorAppDomainTests
     public class AppDomainSampleDataCollector : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
 
         }
@@ -225,7 +226,7 @@ public class DataCollectorAttachmentProcessorAppDomainTests
             {
                 progressReporter.Report(100);
 
-                DateTime expire = DateTime.UtcNow + TimeSpan.FromMilliseconds(int.Parse(timeout));
+                DateTime expire = DateTime.UtcNow + TimeSpan.FromMilliseconds(int.Parse(timeout, CultureInfo.CurrentCulture));
                 while (true)
                 {
                     if (DateTime.UtcNow > expire)
@@ -257,11 +258,11 @@ public class DataCollectorAttachmentProcessorAppDomainTests
     public class AppDomainSampleDataCollectorFailure : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
 
         }
