@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,9 +28,9 @@ using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfa
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 /// <summary>
-/// 
+/// The in-process wrapper.
 /// </summary>
-public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
+internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
 {
     // Must be in sync with the highest supported version in
     // src/Microsoft.TestPlatform.CrossPlatEngine/EventHandlers/TestRequestHandler.cs file.
@@ -41,37 +42,29 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     private bool _sessionStarted;
 
     /// <summary>
-    /// 
+    /// Creates a new instance of <see cref="InProcessVsTestConsoleWrapper"/>.
     /// </summary>
-    /// <param name="consoleParameters"></param>
+    /// 
+    /// <param name="consoleParameters">The console parameters.</param>
     public InProcessVsTestConsoleWrapper(ConsoleParameters consoleParameters)
         : this(
               consoleParameters,
               requestSender: new VsTestConsoleRequestSender(),
               testRequestManager: null,
-              executorParam: null,
-              testPlatformEventSource: null)
+              executor: new Executor(ConsoleOutput.Instance),
+              testPlatformEventSource: TestPlatformEventSource.Instance)
     { }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// 
-    /// <param name="consoleParameters"></param>
-    /// <param name="requestSender"></param>
-    /// <param name="testRequestManager"></param>
-    /// 
-    /// <exception cref="TransationLayerException"></exception>
     internal InProcessVsTestConsoleWrapper(
         ConsoleParameters consoleParameters,
         ITranslationLayerRequestSender requestSender,
         ITestRequestManager? testRequestManager,
-        Executor? executorParam,
-        ITestPlatformEventSource? testPlatformEventSource)
+        Executor executor,
+        ITestPlatformEventSource testPlatformEventSource)
     {
         EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
 
-        _testPlatformEventSource = testPlatformEventSource ?? TestPlatformEventSource.Instance;
+        _testPlatformEventSource = testPlatformEventSource;
         _testPlatformEventSource.TranslationLayerInitializeStart();
 
         // Start communication.
@@ -92,8 +85,10 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         // TODO: under VS we use consoleParameters.InheritEnvironmentVariables, we take that
         // into account when starting a testhost, or clean up in the service host, and use the
         // desired set, so all children can inherit it.
-        consoleParameters.EnvironmentVariables.ToList().ForEach(pair =>
-            Environment.SetEnvironmentVariable(pair.Key, pair.Value));
+        foreach (var pair in consoleParameters.EnvironmentVariables)
+        {
+            Environment.SetEnvironmentVariable(pair.Key, pair.Value);
+        }
 
         string someExistingFile = typeof(InProcessVsTestConsoleWrapper).Assembly.Location;
         var args = new VsTestConsoleProcessManager(someExistingFile).BuildArguments(consoleParameters);
@@ -101,7 +96,6 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         // being understood as test dll to run. (it is present even though we don't provide
         // dotnet path, because it is a .dll file).
         args = args.Skip(1).ToArray();
-        var executor = executorParam ?? new Executor(ConsoleOutput.Instance);
 
         // We standup the client, and it will allocate port as normal that we will never use.
         // This is just to avoid "duplicating" all the setup logic that is done in argument
@@ -113,9 +107,14 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         WaitForConnection();
 
         // Set the test request manager here.
-        TestRequestManager =
-            testRequestManager
-            ?? ((DesignModeClient)DesignModeClient.Instance!).TestRequestManager;
+        TestRequestManager = testRequestManager;
+        if (TestRequestManager == null)
+        {
+            TPDebug.Assert(
+                (DesignModeClient?)DesignModeClient.Instance != null,
+                "DesignModeClient.Instance is null");
+            TestRequestManager = ((DesignModeClient)DesignModeClient.Instance).TestRequestManager;
+        }
 
         _testPlatformEventSource.TranslationLayerInitializeStop();
     }
@@ -131,7 +130,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("DesignModeClient: Exception in AbortTestRun: " + ex);
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.AbortTestRun: Exception occurred: " + ex);
         }
     }
 
@@ -144,7 +143,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("DesignModeClient: Exception in CancelDiscovery: " + ex);
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.CancelDiscovery: Exception occurred: " + ex);
         }
     }
 
@@ -157,7 +156,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("DesignModeClient: Exception in CancelTestRun: " + ex);
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.CancelTestRun: Exception occurred: " + ex);
         }
     }
 
@@ -223,7 +222,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
                 Sources = sources,
                 RunSettings = runSettings,
                 HasCustomHostLauncher = testHostLauncher != null,
-                IsDebuggingEnabled = (testHostLauncher != null)
+                IsDebuggingEnabled = testHostLauncher != null
                                      && testHostLauncher.IsDebug,
                 TestPlatformOptions = options
             };
@@ -246,7 +245,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("DesignModeClient: Exception in StartTestSession: " + ex);
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.StartTestSession: Exception occurred: " + ex);
 
             eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
             eventsHandler.HandleStartTestSessionComplete(new());
@@ -304,7 +303,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("DesignModeClient: Exception in StopTestSession: " + ex);
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.StopTestSession: Exception occurred: " + ex);
 
             eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
             eventsHandler.HandleStopTestSessionComplete(new());
@@ -326,7 +325,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("DesignModeClient: Exception in InitializeExtensions: " + ex);
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.InitializeExtensions: Exception occurred: " + ex);
         }
     }
 
@@ -386,7 +385,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("DesignModeClient: Exception in StartDiscovery: " + ex);
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.DiscoverTests: Exception occurred: " + ex);
 
             discoveryEventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
             var errorDiscoveryComplete = new DiscoveryCompleteEventArgs
@@ -465,7 +464,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.RunTests: Exception occurred: " + ex);
             var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue);
 
             testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
@@ -538,7 +537,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.RunTests: Exception occurred: " + ex);
             var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue);
 
             testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
@@ -632,7 +631,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.RunTestsWithCustomTestHost: Exception occurred: " + ex);
             var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue);
 
             testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
@@ -726,7 +725,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.RunTestsWithCustomTestHost: Exception occurred: " + ex);
             var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue);
 
             testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
@@ -768,27 +767,19 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public async Task DiscoverTestsAsync(
+    public Task DiscoverTestsAsync(
         IEnumerable<string> sources,
         string? discoverySettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
         ITestDiscoveryEventsHandler2 discoveryEventsHandler)
     {
-        // The Task.Delay(100) is a dumb way of silencing the analyzers, otherwise an error saying
-        // the method lacks an await statement will pop up. This is only temporary though, until a
-        // working implementation of this method will completely replace the current method body.
-        await Task.Delay(100, CancellationToken.None);
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public async Task InitializeExtensionsAsync(IEnumerable<string> pathToAdditionalExtensions)
+    public Task InitializeExtensionsAsync(IEnumerable<string> pathToAdditionalExtensions)
     {
-        // The Task.Delay(100) is a dumb way of silencing the analyzers, otherwise an error saying
-        // the method lacks an await statement will pop up. This is only temporary though, until a
-        // working implementation of this method will completely replace the current method body.
-        await Task.Delay(100, CancellationToken.None);
         throw new NotImplementedException();
     }
 
@@ -813,7 +804,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public async Task ProcessTestRunAttachmentsAsync(
+    public Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
         IEnumerable<InvokedDataCollector>? invokedDataCollectors,
         string? processingSettings,
@@ -822,10 +813,6 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         ITestRunAttachmentsProcessingEventsHandler eventsHandler,
         CancellationToken cancellationToken)
     {
-        // The Task.Delay(100) is a dumb way of silencing the analyzers, otherwise an error saying
-        // the method lacks an await statement will pop up. This is only temporary though, until a
-        // working implementation of this method will completely replace the current method body.
-        await Task.Delay(100, CancellationToken.None);
         throw new NotImplementedException();
     }
 
@@ -860,17 +847,13 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public async Task RunTestsAsync(
+    public Task RunTestsAsync(
         IEnumerable<string> sources,
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler)
     {
-        // The Task.Delay(100) is a dumb way of silencing the analyzers, otherwise an error saying
-        // the method lacks an await statement will pop up. This is only temporary though, until a
-        // working implementation of this method will completely replace the current method body.
-        await Task.Delay(100, CancellationToken.None);
         throw new NotImplementedException();
     }
 
@@ -905,17 +888,13 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public async Task RunTestsAsync(
+    public Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler)
     {
-        // The Task.Delay(100) is a dumb way of silencing the analyzers, otherwise an error saying
-        // the method lacks an await statement will pop up. This is only temporary though, until a
-        // working implementation of this method will completely replace the current method body.
-        await Task.Delay(100, CancellationToken.None);
         throw new NotImplementedException();
     }
 
@@ -954,7 +933,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public async Task RunTestsWithCustomTestHostAsync(
+    public Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string? runSettings,
         TestPlatformOptions? options,
@@ -962,10 +941,6 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
-        // The Task.Delay(100) is a dumb way of silencing the analyzers, otherwise an error saying
-        // the method lacks an await statement will pop up. This is only temporary though, until a
-        // working implementation of this method will completely replace the current method body.
-        await Task.Delay(100, CancellationToken.None);
         throw new NotImplementedException();
     }
 
@@ -1004,7 +979,7 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public async Task RunTestsWithCustomTestHostAsync(
+    public Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
         TestPlatformOptions? options,
@@ -1012,20 +987,12 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
-        // The Task.Delay(100) is a dumb way of silencing the analyzers, otherwise an error saying
-        // the method lacks an await statement will pop up. This is only temporary though, until a
-        // working implementation of this method will completely replace the current method body.
-        await Task.Delay(100, CancellationToken.None);
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public async Task StartSessionAsync()
+    public Task StartSessionAsync()
     {
-        // The Task.Delay(100) is a dumb way of silencing the analyzers, otherwise an error saying
-        // the method lacks an await statement will pop up. This is only temporary though, until a
-        // working implementation of this method will completely replace the current method body.
-        await Task.Delay(100, CancellationToken.None);
         throw new NotImplementedException();
     }
 
@@ -1063,17 +1030,13 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public async Task<ITestSession?> StartTestSessionAsync(
+    public Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
         TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler,
         ITestHostLauncher? testHostLauncher)
     {
-        // The Task.Delay(100) is a dumb way of silencing the analyzers, otherwise an error saying
-        // the method lacks an await statement will pop up. This is only temporary though, until a
-        // working implementation of this method will completely replace the current method body.
-        await Task.Delay(100, CancellationToken.None);
         throw new NotImplementedException();
     }
 
@@ -1092,15 +1055,11 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
 
     /// <inheritdoc/>
     [Obsolete("This API is not final yet and is subject to changes.", false)]
-    public async Task<bool> StopTestSessionAsync(
+    public Task<bool> StopTestSessionAsync(
         TestSessionInfo? testSessionInfo,
         TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler)
     {
-        // The Task.Delay(100) is a dumb way of silencing the analyzers, otherwise an error saying
-        // the method lacks an await statement will pop up. This is only temporary though, until a
-        // working implementation of this method will completely replace the current method body.
-        await Task.Delay(100, CancellationToken.None);
         throw new NotImplementedException();
     }
     #endregion
@@ -1110,26 +1069,30 @@ public class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         if (!_isInitialized)
         {
             _isInitialized = true;
-            EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process is not started.");
+            EqtTrace.Info("InProcessVsTestConsoleWrapper.EnsureInitialized: Process is not started.");
             StartSession();
             _sessionStarted = WaitForConnection();
         }
 
         if (!_sessionStarted && _requestSender != null)
         {
-            EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process Started.");
+            EqtTrace.Info("InProcessVsTestConsoleWrapper.EnsureInitialized: Process Started.");
             _sessionStarted = WaitForConnection();
         }
     }
 
     private bool WaitForConnection()
     {
-        EqtTrace.Info("VsTestConsoleWrapper.WaitForConnection: Waiting for connection to command line runner.");
+        EqtTrace.Info("InProcessVsTestConsoleWrapper.WaitForConnection: Waiting for connection to command line runner.");
 
-        var timeout = EnvironmentHelper.GetConnectionTimeout();
-        if (!_requestSender.WaitForRequestHandlerConnection(timeout * 1000))
+        var timeout = EnvironmentHelper.GetConnectionTimeout() * 1000;
+        if (!_requestSender.WaitForRequestHandlerConnection(timeout))
         {
-            throw new Exception("Waiting for request handler connection timed out.");
+            throw new TransationLayerException(
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    "Waiting for request handler connection timed out after {0} seconds.",
+                    timeout));
         }
 
         _testPlatformEventSource.TranslationLayerInitializeStop();

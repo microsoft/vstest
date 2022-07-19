@@ -84,7 +84,7 @@ public class DesignModeClient : IDesignModeClient
     public static IDesignModeClient? Instance { get; private set; }
 
     /// <summary>
-    /// Gets or sets the test request manager.
+    /// Gets the test request manager.
     /// </summary>
     public ITestRequestManager? TestRequestManager { get; internal set; }
 

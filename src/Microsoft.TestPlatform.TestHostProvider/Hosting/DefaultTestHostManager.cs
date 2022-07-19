@@ -186,24 +186,27 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
 
-        var processName = _processHelper.GetCurrentProcessFileName()!;
         var launcherPath = testhostProcessPath;
-        if (!_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
-            !processName.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
+        var processName = _processHelper.GetCurrentProcessFileName();
+        if (processName != null)
         {
-            launcherPath = _dotnetHostHelper.GetMonoPath();
-            argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;
-        }
-        else
-        {
-            // Patching the relative path for IDE scenarios.
-            if (_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
-                && !(processName.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
-                    || processName.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
-                && !File.Exists(testhostProcessPath))
+            if (!_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
+                !processName.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
             {
-                testhostProcessPath = Path.Combine(currentWorkingDirectory!, "..", originalTestHostProcessName);
-                launcherPath = testhostProcessPath;
+                launcherPath = _dotnetHostHelper.GetMonoPath();
+                argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;
+            }
+            else
+            {
+                // Patching the relative path for IDE scenarios.
+                if (_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
+                    && !(processName.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
+                        || processName.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
+                    && !File.Exists(testhostProcessPath))
+                {
+                    testhostProcessPath = Path.Combine(currentWorkingDirectory!, "..", originalTestHostProcessName);
+                    launcherPath = testhostProcessPath;
+                }
             }
         }
 

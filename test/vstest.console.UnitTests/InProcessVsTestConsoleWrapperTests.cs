@@ -3,25 +3,24 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Client;
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-using Microsoft.VisualStudio.TestPlatform.CommandLine;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using FluentAssertions;
 using Moq;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using System.Linq;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 
@@ -754,19 +753,10 @@ public class InProcessVsTestConsoleWrapperTests
                 It.IsAny<ProtocolConfig>()), Times.Once);
     }
 
-    /*[TestMethod]
+    [TestMethod]
     [Obsolete("Test uses obsolete API")]
     public void InProcessWrapperStartTestSessionSucceedsWhenNoExceptionIsThrown()
     {
-        if (!System.Diagnostics.Debugger.IsAttached)
-        {
-            System.Diagnostics.Debugger.Launch();
-        }
-        else
-        {
-            System.Diagnostics.Debugger.Break();
-        }
-
         var mockTestSessionEventsHandler = new Mock<ITestSessionEventsHandler>();
         mockTestSessionEventsHandler
             .Setup(eh => eh.HandleStartTestSessionComplete(It.IsAny<StartTestSessionCompleteEventArgs>()))
@@ -775,6 +765,12 @@ public class InProcessVsTestConsoleWrapperTests
         var testSessionInfo = new TestSessionInfo();
         var startTestSessionCompleteArgs = new StartTestSessionCompleteEventArgs()
         {
+            TestSessionInfo = testSessionInfo
+        };
+
+        var stopTestSessionCompleteArgs = new StopTestSessionCompleteEventArgs()
+        {
+            IsStopped = true,
             TestSessionInfo = testSessionInfo
         };
 
@@ -791,6 +787,17 @@ public class InProcessVsTestConsoleWrapperTests
                 ProtocolConfig _) =>
                     eventsHandler.HandleStartTestSessionComplete(startTestSessionCompleteArgs));
 
+        _mockTestRequestManager.Setup(trm =>
+            trm.StopTestSession(
+                It.IsAny<StopTestSessionPayload>(),
+                It.IsAny<InProcessTestSessionEventsHandler>(),
+                It.IsAny<ProtocolConfig>()))
+            .Callback<StopTestSessionPayload, ITestSessionEventsHandler, ProtocolConfig>((
+                StopTestSessionPayload _,
+                ITestSessionEventsHandler eventsHandler,
+                ProtocolConfig _) =>
+                    eventsHandler.HandleStopTestSessionComplete(stopTestSessionCompleteArgs));
+
         var consoleWrapper = new InProcessVsTestConsoleWrapper(
             new ConsoleParameters(),
             _mockRequestSender.Object,
@@ -798,17 +805,25 @@ public class InProcessVsTestConsoleWrapperTests
             new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),
             new Mock<ITestPlatformEventSource>().Object);
 
-        Assert.AreEqual(
-            consoleWrapper.StartTestSession(testSources, runSettings, mockTestSessionEventsHandler.Object).TestSessionInfo,
-            testSessionInfo);
+        using (var testSession = consoleWrapper?.StartTestSession(_testSources, _runSettings, mockTestSessionEventsHandler.Object))
+        {
+            Assert.AreEqual(
+                testSession?.TestSessionInfo,
+                testSessionInfo);
+        }
 
-        /*_mockTestRequestManager.Verify(trm => trm.ResetOptions(), Times.Once);
+        _mockTestRequestManager.Verify(trm => trm.ResetOptions(), Times.Exactly(2));
         _mockTestRequestManager.Verify(trm => trm.StartTestSession(
              It.IsAny<StartTestSessionPayload>(),
              It.IsAny<ITestHostLauncher3>(),
              It.IsAny<InProcessTestSessionEventsHandler>(),
              It.IsAny<ProtocolConfig>()), Times.Once);
+        _mockTestRequestManager.Verify(trm => trm.StopTestSession(
+             It.IsAny<StopTestSessionPayload>(),
+             It.IsAny<InProcessTestSessionEventsHandler>(),
+             It.IsAny<ProtocolConfig>()), Times.Once);
 
         mockTestSessionEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(startTestSessionCompleteArgs), Times.Once);
-    } */
+        mockTestSessionEventsHandler.Verify(eh => eh.HandleStopTestSessionComplete(stopTestSessionCompleteArgs), Times.Once);
+    }
 }
