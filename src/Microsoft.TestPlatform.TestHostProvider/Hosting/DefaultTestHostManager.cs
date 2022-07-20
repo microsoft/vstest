@@ -166,15 +166,17 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
         var argumentsString = " " + connectionInfo.ToCommandLineOptions();
 
+        TPDebug.Assert(currentWorkingDirectory is not null, "Current working directory must not be null.");
+
         // check in current location for testhost exe
-        var testhostProcessPath = Path.Combine(currentWorkingDirectory!, testHostProcessName);
+        var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
 
         var originalTestHostProcessName = testHostProcessName;
         if (!File.Exists(testhostProcessPath))
         {
             // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies, in dotnet SDK.
             testHostProcessName = Path.Combine("TestHost", originalTestHostProcessName);
-            testhostProcessPath = Path.Combine(currentWorkingDirectory!, "..", testHostProcessName);
+            testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", testHostProcessName);
         }
 
         if (!Shared)
@@ -188,7 +190,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         var launcherPath = testhostProcessPath;
         var processName = _processHelper.GetCurrentProcessFileName();
-        if (processName != null)
+        if (processName is not null)
         {
             if (!_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
                 !processName.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
@@ -204,7 +206,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
                         || processName.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
                     && !File.Exists(testhostProcessPath))
                 {
-                    testhostProcessPath = Path.Combine(currentWorkingDirectory!, "..", originalTestHostProcessName);
+                    testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", originalTestHostProcessName);
                     launcherPath = testhostProcessPath;
                 }
             }

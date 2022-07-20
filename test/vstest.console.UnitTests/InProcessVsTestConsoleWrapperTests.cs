@@ -21,6 +21,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using FluentAssertions;
 using Moq;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 
@@ -28,6 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 public class InProcessVsTestConsoleWrapperTests
 {
     private readonly InProcessVsTestConsoleWrapper _consoleWrapper;
+    private readonly Mock<IEnvironmentVariableHelper> _mockEnvironmentVariableHelper;
     private readonly Mock<ITranslationLayerRequestSender> _mockRequestSender;
     private readonly Mock<ITestRequestManager> _mockTestRequestManager;
     private readonly Mock<IOutput> _mockOutput;
@@ -40,6 +42,8 @@ public class InProcessVsTestConsoleWrapperTests
 
     public InProcessVsTestConsoleWrapperTests()
     {
+        _mockEnvironmentVariableHelper = new Mock<IEnvironmentVariableHelper>();
+
         _mockRequestSender = new Mock<ITranslationLayerRequestSender>();
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(1234);
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
@@ -53,6 +57,7 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper = new InProcessVsTestConsoleWrapper(
             new ConsoleParameters(),
+            _mockEnvironmentVariableHelper.Object,
             _mockRequestSender.Object,
             _mockTestRequestManager.Object,
             _executor,
@@ -67,6 +72,7 @@ public class InProcessVsTestConsoleWrapperTests
         Assert.ThrowsException<TransationLayerException>(() =>
             new InProcessVsTestConsoleWrapper(
                 new ConsoleParameters(),
+                _mockEnvironmentVariableHelper.Object,
                 _mockRequestSender.Object,
                 _mockTestRequestManager.Object,
                 new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),
@@ -85,12 +91,13 @@ public class InProcessVsTestConsoleWrapperTests
 
         var _ = new InProcessVsTestConsoleWrapper(
             consoleParams,
+            _mockEnvironmentVariableHelper.Object,
             _mockRequestSender.Object,
             _mockTestRequestManager.Object,
             new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),
             new Mock<ITestPlatformEventSource>().Object);
 
-        Environment.GetEnvironmentVariable(environmentVariableName).Should().NotBeNull();
+        _mockEnvironmentVariableHelper.Verify(evh => evh.SetEnvironmentVariable(environmentVariableName, "1"));
     }
 
     [TestMethod]
@@ -111,10 +118,11 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.DiscoverTests(_testSources, _runSettings, discoveryEventHandler.Object);
 
-        Assert.IsTrue(_testSources.SequenceEqual(payload!.Sources!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.IsNull(payload!.TestPlatformOptions);
-        Assert.IsNull(payload!.TestSessionInfo);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testSources.SequenceEqual(payload.Sources!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.IsNull(payload.TestPlatformOptions);
+        Assert.IsNull(payload.TestSessionInfo);
 
         _mockEventSource.Verify(es => es.TranslationLayerDiscoveryStart(), Times.Once);
         _mockEventSource.Verify(es => es.TranslationLayerDiscoveryStop(), Times.Once);
@@ -144,10 +152,11 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.DiscoverTests(_testSources, _runSettings, options, discoveryEventHandler.Object);
 
-        Assert.IsTrue(_testSources.SequenceEqual(payload!.Sources!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.AreEqual(options, payload!.TestPlatformOptions);
-        Assert.IsNull(payload!.TestSessionInfo);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testSources.SequenceEqual(payload.Sources!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.AreEqual(options, payload.TestPlatformOptions);
+        Assert.IsNull(payload.TestSessionInfo);
 
         _mockEventSource.Verify(es => es.TranslationLayerDiscoveryStart(), Times.Once);
         _mockEventSource.Verify(es => es.TranslationLayerDiscoveryStop(), Times.Once);
@@ -179,10 +188,11 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.DiscoverTests(_testSources, _runSettings, options, testSessionInfo, discoveryEventHandler.Object);
 
-        Assert.IsTrue(_testSources.SequenceEqual(payload!.Sources!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.AreEqual(options, payload!.TestPlatformOptions);
-        Assert.AreEqual(testSessionInfo.Id, payload!.TestSessionInfo?.Id);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testSources.SequenceEqual(payload.Sources!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.AreEqual(options, payload.TestPlatformOptions);
+        Assert.AreEqual(testSessionInfo.Id, payload.TestSessionInfo?.Id);
 
         _mockEventSource.Verify(es => es.TranslationLayerDiscoveryStart(), Times.Once);
         _mockEventSource.Verify(es => es.TranslationLayerDiscoveryStop(), Times.Once);
@@ -213,10 +223,11 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.RunTests(_testSources, _runSettings, runEventHandler.Object);
 
-        Assert.IsTrue(_testSources.SequenceEqual(payload!.Sources!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.IsNull(payload!.TestPlatformOptions);
-        Assert.IsNull(payload!.TestSessionInfo?.Id);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testSources.SequenceEqual(payload.Sources!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.IsNull(payload.TestPlatformOptions);
+        Assert.IsNull(payload.TestSessionInfo?.Id);
 
         _mockEventSource.Verify(es =>
             es.TranslationLayerExecutionStart(
@@ -256,10 +267,11 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.RunTests(_testSources, _runSettings, options, runEventHandler.Object);
 
-        Assert.IsTrue(_testSources.SequenceEqual(payload!.Sources!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.AreEqual(options, payload!.TestPlatformOptions);
-        Assert.IsNull(payload!.TestSessionInfo?.Id);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testSources.SequenceEqual(payload.Sources!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.AreEqual(options, payload.TestPlatformOptions);
+        Assert.IsNull(payload.TestSessionInfo?.Id);
 
         _mockEventSource.Verify(es =>
             es.TranslationLayerExecutionStart(
@@ -300,10 +312,11 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.RunTests(_testSources, _runSettings, options, testSessionInfo, runEventHandler.Object);
 
-        Assert.IsTrue(_testSources.SequenceEqual(payload!.Sources!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.AreEqual(options, payload!.TestPlatformOptions);
-        Assert.AreEqual(testSessionInfo.Id, payload!.TestSessionInfo?.Id);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testSources.SequenceEqual(payload.Sources!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.AreEqual(options, payload.TestPlatformOptions);
+        Assert.AreEqual(testSessionInfo.Id, payload.TestSessionInfo?.Id);
 
         _mockEventSource.Verify(es =>
             es.TranslationLayerExecutionStart(
@@ -341,10 +354,11 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.RunTests(_testCases, _runSettings, runEventHandler.Object);
 
-        Assert.IsTrue(_testCases.SequenceEqual(payload!.TestCases!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.IsNull(payload!.TestPlatformOptions);
-        Assert.IsNull(payload!.TestSessionInfo?.Id);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testCases.SequenceEqual(payload.TestCases!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.IsNull(payload.TestPlatformOptions);
+        Assert.IsNull(payload.TestSessionInfo?.Id);
 
         _mockEventSource.Verify(es =>
             es.TranslationLayerExecutionStart(
@@ -384,10 +398,11 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.RunTests(_testCases, _runSettings, options, runEventHandler.Object);
 
-        Assert.IsTrue(_testCases.SequenceEqual(payload!.TestCases!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.AreEqual(options, payload!.TestPlatformOptions);
-        Assert.IsNull(payload!.TestSessionInfo?.Id);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testCases.SequenceEqual(payload.TestCases!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.AreEqual(options, payload.TestPlatformOptions);
+        Assert.IsNull(payload.TestSessionInfo?.Id);
 
         _mockEventSource.Verify(es =>
             es.TranslationLayerExecutionStart(
@@ -428,10 +443,11 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.RunTests(_testCases, _runSettings, options, testSessionInfo, runEventHandler.Object);
 
-        Assert.IsTrue(_testCases.SequenceEqual(payload!.TestCases!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.AreEqual(options, payload!.TestPlatformOptions);
-        Assert.AreEqual(testSessionInfo.Id, payload!.TestSessionInfo?.Id);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testCases.SequenceEqual(payload.TestCases!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.AreEqual(options, payload.TestPlatformOptions);
+        Assert.AreEqual(testSessionInfo.Id, payload.TestSessionInfo?.Id);
 
         _mockEventSource.Verify(es =>
             es.TranslationLayerExecutionStart(
@@ -475,11 +491,12 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.RunTestsWithCustomTestHost(_testSources, _runSettings, runEventHandler.Object, testHostLauncher.Object);
 
-        Assert.IsTrue(_testSources.SequenceEqual(payload!.Sources!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.IsNull(payload!.TestPlatformOptions);
-        Assert.IsNull(payload!.TestSessionInfo?.Id);
-        Assert.AreEqual(testHostLauncher.Object.IsDebug, payload!.DebuggingEnabled);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testSources.SequenceEqual(payload.Sources!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.IsNull(payload.TestPlatformOptions);
+        Assert.IsNull(payload.TestSessionInfo?.Id);
+        Assert.AreEqual(testHostLauncher.Object.IsDebug, payload.DebuggingEnabled);
         Assert.AreEqual(testHostLauncher.Object, launcher);
 
         _mockEventSource.Verify(es =>
@@ -526,11 +543,12 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.RunTestsWithCustomTestHost(_testSources, _runSettings, options, runEventHandler.Object, testHostLauncher.Object);
 
-        Assert.IsTrue(_testSources.SequenceEqual(payload!.Sources!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.AreEqual(options, payload!.TestPlatformOptions);
-        Assert.IsNull(payload!.TestSessionInfo?.Id);
-        Assert.AreEqual(testHostLauncher.Object.IsDebug, payload!.DebuggingEnabled);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testSources.SequenceEqual(payload.Sources!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.AreEqual(options, payload.TestPlatformOptions);
+        Assert.IsNull(payload.TestSessionInfo?.Id);
+        Assert.AreEqual(testHostLauncher.Object.IsDebug, payload.DebuggingEnabled);
         Assert.AreEqual(testHostLauncher.Object, launcher);
 
         _mockEventSource.Verify(es =>
@@ -578,11 +596,12 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.RunTestsWithCustomTestHost(_testSources, _runSettings, options, testSessionInfo, runEventHandler.Object, testHostLauncher.Object);
 
-        Assert.IsTrue(_testSources.SequenceEqual(payload!.Sources!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.AreEqual(options, payload!.TestPlatformOptions);
-        Assert.AreEqual(testSessionInfo.Id, payload!.TestSessionInfo?.Id);
-        Assert.AreEqual(testHostLauncher.Object.IsDebug, payload!.DebuggingEnabled);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testSources.SequenceEqual(payload.Sources!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.AreEqual(options, payload.TestPlatformOptions);
+        Assert.AreEqual(testSessionInfo.Id, payload.TestSessionInfo?.Id);
+        Assert.AreEqual(testHostLauncher.Object.IsDebug, payload.DebuggingEnabled);
         Assert.IsNull(launcher);
 
         _mockEventSource.Verify(es =>
@@ -627,11 +646,12 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.RunTestsWithCustomTestHost(_testCases, _runSettings, runEventHandler.Object, testHostLauncher.Object);
 
-        Assert.IsTrue(_testCases.SequenceEqual(payload!.TestCases!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.IsNull(payload!.TestPlatformOptions);
-        Assert.IsNull(payload!.TestSessionInfo?.Id);
-        Assert.AreEqual(testHostLauncher.Object.IsDebug, payload!.DebuggingEnabled);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testCases.SequenceEqual(payload.TestCases!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.IsNull(payload.TestPlatformOptions);
+        Assert.IsNull(payload.TestSessionInfo?.Id);
+        Assert.AreEqual(testHostLauncher.Object.IsDebug, payload.DebuggingEnabled);
         Assert.AreEqual(testHostLauncher.Object, launcher);
 
         _mockEventSource.Verify(es =>
@@ -678,11 +698,12 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.RunTestsWithCustomTestHost(_testCases, _runSettings, options, runEventHandler.Object, testHostLauncher.Object);
 
-        Assert.IsTrue(_testCases.SequenceEqual(payload!.TestCases!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.AreEqual(options, payload!.TestPlatformOptions);
-        Assert.IsNull(payload!.TestSessionInfo?.Id);
-        Assert.AreEqual(testHostLauncher.Object.IsDebug, payload!.DebuggingEnabled);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testCases.SequenceEqual(payload.TestCases!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.AreEqual(options, payload.TestPlatformOptions);
+        Assert.IsNull(payload.TestSessionInfo?.Id);
+        Assert.AreEqual(testHostLauncher.Object.IsDebug, payload.DebuggingEnabled);
         Assert.AreEqual(testHostLauncher.Object, launcher);
 
         _mockEventSource.Verify(es =>
@@ -730,11 +751,12 @@ public class InProcessVsTestConsoleWrapperTests
 
         _consoleWrapper.RunTestsWithCustomTestHost(_testCases, _runSettings, options, testSessionInfo, runEventHandler.Object, testHostLauncher.Object);
 
-        Assert.IsTrue(_testCases.SequenceEqual(payload!.TestCases!));
-        Assert.AreEqual(_runSettings, payload!.RunSettings);
-        Assert.AreEqual(options, payload!.TestPlatformOptions);
-        Assert.AreEqual(testSessionInfo.Id, payload!.TestSessionInfo?.Id);
-        Assert.AreEqual(testHostLauncher.Object.IsDebug, payload!.DebuggingEnabled);
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_testCases.SequenceEqual(payload.TestCases!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.AreEqual(options, payload.TestPlatformOptions);
+        Assert.AreEqual(testSessionInfo.Id, payload.TestSessionInfo?.Id);
+        Assert.AreEqual(testHostLauncher.Object.IsDebug, payload.DebuggingEnabled);
         Assert.IsNull(launcher);
 
         _mockEventSource.Verify(es =>
@@ -800,6 +822,7 @@ public class InProcessVsTestConsoleWrapperTests
 
         var consoleWrapper = new InProcessVsTestConsoleWrapper(
             new ConsoleParameters(),
+            _mockEnvironmentVariableHelper.Object,
             _mockRequestSender.Object,
             _mockTestRequestManager.Object,
             new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),

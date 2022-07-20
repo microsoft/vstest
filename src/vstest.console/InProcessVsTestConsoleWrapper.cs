@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
@@ -38,8 +39,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
 
     private readonly ITranslationLayerRequestSender _requestSender;
     private readonly ITestPlatformEventSource _testPlatformEventSource;
-    private bool _isInitialized;
-    private bool _sessionStarted;
+    private readonly IEnvironmentVariableHelper _environmentVariableHelper;
 
     /// <summary>
     /// Creates a new instance of <see cref="InProcessVsTestConsoleWrapper"/>.
@@ -49,6 +49,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     public InProcessVsTestConsoleWrapper(ConsoleParameters consoleParameters)
         : this(
               consoleParameters,
+              environmentVariableHelper: new EnvironmentVariableHelper(),
               requestSender: new VsTestConsoleRequestSender(),
               testRequestManager: null,
               executor: new Executor(ConsoleOutput.Instance),
@@ -57,6 +58,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
 
     internal InProcessVsTestConsoleWrapper(
         ConsoleParameters consoleParameters,
+        IEnvironmentVariableHelper environmentVariableHelper,
         ITranslationLayerRequestSender requestSender,
         ITestRequestManager? testRequestManager,
         Executor executor,
@@ -64,6 +66,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     {
         EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
 
+        _environmentVariableHelper = environmentVariableHelper;
         _testPlatformEventSource = testPlatformEventSource;
         _testPlatformEventSource.TranslationLayerInitializeStart();
 
@@ -87,7 +90,12 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         // desired set, so all children can inherit it.
         foreach (var pair in consoleParameters.EnvironmentVariables)
         {
-            Environment.SetEnvironmentVariable(pair.Key, pair.Value);
+            if (pair.Value is null)
+            {
+                continue;
+            }
+
+            _environmentVariableHelper.SetEnvironmentVariable(pair.Key, pair.Value);
         }
 
         string someExistingFile = typeof(InProcessVsTestConsoleWrapper).Assembly.Location;
@@ -108,7 +116,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
 
         // Set the test request manager here.
         TestRequestManager = testRequestManager;
-        if (TestRequestManager == null)
+        if (TestRequestManager is null)
         {
             TPDebug.Assert(
                 (DesignModeClient?)DesignModeClient.Instance != null,
@@ -240,7 +248,16 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
                 inProcessEventsHandler,
                 new ProtocolConfig { Version = _highestSupportedVersion });
 
-            resetEvent.WaitOne();
+            var timeout = EnvironmentHelper.GetConnectionTimeout() * 1000;
+            if (!resetEvent.WaitOne(timeout))
+            {
+                throw new TransationLayerException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        Resources.Resources.StartTestSessionTimedOut,
+                        timeout));
+            }
+
             inProcessEventsHandler.StartTestSessionCompleteEventHandler = null;
         }
         catch (Exception ex)
@@ -298,7 +315,16 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
                 inProcessEventsHandler,
                 new ProtocolConfig { Version = _highestSupportedVersion });
 
-            resetEvent.WaitOne();
+            var timeout = EnvironmentHelper.GetConnectionTimeout() * 1000;
+            if (!resetEvent.WaitOne(timeout))
+            {
+                throw new TransationLayerException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        Resources.Resources.StopTestSessionTimedOut,
+                        timeout));
+            }
+
             inProcessEventsHandler.StopTestSessionCompleteEventHandler = null;
         }
         catch (Exception ex)
@@ -523,7 +549,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
 
             var testRunPayload = new TestRunRequestPayload
             {
-                TestCases = testCases.ToList(),
+                TestCases = testCaseList,
                 RunSettings = runSettings,
                 TestPlatformOptions = options,
                 TestSessionInfo = testSessionInfo
@@ -599,13 +625,11 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         {
             TestRequestManager?.ResetOptions();
 
-            var shouldLaunchTesthost = true;
-
             // We must avoid re-launching the test host if the test run payload already
             // contains test session info. Test session info being present is an indicative
             // of an already running test host spawned by a start test session call.
             var customLauncher =
-                shouldLaunchTesthost && testSessionInfo == null
+                testSessionInfo is null
                     ? customTestHostLauncher
                     : null;
 
@@ -693,21 +717,19 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         {
             TestRequestManager?.ResetOptions();
 
-            var shouldLaunchTesthost = true;
-
             // We must avoid re-launching the test host if the test run payload already
             // contains test session info. Test session info being present is an indicative
             // of an already running test host spawned by a start test session call.
             var customLauncher =
-                shouldLaunchTesthost && testSessionInfo == null
+                testSessionInfo is null
                     ? customTestHostLauncher
                     : null;
 
             var testRunPayload = new TestRunRequestPayload
             {
-                TestCases = testCases.ToList(),
+                TestCases = testCaseList,
                 RunSettings = runSettings,
-                DebuggingEnabled = (customLauncher?.IsDebug == true),
+                DebuggingEnabled = customLauncher?.IsDebug == true,
                 TestPlatformOptions = options,
                 TestSessionInfo = testSessionInfo
             };
@@ -1064,23 +1086,6 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
     #endregion
 
-    private void EnsureInitialized()
-    {
-        if (!_isInitialized)
-        {
-            _isInitialized = true;
-            EqtTrace.Info("InProcessVsTestConsoleWrapper.EnsureInitialized: Process is not started.");
-            StartSession();
-            _sessionStarted = WaitForConnection();
-        }
-
-        if (!_sessionStarted && _requestSender != null)
-        {
-            EqtTrace.Info("InProcessVsTestConsoleWrapper.EnsureInitialized: Process Started.");
-            _sessionStarted = WaitForConnection();
-        }
-    }
-
     private bool WaitForConnection()
     {
         EqtTrace.Info("InProcessVsTestConsoleWrapper.WaitForConnection: Waiting for connection to command line runner.");
@@ -1091,7 +1096,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             throw new TransationLayerException(
                 string.Format(
                     CultureInfo.CurrentCulture,
-                    "Waiting for request handler connection timed out after {0} seconds.",
+                    Resources.Resources.RequestHandlerConnectionTimedOut,
                     timeout));
         }
 

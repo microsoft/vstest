@@ -81,7 +81,7 @@ public class DesignModeClient : IDesignModeClient
     /// <summary>
     /// Property exposing the Instance
     /// </summary>
-    public static IDesignModeClient? Instance { get; private set; }
+    public static DesignModeClient? Instance { get; private set; }
 
     /// <summary>
     /// Gets the test request manager.
