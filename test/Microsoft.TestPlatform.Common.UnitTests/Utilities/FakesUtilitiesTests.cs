@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 
@@ -25,14 +26,16 @@ public class FakesUtilitiesTests
     [TestMethod]
     public void FakesSettingsShouldThrowExceptionIfRunSettingsIsPassedAsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(Array.Empty<string>(), null!));
+        Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(new Dictionary<string, Framework>(), null!));
     }
 
     [TestMethod]
     public void FakesSettingsShouldBeNotGeneratedIfFakeConfiguratorAssemblyIsNotPresent()
     {
         string runSettingsXml = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-        var generatedRunSettings = FakesUtilities.GenerateFakesSettingsForRunConfiguration(new string[] { @"C:\temp\UT.dll" }, runSettingsXml);
+        // Just some framework
+        var framework = Framework.FromString("net45")!;
+        var generatedRunSettings = FakesUtilities.GenerateFakesSettingsForRunConfiguration(new Dictionary<string, Framework> { [@"C:\temp\UT.dll"] = framework }, runSettingsXml);
         Assert.AreEqual(generatedRunSettings, runSettingsXml);
     }
 

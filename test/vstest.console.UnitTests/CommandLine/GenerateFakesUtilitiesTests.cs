@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
+
 using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -37,7 +40,7 @@ public class GenerateFakesUtilitiesTests
         CommandLineOptions.Instance.DisableAutoFakes = true;
         string runSettingsXml = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.netstandard,Version=5.0</TargetFrameworkVersion></RunConfiguration ></RunSettings>";
 
-        GenerateFakesUtilities.GenerateFakesSettings(CommandLineOptions.Instance, System.Array.Empty<string>(), ref runSettingsXml);
+        GenerateFakesUtilities.GenerateFakesSettings(CommandLineOptions.Instance, new Dictionary<string, Framework>(), ref runSettingsXml);
         Assert.AreEqual(runSettingsXml, _runSettings);
     }
 

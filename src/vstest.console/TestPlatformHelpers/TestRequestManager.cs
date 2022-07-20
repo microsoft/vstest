@@ -323,26 +323,7 @@ internal class TestRequestManager : ITestRequestManager
         // Get Fakes data collector settings.
         if (!string.Equals(Environment.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))
         {
-            // TODO: Are the sources in _commandLineOptions any different from the ones we get on the request?
-            // because why would they be? We never pass that forward to the executor, so this probably should
-            // just look at sources anyway.
-
-            // The commandline options do not have sources in design time mode,
-            // and so we fall back to using sources instead.
-            if (_commandLineOptions.Sources.Any())
-            {
-                GenerateFakesUtilities.GenerateFakesSettings(
-                    _commandLineOptions,
-                    _commandLineOptions.Sources.ToList(),
-                    ref runsettings);
-            }
-            else if (sources.Any())
-            {
-                GenerateFakesUtilities.GenerateFakesSettings(
-                    _commandLineOptions,
-                    sources,
-                    ref runsettings);
-            }
+            GenerateFakesUtilities.GenerateFakesSettings(_commandLineOptions, sourceToFrameworkMap, ref runsettings);
         }
 
         // We can have either a run that contains string as test container (usually a DLL), which is later resolved to the actual path

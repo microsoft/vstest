@@ -250,7 +250,7 @@ static Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider.SettingsProvi
 static Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider.SettingsProviderExtensionManager.LoadAndInitializeAllExtensions(bool shouldThrowOnError) -> void
 static Microsoft.VisualStudio.TestPlatform.Common.Utilities.CancellationTokenExtensions.ThrowTestPlatformExceptionIfCancellationRequested(this System.Threading.CancellationToken token) -> void
 static Microsoft.VisualStudio.TestPlatform.Common.Utilities.ExceptionUtilities.GetExceptionMessage(System.Exception? exception) -> string!
-static Microsoft.VisualStudio.TestPlatform.Common.Utilities.FakesUtilities.GenerateFakesSettingsForRunConfiguration(string![]! sources, string! runSettingsXml) -> string!
+static Microsoft.VisualStudio.TestPlatform.Common.Utilities.FakesUtilities.GenerateFakesSettingsForRunConfiguration(System.Collections.Generic.IDictionary<string!, Microsoft.VisualStudio.TestPlatform.ObjectModel.Framework!>! sourceToFrameworkMap, string! runSettingsXml) -> string!
 static Microsoft.VisualStudio.TestPlatform.Common.Utilities.RunSettingsUtilities.CreateAndInitializeRunSettings(string? settingsXml) -> Microsoft.VisualStudio.TestPlatform.Common.RunSettings?
 static Microsoft.VisualStudio.TestPlatform.Common.Utilities.RunSettingsUtilities.GetMaxCpuCount(Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration? runConfiguration) -> int
 static Microsoft.VisualStudio.TestPlatform.Common.Utilities.RunSettingsUtilities.GetMaxCpuCount(string? settingXml) -> int

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.XPath;
@@ -34,9 +35,9 @@ public static class FakesUtilities
     /// <param name="sources">test sources</param>
     /// <param name="runSettingsXml">runsettings</param>
     /// <returns>updated runsettings for fakes</returns>
-    public static string GenerateFakesSettingsForRunConfiguration(string[] sources, string runSettingsXml)
+    public static string GenerateFakesSettingsForRunConfiguration(IDictionary<string, Framework> sourceToFrameworkMap, string runSettingsXml)
     {
-        ValidateArg.NotNull(sources, nameof(sources));
+        ValidateArg.NotNull(sourceToFrameworkMap, nameof(sourceToFrameworkMap));
         ValidateArg.NotNull(runSettingsXml, nameof(runSettingsXml));
 
         var doc = new XmlDocument();
@@ -50,7 +51,7 @@ public static class FakesUtilities
         var frameworkVersion = GetFramework(runSettingsXml);
         return frameworkVersion == null
             ? runSettingsXml
-            : TryAddFakesDataCollectorSettings(doc, sources, (FrameworkVersion)frameworkVersion)
+            : TryAddFakesDataCollectorSettings(doc, sourceToFrameworkMap)
                 ? doc.OuterXml
                 : runSettingsXml;
     }
@@ -70,6 +71,11 @@ public static class FakesUtilities
             return null;
         }
 
+        return GetFrameworkVersion(targetFramework);
+    }
+
+    private static FrameworkVersion GetFrameworkVersion(Framework targetFramework)
+    {
         // Since there are no FrameworkVersion values for .Net Core 2.0 +, we check TargetFramework instead
         // and default to FrameworkCore10 for .Net Core
         if (targetFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0 ||
@@ -91,21 +97,18 @@ public static class FakesUtilities
     /// <param name="runSettings">runsettings</param>
     /// <param name="sources">test sources</param>
     /// <returns>true if runSettings was modified; false otherwise.</returns>
-    private static bool TryAddFakesDataCollectorSettings(
-        XmlDocument runSettings,
-        IEnumerable<string> sources,
-        FrameworkVersion framework)
+    private static bool TryAddFakesDataCollectorSettings(XmlDocument runSettings, IDictionary<string, Framework> sourceToFrameworkMap)
     {
         // A new Fakes Configurator API makes the decision to add the right datacollector uri to the configuration
         // There now exist two data collector URIs to support two different scenarios. The new scenario involves
         // using the CLRIE profiler, and the old involves using the Intellitrace profiler (which isn't supported in
         // .NET Core scenarios). The old API still exists for fallback measures.
+        var sourceToFrameworkVersionMap = ConvertToFrameworkVersion(sourceToFrameworkMap);
 
         var crossPlatformConfigurator = TryGetFakesCrossPlatformDataCollectorConfigurator();
         if (crossPlatformConfigurator != null)
         {
-            var sourceTfmMap = CreateDictionary(sources, framework);
-            var fakesSettings = crossPlatformConfigurator(sourceTfmMap);
+            var fakesSettings = crossPlatformConfigurator(sourceToFrameworkVersionMap);
 
             // if no fakes, return settings unchanged
             if (fakesSettings == null)
@@ -117,7 +120,7 @@ public static class FakesUtilities
             return true;
         }
 
-        return AddFallbackFakesSettings(runSettings, sources, framework);
+        return AddFallbackFakesSettings(runSettings, sourceToFrameworkVersionMap);
     }
 
     internal static void InsertOrReplaceFakesDataCollectorNode(XmlDocument runSettings, DataCollectorSettings settings)
@@ -142,15 +145,12 @@ public static class FakesUtilities
         XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator()!, settings);
     }
 
-    private static IDictionary<string, FrameworkVersion> CreateDictionary(IEnumerable<string> sources, FrameworkVersion framework)
+    private static IDictionary<string, FrameworkVersion> ConvertToFrameworkVersion(IDictionary<string, Framework> sourceToFrameworkMap)
     {
         var dict = new Dictionary<string, FrameworkVersion>();
-        foreach (var source in sources)
+        foreach (var pair in sourceToFrameworkMap)
         {
-            if (!dict.ContainsKey(source))
-            {
-                dict.Add(source, framework);
-            }
+            dict.Add(pair.Key, GetFrameworkVersion(pair.Value));
         }
 
         return dict;
@@ -158,16 +158,11 @@ public static class FakesUtilities
 
     private static bool AddFallbackFakesSettings(
         XmlDocument runSettings,
-        IEnumerable<string> sources,
-        FrameworkVersion framework)
+        IDictionary<string, FrameworkVersion> sourceToFrameworkVersionMap)
     {
-
         // The fallback settings is for the old implementation of fakes
         // that only supports .Net Framework versions
-        if (framework
-            is not FrameworkVersion.Framework35
-            and not FrameworkVersion.Framework40
-            and not FrameworkVersion.Framework45)
+        if (sourceToFrameworkVersionMap.Values.Any(f => f is not FrameworkVersion.Framework35 and not FrameworkVersion.Framework40 and not FrameworkVersion.Framework45))
         {
             return false;
         }
@@ -179,7 +174,7 @@ public static class FakesUtilities
         }
 
         // if no fakes, return settings unchanged
-        var fakesConfiguration = netFrameworkConfigurator(sources);
+        var fakesConfiguration = netFrameworkConfigurator(sourceToFrameworkVersionMap.Keys);
         if (fakesConfiguration == null)
         {
             return false;
