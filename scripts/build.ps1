@@ -1358,45 +1358,45 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-# if ($Force -or $Steps -contains "InstallDotnet") {
-#     Install-DotNetCli
-# }
+if ($Force -or $Steps -contains "InstallDotnet") {
+    Install-DotNetCli
+}
 
-# if ($Force -or $Steps -contains "Restore") {
-#     Clear-Package
-#     Restore-Package
-# }
+if ($Force -or $Steps -contains "Restore") {
+    Clear-Package
+    Restore-Package
+}
 
-# if ($Force -or $Steps -contains "UpdateLocalization") {
-#     Update-LocalizedResources
-# }
+if ($Force -or $Steps -contains "UpdateLocalization") {
+    Update-LocalizedResources
+}
 
-# if ($Force -or $Steps -contains "Build") {
-#     Invoke-Build
-# }
+if ($Force -or $Steps -contains "Build") {
+    Invoke-Build
+}
 
-# if ($Force -or $Steps -contains "Publish") {
-#     Publish-Package
-#     Publish-VsixPackage
-# }
+if ($Force -or $Steps -contains "Publish") {
+    Publish-Package
+    Publish-VsixPackage
+}
 
-# if ($Force -or $Steps -contains "Pack") {
-#     Create-VsixPackage
-#     Create-NugetPackages
-# }
+if ($Force -or $Steps -contains "Pack") {
+    Create-VsixPackage
+    Create-NugetPackages
+}
 
-# if ($Force -or $Steps -contains "Manifest") {
-#     Generate-Manifest -PackageFolder $TPB_PackageOutDir
-#     if (Test-Path $TPB_SourceBuildPackageOutDir)
-#     {
-#         Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
-#     }
-#     Copy-PackageIntoStaticDirectory
-# }
+if ($Force -or $Steps -contains "Manifest") {
+    Generate-Manifest -PackageFolder $TPB_PackageOutDir
+    if (Test-Path $TPB_SourceBuildPackageOutDir)
+    {
+        Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
+    }
+    Copy-PackageIntoStaticDirectory
+}
 
 if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
-    # Publish-PatchedDotnet
-    # Invoke-TestAssetsBuild
+    Publish-PatchedDotnet
+    Invoke-TestAssetsBuild
     Invoke-CompatibilityTestAssetsBuild
     Publish-Tests
 }
