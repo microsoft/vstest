@@ -287,11 +287,14 @@ function Invoke-CompatibilityTestAssetsBuild {
         Write-Log ".. .. Build: Source: $generatedSln -- add NuGet source"
         Invoke-Exe -IgnoreExitCode 1 $nugetExe -Arguments "sources add -Name ""locally-built-testplatform-packages"" -Source $env:TP_TESTARTIFACTS\packages\ -ConfigFile ""$nugetConfig"""
 
+        Write-Log ".. .. Build: Source: $generatedSln -- generate solution"
         foreach ($project in $projects) {
             $projectName = Split-Path -Path $project -Leaf
-            $projectDir = Split-Path -Path $project -Parent
-            $projectItems = Get-ChildItem $projectDir | Where-Object { $_.Name -notin "bin", "obj" } | ForEach-Object { Get-ChildItem $_ -Recurse -File }
-            
+            $projectBaseName = [IO.Path]::GetFileNameWithoutExtension($projectName)
+            $projectDir = Split-Path -Path $project
+            $projectItems = Get-ChildItem $projectDir | Where-Object { $_.Name -notin "bin", "obj" } | ForEach-Object { if ($_.PsIsContainer) { Get-ChildItem $_ -Recurse -File } else { $_ } }
+
+            Write-Log ".. .. .. Project $project has $($projectItems.Count) project items."
             # We use the same version properties for NET.Test.Sdk as for VSTestConsole, for now.
             foreach ($sdkPropertyName in $vstestConsoleVersionProperties) {
                 if ("VSTestConsoleLatestVersion" -eq $sdkPropertyName) {
@@ -321,9 +324,10 @@ function Invoke-CompatibilityTestAssetsBuild {
 
                     # Do not make this a folder structure, it will break the relative reference to scripts\build\TestAssets.props that we have in the project,
                     # because the relative path will be different. 
-                    $compatibilityProjectDir = "$generated/$dirNetTestSdkPropertyName-$dirNetTestSdkVersion--$dirMSTestPropertyName-$dirMSTestVersion--$projectName/"
+                    $compatibilityProjectDir = "$generated/$dirNetTestSdkPropertyName-$dirNetTestSdkVersion--$dirMSTestPropertyName-$dirMSTestVersion--$projectBaseName"
+
                     if (Test-path $compatibilityProjectDir) { 
-                        $a = 10
+                        throw "Path '$compatibilityProjectDir' does not exist"
                     }
                     New-Item -ItemType Directory -Path $compatibilityProjectDir | Out-Null
                     $compatibilityProjectDir = Resolve-Path $compatibilityProjectDir
@@ -331,14 +335,20 @@ function Invoke-CompatibilityTestAssetsBuild {
                         $relativePath = ($projectItem.FullName -replace [regex]::Escape($projectDir)).TrimStart("\")
                         $fullPath = Join-Path $compatibilityProjectDir $relativePath
                         try {
-                            Copy-Item -Path $projectItem.FullName -Destination $fullPath
+                            Copy-Item -Path $projectItem.FullName -Destination $fullPath -Verbose
                         }
-                        catch { 
-                            $a = 10
+                        catch {
+                            # can throw on wrong path, this makes the error more verbose
+                            throw "$_, Source: '$($projectItem.FullName)', Destination: '$fullPath'"
                         }
                     }
 
-                    $compatibilityCsproj = Get-ChildItem -Path $compatibilityProjectDir -Filter *.csproj 
+                    $compatibilityCsproj = Get-ChildItem -Path $compatibilityProjectDir -Filter *.csproj
+                    if (-not $compatibilityCsproj) {
+                        throw "No .csproj files found in directory $compatibilityProjectDir."
+                    }
+
+                    $compatibilityCsproj = $compatibilityCsproj.FullName
                     $csprojContent = (Get-Content $compatibilityCsproj -Encoding UTF8) `
                         -replace "\$\(MSTestFrameworkVersion\)", $mstestVersion `
                         -replace "\$\(MSTestAdapterVersion\)", $mstestVersion `
@@ -348,10 +358,13 @@ function Invoke-CompatibilityTestAssetsBuild {
                     $uniqueCsprojName = Join-Path $compatibilityProjectDir "$([IO.Path]::GetFileNameWithoutExtension($projectName))-$dirNetTestSdkPropertyName-$dirNetTestSdkVersion--$dirMSTestPropertyName-$dirMSTestVersion.csproj"
                     Rename-Item $compatibilityCsproj $uniqueCsprojName
                     $projectsToAdd += $uniqueCsprojName
+
+                    Write-Log ".. .. .. Generated: $uniqueCsprojName"
                 }
             }
         }
 
+        Write-Log ".. .. .. Building: generatedSln"
         Invoke-Exe $dotnetExe -Arguments "sln $generatedSln add $projectsToAdd"
         Invoke-Exe $dotnetExe -Arguments "build $generatedSln"
         $cacheIdText | Set-Content "$generated/checksum.json" -NoNewline
@@ -1345,45 +1358,45 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-if ($Force -or $Steps -contains "InstallDotnet") {
-    Install-DotNetCli
-}
+# if ($Force -or $Steps -contains "InstallDotnet") {
+#     Install-DotNetCli
+# }
 
-if ($Force -or $Steps -contains "Restore") {
-    Clear-Package
-    Restore-Package
-}
+# if ($Force -or $Steps -contains "Restore") {
+#     Clear-Package
+#     Restore-Package
+# }
 
-if ($Force -or $Steps -contains "UpdateLocalization") {
-    Update-LocalizedResources
-}
+# if ($Force -or $Steps -contains "UpdateLocalization") {
+#     Update-LocalizedResources
+# }
 
-if ($Force -or $Steps -contains "Build") {
-    Invoke-Build
-}
+# if ($Force -or $Steps -contains "Build") {
+#     Invoke-Build
+# }
 
-if ($Force -or $Steps -contains "Publish") {
-    Publish-Package
-    Publish-VsixPackage
-}
+# if ($Force -or $Steps -contains "Publish") {
+#     Publish-Package
+#     Publish-VsixPackage
+# }
 
-if ($Force -or $Steps -contains "Pack") {
-    Create-VsixPackage
-    Create-NugetPackages
-}
+# if ($Force -or $Steps -contains "Pack") {
+#     Create-VsixPackage
+#     Create-NugetPackages
+# }
 
-if ($Force -or $Steps -contains "Manifest") {
-    Generate-Manifest -PackageFolder $TPB_PackageOutDir
-    if (Test-Path $TPB_SourceBuildPackageOutDir)
-    {
-        Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
-    }
-    Copy-PackageIntoStaticDirectory
-}
+# if ($Force -or $Steps -contains "Manifest") {
+#     Generate-Manifest -PackageFolder $TPB_PackageOutDir
+#     if (Test-Path $TPB_SourceBuildPackageOutDir)
+#     {
+#         Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
+#     }
+#     Copy-PackageIntoStaticDirectory
+# }
 
 if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
-    Publish-PatchedDotnet
-    Invoke-TestAssetsBuild
+    # Publish-PatchedDotnet
+    # Invoke-TestAssetsBuild
     Invoke-CompatibilityTestAssetsBuild
     Publish-Tests
 }
