@@ -5,9 +5,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-#pragma warning disable IDE1006 // Naming Styles
 namespace vstest.ProgrammerTests.Fakes;
-#pragma warning restore IDE1006 // Naming Styles
 
 internal class FakeCommunicationEndpoint : ICommunicationEndPoint
 {
