@@ -78,8 +78,6 @@ Write-Verbose "Setup build configuration."
 $TPB_TestAssets = Join-Path $env:TP_ROOT_DIR "test\TestAssets\"
 $TPB_Solution = Join-Path $env:TP_ROOT_DIR "TestPlatform.sln"
 $TPB_TestAssets_Solution = Join-Path $TPB_TestAssets "TestAssets.sln"
-$TPB_CompatibilityTestAssets = Join-Path $env:TP_ROOT_DIR "test\CompatibilityTestAssets\"
-$TPB_CompatibilityTestAssets_Solution = Join-Path $TPB_CompatibilityTestAssets "TestAssets.sln"
 $TPB_TestAssets_CILAssets = Join-Path $TPB_TestAssets "CILProject\CILProject.proj"
 $TPB_TargetFramework462 = "net462"
 $TPB_TargetFramework472 = "net472"
@@ -237,6 +235,10 @@ function Invoke-CompatibilityTestAssetsBuild {
         }
 
         $cacheId[$sdkPropertyName] = $netTestSdkVersion
+
+            # We don't use the results of this build anywhere, we just use them to restore the packages to nuget cache
+            # because using nuget.exe install errors out in various weird ways.
+            Invoke-Exe $dotnetExe -Arguments "build $env:TP_ROOT_DIR\test\TestAssets\Tools\Tools.csproj --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:NETTestSdkVersion=$netTestSdkVersion"
     }
 
     foreach ($propertyName in $msTestVersionProperties) {
@@ -258,7 +260,7 @@ function Invoke-CompatibilityTestAssetsBuild {
     if ($cacheIdText -eq $currentCacheId) {
         if (Test-Path $generatedSln) {
             Write-Log ".. .. Build: Source: $generatedSln, cache is up to date, just building the solution."
-            Invoke-Exe $dotnetExe -Arguments "build $generatedSln"
+            Invoke-Exe $dotnetExe -Arguments "build $generatedSln --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
             return
         }
     }
@@ -324,7 +326,11 @@ function Invoke-CompatibilityTestAssetsBuild {
 
                     # Do not make this a folder structure, it will break the relative reference to scripts\build\TestAssets.props that we have in the project,
                     # because the relative path will be different. 
-                    $compatibilityProjectDir = "$generated/$dirNetTestSdkPropertyName-$dirNetTestSdkVersion--$dirMSTestPropertyName-$dirMSTestVersion--$projectBaseName"
+                    #
+                    # It would be nice to use fully descriptive name but it is too long, hash the versions instead.
+                    # $compatibilityProjectDir = "$generated/$projectBaseName--$dirNetTestSdkPropertyName-$dirNetTestSdkVersion--$dirMSTestPropertyName-$dirMSTestVersion"
+                    $projectShortName = "$projectBaseName--"+([string]::Format("{0:X}", "$projectBaseName--$dirNetTestSdkPropertyName-$dirNetTestSdkVersion--$dirMSTestPropertyName-$dirMSTestVersion".GetHashCode()))
+                    $compatibilityProjectDir = "$generated/$projectShortName"
 
                     if (Test-path $compatibilityProjectDir) { 
                         throw "Path '$compatibilityProjectDir' does not exist"
@@ -355,7 +361,7 @@ function Invoke-CompatibilityTestAssetsBuild {
                         -replace "\$\(NETTestSdkVersion\)", $netTestSdkVersion
                     $csprojContent | Set-Content -Encoding UTF8 -Path $compatibilityCsproj -Force
 
-                    $uniqueCsprojName = Join-Path $compatibilityProjectDir "$([IO.Path]::GetFileNameWithoutExtension($projectName))-$dirNetTestSdkPropertyName-$dirNetTestSdkVersion--$dirMSTestPropertyName-$dirMSTestVersion.csproj"
+                    $uniqueCsprojName = Join-Path $compatibilityProjectDir "$projectShortName.csproj"
                     Rename-Item $compatibilityCsproj $uniqueCsprojName
                     $projectsToAdd += $uniqueCsprojName
 
@@ -366,7 +372,7 @@ function Invoke-CompatibilityTestAssetsBuild {
 
         Write-Log ".. .. .. Building: generatedSln"
         Invoke-Exe $dotnetExe -Arguments "sln $generatedSln add $projectsToAdd"
-        Invoke-Exe $dotnetExe -Arguments "build $generatedSln"
+        Invoke-Exe $dotnetExe -Arguments "build $generatedSln --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
         $cacheIdText | Set-Content "$generated/checksum.json" -NoNewline
         # end
     }

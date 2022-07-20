@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
@@ -216,10 +217,9 @@ public class IntegrationTestEnvironment
         // Update the path to be taken from the compatibility matrix instead of from the root folder.
         if (DllInfos.Count > 0)
         {
-            foreach (var dllInfo in DllInfos)
-            {
-                assetPath = dllInfo.UpdatePath(assetPath);
-            }
+            // The path is really ugly: S:\p\vstest3\test\GeneratedTestAssets\NETTestSdkLegacyStable-15.9.2--MSTestMostDownloaded-2.1.0--MSTestProject2\bin\Debug\net462\MSTestProject2-NETTestSdkLegacyStable-15.9.2--MSTestMostDownloaded-2.1.0.dll
+            var versions = string.Join("--", DllInfos.Select(d => d.Path));
+            assetPath = Path.Combine(TestAssetsPath, "..", "GeneratedTestAssets", $"{simpleAssetName}--{versions}", "bin", BuildConfiguration, targetFramework, $"{simpleAssetName}--{versions}.dll");
         }
 
         Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: \"{0}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", assetPath);
