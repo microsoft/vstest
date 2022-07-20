@@ -19,18 +19,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 /// <summary>
 /// ParallelProxyDiscoveryManager that manages parallel discovery
 /// </summary>
-internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
+internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager, IDisposable
 {
     private readonly IDataSerializer _dataSerializer;
     private readonly DiscoveryDataAggregator _dataAggregator;
     private readonly bool _isParallel;
     private readonly ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler2, DiscoveryCriteria> _parallelOperationManager;
     private readonly Dictionary<string, TestRuntimeProviderInfo> _sourceToTestHostProviderMap;
+    private readonly IRequestData _requestData;
+
     private int _discoveryCompletedClients;
     private int _availableTestSources;
     private int _availableWorkloads;
     private bool _skipDefaultAdapters;
-    private readonly IRequestData _requestData;
+    private bool _isDisposed;
 
     public bool IsAbortRequested { get; private set; }
 
@@ -294,5 +296,14 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
                 TaskContinuationOptions.OnlyOnFaulted);
 
         EqtTrace.Verbose("ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: No sources available for discovery.");
+    }
+
+    public void Dispose()
+    {
+        if (!_isDisposed)
+        {
+            _parallelOperationManager.Dispose();
+            _isDisposed = true;
+        }
     }
 }

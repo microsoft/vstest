@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 /// <summary>
 /// Orchestrates discovery operations for the engine communicating with the test host process.
 /// </summary>
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class DiscoveryManager : IDiscoveryManager
 {
     private readonly TestSessionMessageLogger _sessionMessageLogger;
