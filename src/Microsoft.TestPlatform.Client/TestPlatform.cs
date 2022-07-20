@@ -295,8 +295,11 @@ internal class TestPlatform : ITestPlatform
         string extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()), "Extensions");
         if (!fileHelper.DirectoryExists(extensionsFolder))
         {
-            // NOMERGE: Since we no-longer run from <playground>\vstest.console\vstest.conosle.exe in Playground, the relative extensions folder location changed.
-            // And we need to patch it.
+            // TODO: Since we no-longer run from <playground>\vstest.console\vstest.conosle.exe in Playground, the relative
+            // extensions folder location changed and we need to patch it. This should be a TEMPORARY solution though, we
+            // should come up with a better way of fixing this.
+            // NOTE: This is specific to Playground which references vstest.console from a location that doesn't contain
+            // the Extensions folder. Normal projects shouldn't have this issue.
             extensionsFolder = Path.Combine(Path.GetDirectoryName(extensionsFolder), "vstest.console", "Extensions");
         }
 
