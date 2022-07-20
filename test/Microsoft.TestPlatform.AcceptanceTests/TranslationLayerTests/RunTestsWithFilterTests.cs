@@ -40,7 +40,6 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        // Setup();
 
         _runEventHandler = new RunEventHandler();
 
