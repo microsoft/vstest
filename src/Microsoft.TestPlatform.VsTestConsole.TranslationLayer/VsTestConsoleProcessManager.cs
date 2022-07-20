@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 /// <summary>
 /// Vstest.console process manager
 /// </summary>
-internal class VsTestConsoleProcessManager : IProcessManager
+internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
 {
     /// <summary>
     /// Port number for communicating with Vstest CLI
@@ -56,6 +56,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
     private Process? _process;
     private bool _vstestConsoleStarted;
     private bool _vstestConsoleExited;
+    private bool _isDisposed;
 
     internal IFileHelper FileHelper { get; set; }
 
@@ -260,4 +261,14 @@ internal class VsTestConsoleProcessManager : IProcessManager
 
     private static string GetEscapeSequencedPath(string path)
         => path.IsNullOrEmpty() ? path : $"\"{path.Trim('"')}\"";
+
+    public void Dispose()
+    {
+        if (!_isDisposed)
+        {
+            _processExitedEvent.Dispose();
+            _process?.Dispose();
+            _isDisposed = true;
+        }
+    }
 }
