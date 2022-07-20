@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.TestUtilities;
 
 public class TestableTestPluginCache : TestPluginCache
 {
-    public Action? Action;
+    public Action? Action { get; set; }
 
     public TestableTestPluginCache(List<string> extensionsPath)
     {
