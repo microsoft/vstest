@@ -4,7 +4,10 @@
 using System;
 using System.Globalization;
 using System.Reflection;
+using System.Threading.Tasks;
+using System.Threading;
 
+using Microsoft.VisualStudio.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
@@ -71,8 +74,12 @@ public class DataCollectorMain
         _uiLanguageOverride = uiLanguageOverride;
     }
 
+
+
     public void Run(string[]? args)
     {
+        System.Diagnostics.Debug.Assert(false);
+
         DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS");
         DebuggerBreakpoint.WaitForDebugger("VSTEST_DATACOLLECTOR_DEBUG");
 
