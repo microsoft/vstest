@@ -4,10 +4,7 @@
 using System;
 using System.Globalization;
 using System.Reflection;
-using System.Threading.Tasks;
-using System.Threading;
 
-using Microsoft.VisualStudio.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
@@ -73,8 +70,6 @@ public class DataCollectorMain
         _requestHandler = requestHandler;
         _uiLanguageOverride = uiLanguageOverride;
     }
-
-
 
     public void Run(string[]? args)
     {
