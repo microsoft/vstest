@@ -44,15 +44,15 @@
   <files>
     <file src="Icon.png" target="" />
     <file src="licenses\LICENSE_NET.txt" target="" />
-    <file src="netcoreapp\*" target="build\netcoreapp1.0\" />
-    <file src="netcoreapp\*" target="build\netcoreapp2.1\" />
-    <file src="netfx\*" target="build\net462\" />
+    <file src="netcoreapp\*" target="buildTransitive\netcoreapp1.0\" />
+    <file src="netcoreapp\*" target="buildTransitive\netcoreapp2.1\" />
+    <file src="netfx\*" target="buildTransitive\net462\" />
 
     <file src="Microsoft.NET.Test.Sdk.props" target="buildMultiTargeting\" />
-    <file src="Microsoft.NET.Test.Sdk.props" target="build\netcoreapp1.0\" />
-    <file src="Microsoft.NET.Test.Sdk.props" target="build\netcoreapp2.1\" />
-    <file src="Microsoft.NET.Test.Sdk.props" target="build\net462\" />
-    <file src="Microsoft.NET.Test.Sdk.props" target="build\uap10.0\" />
+    <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\netcoreapp1.0\" />
+    <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\netcoreapp2.1\" />
+    <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\net462\" />
+    <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\uap10.0\" />
 
     <file src="_._" target="lib/netcoreapp1.0" />
     <file src="_._" target="lib/netcoreapp2.1" />
