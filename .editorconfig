@@ -221,6 +221,33 @@ dotnet_diagnostic.CA1824.severity = warning # not default, increased severity to
 # CA1001: Types that own disposable fields should be disposable
 dotnet_diagnostic.CA1001.severity = warning # not default, increased severity to ensure it is applied
 
+# CA1000: Do not declare static members on generic types
+dotnet_diagnostic.CA1000.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1051: Do not declare visible instance fields
+dotnet_diagnostic.CA1051.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1010: Collections should implement generic interface
+dotnet_diagnostic.CA1010.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1047: Do not declare protected members in sealed types
+dotnet_diagnostic.CA1047.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1050: Declare types in namespaces
+dotnet_diagnostic.CA1050.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1061: Do not hide base class methods
+dotnet_diagnostic.CA1061.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1069: Enums should not have duplicate values
+dotnet_diagnostic.CA1069.severity = warning # not default, increased severity to ensure it is applied
+
+# CA1070: Do not declare event fields as virtual
+dotnet_diagnostic.CA1070.severity = warning # not default, increased severity to ensure it is applied
+
+# IDE0064: Make struct fields writable
+dotnet_diagnostic.IDE0064.severity = warning # not default, increased severity to ensure it is applied
+
 # CA1304: Specify CultureInfo
 dotnet_diagnostic.CA1304.severity = warning # not default, increased severity to ensure it is applied
 
