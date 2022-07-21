@@ -819,4 +819,7 @@
   <data name="StopTestSessionTimedOut" xml:space="preserve">
     <value>Waiting for stop test session timed out after {0} seconds.</value>
   </data>
+  <data name="ErrorHostingCommunicationChannel" xml:space="preserve">
+    <value>Error hosting communication channel.</value>
+  </data>
 </root>

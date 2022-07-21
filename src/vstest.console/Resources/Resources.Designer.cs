@@ -1843,5 +1843,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("WarningEmulatedOnArm64", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Error hosting the communication channel. For better performance, please consider using the native runner vstest.console.arm64.exe..
+        /// </summary>
+        internal static string ErrorHostingCommunicationChannel {
+            get {
+                return ResourceManager.GetString("ErrorHostingCommunicationChannel", resourceCulture);
+            }
+        }
     }
 }
