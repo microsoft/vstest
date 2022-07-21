@@ -18,9 +18,6 @@ internal static class DebuggerBreakpoint
 {
     internal static void AttachVisualStudioDebugger(string environmentVariable)
     {
-#if NETCOREAPP1_0
-        return;
-#else
         if (string.IsNullOrWhiteSpace(environmentVariable))
         {
             throw new ArgumentException($"'{nameof(environmentVariable)}' cannot be null or whitespace.", nameof(environmentVariable));
@@ -53,14 +50,10 @@ internal static class DebuggerBreakpoint
 
             Break();
         }
-#endif
     }
 
     private static bool AttachVs(Process process, int? vsPid)
     {
-#if NETCOREAPP1_0
-        return false;
-#else
         // The way we attach VS is not compatible with .NET Core 2.1 and .NET Core 3.1, but works in .NET Framework and .NET.
         // We could call the library code directly here for .NET, and .NET Framework, but then we would also need to package it
         // together with testhost. So instead we always run the executable, and pass path to it using env variable.
@@ -84,15 +77,10 @@ internal static class DebuggerBreakpoint
         attachVsProcess.WaitForExit();
 
         return attachVsProcess.ExitCode == 0;
-#endif
     }
 
     private static string? FindAttachVs()
     {
-#if NETCOREAPP1_0
-        return null;
-#else
-
         var fromPath = FindOnPath("AttachVS.exe");
         if (fromPath != null)
         {
@@ -100,13 +88,9 @@ internal static class DebuggerBreakpoint
         }
 
 
-# if NETCOREAPP
-        var parent = AppContext.BaseDirectory;
-#else
         // Don't use current process MainModule here, it resolves to dotnet if you invoke
         // dotnet vstest.console.dll, or dotnet testhost.dll. Use the entry assembly instead.
-        var parent = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-#endif
+        var parent = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
         while (parent != null)
         {
             var path = Path.Combine(parent, @"src\AttachVS\bin\Debug\net472\AttachVS.exe");
@@ -120,7 +104,6 @@ internal static class DebuggerBreakpoint
         }
 
         return parent;
-#endif
     }
 
     private static string? FindOnPath(string exeName)

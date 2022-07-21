@@ -264,9 +264,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         bool testHostExeFound = false;
         if (!useCustomDotnetHostpath
             && _platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
-            // REVIEW ME: @Marco Do we need to update the logic?
-            // testhost*.exe are build for netcoreapp2.1 and are not able to search for the correct runtime in case of
-            // x64/x86 on arm because the new logic (registry lookup) was added in since netcoreapp3.0.
             // On arm we cannot rely on apphost and we'll use dotnet.exe muxer.
             && !IsWinOnArm())
         {
