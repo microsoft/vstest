@@ -7,9 +7,9 @@
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.PlatformAbstractions</AssemblyName>
     <RootNamespace>Microsoft.TestPlatform.PlatformAbstractions</RootNamespace>
-    <TargetFrameworks>$(TargetNetFxVersion);netcoreapp1.0;netcoreapp2.1;netstandard1.3;netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>$(TargetNetFxVersion);netcoreapp1.0;netcoreapp2.1;netstandard1.3;netstandard2.0;net7.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0;netstandard1.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
     <!-- This causes a build error on netcoreapp1.0 -->
     <NoWarn Condition="'$(TargetFramework)' != 'netcoreapp1.0'">$(NoWarn);NU1605</NoWarn>

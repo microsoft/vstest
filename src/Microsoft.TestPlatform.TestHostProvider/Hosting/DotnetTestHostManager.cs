@@ -296,7 +296,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                     var testHostNugetRoot = new DirectoryInfo(testHostPath).Parent!.Parent!.Parent!;
 
 #if DOTNET_BUILD_FROM_SOURCE
-                    var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "net6.0", folderName, exeName);
+                    var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "net7.0", folderName, exeName);
 #else
                     var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "netcoreapp2.1", folderName, exeName);
 #endif
