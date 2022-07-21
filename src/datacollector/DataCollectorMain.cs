@@ -78,8 +78,6 @@ public class DataCollectorMain
 
     public void Run(string[]? args)
     {
-        System.Diagnostics.Debug.Assert(false);
-
         DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS");
         DebuggerBreakpoint.WaitForDebugger("VSTEST_DATACOLLECTOR_DEBUG");
 
