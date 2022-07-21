@@ -53,6 +53,7 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
+    <ProjectReference Include="..\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="NullableHelpers.cs">

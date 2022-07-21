@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 
 using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
 using Microsoft.VisualStudio.TestPlatform.Client.Execution;
@@ -292,6 +293,16 @@ internal class TestPlatform : ITestPlatform
         }
 
         string extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()), "Extensions");
+        if (!fileHelper.DirectoryExists(extensionsFolder))
+        {
+            // TODO: Since we no-longer run from <playground>\vstest.console\vstest.conosle.exe in Playground, the relative
+            // extensions folder location changed and we need to patch it. This should be a TEMPORARY solution though, we
+            // should come up with a better way of fixing this.
+            // NOTE: This is specific to Playground which references vstest.console from a location that doesn't contain
+            // the Extensions folder. Normal projects shouldn't have this issue.
+            extensionsFolder = Path.Combine(Path.GetDirectoryName(extensionsFolder), "vstest.console", "Extensions");
+        }
+
         if (fileHelper.DirectoryExists(extensionsFolder))
         {
             // Load default runtime providers

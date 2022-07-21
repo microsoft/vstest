@@ -37,7 +37,7 @@ public class TestSession : ITestSession
     /// <param name="eventsHandler">The session event handler.</param>
     /// <param name="consoleWrapper">The encapsulated console wrapper.</param>
     public TestSession(
-        TestSessionInfo testSessionInfo,
+        TestSessionInfo? testSessionInfo,
         ITestSessionEventsHandler eventsHandler,
         IVsTestConsoleWrapper consoleWrapper)
     {

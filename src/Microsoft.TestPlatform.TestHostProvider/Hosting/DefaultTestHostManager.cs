@@ -164,17 +164,20 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         string testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
 
-        var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location)!, "..//");
+        var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
         var argumentsString = " " + connectionInfo.ToCommandLineOptions();
+
+        TPDebug.Assert(currentWorkingDirectory is not null, "Current working directory must not be null.");
 
         // check in current location for testhost exe
         var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
 
+        var originalTestHostProcessName = testHostProcessName;
         if (!File.Exists(testhostProcessPath))
         {
             // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies, in dotnet SDK.
-            testHostProcessName = Path.Combine("TestHost", testHostProcessName);
-            testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+            testHostProcessName = Path.Combine("TestHost", originalTestHostProcessName);
+            testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", testHostProcessName);
         }
 
         if (!Shared)
@@ -187,11 +190,27 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
 
         var launcherPath = testhostProcessPath;
-        if (!_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
-            !_processHelper.GetCurrentProcessFileName()!.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
+        var processName = _processHelper.GetCurrentProcessFileName();
+        if (processName is not null)
         {
-            launcherPath = _dotnetHostHelper.GetMonoPath();
-            argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;
+            if (!_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
+                !processName.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
+            {
+                launcherPath = _dotnetHostHelper.GetMonoPath();
+                argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;
+            }
+            else
+            {
+                // Patching the relative path for IDE scenarios.
+                if (_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
+                    && !(processName.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
+                        || processName.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
+                    && !File.Exists(testhostProcessPath))
+                {
+                    testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", originalTestHostProcessName);
+                    launcherPath = testhostProcessPath;
+                }
+            }
         }
 
         // For IDEs and other scenario, current directory should be the

@@ -83,7 +83,12 @@ public class DesignModeClient : IDesignModeClient
     /// <summary>
     /// Property exposing the Instance
     /// </summary>
-    public static IDesignModeClient? Instance { get; private set; }
+    public static DesignModeClient? Instance { get; private set; }
+
+    /// <summary>
+    /// Gets the test request manager.
+    /// </summary>
+    public ITestRequestManager? TestRequestManager { get; internal set; }
 
     /// <summary>
     /// Initializes DesignMode
@@ -105,7 +110,10 @@ public class DesignModeClient : IDesignModeClient
     /// </param>
     public void ConnectToClientAndProcessRequests(int port, ITestRequestManager testRequestManager)
     {
-        EqtTrace.Info("Trying to connect to server on port: {0}", port);
+        // Used by the in-process vstest.console wrapper.
+        TestRequestManager = testRequestManager;
+
+        EqtTrace.Info("Trying to connect to server on port : {0}", port);
         _communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
 
         var connectionTimeoutInSecs = EnvironmentHelper.GetConnectionTimeout();

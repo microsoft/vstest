@@ -229,7 +229,7 @@ internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
         }
     }
 
-    private string[] BuildArguments(ConsoleParameters parameters)
+    internal string[] BuildArguments(ConsoleParameters parameters)
     {
         var args = new List<string>
         {

@@ -60,9 +60,13 @@ namespace PerfyPassing
             IMessageLogger _3, ITestCaseDiscoverySink discoverySink)
         {
             var location = typeof(Perfy).Assembly.Location;
+            var tps = new List<TestProperty>();
+            Func<object, bool> validator = (object o) => !string.IsNullOrWhiteSpace(o as string);
+
             for (var i = 0; i < Count; i++)
             {
-                discoverySink.SendTestCase(new TestCase($"Test{i}", Uri, location));
+                var tc = new TestCase($"Test{i}", Uri, location);
+                discoverySink.SendTestCase(tc);
             }
         }
     }
