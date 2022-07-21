@@ -3,7 +3,6 @@
 
 using System;
 
-using Microsoft.VisualStudio.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector;
@@ -21,8 +20,6 @@ public class Program
     /// </param>
     public static void Main(string[]? args)
     {
-        System.Diagnostics.Debug.Assert(false);
-        SendTelemetry();
         try
         {
             new DataCollectorMain().Run(args);
@@ -35,32 +32,6 @@ public class Program
         finally
         {
             EqtTrace.Info("Program.Main: exiting datacollector process.");
-        }
-    }
-
-    private static void SendTelemetry()
-    {
-        try
-        {
-            TelemetryService.DefaultSession.IsOptedIn = true;
-            TelemetryService.DefaultSession.UseVsIsOptedIn();
-            TelemetryService.DefaultSession.Start();
-            TelemetryEvent coloringEvent = new("vs/codecoverage/faisal/main");
-            coloringEvent.Properties["vs.codecoverage.faisal.collectorproperty"] = false;
-            TelemetryService.DefaultSession.PostEvent(coloringEvent);
-            //if (networkAsync)
-            //{
-            //    var cts = new CancellationTokenSource(60000);
-            //    await TelemetryService.DefaultSession.DisposeToNetworkAsync(cts.Token).ConfigureAwait(false);
-            //}
-            //else
-            {
-                TelemetryService.DefaultSession.Dispose();
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
         }
     }
 }
