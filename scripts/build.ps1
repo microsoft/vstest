@@ -329,7 +329,7 @@ function Invoke-CompatibilityTestAssetsBuild {
                     #
                     # It would be nice to use fully descriptive name but it is too long, hash the versions instead.
                     # $compatibilityProjectDir = "$generated/$projectBaseName--$dirNetTestSdkPropertyName-$dirNetTestSdkVersion--$dirMSTestPropertyName-$dirMSTestVersion"
-                    $projectShortName = "$projectBaseName--"+([string]::Format("{0:X}", "$projectBaseName--$dirNetTestSdkPropertyName-$dirNetTestSdkVersion--$dirMSTestPropertyName-$dirMSTestVersion".GetHashCode()))
+                    $projectShortName = [string]::Format("{0:X}", "$projectBaseName--$dirNetTestSdkPropertyName-$dirNetTestSdkVersion--$dirMSTestPropertyName-$dirMSTestVersion".GetHashCode())
                     $compatibilityProjectDir = "$generated/$projectShortName"
 
                     if (Test-path $compatibilityProjectDir) { 
