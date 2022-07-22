@@ -587,7 +587,11 @@ public class DotnetTestHostManagerTests
     [TestMethod]
     public async Task LaunchTestHostShouldLaunchProcessWithConnectionInfo()
     {
-        var expectedArgs = "exec \"" + _defaultTestHostPath + "\" --port 123 --endpoint 127.0.0.1:123 --role client --parentprocessid 0";
+        var expectedArgs = "exec \"" + _defaultTestHostPath + "\""
+#if NET
+            + " --roll-forward Major"
+#endif
+            + " --port 123 --endpoint 127.0.0.1:123 --role client --parentprocessid 0";
         _dotnetHostManager.SetCustomLauncher(_mockTestHostLauncher.Object);
         await _dotnetHostManager.LaunchTestHostAsync(_defaultTestProcessStartInfo, CancellationToken.None);
 
