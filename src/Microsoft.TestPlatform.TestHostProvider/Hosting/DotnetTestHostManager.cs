@@ -449,6 +449,13 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
         EqtTrace.Verbose("DotnetTestHostmanager: Full path of host exe is {0}", startInfo.FileName);
 
+        if (_targetFramework.Name.StartsWith(".NETCoreApp,", StringComparison.OrdinalIgnoreCase)
+            && Version.TryParse(_targetFramework.Version, out var version)
+            && version < new Version(3, 0))
+        {
+            args += " --roll-forward Major";
+        }
+
         args += " " + connectionInfo.ToCommandLineOptions();
 
         // Create a additional probing path args with Nuget.Client
