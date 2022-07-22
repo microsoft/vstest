@@ -988,6 +988,11 @@ Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")
         <target state="new">Waiting for stop test session timed out after {0} seconds.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ErrorHostingCommunicationChannel">
+        <source>Error hosting communication channel.</source>
+        <target state="new">Error hosting communication channel.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

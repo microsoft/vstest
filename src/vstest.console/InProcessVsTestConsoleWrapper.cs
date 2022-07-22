@@ -77,7 +77,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         {
             // Close the sender as it failed to host server.
             _requestSender.Close();
-            throw new TransationLayerException("Error hosting communication channel.");
+            throw new TransationLayerException(Resources.Resources.ErrorHostingCommunicationChannel);
         }
 
         // Fill the parameters.
@@ -119,9 +119,9 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         if (TestRequestManager is null)
         {
             TPDebug.Assert(
-                (DesignModeClient?)DesignModeClient.Instance != null,
+                DesignModeClient.Instance != null,
                 "DesignModeClient.Instance is null");
-            TestRequestManager = ((DesignModeClient)DesignModeClient.Instance).TestRequestManager;
+            TestRequestManager = DesignModeClient.Instance.TestRequestManager;
         }
 
         _testPlatformEventSource.TranslationLayerInitializeStop();
@@ -476,7 +476,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
 
             var testRunPayload = new TestRunRequestPayload
             {
-                Sources = sourceList.ToList(),
+                Sources = sourceList,
                 RunSettings = runSettings,
                 TestPlatformOptions = options,
                 TestSessionInfo = testSessionInfo
@@ -637,7 +637,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             {
                 Sources = sourceList,
                 RunSettings = runSettings,
-                DebuggingEnabled = (customLauncher?.IsDebug == true),
+                DebuggingEnabled = customLauncher?.IsDebug == true,
                 TestPlatformOptions = options,
                 TestSessionInfo = testSessionInfo
             };
