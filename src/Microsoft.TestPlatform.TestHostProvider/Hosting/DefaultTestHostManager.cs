@@ -173,7 +173,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
 
         var originalTestHostProcessName = testHostProcessName;
-        if (!File.Exists(testhostProcessPath))
+        if (!_fileHelper.Exists(testhostProcessPath))
         {
             // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies, in dotnet SDK.
             testHostProcessName = Path.Combine("TestHost", originalTestHostProcessName);

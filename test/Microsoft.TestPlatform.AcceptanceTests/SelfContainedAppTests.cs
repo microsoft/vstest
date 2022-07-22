@@ -13,7 +13,7 @@ public class SelfContainedAppTests : AcceptanceTestBase
 {
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false, useNetCore31Target: true)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void RunningApplicationThatIsBuiltAsSelfContainedWillNotFailToFindHostpolicyDll(RunnerInfo runnerInfo)
     {
         // when the application is self-contained which is dictated by the RuntimeIdentifier and OutputType project

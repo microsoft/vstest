@@ -23,7 +23,6 @@ public class NetCoreTargetFrameworkDataSourceAttribute : Attribute, ITestDataSou
 {
     private readonly bool _useDesktopRunner;
     private readonly bool _useCoreRunner;
-    private readonly bool _useNetCore31Target;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSourceAttribute"/> class.
@@ -32,12 +31,10 @@ public class NetCoreTargetFrameworkDataSourceAttribute : Attribute, ITestDataSou
     /// <param name="useCoreRunner">To run tests with core runner(dotnet vstest.console.dll)</param>
     public NetCoreTargetFrameworkDataSourceAttribute(
         bool useDesktopRunner = true,
-        bool useCoreRunner = true,
-        bool useNetCore31Target = true)
+        bool useCoreRunner = true)
     {
         _useDesktopRunner = useDesktopRunner;
         _useCoreRunner = useCoreRunner;
-        _useNetCore31Target = useNetCore31Target;
     }
 
     public bool DebugVSTestConsole { get; set; }
@@ -71,20 +68,14 @@ public class NetCoreTargetFrameworkDataSourceAttribute : Attribute, ITestDataSou
         {
             var runnerFramework = IntegrationTestBase.DesktopRunnerFramework;
 
-            if (_useNetCore31Target)
-            {
-                AddRunnerDataRow(dataRows, runnerFramework, AcceptanceTestBase.Core31TargetFramework);
-            }
+            AddRunnerDataRow(dataRows, runnerFramework, AcceptanceTestBase.Core31TargetFramework);
         }
 
         if (_useCoreRunner)
         {
             var runnerFramework = IntegrationTestBase.CoreRunnerFramework;
 
-            if (_useNetCore31Target)
-            {
-                AddRunnerDataRow(dataRows, runnerFramework, AcceptanceTestBase.Core31TargetFramework);
-            }
+            AddRunnerDataRow(dataRows, runnerFramework, AcceptanceTestBase.Core31TargetFramework);
         }
 
         return dataRows;
