@@ -88,5 +88,6 @@
     <MicrosoftVisualStudioTelemetryVersion>16.4.78</MicrosoftVisualStudioTelemetryVersion>
     <MicrosoftVisualStudioRemoteControlVersion>16.3.44</MicrosoftVisualStudioRemoteControlVersion>
     <MicrosoftVisualStudioUtilitiesInternalVersion>16.3.36</MicrosoftVisualStudioUtilitiesInternalVersion>
+    <MicrosoftWin32Registry>6.0.0-preview.5.21301.5</MicrosoftWin32Registry>
   </PropertyGroup>
 </Project>

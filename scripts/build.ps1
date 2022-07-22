@@ -997,6 +997,7 @@ function Copy-CodeCoverage-Package-Artifacts {
     $visualStudioTelemetryVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftVisualStudioTelemetryVersion
     $visualStudioRemoteControlVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftVisualStudioRemoteControlVersion
     $visualStudioUtilitiesInternalVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftVisualStudioUtilitiesInternalVersion
+    $win32RegistryVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftWin32Registry
     $traceDataCollectorPackagesNetFxDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TraceDataCollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework472"
     $internalCodeCoveragePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\"
     $codeCoverageCorePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.codecoverage.core\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
@@ -1009,6 +1010,7 @@ function Copy-CodeCoverage-Package-Artifacts {
     $visualStudioTelemetryDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Telemetry\$visualStudioTelemetryVersion\lib\$TPB_TargetFrameworkNS20"
     $visualStudioRemoteControl = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.RemoteControl\$visualStudioRemoteControlVersion\lib\$TPB_TargetFrameworkNS20"
     $visualStudioUtilitiesDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Utilities.Internal\$visualStudioUtilitiesInternalVersion\lib\$TPB_TargetFrameworkNS20"
+    $win32RegistryDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Utilities.Internal\$win32RegistryVersion\lib\$TPB_TargetFrameworkNS20"
 
     $microsoftCodeCoveragePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.CodeCoverage\")
     $microsoftCodeCoverageExtensionsPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.CodeCoverage.Extensions\")
@@ -1027,6 +1029,7 @@ function Copy-CodeCoverage-Package-Artifacts {
     Copy-Item $visualStudioTelemetryDirectory\Microsoft.VisualStudio.Telemetry.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $visualStudioRemoteControl\Microsoft.VisualStudio.RemoteControl.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $visualStudioUtilitiesDirectory\Microsoft.VisualStudio.Utilities.Internal.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $win32RegistryDirectory\Microsoft.Win32.Registry.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $internalCodeCoveragePackagesDir\CodeCoverage $microsoftCodeCoveragePackageDir -Force -Recurse
     Copy-Item $internalCodeCoveragePackagesDir\InstrumentationEngine $microsoftCodeCoveragePackageDir -Force -Recurse
     Copy-Item $internalCodeCoveragePackagesDir\Shim $microsoftCodeCoveragePackageDir -Force -Recurse
