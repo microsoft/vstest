@@ -993,6 +993,7 @@ function Create-NugetPackages {
 function Copy-CodeCoverage-Package-Artifacts {
     # Copy TraceDataCollector to Microsoft.CodeCoverage folder.
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftInternalCodeCoverageVersion
+    $traceDataCollectorPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.tracedatacollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
     $visualStudioTelemetryVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftVisualStudioTelemetryVersion
     $visualStudioRemoteControlVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftVisualStudioRemoteControlVersion
     $visualStudioUtilitiesInternalVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftVisualStudioUtilitiesInternalVersion
