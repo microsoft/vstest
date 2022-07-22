@@ -220,7 +220,7 @@ public class IntegrationTestEnvironment
             // The path is really ugly: S:\p\vstest3\test\GeneratedTestAssets\NETTestSdkLegacyStable-15.9.2--MSTestMostDownloaded-2.1.0--MSTestProject2\bin\Debug\net462\MSTestProject2-NETTestSdkLegacyStable-15.9.2--MSTestMostDownloaded-2.1.0.dll
             // And we need to hash the versions in it to get shorter path as well.
             var versions = string.Join("--", DllInfos.Select(d => d.Path));
-            var versionsHash = $"{versions.GetHashCode():X}";
+            var versionsHash = Hash(versions);
             assetPath = Path.Combine(TestAssetsPath, "..", "GeneratedTestAssets", $"{simpleAssetName}--{versionsHash}", "bin", BuildConfiguration, targetFramework, $"{simpleAssetName}--{versionsHash}.dll");
         }
 
@@ -229,6 +229,20 @@ public class IntegrationTestEnvironment
         // If you are thinking about wrapping the path in double quotes here,
         // then don't. File.Exist cannot handle quoted paths, and we use it in a lot of places.
         return assetPath;
+
+        static string Hash(string value)
+        {
+            unchecked
+            {
+                long hash = 23;
+                foreach (char ch in value)
+                {
+                    hash = hash * 31 + ch;
+                }
+
+                return $"{hash:X}";
+            }
+        }
     }
 
     /// <summary>
