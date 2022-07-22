@@ -254,6 +254,8 @@
     <file src="Microsoft.CodeCoverage\Microsoft.CodeCoverage.Core.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.CodeCoverage.Core.dll" />
     <file src="Microsoft.CodeCoverage\Microsoft.CodeCoverage.Telemetry.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.CodeCoverage.Telemetry.dll" />
     <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.Telemetry.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.Telemetry.dll" />
+    <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.Utilities.Internal.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.Utilities.Internal.dll" />
+    <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.RemoteControl.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.RemoteControl.dll" />
 
     <file src="net462\$Runtime$\Microsoft.CodeCoverage.IO.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.CodeCoverage.IO.dll" />
     <file src="net462\$Runtime$\cs\Microsoft.CodeCoverage.IO.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\cs\Microsoft.CodeCoverage.IO.dll" />
