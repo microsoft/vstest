@@ -121,7 +121,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             TPDebug.Assert(
                 DesignModeClient.Instance != null,
                 "DesignModeClient.Instance is null");
-            TestRequestManager = ((DesignModeClient)DesignModeClient.Instance).TestRequestManager;
+            TestRequestManager = DesignModeClient.Instance.TestRequestManager;
         }
 
         _testPlatformEventSource.TranslationLayerInitializeStop();
