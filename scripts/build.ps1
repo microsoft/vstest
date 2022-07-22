@@ -182,7 +182,7 @@ function Invoke-CompatibilityTestAssetsBuild {
     $generated = Join-Path (Split-Path -Path $TPB_TestAssets) -ChildPath "GeneratedTestAssets"
     $generatedSln = Join-Path $generated "CompatibilityTestAssets.sln"
 
-    # Figure out if the versions or the projects to build changed, and if they did not just
+    # Figure out if the versions or the projects to build changed, and if they did not
     # and the solution is already in place just build it.
     # Otherwise delete everything and regenerate and re-build.
     $dependenciesPath = "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props"
