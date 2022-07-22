@@ -31,31 +31,6 @@ internal class TestHostTraceListener : DefaultTraceListener
         }
 
         EqtTrace.Verbose("TestPlatformTraceListener.Setup: Added test platform trace listener.");
-
-        // REVIEW ME: Shall we remove this fix?
-        // this is a netcoreapp2.1 only fix, but because we always compile against netcoreapp2.1
-        // and upgrade the executable as necessary this needs to be a runtime check and not a compile time
-        // check. This call returns ".NET Core 4.6.xxx" on netcore 2.1 and older, and ".NET Core 3.1.xxx"
-        // or the respective version on the newer runtimes
-        if (System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core 4.6"))
-        {
-            try
-            {
-                // workaround for netcoreapp2.1 where the trace listener api is not called when
-                // TPDebug.Assert fails. This method is internal, but the class is on purpose keeping the
-                // callback settable so tests can set the callback
-                var field = typeof(Debug).GetField("s_ShowDialog", BindingFlags.Static | BindingFlags.NonPublic);
-                if (field != null)
-                {
-                    var value = field.GetValue(null);
-                    field.SetValue(null, (Action<string, string, string, string>)ShowDialog);
-                }
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Error("TestPlatformTraceListener.Setup: Failed to replace inner callback to ShowDialog in TPDebug.Assert. Calls to TPDebug.Assert with crash the test host process. {0}", ex);
-            }
-        }
     }
 
     public override void Fail(string message)
@@ -66,16 +41,6 @@ internal class TestHostTraceListener : DefaultTraceListener
     public override void Fail(string message, string detailMessage)
     {
         throw GetException((message + Environment.NewLine + detailMessage));
-    }
-
-    public static void ShowDialog(string stackTrace, string message, string detailMessage, string _)
-    {
-        var text = !string.IsNullOrEmpty(message)
-            ? !string.IsNullOrEmpty(detailMessage)
-                ? (message + Environment.NewLine + detailMessage)
-                : message
-            : null;
-        throw GetException(text);
     }
 
     private static DebugAssertException GetException(string? message)
