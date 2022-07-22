@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
@@ -216,10 +217,11 @@ public class IntegrationTestEnvironment
         // Update the path to be taken from the compatibility matrix instead of from the root folder.
         if (DllInfos.Count > 0)
         {
-            foreach (var dllInfo in DllInfos)
-            {
-                assetPath = dllInfo.UpdatePath(assetPath);
-            }
+            // The path is really ugly: S:\p\vstest3\test\GeneratedTestAssets\NETTestSdkLegacyStable-15.9.2--MSTestMostDownloaded-2.1.0--MSTestProject2\bin\Debug\net462\MSTestProject2-NETTestSdkLegacyStable-15.9.2--MSTestMostDownloaded-2.1.0.dll
+            // And we need to hash the versions in it to get shorter path as well.
+            var versions = string.Join("--", DllInfos.Select(d => d.Path));
+            var versionsHash = Hash(versions);
+            assetPath = Path.Combine(TestAssetsPath, "..", "GeneratedTestAssets", $"{simpleAssetName}--{versionsHash}", "bin", BuildConfiguration, targetFramework, $"{simpleAssetName}--{versionsHash}.dll");
         }
 
         Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: \"{0}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", assetPath);
@@ -227,6 +229,20 @@ public class IntegrationTestEnvironment
         // If you are thinking about wrapping the path in double quotes here,
         // then don't. File.Exist cannot handle quoted paths, and we use it in a lot of places.
         return assetPath;
+
+        static string Hash(string value)
+        {
+            unchecked
+            {
+                long hash = 23;
+                foreach (char ch in value)
+                {
+                    hash = hash * 31 + ch;
+                }
+
+                return $"{hash:X}";
+            }
+        }
     }
 
     /// <summary>

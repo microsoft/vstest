@@ -113,6 +113,8 @@ ehthumbs.db
 *.zip
 /src/package/sign/sign.nuget.targets
 
+test/GeneratedTestAssets/
+
 # ===========================
 # Localized resx files
 # ===========================

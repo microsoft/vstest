@@ -388,3 +388,32 @@ function Start-InlineProcess {
         $process.Dispose()
     }
 }
+
+Add-Type -TypeDefinition @"
+    public static class Hash { 
+        public static string GetHash(string value)
+        {
+            unchecked
+            {
+                ulong hash = 23;
+                foreach (char ch in value)
+                {
+                    hash = hash * 31;
+                        hash += ch;
+                }
+
+                return string.Format("{0:X}", hash);
+            }
+        }
+    }
+"@
+
+function Get-Hash {
+    param (
+        [Parameter(Mandatory)]
+        [string]$Value
+    )
+
+    # PowerShell does not have unchecked keyword, so we can't do unchecked math easily. 
+    [Hash]::GetHash($Value)
+}
