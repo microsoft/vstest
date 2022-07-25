@@ -259,7 +259,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
         // Try find testhost.exe (or the architecture specific version). We ship those ngened executables for Windows
         // because they have faster startup time. We ship them only for some platforms.
-        // When user specified path to dotnet.exe don't try to find the exexutable, because we will always use the
+        // When user specified path to dotnet.exe don't try to find the executable, because we will always use the
         // testhost.dll together with their dotnet.exe.
         bool testHostExeFound = false;
         if (!useCustomDotnetHostpath
@@ -449,6 +449,8 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
         EqtTrace.Verbose("DotnetTestHostmanager: Full path of host exe is {0}", startInfo.FileName);
 
+        // Attempt to upgrade netcoreapp2.1 and earlier versions of testhost to netcoreapp3.1 or a newer runtime,
+        // assuming that the user does not have that old runtime installed.
         if (_targetFramework.Name.StartsWith(".NETCoreApp,", StringComparison.OrdinalIgnoreCase)
             && Version.TryParse(_targetFramework.Version, out var version)
             && version < new Version(3, 0))

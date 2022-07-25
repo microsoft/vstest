@@ -23,7 +23,6 @@ public class TraitCollection : IEnumerable<Trait>
         // TODO: Fix this with proper resourcing for UWP and Win 8.1 Apps
         // Trying to access resources will throw "MissingManifestResourceException" percolated as "TypeInitialization" exception
         "Traits",
-
 #else
         Resources.Resources.TestCasePropertyTraitsLabel,
 #endif
