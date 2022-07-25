@@ -105,11 +105,13 @@ function Install-DotNetCli
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
 
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '2.1' -Architecture x64 -NoPath -Version '2.1.30'
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '3.1' -Architecture x64 -NoPath -Version '3.1.24'
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '5.0' -Architecture x64 -NoPath -Version '5.0.16'
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '6.0' -Architecture x64 -NoPath -Version '6.0.4'
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Channel '7.0' -Architecture x64 -NoPath -Version $env:DOTNET_CLI_VERSION
 
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '2.1' -Architecture x86 -NoPath -Version '2.1.30'
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '3.1' -Architecture x86 -NoPath -Version '3.1.24'
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '5.0' -Architecture x86 -NoPath -Version '5.0.16'
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '6.0' -Architecture x86 -NoPath -Version '6.0.4'
@@ -388,7 +390,7 @@ function Start-InlineProcess {
 }
 
 Add-Type -TypeDefinition @"
-    public static class Hash {
+    public static class Hash { 
         public static string GetHash(string value)
         {
             unchecked
@@ -412,6 +414,6 @@ function Get-Hash {
         [string]$Value
     )
 
-    # PowerShell does not have unchecked keyword, so we can't do unchecked math easily.
+    # PowerShell does not have unchecked keyword, so we can't do unchecked math easily. 
     [Hash]::GetHash($Value)
 }
