@@ -41,6 +41,7 @@
     <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.RemoteControl.dll" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.Utilities.Internal.dll" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\Microsoft.Win32.Registry.dll" target="build\netstandard1.0\" />
+    <file src="Microsoft.CodeCoverage\System.Runtime.CompilerServices.Unsafe.dll" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\Mono.Cecil.dll" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\Mono.Cecil.Pdb.dll" target="build\netstandard1.0\" />
 
