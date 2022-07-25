@@ -65,7 +65,7 @@ public class AcceptanceTestBase : IntegrationTestBase
     {
         testEnvironment.VSTestConsoleInfo = runnerInfo.VSTestConsoleInfo;
         // The order here matters, it changes how the resulting path is built when we resolve test dlls and other assets.
-        testEnvironment.DllInfos = new[] { runnerInfo.AdapterInfo, runnerInfo.TestHostInfo }.Where(d => d != null).Select(x => x!).ToList();
+        testEnvironment.DllInfos = new[] { runnerInfo.TestHostInfo, runnerInfo.AdapterInfo }.Where(d => d != null).Select(x => x!).ToList();
         testEnvironment.DebugInfo = runnerInfo.DebugInfo;
 
         testEnvironment.RunnerFramework = runnerInfo.RunnerFramework!;

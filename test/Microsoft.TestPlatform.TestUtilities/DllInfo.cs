@@ -19,15 +19,4 @@ public class DllInfo
     public string? Path { get; set; }
 
     public override string ToString() => $" {Name} = {Version} [{VersionType}]";
-
-    public string UpdatePath(string path)
-    {
-        // Version is not directly used, below, but if it is not populated the path will be incorrect.
-        // We don't want to throw when creating SourcePathInfo because that is happening too early, and has worse error reporting.
-        if (Version == null)
-            throw new InvalidOperationException($"Version was not correctly populated from TestPlatform.Dependencies.props, review that there is entry for {PropertyName}{VersionType}Version.");
-
-        // TODO: replacing in the result string is lame, but I am not going to fight 20 GetAssetFullPath method overloads right now
-        return path.Replace($"{System.IO.Path.DirectorySeparatorChar}bin{System.IO.Path.DirectorySeparatorChar}", Path);
-    }
 }

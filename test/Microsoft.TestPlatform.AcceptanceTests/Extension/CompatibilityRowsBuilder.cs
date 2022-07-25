@@ -287,13 +287,6 @@ public class CompatibilityRowsBuilder
         RunnerInfo runnerInfo = GetRunnerInfo(batch, runnerFramework, hostFramework, inIsolation);
         runnerInfo.DebugInfo = GetDebugInfo();
         runnerInfo.VSTestConsoleInfo = GetVSTestConsoleInfo(runnerVersion, runnerInfo);
-
-        // The order in which we add them matters. We end up both modifying the same path
-        // and adding to it. So the first one added will be later in the path. E.g.:
-        // Adding testSdk first:
-        // C:\p\vstest\test\TestAssets\MSTestProject1\bin\MSTestLatestPreview-2.2.9-preview-20220210-07\NETTestSdkLatest-17.2.0-dev\Debug\net462\MSTestProject1.dll
-        // versus adding testSdk second:
-        // C:\p\vstest\test\TestAssets\MSTestProject1\bin\NETTestSdkLatest-17.2.0-dev\MSTestLatestPreview-2.2.9-preview-20220210-07\Debug\net462\MSTestProject1.dll
         runnerInfo.TestHostInfo = GetNetTestSdkInfo(hostVersion);
         runnerInfo.AdapterInfo = GetMSTestInfo(adapterVersion);
         dataRows.Add(runnerInfo);
@@ -329,8 +322,7 @@ public class CompatibilityRowsBuilder
         // This way it throws in the body of the test which has better error reporting than throwing in the data source.
         XmlNode? node = depsXml.DocumentElement?.SelectSingleNode($"PropertyGroup/MSTestFramework{msTestVersion}Version");
         var version = node?.InnerText.Replace("[", "").Replace("]", "");
-        var slash = Path.DirectorySeparatorChar;
-        var versionSpecificBinPath = $"{slash}bin{slash}MSTest{msTestVersion}-{version}{slash}";
+        var versionSpecificPath = $"MSTest{msTestVersion}-{version}";
 
         return new DllInfo
         {
@@ -338,7 +330,7 @@ public class CompatibilityRowsBuilder
             PropertyName = "MSTest",
             VersionType = msTestVersion,
             Version = version,
-            Path = versionSpecificBinPath,
+            Path = versionSpecificPath,
         };
     }
 
@@ -391,7 +383,6 @@ public class CompatibilityRowsBuilder
 
         // When version is Latest, we built it locally, but it gets restored into our nuget cache on build
         // same as other versions, we just need to grab the version from a different property.
-
         var propertyName = testhostVersionType == AcceptanceTestBase.LATEST
             ? "NETTestSdkVersion"
             : $"VSTestConsole{testhostVersionType}Version";
@@ -402,14 +393,13 @@ public class CompatibilityRowsBuilder
         // We use the VSTestConsole properties to figure out testhost version, for now.
         XmlNode? node = depsXml.DocumentElement?.SelectSingleNode($"PropertyGroup/{propertyName}");
         var version = node?.InnerText.Replace("[", "").Replace("]", "");
-        var slash = Path.DirectorySeparatorChar;
-        var versionSpecificBinPath = $"{slash}bin{slash}NETTestSdk{testhostVersionType}-{version}{slash}";
+        var versionSpecificPath = $"NETTestSdk{testhostVersionType}-{version}";
 
         return new NetTestSdkInfo
         {
             VersionType = testhostVersionType,
             Version = version,
-            Path = versionSpecificBinPath
+            Path = versionSpecificPath
         };
     }
 
