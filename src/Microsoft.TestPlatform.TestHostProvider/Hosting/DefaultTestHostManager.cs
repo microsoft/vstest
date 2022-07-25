@@ -173,10 +173,13 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
 
         var originalTestHostProcessName = testHostProcessName;
+
         if (!_fileHelper.Exists(testhostProcessPath))
         {
-            // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies, in dotnet SDK.
-            testHostProcessName = Path.Combine("TestHost", originalTestHostProcessName);
+            // We assume that we could not find testhost.exe in the root folder so we are going to lookup in the
+            // TestHostNetFramework folder (assuming we are currently running under netcoreapp3.1) or in dotnet SDK
+            // context.
+            testHostProcessName = Path.Combine("TestHostNetFramework", originalTestHostProcessName);
             testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", testHostProcessName);
         }
 
@@ -187,7 +190,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             argumentsString += " --testsourcepath " + sources.FirstOrDefault()?.AddDoubleQuote();
         }
 
-        EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
+        EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Trying to use {0} from {1}", originalTestHostProcessName, testhostProcessPath);
 
         var launcherPath = testhostProcessPath;
         var processName = _processHelper.GetCurrentProcessFileName();
@@ -208,6 +211,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
                     && !File.Exists(testhostProcessPath))
                 {
                     testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", originalTestHostProcessName);
+                    EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Could not find {0} in previous location, now using {1}", originalTestHostProcessName, testhostProcessPath);
                     launcherPath = testhostProcessPath;
                 }
             }

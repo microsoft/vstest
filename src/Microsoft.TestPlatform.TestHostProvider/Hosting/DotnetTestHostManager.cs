@@ -322,9 +322,9 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
             if (testHostPath.IsNullOrEmpty())
             {
-                // We still did not find testhost.dll. Try finding it next to vstest.console, (or in next to vstest.console ./TestHost for .NET Framework)
+                // We still did not find testhost.dll. Try finding it next to vstest.console, (or in next to vstest.console ./TestHostNet for .NET Framework)
 #if NETFRAMEWORK
-                var testHostNextToRunner = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!, "TestHost", "testhost.dll");
+                var testHostNextToRunner = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!, "TestHostNet", "testhost.dll");
 #else
                 var testHostNextToRunner = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!, "testhost.dll");
 #endif

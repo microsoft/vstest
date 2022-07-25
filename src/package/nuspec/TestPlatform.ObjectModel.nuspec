@@ -125,8 +125,8 @@
       <file src="netcoreapp3.1\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\netcoreapp3.1\" />
 
       <!-- Add localized resources -->
-      <file src="netcoreapp3.1\**\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"   exclude="**\TestHost\**\*.*" target="lib\netcoreapp3.1\" />
-      <file src="netcoreapp3.1\**\Microsoft.TestPlatform.CoreUtilities.resources.dll"               exclude="**\TestHost\**\*.*" target="lib\netcoreapp3.1\" />
+      <file src="netcoreapp3.1\**\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"   exclude="**\TestHost*\**\*.*" target="lib\netcoreapp3.1\" />
+      <file src="netcoreapp3.1\**\Microsoft.TestPlatform.CoreUtilities.resources.dll"               exclude="**\TestHost*\**\*.*" target="lib\netcoreapp3.1\" />
     <!-- /netcoreapp3.1 -->
 
     <!-- netstandard 1.0 -->

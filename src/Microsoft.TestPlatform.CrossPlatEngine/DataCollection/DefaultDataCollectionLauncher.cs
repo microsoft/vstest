@@ -60,10 +60,12 @@ internal class DefaultDataCollectionLauncher : DataCollectionLauncher
         TPDebug.Assert(currentProcessPath is not null, "currentProcessPath is not null");
 
         // If current process is dotnet/dotnet.exe and you are here, datacollector.exe/datacollector.arm64.exe is present in TestHost folder.
-        string dataCollectorProcessName = _processHelper.GetCurrentProcessArchitecture() == PlatformArchitecture.ARM64 ? DataCollectorProcessNameArm64 : DataCollectorProcessName;
+        string dataCollectorProcessName = _processHelper.GetCurrentProcessArchitecture() == PlatformArchitecture.ARM64
+            ? DataCollectorProcessNameArm64
+            : DataCollectorProcessName;
         string dataCollectorProcessPath = currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                                           || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)
-            ? Path.Combine(dataCollectorDirectory, "TestHost", dataCollectorProcessName)
+            ? Path.Combine(dataCollectorDirectory, "TestHostNetFramework", dataCollectorProcessName)
             : Path.Combine(dataCollectorDirectory, dataCollectorProcessName);
 
         var argumentsString = string.Join(" ", commandLineArguments);

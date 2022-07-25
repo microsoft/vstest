@@ -87,7 +87,7 @@ public class DefaultTestHostManagerTests
         _mockFileHelper.Setup(x => x.Exists(It.IsAny<string>())).Returns(false);
         var startInfo = _testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default);
 
-        Assert.IsTrue(startInfo.FileName!.EndsWith(Path.Combine("TestHost", "testhost.exe")));
+        Assert.IsTrue(startInfo.FileName!.EndsWith(Path.Combine("TestHostNetFramework", "testhost.exe")));
     }
 
     [TestMethod]
@@ -189,7 +189,7 @@ public class DefaultTestHostManagerTests
             default);
 
         Assert.AreEqual("/usr/bin/mono", info.FileName);
-        StringAssert.Contains(info.Arguments, "TestHost" + Path.DirectorySeparatorChar + "testhost.exe\"");
+        StringAssert.Contains(info.Arguments, Path.Combine("TestHostNetFramework", "testhost.exe"));
     }
 
     [TestMethod]
@@ -205,8 +205,9 @@ public class DefaultTestHostManagerTests
             null,
             default);
 
-        StringAssert.Contains(info.FileName, "TestHost" + Path.DirectorySeparatorChar + "testhost.exe");
-        Assert.IsFalse(info.Arguments!.Contains("TestHost" + Path.DirectorySeparatorChar + "testhost.exe"));
+        var testHostPath = Path.Combine("TestHostNetFramework", "testhost.exe");
+        StringAssert.EndsWith(info.FileName, testHostPath);
+        Assert.IsFalse(info.Arguments!.Contains(testHostPath));
     }
 
     [TestMethod]

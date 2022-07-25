@@ -266,7 +266,7 @@ function Invoke-CompatibilityTestAssetsBuild {
     }
 
     if ($rebuild) {
-        if (Test-Path $generated) { 
+        if (Test-Path $generated) {
             Remove-Item $generated -Recurse -Force
         }
 
@@ -279,7 +279,7 @@ function Invoke-CompatibilityTestAssetsBuild {
 
         Invoke-Exe $dotnetExe -Arguments "new sln --name CompatibilityTestAssets --output ""$generated"""
 
-        Write-Log ".. .. Build: Source: $generatedSln" 
+        Write-Log ".. .. Build: Source: $generatedSln"
         try {
             $projectsToAdd = @()
             $nugetConfigSource = Join-Path $TPB_TestAssets "NuGet.config"
@@ -326,7 +326,7 @@ function Invoke-CompatibilityTestAssetsBuild {
                         $dirMSTestPropertyName = $propertyName -replace "Framework" -replace "Version"
 
                         # Do not make this a folder structure, it will break the relative reference to scripts\build\TestAssets.props that we have in the project,
-                        # because the relative path will be different. 
+                        # because the relative path will be different.
                         #
                         # It would be nice to use fully descriptive name but it is too long, hash the versions instead.
                         # $compatibilityProjectDir = "$generated/$projectBaseName--$dirNetTestSdkPropertyName-$dirNetTestSdkVersion--$dirMSTestPropertyName-$dirMSTestVersion"
@@ -336,7 +336,7 @@ function Invoke-CompatibilityTestAssetsBuild {
                         $projectShortName = "$projectBaseName--" + $hash
                         $compatibilityProjectDir = "$generated/$projectShortName"
 
-                        if (Test-path $compatibilityProjectDir) { 
+                        if (Test-path $compatibilityProjectDir) {
                             throw "Path '$compatibilityProjectDir' does not exist"
                         }
                         New-Item -ItemType Directory -Path $compatibilityProjectDir | Out-Null
@@ -426,7 +426,7 @@ function Publish-Package {
     $netstandard13PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS13");
     $netstandard20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS20");
     $coreCLR31PackageDir = Get-CoreCLR31PackageDirectory
-    $coreCLR31TestHostPackageDir = Get-CoreCLR31TestHostPackageDirectory
+    $coreClrNetFrameworkTestHostDir = Join-Path $coreCLR31PackageDir "TestHostNetFramework"
     $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package\package.csproj"
     $testHostProject = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
     $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
@@ -515,14 +515,12 @@ function Publish-Package {
     Copy-Item $testhostCore31PackageTempARM64Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore31PackageARM64Dir -Force
 
     # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
-    $coreCLRFull_Dir = "TestHost"
-    $fullDestDir = Join-Path $coreCLR31PackageDir $coreCLRFull_Dir
-    New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
-    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -Recurse
+    New-Item -ItemType directory -Path $coreClrNetFrameworkTestHostDir -Force | Out-Null
+    Copy-Item $testhostFullPackageDir\* $coreClrNetFrameworkTestHostDir -Force -Recurse
 
     # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
-    Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_ARM64_Runtime false $fullDestDir
-    Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_X64_Runtime false $fullDestDir
+    Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_ARM64_Runtime false $coreClrNetFrameworkTestHostDir
+    Publish-PackageWithRuntimeInternal $dataCollectorProject $TPB_TargetFramework472 $TPB_X64_Runtime false $coreClrNetFrameworkTestHostDir
 
     New-Item -ItemType directory -Path $net462PackageDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $net462PackageDir -Force -Recurse
@@ -604,7 +602,7 @@ function Publish-Package {
     Copy-Item -Recurse $comComponentsDirectory\* $testhostCore31PackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostFullPackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostUapPackageDir -Force
-    Copy-Item -Recurse $comComponentsDirectory\* $coreCLR31TestHostPackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $coreClrNetFrameworkTestHostDir -Force
 
     # Copy over the logger assemblies to the Extensions folder.
     $extensions_Dir = "Extensions"
@@ -735,13 +733,13 @@ function Publish-Package {
     Copy-Item $newtonsoft $coreCLR31PackageDir -Force
 
     # Copy .NET Standard CPP Test adapter
-    New-Item "$net462PackageDir\TestHost" -ItemType Directory -Force | Out-Null
-    $fullCLRTestHostDir = "$net462PackageDir\TestHost"
+    $fullClrNetTestHostDir = "$net462PackageDir\TestHostNet"
+    New-Item $fullClrNetTestHostDir -ItemType Directory -Force | Out-Null
 
     $testPlatformRemoteExternalsVersion = ([xml](Get-Content "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props")).Project.PropertyGroup.TestPlatformRemoteExternalsVersion
     $testPlatformRemoteExternalsSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Remote\$testPlatformRemoteExternalsVersion\tools\netstandard\Extensions\*"
     Copy-Item $testPlatformRemoteExternalsSourceDirectory $coreCLR31PackageDir -Force -Recurse
-    Copy-Item $testPlatformRemoteExternalsSourceDirectory $fullCLRTestHostDir -Force -Recurse
+    Copy-Item $testPlatformRemoteExternalsSourceDirectory $fullClrNetTestHostDir -Force -Recurse
 
     # Copy standalone testhost
     $standaloneTesthost = Join-Path $env:TP_ROOT_DIR "temp\testhost\*"
@@ -751,8 +749,8 @@ function Publish-Package {
 
     Get-Item "$testhostCore31PackageDir\*" |
     Where-Object { $_.Name -notin ("x64", "x86", "win7-x64", "win7-x86", "testhost.deps.json", "testhost.runtimeconfig.json") } |
-    Copy-Item -Recurse -Destination $fullCLRTestHostDir -Force
-    Copy-Item $standaloneTesthost $fullCLRTestHostDir -Force
+    Copy-Item -Recurse -Destination $fullClrNetTestHostDir -Force
+    Copy-Item $standaloneTesthost $fullClrNetTestHostDir -Force
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     Copy-PackageItems "Microsoft.TestPlatform.Build"
@@ -1177,10 +1175,6 @@ function Get-FullCLR462PackageDirectory {
 
 function Get-CoreCLR31PackageDirectory {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore31")
-}
-
-function Get-CoreCLR31TestHostPackageDirectory {
-    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore31\TestHost")
 }
 
 function Locate-MSBuildPath {
