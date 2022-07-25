@@ -1196,7 +1196,7 @@
       </trans-unit>
       <trans-unit id="ErrorHostingCommunicationChannel">
         <source>Error hosting communication channel.</source>
-        <target state="new">Error hosting communication channel.</target>
+        <target state="translated">通信チャネルをホスト中にエラーが発生しました。</target>
         <note></note>
       </trans-unit>
     </body>

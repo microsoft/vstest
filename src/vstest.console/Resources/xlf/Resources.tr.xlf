@@ -1196,7 +1196,7 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       </trans-unit>
       <trans-unit id="ErrorHostingCommunicationChannel">
         <source>Error hosting communication channel.</source>
-        <target state="new">Error hosting communication channel.</target>
+        <target state="translated">İletişim kanalını barındırma hatası.</target>
         <note></note>
       </trans-unit>
     </body>
