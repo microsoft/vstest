@@ -51,12 +51,12 @@ Example: 'System.Reflection.MethodBase' is not implemented on this platform!</no
       </trans-unit>
       <trans-unit id="ErrorMethodExpectedAsAnArgument">
         <source>Argument must be a method. (Argument name: {0})</source>
-        <target state="new">Argument must be a method. (Argument name: {0})</target>
+        <target state="translated">Bağımsız değişken bir yöntem olmalıdır. (Bağımsız değişken adı: {0})</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ErrorCannotAppendAfterHashCalculation">
         <source>Cannot append to a TestIdProvider, after GetId or GetHash method is called.</source>
-        <target state="new">Cannot append to a TestIdProvider, after GetId or GetHash method is called.</target>
+        <target state="translated">GetId veya GetHash yöntemi çağrıldıktan sonra bir TestIdProvider sağlayıcısına eklenemiyor.</target>
         <note></note>
       </trans-unit>
     </body>
