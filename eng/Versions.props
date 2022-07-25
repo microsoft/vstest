@@ -54,7 +54,7 @@
     <SystemMemoryVersion>4.5.1</SystemMemoryVersion>
     <SystemNumericsVectorsVersion>4.4.0</SystemNumericsVectorsVersion>
     <SystemReflectionMetadataVersion>1.4.2</SystemReflectionMetadataVersion>
-    <SystemRuntimeCompilerServicesUnsafeVersion>6.0.0</SystemRuntimeCompilerServicesUnsafeVersion>
+    <SystemRuntimeCompilerServicesUnsafeVersion>5.0.0</SystemRuntimeCompilerServicesUnsafeVersion>
     <SystemTextEncodingsWebVersion>4.5.1</SystemTextEncodingsWebVersion>
     <SystemThreadingTasksExtensionVersion>4.5.1</SystemThreadingTasksExtensionVersion>
     <SystemValueTupleVersion>4.4.0</SystemValueTupleVersion>
