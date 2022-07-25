@@ -1181,22 +1181,22 @@
       </trans-unit>
       <trans-unit id="RequestHandlerConnectionTimedOut">
         <source>Waiting for request handler connection timed out after {0} seconds.</source>
-        <target state="new">Waiting for request handler connection timed out after {0} seconds.</target>
+        <target state="translated">Время ожидания подключения обработчика запросов истекло через {0} с.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="StartTestSessionTimedOut">
         <source>Waiting for start test session timed out after {0} seconds.</source>
-        <target state="new">Waiting for start test session timed out after {0} seconds.</target>
+        <target state="translated">Время ожидания начала тестового сеанса истекло через {0} с.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="StopTestSessionTimedOut">
         <source>Waiting for stop test session timed out after {0} seconds.</source>
-        <target state="new">Waiting for stop test session timed out after {0} seconds.</target>
+        <target state="translated">Время ожидания остановки тестового сеанса истекло через {0} с.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ErrorHostingCommunicationChannel">
         <source>Error hosting communication channel.</source>
-        <target state="new">Error hosting communication channel.</target>
+        <target state="translated">Ошибка при размещении коммуникационного канала.</target>
         <note></note>
       </trans-unit>
     </body>
