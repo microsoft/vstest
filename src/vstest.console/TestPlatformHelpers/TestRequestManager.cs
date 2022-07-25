@@ -174,12 +174,15 @@ internal class TestRequestManager : ITestRequestManager
                 runsettings,
                 discoveryPayload.Sources.ToList(),
                 discoveryEventsRegistrar,
+                isDiscovery: true,
                 out string updatedRunsettings,
                 out IDictionary<string, Architecture> sourceToArchitectureMap,
                 out IDictionary<string, Framework> sourceToFrameworkMap))
         {
             runsettings = updatedRunsettings;
         }
+
+
 
         var sourceToSourceDetailMap = discoveryPayload.Sources.Select(source => new SourceDetail
         {
@@ -265,6 +268,7 @@ internal class TestRequestManager : ITestRequestManager
         ProtocolConfig protocolConfig)
     {
         EqtTrace.Info("TestRequestManager.RunTests: run tests started.");
+        testRunRequestPayload.RunSettings ??= "<RunSettings></RunSettings>";
         var runsettings = testRunRequestPayload.RunSettings;
 
         if (testRunRequestPayload.TestPlatformOptions != null)
@@ -281,6 +285,7 @@ internal class TestRequestManager : ITestRequestManager
                 runsettings!,
                 sources!,
                 testRunEventsRegistrar,
+                isDiscovery: false,
                 out string updatedRunsettings,
                 out IDictionary<string, Architecture> sourceToArchitectureMap,
                 out IDictionary<string, Framework> sourceToFrameworkMap))
@@ -468,7 +473,8 @@ internal class TestRequestManager : ITestRequestManager
         if (UpdateRunSettingsIfRequired(
                 payload.RunSettings,
                 payload.Sources,
-                null,
+                registrar: null,
+                isDiscovery: false,
                 out string updatedRunsettings,
                 out IDictionary<string, Architecture> sourceToArchitectureMap,
                 out IDictionary<string, Framework> sourceToFrameworkMap))
@@ -652,6 +658,7 @@ internal class TestRequestManager : ITestRequestManager
         string runsettingsXml,
         IList<string>? sources,
         IBaseTestEventsRegistrar? registrar,
+        bool isDiscovery,
         out string updatedRunSettingsXml,
         out IDictionary<string, Architecture> sourceToArchitectureMap,
         out IDictionary<string, Framework> sourceToFrameworkMap)
@@ -800,6 +807,7 @@ internal class TestRequestManager : ITestRequestManager
         settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
         settingsUpdated |= UpdateTargetDevice(navigator, document);
         settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
+        settingsUpdated |= AddOrUpdateBatchSize(document, runConfiguration, isDiscovery);
 
         updatedRunSettingsXml = navigator.OuterXml;
 
@@ -905,6 +913,27 @@ internal class TestRequestManager : ITestRequestManager
             InferRunSettingsHelper.UpdateDesignMode(
                 document,
                 _commandLineOptions.IsDesignMode);
+        }
+        return updateRequired;
+    }
+
+    private bool AddOrUpdateBatchSize(XmlDocument document, RunConfiguration runConfiguration, bool isDiscovery)
+    {
+        // On run keep it as is to fall back to the current default value (which is 10 right now).
+        if (!isDiscovery)
+        {
+            // We did not update runnsettings.
+            return false;
+        }
+
+
+        // If user is already setting batch size via runsettings or CLI args; we skip.
+        bool updateRequired = !runConfiguration.BatchSizeSet;
+        if (updateRequired)
+        {
+            InferRunSettingsHelper.UpdateBatchSize(
+                document,
+                CommandLineOptions.DefaultDiscoveryBatchSize);
         }
         return updateRequired;
     }
