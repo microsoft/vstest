@@ -812,12 +812,9 @@ function Publish-Package {
         New-Item $testPlatformDirectory -Type Directory -Force | Out-Null
     }
 
-    $visualStudioTelemetryVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftVisualStudioTelemetryVersion
-    $visualStudioRemoteControlVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftVisualStudioRemoteControlVersion
-    $visualStudioUtilitiesInternalVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftVisualStudioUtilitiesInternalVersion
-    $visualStudioTelemetryDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Telemetry\$visualStudioTelemetryVersion\lib\net45"
-    $visualStudioRemoteControl = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.RemoteControl\$visualStudioRemoteControlVersion\lib\net45"
-    $visualStudioUtilitiesDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Utilities.Internal\$visualStudioUtilitiesInternalVersion\lib\net45"
+    $visualStudioTelemetryDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Telemetry\16.3.58\lib\net45"
+    $visualStudioRemoteControl = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.RemoteControl\16.3.23\lib\net45"
+    $visualStudioUtilitiesDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Utilities.Internal\16.3.23\lib\net45"
 
     Copy-Item "$visualStudioTelemetryDirectory\Microsoft.VisualStudio.Telemetry.dll" $testPlatformDirectory -Force
     Copy-Item "$visualStudioRemoteControl\Microsoft.VisualStudio.RemoteControl.dll" $testPlatformDirectory -Force
@@ -1121,11 +1118,6 @@ function Copy-CodeCoverage-Package-Artifacts {
     # Copy TraceDataCollector to Microsoft.CodeCoverage folder.
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftInternalCodeCoverageVersion
     $traceDataCollectorPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.tracedatacollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    $visualStudioTelemetryVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftVisualStudioTelemetryVersion
-    $visualStudioRemoteControlVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftVisualStudioRemoteControlVersion
-    $visualStudioUtilitiesInternalVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftVisualStudioUtilitiesInternalVersion
-    $win32RegistryVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.MicrosoftWin32RegistryVersion
-    $systemRuntimeCompilerServicesUnsafeVersion = ([xml](Get-Content $env:TP_ROOT_DIR\eng\Versions.props)).Project.PropertyGroup.SystemRuntimeCompilerServicesUnsafeVersion
     $traceDataCollectorPackagesNetFxDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TraceDataCollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework472"
     $internalCodeCoveragePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\"
     $codeCoverageCorePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.codecoverage.core\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
@@ -1135,11 +1127,7 @@ function Copy-CodeCoverage-Package-Artifacts {
     $codeCoverageImAlpinePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\InstrumentationEngine\alpine"
     $codeCoverageImMacosPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\InstrumentationEngine\macos"
     $codeCoverageTelemetryPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.codecoverage.telemetry\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    $visualStudioTelemetryDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Telemetry\$visualStudioTelemetryVersion\lib\$TPB_TargetFrameworkNS20"
-    $visualStudioRemoteControl = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.RemoteControl\$visualStudioRemoteControlVersion\lib\$TPB_TargetFrameworkNS20"
-    $visualStudioUtilitiesDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Utilities.Internal\$visualStudioUtilitiesInternalVersion\lib\$TPB_TargetFrameworkNS20"
-    $win32RegistryDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Win32.Registry\$win32RegistryVersion\lib\$TPB_TargetFrameworkNS20"
-    $systemRuntimeCompilerServicesUnsafeDirectory = Join-Path $env:TP_PACKAGES_DIR "System.Runtime.CompilerServices.Unsafe\$systemRuntimeCompilerServicesUnsafeVersion\lib\$TPB_TargetFrameworkNS20"
+    $telemetryDirectory = Join-Path $env:TP_PACKAGES_DIR "$internalCodeCoveragePackagesDir\Microsoft.VisualStudio.Telemetry"
 
     $microsoftCodeCoveragePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.CodeCoverage\")
     $microsoftCodeCoverageExtensionsPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.CodeCoverage.Extensions\")
@@ -1155,11 +1143,11 @@ function Copy-CodeCoverage-Package-Artifacts {
     Copy-Item $codeCoverageInstrumentationPackagesDir\Mono.Cecil.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $codeCoverageInstrumentationPackagesDir\Mono.Cecil.Pdb.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $codeCoverageTelemetryPackagesDir\Microsoft.CodeCoverage.Telemetry.dll $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $visualStudioTelemetryDirectory\Microsoft.VisualStudio.Telemetry.dll $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $visualStudioRemoteControl\Microsoft.VisualStudio.RemoteControl.dll $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $visualStudioUtilitiesDirectory\Microsoft.VisualStudio.Utilities.Internal.dll $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $win32RegistryDirectory\Microsoft.Win32.Registry.dll $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $systemRuntimeCompilerServicesUnsafeDirectory\System.Runtime.CompilerServices.Unsafe.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $telemetryDirectory\Microsoft.VisualStudio.Telemetry.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $telemetryDirectory\Microsoft.VisualStudio.RemoteControl.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $telemetryDirectory\Microsoft.VisualStudio.Utilities.Internal.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $telemetryDirectory\Microsoft.Win32.Registry.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $telemetryDirectory\System.Runtime.CompilerServices.Unsafe.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $internalCodeCoveragePackagesDir\CodeCoverage $microsoftCodeCoveragePackageDir -Force -Recurse
     Copy-Item $internalCodeCoveragePackagesDir\InstrumentationEngine $microsoftCodeCoveragePackageDir -Force -Recurse
     Copy-Item $internalCodeCoveragePackagesDir\Shim $microsoftCodeCoveragePackageDir -Force -Recurse
