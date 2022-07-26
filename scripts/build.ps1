@@ -1130,7 +1130,7 @@ function Copy-CodeCoverage-Package-Artifacts {
     $codeCoverageImAlpinePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\InstrumentationEngine\alpine"
     $codeCoverageImMacosPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\InstrumentationEngine\macos"
     $codeCoverageTelemetryPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.codecoverage.telemetry\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
-    $telemetryDirectory = Join-Path $env:TP_PACKAGES_DIR "$internalCodeCoveragePackagesDir\Microsoft.VisualStudio.Telemetry"
+    $telemetryDirectory = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\Microsoft.VisualStudio.Telemetry"
 
     $microsoftCodeCoveragePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.CodeCoverage\")
     $microsoftCodeCoverageExtensionsPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.CodeCoverage.Extensions\")
