@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -79,8 +81,10 @@ public class FrameworkTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
+        Console.WriteLine($">>>>>>> arguments: {arguments}");
         arguments = string.Concat(arguments, " ", "/tests:PassingTest");
         arguments = string.Concat(arguments, " ", "/Framework:Framework40");
+        Console.WriteLine($">>>>>>> arguments concat: {arguments}");
 
         InvokeVsTest(arguments);
 
