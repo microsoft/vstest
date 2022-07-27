@@ -52,6 +52,7 @@
     <PackageReference Include="System.ServiceModel.Primitives" Version="$(SystemServiceModelVersion)" />
     <PackageReference Include="System.ServiceModel.Security" Version="$(SystemServiceModelVersion)" />
     <PackageReference Include="System.Private.ServiceModel" Version="$(SystemServiceModelVersion)" />
+    <PackageReference Include="System.ServiceModel.Http" Version="$(SystemServiceModelVersion)" />
     <!-- / CVE-2018-8356 mitigation -->
   </ItemGroup>
 
