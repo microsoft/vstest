@@ -125,26 +125,26 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.Extensions.EventLogCollector.dll" />
 
-      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.TestPlatform.CommunicationUtilities.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.TestPlatform.CoreUtilities.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.TestPlatform.CrossPlatEngine.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.TestPlatform.Utilities.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\testhost.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\win10-arm64\Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\win10-arm64\testhost.arm64.dll" />
-      <NativeBinariesToSign Include="$(ArtifactsDirectory)TestHost\win10-arm64\testhost.arm64.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\Microsoft.TestPlatform.CoreUtilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\Microsoft.TestPlatform.Utilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\Microsoft.VisualStudio.TestPlatform.Common.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\testhost.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\win10-arm64\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\win10-arm64\testhost.arm64.dll" />
+      <NativeBinariesToSign Include="$(ArtifactsDirectory)TestHostNet\win10-arm64\testhost.arm64.exe" />
 
       <!-- Localized resources -->
       <AssembliesToSign Include="$(ArtifactsDirectory)%(ResxLang.Identity)\*.*" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\%(ResxLang.Identity)\*.*" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\%(ResxLang.Identity)\*.*" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\%(ResxLang.Identity)\*.*" />
 
       <!-- Third Party assemblies to sign -->
       <ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)Newtonsoft.Json.dll" />
-      <ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)TestHost\Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET Core -->
@@ -166,34 +166,34 @@
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)testhost.dll" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)vstest.console.dll" />
 
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\Microsoft.TestPlatform.CommunicationUtilities.dll" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\Microsoft.TestPlatform.CoreUtilities.dll" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\Microsoft.TestPlatform.CrossPlatEngine.dll" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\Microsoft.TestPlatform.Utilities.dll" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\Microsoft.TestPlatform.CoreUtilities.dll" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\Microsoft.TestPlatform.Utilities.dll" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\Microsoft.VisualStudio.TestPlatform.Common.dll" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
 
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.net47.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.net471.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.net472.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.net48.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net47.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net471.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net472.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net48.exe" />
 
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.x86.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.net47.x86.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.net471.x86.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.net472.x86.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.net48.x86.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.x86.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net47.x86.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net471.x86.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net472.x86.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net48.x86.exe" />
 
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.arm64.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.net47.arm64.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.net471.arm64.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.net472.arm64.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\testhost.net48.arm64.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.arm64.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net47.arm64.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net471.arm64.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net472.arm64.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net48.arm64.exe" />
 
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\datacollector.exe" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\datacollector.arm64.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\datacollector.exe" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\datacollector.arm64.exe" />
 
       <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
       <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
@@ -236,11 +236,11 @@
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)%(ResxLang.Identity)\*.*" />
       <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)%(ResxLang.Identity)\*.*" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)Extensions\%(ResxLang.Identity)\*.*" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\%(ResxLang.Identity)\*.*" />
+      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\%(ResxLang.Identity)\*.*" />
 
       <!-- Third Party assemblies to sign -->
       <ThirdPartyAssembliesToSign Include="$(ArtifactsCore31Directory)Newtonsoft.Json.dll" />
-      <ThirdPartyAssembliesToSign Include="$(ArtifactsCore31Directory)TestHost\Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <!-- Sign Microsoft.TestPlatform.Build -->
