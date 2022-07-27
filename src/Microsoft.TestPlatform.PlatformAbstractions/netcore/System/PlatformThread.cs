@@ -39,7 +39,6 @@ public class PlatformThread : IThread
             }
         });
 
-        // ApartmentState is not supported in netcoreapp1.0.
         thread.IsBackground = true;
         thread.Start();
         if (waitForCompletion)

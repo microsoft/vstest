@@ -91,6 +91,8 @@ public class EventLogDataCollector : DataCollector
     /// </summary>
     private readonly IDictionary<string, IEventLogContainer> _eventLogContainerMap = new Dictionary<string, IEventLogContainer>();
 
+    private bool _isDisposed;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="EventLogDataCollector"/> class.
     /// </summary>
@@ -290,25 +292,33 @@ public class EventLogDataCollector : DataCollector
     /// <param name="disposing">Not used since this class does not have a finalizer.</param>
     protected override void Dispose(bool disposing)
     {
+        if (_isDisposed)
+            return;
+
         base.Dispose(disposing);
 
-        // Unregister events
-        if (_events != null)
+        if (disposing)
         {
-            _events.SessionStart -= _sessionStartEventHandler;
-            _events.SessionEnd -= _sessionEndEventHandler;
-            _events.TestCaseStart -= _testCaseStartEventHandler;
-            _events.TestCaseEnd -= _testCaseEndEventHandler;
+            // Unregister events
+            if (_events != null)
+            {
+                _events.SessionStart -= _sessionStartEventHandler;
+                _events.SessionEnd -= _sessionEndEventHandler;
+                _events.TestCaseStart -= _testCaseStartEventHandler;
+                _events.TestCaseEnd -= _testCaseEndEventHandler;
+            }
+
+            // Unregister EventLogEntry Written.
+            foreach (var eventLogContainer in _eventLogContainerMap.Values)
+            {
+                eventLogContainer.Dispose();
+            }
+
+            // Delete all the temp event log directories
+            RemoveTempEventLogDirs(_eventLogDirectories);
         }
 
-        // Unregister EventLogEntry Written.
-        foreach (var eventLogContainer in _eventLogContainerMap.Values)
-        {
-            eventLogContainer.Dispose();
-        }
-
-        // Delete all the temp event log directories
-        RemoveTempEventLogDirs(_eventLogDirectories);
+        _isDisposed = true;
     }
 
     #endregion

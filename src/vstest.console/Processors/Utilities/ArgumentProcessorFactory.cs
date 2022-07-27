@@ -125,7 +125,7 @@ internal class ArgumentProcessorFactory
         var pair = new CommandArgumentPair(argument);
 
         // Find the associated argument processor.
-        CommandToProcessorMap.TryGetValue(pair.Command, out IArgumentProcessor argumentProcessor);
+        CommandToProcessorMap.TryGetValue(pair.Command, out IArgumentProcessor? argumentProcessor);
 
         // If an argument processor was not found for the command, then consider it as a test source argument.
         if (argumentProcessor == null)
@@ -161,7 +161,7 @@ internal class ArgumentProcessorFactory
         Contract.EndContractBlock();
 
         // Find the associated argument processor.
-        CommandToProcessorMap.TryGetValue(command, out IArgumentProcessor argumentProcessor);
+        CommandToProcessorMap.TryGetValue(command, out IArgumentProcessor? argumentProcessor);
 
         if (argumentProcessor != null)
         {

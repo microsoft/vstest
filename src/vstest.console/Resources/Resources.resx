@@ -810,4 +810,16 @@
   <data name="WarningEmulatedOnArm64" xml:space="preserve">
     <value>vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</value>
   </data>
+  <data name="RequestHandlerConnectionTimedOut" xml:space="preserve">
+    <value>Waiting for request handler connection timed out after {0} seconds.</value>
+  </data>
+  <data name="StartTestSessionTimedOut" xml:space="preserve">
+    <value>Waiting for start test session timed out after {0} seconds.</value>
+  </data>
+  <data name="StopTestSessionTimedOut" xml:space="preserve">
+    <value>Waiting for stop test session timed out after {0} seconds.</value>
+  </data>
+  <data name="ErrorHostingCommunicationChannel" xml:space="preserve">
+    <value>Error hosting communication channel.</value>
+  </data>
 </root>

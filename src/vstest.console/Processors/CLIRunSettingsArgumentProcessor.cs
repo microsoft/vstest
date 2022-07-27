@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Xml.XPath;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
@@ -197,7 +198,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
         }
     }
 
-    private bool UpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
+    private static bool UpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
     {
         if (!node.Contains(Constants.TestRunParametersName))
         {
@@ -212,7 +213,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
             return true;
         }
 
-        var exceptionMessage = string.Format(CommandLineResources.InvalidTestRunParameterArgument, node);
+        var exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestRunParameterArgument, node);
         throw new CommandLineException(exceptionMessage);
     }
 

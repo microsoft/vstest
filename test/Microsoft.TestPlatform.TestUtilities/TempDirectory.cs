@@ -11,6 +11,8 @@ namespace Microsoft.TestPlatform.TestUtilities;
 
 public class TempDirectory : IDisposable
 {
+    private bool _isDisposed;
+
     /// <summary>
     /// Creates a unique temporary directory.
     /// </summary>
@@ -23,7 +25,21 @@ public class TempDirectory : IDisposable
 
     public void Dispose()
     {
-        TryRemoveDirectory(Path);
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+
+        if (disposing)
+        {
+            TryRemoveDirectory(Path);
+        }
+
+        _isDisposed = true;
     }
 
     public DirectoryInfo CreateDirectory(string dir)

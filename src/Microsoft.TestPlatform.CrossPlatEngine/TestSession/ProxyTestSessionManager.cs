@@ -239,10 +239,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             if (!_proxyMap.ContainsKey(source)
                 || !_proxyContainerList[_proxyMap[source]].IsAvailable)
             {
-                throw new InvalidOperationException(
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CrossPlatResources.NoAvailableProxyForDeque));
+                throw new InvalidOperationException(CrossPlatResources.NoAvailableProxyForDeque);
             }
 
             // We must ensure the current run settings match the run settings from when the
@@ -251,10 +248,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             if (!CheckRunSettingsAreCompatible(runSettings))
             {
                 EqtTrace.Verbose($"ProxyTestSessionManager.DequeueProxy: A proxy exists, but the runsettings do not match. Skipping it. Incoming settings: {runSettings}, Settings on proxy: {_testSessionCriteria.RunSettings}");
-                throw new InvalidOperationException(
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CrossPlatResources.NoProxyMatchesDescription));
+                throw new InvalidOperationException(CrossPlatResources.NoProxyMatchesDescription);
             }
 
             // Get the actual proxy.
@@ -283,7 +277,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             {
                 throw new ArgumentException(
                     string.Format(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         CrossPlatResources.NoSuchProxyId,
                         proxyId));
             }
@@ -294,7 +288,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             {
                 throw new InvalidOperationException(
                     string.Format(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         CrossPlatResources.ProxyIsAlreadyAvailable,
                         proxyId));
             }

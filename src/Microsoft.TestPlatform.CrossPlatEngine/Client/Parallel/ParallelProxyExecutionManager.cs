@@ -24,12 +24,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 /// <summary>
 /// ParallelProxyExecutionManager that manages parallel execution
 /// </summary>
-internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
+internal sealed class ParallelProxyExecutionManager : IParallelProxyExecutionManager, IDisposable
 {
     private readonly IDataSerializer _dataSerializer;
     private readonly bool _isParallel;
     private readonly ParallelOperationManager<IProxyExecutionManager, IInternalTestRunEventsHandler, TestRunCriteria> _parallelOperationManager;
     private readonly Dictionary<string, TestRuntimeProviderInfo> _sourceToTestHostProviderMap;
+
+    private bool _isDisposed;
 
     #region TestRunSpecificData
 
@@ -404,6 +406,15 @@ internal class ParallelProxyExecutionManager : IParallelProxyExecutionManager
         }
 
         EqtTrace.Verbose("ProxyParallelExecutionManager: No sources available for execution.");
+    }
+
+    public void Dispose()
+    {
+        if (!_isDisposed)
+        {
+            _parallelOperationManager.Dispose();
+            _isDisposed = true;
+        }
     }
 }
 

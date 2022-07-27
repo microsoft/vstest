@@ -80,7 +80,7 @@ internal class UiLanguageOverride
         // Do not override any environment variables that are already set as we do not want to clobber a more granular setting with our global setting.
         SetIfNotAlreadySet(DOTNET_CLI_UI_LANGUAGE, language.Name, environmentVariableHelper);
 #if !NETCOREAPP1_0 && !NETSTANDARD1_3
-        SetIfNotAlreadySet(VSLANG, language.LCID.ToString(), environmentVariableHelper); // for tools following VS guidelines to just work in CLI
+        SetIfNotAlreadySet(VSLANG, language.LCID.ToString(CultureInfo.CurrentCulture), environmentVariableHelper); // for tools following VS guidelines to just work in CLI
 #endif
         SetIfNotAlreadySet(PreferredUILang, language.Name, environmentVariableHelper); // for C#/VB targets that pass $(PreferredUILang) to compiler
     }

@@ -44,9 +44,11 @@ public class DesignModeClient : IDesignModeClient
     private readonly IEnvironment _platformEnvironment;
     private readonly TestSessionMessageLogger _testSessionMessageLogger;
     private readonly object _lockObject = new();
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
+    [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Part of the public API")]
     protected Action<Message>? onCustomTestHostLaunchAckReceived;
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
+    [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Part of the public API")]
     protected Action<Message>? onAttachDebuggerAckRecieved;
 
     /// <summary>
@@ -81,7 +83,12 @@ public class DesignModeClient : IDesignModeClient
     /// <summary>
     /// Property exposing the Instance
     /// </summary>
-    public static IDesignModeClient? Instance { get; private set; }
+    public static DesignModeClient? Instance { get; private set; }
+
+    /// <summary>
+    /// Gets the test request manager.
+    /// </summary>
+    public ITestRequestManager? TestRequestManager { get; internal set; }
 
     /// <summary>
     /// Initializes DesignMode
@@ -103,7 +110,10 @@ public class DesignModeClient : IDesignModeClient
     /// </param>
     public void ConnectToClientAndProcessRequests(int port, ITestRequestManager testRequestManager)
     {
-        EqtTrace.Info("Trying to connect to server on port: {0}", port);
+        // Used by the in-process vstest.console wrapper.
+        TestRequestManager = testRequestManager;
+
+        EqtTrace.Info("Trying to connect to server on port : {0}", port);
         _communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
 
         var connectionTimeoutInSecs = EnvironmentHelper.GetConnectionTimeout();
@@ -120,7 +130,7 @@ public class DesignModeClient : IDesignModeClient
             Dispose();
             throw new TimeoutException(
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                     CoreUtilities.Constants.VstestConsoleProcessName,
                     "translation layer",
@@ -642,18 +652,18 @@ public class DesignModeClient : IDesignModeClient
 
     #region IDisposable Support
 
-    private bool _disposedValue; // To detect redundant calls
+    private bool _isDisposed; // To detect redundant calls
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (!_isDisposed)
         {
             if (disposing)
             {
-                _communicationManager?.StopClient();
+                _communicationManager.StopClient();
             }
 
-            _disposedValue = true;
+            _isDisposed = true;
         }
     }
 
@@ -662,6 +672,7 @@ public class DesignModeClient : IDesignModeClient
     {
         // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
         Dispose(true);
+        GC.SuppressFinalize(this);
     }
     #endregion
 }

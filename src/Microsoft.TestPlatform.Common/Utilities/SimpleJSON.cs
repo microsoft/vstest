@@ -328,7 +328,7 @@ internal abstract partial class JSONNode
         }
         set
         {
-            Value = value.ToString();
+            Value = value.ToString(CultureInfo.InvariantCulture);
         }
     }
 
@@ -340,7 +340,7 @@ internal abstract partial class JSONNode
         }
         set
         {
-            Value = value.ToString();
+            Value = value.ToString(CultureInfo.InvariantCulture);
         }
     }
 
@@ -403,7 +403,7 @@ internal abstract partial class JSONNode
 
     public static implicit operator JSONNode(long n)
     {
-        return LongAsString ? new JSONString(n.ToString()) : new JSONNumber(n);
+        return LongAsString ? new JSONString(n.ToString(CultureInfo.InvariantCulture)) : new JSONNumber(n);
     }
     public static implicit operator long(JSONNode d)
     {
@@ -412,7 +412,7 @@ internal abstract partial class JSONNode
 
     public static implicit operator JSONNode(ulong n)
     {
-        return LongAsString ? new JSONString(n.ToString()) : new JSONNumber(n);
+        return LongAsString ? new JSONString(n.ToString(CultureInfo.InvariantCulture)) : new JSONNumber(n);
     }
     public static implicit operator ulong(JSONNode d)
     {
@@ -505,7 +505,7 @@ internal abstract partial class JSONNode
                     if (c < ' ' || (ForceASCII && c > 127))
                     {
                         ushort val = c;
-                        sb.Append("\\u").Append(val.ToString("X4"));
+                        sb.Append("\\u").Append(val.ToString("X4", CultureInfo.InvariantCulture));
                     }
                     else
                         sb.Append(c);
@@ -523,7 +523,11 @@ internal abstract partial class JSONNode
             return token;
         if (token.Length <= 5)
         {
-            string tmp = token.ToLower();
+            string tmp = token.ToLower(
+#if !NETSTANDARD1_3
+                CultureInfo.InvariantCulture
+#endif
+                );
             if (tmp is "false" or "true")
                 return tmp == "true";
             if (tmp == "null")
@@ -674,7 +678,8 @@ internal abstract partial class JSONNode
                                     string s = aJSON.Substring(i + 1, 4);
                                     token.Append((char)int.Parse(
                                         s,
-                                        System.Globalization.NumberStyles.AllowHexSpecifier));
+                                        System.Globalization.NumberStyles.AllowHexSpecifier,
+                                        CultureInfo.InvariantCulture));
                                     i += 4;
                                     break;
                                 }
@@ -1124,7 +1129,7 @@ internal partial class JSONNumber : JSONNode
         if (base.Equals(obj))
             return true;
         JSONNumber s2 = obj as JSONNumber;
-        return s2 != null ? _data == s2._data : IsNumeric(obj) && Convert.ToDouble(obj) == _data;
+        return s2 != null ? _data == s2._data : IsNumeric(obj) && Convert.ToDouble(obj, CultureInfo.InvariantCulture) == _data;
     }
     public override int GetHashCode()
     {
@@ -1342,7 +1347,7 @@ internal partial class JSONLazyCreator : JSONNode
         set
         {
             if (LongAsString)
-                Set(new JSONString(value.ToString()));
+                Set(new JSONString(value.ToString(CultureInfo.InvariantCulture)));
             else
                 Set(new JSONNumber(value));
         }
@@ -1361,7 +1366,7 @@ internal partial class JSONLazyCreator : JSONNode
         set
         {
             if (LongAsString)
-                Set(new JSONString(value.ToString()));
+                Set(new JSONString(value.ToString(CultureInfo.InvariantCulture)));
             else
                 Set(new JSONNumber(value));
         }

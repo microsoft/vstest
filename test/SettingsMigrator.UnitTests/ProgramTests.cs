@@ -18,7 +18,7 @@ public class ProgramTests
     [TestMethod]
     public void NoArgumentsShouldNotBeAccepted()
     {
-        int returnCode = Program.Main(new string[] { });
+        int returnCode = Program.Main(System.Array.Empty<string>());
         Assert.AreEqual(1, returnCode, "No arguments should not be accepted.");
     }
 }

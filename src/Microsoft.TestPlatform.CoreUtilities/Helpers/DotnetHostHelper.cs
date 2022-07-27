@@ -5,6 +5,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Reflection.PortableExecutable;
 
@@ -75,7 +76,7 @@ public class DotnetHostHelper : IDotnetHostHelper
     {
         if (!TryGetExecutablePath("dotnet", out var dotnetPath))
         {
-            string errorMessage = string.Format(Resources.NoDotnetExeFound, "dotnet");
+            string errorMessage = string.Format(CultureInfo.CurrentCulture, Resources.NoDotnetExeFound, "dotnet");
 
             EqtTrace.Error(errorMessage);
             throw new FileNotFoundException(errorMessage);
@@ -88,7 +89,7 @@ public class DotnetHostHelper : IDotnetHostHelper
     {
         if (!TryGetExecutablePath(MONOEXENAME, out var monoPath))
         {
-            string errorMessage = string.Format(Resources.NoDotnetExeFound, MONOEXENAME);
+            string errorMessage = string.Format(CultureInfo.CurrentCulture, Resources.NoDotnetExeFound, MONOEXENAME);
 
             EqtTrace.Error(errorMessage);
             throw new FileNotFoundException(errorMessage);

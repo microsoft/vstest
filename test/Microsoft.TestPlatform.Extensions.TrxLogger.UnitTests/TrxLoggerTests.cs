@@ -743,8 +743,7 @@ public class TrxLoggerTests
 
         testCase1.SetPropertyValue(testProperty, new[] { "ClassLevel", "AsmLevel" });
 
-        var converter = new Converter(new Mock<IFileHelper>().Object, new TrxFileHelper());
-        List<string> listCategoriesActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
+        List<string> listCategoriesActual = Converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
 
         List<string> listCategoriesExpected = new()
         {
@@ -763,8 +762,7 @@ public class TrxLoggerTests
 
         testCase1.SetPropertyValue(testProperty, new[] { "99999", "0" });
 
-        var converter = new Converter(new Mock<IFileHelper>().Object, new TrxFileHelper());
-        List<string> listWorkItemsActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "WorkItemIds");
+        List<string> listWorkItemsActual = Converter.GetCustomPropertyValueFromTestCase(testCase1, "WorkItemIds");
 
         List<string> listWorkItemsExpected = new()
         {
@@ -790,12 +788,12 @@ public class TrxLoggerTests
         var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
         _testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
-        Assert.IsTrue(File.Exists(_testableTrxLogger.TrxFile), string.Format("TRX file: {0}, should have got created.", _testableTrxLogger.TrxFile));
+        Assert.IsTrue(File.Exists(_testableTrxLogger.TrxFile), $"TRX file: {_testableTrxLogger.TrxFile}, should have got created.");
 
         string? actualMessage = GetElementValueFromTrx(_testableTrxLogger.TrxFile!, "StdOut");
 
         Assert.IsNotNull(actualMessage);
-        Assert.IsTrue(string.Equals(message, actualMessage), string.Format("StdOut messages do not match. Expected:{0}, Actual:{1}", message, actualMessage));
+        Assert.IsTrue(string.Equals(message, actualMessage), $"StdOut messages do not match. Expected:{message}, Actual:{actualMessage}");
     }
 
     [TestMethod]
@@ -811,11 +809,11 @@ public class TrxLoggerTests
         using XmlReader reader = XmlReader.Create(file);
         XDocument document = XDocument.Load(reader);
         var timesNode = document.Descendants(document.Root!.GetDefaultNamespace() + "Times").First();
-        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("creation").First().Value));
-        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("start").First().Value));
+        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("creation").First().Value, CultureInfo.CurrentCulture));
+        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("start").First().Value, CultureInfo.CurrentCulture));
         var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").First();
-        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("endTime").First().Value));
-        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("startTime").First().Value));
+        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("endTime").First().Value, CultureInfo.CurrentCulture));
+        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("startTime").First().Value, CultureInfo.CurrentCulture));
     }
 
     [TestMethod]

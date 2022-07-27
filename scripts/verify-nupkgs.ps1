@@ -13,15 +13,15 @@ function Verify-Nuget-Packages($packageDirectory, $version)
     Write-Log "Starting Verify-Nuget-Packages."
     $expectedNumOfFiles = @{
         "Microsoft.CodeCoverage" = 57;
-        "Microsoft.NET.Test.Sdk" = 27;
-        "Microsoft.TestPlatform" = 626;
+        "Microsoft.NET.Test.Sdk" = 18;
+        "Microsoft.TestPlatform" = 605;
         "Microsoft.TestPlatform.Build" = 21;
-        "Microsoft.TestPlatform.CLI" = 427;
+        "Microsoft.TestPlatform.CLI" = 499;
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 35;
-        "Microsoft.TestPlatform.ObjectModel" = 238;
+        "Microsoft.TestPlatform.ObjectModel" = 180;
         "Microsoft.TestPlatform.AdapterUtilities" = 62;
-        "Microsoft.TestPlatform.Portable" = 648;
-        "Microsoft.TestPlatform.TestHost" = 208;
+        "Microsoft.TestPlatform.Portable" = 597;
+        "Microsoft.TestPlatform.TestHost" = 153;
         "Microsoft.TestPlatform.TranslationLayer" = 123;
         "Microsoft.TestPlatform.Internal.Uwp" = 86;
     }
@@ -64,7 +64,7 @@ function Verify-Nuget-Packages($packageDirectory, $version)
         }
     }
 
-    if ($errors) { 
+    if ($errors) {
         Write-Error "There are $($errors.Count) errors:`n$($errors -join "`n")"
     }
 

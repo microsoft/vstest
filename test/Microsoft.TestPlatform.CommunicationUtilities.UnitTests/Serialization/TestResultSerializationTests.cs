@@ -296,7 +296,7 @@ public class TestResultSerializationTests
 
     private static T Deserialize<T>(string json, int version)
     {
-        return JsonDataSerializer.Instance.Deserialize<T>(json, version);
+        return JsonDataSerializer.Instance.Deserialize<T>(json, version)!;
     }
 
     private static void VerifyDummyPropertyIsRegistered()

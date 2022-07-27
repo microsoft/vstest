@@ -1179,6 +1179,26 @@
         <target state="translated">vstest.console.exe выполняется в режиме эмуляции как {0}. Для повышения производительности рекомендуется использовать собственное средство выполнения тестов vstest.console.arm64.exe.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="RequestHandlerConnectionTimedOut">
+        <source>Waiting for request handler connection timed out after {0} seconds.</source>
+        <target state="translated">Время ожидания подключения обработчика запросов истекло через {0} с.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StartTestSessionTimedOut">
+        <source>Waiting for start test session timed out after {0} seconds.</source>
+        <target state="translated">Время ожидания начала тестового сеанса истекло через {0} с.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StopTestSessionTimedOut">
+        <source>Waiting for stop test session timed out after {0} seconds.</source>
+        <target state="translated">Время ожидания остановки тестового сеанса истекло через {0} с.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ErrorHostingCommunicationChannel">
+        <source>Error hosting communication channel.</source>
+        <target state="translated">Ошибка при размещении коммуникационного канала.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

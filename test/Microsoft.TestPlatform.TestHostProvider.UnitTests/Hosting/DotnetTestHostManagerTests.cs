@@ -302,7 +302,7 @@ public class DotnetTestHostManagerTests
         var testhostExePath = "testhost.exe";
         _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
         _mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(false);
-        _mockFileHelper.Setup(ph => ph.Exists("C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x64\\testhost.exe")).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists("C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp3.1\\x64\\testhost.exe")).Returns(true);
         _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
         var sourcePath = Path.Combine(_temp, "test.dll");
 
@@ -327,7 +327,7 @@ public class DotnetTestHostManagerTests
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""9.0.1""
+                    ""Newtonsoft.Json"": ""13.0.1""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -362,7 +362,7 @@ public class DotnetTestHostManagerTests
 
         var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-        StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x64\\testhost.exe");
+        StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp3.1\\x64\\testhost.exe");
     }
 
     [TestMethod]
@@ -372,7 +372,7 @@ public class DotnetTestHostManagerTests
         var testhostExePath = "testhost.x86.exe";
         _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>");
         _mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(false);
-        _mockFileHelper.Setup(ph => ph.Exists($"C:\\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost\\15.0.0-Dev{Path.DirectorySeparatorChar}build\\netcoreapp2.1\\x86\\testhost.x86.exe")).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists($"C:\\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost\\15.0.0-Dev{Path.DirectorySeparatorChar}build\\netcoreapp3.1\\x86\\testhost.x86.exe")).Returns(true);
         _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
         var sourcePath = Path.Combine(_temp, "test.dll");
 
@@ -397,7 +397,7 @@ public class DotnetTestHostManagerTests
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""9.0.1""
+                    ""Newtonsoft.Json"": ""13.0.1""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -432,7 +432,7 @@ public class DotnetTestHostManagerTests
 
         var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-        StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x86\\testhost.x86.exe");
+        StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp3.1\\x86\\testhost.x86.exe");
     }
 
     [TestMethod]
@@ -587,7 +587,11 @@ public class DotnetTestHostManagerTests
     [TestMethod]
     public async Task LaunchTestHostShouldLaunchProcessWithConnectionInfo()
     {
-        var expectedArgs = "exec \"" + _defaultTestHostPath + "\" --port 123 --endpoint 127.0.0.1:123 --role client --parentprocessid 0";
+        var expectedArgs = "exec \"" + _defaultTestHostPath + "\""
+#if NET
+            + " --roll-forward Major"
+#endif
+            + " --port 123 --endpoint 127.0.0.1:123 --role client --parentprocessid 0";
         _dotnetHostManager.SetCustomLauncher(_mockTestHostLauncher.Object);
         await _dotnetHostManager.LaunchTestHostAsync(_defaultTestProcessStartInfo, CancellationToken.None);
 
@@ -628,7 +632,7 @@ public class DotnetTestHostManagerTests
         StringAssert.Contains(startInfo.Arguments, expectedTestHostPath);
     }
 
-    // TODO: This assembly was previously compiled as net472 and so it was skipped and only ran as netcoreapp2.1. This fails in test, but works in code that is not isolated in appdomain. Might be worth fixing because we get one null here, and another in DotnetTestHostManager.
+    // TODO: This assembly was previously compiled as net472 and so it was skipped and only ran as netcoreapp3.1. This fails in test, but works in code that is not isolated in appdomain. Might be worth fixing because we get one null here, and another in DotnetTestHostManager.
     // Assembly.GetEntryAssembly().Location is null because of running in app domain.
 #if NET
     [TestMethod]
@@ -656,7 +660,7 @@ public class DotnetTestHostManagerTests
 
 #endif
 
-    // TODO: This assembly was previously compiled as net472 and so it was skipped and only ran as netcoreapp2.1. This fails in test, but works in code that is not isolated in appdomain. Might be worth fixing because we get one null here, and another in DotnetTestHostManager.
+    // TODO: This assembly was previously compiled as net472 and so it was skipped and only ran as netcoreapp3.1. This fails in test, but works in code that is not isolated in appdomain. Might be worth fixing because we get one null here, and another in DotnetTestHostManager.
     // Assembly.GetEntryAssembly().Location is null because of running in app domain.
 #if NET
 
@@ -665,8 +669,6 @@ public class DotnetTestHostManagerTests
     // we can't put in a "default" value, and we don't have other way to determine if this provided value is the
     // runtime default or the actual value that user provided, so right now the default will use the latest, instead
     // or the more correct 1.0, it should be okay, as that version is not supported anymore anyway
-    [DataRow("netcoreapp1.0", "latest")]
-    [DataRow("netcoreapp2.1", "2.1")]
     [DataRow("netcoreapp3.1", "3.1")]
     [DataRow("net5.0", "5.0")]
 
@@ -735,7 +737,7 @@ public class DotnetTestHostManagerTests
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""9.0.1""
+                    ""Newtonsoft.Json"": ""13.0.1""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -800,7 +802,7 @@ public class DotnetTestHostManagerTests
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""9.0.1""
+                    ""Newtonsoft.Json"": ""13.0.1""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -868,7 +870,7 @@ public class DotnetTestHostManagerTests
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""9.0.1""
+                    ""Newtonsoft.Json"": ""13.0.1""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -1023,143 +1025,6 @@ public class DotnetTestHostManagerTests
         await _dotnetHostManager.CleanTestHostAsync(CancellationToken.None);
 
         Assert.IsTrue(isVerified);
-    }
-
-    [TestMethod]
-    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT(x86)", "DOTNET_ROOT(x86)")]
-    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT", "DOTNET_ROOT")]
-    public void ForwardDotnetRootEnvironmentVariableWhenTargetFrameworkIsLessThanNet6SetsCorrectEnvVariable(string envVarName, string expectedForwaredName)
-    {
-        // Arrange
-        const string envVarValue = "c:\\SomePath";
-        _mockEnvironmentVariable.Reset();
-        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable(envVarName)).Returns(envVarValue);
-        string runSettingsXml = """
-            <RunSettings>
-                <RunConfiguration>
-                    <TargetFrameworkVersion>net5.0</TargetFrameworkVersion>
-                </RunConfiguration>
-            </RunSettings>
-            """;
-        _dotnetHostManager.Initialize(_mockMessageLogger.Object, runSettingsXml);
-
-        var startInfo = new TestProcessStartInfo { EnvironmentVariables = new Dictionary<string, string?>() };
-        // Sanity check
-        Assert.AreEqual(0, startInfo.EnvironmentVariables.Count);
-
-        // Act
-        _dotnetHostManager.ForwardDotnetRootEnvironmentVariable(startInfo);
-
-        // Assert
-        Assert.AreEqual(1, startInfo.EnvironmentVariables.Count);
-        Assert.IsTrue(startInfo.EnvironmentVariables.TryGetValue(expectedForwaredName, out var actualEnvVarValue));
-        Assert.AreEqual(envVarValue, actualEnvVarValue);
-    }
-
-    [TestMethod]
-    [DataRow("DOTNET_ROOT(x86)", "net5.0")]
-    [DataRow("DOTNET_ROOT(x86)", "net6.0")]
-    [DataRow("DOTNET_ROOT", "net5.0")]
-    [DataRow("DOTNET_ROOT", "net6.0")]
-    [DataRow("DOTNET_ROOT_X86", "net5.0")]
-    [DataRow("DOTNET_ROOT_X86", "net6.0")]
-    [DataRow("DOTNET_ROOT_X64", "net5.0")]
-    [DataRow("DOTNET_ROOT_X64", "net6.0")]
-    [DataRow("DOTNET_ROOT_ARM64", "net5.0")]
-    [DataRow("DOTNET_ROOT_ARM64", "net6.0")]
-    public void ForwardDotnetRootEnvironmentVariableWhenIncorrectEnvVarDoesNothing(string envVarName, string framework)
-    {
-        // Arrange
-        const string envVarValue = "c:\\SomePath";
-        _mockEnvironmentVariable.Reset();
-        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable(envVarName)).Returns(envVarValue);
-        string runSettingsXml = $"""
-            <RunSettings>
-                <RunConfiguration>
-                    <TargetFrameworkVersion>{framework}</TargetFrameworkVersion>
-                </RunConfiguration>
-            </RunSettings>
-            """;
-        _dotnetHostManager.Initialize(_mockMessageLogger.Object, runSettingsXml);
-
-        var startInfo = new TestProcessStartInfo { EnvironmentVariables = new Dictionary<string, string?>() };
-
-        // Act
-        _dotnetHostManager.ForwardDotnetRootEnvironmentVariable(startInfo);
-
-        // Assert
-        Assert.AreEqual(0, startInfo.EnvironmentVariables.Count);
-    }
-
-    [TestMethod]
-    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT(x86)", PlatformArchitecture.X86)]
-    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT(x86)", PlatformArchitecture.X64)]
-    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT", PlatformArchitecture.X86)]
-    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT", PlatformArchitecture.X64)]
-    public void ForwardDotnetRootEnvironmentVariableWhenTargetFrameworkIsGreaterOrEqualsToNet6SetsCorrectEnvVariable(string envVarName, PlatformArchitecture platformArchitecture)
-    {
-        // Arrange
-        const string envVarValue = "c:\\SomePath";
-        _mockEnvironmentVariable.Reset();
-        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable(envVarName)).Returns(envVarValue);
-        _mockProcessHelper.Setup(x => x.GetCurrentProcessArchitecture()).Returns(platformArchitecture);
-        string runSettingsXml = """
-            <RunSettings>
-                <RunConfiguration>
-                    <TargetFrameworkVersion>net6.0</TargetFrameworkVersion>
-                </RunConfiguration>
-            </RunSettings>
-            """;
-        _dotnetHostManager.Initialize(_mockMessageLogger.Object, runSettingsXml);
-
-        var startInfo = new TestProcessStartInfo { EnvironmentVariables = new Dictionary<string, string?>() };
-        // Sanity check
-        Assert.AreEqual(0, startInfo.EnvironmentVariables.Count);
-
-        // Act
-        _dotnetHostManager.ForwardDotnetRootEnvironmentVariable(startInfo);
-
-        // Assert
-        Assert.AreEqual(1, startInfo.EnvironmentVariables.Count);
-        Assert.IsTrue(startInfo.EnvironmentVariables.TryGetValue($"DOTNET_ROOT_{platformArchitecture.ToString().ToUpperInvariant()}", out var actualEnvVarValue));
-        Assert.AreEqual(envVarValue, actualEnvVarValue);
-    }
-
-    [TestMethod]
-    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT(x86)", PlatformArchitecture.X86)]
-    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT(x86)", PlatformArchitecture.X64)]
-    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT(x86)", PlatformArchitecture.ARM64)]
-    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT", PlatformArchitecture.X86)]
-    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT", PlatformArchitecture.X64)]
-    [DataRow("VSTEST_WINAPPHOST_DOTNET_ROOT", PlatformArchitecture.ARM64)]
-    public void ForwardDotnetRootEnvironmentVariableWhenTargetFrameworkIsGreaterOrEqualsToNet6DoesNotOverrideEnvVar(string envVarName, PlatformArchitecture platformArchitecture)
-    {
-        // Arrange
-        const string expectedEnvVarValue = "c:\\SomePath";
-        const string nonForwardedEnvVarValue = "C:\\SomeOtherPath";
-        var expectedForwardedEnvVarName = $"DOTNET_ROOT_{platformArchitecture.ToString().ToUpperInvariant()}";
-        _mockEnvironmentVariable.Reset();
-        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable(envVarName)).Returns(expectedEnvVarValue);
-        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable(expectedForwardedEnvVarName)).Returns(nonForwardedEnvVarValue);
-        _mockProcessHelper.Setup(x => x.GetCurrentProcessArchitecture()).Returns(platformArchitecture);
-        string runSettingsXml = """
-            <RunSettings>
-                <RunConfiguration>
-                    <TargetFrameworkVersion>net6.0</TargetFrameworkVersion>
-                </RunConfiguration>
-            </RunSettings>
-            """;
-        _dotnetHostManager.Initialize(_mockMessageLogger.Object, runSettingsXml);
-
-        var startInfo = new TestProcessStartInfo { EnvironmentVariables = new Dictionary<string, string?>() };
-        // Sanity check
-        Assert.AreEqual(0, startInfo.EnvironmentVariables.Count);
-
-        // Act
-        _dotnetHostManager.ForwardDotnetRootEnvironmentVariable(startInfo);
-
-        // Assert
-        Assert.AreEqual(0, startInfo.EnvironmentVariables.Count);
     }
 
     private void DotnetHostManagerExitCodeTesterHostExited(object? sender, HostProviderEventArgs e)

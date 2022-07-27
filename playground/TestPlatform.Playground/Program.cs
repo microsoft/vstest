@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -19,7 +20,7 @@ namespace TestPlatform.Playground;
 
 internal class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
         // This project references TranslationLayer, vstest.console, TestHostProvider, testhost and MSTest1 projects, to make sure
         // we build all the dependencies of that are used to run tests via VSTestConsoleWrapper. It then copies the components from
@@ -169,7 +170,7 @@ internal class Program
 
         public void HandleLogMessage(TestMessageLevel level, string? message)
         {
-            Console.WriteLine($"[DISCOVERY.{level.ToString().ToUpper()}] {message}");
+            Console.WriteLine($"[DISCOVERY.{level.ToString().ToUpper(CultureInfo.InvariantCulture)}] {message}");
         }
 
         public void HandleRawMessage(string rawMessage)
@@ -197,7 +198,7 @@ internal class Program
 
         public void HandleLogMessage(TestMessageLevel level, string? message)
         {
-            Console.WriteLine($"[{level.ToString().ToUpper()}]: {message}");
+            Console.WriteLine($"[{level.ToString().ToUpper(CultureInfo.InvariantCulture)}]: {message}");
         }
 
         public void HandleRawMessage(string rawMessage)

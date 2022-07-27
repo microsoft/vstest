@@ -27,7 +27,7 @@
     <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
     <DeployExtension>False</DeployExtension>
     <IsProductComponent>true</IsProductComponent>
-    <VsixInputFileLocation>$(TestPlatformRoot)artifacts\$(Configuration)\net451\win7-x64</VsixInputFileLocation>
+    <VsixInputFileLocation>$(TestPlatformRoot)artifacts\$(Configuration)\$(TargetNetFxVersion)\win7-x64</VsixInputFileLocation>
     <OutputPath>$(TestPlatformRoot)artifacts\$(Configuration)\VSIX</OutputPath>
     <ExtensionInstallationFolder>TestPlatform</ExtensionInstallationFolder>
     <ExtensionInstallationRelativeToVS>[installDir]\Common7\IDE\Extensions\TestPlatform</ExtensionInstallationRelativeToVS>
@@ -93,7 +93,7 @@
     <VsixSourceItem Include="Resources\zh-Hant\extension.vsixlangpack">
       <VSIXSubPath>zh-Hant</VSIXSubPath>
     </VsixSourceItem>
-    
+
     <!-- Localized resources -->
     <VsixSourceItem Include="$(VsixInputFileLocation)\cs\*.dll">
       <VSIXSubPath>cs</VSIXSubPath>
@@ -192,7 +192,7 @@
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\Cpp\arm64\*.*" Exclude="$(VsixInputFileLocation)\Extensions\Cpp\arm64\*.pdb">
       <VSIXSubPath>Extensions\Cpp\arm64</VSIXSubPath>
     </VsixSourceItem>
-    
+
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\TestImpact\ComComponents\x64\*.*">
       <VSIXSubPath>Extensions\TestImpact\ComComponents\x64</VSIXSubPath>
     </VsixSourceItem>
@@ -240,32 +240,20 @@
     <VsixSourceItem Include="$(VsixInputFileLocation)\*.*" Exclude="$(VsixInputFileLocation)\*.pdb" />
 
 <VsixSourceItem Include="$(VsixInputFileLocation)\*.*" Exclude="$(VsixInputFileLocation)\*.pdb" />
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.exe" /> 
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net452.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net452.exe" /> 
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net46.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net46.exe" /> 
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net461.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net461.exe" /> 
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net462.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net462.exe" /> 
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net47.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net47.exe" /> 
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net471.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net471.exe" /> 
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net472.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net472.exe" /> 
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net48.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net48.exe" /> 
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.exe" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net47.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net47.exe" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net471.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net471.exe" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net472.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net472.exe" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net48.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net48.exe" />
 
     <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.x86.exe" />
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net452.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net452.x86.exe" />
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net46.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net46.x86.exe" />
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net461.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net461.x86.exe" />
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net462.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net462.x86.exe" />
     <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net47.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net47.x86.exe" />
     <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net471.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net471.x86.exe" />
     <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net472.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net472.x86.exe" />
     <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net48.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net48.x86.exe" />
-    
+
     <!-- Arm64 is not yet supported by VsixUtil.exe and it will generate a wrong manifest. We disable temporary the ngen to avoid to enqueue arm64 binaries in the wrong architecture polluting logs with errors.-->
     <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.arm64.exe" Ngen="false" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.arm64.exe" />
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net452.arm64.exe" Ngen="false" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net452.arm64.exe" />
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net46.arm64.exe" Ngen="false" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net46.arm64.exe" />
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net461.arm64.exe" Ngen="false" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net461.arm64.exe" />
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net462.arm64.exe" Ngen="false" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net462.arm64.exe" />
     <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net47.arm64.exe" Ngen="false" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net47.arm64.exe" />
     <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net471.arm64.exe" Ngen="false" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net471.arm64.exe" />
     <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net472.arm64.exe" Ngen="false" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net472.arm64.exe" />
@@ -279,7 +267,7 @@
     <Content Include="testplatform.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>    
+    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -294,7 +282,7 @@
     <Error Condition="!Exists('$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.targets'))" />
   </Target>
   <Import Project="$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.targets" Condition="Exists('$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

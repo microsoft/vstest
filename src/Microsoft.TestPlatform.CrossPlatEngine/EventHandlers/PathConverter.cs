@@ -119,14 +119,14 @@ internal class PathConverter : IPathConverter
         return attachmentSets!;
     }
 
-    private AttachmentSet UpdateAttachmentSet(AttachmentSet attachmentSet, PathConversionDirection updateDirection)
+    private static AttachmentSet UpdateAttachmentSet(AttachmentSet attachmentSet, PathConversionDirection updateDirection)
     {
         ValidateArg.NotNull(attachmentSet, nameof(attachmentSet));
         attachmentSet.Attachments.ToList().ForEach(a => UpdateAttachment(a, updateDirection));
         return attachmentSet;
     }
 
-    private UriDataAttachment UpdateAttachment(UriDataAttachment attachment, PathConversionDirection _)
+    private static UriDataAttachment UpdateAttachment(UriDataAttachment attachment, PathConversionDirection _)
     {
         ValidateArg.NotNull(attachment, nameof(attachment));
         // todo: convert uri? https://github.com/microsoft/vstest/issues/3367

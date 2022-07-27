@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,8 +29,8 @@ namespace Microsoft.TestPlatform.TestUtilities;
 /// </summary>
 public class IntegrationTestBase
 {
-    public const string DesktopRunnerFramework = "net451";
-    public const string CoreRunnerFramework = "netcoreapp2.1";
+    public const string DesktopRunnerFramework = "net462";
+    public const string CoreRunnerFramework = "netcoreapp3.1";
 
     private const string TotalTestsMessage = "Total tests: {0}";
     private const string PassedTestsMessage = " Passed: {0}";
@@ -193,7 +194,7 @@ public class IntegrationTestBase
     /// Invokes our local copy of dotnet that is patched with artifacts from the build with specified arguments.
     /// </summary>
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
-    public void InvokeDotnetTest(string arguments, Dictionary<string, string?>? environmentVariables = null, bool useDotnetFromTools = false, string? workingDirectory = null)
+    public void InvokeDotnetTest(string arguments, Dictionary<string, string?>? environmentVariables = null)
     {
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
 
@@ -208,7 +209,7 @@ public class IntegrationTestBase
         // https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestForwardingApp.cs#L30-L39
         debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
 
-        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables, useDotnetFromTools, workingDirectory);
+        ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
         FormatStandardOutCome();
     }
 
@@ -279,7 +280,7 @@ public class IntegrationTestBase
     /// <param name="runnerFramework">Runner Framework</param>
     /// <param name="framework">Framework for which Tests are not supported</param>
     /// <param name="message">Message to be shown</param>
-    public void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
+    public static void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
     {
         if (runnerFramework.StartsWith(framework))
         {
@@ -307,6 +308,7 @@ public class IntegrationTestBase
         {
             // No test should be found/run
             var summaryStatus = string.Format(
+                CultureInfo.CurrentCulture,
                 TestSummaryStatusMessageFormat,
                 @"\d+",
                 @"\d+",
@@ -323,20 +325,20 @@ public class IntegrationTestBase
         }
         else
         {
-            var summaryStatus = string.Format(TotalTestsMessage, totalTestCount);
+            var summaryStatus = string.Format(CultureInfo.CurrentCulture, TotalTestsMessage, totalTestCount);
             if (passed != 0)
             {
-                summaryStatus += string.Format(PassedTestsMessage, passed);
+                summaryStatus += string.Format(CultureInfo.CurrentCulture, PassedTestsMessage, passed);
             }
 
             if (failed != 0)
             {
-                summaryStatus += string.Format(FailedTestsMessage, failed);
+                summaryStatus += string.Format(CultureInfo.CurrentCulture, FailedTestsMessage, failed);
             }
 
             if (skipped != 0)
             {
-                summaryStatus += string.Format(SkippedTestsMessage, skipped);
+                summaryStatus += string.Format(CultureInfo.CurrentCulture, SkippedTestsMessage, skipped);
             }
 
             Assert.IsTrue(
@@ -439,7 +441,7 @@ public class IntegrationTestBase
     public void ValidatePassedTests(params string[] passedTests)
     {
         // Convert the unicode character to its unicode value for assertion
-        _standardTestOutput = Regex.Replace(_standardTestOutput, @"[^\x00-\x7F]", c => string.Format(@"\u{0:x4}", (int)c.Value[0]));
+        _standardTestOutput = Regex.Replace(_standardTestOutput, @"[^\x00-\x7F]", c => $@"\u{(int)c.Value[0]:x4}");
         foreach (var test in passedTests)
         {
             // Check for tick or ? both, in some cases as unicode character for tick is not available
@@ -578,19 +580,19 @@ public class IntegrationTestBase
 
         if (testFramework == UnitTestFramework.MSTest)
         {
-            adapterRelativePath = string.Format(_testAdapterRelativePath, _testEnvironment.DependencyVersions["MSTestAdapterVersion"]);
+            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _testAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["MSTestAdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.NUnit)
         {
-            adapterRelativePath = string.Format(_nUnitTestAdapterRelativePath, _testEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
+            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _nUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.XUnit)
         {
-            adapterRelativePath = string.Format(_xUnitTestAdapterRelativePath, _testEnvironment.DependencyVersions["XUnitAdapterVersion"]);
+            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.Chutzpah)
         {
-            adapterRelativePath = string.Format(_chutzpahTestAdapterRelativePath, _testEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
+            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _chutzpahTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
         }
 
         return _testEnvironment.GetNugetPackage(adapterRelativePath);
@@ -762,7 +764,7 @@ public class IntegrationTestBase
     /// <param name="stdError"></param>
     /// <param name="exitCode"></param>
     private void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode,
-        Dictionary<string, string?>? environmentVariables = null, bool useDotnetFromTools = false, string? workingDirectory = null)
+        Dictionary<string, string?>? environmentVariables = null)
     {
         if (environmentVariables is null)
         {
@@ -772,8 +774,8 @@ public class IntegrationTestBase
         environmentVariables["DOTNET_MULTILEVEL_LOOKUP"] = "0";
 
         var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
-        var patchedDotnetPath = Path.Combine(useDotnetFromTools ? _testEnvironment.ToolsDirectory : _testEnvironment.TestArtifactsDirectory, executablePath);
-        ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables, workingDirectory);
+        var patchedDotnetPath = Path.Combine(_testEnvironment.TestArtifactsDirectory, executablePath);
+        ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
     }
 
     protected static void ExecuteApplication(string path, string? args, out string stdOut, out string stdError, out int exitCode,

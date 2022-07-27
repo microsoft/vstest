@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
 {
@@ -17,5 +16,4 @@ namespace Tests
         #region FailingTests
         #endregion
     }
- 
 }

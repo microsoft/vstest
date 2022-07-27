@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
@@ -49,6 +50,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     private Action<Message>? _onAttachDebuggerAckRecieved;
     private IPathConverter _pathConverter;
     private Exception? _messageProcessingUnrecoverableError;
+    private bool _isDisposed;
 
     public TestHostConnectionInfo ConnectionInfo { get; set; }
     string? IDeploymentAwareTestRequestHandler.LocalPath { get; set; }
@@ -154,8 +156,22 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
     /// <inheritdoc />
     public void Dispose()
     {
-        _communicationEndPoint?.Stop();
-        _channel?.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+
+        if (disposing)
+        {
+            _communicationEndPoint?.Stop();
+            _channel?.Dispose();
+        }
+
+        _isDisposed = true;
     }
 
     /// <inheritdoc />
@@ -348,7 +364,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                     // Can only do this after InitializeCommunication because TestHost cannot "Send Log" unless communications are initialized
                     if (!StringUtils.IsNullOrEmpty(EqtTrace.LogFile))
                     {
-                        SendLog(TestMessageLevel.Informational, string.Format(CrossPlatResources.TesthostDiagLogOutputFile, EqtTrace.LogFile));
+                        SendLog(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, CrossPlatResources.TesthostDiagLogOutputFile, EqtTrace.LogFile));
                     }
                     else if (!StringUtils.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
                     {

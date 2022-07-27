@@ -96,7 +96,7 @@ public class JsonDataSerializer : IDataSerializer
             // PERF: This is slow, we deserialize the message, and the payload into JToken just to get the header. We then
             // deserialize the data from the JToken, but that is twice as expensive as deserializing the whole object directly into the final object type.
             // We need this for backward compatibility though.
-            return Deserialize<VersionedMessage>(rawMessage);
+            return Deserialize<VersionedMessage>(rawMessage)!;
         }
 
         // PERF: Try grabbing the version and message type from the string directly, we are pretty certain how the message is serialized
@@ -105,7 +105,7 @@ public class JsonDataSerializer : IDataSerializer
         {
             // PERF: If the fast path fails, deserialize into header object that does not have any Payload. When the message type info
             // is at the start of the message, this is also pretty fast. Again, this won't touch the payload.
-            MessageHeader header = JsonConvert.DeserializeObject<MessageHeader>(rawMessage, JsonSettings);
+            MessageHeader header = JsonConvert.DeserializeObject<MessageHeader>(rawMessage, JsonSettings)!;
             version = header.Version;
             messageType = header.MessageType;
         }
@@ -161,13 +161,19 @@ public class JsonDataSerializer : IDataSerializer
         var messageWithRawMessage = (VersionedMessageWithRawMessage)message;
         var rawMessage = messageWithRawMessage.RawMessage;
 
+        if (rawMessage == null)
+        {
+            return default;
+        }
+
         // The deserialized message can still have a version (0 or 1), that should use the old deserializer
         if (payloadSerializer == PayloadSerializerV2)
         {
             // PERF: Fast path is compatibile only with protocol versions that use serializer_2,
             // and this is faster than deserializing via deserializer_2.
             var messageWithPayload = JsonConvert.DeserializeObject<PayloadedMessage<T>>(rawMessage, FastJsonSettings);
-            return messageWithPayload.Payload;
+
+            return messageWithPayload == null ? default : messageWithPayload.Payload;
         }
         else
         {
@@ -175,7 +181,7 @@ public class JsonDataSerializer : IDataSerializer
             // This is still better than deserializing the JToken in DeserializeMessage because here we know that the payload
             // will actually be used.
             TPDebug.Assert(rawMessage is not null, "rawMessage should not be null");
-            var rawMessagePayload = Deserialize<Message>(rawMessage).Payload;
+            var rawMessagePayload = Deserialize<Message>(rawMessage)?.Payload;
             TPDebug.Assert(rawMessagePayload is not null, "rawMessagePayload should not be null");
             return Deserialize<T>(payloadSerializer, rawMessagePayload);
         }
@@ -286,7 +292,8 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="version">Version of serializer to be used.</param>
     /// <typeparam name="T">Target type to deserialize.</typeparam>
     /// <returns>An instance of <see cref="T"/>.</returns>
-    public T Deserialize<T>(string json, int version = 1)
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
+    public T? Deserialize<T>(string json, int version = 1)
     {
         var payloadSerializer = GetPayloadSerializer(version);
         return Deserialize<T>(payloadSerializer, json);
@@ -327,6 +334,9 @@ public class JsonDataSerializer : IDataSerializer
         // so when we resolved the old serializer we should use non-fast path.
         if (DisableFastJson || payloadSerializer == PayloadSerializerV1)
         {
+            if (payload == null)
+                return string.Empty;
+
             var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
             return version > 1 ?
@@ -346,6 +356,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="data">Instance of the object to serialize.</param>
     /// <param name="version">Version to be stamped.</param>
     /// <returns>JSON string.</returns>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public string Serialize<T>(T data, int version = 1)
     {
         var payloadSerializer = GetPayloadSerializer(version);
@@ -387,7 +398,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <param name="serializer">Serializer.</param>
     /// <param name="data">Data to be deserialized.</param>
     /// <returns>Deserialized data.</returns>
-    private static T Deserialize<T>(JsonSerializer serializer, string data)
+    private static T? Deserialize<T>(JsonSerializer serializer, string data)
     {
         using var stringReader = new StringReader(data);
         using var jsonReader = new JsonTextReader(stringReader);
@@ -403,7 +414,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Deserialized data.</returns>
     private static T Deserialize<T>(JsonSerializer serializer, JToken jToken)
     {
-        return jToken.ToObject<T>(serializer);
+        return jToken.ToObject<T>(serializer)!;
     }
 
     private static JsonSerializer GetPayloadSerializer(int? version)

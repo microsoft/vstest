@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Globalization;
 
 using Microsoft.TestPlatform.PerformanceTests.PerfInstrumentation;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -39,7 +40,7 @@ public class DiscoveryPerfTests : TelemetryPerfTestBase
         using (perfAnalyzer.Start())
         {
             // This tells to PerfyTestAdapter how many tests it should return, this is our overhead baseline.
-            var perfyTestAdapterEnv = new Dictionary<string, string?> { ["TEST_COUNT"] = expectedNumberOfTests.ToString() };
+            var perfyTestAdapterEnv = new Dictionary<string, string?> { ["TEST_COUNT"] = expectedNumberOfTests.ToString(CultureInfo.InvariantCulture) };
             var vstestConsoleWrapper = GetVsTestConsoleWrapper(perfyTestAdapterEnv, traceLevel: System.Diagnostics.TraceLevel.Off);
             var assetPath = GetPerfAssetFullPath(projectName);
             vstestConsoleWrapper.DiscoverTests(assetPath, GetDefaultRunSettings(), options, discoveryEventHandler2);
@@ -82,7 +83,7 @@ public class DiscoveryPerfTests : TelemetryPerfTestBase
         using (perfAnalyzer.Start())
         {
             // This tells to PerfyTestAdapter how many tests it should return, this is our overhead baseline.
-            var perfyTestAdapterEnv = new Dictionary<string, string?> { ["TEST_COUNT"] = expectedNumberOfTests.ToString() };
+            var perfyTestAdapterEnv = new Dictionary<string, string?> { ["TEST_COUNT"] = expectedNumberOfTests.ToString(CultureInfo.InvariantCulture) };
             var vstestConsoleWrapper = GetVsTestConsoleWrapper(perfyTestAdapterEnv, traceLevel: System.Diagnostics.TraceLevel.Off);
             vstestConsoleWrapper.DiscoverTests(GetPerfAssetFullPath(projectName), GetDefaultRunSettings(), options, discoveryEventHandler2);
             vstestConsoleWrapper.EndSession();

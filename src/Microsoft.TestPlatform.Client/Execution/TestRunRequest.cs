@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 
@@ -32,7 +33,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// <summary>
     /// Specifies whether the run is disposed or not
     /// </summary>
-    private bool _disposed;
+    private bool _isDisposed;
 
     /// <summary>
     /// Sync object for various operations
@@ -107,7 +108,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException("testRunRequest");
             }
@@ -169,7 +170,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     {
         EqtTrace.Verbose("TestRunRequest.OnTestSessionTimeout: calling cancellation as test run exceeded testSessionTimeout {0} milliseconds", _testSessionTimeout);
 
-        string message = string.Format(ClientResources.TestSessionTimeoutMessage, _testSessionTimeout);
+        string message = string.Format(CultureInfo.CurrentCulture, ClientResources.TestSessionTimeoutMessage, _testSessionTimeout);
         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
         var rawMessage = _dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
 
@@ -185,7 +186,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     {
         EqtTrace.Verbose("TestRunRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
 
-        if (_disposed)
+        if (_isDisposed)
         {
             throw new ObjectDisposedException("testRunRequest");
         }
@@ -214,7 +215,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         lock (_cancelSyncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("Ignoring TestRunRequest.CancelAsync() as testRunRequest object has already been disposed.");
                 return;
@@ -243,7 +244,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         lock (_cancelSyncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("Ignoring TestRunRequest.Abort() as testRunRequest object has already been disposed");
                 return;
@@ -364,7 +365,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         lock (_syncObject)
         {
             // If this object is disposed, don't do anything
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("TestRunRequest.TestRunComplete: Ignoring as the object is disposed.");
                 return;
@@ -480,7 +481,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         lock (_syncObject)
         {
             // If this object is disposed, don't do anything
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("TestRunRequest.SendTestRunStatsChange: Ignoring as the object is disposed.");
                 return;
@@ -505,7 +506,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
         lock (_syncObject)
         {
             // If this object is disposed, don't do anything
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("TestRunRequest.SendTestRunMessage: Ignoring as the object is disposed.");
                 return;
@@ -683,7 +684,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
         lock (_syncObject)
         {
-            if (!_disposed)
+            if (!_isDisposed)
             {
                 if (disposing)
                 {
@@ -692,7 +693,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
                 // Indicate that object has been disposed
                 _runCompletionEvent = null!;
-                _disposed = true;
+                _isDisposed = true;
             }
         }
 

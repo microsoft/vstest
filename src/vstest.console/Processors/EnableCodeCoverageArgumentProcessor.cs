@@ -199,7 +199,7 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
         if (runsettingsXml == null)
         {
             _runSettingsManager.AddDefaultRunSettings();
-            runsettingsXml = _runSettingsManager.ActiveRunSettings?.SettingsXml;
+            runsettingsXml = _runSettingsManager.ActiveRunSettings!.SettingsXml!;
         }
 
         IXPathNavigable runSettingsDocument;
@@ -286,9 +286,9 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
         var navigator = runSettingDocument.CreateNavigator();
         var nodes = navigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
 
-        foreach (XPathNavigator dataCollectorNavigator in nodes)
+        foreach (XPathNavigator? dataCollectorNavigator in nodes)
         {
-            var fn = dataCollectorNavigator.GetAttribute("friendlyName", string.Empty);
+            var fn = dataCollectorNavigator?.GetAttribute("friendlyName", string.Empty);
             if (string.Equals(dataCollectorFriendlyName, fn, StringComparison.OrdinalIgnoreCase))
             {
                 return true;

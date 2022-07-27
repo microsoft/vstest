@@ -973,6 +973,26 @@ Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")
         <target state="new">vstest.console.exe is running in emulated mode as {0}. For better performance, please consider using the native runner vstest.console.arm64.exe.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="RequestHandlerConnectionTimedOut">
+        <source>Waiting for request handler connection timed out after {0} seconds.</source>
+        <target state="new">Waiting for request handler connection timed out after {0} seconds.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StartTestSessionTimedOut">
+        <source>Waiting for start test session timed out after {0} seconds.</source>
+        <target state="new">Waiting for start test session timed out after {0} seconds.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StopTestSessionTimedOut">
+        <source>Waiting for stop test session timed out after {0} seconds.</source>
+        <target state="new">Waiting for stop test session timed out after {0} seconds.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ErrorHostingCommunicationChannel">
+        <source>Error hosting communication channel.</source>
+        <target state="new">Error hosting communication channel.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

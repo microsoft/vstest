@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -45,9 +46,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 internal class TestRequestManager : ITestRequestManager
 {
     private static ITestRequestManager? s_testRequestManagerInstance;
-
-    // Defines the default architecture to be used for AnyCPU or non-dll sources. This is just temporary, and unsupported, DO NOT use.
-    private static readonly string VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU = nameof(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU);
 
     private readonly ITestPlatform _testPlatform;
     private readonly ITestPlatformEventSource _testPlatformEventSource;
@@ -149,7 +147,7 @@ internal class TestRequestManager : ITestRequestManager
     /// <inheritdoc />
     public void ResetOptions()
     {
-        _commandLineOptions.Reset();
+        CommandLineOptions.Reset();
     }
 
     /// <inheritdoc />
@@ -301,6 +299,7 @@ internal class TestRequestManager : ITestRequestManager
         {
             throw new SettingsException(
                 string.Format(
+                    CultureInfo.CurrentCulture,
                     Resources.Resources.RunsettingsWithDCErrorMessage,
                     runsettings));
         }
@@ -488,6 +487,7 @@ internal class TestRequestManager : ITestRequestManager
         {
             throw new SettingsException(
                 string.Format(
+                    CultureInfo.CurrentCulture,
                     Resources.Resources.RunsettingsWithDCErrorMessage,
                     payload.RunSettings));
         }
@@ -591,10 +591,7 @@ internal class TestRequestManager : ITestRequestManager
             {
                 // We are collecting telemetry for the legacy nodes and attributes used in the runsettings.
                 requestData.MetricsCollection.Add(
-                    string.Format(
-                        "{0}.{1}",
-                        TelemetryDataConstants.LegacySettingPrefix,
-                        ciData.Key),
+                    $"{TelemetryDataConstants.LegacySettingPrefix}.{ciData.Key}",
                     ciData.Value);
             }
         }
@@ -633,23 +630,22 @@ internal class TestRequestManager : ITestRequestManager
     public void Dispose()
     {
         Dispose(true);
-
-        // Use SupressFinalize in case a subclass
-        // of this type implements a finalizer.
         GC.SuppressFinalize(this);
     }
 
-    private void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
-        if (!_isDisposed)
+        if (_isDisposed)
         {
-            if (disposing)
-            {
-                _metricsPublisher.Result.Dispose();
-            }
-
-            _isDisposed = true;
+            return;
         }
+
+        if (disposing)
+        {
+            _metricsPublisher.Result.Dispose();
+        }
+
+        _isDisposed = true;
     }
 
     private bool UpdateRunSettingsIfRequired(
@@ -723,7 +719,7 @@ internal class TestRequestManager : ITestRequestManager
             // it can be specified by user on the command line with --arch or through runsettings.
             // If it's not specified by user will be filled by current processor architecture;
             // should be the same as SDK.
-            defaultArchitecture = GetDefaultArchitecture(runConfiguration, runsettingsXml);
+            defaultArchitecture = GetDefaultArchitecture(runConfiguration);
         }
         else
         {
@@ -734,7 +730,7 @@ internal class TestRequestManager : ITestRequestManager
                 // As default architecture we specify the expected test host architecture,
                 // it can be specified by user on the command line with /Platform or through runsettings.
                 // If it's not specified by user will be filled by current processor architecture.
-                defaultArchitecture = GetDefaultArchitecture(runConfiguration, runsettingsXml);
+                defaultArchitecture = GetDefaultArchitecture(runConfiguration);
             }
 
             // Other scenarios, most notably .NET Framework with MultiTFM disabled, will use the old default X86 architecture.
@@ -809,7 +805,7 @@ internal class TestRequestManager : ITestRequestManager
 
         return settingsUpdated;
 
-        Architecture GetDefaultArchitecture(RunConfiguration runConfiguration, string runsettingsXml)
+        Architecture GetDefaultArchitecture(RunConfiguration runConfiguration)
         {
             if (!RunSettingsHelper.Instance.IsDefaultTargetArchitecture)
             {
@@ -820,23 +816,6 @@ internal class TestRequestManager : ITestRequestManager
             if (defaultArchitectureFromRunsettings != null)
             {
                 return defaultArchitectureFromRunsettings.Value;
-            }
-
-            // Returns null, where there are none.
-            Dictionary<string, string?>? environmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(runsettingsXml);
-            if (environmentVariables != null)
-            {
-                string? defaultArchitectureFromRunsettingsEnvironmentVariables = environmentVariables.TryGetValue(VSTEST_DEFAULT_ARCHITECTURE_FOR_ANYCPU, out var architecture) ? architecture : null;
-
-                if (defaultArchitectureFromRunsettingsEnvironmentVariables != null)
-                {
-                    Architecture? defaultArchitecture = Enum.TryParse<Architecture>(defaultArchitectureFromRunsettingsEnvironmentVariables, out var arch) ? arch : null;
-
-                    if (defaultArchitecture != null)
-                    {
-                        return defaultArchitecture.Value;
-                    }
-                }
             }
 
             return TranslateToArchitecture(_processHelper.GetCurrentProcessArchitecture());
@@ -1219,8 +1198,7 @@ internal class TestRequestManager : ITestRequestManager
                 navigator,
                 out var platformXml);
 
-            bool runSettingsHaveValidPlatform = isValidPlatformXml && !platformXml.IsNullOrWhiteSpace();
-            if (runSettingsHaveValidPlatform)
+            if (isValidPlatformXml && !platformXml.IsNullOrWhiteSpace())
             {
                 // TODO: this should be checking if the enum has the value specified, or ideally just ask the runsettings to give that value
                 // so we parse the same way always

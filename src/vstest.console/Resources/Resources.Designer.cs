@@ -1233,6 +1233,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Waiting for request handler connection timed out after {0} seconds..
+        /// </summary>
+        internal static string RequestHandlerConnectionTimedOut {
+            get {
+                return ResourceManager.GetString("RequestHandlerConnectionTimedOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to @&lt;file&gt;
         ///      Read response file for more options..
         /// </summary>
@@ -1418,6 +1427,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Waiting for start test session timed out after {0} seconds..
+        /// </summary>
+        internal static string StartTestSessionTimedOut {
+            get {
+                return ResourceManager.GetString("StartTestSessionTimedOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Standard Error Messages:.
         /// </summary>
         internal static string StdErrMessagesBanner {
@@ -1432,6 +1450,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         internal static string StdOutMessagesBanner {
             get {
                 return ResourceManager.GetString("StdOutMessagesBanner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for stop test session timed out after {0} seconds..
+        /// </summary>
+        internal static string StopTestSessionTimedOut {
+            get {
+                return ResourceManager.GetString("StopTestSessionTimedOut", resourceCulture);
             }
         }
         
@@ -1814,6 +1841,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         internal static string WarningEmulatedOnArm64 {
             get {
                 return ResourceManager.GetString("WarningEmulatedOnArm64", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Error hosting the communication channel. For better performance, please consider using the native runner vstest.console.arm64.exe..
+        /// </summary>
+        internal static string ErrorHostingCommunicationChannel {
+            get {
+                return ResourceManager.GetString("ErrorHostingCommunicationChannel", resourceCulture);
             }
         }
     }

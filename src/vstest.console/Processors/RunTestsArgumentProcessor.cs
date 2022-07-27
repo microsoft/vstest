@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Globalization;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
@@ -139,7 +138,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         var anySource = _commandLineOptions.Sources.FirstOrDefault();
         if (anySource == null)
         {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
+            throw new CommandLineException(CommandLineResources.MissingTestSourceFile);
         }
 
         Output.WriteLine(CommandLineResources.StartingExecution, OutputLevel.Information);
@@ -209,7 +208,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e">RunCompletion args</param>
-        private void TestRunRequest_OnRunCompletion(object sender, TestRunCompleteEventArgs e)
+        private void TestRunRequest_OnRunCompletion(object? sender, TestRunCompleteEventArgs e)
         {
             // If run is not aborted/canceled then check the count of executed tests.
             // we need to check if there are any tests executed - to try show some help info to user to check for installed vsix extensions

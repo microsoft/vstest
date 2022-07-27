@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -116,6 +117,7 @@ internal abstract class BaseRunTests
     /// <param name="testEventsPublisher">Publisher for test events.</param>
     /// <param name="platformThread">Platform Thread.</param>
     /// <param name="dataSerializer">Data Serializer for cloning TestCase and test results object.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Part of the public API")]
     protected BaseRunTests(
         IRequestData requestData,
         string? package,
@@ -382,7 +384,7 @@ internal abstract class BaseRunTests
                 TestRunEventsHandler?.HandleLogMessage(
                     TestMessageLevel.Warning,
                     string.Format(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         CrossPlatEngineResources.NoMatchingExecutor,
                         executorUriExtensionTuple.Item1.AbsoluteUri,
                         runtimeVersion));
@@ -418,11 +420,7 @@ internal abstract class BaseRunTests
 #endif
                 if (!FrameworkHandle.AttachDebuggerToProcess(pid))
                 {
-                    EqtTrace.Warning(
-                        string.Format(
-                            CultureInfo.CurrentUICulture,
-                            CrossPlatEngineResources.AttachDebuggerToDefaultTestHostFailure,
-                            pid));
+                    EqtTrace.Warning(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.AttachDebuggerToDefaultTestHostFailure, pid));
                 }
             }
         }
@@ -479,7 +477,7 @@ internal abstract class BaseRunTests
 
                     // Collecting Total Tests Ran by each Adapter
                     var totalTestRun = TestRunCache.TotalExecutedTests - totalTests;
-                    _requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsRanByAdapter, executorUri), totalTestRun);
+                    _requestData.MetricsCollection.Add($"{TelemetryDataConstants.TotalTestsRanByAdapter}.{executorUri}", totalTestRun);
 
                     // Only enable this for MSTestV1 telemetry for now, this might become more generic later.
                     if (MsTestV1TelemetryHelper.IsMsTestV1Adapter(executorUri))
@@ -488,7 +486,7 @@ internal abstract class BaseRunTests
                         {
                             var value = TestRunCache.AdapterTelemetry[adapterMetrics];
 
-                            _requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsRunByMSTestv1, adapterMetrics), value);
+                            _requestData.MetricsCollection.Add($"{TelemetryDataConstants.TotalTestsRunByMSTestv1}.{adapterMetrics}", value);
                         }
                     }
 
@@ -507,7 +505,7 @@ internal abstract class BaseRunTests
                     executor.Metadata.ExtensionUri);
 
                 // Collecting Time Taken by each executor Uri
-                _requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, executorUri), totalTimeTaken.TotalSeconds);
+                _requestData.MetricsCollection.Add($"{TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter}.{executorUri}", totalTimeTaken.TotalSeconds);
                 totalTimeTakenByAdapters += totalTimeTaken.TotalSeconds;
             }
             catch (Exception e)
@@ -578,7 +576,7 @@ internal abstract class BaseRunTests
         }
     }
 
-    private void SetAdapterLoggingSettings()
+    private static void SetAdapterLoggingSettings()
     {
         // TODO: enable the below once runsettings is in.
         // var sessionMessageLogger = testExecutorFrameworkHandle as TestSessionMessageLogger;
@@ -682,7 +680,7 @@ internal abstract class BaseRunTests
             EqtTrace.Warning("BaseRunTests.TryToRunInSTAThread: Failed to run in STA thread: {0}", ex);
             TestRunEventsHandler.HandleLogMessage(
                 TestMessageLevel.Warning,
-                string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.ExecutionThreadApartmentStateNotSupportedForFramework, _runConfiguration.TargetFramework!.ToString()));
+                string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.ExecutionThreadApartmentStateNotSupportedForFramework, _runConfiguration.TargetFramework!.ToString()));
         }
 
         return success;

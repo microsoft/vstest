@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml;
 
@@ -481,6 +482,7 @@ public class XmlRunSettingsUtilitiesTests
 
         Assert.IsTrue(exceptionMessage.Contains(
             string.Format(
+                CultureInfo.CurrentCulture,
                 Resources.InvalidUriInSettings,
                 "invalidUri",
                 "Logger")));
@@ -712,6 +714,7 @@ public class XmlRunSettingsUtilitiesTests
         }
 
         Assert.IsTrue(exceptionMessage.Contains(string.Format(
+            CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlAttribute,
             "LoggerRunSettings",
             "name")));
@@ -775,6 +778,7 @@ public class XmlRunSettingsUtilitiesTests
         }
 
         Assert.IsTrue(exceptionMessage.Contains(string.Format(
+            CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlElement,
             "LoggerRUNSettings",
             "LoggersInvalid")));
@@ -807,6 +811,7 @@ public class XmlRunSettingsUtilitiesTests
         }
 
         Assert.IsTrue(exceptionMessage.Contains(string.Format(
+            CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlAttribute,
             "Loggers",
             "nameAttr")));
@@ -874,6 +879,7 @@ public class XmlRunSettingsUtilitiesTests
         }
 
         Assert.IsTrue(exceptionMessage.Contains(string.Format(
+            CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlElement,
             "Loggers",
             "LoggerInvalid")));
@@ -906,9 +912,7 @@ public class XmlRunSettingsUtilitiesTests
             exceptionMessage = ex.Message;
         }
 
-        Assert.IsTrue(exceptionMessage.Contains(string.Format(
-            Resources.MissingLoggerAttributes,
-            "LogGer")));
+        Assert.IsTrue(exceptionMessage.Contains(string.Format(CultureInfo.CurrentCulture, Resources.MissingLoggerAttributes, "LogGer")));
     }
 
     [TestMethod]
@@ -973,6 +977,7 @@ public class XmlRunSettingsUtilitiesTests
         }
 
         Assert.AreEqual(string.Format(
+            CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlElement,
             "Logger",
             "ConfiGUrationInvalid"), exceptionMessage);
@@ -1010,6 +1015,7 @@ public class XmlRunSettingsUtilitiesTests
         }
 
         Assert.AreEqual(string.Format(
+            CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlAttribute,
             "Logger",
             "invalidAttr"), exceptionMessage);

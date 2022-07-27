@@ -81,14 +81,14 @@ internal class RunTestsWithSources : BaseRunTests
             var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(TestExecutionContext.TestCaseFilter);
             TestRunEventsHandler?.HandleLogMessage(
                 TestMessageLevel.Warning,
-                string.Format(CrossPlatEngineResources.NoTestsAvailableForGivenTestCaseFilter, testCaseFilterToShow, sourcesString));
+                string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.NoTestsAvailableForGivenTestCaseFilter, testCaseFilterToShow, sourcesString));
         }
         else
         {
             TestRunEventsHandler?.HandleLogMessage(
                 TestMessageLevel.Warning,
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
                     sourcesString));
         }
@@ -174,7 +174,7 @@ internal class RunTestsWithSources : BaseRunTests
                 if (executorUri == null)
                 {
                     string errorMessage = string.Format(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         CrossPlatEngineResources.IgnoringExecutorAsNoDefaultExecutorUriAttribute,
                         discoverer.Value);
                     logger.SendMessage(TestMessageLevel.Warning, errorMessage);
@@ -190,7 +190,7 @@ internal class RunTestsWithSources : BaseRunTests
                 else
                 {
                     string errorMessage = string.Format(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         CrossPlatEngineResources.DuplicateAdaptersFound,
                         executorUri,
                         discoverer.Value);

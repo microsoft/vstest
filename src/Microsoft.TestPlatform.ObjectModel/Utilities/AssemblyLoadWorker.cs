@@ -22,7 +22,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
     /// </summary>
     /// <param name="path">Path of the assembly file</param>
     /// <returns> String representation of the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
-    public string GetTargetFrameworkVersionStringFromPath(string path)
+    public static string GetTargetFrameworkVersionStringFromPath(string path)
     {
         if (!File.Exists(path))
         {
@@ -76,9 +76,9 @@ internal class AssemblyLoadWorker : MarshalByRefObject
     /// Returns null on failure and an empty array if there is no reference in the project.
     /// </summary>
     /// <param name="path">Path to the assembly file to load from.</param>
-    public string[]? GetReferencedAssemblies(string path)
+    public static string[]? GetReferencedAssemblies(string path)
     {
-        TPDebug.Assert(!StringUtils.IsNullOrEmpty(path));
+        TPDebug.Assert(!path.IsNullOrEmpty());
 
         Assembly? a = null;
         try
@@ -104,7 +104,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
     /// <summary>
     /// Returns true if given assembly matched name and public key token.
     /// </summary>
-    public bool? CheckAssemblyReference(string path, string referenceAssemblyName, byte[] publicKeyToken)
+    public static bool? CheckAssemblyReference(string path, string referenceAssemblyName, byte[] publicKeyToken)
     {
         try
         {
@@ -162,7 +162,7 @@ internal class AssemblyLoadWorker : MarshalByRefObject
     /// <param name="path"></param>
     /// <param name="procArchType"></param>
     /// <param name="frameworkVersion"></param>
-    public void GetPlatformAndFrameworkSettings(string path, out string procArchType, out string frameworkVersion)
+    public static void GetPlatformAndFrameworkSettings(string path, out string procArchType, out string frameworkVersion)
     {
         procArchType = nameof(Architecture.Default);
         frameworkVersion = string.Empty;

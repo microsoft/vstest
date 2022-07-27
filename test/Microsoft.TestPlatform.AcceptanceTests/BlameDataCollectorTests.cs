@@ -3,6 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+#if NET
+using System.Globalization;
+#endif
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,7 +23,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestCategory("Windows-Review")]
 public class BlameDataCollectorTests : AcceptanceTestBase
 {
-    public const string NETCOREANDFX = "net452;net472;netcoreapp3.1";
+    public const string NETCOREANDFX = "net462;net472;netcoreapp3.1";
     public const string NET50 = "net5.0";
     private readonly string _procDumpPath;
 
@@ -37,7 +40,6 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // netcoreapp2.1 dump is not supported on Linux
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
@@ -54,7 +56,6 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // netcoreapp2.1 dump is not supported on Linux
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
@@ -79,7 +80,6 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // netcoreapp2.1 dump is not supported on Linux
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
@@ -104,7 +104,6 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // netcoreapp2.1 dump is not supported on Linux
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
@@ -129,9 +128,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
+    [NetCoreRunner("net462;net472;netcoreapp3.1;net5.0")]
     // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
+    // [NetFrameworkRunner("net462;net472;netcoreapp3.1;net5.0")]
     public void HangDumpOnTimeout(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -152,9 +151,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     [TestMethod]
     // net5.0 does not support dump on exit
-    [NetCoreRunner("net452;net472;netcoreapp3.1")]
+    [NetCoreRunner("net462;net472;netcoreapp3.1")]
     // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
+    // [NetFrameworkRunner("net462;net472;netcoreapp3.1")]
 
     public void CrashDumpWhenThereIsNoTimeout(RunnerInfo runnerInfo)
     {
@@ -176,9 +175,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     [TestMethod]
     // net5.0 does not support dump on exit
-    [NetCoreRunner("net452;net472;netcoreapp3.1")]
+    [NetCoreRunner("net462;net472;netcoreapp3.1")]
     // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
+    // [NetFrameworkRunner("net462;net472;netcoreapp3.1")]
 
     public void CrashDumpOnExit(RunnerInfo runnerInfo)
     {
@@ -199,9 +198,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
+    [NetCoreRunner("net462;net472;netcoreapp3.1;net5.0")]
     // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
+    // [NetFrameworkRunner("net462;net472;netcoreapp3.1;net5.0")]
     public void CrashDumpOnStackOverflow(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -237,9 +236,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
+    [NetCoreRunner("net462;net472;netcoreapp3.1;net5.0")]
     // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
+    // [NetFrameworkRunner("net462;net472;netcoreapp3.1;net5.0")]
     public void HangDumpChildProcesses(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -310,13 +309,21 @@ public class BlameDataCollectorTests : AcceptanceTestBase
             err.AppendLine("Expected all dumps in the list of attachments to exist, and not be empty, but:");
             if (nonExistingDumps.Any())
             {
-                err.AppendLine($"{nonExistingDumps.Count} don't exist:")
+                err.AppendLine(
+#if NET
+                    CultureInfo.InvariantCulture,
+#endif
+                    $"{nonExistingDumps.Count} don't exist:")
                 .AppendLine(string.Join(Environment.NewLine, nonExistingDumps));
             }
 
             if (emptyDumps.Any())
             {
-                err.AppendLine($"{emptyDumps.Count} are empty:")
+                err.AppendLine(
+#if NET
+                    CultureInfo.InvariantCulture,
+#endif
+                    $"{emptyDumps.Count} are empty:")
                 .AppendLine(string.Join(Environment.NewLine, emptyDumps));
             }
 
@@ -354,7 +361,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         Assert.IsTrue(isValid, "Sequence attachment is not valid.");
     }
 
-    private bool IsValidXml(string xmlFilePath)
+    private static bool IsValidXml(string xmlFilePath)
     {
         var file = File.OpenRead(xmlFilePath);
         var reader = XmlReader.Create(file);

@@ -16,10 +16,12 @@ Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher.MetricsPublisherFactor
 Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher.MetricsPublisherFactory.MetricsPublisherFactory() -> void
 Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher.NoOpMetricsPublisher
 Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher.NoOpMetricsPublisher.Dispose() -> void
+virtual Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher.NoOpMetricsPublisher.Dispose(bool disposing) -> void
 Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher.NoOpMetricsPublisher.NoOpMetricsPublisher() -> void
 Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher.NoOpMetricsPublisher.PublishMetrics(string! eventName, System.Collections.Generic.IDictionary<string!, object?>! metrics) -> void
 Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher.TextFileTelemetryPublisher
 Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher.TextFileTelemetryPublisher.Dispose() -> void
+virtual Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher.TextFileTelemetryPublisher.Dispose(bool disposing) -> void
 Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher.TextFileTelemetryPublisher.PublishMetrics(string! eventName, System.Collections.Generic.IDictionary<string!, object?>! metrics) -> void
 Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher.TextFileTelemetryPublisher.TextFileTelemetryPublisher() -> void
 Microsoft.VisualStudio.TestPlatform.CommandLine.TestSourceException

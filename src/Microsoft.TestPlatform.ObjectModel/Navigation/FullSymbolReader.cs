@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -138,7 +139,7 @@ internal class FullSymbolReader : ISymbolReader
             int hResult = _source.LoadDataForExe(filename, searchPath, IntPtr.Zero);
             if (HResult.Failed(hResult))
             {
-                throw new COMException(string.Format(Resources.Resources.FailedToCreateDiaSession, hResult));
+                throw new COMException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.FailedToCreateDiaSession, hResult));
             }
 
             // Open the session and return it
@@ -475,36 +476,38 @@ internal class FullSymbolReader : ISymbolReader
         }
     }
 
-    private void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
-        if (!_isDisposed)
+        if (_isDisposed)
         {
-            if (disposing)
+            return;
+        }
+
+        if (disposing)
+        {
+            foreach (Dictionary<string, IDiaSymbol> methodSymbolsForType in _methodSymbols.Values)
             {
-                foreach (Dictionary<string, IDiaSymbol> methodSymbolsForType in _methodSymbols.Values)
+                foreach (IDiaSymbol methodSymbol in methodSymbolsForType.Values)
                 {
-                    foreach (IDiaSymbol methodSymbol in methodSymbolsForType.Values)
-                    {
-                        IDiaSymbol? symToRelease = methodSymbol;
-                        ReleaseComObject(ref symToRelease);
-                    }
-
-                    methodSymbolsForType.Clear();
-                }
-
-                _methodSymbols.Clear();
-                foreach (IDiaSymbol typeSymbol in _typeSymbols.Values)
-                {
-                    IDiaSymbol? symToRelease = typeSymbol;
+                    IDiaSymbol? symToRelease = methodSymbol;
                     ReleaseComObject(ref symToRelease);
                 }
 
-                _typeSymbols.Clear();
-                ReleaseComObject(ref _session);
-                ReleaseComObject(ref _source);
+                methodSymbolsForType.Clear();
             }
 
-            _isDisposed = true;
+            _methodSymbols.Clear();
+            foreach (IDiaSymbol typeSymbol in _typeSymbols.Values)
+            {
+                IDiaSymbol? symToRelease = typeSymbol;
+                ReleaseComObject(ref symToRelease);
+            }
+
+            _typeSymbols.Clear();
+            ReleaseComObject(ref _session);
+            ReleaseComObject(ref _source);
         }
+
+        _isDisposed = true;
     }
 }

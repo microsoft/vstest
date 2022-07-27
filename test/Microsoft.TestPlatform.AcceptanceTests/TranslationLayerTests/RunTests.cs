@@ -71,8 +71,8 @@ public class RunTests : AcceptanceTestBase
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
-        var incompatibleDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
+        var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETFX);
+        var incompatibleDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETCORE);
 
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
@@ -94,8 +94,8 @@ public class RunTests : AcceptanceTestBase
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
-        var netDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
+        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETFX);
+        var netDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETCORE);
 
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
@@ -196,7 +196,7 @@ public class RunTests : AcceptanceTestBase
             new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
             _runEventHandler);
 
-        var errorMessage = runnerInfo.TargetFramework == "net451"
+        var errorMessage = runnerInfo.TargetFramework == "net462"
             ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.{Environment.NewLine}"
             : $"The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.{Environment.NewLine}";
 

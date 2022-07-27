@@ -86,7 +86,7 @@ public class VSTestTask : Task, ICancelableTask
             Console.WriteLine("Waiting for debugger attach...");
 
             var currentProcess = Process.GetCurrentProcess();
-            Console.WriteLine(string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName));
+            Console.WriteLine($"Process Id: {currentProcess.Id}, Name: {currentProcess.ProcessName}");
 
             while (!Debugger.IsAttached)
             {

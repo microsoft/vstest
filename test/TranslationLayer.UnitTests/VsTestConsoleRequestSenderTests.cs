@@ -1952,7 +1952,7 @@ public class VsTestConsoleRequestSenderTests
         var payload = new TestRunAttachmentsProcessingCompletePayload()
         {
             AttachmentsProcessingCompleteEventArgs = new TestRunAttachmentsProcessingCompleteEventArgs(false, null),
-            Attachments = new AttachmentSet[0]
+            Attachments = Array.Empty<AttachmentSet>()
         };
 
         var attachmentsProcessingComplete = new Message()

@@ -156,7 +156,7 @@ internal class PortArgumentExecutor : IArgumentExecutor
         }
         catch (TimeoutException ex)
         {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, string.Format(CommandLineResources.DesignModeClientTimeoutError, _commandLineOptions.Port)), ex);
+            throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.DesignModeClientTimeoutError, _commandLineOptions.Port), ex);
         }
 
         return ArgumentProcessorResult.Success;

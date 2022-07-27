@@ -643,6 +643,7 @@ public class InferRunSettingsHelper
     /// Returns the sources matching the specified platform and framework settings.
     /// For incompatible sources, warning is added to incompatibleSettingWarning.
     /// </summary>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Part of the public API")]
     public static IEnumerable<string> FilterCompatibleSources(Architecture chosenPlatform, Architecture defaultArchitecture, Framework chosenFramework, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, out string incompatibleSettingWarning)
     {
         incompatibleSettingWarning = string.Empty;

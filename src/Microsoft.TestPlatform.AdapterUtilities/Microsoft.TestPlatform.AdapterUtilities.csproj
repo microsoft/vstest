@@ -5,7 +5,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;netstandard2.0;$(TargetNetFxVersion)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.AdapterUtilities</AssemblyName>
@@ -24,11 +24,11 @@
 
     <!-- On non windows environment, make UAP behave like desktop .NET framework -->
     <TargetFrameworkIdentifier Condition="'$(OS)' != 'Windows_NT'">.NETFramework</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion Condition="'$(OS)' != 'Windows_NT'">v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(OS)' != 'Windows_NT'">v4.6.2</TargetFrameworkVersion>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net45'">
+  <PropertyGroup Condition="'$(TargetFramework)' == '$(TargetNetFxVersion)'">
     <RuntimeIdentifier>any</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
@@ -43,6 +43,7 @@
     <PackageReference Include="System.ServiceModel.Primitives" Version="$(SystemServiceModelVersion)" />
     <PackageReference Include="System.ServiceModel.Security" Version="$(SystemServiceModelVersion)" />
     <PackageReference Include="System.Private.ServiceModel" Version="$(SystemServiceModelVersion)" />
+    <PackageReference Include="System.ServiceModel.Http" Version="$(SystemServiceModelVersion)" />
     <!-- / CVE-2018-8356 mitigation -->
   </ItemGroup>
 
@@ -54,7 +55,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
-    <!-- Disabled auto code generation to support net20
+
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -64,7 +65,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    -->
   </ItemGroup>
 
   <ItemGroup>

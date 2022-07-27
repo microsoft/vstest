@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Microsoft.TestPlatform.AdapterUtilities;
 
+/// <summary>
+/// Used to generate id for tests.
+/// </summary>
 public class TestIdProvider
 {
     internal const int BlockBits = 512;
@@ -20,19 +23,52 @@ public class TestIdProvider
 
     private readonly Sha1Implementation _hasher;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestIdProvider"/> class.
+    /// </summary>
     public TestIdProvider()
     {
         _hasher = new Sha1Implementation();
     }
 
+    /// <summary>
+    /// Appends a string to id generation seed.
+    /// </summary>
+    /// <param name="str">String to append to the id seed.</param>
+    /// <exception cref="InvalidOperationException">Thrown if <see cref="GetHash"/> or <see cref="GetId"/> is called already.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is <c>null</c>.</exception>
     public void AppendString(string str)
     {
         if (_hash != null)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(Resources.Resources.ErrorCannotAppendAfterHashCalculation);
         }
+        _ = str ?? throw new ArgumentNullException(nameof(str));
 
         var bytes = Encoding.Unicode.GetBytes(str);
+
+        AppendBytes(bytes);
+    }
+
+    /// <summary>
+    /// Appends an array of bytes to id generation seed.
+    /// </summary>
+    /// <param name="bytes">Array to append to the id seed.</param>
+    /// <exception cref="InvalidOperationException">Thrown if <see cref="GetHash"/> or <see cref="GetId"/> is called already.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="bytes"/> is <c>null</c>.</exception>
+    public void AppendBytes(byte[] bytes)
+    {
+        if (_hash != null)
+        {
+            throw new InvalidOperationException(Resources.Resources.ErrorCannotAppendAfterHashCalculation);
+        }
+        _ = bytes ?? throw new ArgumentNullException(nameof(bytes));
+
+        if (bytes.Length == 0)
+        {
+            return;
+        }
+
         var end = Math.Min(BlockBytes - _position, bytes.Length);
 
         Buffer.BlockCopy(bytes, 0, _lastBlock, _position, end);
@@ -73,6 +109,14 @@ public class TestIdProvider
         }
     }
 
+    /// <summary>
+    /// Calculates the Id seed.
+    /// </summary>
+    /// <returns>An array containing the seed.</returns>
+    /// <remarks>
+    /// <see cref="AppendBytes(byte[])"/> and <see cref="AppendString(string)"/> cannot be called
+    /// on instance after this method is called.
+    /// </remarks>
     public byte[] GetHash()
     {
         if (_hash != null)
@@ -91,6 +135,14 @@ public class TestIdProvider
         return _hash;
     }
 
+    /// <summary>
+    /// Calculates the Id from the seed.
+    /// </summary>
+    /// <returns>Id</returns>
+    /// <remarks>
+    /// <see cref="AppendBytes(byte[])"/> and <see cref="AppendString(string)"/> cannot be called
+    /// on instance after this method is called.
+    /// </remarks>
     public Guid GetId()
     {
         if (_id != Guid.Empty)

@@ -435,7 +435,7 @@ public class TestEngineTests
                 <RunConfiguration>
                     <DisableAppDomain>false</DisableAppDomain>
                     <DesignMode>false</DesignMode>
-                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.6.2</TargetFrameworkVersion>
                     <MaxCpuCount>1</MaxCpuCount>
                 </RunConfiguration >
                 <InProcDataCollectionRunSettings>
@@ -470,7 +470,7 @@ public class TestEngineTests
                 <RunConfiguration>
                     <DisableAppDomain>false</DisableAppDomain>
                     <DesignMode>false</DesignMode>
-                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.6.2</TargetFrameworkVersion>
                     <MaxCpuCount>1</MaxCpuCount>
                 </RunConfiguration >
                 <MSTest>
@@ -500,7 +500,7 @@ public class TestEngineTests
                 <RunConfiguration>
                     <DisableAppDomain>false</DisableAppDomain>
                     <DesignMode>false</DesignMode>
-                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.6.2</TargetFrameworkVersion>
                     <MaxCpuCount>1</MaxCpuCount>
                 </RunConfiguration>
             </RunSettings>";
@@ -532,7 +532,7 @@ public class TestEngineTests
                 <RunConfiguration>
                     <DisableAppDomain>false</DisableAppDomain>
                     <DesignMode>false</DesignMode>
-                    <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                    <TargetFrameworkVersion>.NETFramework, Version=v4.6.2</TargetFrameworkVersion>
                     <MaxCpuCount>1</MaxCpuCount>
                 </RunConfiguration>
             </RunSettings>";

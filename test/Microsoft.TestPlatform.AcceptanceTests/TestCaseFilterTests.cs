@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class TestCaseFilterTests : AcceptanceTestBase
 {
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithAndOperatorTrait(RunnerInfo runnerInfo)
     {

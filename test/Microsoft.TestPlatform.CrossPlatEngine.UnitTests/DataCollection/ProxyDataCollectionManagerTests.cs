@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 
@@ -78,7 +79,7 @@ public class ProxyDataCollectionManagerTests
     public void InitializeShouldSetTimeoutBasedOnTimeoutEnvironmentVarible()
     {
         var timeout = 10;
-        Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, timeout.ToString());
+        Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, timeout.ToString(CultureInfo.CurrentCulture));
         _mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(timeout * 1000)).Returns(true);
 
         _proxyDataCollectionManager.Initialize();
@@ -123,7 +124,7 @@ public class ProxyDataCollectionManagerTests
                 x =>
                     x.LaunchDataCollector(
                         It.IsAny<IDictionary<string, string?>>(),
-                        It.Is<IList<string>>(list => list.Contains("--diag") && list.Contains("--tracelevel") && list.Contains(expectedTraceLevel.ToString()))),
+                        It.Is<IList<string>>(list => list.Contains("--diag") && list.Contains("--tracelevel") && list.Contains(expectedTraceLevel.ToString(CultureInfo.CurrentCulture)))),
                 Times.Once);
         }
         finally

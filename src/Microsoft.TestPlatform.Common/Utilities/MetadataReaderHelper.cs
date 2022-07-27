@@ -38,16 +38,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
         }
     }
 */
-internal class MetadataReaderExtensionsHelper
+internal static class MetadataReaderExtensionsHelper
 {
     private const string TestExtensionTypesAttributeV2 = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesV2Attribute";
     private static readonly ConcurrentDictionary<string, Type[]> AssemblyCache = new();
     private static readonly Type[] EmptyTypeArray = new Type[0];
 
-    public Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)
+    public static Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)
         => AssemblyCache.GetOrAdd(assemblyFilePath, DiscoverTestExtensionTypesV2AttributeInternal(loadedAssembly, assemblyFilePath));
 
-    private Type[] DiscoverTestExtensionTypesV2AttributeInternal(Assembly loadedAssembly, string assemblyFilePath)
+    private static Type[] DiscoverTestExtensionTypesV2AttributeInternal(Assembly loadedAssembly, string assemblyFilePath)
     {
         EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Discovering extensions inside assembly '{loadedAssembly.FullName}' file path '{assemblyFilePath}'");
 

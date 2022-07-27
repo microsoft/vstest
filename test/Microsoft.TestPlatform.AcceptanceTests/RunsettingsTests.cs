@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -238,7 +239,7 @@ public class RunsettingsTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     public void RunSettingsWithInvalidValueShouldLogError(RunnerInfo runnerInfo)
     {
@@ -259,7 +260,7 @@ public class RunsettingsTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     public void TestAdapterPathFromRunSettings(RunnerInfo runnerInfo)
     {
@@ -283,7 +284,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithPlatform(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -314,7 +315,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -341,7 +342,7 @@ public class RunsettingsTests : AcceptanceTestBase
                                    </RunSettings>";
 
         // Scripts have relative paths to temp directory where the runsettings is created.
-        var runsettingsXml = string.Format(runsettingsFormat, setupScriptName, cleanupScriptName);
+        var runsettingsXml = string.Format(CultureInfo.CurrentCulture, runsettingsFormat, setupScriptName, cleanupScriptName);
         var runsettingsPath = GetRunsettingsFilePath(null, TempDirectory);
         File.WriteAllText(runsettingsPath, runsettingsXml);
 
@@ -360,7 +361,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithDeploymentItem(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -382,7 +383,7 @@ public class RunsettingsTests : AcceptanceTestBase
                                     </LegacySettings>
                                    </RunSettings>";
 
-        var runsettingsXml = string.Format(runsettingsFormat, deploymentItem);
+        var runsettingsXml = string.Format(CultureInfo.CurrentCulture, runsettingsFormat, deploymentItem);
         var runsettingsPath = GetRunsettingsFilePath(null, TempDirectory);
         File.WriteAllText(runsettingsPath, runsettingsXml);
 
@@ -397,7 +398,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsTestTimeout(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -424,7 +425,7 @@ public class RunsettingsTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsAssemblyResolution(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -449,7 +450,7 @@ public class RunsettingsTests : AcceptanceTestBase
                                    </RunSettings>";
 
         var testAssemblyDirectory = Path.Combine(_testEnvironment.TestAssetsPath, "LegacySettingsUnitTestProject", "DependencyAssembly");
-        var runsettingsXml = string.Format(runsettingsFormat, testAssemblyDirectory);
+        var runsettingsXml = string.Format(CultureInfo.CurrentCulture, runsettingsFormat, testAssemblyDirectory);
         var runsettingsPath = GetRunsettingsFilePath(null, TempDirectory);
         File.WriteAllText(runsettingsPath, runsettingsXml);
         var arguments = PrepareArguments(testAssemblyPath, string.Empty, runsettingsPath, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -505,8 +506,8 @@ public class RunsettingsTests : AcceptanceTestBase
     [TestMethod]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void RunSettingsAreLoadedFromProject(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

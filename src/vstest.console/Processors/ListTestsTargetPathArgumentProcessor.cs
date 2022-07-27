@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -79,7 +78,7 @@ internal class ListTestsTargetPathArgumentExecutor : IArgumentExecutor
         if (argument.IsNullOrWhiteSpace())
         {
             // Not adding this string to resources because this processor is only used internally.
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, "ListTestsTargetPath is required with ListFullyQualifiedTests!"));
+            throw new CommandLineException("ListTestsTargetPath is required with ListFullyQualifiedTests!");
         }
 
         _commandLineOptions.ListTestsTargetPath = argument;

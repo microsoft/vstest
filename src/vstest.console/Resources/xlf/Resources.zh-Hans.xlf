@@ -1179,6 +1179,26 @@
         <target state="translated">vstest.console.exe 正在模拟模式下运行，因为 {0}。为了获得更好的性能，请考虑使用本机运行程序 vstest.console.arm64.exe。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="RequestHandlerConnectionTimedOut">
+        <source>Waiting for request handler connection timed out after {0} seconds.</source>
+        <target state="translated">等待请求处理程序连接在 {0} 秒后超时。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StartTestSessionTimedOut">
+        <source>Waiting for start test session timed out after {0} seconds.</source>
+        <target state="translated">等待启动测试会话在 {0} 秒后超时。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StopTestSessionTimedOut">
+        <source>Waiting for stop test session timed out after {0} seconds.</source>
+        <target state="translated">等待停止测试会话在 {0} 秒后超时。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ErrorHostingCommunicationChannel">
+        <source>Error hosting communication channel.</source>
+        <target state="translated">托管信道时出错。</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

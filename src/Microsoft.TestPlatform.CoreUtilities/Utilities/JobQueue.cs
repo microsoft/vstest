@@ -197,7 +197,14 @@ public class JobQueue<T> : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (_isDisposed)
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed
+            || !disposing)
         {
             return;
         }
@@ -206,7 +213,7 @@ public class JobQueue<T> : IDisposable
         if (!_queueProcessing.WaitOne(0))
         {
             throw new InvalidOperationException(
-                string.Format(CultureInfo.CurrentUICulture, Resources.QueuePausedDisposeError, _displayName));
+                string.Format(CultureInfo.CurrentCulture, Resources.QueuePausedDisposeError, _displayName));
         }
 
         _isDisposed = true;
@@ -274,7 +281,7 @@ public class JobQueue<T> : IDisposable
         if (_isDisposed)
         {
             throw new ObjectDisposedException(
-                string.Format(CultureInfo.CurrentUICulture, Resources.QueueAlreadyDisposed, _displayName));
+                string.Format(CultureInfo.CurrentCulture, Resources.QueueAlreadyDisposed, _displayName));
         }
     }
 
@@ -353,12 +360,7 @@ public class JobQueue<T> : IDisposable
         }
         catch (Exception e)
         {
-            _exceptionLogger(
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    Resources.ExceptionFromJobProcessor,
-                    _displayName,
-                    e));
+            _exceptionLogger(string.Format(CultureInfo.CurrentCulture, Resources.ExceptionFromJobProcessor, _displayName, e));
         }
     }
 

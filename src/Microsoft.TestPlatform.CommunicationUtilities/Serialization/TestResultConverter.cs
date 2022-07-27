@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -22,11 +23,11 @@ public class TestResultConverter : JsonConverter
     }
 
     /// <inheritdoc/>
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         var data = JObject.Load(reader);
 
-        var testCase = data["TestCase"].ToObject<TestCase>(serializer);
+        var testCase = data["TestCase"]!.ToObject<TestCase>(serializer)!;
         var testResult = new TestResult(testCase);
 
         // Add attachments for the result
@@ -35,9 +36,9 @@ public class TestResultConverter : JsonConverter
         {
             foreach (var attachment in attachments.Values<JToken>())
             {
-                if (attachment.Type != JTokenType.Null)
+                if (attachment!.Type != JTokenType.Null)
                 {
-                    testResult.Attachments.Add(attachment.ToObject<AttachmentSet>(serializer));
+                    testResult.Attachments.Add(attachment!.ToObject<AttachmentSet>(serializer)!);
                 }
             }
         }
@@ -48,14 +49,14 @@ public class TestResultConverter : JsonConverter
         {
             foreach (var message in messages.Values<JToken>())
             {
-                if (message.Type != JTokenType.Null)
+                if (message!.Type != JTokenType.Null)
                 {
-                    testResult.Messages.Add(message.ToObject<TestResultMessage>(serializer));
+                    testResult.Messages.Add(message.ToObject<TestResultMessage>(serializer)!);
                 }
             }
         }
 
-        JToken properties = data["Properties"];
+        JToken properties = data["Properties"]!;
         if (properties == null || !properties.HasValues)
         {
             return testResult;
@@ -65,12 +66,12 @@ public class TestResultConverter : JsonConverter
         // key value pairs.
         foreach (var property in properties.Values<JToken>())
         {
-            var testProperty = property["Key"].ToObject<TestProperty>(serializer);
+            var testProperty = property!["Key"]!.ToObject<TestProperty>(serializer)!;
 
             // Let the null values be passed in as null data
             var token = property["Value"];
             string? propertyData = null;
-            if (token.Type != JTokenType.Null)
+            if (token!.Type != JTokenType.Null)
             {
                 // If the property is already a string. No need to convert again.
                 if (token.Type == JTokenType.String)
@@ -94,11 +95,11 @@ public class TestResultConverter : JsonConverter
                 case "TestResult.Outcome":
                     testResult.Outcome = (TestOutcome)Enum.Parse(typeof(TestOutcome), propertyData!); break;
                 case "TestResult.Duration":
-                    testResult.Duration = TimeSpan.Parse(propertyData!); break;
+                    testResult.Duration = TimeSpan.Parse(propertyData!, CultureInfo.CurrentCulture); break;
                 case "TestResult.StartTime":
-                    testResult.StartTime = DateTimeOffset.Parse(propertyData!); break;
+                    testResult.StartTime = DateTimeOffset.Parse(propertyData!, CultureInfo.CurrentCulture); break;
                 case "TestResult.EndTime":
-                    testResult.EndTime = DateTimeOffset.Parse(propertyData!); break;
+                    testResult.EndTime = DateTimeOffset.Parse(propertyData!, CultureInfo.CurrentCulture); break;
                 case "TestResult.ErrorMessage":
                     testResult.ErrorMessage = propertyData; break;
                 case "TestResult.ErrorStackTrace":
@@ -115,8 +116,13 @@ public class TestResultConverter : JsonConverter
     }
 
     /// <inheritdoc/>
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
+        if (value == null)
+        {
+            return;
+        }
+
         // P2 to P1
         var testResult = (TestResult)value;
 

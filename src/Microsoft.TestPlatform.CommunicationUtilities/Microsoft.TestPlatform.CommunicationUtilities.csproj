@@ -5,7 +5,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.CommunicationUtilities</AssemblyName>
-    <TargetFrameworks>net6.0;netstandard2.0;netstandard1.3;net451</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.0;netstandard1.3;$(TargetNetFxVersion)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
@@ -20,7 +20,7 @@
       <Version>$(JsonNetVersion)</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
   </ItemGroup>

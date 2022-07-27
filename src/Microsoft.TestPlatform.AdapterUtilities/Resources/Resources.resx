@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ErrorCannotAppendAfterHashCalculation" xml:space="preserve">
+    <value>Cannot append to a TestIdProvider, after GetId or GetHash method is called.</value>
+  </data>
   <data name="ErrorIncompleteManagedName" xml:space="preserve">
     <value>ManagedName is incomplete</value>
   </data>
@@ -126,6 +129,9 @@
   </data>
   <data name="ErrorMethodArityMustBeNumeric" xml:space="preserve">
     <value>Method arity must be numeric.</value>
+  </data>
+  <data name="ErrorMethodExpectedAsAnArgument" xml:space="preserve">
+    <value>Argument must be a method. (Argument name: {0})</value>
   </data>
   <data name="ErrorMethodNotFound" xml:space="preserve">
     <value>Method '{0}' not found on type '{1}'</value>

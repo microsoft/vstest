@@ -62,7 +62,7 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource()]
+    [RunnerCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -212,6 +212,7 @@ public class DiscoverTests : AcceptanceTestBase
     [TestMethod]
     [NetFullTargetFrameworkDataSource(inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
+    [Ignore("Flaky on CI")]
     public async Task CancelTestDiscovery(RunnerInfo runnerInfo)
     {
         var sw = Stopwatch.StartNew();

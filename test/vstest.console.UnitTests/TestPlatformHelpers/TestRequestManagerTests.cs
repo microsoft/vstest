@@ -29,6 +29,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
@@ -107,7 +108,7 @@ public class TestRequestManagerTests
     [TestCleanup]
     public void Cleanup()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
 
         // Opt out the Telemetry
         Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
@@ -2578,9 +2579,14 @@ public class TestRequestManagerTests
     [DataRow("x86")]
     [DataRow("x64")]
     [DataRow("arm64")]
+    // Don't parallelize because we can run into conflict with GetDefaultArchitecture -> RunSettingsHelper.Instance.IsDefaultTargetArchitecture
+    // which is set by some other test.
+    [DoNotParallelize]
     public void SettingDefaultPlatformUsesItForAnyCPUSourceButNotForNonAnyCPUSource(string defaultPlatform)
     {
         // -- Arrange
+
+        RunSettingsHelper.Instance.IsDefaultTargetArchitecture = true;
         var payload = new DiscoveryRequestPayload()
         {
             Sources = new List<string>() { "AnyCPU.dll", "x64.dll" },

@@ -75,7 +75,7 @@ public static class AssemblyHelper
                         null, null, null);
                 }
 
-                return worker.CheckAssemblyReference(source, referenceAssemblyName, referenceAssemblyPublicKeyToken);
+                return AssemblyLoadWorker.CheckAssemblyReference(source, referenceAssemblyName, referenceAssemblyPublicKeyToken);
             }
             finally
             {
@@ -121,7 +121,7 @@ public static class AssemblyHelper
                 false, BindingFlags.Default, null,
                 null, null, null);
 
-            worker.GetPlatformAndFrameworkSettings(testSource, out var procArchType, out var frameworkVersion);
+            AssemblyLoadWorker.GetPlatformAndFrameworkSettings(testSource, out var procArchType, out var frameworkVersion);
 
             Architecture targetPlatform = (Architecture)Enum.Parse(typeof(Architecture), procArchType);
             var targetFramework = frameworkVersion.ToUpperInvariant() switch
@@ -154,7 +154,7 @@ public static class AssemblyHelper
     /// <param name="source">Full path to the assembly to get dependencies for.</param>
     public static string[]? GetReferencedAssemblies(string source)
     {
-        TPDebug.Assert(!StringUtils.IsNullOrEmpty(source));
+        TPDebug.Assert(!source.IsNullOrEmpty());
 
         var setupInfo = new AppDomainSetup();
         setupInfo.ApplicationBase = Path.GetDirectoryName(Path.GetFullPath(source));
@@ -191,7 +191,7 @@ public static class AssemblyHelper
                     null, null, null);
             }
 
-            return worker.GetReferencedAssemblies(source);
+            return AssemblyLoadWorker.GetReferencedAssemblies(source);
         }
         finally
         {
@@ -228,7 +228,7 @@ public static class AssemblyHelper
     /// <returns>String representation of the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
     internal static string GetTargetFrameworkVersionString(string path)
     {
-        TPDebug.Assert(!StringUtils.IsNullOrEmpty(path));
+        TPDebug.Assert(!path.IsNullOrEmpty());
 
         var setupInfo = new AppDomainSetup();
         setupInfo.ApplicationBase = Path.GetDirectoryName(Path.GetFullPath(path));
@@ -270,7 +270,7 @@ public static class AssemblyHelper
                     null, null, null);
             }
 
-            return worker.GetTargetFrameworkVersionStringFromPath(path);
+            return AssemblyLoadWorker.GetTargetFrameworkVersionStringFromPath(path);
         }
         finally
         {

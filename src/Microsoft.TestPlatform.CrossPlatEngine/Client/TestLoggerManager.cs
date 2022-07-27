@@ -183,10 +183,7 @@ internal class TestLoggerManager : ITestLoggerManager
                         : logger.FriendlyName;
 
                 throw new InvalidLoggerException(
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CommonResources.LoggerNotFound,
-                        value));
+                    string.Format(CultureInfo.CurrentCulture, CommonResources.LoggerNotFound, value));
             }
         }
 
@@ -413,7 +410,7 @@ internal class TestLoggerManager : ITestLoggerManager
 
                 throw new InvalidLoggerException(
                     string.Format(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         CommonResources.LoggerUriInvalid,
                         extension.Metadata.ExtensionUri));
             }
@@ -430,7 +427,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="runSettings">Test run settings.</param>
     /// <returns>Test results directory</returns>
-    internal string? GetResultsDirectory(string? runSettings)
+    internal static string? GetResultsDirectory(string? runSettings)
     {
         string? resultsDirectory = null;
         if (runSettings != null)
@@ -454,7 +451,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="runSettings">Test run settings.</param>
     /// <returns>Target framework</returns>
-    internal Framework? GetTargetFramework(string? runSettings)
+    internal static Framework? GetTargetFramework(string? runSettings)
     {
         Framework? targetFramework = null;
         if (runSettings != null)
@@ -478,7 +475,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// </summary>
     /// <param name="runSettings"></param>
     /// <returns></returns>
-    internal bool GetTreatNoTestsAsError(string? runSettings)
+    internal static bool GetTreatNoTestsAsError(string? runSettings)
     {
         return RunSettingsUtilities.GetTreatNoTestsAsError(runSettings);
     }
@@ -504,7 +501,7 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <param name="disposing">
     /// The disposing.
     /// </param>
-    internal virtual void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         if (!_isDisposed)
         {
@@ -617,7 +614,7 @@ internal class TestLoggerManager : ITestLoggerManager
             _messageLogger.SendMessage(
                 TestMessageLevel.Error,
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommonResources.LoggerInitializationError,
                     extensionUri.IsNullOrEmpty() ? "type" : "uri",
                     extensionUri.IsNullOrEmpty() ? logger.GetType().ToString() : extensionUri,
