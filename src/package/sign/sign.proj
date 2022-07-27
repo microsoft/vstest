@@ -229,7 +229,6 @@
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)Extensions\dump\DumpMinitool.arm64.exe" />
 
       <!-- Localized resources -->
-      <Core10AssembliesToSign Include="$(ArtifactsCore10Directory)%(ResxLang.Identity)\*.*" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)%(ResxLang.Identity)\*.*" />
       <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)%(ResxLang.Identity)\*.*" />
       <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)%(ResxLang.Identity)\*.*" />
@@ -421,12 +420,6 @@
     <Message Text="Signing using authenticode certificate Core31AssembliesToSign:'%(Core31AssembliesToSign.Authenticode)' for @(Core31AssembliesToSign)"/>
     <SignFiles Files="@(Core31AssembliesToSign)"
                BinariesDirectory="$(ArtifactsCore31Directory)"
-               IntermediatesDirectory="$(IntermediatesDirectory)"
-               Type="$(SignType)" />
-
-    <Message Text="Signing using authenticode certificate Core10AssembliesToSign:'%(Core10AssembliesToSign.Authenticode)' for @(Core10AssembliesToSign)"/>
-    <SignFiles Files="@(Core10AssembliesToSign)"
-               BinariesDirectory="$(ArtifactsCore10Directory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
