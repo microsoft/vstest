@@ -71,9 +71,9 @@ public static class XmlRunSettingsUtilities
         var navigator = runSettingDocument.CreateNavigator();
         var nodes = navigator!.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
 
-        foreach (XPathNavigator dataCollectorNavigator in nodes)
+        foreach (XPathNavigator? dataCollectorNavigator in nodes)
         {
-            var uri = dataCollectorNavigator.GetAttribute("uri", string.Empty);
+            var uri = dataCollectorNavigator?.GetAttribute("uri", string.Empty);
             if (string.Equals(dataCollectorUri, uri, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
@@ -101,10 +101,10 @@ public static class XmlRunSettingsUtilities
             var runSettingsNavigator = document.CreateNavigator();
             var nodes = runSettingsNavigator!.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
 
-            foreach (XPathNavigator dataCollectorNavigator in nodes)
+            foreach (XPathNavigator? dataCollectorNavigator in nodes)
             {
-                var friendlyName = dataCollectorNavigator.GetAttribute("friendlyName", string.Empty);
-                friendlyNameList.Add(friendlyName);
+                var friendlyName = dataCollectorNavigator?.GetAttribute("friendlyName", string.Empty);
+                friendlyNameList.Add(friendlyName!);
             }
         }
 

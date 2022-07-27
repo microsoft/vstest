@@ -2,5 +2,6 @@
 <Project>
   <PropertyGroup>
     <TargetNetFxVersion>net462</TargetNetFxVersion>
+    <TargetNetCoreVersion>netcoreapp3.1</TargetNetCoreVersion>
   </PropertyGroup>
 </Project>

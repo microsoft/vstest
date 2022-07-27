@@ -20,7 +20,7 @@ public class AssemblyPropertiesTests : IntegrationTestBase
 
     [TestMethod]
     [DataRow("net462")]
-    [DataRow("netcoreapp2.1")]
+    [DataRow("netcoreapp3.1")]
     public void GetAssemblyTypeForManagedDll(string framework)
     {
         var assemblyPath = _testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
@@ -48,7 +48,7 @@ public class AssemblyPropertiesTests : IntegrationTestBase
     }
 
     [TestMethod]
-    [DataRow("netcoreapp2.1")]
+    [DataRow("netcoreapp3.1")]
     public void GetAssemblyTypeForNetCoreManagedExe(string framework)
     {
         var assemblyPath = _testEnvironment.GetTestAsset("ConsoleManagedApp.dll", framework);

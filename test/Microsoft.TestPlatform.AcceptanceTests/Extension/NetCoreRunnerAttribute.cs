@@ -14,9 +14,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 /// <summary>
-/// Runs tests using the dotnet vstest.console.dll built against .NET Core 2.1.
+/// Runs tests using the dotnet vstest.console.dll built against .NET Core 3.1.
 /// Provide a list of target frameworks to run the tests from given as a ';' separated list, or using a constant containing that range such as
-/// AcceptanceTestBase.NETFX462_NET50 = "net462;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0" to determine which target framework of the project
+/// AcceptanceTestBase.NETFX462_NET50 = "net462;net472;net48;netcoreapp3.1;net5.0" to determine which target framework of the project
 /// to test. The target project must list those TFMs in the TargetFrameworks property in csproj.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]

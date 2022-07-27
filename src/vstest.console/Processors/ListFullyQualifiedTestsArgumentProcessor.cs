@@ -213,7 +213,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
             discoveryRequest.OnDiscoveredTests -= DiscoveryRequest_OnDiscoveredTests;
         }
 
-        private void DiscoveryRequest_OnDiscoveredTests(object sender, DiscoveredTestsEventArgs args)
+        private void DiscoveryRequest_OnDiscoveredTests(object? sender, DiscoveredTestsEventArgs args)
         {
             if (args == null)
             {
@@ -350,7 +350,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
                 //always return value as a list of string
                 if (testPropertyValue != null)
                 {
-                    var multiValue = new List<string> { testPropertyValue.ToString() };
+                    var multiValue = new List<string> { testPropertyValue.ToString()! };
                     traitDictionary.Add(testPropertyKey, multiValue);
                 }
             }
@@ -366,7 +366,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
             foreach (var trait in traits)
             {
                 var newTraitValueList = new List<string> { trait.Value };
-                if (!traitDictionary.TryGetValue(trait.Name, out List<string> currentTraitValue))
+                if (!traitDictionary.TryGetValue(trait.Name, out List<string>? currentTraitValue))
                 {
                     // if the current trait's key is not already present, add the current trait key-value pair
                     traitDictionary.Add(trait.Name, newTraitValueList);
@@ -391,7 +391,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
             if (!traitDictionary.ContainsKey(TestCategory) && traitDictionary.ContainsKey(Category))
             {
                 traitDictionary.TryGetValue(Category, out var categoryValue);
-                traitDictionary.Add(TestCategory, categoryValue);
+                traitDictionary.Add(TestCategory, categoryValue!);
             }
 
             return traitDictionary;
@@ -402,7 +402,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         /// </summary>
         private static string[]? PropertyValueProvider(string propertyName, Dictionary<string, List<string>> traitDictionary)
         {
-            traitDictionary.TryGetValue(propertyName, out List<string> propertyValueList);
+            traitDictionary.TryGetValue(propertyName, out List<string>? propertyValueList);
             if (propertyValueList != null)
             {
                 var propertyValueArray = propertyValueList.ToArray();

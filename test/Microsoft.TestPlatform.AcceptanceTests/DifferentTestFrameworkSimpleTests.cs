@@ -54,7 +54,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     // C++ tests cannot run in .NET Framework host under .NET Core, because we only ship .NET Standard CPP adapter in .NET Core
     // We also don't test x86 for .NET Core, because the resolver there does not switch between x86 and x64 correctly, it just uses the parent process bitness.
     // We run this on netcore31 and not the default netcore21 because netcore31 is the minimum tfm that has the runtime features we need, such as additionaldeps.
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false, useCoreRunner: true, useNetCore21Target: false, useNetCore31Target: true)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false, useCoreRunner: true)]
     public void CPPRunAllTestExecutionPlatformx64Net(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

@@ -413,7 +413,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Called when a test run start is received
     /// </summary>
-    private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
+    private void TestRunStartHandler(object? sender, TestRunStartEventArgs e)
     {
         ValidateArg.NotNull(sender, nameof(sender));
         ValidateArg.NotNull(e, nameof(e));
@@ -433,7 +433,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Called when a test message is received.
     /// </summary>
-    private void TestMessageHandler(object sender, TestRunMessageEventArgs e)
+    private void TestMessageHandler(object? sender, TestRunMessageEventArgs e)
     {
         ValidateArg.NotNull(sender, nameof(sender));
         ValidateArg.NotNull(e, nameof(e));
@@ -499,7 +499,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Called when a test result is received.
     /// </summary>
-    private void TestResultHandler(object sender, TestResultEventArgs e)
+    private void TestResultHandler(object? sender, TestResultEventArgs e)
     {
         ValidateArg.NotNull(sender, nameof(sender));
         ValidateArg.NotNull(e, nameof(e));
@@ -668,7 +668,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Called when a test run is completed.
     /// </summary>
-    private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
+    private void TestRunCompleteHandler(object? sender, TestRunCompleteEventArgs e)
     {
         TPDebug.Assert(Output != null, "Initialize should have been called");
 

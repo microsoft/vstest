@@ -128,7 +128,10 @@ public class DataCollectorMain
             });
 
         // Get server port and initialize communication.
-        int port = argsDictionary.TryGetValue(PortArgument, out var portValue) ? int.Parse(portValue, CultureInfo.CurrentCulture) : 0;
+        int port = argsDictionary.TryGetValue(PortArgument, out var portValue)
+            && int.TryParse(portValue, NumberStyles.Integer, CultureInfo.CurrentCulture, out var p)
+            ? p
+            : 0;
 
         if (port <= 0)
         {

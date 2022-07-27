@@ -20,7 +20,7 @@ public class DiaSessionTests : IntegrationTestBase
 #if NETFRAMEWORK
             "net462";
 #else
-            "netcoreapp2.1";
+            "netcoreapp3.1";
 #endif
         return currentTargetFrameWork;
     }
