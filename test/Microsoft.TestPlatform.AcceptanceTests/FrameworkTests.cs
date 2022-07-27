@@ -81,14 +81,13 @@ public class FrameworkTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: TempDirectory.Path);
-        Console.WriteLine($">>>>>>> arguments: {arguments}");
         arguments = string.Concat(arguments, " ", "/tests:PassingTest");
         arguments = string.Concat(arguments, " ", "/Framework:Framework40");
-        Console.WriteLine($">>>>>>> arguments concat: {arguments}");
 
         InvokeVsTest(arguments);
 
-        if (runnerInfo.TargetFramework.Contains("netcore"))
+        var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
+        if (runnerInfo.TargetFramework.Contains("netcore") && isWindows)
         {
             StdOutputContains("No test is available");
         }
