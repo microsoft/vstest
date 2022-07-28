@@ -32,11 +32,13 @@ public static class AssemblyHelper
     /// </summary>
     public static bool? DoesReferencesAssembly(string source, AssemblyName referenceAssembly)
     {
-        ValidateArg.NotNull(referenceAssembly, nameof(referenceAssembly));
+        if (source.IsNullOrEmpty() || referenceAssembly is null)
+        {
+            return null;
+        }
+
         try
         {
-            ValidateArg.NotNullOrEmpty(source, nameof(source));
-
             var referenceAssemblyName = referenceAssembly.Name;
             var referenceAssemblyPublicKeyToken = referenceAssembly.GetPublicKeyToken();
 
