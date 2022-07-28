@@ -6,8 +6,6 @@ using System.IO;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -15,9 +13,7 @@ public class SelfContainedAppTests : AcceptanceTestBase
 {
     [TestMethod]
     [TestCategory("Windows-Review")]
-    // this is core 3.1 only, full framework and netcoreapp2.1 don't "publish" automatically during build
-    // but if you run it on 2.1 it will pass because we execute the test normally
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false, useNetCore21Target: false, useNetCore31Target: true)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void RunningApplicationThatIsBuiltAsSelfContainedWillNotFailToFindHostpolicyDll(RunnerInfo runnerInfo)
     {
         // when the application is self-contained which is dictated by the RuntimeIdentifier and OutputType project

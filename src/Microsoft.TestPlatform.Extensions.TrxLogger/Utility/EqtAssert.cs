@@ -3,11 +3,11 @@
 
 using System;
 using System.Diagnostics;
-using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
+
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
@@ -24,13 +24,13 @@ internal sealed class EqtAssert
     }
 
     /// <summary>
-    /// Verifies that the specified parameter is not null, Debug.Asserts and throws.
+    /// Verifies that the specified parameter is not null, TPDebug.Asserts and throws.
     /// </summary>
     /// <param name="expression">Expression to check</param>
     /// <param name="comment">Comment to write</param>
     public static void IsTrue(bool expression, string comment)
     {
-        Debug.Assert(expression, comment);
+        TPDebug.Assert(expression, comment);
         if (!expression)
         {
             throw new Exception(comment);
@@ -38,14 +38,14 @@ internal sealed class EqtAssert
     }
 
     /// <summary>
-    /// Verifies that the specified parameter is not null, Debug.Asserts and throws.
+    /// Verifies that the specified parameter is not null, TPDebug.Asserts and throws.
     /// </summary>
     /// <param name="parameter">Parameter to check</param>
     /// <param name="parameterName">String - parameter name</param>
-    public static void ParameterNotNull(object parameter, string parameterName)
+    public static void ParameterNotNull([ValidatedNotNull] object? parameter, [ValidatedNotNull] string parameterName)
     {
         AssertParameterNameNotNullOrEmpty(parameterName);
-        Debug.Assert(parameter != null, string.Format(CultureInfo.InvariantCulture, "'{0}' is null", parameterName));
+        TPDebug.Assert(parameter != null, $"'{nameof(parameterName)}' is null");
         if (parameter == null)
         {
             throw new ArgumentNullException(parameterName);
@@ -53,17 +53,17 @@ internal sealed class EqtAssert
     }
 
     /// <summary>
-    /// Verifies that the specified string parameter is neither null nor empty, Debug.Asserts and throws.
+    /// Verifies that the specified string parameter is neither null nor empty, TPDebug.Asserts and throws.
     /// </summary>
     /// <param name="parameter">Parameter to check</param>
     /// <param name="parameterName">String - parameter name</param>
-    public static void StringNotNullOrEmpty(string parameter, string parameterName)
+    public static void StringNotNullOrEmpty([ValidatedNotNull] string? parameter, [ValidatedNotNull] string parameterName)
     {
         AssertParameterNameNotNullOrEmpty(parameterName);
-        Debug.Assert(!string.IsNullOrEmpty(parameter), string.Format(CultureInfo.InvariantCulture, "'{0}' is null or empty", parameterName));
-        if (string.IsNullOrEmpty(parameter))
+        TPDebug.Assert(!parameter.IsNullOrEmpty(), $"'{nameof(parameterName)}' is null or empty");
+        if (parameter.IsNullOrEmpty())
         {
-            throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_CannotBeNullOrEmpty));
+            throw new ArgumentException(TrxLoggerResources.Common_CannotBeNullOrEmpty);
         }
     }
 
@@ -72,8 +72,8 @@ internal sealed class EqtAssert
     /// </summary>
     /// <param name="parameterName">The parameter name to verify</param>
     [Conditional("DEBUG")]
-    private static void AssertParameterNameNotNullOrEmpty(string parameterName)
+    private static void AssertParameterNameNotNullOrEmpty([ValidatedNotNull] string? parameterName)
     {
-        Debug.Assert(!string.IsNullOrEmpty(parameterName), "'parameterName' is null or empty");
+        TPDebug.Assert(!parameterName.IsNullOrEmpty(), "'parameterName' is null or empty");
     }
 }

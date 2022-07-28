@@ -15,15 +15,13 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 
 [TestClass]
 public class TestExtensionManagerTests
 {
     private readonly IMessageLogger _messageLogger;
-    private TestExtensionManager<ITestLogger, ITestLoggerCapabilities> _testExtensionManager;
+    private TestExtensionManager<ITestLogger, ITestLoggerCapabilities>? _testExtensionManager;
     private readonly IEnumerable<LazyExtension<ITestLogger, ITestLoggerCapabilities>> _filteredTestExtensions;
     private readonly IEnumerable<LazyExtension<ITestLogger, Dictionary<string, object>>> _unfilteredTestExtensions;
 
@@ -44,7 +42,7 @@ public class TestExtensionManagerTests
     [TestMethod]
     public void TestExtensionManagerConstructorShouldThrowExceptionIfMessageLoggerIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _testExtensionManager = new DummyTestExtensionManager(_unfilteredTestExtensions, _filteredTestExtensions, null));
+        Assert.ThrowsException<ArgumentNullException>(() => _testExtensionManager = new DummyTestExtensionManager(_unfilteredTestExtensions, _filteredTestExtensions, null!));
     }
 
     [TestMethod]
@@ -64,7 +62,7 @@ public class TestExtensionManagerTests
         TestPluginCacheHelper.SetupMockAdditionalPathExtensions(typeof(TestExtensionManagerTests));
         Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                var result = _testExtensionManager.TryGetTestExtension(default(Uri));
+                var result = _testExtensionManager.TryGetTestExtension(default(Uri)!);
             }
         );
     }
@@ -98,15 +96,15 @@ public class TestExtensionManagerTests
             events.TestResult += Events_TestResult;
         }
 
-        private void Events_TestResult(object sender, TestResultEventArgs e)
+        private void Events_TestResult(object? sender, TestResultEventArgs e)
         {
         }
 
-        private void Events_TestRunComplete(object sender, TestRunCompleteEventArgs e)
+        private void Events_TestRunComplete(object? sender, TestRunCompleteEventArgs e)
         {
         }
 
-        private void TestMessageHandler(object sender, TestRunMessageEventArgs e)
+        private void TestMessageHandler(object? sender, TestRunMessageEventArgs e)
         {
         }
     }

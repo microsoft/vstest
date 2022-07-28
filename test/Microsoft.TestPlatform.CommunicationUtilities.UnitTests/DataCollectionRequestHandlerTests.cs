@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -76,13 +77,13 @@ public class DataCollectionRequestHandlerTests
     [TestMethod]
     public void CreateInstanceShouldThrowExceptionIfInstanceCommunicationManagerIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(null, _mockMessageSink.Object));
+        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(null!, _mockMessageSink.Object));
     }
 
     [TestMethod]
     public void CreateInstanceShouldThrowExceptinIfInstanceMessageSinkIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(_mockCommunicationManager.Object, null));
+        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(_mockCommunicationManager.Object, null!));
     }
 
     [TestMethod]
@@ -290,7 +291,7 @@ public class DataCollectionRequestHandlerTests
     public void ProcessRequestsShouldSetTimeoutBasedOnEnvVariable()
     {
         var timeout = 10;
-        Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, timeout.ToString());
+        Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, timeout.ToString(CultureInfo.InvariantCulture));
         var beforeTestRunSTartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } };
         _mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
             .Returns(beforeTestRunSTartPayload);
@@ -352,8 +353,8 @@ public class DataCollectionRequestHandlerTests
         _requestHandler.ProcessRequests();
 
         _mockDataCollectionManager.Verify(x => x.SessionStarted(It.Is<SessionStartEventArgs>(
-            y => y.GetPropertyValue<IEnumerable<string>>("TestSources").Contains("test1.dll") &&
-                 y.GetPropertyValue<IEnumerable<string>>("TestSources").Contains("test2.dll"))));
+            y => y.GetPropertyValue<IEnumerable<string>>("TestSources")!.Contains("test1.dll") &&
+                 y.GetPropertyValue<IEnumerable<string>>("TestSources")!.Contains("test2.dll"))));
     }
 
     [TestMethod]

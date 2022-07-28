@@ -3,13 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
@@ -18,16 +17,16 @@ public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProce
 {
     public List<AttachmentSet> Attachments { get; private set; }
 
-    public TestRunAttachmentsProcessingCompleteEventArgs CompleteArgs { get; private set; }
+    public TestRunAttachmentsProcessingCompleteEventArgs? CompleteArgs { get; private set; }
 
     public List<TestRunAttachmentsProcessingProgressEventArgs> ProgressArgs { get; private set; }
 
     /// <summary>
     /// Gets the log message.
     /// </summary>
-    public string LogMessage { get; private set; }
+    public string? LogMessage { get; private set; }
 
-    public List<string> Errors { get; set; }
+    public List<string?> Errors { get; set; }
 
     /// <summary>
     /// Gets the test message level.
@@ -36,7 +35,7 @@ public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProce
 
     public TestRunAttachmentsProcessingEventHandler()
     {
-        Errors = new List<string>();
+        Errors = new();
         Attachments = new List<AttachmentSet>();
         ProgressArgs = new List<TestRunAttachmentsProcessingProgressEventArgs>();
     }
@@ -49,7 +48,7 @@ public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProce
         }
     }
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         LogMessage = message;
         TestMessageLevel = level;
@@ -64,13 +63,15 @@ public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProce
         // No op
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Usage is unclear so keeping as non-static")]
     public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo _)
     {
         // No op
         return -1;
     }
 
-    public bool AttachDebuggerToProcess(int pid)
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Usage is unclear so keeping as non-static")]
+    public bool AttachDebuggerToProcess(int _)
     {
         // No op
         return true;
@@ -84,7 +85,7 @@ public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProce
         }
     }
 
-    public void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk)
+    public void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet>? lastChunk)
     {
         if (lastChunk != null)
         {

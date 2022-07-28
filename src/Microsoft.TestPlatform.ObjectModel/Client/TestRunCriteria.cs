@@ -3,14 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
@@ -19,8 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 /// </summary>
 public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
 {
-    private string _testCaseFilter;
-    private FilterOptions _filterOptions;
+    private string? _testCaseFilter;
+    private FilterOptions? _filterOptions;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
@@ -73,7 +73,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         IEnumerable<string> sources,
         long frequencyOfRunStatsChangeEvent,
         bool keepAlive,
-        string testSettings)
+        string? testSettings)
         : this(
             sources,
             frequencyOfRunStatsChangeEvent,
@@ -100,7 +100,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         IEnumerable<string> sources,
         long frequencyOfRunStatsChangeEvent,
         bool keepAlive,
-        string testSettings,
+        string? testSettings,
         TimeSpan runStatsChangeEventTimeout)
         : this(
             sources,
@@ -132,9 +132,9 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         IEnumerable<string> sources,
         long frequencyOfRunStatsChangeEvent,
         bool keepAlive,
-        string testSettings,
+        string? testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher)
+        ITestHostLauncher? testHostLauncher)
         : this(
             sources,
             frequencyOfRunStatsChangeEvent,
@@ -169,11 +169,11 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         IEnumerable<string> sources,
         long frequencyOfRunStatsChangeEvent,
         bool keepAlive,
-        string testSettings,
+        string? testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher,
-        string testCaseFilter,
-        FilterOptions filterOptions)
+        ITestHostLauncher? testHostLauncher,
+        string? testCaseFilter,
+        FilterOptions? filterOptions)
         : this(
             sources,
             frequencyOfRunStatsChangeEvent,
@@ -214,12 +214,12 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         IEnumerable<string> sources,
         long frequencyOfRunStatsChangeEvent,
         bool keepAlive,
-        string testSettings,
+        string? testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher,
-        string testCaseFilter,
-        FilterOptions filterOptions,
-        TestSessionInfo testSessionInfo,
+        ITestHostLauncher? testHostLauncher,
+        string? testCaseFilter,
+        FilterOptions? filterOptions,
+        TestSessionInfo? testSessionInfo,
         bool debugEnabledForTestSession)
         : base(
             frequencyOfRunStatsChangeEvent,
@@ -289,9 +289,9 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         Dictionary<string, IEnumerable<string>> adapterSourceMap,
         long frequencyOfRunStatsChangeEvent,
         bool keepAlive,
-        string testSettings,
+        string? testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher)
+        ITestHostLauncher? testHostLauncher)
         : base(
             frequencyOfRunStatsChangeEvent,
             keepAlive,
@@ -431,7 +431,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         bool keepAlive,
         string testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher)
+        ITestHostLauncher? testHostLauncher)
         : this(
             tests,
             frequencyOfRunStatsChangeEvent,
@@ -468,10 +468,10 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         IEnumerable<TestCase> tests,
         long frequencyOfRunStatsChangeEvent,
         bool keepAlive,
-        string testSettings,
+        string? testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher,
-        TestSessionInfo testSessionInfo,
+        ITestHostLauncher? testHostLauncher,
+        TestSessionInfo? testSessionInfo,
         bool debugEnabledForTestSession)
         : base(
             frequencyOfRunStatsChangeEvent,
@@ -492,7 +492,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
     /// Gets the test containers (e.g. DLL/EXE/artifacts to scan).
     /// </summary>
     [IgnoreDataMember]
-    public IEnumerable<string> Sources
+    public IEnumerable<string>? Sources
     {
         get
         {
@@ -510,26 +510,23 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
     /// </code>
     /// </summary>
     [DataMember]
-    public Dictionary<string, IEnumerable<string>> AdapterSourceMap { get; private set; }
+    public Dictionary<string, IEnumerable<string>>? AdapterSourceMap { get; private set; }
 
     /// <summary>
     /// Gets the tests that need to executed in this test run.
     /// This will be null if test run is created with specific test containers.
     /// </summary>
     [DataMember]
-    public IEnumerable<TestCase> Tests { get; private set; }
+    public IEnumerable<TestCase>? Tests { get; private set; }
 
     /// <summary>
     /// Gets or sets the criteria for filtering test cases.
     /// </summary>
     /// <remarks>This is only for with sources.</remarks>
     [DataMember]
-    public string TestCaseFilter
+    public string? TestCaseFilter
     {
-        get
-        {
-            return _testCaseFilter;
-        }
+        get => _testCaseFilter;
 
         private set
         {
@@ -547,12 +544,9 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
     /// </summary>
     /// <remarks>This is only applicable when TestCaseFilter is present.</remarks>
     [DataMember]
-    public FilterOptions FilterOptions
+    public FilterOptions? FilterOptions
     {
-        get
-        {
-            return _filterOptions;
-        }
+        get => _filterOptions;
 
         private set
         {
@@ -568,7 +562,7 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
     /// <summary>
     /// Gets or sets the test session info object.
     /// </summary>
-    public TestSessionInfo TestSessionInfo { get; set; }
+    public TestSessionInfo? TestSessionInfo { get; set; }
 
     /// <summary>
     /// Gets or sets a flag indicating if debugging should be enabled when we have test session
@@ -579,18 +573,40 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
     /// <summary>
     /// Gets a value indicating whether run criteria is based on specific tests.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(Tests))]
+    [MemberNotNullWhen(false, nameof(Sources))]
     public bool HasSpecificTests
     {
-        get { return Tests != null; }
+        get
+        {
+            if (Tests != null)
+            {
+                return true;
+            }
+
+            TPDebug.Assert(Sources is not null, "Sources is null and Tests is null");
+            return false;
+        }
     }
 
     /// <summary>
     /// Gets a value indicating whether run criteria is based on specific sources.
     /// </summary>
     [DataMember]
+    [MemberNotNullWhen(true, nameof(Sources))]
+    [MemberNotNullWhen(false, nameof(Tests))]
     public bool HasSpecificSources
     {
-        get { return Sources != null; }
+        get
+        {
+            if (Sources != null)
+            {
+                return true;
+            }
+
+            TPDebug.Assert(Tests is not null, "Tests is null and Sources is null");
+            return false;
+        }
     }
 
     /// <inheritdoc/>
@@ -611,15 +627,14 @@ public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
         return sb.ToString();
     }
 
-    protected bool Equals(TestRunCriteria other)
-    {
-        return base.Equals(other)
-               && string.Equals(TestCaseFilter, other.TestCaseFilter)
-               && Equals(FilterOptions, other.FilterOptions);
-    }
+    protected bool Equals(TestRunCriteria? other)
+        => other is not null
+            && base.Equals(other)
+            && string.Equals(TestCaseFilter, other.TestCaseFilter)
+            && Equals(FilterOptions, other.FilterOptions);
 
     /// <inheritdoc/>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is null)
         {
@@ -658,8 +673,9 @@ public class BaseTestRunCriteria
     /// </summary>
     ///
     /// <param name="runCriteria">Run criteria to clone.</param>
-    public BaseTestRunCriteria(BaseTestRunCriteria runCriteria!!)
+    public BaseTestRunCriteria(BaseTestRunCriteria runCriteria)
     {
+        ValidateArg.NotNull(runCriteria, nameof(runCriteria));
         FrequencyOfRunStatsChangeEvent = runCriteria.FrequencyOfRunStatsChangeEvent;
         KeepAlive = runCriteria.KeepAlive;
         TestRunSettings = runCriteria.TestRunSettings;
@@ -708,7 +724,7 @@ public class BaseTestRunCriteria
     public BaseTestRunCriteria(
         long frequencyOfRunStatsChangeEvent,
         bool keepAlive,
-        string testSettings)
+        string? testSettings)
         : this(
             frequencyOfRunStatsChangeEvent,
             keepAlive,
@@ -734,7 +750,7 @@ public class BaseTestRunCriteria
     public BaseTestRunCriteria(
         long frequencyOfRunStatsChangeEvent,
         bool keepAlive,
-        string testSettings,
+        string? testSettings,
         TimeSpan runStatsChangeEventTimeout)
         : this(
             frequencyOfRunStatsChangeEvent,
@@ -763,9 +779,9 @@ public class BaseTestRunCriteria
     public BaseTestRunCriteria(
         long frequencyOfRunStatsChangeEvent,
         bool keepAlive,
-        string testSettings,
+        string? testSettings,
         TimeSpan runStatsChangeEventTimeout,
-        ITestHostLauncher testHostLauncher)
+        ITestHostLauncher? testHostLauncher)
     {
         if (frequencyOfRunStatsChangeEvent <= 0)
         {
@@ -799,13 +815,13 @@ public class BaseTestRunCriteria
     /// Gets the settings used for this run.
     /// </summary>
     [DataMember]
-    public string TestRunSettings { get; private set; }
+    public string? TestRunSettings { get; private set; }
 
     /// <summary>
     /// Gets the custom launcher for test executor.
     /// </summary>
     [DataMember]
-    public ITestHostLauncher TestHostLauncher { get; private set; }
+    public ITestHostLauncher? TestHostLauncher { get; private set; }
 
     /// <summary>
     /// Gets the frequency of run stats test event.
@@ -826,16 +842,15 @@ public class BaseTestRunCriteria
     [DataMember]
     public TimeSpan RunStatsChangeEventTimeout { get; private set; }
 
-    protected bool Equals(BaseTestRunCriteria other)
-    {
-        return KeepAlive == other.KeepAlive
-               && string.Equals(TestRunSettings, other.TestRunSettings)
-               && FrequencyOfRunStatsChangeEvent == other.FrequencyOfRunStatsChangeEvent
-               && RunStatsChangeEventTimeout.Equals(other.RunStatsChangeEventTimeout);
-    }
+    protected bool Equals(BaseTestRunCriteria? other)
+        => other is not null
+            && KeepAlive == other.KeepAlive
+            && string.Equals(TestRunSettings, other.TestRunSettings)
+            && FrequencyOfRunStatsChangeEvent == other.FrequencyOfRunStatsChangeEvent
+            && RunStatsChangeEventTimeout.Equals(other.RunStatsChangeEventTimeout);
 
     /// <inheritdoc/>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is null)
         {

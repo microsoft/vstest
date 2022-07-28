@@ -10,6 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 /// </summary>
 internal interface IDeploymentAwareTestRequestHandler
 {
-    string LocalPath { get; set; }
-    string RemotePath { get; set; }
+    string? LocalPath { get; set; }
+    string? RemotePath { get; set; }
 }

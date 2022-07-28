@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ public class PostProcessingTests : AcceptanceTestBase
         // Build and run tests like msbuild
         Parallel.For(0, 5, i =>
         {
-            string projectFolder = Path.Combine(TempDirectory.Path, i.ToString());
+            string projectFolder = Path.Combine(TempDirectory.Path, i.ToString(CultureInfo.InvariantCulture));
             ExecuteApplication(GetConsoleRunnerPath(), $"new mstest -o {projectFolder}", out string stdOut, out string stdError, out int exitCode);
             Assert.AreEqual(exitCode, 0);
             ExecuteApplication(GetConsoleRunnerPath(), $"build {projectFolder} -c release", out stdOut, out stdError, out exitCode);

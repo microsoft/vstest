@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 /// <summary>
@@ -15,12 +13,12 @@ public class BeforeTestRunStartPayload
     /// <summary>
     /// Gets or sets run settings xml.
     /// </summary>
-    public string SettingsXml { get; set; }
+    public string? SettingsXml { get; set; }
 
     /// <summary>
     /// Gets or sets list of test sources.
     /// </summary>
-    public IEnumerable<string> Sources { get; set; }
+    public IEnumerable<string>? Sources { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether telemetry is enabled.

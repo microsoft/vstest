@@ -7,10 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
@@ -23,12 +20,12 @@ public interface ITestRuntimeProvider
     /// Raised when host is launched successfully
     /// Consumed by TestPlatform to initialize connection b/w test host and test platform
     /// </summary>
-    event EventHandler<HostProviderEventArgs> HostLaunched;
+    event EventHandler<HostProviderEventArgs>? HostLaunched;
 
     /// <summary>
     /// Raised when host is cleaned up and removes all it's dependencies
     /// </summary>
-    event EventHandler<HostProviderEventArgs> HostExited;
+    event EventHandler<HostProviderEventArgs>? HostExited;
 
     /// <summary>
     /// Gets a value indicating whether the test host is specific to a test source. If yes, each test source
@@ -41,7 +38,7 @@ public interface ITestRuntimeProvider
     /// </summary>
     /// <param name="logger">provide logger to runtimes</param>
     /// <param name="runsettingsXml">provide runsettings to runtimes for initialization</param>
-    void Initialize(IMessageLogger logger, string runsettingsXml);
+    void Initialize(IMessageLogger? logger, string runsettingsXml);
 
     /// <summary>
     /// Gets a value indicating whether the test host is specific to a test source. If yes, each test source
@@ -53,7 +50,7 @@ public interface ITestRuntimeProvider
     /// <returns>
     /// The <see cref="bool"/>.
     /// </returns>
-    bool CanExecuteCurrentRunConfiguration(string runsettingsXml);
+    bool CanExecuteCurrentRunConfiguration(string? runsettingsXml);
 
     /// <summary>
     /// Sets a custom launcher
@@ -83,7 +80,7 @@ public interface ITestRuntimeProvider
     /// <param name="environmentVariables">Set of environment variables for the test host process.</param>
     /// <param name="connectionInfo">Set of connection parameters for the test host process to communicate with test runner.</param>
     /// <returns>ProcessStartInfo of the test host.</returns>
-    TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo);
+    TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string?>? environmentVariables, TestRunnerConnectionInfo connectionInfo);
 
     /// <summary>
     /// Gets paths of any additional extensions.

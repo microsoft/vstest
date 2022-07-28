@@ -7,16 +7,15 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
 
 /// <summary>
 /// The test run events handler.
 /// </summary>
-public class TestRunEventsHandler : ITestRunEventsHandler2
+public class TestRunEventsHandler : IInternalTestRunEventsHandler
 {
     private readonly ITestRequestHandler _requestHandler;
 
@@ -33,7 +32,7 @@ public class TestRunEventsHandler : ITestRunEventsHandler2
     /// Handle test run stats change.
     /// </summary>
     /// <param name="testRunChangedArgs"> The test run changed args. </param>
-    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
     {
         EqtTrace.Info("Sending test run statistics");
         _requestHandler.SendTestRunStatistics(testRunChangedArgs);
@@ -46,7 +45,7 @@ public class TestRunEventsHandler : ITestRunEventsHandler2
     /// <param name="lastChunkArgs"> The last chunk args. </param>
     /// <param name="runContextAttachments"> The run context attachments. </param>
     /// <param name="executorUris"> The executor uris. </param>
-    public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
+    public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris)
     {
         EqtTrace.Info("Sending test run complete");
         _requestHandler.SendExecutionComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
@@ -57,9 +56,9 @@ public class TestRunEventsHandler : ITestRunEventsHandler2
     /// </summary>
     /// <param name="level"> The level. </param>
     /// <param name="message"> The message. </param>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
-        switch ((TestMessageLevel)level)
+        switch (level)
         {
             case TestMessageLevel.Informational:
                 EqtTrace.Info(message);
@@ -93,16 +92,16 @@ public class TestRunEventsHandler : ITestRunEventsHandler2
     /// </summary>
     /// <param name="testProcessStartInfo">Process start info</param>
     /// <returns>ProcessId of the launched process</returns>
-    public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
+    public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo? testProcessStartInfo)
     {
         EqtTrace.Info("Sending LaunchProcessWithDebuggerAttached on additional test process: {0}", testProcessStartInfo?.FileName);
         return _requestHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
     }
 
     /// <inheritdoc/>
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
     {
-        EqtTrace.Info("Sending AttachDebuggerToProcess on additional test process with pid: {0}", pid);
-        return _requestHandler.AttachDebuggerToProcess(pid);
+        EqtTrace.Info("Sending AttachDebuggerToProcess on additional test process with pid: {0}", attachDebuggerInfo.ProcessId);
+        return _requestHandler.AttachDebuggerToProcess(attachDebuggerInfo);
     }
 }

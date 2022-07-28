@@ -5,8 +5,6 @@ using System;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 public class BlameTestObject
@@ -31,15 +29,12 @@ public class BlameTestObject
     /// <param name="source">
     /// Test container source from which the test is discovered.
     /// </param>
-    public BlameTestObject(string fullyQualifiedName, Uri executorUri!!, string source)
+    public BlameTestObject(string fullyQualifiedName, Uri executorUri, string source)
     {
-        ValidateArg.NotNullOrEmpty(fullyQualifiedName, nameof(fullyQualifiedName));
-        ValidateArg.NotNullOrEmpty(source, nameof(source));
-
         Id = Guid.Empty;
-        FullyQualifiedName = fullyQualifiedName;
-        ExecutorUri = executorUri;
-        Source = source;
+        FullyQualifiedName = ValidateArg.NotNullOrEmpty(fullyQualifiedName, nameof(fullyQualifiedName));
+        ExecutorUri = executorUri ?? throw new ArgumentNullException(nameof(executorUri));
+        Source = ValidateArg.NotNullOrEmpty(source, nameof(source));
         IsCompleted = false;
     }
 
@@ -67,17 +62,17 @@ public class BlameTestObject
     /// <summary>
     /// Gets or sets the fully qualified name of the test case.
     /// </summary>
-    public string FullyQualifiedName { get; set; }
+    public string? FullyQualifiedName { get; set; }
 
     /// <summary>
     /// Gets or sets the Uri of the Executor to use for running this test.
     /// </summary>
-    public Uri ExecutorUri { get; set; }
+    public Uri? ExecutorUri { get; set; }
 
     /// <summary>
     /// Gets or sets the test container source from which the test is discovered.
     /// </summary>
-    public string Source { get; set; }
+    public string? Source { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether test case is completed or not.
@@ -87,6 +82,6 @@ public class BlameTestObject
     /// <summary>
     /// Gets or sets the display name of the test case
     /// </summary>
-    public string DisplayName { get; set; }
+    public string? DisplayName { get; set; }
 
 }

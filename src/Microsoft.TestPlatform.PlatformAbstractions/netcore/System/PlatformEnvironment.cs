@@ -8,8 +8,6 @@ using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc />
@@ -57,6 +55,9 @@ public class PlatformEnvironment : IEnvironment
             return RuntimeInformation.OSDescription;
         }
     }
+
+    /// <inheritdoc />
+    public int ProcessorCount => Environment.ProcessorCount;
 
     /// <inheritdoc />
     public void Exit(int exitcode)

@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 /// <summary>
@@ -23,7 +21,7 @@ public interface IProxyExecutionManager
     /// </summary>
     void Initialize(bool skipDefaultAdapters);
 
-    void InitializeTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler);
+    void InitializeTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler);
 
     /// <summary>
     /// Starts the test run.
@@ -31,19 +29,19 @@ public interface IProxyExecutionManager
     /// <param name="testRunCriteria">The settings/options for the test run.</param>
     /// <param name="eventHandler">EventHandler for handling execution events from Engine.</param>
     /// <returns>The process id of the runner executing tests.</returns>
-    int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler);
+    int StartTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler);
 
     /// <summary>
     /// Cancels the test run. On the test host, this will send a message to adapters.
     /// </summary>
     // <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
-    void Cancel(ITestRunEventsHandler eventHandler);
+    void Cancel(IInternalTestRunEventsHandler eventHandler);
 
     /// <summary>
     /// Aborts the test operation. This will forcefully terminate the test host.
     /// </summary>
     // <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
-    void Abort(ITestRunEventsHandler eventHandler);
+    void Abort(IInternalTestRunEventsHandler eventHandler);
 
     /// <summary>
     /// Closes the current test operation by sending a end session message.

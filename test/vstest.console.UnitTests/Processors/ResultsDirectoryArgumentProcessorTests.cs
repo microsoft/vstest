@@ -28,7 +28,7 @@ public class ResultsDirectoryArgumentProcessorTests
     [TestCleanup]
     public void TestCleanup()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
     }
 
     [TestMethod]
@@ -42,7 +42,7 @@ public class ResultsDirectoryArgumentProcessorTests
     public void GetExecuterShouldReturnResultsDirectoryArgumentExecutor()
     {
         var processor = new ResultsDirectoryArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is ResultsDirectoryArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is ResultsDirectoryArgumentExecutor);
     }
 
     #region ResultsDirectoryArgumentProcessorCapabilities tests
@@ -155,7 +155,7 @@ public class ResultsDirectoryArgumentProcessorTests
 
     #endregion
 
-    private string TranslatePath(string path)
+    private static string TranslatePath(string path)
     {
         // RuntimeInformation has conflict when used
         if (Environment.OSVersion.Platform.ToString().StartsWith("Win"))

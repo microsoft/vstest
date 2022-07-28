@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 /// <summary>
@@ -46,8 +44,9 @@ internal static class RunSettingsProviderExtensions
     /// </summary>
     private const string ValueString = "value";
 
-    public static void UpdateRunSettings(this IRunSettingsProvider runSettingsProvider!!, string runsettingsXml)
+    public static void UpdateRunSettings(this IRunSettingsProvider runSettingsProvider, string runsettingsXml)
     {
+        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
         ValidateArg.NotNullOrWhiteSpace(runsettingsXml, nameof(runsettingsXml));
 
         var runSettings = new RunSettings();
@@ -55,8 +54,9 @@ internal static class RunSettingsProviderExtensions
         runSettingsProvider.SetActiveRunSettings(runSettings);
     }
 
-    public static void AddDefaultRunSettings(this IRunSettingsProvider runSettingsProvider!!)
+    public static void AddDefaultRunSettings(this IRunSettingsProvider runSettingsProvider)
     {
+        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
         var runSettingsXml = runSettingsProvider.ActiveRunSettings?.SettingsXml;
 
         if (runSettingsXml.IsNullOrWhiteSpace())
@@ -71,15 +71,18 @@ internal static class RunSettingsProviderExtensions
     public static void UpdateRunSettingsXmlDocumentInnerXml(XmlDocument xmlDocument, string key, string data)
     {
         var node = GetXmlNode(xmlDocument, key) ?? CreateNode(xmlDocument, key);
+        TPDebug.Assert(node is not null, "node is null");
         node.InnerXml = data;
     }
 
-    public static void UpdateRunSettingsNode(this IRunSettingsProvider runSettingsProvider!!, string key, string data!!)
+    public static void UpdateRunSettingsNode(this IRunSettingsProvider runSettingsProvider, string key, string data)
     {
+        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
         ValidateArg.NotNullOrWhiteSpace(key, nameof(key));
+        ValidateArg.NotNull(data, nameof(data));
 
         var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
-        UpdateRunSettingsXmlDocument(xmlDocument, key, data);
+        UpdateRunSettingsXmlDocumentInnerText(xmlDocument, key, data);
         runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
     }
 
@@ -103,8 +106,9 @@ internal static class RunSettingsProviderExtensions
     /// </summary>
     /// <param name="runSettingsProvider"></param>
     /// <param name="match"></param>
-    public static void UpdateTestRunParameterSettingsNode(this IRunSettingsProvider runSettingsProvider!!, Match match)
+    public static void UpdateTestRunParameterSettingsNode(this IRunSettingsProvider runSettingsProvider, Match match)
     {
+        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
         var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
         XmlNode testRunParameterNode = GetXmlNode(xmlDocument, Constants.TestRunParametersName) ?? xmlDocument.CreateElement(Constants.TestRunParametersName);
         var attrName = match.Groups[AttributeNameString].Value;
@@ -116,7 +120,7 @@ internal static class RunSettingsProviderExtensions
             element.SetAttribute(NameString, attrName);
             element.SetAttribute(ValueString, attrValue);
             testRunParameterNode.AppendChild(element);
-            xmlDocument.DocumentElement.AppendChild(testRunParameterNode);
+            xmlDocument.DocumentElement!.AppendChild(testRunParameterNode);
         }
 
         runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
@@ -126,9 +130,9 @@ internal static class RunSettingsProviderExtensions
     {
         foreach (XmlNode node in xmlNode.ChildNodes)
         {
-            if (string.Compare(node.Attributes[NameString].Value, attrName) == 0)
+            if (string.Compare(node.Attributes![NameString]!.Value, attrName) == 0)
             {
-                node.Attributes[ValueString].Value = attrValue;
+                node.Attributes[ValueString]!.Value = attrValue;
                 return true;
             }
         }
@@ -136,17 +140,20 @@ internal static class RunSettingsProviderExtensions
         return false;
     }
 
-    public static void UpdateRunSettingsNodeInnerXml(this IRunSettingsProvider runSettingsProvider!!, string key, string xml!!)
+    public static void UpdateRunSettingsNodeInnerXml(this IRunSettingsProvider runSettingsProvider, string key, string xml)
     {
+        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
         ValidateArg.NotNullOrWhiteSpace(key, nameof(key));
+        ValidateArg.NotNull(xml, nameof(xml));
 
         var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
         UpdateRunSettingsXmlDocumentInnerXml(xmlDocument, key, xml);
         runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
     }
 
-    public static string QueryRunSettingsNode(this IRunSettingsProvider runSettingsProvider!!, string key)
+    public static string? QueryRunSettingsNode(this IRunSettingsProvider runSettingsProvider, string key)
     {
+        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
         ValidateArg.NotNullOrWhiteSpace(key, nameof(key));
 
         var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
@@ -154,16 +161,17 @@ internal static class RunSettingsProviderExtensions
         return node?.InnerText;
     }
 
-    internal static XmlNode GetXmlNode(XmlDocument xmlDocument, string key)
+    internal static XmlNode? GetXmlNode(XmlDocument xmlDocument, string key)
     {
         var xPath = key.Replace('.', '/');
-        var node = xmlDocument.SelectSingleNode(string.Format("//RunSettings/{0}", xPath));
+        var node = xmlDocument.SelectSingleNode($"//RunSettings/{xPath}");
         return node;
     }
 
-    internal static void UpdateRunSettingsXmlDocument(XmlDocument xmlDocument, string key, string data)
+    internal static void UpdateRunSettingsXmlDocumentInnerText(XmlDocument xmlDocument, string key, string data)
     {
         var node = GetXmlNode(xmlDocument, key) ?? CreateNode(xmlDocument, key);
+        TPDebug.Assert(node is not null, "node is null");
         node.InnerText = data;
     }
 
@@ -187,14 +195,15 @@ internal static class RunSettingsProviderExtensions
         return document.OuterXml;
     }
 
-    private static XmlNode CreateNode(XmlDocument doc, string xPath)
+    private static XmlNode? CreateNode(XmlDocument doc, string xPath)
     {
         var path = xPath.Split('.');
-        XmlNode node = null;
-        XmlNode parent = doc.DocumentElement;
+        XmlNode? node = null;
+        XmlNode? parent = doc.DocumentElement!;
 
         for (var i = 0; i < path.Length; i++)
         {
+            TPDebug.Assert(parent is not null, "parent is null");
             node = parent.SelectSingleNode(path[i]) ?? parent.AppendChild(doc.CreateElement(path[i]));
             parent = node;
         }
@@ -202,8 +211,9 @@ internal static class RunSettingsProviderExtensions
         return node;
     }
 
-    private static XmlDocument GetRunSettingXmlDocument(this IRunSettingsProvider runSettingsProvider!!)
+    private static XmlDocument GetRunSettingXmlDocument(this IRunSettingsProvider runSettingsProvider)
     {
+        ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
         var doc = new XmlDocument();
 
         if (!StringUtils.IsNullOrEmpty(runSettingsProvider.ActiveRunSettings?.SettingsXml))
@@ -226,7 +236,7 @@ internal static class RunSettingsProviderExtensions
             using var reader =
                 XmlReader.Create(
                     new StringReader(
-                        XmlRunSettingsUtilities.CreateDefaultRunSettings().CreateNavigator().OuterXml),
+                        XmlRunSettingsUtilities.CreateDefaultRunSettings().CreateNavigator()!.OuterXml),
                     new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit });
             doc.Load(reader);
 #endif

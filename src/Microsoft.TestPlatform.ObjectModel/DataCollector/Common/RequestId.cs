@@ -2,9 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.Runtime.Serialization;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
@@ -45,7 +44,7 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
     /// </summary>
     /// <param name="obj">The object to compare to</param>
     /// <returns>True if equal, false otherwise</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj == null)
         {
@@ -57,7 +56,7 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
             return true;
         }
 
-        RequestId other = obj as RequestId;
+        RequestId? other = obj as RequestId;
         return other != null && Id == other.Id;
     }
 
@@ -90,7 +89,7 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
     /// </summary>
     /// <param name="other">The request ID to compare to</param>
     /// <returns>True if equal, false otherwise</returns>
-    public bool Equals(RequestId other)
+    public bool Equals(RequestId? other)
     {
         return
             other != null && (
@@ -108,7 +107,7 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
     /// </summary>
     /// <param name="other">The request ID to compare to</param>
     /// <returns>An indication of the two request IDs' relative values</returns>
-    public int CompareTo(RequestId other)
+    public int CompareTo(RequestId? other)
     {
         return other == null ? 1 : Id.CompareTo(other.Id);
     }
@@ -125,16 +124,16 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
     /// <exception cref="ArgumentException">
     /// 'obj' is not null and not an instance of <see cref="RequestId"/>
     /// </exception>
-    public int CompareTo(object obj)
+    public int CompareTo(object? obj)
     {
         if (obj == null)
         {
             return 1;
         }
 
-        RequestId other = obj as RequestId;
+        RequestId? other = obj as RequestId;
         return other == null
-            ? throw new ArgumentException(string.Format(Resources.Resources.Common_ObjectMustBeOfType, new object[] { typeof(RequestId).Name }), nameof(obj))
+            ? throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.Common_ObjectMustBeOfType, new object[] { typeof(RequestId).Name }), nameof(obj))
             : Id.CompareTo(other.Id);
     }
 
@@ -150,7 +149,7 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
     /// <param name="left">The left-hand request ID</param>
     /// <param name="right">The right-hand request ID</param>
     /// <returns>True if equal, false otherwise</returns>
-    public static bool operator ==(RequestId left, RequestId right)
+    public static bool operator ==(RequestId? left, RequestId? right)
     {
         return
             ReferenceEquals(left, right) ||
@@ -165,7 +164,7 @@ public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, I
     /// <param name="left">The left-hand request ID</param>
     /// <param name="right">The right-hand request ID</param>
     /// <returns>True if unequal, false otherwise</returns>
-    public static bool operator !=(RequestId left, RequestId right)
+    public static bool operator !=(RequestId? left, RequestId? right)
     {
         return !(left == right);
     }

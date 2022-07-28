@@ -4,13 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+#if NETCOREAPP2_0_OR_GREATER || NETFRAMEWORK
+using System.IO;
+#endif
 using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.VisualStudio.TestPlatform.Common;
-using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
@@ -102,7 +103,16 @@ internal class DefaultEngineInvoker :
                 .GetTypeInfo()
                 .Assembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-            EqtTrace.Verbose($"Version: {version}");
+            EqtTrace.Verbose($"Version: {version} Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}");
+#if NETCOREAPP2_0_OR_GREATER || NETFRAMEWORK
+            // https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location?view=net-6.0#remarks
+            // In .NET 5 and later versions, for bundled assemblies, the value returned is an empty string.
+            string objectTypeLocation = typeof(object).Assembly.Location;
+            if (!objectTypeLocation.IsNullOrEmpty())
+            {
+                EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(objectTypeLocation)}");
+            }
+#endif
         }
 
         if (EqtTrace.IsInfoEnabled)
@@ -135,13 +145,13 @@ internal class DefaultEngineInvoker :
             ConnectToDatacollector(dcPort);
         }
 
-        var requestData = GetRequestData(argsDictionary);
+        var telemetryOptedIn = GetTelemetryStatusFromArgs(argsDictionary);
 
         // Start processing async in a different task
         EqtTrace.Info("DefaultEngineInvoker.Invoke: Start Request Processing.");
         try
         {
-            StartProcessingAsync(_requestHandler, new TestHostManagerFactory(requestData)).Wait();
+            StartProcessingAsync(_requestHandler, new TestHostManagerFactory(telemetryOptedIn)).Wait();
         }
         finally
         {
@@ -155,29 +165,14 @@ internal class DefaultEngineInvoker :
         }
     }
 
-    private static RequestData GetRequestData(IDictionary<string, string?> argsDictionary)
+    private static bool GetTelemetryStatusFromArgs(IDictionary<string, string?> argsDictionary)
     {
-        // Checks for Telemetry Opted in or not from Command line Arguments.
-        // By Default opting out in Test Host to handle scenario when user running old version of vstest.console
+        // Checks if telemetry is opted in in the command line arguments.
+        // By default opting out in testhost to handle the scenario when the user is running an old
+        // version of vstest.console.
         var telemetryStatus = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, TelemetryOptedIn);
-        var telemetryOptedIn = false;
-        if (!string.IsNullOrWhiteSpace(telemetryStatus))
-        {
-            if (telemetryStatus.Equals("true", StringComparison.Ordinal))
-            {
-                telemetryOptedIn = true;
-            }
-        }
 
-        var requestData = new RequestData
-        {
-            MetricsCollection =
-                telemetryOptedIn
-                    ? new MetricsCollection()
-                    : new NoOpMetricsCollection(),
-            IsTelemetryOptedIn = telemetryOptedIn
-        };
-        return requestData;
+        return string.Equals(telemetryStatus, "true", StringComparison.Ordinal);
     }
 
     private void ConnectToDatacollector(int dcPort)
@@ -199,7 +194,7 @@ internal class DefaultEngineInvoker :
                 dcPort);
             throw new TestPlatformException(
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                     CoreUtilitiesConstants.TesthostProcessName,
                     CoreUtilitiesConstants.DatacollectorProcessName,
@@ -257,8 +252,8 @@ internal class DefaultEngineInvoker :
         EqtTrace.Info("DefaultEngineInvoker.GetConnectionInfo: Initialize communication on endpoint address: '{0}'", endpoint);
 
         var connectionRole = ConnectionRole.Client;
-        string role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
-        if (!string.IsNullOrWhiteSpace(role) && string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
+        string? role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
+        if (string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
         {
             connectionRole = ConnectionRole.Host;
         }
@@ -266,7 +261,7 @@ internal class DefaultEngineInvoker :
         // Start Processing of requests
         var connectionInfo = new TestHostConnectionInfo
         {
-            Endpoint = endpoint,
+            Endpoint = endpoint!,
             Role = connectionRole,
             Transport = Transport.Sockets
         };

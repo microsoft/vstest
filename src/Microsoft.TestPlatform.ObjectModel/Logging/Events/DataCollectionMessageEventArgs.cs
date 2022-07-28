@@ -4,8 +4,6 @@
 using System;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 /// <summary>
@@ -19,14 +17,15 @@ public class DataCollectionMessageEventArgs : TestRunMessageEventArgs
     /// </summary>
     /// <param name="level">Level at which message should be logged.</param>
     /// <param name="message">Text message.</param>
-    public DataCollectionMessageEventArgs(TestMessageLevel level, string message) : base(level, message)
+    public DataCollectionMessageEventArgs(TestMessageLevel level, string message)
+        : base(level, message)
     {
     }
     /// <summary>
     /// Friendly name of collector
     /// </summary>
     [DataMember]
-    public string FriendlyName
+    public string? FriendlyName
     {
         get;
         set;
@@ -37,7 +36,7 @@ public class DataCollectionMessageEventArgs : TestRunMessageEventArgs
     /// Uri of collector.
     /// </summary>
     [DataMember]
-    public Uri Uri
+    public Uri? Uri
     {
         get;
         set;

@@ -18,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
 /// <summary>
@@ -40,23 +38,22 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     private volatile bool _proxySetupFailed;
     private readonly StartTestSessionCriteria _testSessionCriteria;
     private readonly int _maxTesthostCount;
-    private TestSessionInfo _testSessionInfo;
-    private readonly Func<TestRuntimeProviderInfo, ProxyOperationManager> _proxyCreator;
+    private TestSessionInfo? _testSessionInfo;
+    private readonly Func<TestRuntimeProviderInfo, ProxyOperationManager?> _proxyCreator;
     private readonly List<TestRuntimeProviderInfo> _runtimeProviders;
     private readonly IList<ProxyOperationManagerContainer> _proxyContainerList;
     private readonly IDictionary<string, int> _proxyMap;
     private readonly Stopwatch _testSessionStopwatch;
     private readonly Dictionary<string, TestRuntimeProviderInfo> _sourceToRuntimeProviderInfoMap;
-    private IDictionary<string, string> _testSessionEnvironmentVariables = new Dictionary<string, string>();
+    private Dictionary<string, string?> _testSessionEnvironmentVariables = new();
 
-    private IDictionary<string, string> TestSessionEnvironmentVariables
+    private IDictionary<string, string?> TestSessionEnvironmentVariables
     {
         get
         {
             if (_testSessionEnvironmentVariables.Count == 0)
             {
-                _testSessionEnvironmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(
-                        _testSessionCriteria.RunSettings)
+                _testSessionEnvironmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(_testSessionCriteria.RunSettings)
                     ?? _testSessionEnvironmentVariables;
             }
 
@@ -67,14 +64,14 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyTestSessionManager"/> class.
     /// </summary>
-    /// 
+    ///
     /// <param name="criteria">The test session criteria.</param>
     /// <param name="maxTesthostCount">The testhost count.</param>
     /// <param name="proxyCreator">The proxy creator.</param>
     public ProxyTestSessionManager(
         StartTestSessionCriteria criteria,
         int maxTesthostCount,
-        Func<TestRuntimeProviderInfo, ProxyOperationManager> proxyCreator,
+        Func<TestRuntimeProviderInfo, ProxyOperationManager?> proxyCreator,
         List<TestRuntimeProviderInfo> runtimeProviders)
     {
         _testSessionCriteria = criteria;
@@ -88,7 +85,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         // Get dictionary from source -> runtimeProviderInfo, that has the type of runtime provider to create for this
         // source, and updated runsettings.
         _sourceToRuntimeProviderInfoMap = _runtimeProviders
-            .SelectMany(runtimeProviderInfo => runtimeProviderInfo.SourceDetails.Select(detail => new KeyValuePair<string, TestRuntimeProviderInfo>(detail.Source, runtimeProviderInfo)))
+            .SelectMany(runtimeProviderInfo => runtimeProviderInfo.SourceDetails.Select(detail => new KeyValuePair<string, TestRuntimeProviderInfo>(detail.Source!, runtimeProviderInfo)))
             .ToDictionary(pair => pair.Key, pair => pair.Value);
     }
 
@@ -120,6 +117,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         {
             // This is similar to what we do in ProxyExecutionManager, and ProxyDiscoveryManager, we split
             // up the payload into multiple smaller pieces. Here it is one source per proxy.
+            TPDebug.Assert(_testSessionCriteria.Sources is not null, "_testSessionCriteria.Sources is null");
             var source = _testSessionCriteria.Sources[i];
             var sources = new List<string>() { source };
             var runtimeProviderInfo = _sourceToRuntimeProviderInfoMap[source];
@@ -226,14 +224,14 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     /// <summary>
     /// Dequeues a proxy to be used either by discovery or execution.
     /// </summary>
-    /// 
+    ///
     /// <param name="source">The source to be associated to this proxy.</param>
     /// <param name="runSettings">The run settings.</param>
-    /// 
+    ///
     /// <returns>The dequeued proxy.</returns>
-    public virtual ProxyOperationManager DequeueProxy(string source, string runSettings)
+    public virtual ProxyOperationManager DequeueProxy(string source, string? runSettings)
     {
-        ProxyOperationManagerContainer proxyContainer = null;
+        ProxyOperationManagerContainer? proxyContainer = null;
 
         lock (_proxyOperationLockObject)
         {
@@ -241,10 +239,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             if (!_proxyMap.ContainsKey(source)
                 || !_proxyContainerList[_proxyMap[source]].IsAvailable)
             {
-                throw new InvalidOperationException(
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CrossPlatResources.NoAvailableProxyForDeque));
+                throw new InvalidOperationException(CrossPlatResources.NoAvailableProxyForDeque);
             }
 
             // We must ensure the current run settings match the run settings from when the
@@ -253,10 +248,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             if (!CheckRunSettingsAreCompatible(runSettings))
             {
                 EqtTrace.Verbose($"ProxyTestSessionManager.DequeueProxy: A proxy exists, but the runsettings do not match. Skipping it. Incoming settings: {runSettings}, Settings on proxy: {_testSessionCriteria.RunSettings}");
-                throw new InvalidOperationException(
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CrossPlatResources.NoProxyMatchesDescription));
+                throw new InvalidOperationException(CrossPlatResources.NoProxyMatchesDescription);
             }
 
             // Get the actual proxy.
@@ -272,9 +264,9 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
     /// <summary>
     /// Enqueues a proxy back once discovery or executions is done with it.
     /// </summary>
-    /// 
+    ///
     /// <param name="proxyId">The id of the proxy to be re-enqueued.</param>
-    /// 
+    ///
     /// <returns>True if the operation succeeded, false otherwise.</returns>
     public virtual bool EnqueueProxy(int proxyId)
     {
@@ -285,7 +277,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             {
                 throw new ArgumentException(
                     string.Format(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         CrossPlatResources.NoSuchProxyId,
                         proxyId));
             }
@@ -296,7 +288,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
             {
                 throw new InvalidOperationException(
                     string.Format(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         CrossPlatResources.ProxyIsAlreadyAvailable,
                         proxyId));
             }
@@ -404,7 +396,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         }
     }
 
-    private bool CheckRunSettingsAreCompatible(string requestRunSettings)
+    private bool CheckRunSettingsAreCompatible(string? requestRunSettings)
     {
         // Environment variable sets should be identical, otherwise it's not safe to reuse the
         // already running testhosts.
@@ -430,7 +422,7 @@ internal class ProxyOperationManagerContainer
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyOperationManagerContainer"/> class.
     /// </summary>
-    /// 
+    ///
     /// <param name="proxy">The proxy.</param>
     /// <param name="available">A flag indicating if the proxy is available to do work.</param>
     public ProxyOperationManagerContainer(ProxyOperationManager proxy, bool available)

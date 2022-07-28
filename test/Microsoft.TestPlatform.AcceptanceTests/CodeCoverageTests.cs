@@ -2,14 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 
 using Microsoft.TestPlatform.TestUtilities;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -303,33 +302,33 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         return arguments;
     }
 
-    private void AssertSkippedMethod(XmlDocument document)
+    private static void AssertSkippedMethod(XmlDocument document)
     {
-        var module = GetModuleNode(document.DocumentElement, "codecoveragetest.dll");
+        var module = GetModuleNode(document.DocumentElement!, "codecoveragetest.dll");
         Assert.IsNotNull(module);
 
-        var coverage = double.Parse(module.Attributes["block_coverage"].Value);
+        var coverage = double.Parse(module.Attributes!["block_coverage"]!.Value, CultureInfo.InvariantCulture);
         Assert.IsTrue(coverage > ExpectedMinimalModuleCoverage);
 
         var testSignFunction = GetNode(module, "skipped_function", "TestSign()");
         Assert.IsNotNull(testSignFunction);
-        Assert.AreEqual("name_excluded", testSignFunction.Attributes["reason"].Value);
+        Assert.AreEqual("name_excluded", testSignFunction.Attributes!["reason"]!.Value);
 
         var skippedTestMethod = GetNode(module, "skipped_function", "__CxxPureMSILEntry_Test()");
         Assert.IsNotNull(skippedTestMethod);
-        Assert.AreEqual("name_excluded", skippedTestMethod.Attributes["reason"].Value);
+        Assert.AreEqual("name_excluded", skippedTestMethod.Attributes!["reason"]!.Value);
 
         var testAbsFunction = GetNode(module, "function", "TestAbs()");
         Assert.IsNotNull(testAbsFunction);
     }
 
-    private void ValidateCoverageData(XmlDocument document, string moduleName, bool validateSourceFileNames)
+    private static void ValidateCoverageData(XmlDocument document, string moduleName, bool validateSourceFileNames)
     {
-        var module = GetModuleNode(document.DocumentElement, moduleName.ToLower());
+        var module = GetModuleNode(document.DocumentElement!, moduleName.ToLowerInvariant());
 
         if (module == null)
         {
-            module = GetModuleNode(document.DocumentElement, moduleName);
+            module = GetModuleNode(document.DocumentElement!, moduleName);
         }
         Assert.IsNotNull(module);
 
@@ -342,15 +341,15 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         }
     }
 
-    private void AssertSourceFileName(XmlNode module)
+    private static void AssertSourceFileName(XmlNode module)
     {
         const string expectedFileName = "UnitTest1.cs";
 
         var found = false;
         var sourcesNode = module.SelectSingleNode("./source_files");
-        foreach (XmlNode node in sourcesNode.ChildNodes)
+        foreach (XmlNode node in sourcesNode!.ChildNodes)
         {
-            if (node.Attributes["path"].Value.Contains(expectedFileName))
+            if (node.Attributes!["path"]!.Value.Contains(expectedFileName))
             {
                 found = true;
                 break;

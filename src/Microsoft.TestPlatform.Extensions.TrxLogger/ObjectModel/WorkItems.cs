@@ -6,12 +6,10 @@ using System.Text;
 using System.Xml;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+
 #region WorkItem
 /// <summary>
 /// Stores an int which represents a workitem
@@ -48,7 +46,7 @@ internal sealed class WorkItem : IXmlTestStore
     /// </summary>
     /// <param name="other">Value being compared to.</param>
     /// <returns>True if the values are the same and false otherwise.</returns>
-    public override bool Equals(object other)
+    public override bool Equals(object? other)
     {
         return other is WorkItem otherItem && _id == otherItem._id;
     }
@@ -79,7 +77,7 @@ internal sealed class WorkItem : IXmlTestStore
     /// </summary>
     /// <param name="element"> XmlElement element </param>
     /// <param name="parameters"> XmlTestStoreParameters parameters</param>
-    public void Save(XmlElement element, XmlTestStoreParameters parameters)
+    public void Save(XmlElement element, XmlTestStoreParameters? parameters)
     {
         new XmlPersistence().SaveSingleFields(element, this, parameters);
     }
@@ -176,7 +174,7 @@ internal sealed class WorkItemCollection : EqtBaseCollection<WorkItem>
     /// </summary>
     /// <param name="obj">other collection</param>
     /// <returns>true if the collections contain the same items</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         bool result = false;
 
@@ -216,7 +214,7 @@ internal sealed class WorkItemCollection : EqtBaseCollection<WorkItem>
         return base.GetHashCode();
     }
 
-    public override void Save(XmlElement element, XmlTestStoreParameters parameters)
+    public override void Save(XmlElement element, XmlTestStoreParameters? parameters)
     {
         XmlPersistence xmlPersistence = new();
         xmlPersistence.SaveHashtable(_container, element, ".", ".", null, "Workitem", parameters);

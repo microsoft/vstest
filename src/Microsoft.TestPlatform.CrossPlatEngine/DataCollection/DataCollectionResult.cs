@@ -5,8 +5,6 @@ using System.Collections.ObjectModel;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
@@ -14,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 /// </summary>
 public class DataCollectionResult
 {
-    public DataCollectionResult(Collection<AttachmentSet> attachments, Collection<InvokedDataCollector> invokedDataCollectors)
+    public DataCollectionResult(Collection<AttachmentSet>? attachments, Collection<InvokedDataCollector>? invokedDataCollectors)
     {
         Attachments = attachments;
         InvokedDataCollectors = invokedDataCollectors;
@@ -23,10 +21,10 @@ public class DataCollectionResult
     /// <summary>
     /// Get list of attachments
     /// </summary>
-    public Collection<AttachmentSet> Attachments { get; }
+    public Collection<AttachmentSet>? Attachments { get; }
 
     /// <summary>
     /// Get the list of the invoked data collectors.
     /// </summary>
-    public Collection<InvokedDataCollector> InvokedDataCollectors { get; }
+    public Collection<InvokedDataCollector>? InvokedDataCollectors { get; }
 }

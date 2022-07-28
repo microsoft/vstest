@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.Utilities;
 
 [TestClass]
@@ -41,7 +39,7 @@ public class RunSettingsUtilitiesTests
     [TestMethod]
     public void GetMaxCpuCountWithNullSettingXmlShouldReturnDefaultCpuCount()
     {
-        string settingXml = null;
+        string? settingXml = null;
         int expectedResult = Constants.DefaultCpuCount;
 
         int result = RunSettingsUtilities.GetMaxCpuCount(settingXml);
@@ -108,8 +106,10 @@ public class RunSettingsUtilitiesTests
 [SettingsName("DummyMSTest")]
 public class DummyMsTestSetingsProvider : ISettingsProvider
 {
-    public void Load(XmlReader reader!!)
+    public void Load(XmlReader reader)
     {
+        ValidateArg.NotNull(reader, nameof(reader));
+
         reader.Read();
         StringToVerify = reader.ReadOuterXml();
     }

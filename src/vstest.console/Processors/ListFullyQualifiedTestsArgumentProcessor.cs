@@ -3,8 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -20,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
@@ -34,9 +30,8 @@ internal class ListFullyQualifiedTestsArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/ListFullyQualifiedTests";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -48,7 +43,7 @@ internal class ListFullyQualifiedTestsArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new ListFullyQualifiedTestsArgumentExecutor(
@@ -102,11 +97,6 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
     private readonly ITestDiscoveryEventsRegistrar _discoveryEventsRegistrar;
 
     /// <summary>
-    /// Test case filter instance
-    /// </summary>
-    private readonly TestCaseFilter _testCasefilter;
-
-    /// <summary>
     /// List to store the discovered tests
     /// </summary>
     private readonly List<string> _discoveredTests = new();
@@ -137,17 +127,15 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         ITestRequestManager testRequestManager,
         IOutput output)
     {
-        Contract.Requires(options != null);
+        ValidateArg.NotNull(options, nameof(options));
 
         _commandLineOptions = options;
         Output = output;
         _testRequestManager = testRequestManager;
 
         _runSettingsManager = runSettingsProvider;
-        _testCasefilter = new TestCaseFilter();
-        _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output, _testCasefilter, _discoveredTests, _commandLineOptions);
+        _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(_discoveredTests, _commandLineOptions);
     }
-
 
     #region IArgumentExecutor
 
@@ -155,9 +143,9 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        if (!string.IsNullOrWhiteSpace(argument))
+        if (!argument.IsNullOrWhiteSpace())
         {
             _commandLineOptions.AddSource(argument);
         }
@@ -168,16 +156,16 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
     /// </summary>
     public ArgumentProcessorResult Execute()
     {
-        Contract.Assert(Output != null);
-        Contract.Assert(_commandLineOptions != null);
-        Contract.Assert(!string.IsNullOrWhiteSpace(_runSettingsManager?.ActiveRunSettings?.SettingsXml));
+        TPDebug.Assert(Output != null);
+        TPDebug.Assert(_commandLineOptions != null);
+        TPDebug.Assert(!StringUtils.IsNullOrWhiteSpace(_runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
         if (!_commandLineOptions.Sources.Any())
         {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
+            throw new CommandLineException(CommandLineResources.MissingTestSourceFile);
         }
 
-        if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+        if (!EqtTrace.LogFile.IsNullOrEmpty())
         {
             Output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
         }
@@ -188,7 +176,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
             new DiscoveryRequestPayload { Sources = _commandLineOptions.Sources, RunSettings = runSettings },
             _discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
 
-        if (string.IsNullOrEmpty(_commandLineOptions.ListTestsTargetPath))
+        if (_commandLineOptions.ListTestsTargetPath.IsNullOrEmpty())
         {
             // This string does not need to go to Resources. Reason - only internal consumption
             throw new CommandLineException("Target Path should be specified for listing FQDN tests!");
@@ -202,15 +190,11 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
 
     private class DiscoveryEventsRegistrar : ITestDiscoveryEventsRegistrar
     {
-        private readonly IOutput _output;
-        private readonly TestCaseFilter _testCasefilter;
         private readonly List<string> _discoveredTests;
         private readonly CommandLineOptions _options;
 
-        public DiscoveryEventsRegistrar(IOutput output, TestCaseFilter filter, List<string> discoveredTests, CommandLineOptions cmdOptions)
+        public DiscoveryEventsRegistrar(List<string> discoveredTests, CommandLineOptions cmdOptions)
         {
-            _output = output;
-            _testCasefilter = filter;
             _discoveredTests = discoveredTests;
             _options = cmdOptions;
         }
@@ -229,7 +213,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
             discoveryRequest.OnDiscoveredTests -= DiscoveryRequest_OnDiscoveredTests;
         }
 
-        private void DiscoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
+        private void DiscoveryRequest_OnDiscoveredTests(object? sender, DiscoveredTestsEventArgs args)
         {
             if (args == null)
             {
@@ -237,9 +221,9 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
             }
 
             // Initializing the test case filter here because the filter value is read late.
-            _testCasefilter.Initialize(_options.TestCaseFilterValue);
+            TestCaseFilter.Initialize(_options.TestCaseFilterValue);
             var discoveredTests = args.DiscoveredTestCases.ToList();
-            var filteredTests = _testCasefilter.FilterTests(discoveredTests).ToList();
+            var filteredTests = TestCaseFilter.FilterTests(discoveredTests).ToList();
 
             // remove any duplicate tests
             filteredTests = filteredTests.Select(test => test.FullyQualifiedName)
@@ -250,19 +234,14 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         }
     }
 
-    private class TestCaseFilter
+    private static class TestCaseFilter
     {
-        private static TestCaseFilterExpression s_filterExpression;
+        private static TestCaseFilterExpression? s_filterExpression;
         private const string TestCategory = "TestCategory";
         private const string Category = "Category";
         private const string Traits = "Traits";
 
-        public TestCaseFilter()
-        {
-
-        }
-
-        public void Initialize(string filterString)
+        public static void Initialize(string? filterString)
         {
             ValidateFilter(filterString);
         }
@@ -270,7 +249,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         /// <summary>
         /// Filter tests
         /// </summary>
-        public IEnumerable<TestCase> FilterTests(IEnumerable<TestCase> testCases)
+        public static IEnumerable<TestCase> FilterTests(IEnumerable<TestCase> testCases)
         {
             EqtTrace.Verbose("TestCaseFilter.FilterTests : Test Filtering invoked.");
 
@@ -289,9 +268,9 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
             return filteredList;
         }
 
-        private static void ValidateFilter(string filterString)
+        private static void ValidateFilter(string? filterString)
         {
-            if (string.IsNullOrEmpty(filterString))
+            if (filterString.IsNullOrEmpty())
             {
                 s_filterExpression = null;
                 return;
@@ -301,7 +280,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
 
             if (filterWrapper.ParseError != null)
             {
-                var fe = new FormatException(string.Format("Invalid Test Case Filter: {0}", filterString));
+                var fe = new FormatException($"Invalid Test Case Filter: {filterString}");
                 EqtTrace.Error("TestCaseFilter.ValidateFilter : Filtering failed with exception : " + fe.Message);
                 throw fe;
             }
@@ -371,7 +350,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
                 //always return value as a list of string
                 if (testPropertyValue != null)
                 {
-                    var multiValue = new List<string> { testPropertyValue.ToString() };
+                    var multiValue = new List<string> { testPropertyValue.ToString()! };
                     traitDictionary.Add(testPropertyKey, multiValue);
                 }
             }
@@ -387,7 +366,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
             foreach (var trait in traits)
             {
                 var newTraitValueList = new List<string> { trait.Value };
-                if (!traitDictionary.TryGetValue(trait.Name, out List<string> currentTraitValue))
+                if (!traitDictionary.TryGetValue(trait.Name, out List<string>? currentTraitValue))
                 {
                     // if the current trait's key is not already present, add the current trait key-value pair
                     traitDictionary.Add(trait.Name, newTraitValueList);
@@ -412,7 +391,7 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
             if (!traitDictionary.ContainsKey(TestCategory) && traitDictionary.ContainsKey(Category))
             {
                 traitDictionary.TryGetValue(Category, out var categoryValue);
-                traitDictionary.Add(TestCategory, categoryValue);
+                traitDictionary.Add(TestCategory, categoryValue!);
             }
 
             return traitDictionary;
@@ -421,9 +400,9 @@ internal class ListFullyQualifiedTestsArgumentExecutor : IArgumentExecutor
         /// <summary>
         /// Provides value for property name 'propertyName' as used in filter.
         /// </summary>
-        private static string[] PropertyValueProvider(string propertyName, Dictionary<string, List<string>> traitDictionary)
+        private static string[]? PropertyValueProvider(string propertyName, Dictionary<string, List<string>> traitDictionary)
         {
-            traitDictionary.TryGetValue(propertyName, out List<string> propertyValueList);
+            traitDictionary.TryGetValue(propertyName, out List<string>? propertyValueList);
             if (propertyValueList != null)
             {
                 var propertyValueArray = propertyValueList.ToArray();

@@ -220,12 +220,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NoSuitableRuntimeProviderFound" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[No suitable test runtime provider was found:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[No se encontró ningún proveedor de tiempo de ejecución de prueba adecuado:]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NoTestHostProviderFound" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[No suitable test runtime provider found for this run.]]></Val>
+          <Val><![CDATA[No suitable test runtime provider was found for any source in this run.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[No se encontró un proveedor de tiempo de ejecución de prueba adecuado para esta ejecución.]]></Val>
+            <Val><![CDATA[No se encontró ningún proveedor de tiempo de ejecución de pruebas adecuado para ningún origen en esta ejecución.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[No suitable test runtime provider found for this run.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -270,6 +282,15 @@
           <Val><![CDATA[Proxy with id {0} is already available and cannot be re-enqueued.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[El proxy con el identificador {0} ya está disponible y no se puede volver a poner en cola.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";SkippingSource" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Skipping source:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Omitiendo origen:]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

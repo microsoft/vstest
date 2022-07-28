@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 
@@ -18,8 +19,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 /// <summary>
@@ -28,9 +27,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 [TestClass]
 public class RunTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private RunEventHandler _runEventHandler;
+    private IVsTestConsoleWrapper? _vstestConsoleWrapper;
+    private RunEventHandler? _runEventHandler;
 
+    [MemberNotNull(nameof(_vstestConsoleWrapper), nameof(_runEventHandler))]
     private void Setup()
     {
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();
@@ -71,8 +71,8 @@ public class RunTests : AcceptanceTestBase
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
-        var incompatibleDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
+        var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETFX);
+        var incompatibleDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETCORE);
 
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
@@ -94,8 +94,8 @@ public class RunTests : AcceptanceTestBase
 
         var vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", "net451");
-        var netDll = GetTestDllForFramework("MSTestProject1.dll", "netcoreapp2.1");
+        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETFX);
+        var netDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETCORE);
 
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
@@ -146,7 +146,7 @@ public class RunTests : AcceptanceTestBase
 
         // Assert
         Assert.AreEqual(6, _runEventHandler.TestResults.Count);
-        Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
+        Assert.IsTrue(_runEventHandler.Metrics!.ContainsKey(TelemetryDataConstants.TargetDevice));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetFramework));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOS));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForRun));
@@ -170,7 +170,7 @@ public class RunTests : AcceptanceTestBase
 
         // Assert
         Assert.AreEqual(6, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(0, _runEventHandler.Metrics.Count);
+        Assert.AreEqual(0, _runEventHandler.Metrics!.Count);
     }
 
     [TestMethod]
@@ -196,7 +196,7 @@ public class RunTests : AcceptanceTestBase
             new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
             _runEventHandler);
 
-        var errorMessage = runnerInfo.TargetFramework == "net451"
+        var errorMessage = runnerInfo.TargetFramework == "net462"
             ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.{Environment.NewLine}"
             : $"The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.{Environment.NewLine}";
 

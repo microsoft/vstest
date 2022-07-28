@@ -2,8 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
@@ -20,23 +18,20 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 internal class RunTestsArgumentProcessor : IArgumentProcessor
 {
     public const string CommandName = "/RunTests";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     public Lazy<IArgumentProcessorCapabilities> Metadata
         => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
             new RunTestsArgumentProcessorCapabilities());
 
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new RunTestsArgumentExecutor(
@@ -111,7 +106,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         IArtifactProcessingManager artifactProcessingManager,
         IOutput output)
     {
-        Contract.Requires(commandLineOptions != null);
+        ValidateArg.NotNull(commandLineOptions, nameof(commandLineOptions));
 
         _commandLineOptions = commandLineOptions;
         _runSettingsManager = runSettingsProvider;
@@ -120,7 +115,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions, artifactProcessingManager);
     }
 
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         // Nothing to do.
     }
@@ -130,8 +125,8 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
     /// </summary>
     public ArgumentProcessorResult Execute()
     {
-        Contract.Assert(_commandLineOptions != null);
-        Contract.Assert(!string.IsNullOrWhiteSpace(_runSettingsManager?.ActiveRunSettings?.SettingsXml));
+        TPDebug.Assert(_commandLineOptions != null);
+        TPDebug.Assert(!StringUtils.IsNullOrWhiteSpace(_runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
         if (_commandLineOptions.IsDesignMode)
         {
@@ -143,11 +138,11 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         var anySource = _commandLineOptions.Sources.FirstOrDefault();
         if (anySource == null)
         {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
+            throw new CommandLineException(CommandLineResources.MissingTestSourceFile);
         }
 
         Output.WriteLine(CommandLineResources.StartingExecution, OutputLevel.Information);
-        if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+        if (!StringUtils.IsNullOrEmpty(EqtTrace.LogFile))
         {
             Output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
         }
@@ -213,14 +208,14 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e">RunCompletion args</param>
-        private void TestRunRequest_OnRunCompletion(object sender, TestRunCompleteEventArgs e)
+        private void TestRunRequest_OnRunCompletion(object? sender, TestRunCompleteEventArgs e)
         {
             // If run is not aborted/canceled then check the count of executed tests.
             // we need to check if there are any tests executed - to try show some help info to user to check for installed vsix extensions
             if (!e.IsAborted && !e.IsCanceled)
             {
-                s_numberOfExecutedTests = e.TestRunStatistics.ExecutedTests;
-                var testsFoundInAnySource = e.TestRunStatistics != null && (e.TestRunStatistics.ExecutedTests > 0);
+                var testsFoundInAnySource = e.TestRunStatistics != null && e.TestRunStatistics.ExecutedTests > 0;
+                s_numberOfExecutedTests = e.TestRunStatistics!.ExecutedTests;
 
                 // Indicate the user to use test adapter path command if there are no tests found
                 if (!testsFoundInAnySource && !CommandLineOptions.Instance.TestAdapterPathsSet && _commandLineOptions.TestCaseFilterValue == null)
@@ -232,6 +227,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
             // Collect tests session artifacts for post processing
             if (_commandLineOptions.ArtifactProcessingMode == ArtifactProcessingMode.Collect)
             {
+                TPDebug.Assert(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml is not null, "RunSettingsManager.Instance.ActiveRunSettings.SettingsXml is null");
                 _artifactProcessingManager.CollectArtifacts(e, RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
             }
         }

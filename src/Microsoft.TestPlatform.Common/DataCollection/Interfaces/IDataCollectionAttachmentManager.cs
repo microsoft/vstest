@@ -8,8 +8,6 @@ using System.ComponentModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
 
 /// <summary>
@@ -57,7 +55,7 @@ internal interface IDataCollectionAttachmentManager
     /// <param name="friendlyName">
     /// The friendly Name.
     /// </param>
-    void AddAttachment(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler sendFileCompletedCallback, Uri dataCollectorUri, string friendlyName);
+    void AddAttachment(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler? sendFileCompletedCallback, Uri dataCollectorUri, string friendlyName);
 
     /// <summary>
     /// Stops processing further transfer requests as test run is canceled.

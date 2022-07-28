@@ -2,32 +2,31 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
 /// Communication client implementation over sockets.
 /// </summary>
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class SocketClient : ICommunicationEndPoint
 {
     private readonly CancellationTokenSource _cancellation;
     private readonly TcpClient _tcpClient;
     private readonly Func<Stream, ICommunicationChannel> _channelFactory;
-    private ICommunicationChannel _channel;
+
+    private ICommunicationChannel? _channel;
     private bool _stopped;
-    private string _endPoint;
+    private string? _endPoint;
 
     public SocketClient()
         : this(stream => new LengthPrefixCommunicationChannel(stream))
@@ -45,10 +44,10 @@ public class SocketClient : ICommunicationEndPoint
     }
 
     /// <inheritdoc />
-    public event EventHandler<ConnectedEventArgs> Connected;
+    public event EventHandler<ConnectedEventArgs>? Connected;
 
     /// <inheritdoc />
-    public event EventHandler<DisconnectedEventArgs> Disconnected;
+    public event EventHandler<DisconnectedEventArgs>? Disconnected;
 
     /// <inheritdoc />
     public string Start(string endPoint)
@@ -79,31 +78,32 @@ public class SocketClient : ICommunicationEndPoint
     {
         EqtTrace.Info("SocketClient.OnServerConnected: connected to server endpoint: {0}", _endPoint);
 
-        if (Connected != null)
+        if (Connected == null)
         {
-            if (connectAsyncTask.IsFaulted)
-            {
-                Connected.SafeInvoke(this, new ConnectedEventArgs(connectAsyncTask.Exception), "SocketClient: Server Failed to Connect");
-                EqtTrace.Verbose("Unable to connect to server, Exception occurred: {0}", connectAsyncTask.Exception);
-            }
-            else
-            {
-                _channel = _channelFactory(_tcpClient.GetStream());
-                Connected.SafeInvoke(this, new ConnectedEventArgs(_channel), "SocketClient: ServerConnected");
-
-                EqtTrace.Verbose("Connected to server, and starting MessageLoopAsync");
-
-                // Start the message loop
-                Task.Run(() => _tcpClient.MessageLoopAsync(
-                        _channel,
-                        StopOnError,
-                        _cancellation.Token))
-                    .ConfigureAwait(false);
-            }
+            return;
         }
+
+        if (connectAsyncTask.IsFaulted)
+        {
+            Connected.SafeInvoke(this, new ConnectedEventArgs(connectAsyncTask.Exception), "SocketClient: Server Failed to Connect");
+            EqtTrace.Verbose("Unable to connect to server, Exception occurred: {0}", connectAsyncTask.Exception);
+            return;
+        }
+
+        _channel = _channelFactory(_tcpClient.GetStream());
+        Connected.SafeInvoke(this, new ConnectedEventArgs(_channel), "SocketClient: ServerConnected");
+
+        EqtTrace.Verbose("Connected to server, and starting MessageLoopAsync");
+
+        // Start the message loop
+        Task.Run(() => _tcpClient.MessageLoopAsync(
+                _channel,
+                StopOnError,
+                _cancellation.Token))
+            .ConfigureAwait(false);
     }
 
-    private void StopOnError(Exception error)
+    private void StopOnError(Exception? error)
     {
         EqtTrace.Info("SocketClient.PrivateStop: Stop communication from server endpoint: {0}, error:{1}", _endPoint, error);
         // This is here to prevent stack overflow.
@@ -120,7 +120,7 @@ public class SocketClient : ICommunicationEndPoint
             // tcpClient.Close() not available for netstandard1.5.
             _tcpClient?.Dispose();
 #endif
-            _channel.Dispose();
+            _channel?.Dispose();
             _cancellation.Dispose();
 
             Disconnected?.SafeInvoke(this, new DisconnectedEventArgs(), "SocketClient: ServerDisconnected");

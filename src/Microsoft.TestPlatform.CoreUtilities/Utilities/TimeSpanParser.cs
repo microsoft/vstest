@@ -4,20 +4,18 @@
 using System;
 using System.Text.RegularExpressions;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 public static class TimeSpanParser
 {
     static readonly Regex Pattern = new(@"(?<value>^\d+(?:\.\d+)?)\s*(?<suffix>ms|mil|m|h|d|s?[a-z]*)$", RegexOptions.IgnoreCase);
 
-    public static TimeSpan Parse(string time)
+    public static TimeSpan Parse(string? time)
     {
         return TryParse(time, out var result) ? result : throw GetFormatException(time);
     }
 
-    public static bool TryParse(string time, out TimeSpan result)
+    public static bool TryParse(string? time, out TimeSpan result)
     {
         if (string.IsNullOrWhiteSpace(time))
         {
@@ -77,7 +75,7 @@ public static class TimeSpanParser
         return false;
     }
 
-    static FormatException GetFormatException(string value)
+    static FormatException GetFormatException(string? value)
     {
         return new FormatException($"The value '{value}' is not a valid time string. Use a time string in this format 5400000 / 5400000ms / 5400s / 90m / 1.5h / 0.625d.");
     }

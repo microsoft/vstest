@@ -24,7 +24,7 @@ public class PlatformArgumentProcessorTests
     [TestCleanup]
     public void TestCleanup()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
     }
 
     [TestMethod]
@@ -38,7 +38,7 @@ public class PlatformArgumentProcessorTests
     public void GetExecuterShouldReturnPlatformArgumentExecutor()
     {
         var processor = new PlatformArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is PlatformArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is PlatformArgumentExecutor);
     }
 
     #region PlatformArgumentProcessorCapabilities tests

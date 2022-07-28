@@ -13,8 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 
 /// <summary>
@@ -23,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEventHandler
 {
     private readonly ICommunicationManager _communicationManager;
-    private readonly IDataCollectionManager _dataCollectionManager;
+    private readonly IDataCollectionManager? _dataCollectionManager;
     private readonly IDataSerializer _dataSerializer;
     private readonly IMessageSink _messageSink;
 
@@ -40,7 +38,7 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
     /// <param name="communicationManager">Communication manager implementation.</param>
     /// <param name="dataCollectionManager">Data collection manager implementation.</param>
     /// <param name="dataSerializer">Serializer for serialization and deserialization of the messages.</param>
-    internal DataCollectionTestCaseEventHandler(IMessageSink messageSink, ICommunicationManager communicationManager, IDataCollectionManager dataCollectionManager, IDataSerializer dataSerializer)
+    internal DataCollectionTestCaseEventHandler(IMessageSink messageSink, ICommunicationManager communicationManager, IDataCollectionManager? dataCollectionManager, IDataSerializer dataSerializer)
     {
         _communicationManager = communicationManager;
         _dataCollectionManager = dataCollectionManager;
@@ -76,7 +74,7 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
         do
         {
             var message = _communicationManager.ReceiveMessage();
-            switch (message.MessageType)
+            switch (message?.MessageType)
             {
                 case MessageType.DataCollectionTestStart:
                     EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case starting.");
@@ -85,6 +83,8 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
 
                     try
                     {
+                        TPDebug.Assert(_dataCollectionManager is not null, "_dataCollectionManager is null");
+                        TPDebug.Assert(testCaseStartEventArgs is not null, "testCaseStartEventArgs is null");
                         _dataCollectionManager.TestCaseStarted(testCaseStartEventArgs);
                     }
                     catch (Exception ex)
@@ -107,6 +107,8 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
                     Collection<AttachmentSet> attachmentSets;
                     try
                     {
+                        TPDebug.Assert(_dataCollectionManager is not null, "_dataCollectionManager is null");
+                        TPDebug.Assert(testCaseEndEventArgs is not null, "testCaseEndEventArgs is null");
                         attachmentSets = _dataCollectionManager.TestCaseEnded(testCaseEndEventArgs);
                     }
                     catch (Exception ex)
@@ -139,7 +141,7 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
                     break;
 
                 default:
-                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Invalid Message type '{0}'", message.MessageType);
+                    EqtTrace.Info("DataCollectionTestCaseEventHandler: Invalid Message type '{0}'", message?.MessageType);
 
                     break;
             }

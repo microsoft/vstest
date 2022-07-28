@@ -10,8 +10,10 @@ using Microsoft.VisualStudio.TestPlatform.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using Moq;
+using System.Globalization;
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
 
@@ -34,7 +36,7 @@ public class DataCollectorMainTests
         _mockProcessHelper = new Mock<IProcessHelper>();
         _mockEnvironment = new Mock<IEnvironment>();
         _mockDataCollectionRequestHandler = new Mock<IDataCollectionRequestHandler>();
-        _dataCollectorMain = new DataCollectorMain(_mockProcessHelper.Object, _mockEnvironment.Object, _mockDataCollectionRequestHandler.Object);
+        _dataCollectorMain = new DataCollectorMain(_mockProcessHelper.Object, _mockEnvironment.Object, _mockDataCollectionRequestHandler.Object, new());
         _mockDataCollectionRequestHandler.Setup(rh => rh.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(true);
     }
 
@@ -114,5 +116,77 @@ public class DataCollectorMainTests
         _mockDataCollectionRequestHandler.Setup(rh => rh.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(false);
         var message = Assert.ThrowsException<TestPlatformException>(() => _dataCollectorMain.Run(_args)).Message;
         Assert.AreEqual(TimoutErrorMessage, message);
+    }
+
+    [TestMethod]
+    public void RunWhenCliUiLanguageIsSetChangesCultureAndFlowsOverride()
+    {
+        // Arrange
+        var culture = new CultureInfo("fr-fr");
+        var envVarMock = new Mock<IEnvironmentVariableHelper>();
+        envVarMock.Setup(x => x.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE")).Returns(culture.Name);
+
+        bool threadCultureWasSet = false;
+        var dataCollectorMain = new DataCollectorMain(_mockProcessHelper.Object, _mockEnvironment.Object, _mockDataCollectionRequestHandler.Object,
+            new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture)));
+
+        // Act
+        dataCollectorMain.Run(_args);
+
+        // Assert
+        Assert.IsTrue(threadCultureWasSet, "DefaultThreadCurrentUICulture was not set");
+        envVarMock.Verify(x => x.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE"), Times.Exactly(2));
+        envVarMock.Verify(x => x.GetEnvironmentVariable("VSLANG"), Times.Once);
+        envVarMock.Verify(x => x.SetEnvironmentVariable("VSLANG", culture.LCID.ToString(CultureInfo.InvariantCulture)), Times.Once);
+        envVarMock.Verify(x => x.GetEnvironmentVariable("PreferredUILang"), Times.Once);
+        envVarMock.Verify(x => x.SetEnvironmentVariable("PreferredUILang", culture.Name), Times.Once);
+    }
+
+    [TestMethod]
+    public void RunWhenVsLangIsSetChangesCultureAndFlowsOverride()
+    {
+        // Arrange
+        var culture = new CultureInfo("fr-fr");
+        var envVarMock = new Mock<IEnvironmentVariableHelper>();
+        envVarMock.Setup(x => x.GetEnvironmentVariable("VSLANG")).Returns(culture.LCID.ToString(CultureInfo.InvariantCulture));
+
+        bool threadCultureWasSet = false;
+        var dataCollectorMain = new DataCollectorMain(_mockProcessHelper.Object, _mockEnvironment.Object, _mockDataCollectionRequestHandler.Object,
+            new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture)));
+
+        // Act
+        dataCollectorMain.Run(_args);
+
+        // Assert
+        Assert.IsTrue(threadCultureWasSet, "DefaultThreadCurrentUICulture was not set");
+        envVarMock.Verify(x => x.GetEnvironmentVariable("VSLANG"), Times.Exactly(2));
+        envVarMock.Verify(x => x.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE"), Times.Exactly(2));
+        envVarMock.Verify(x => x.SetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE", culture.Name), Times.Once);
+        envVarMock.Verify(x => x.GetEnvironmentVariable("PreferredUILang"), Times.Once);
+        envVarMock.Verify(x => x.SetEnvironmentVariable("PreferredUILang", culture.Name), Times.Once);
+    }
+
+    [TestMethod]
+    public void RunWhenNoCultureEnvVarSetDoesNotChangeCultureNorFlowsOverride()
+    {
+        // Arrange
+        var envVarMock = new Mock<IEnvironmentVariableHelper>();
+        envVarMock.Setup(x => x.GetEnvironmentVariable(It.IsAny<string>())).Returns(default(string));
+
+        bool threadCultureWasSet = false;
+        var dataCollectorMain = new DataCollectorMain(_mockProcessHelper.Object, _mockEnvironment.Object, _mockDataCollectionRequestHandler.Object,
+            new(envVarMock.Object, lang => threadCultureWasSet = true));
+
+        // Act
+        dataCollectorMain.Run(_args);
+
+        // Assert
+        Assert.IsFalse(threadCultureWasSet, "DefaultThreadCurrentUICulture was set");
+        envVarMock.Verify(x => x.GetEnvironmentVariable("VSLANG"), Times.Once);
+        envVarMock.Verify(x => x.SetEnvironmentVariable("VSLANG", It.IsAny<string>()), Times.Never);
+        envVarMock.Verify(x => x.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE"), Times.Once);
+        envVarMock.Verify(x => x.SetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE", It.IsAny<string>()), Times.Never);
+        envVarMock.Verify(x => x.GetEnvironmentVariable("PreferredUILang"), Times.Never);
+        envVarMock.Verify(x => x.SetEnvironmentVariable("PreferredUILang", It.IsAny<string>()), Times.Never);
     }
 }

@@ -16,8 +16,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities;
 
 [TestClass]
@@ -79,10 +77,7 @@ public class LazyExtensionTests
     {
         var testDiscovererPluginInfo = new TestDiscovererPluginInformation(typeof(DummyExtension));
         var mockMetadata = new Mock<ITestDiscovererCapabilities>();
-        LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> extension =
-            new(
-                testDiscovererPluginInfo,
-                mockMetadata.Object);
+        LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> extension = new(testDiscovererPluginInfo, mockMetadata.Object);
 
         Assert.AreEqual(mockMetadata.Object, extension.Metadata);
     }
@@ -91,17 +86,14 @@ public class LazyExtensionTests
     public void MetadataShouldCreateMetadataFromMetadataType()
     {
         var testDiscovererPluginInfo = new TestDiscovererPluginInformation(typeof(DummyExtension));
-        LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> extension =
-            new(
-                testDiscovererPluginInfo,
-                typeof(DummyDiscovererCapability));
+        LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> extension = new(testDiscovererPluginInfo, typeof(DummyDiscovererCapability));
 
         var metadata = extension.Metadata;
         Assert.IsNotNull(metadata);
         Assert.AreEqual(typeof(DummyDiscovererCapability), metadata.GetType());
-        CollectionAssert.AreEqual(new List<string> { "csv" }, (metadata as ITestDiscovererCapabilities).FileExtension.ToArray());
-        Assert.AreEqual("executor://unittestexecutor/", (metadata as ITestDiscovererCapabilities).DefaultExecutorUri.AbsoluteUri);
-        Assert.AreEqual(AssemblyType.Native, (metadata as ITestDiscovererCapabilities).AssemblyType);
+        CollectionAssert.AreEqual(new List<string> { "csv" }, metadata.FileExtension!.ToArray());
+        Assert.AreEqual("executor://unittestexecutor/", metadata.DefaultExecutorUri!.AbsoluteUri);
+        Assert.AreEqual(AssemblyType.Native, metadata.AssemblyType);
     }
 
     #endregion

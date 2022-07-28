@@ -32,7 +32,7 @@ public class ParallelProxyExecutionManagerTests
 
     private readonly List<Mock<IProxyExecutionManager>> _usedMockManagers;
     private readonly Func<TestRuntimeProviderInfo, IProxyExecutionManager> _createMockManager;
-    private readonly Mock<ITestRunEventsHandler> _mockEventHandler;
+    private readonly Mock<IInternalTestRunEventsHandler> _mockEventHandler;
 
     private readonly List<string> _sources;
     private readonly List<string> _processedSources;
@@ -66,7 +66,7 @@ public class ParallelProxyExecutionManagerTests
             _usedMockManagers.Add(manager);
             return manager.Object;
         };
-        _mockEventHandler = new Mock<ITestRunEventsHandler>();
+        _mockEventHandler = new Mock<IInternalTestRunEventsHandler>();
 
         // Configure sources
         _sources = new List<string>() { "1.dll", "2.dll" };
@@ -115,11 +115,11 @@ public class ParallelProxyExecutionManagerTests
         var parallelExecutionManager = new ParallelProxyExecutionManager(_mockRequestData.Object, _createMockManager, parallelLevel: 1000, _runtimeProviders);
 
         // Starting parallel run will create 2 proxy managers, which we will then promptly abort.
-        parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, new Mock<ITestRunEventsHandler>().Object);
-        parallelExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
+        parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, new Mock<IInternalTestRunEventsHandler>().Object);
+        parallelExecutionManager.Abort(It.IsAny<IInternalTestRunEventsHandler>());
 
         Assert.AreEqual(2, _usedMockManagers.Count, "Number of Concurrent Managers created should be equal to the amount of dlls that run");
-        _usedMockManagers.ForEach(em => em.Verify(m => m.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Once));
+        _usedMockManagers.ForEach(em => em.Verify(m => m.Abort(It.IsAny<IInternalTestRunEventsHandler>()), Times.Once));
     }
 
     [TestMethod]
@@ -128,11 +128,11 @@ public class ParallelProxyExecutionManagerTests
         var parallelExecutionManager = new ParallelProxyExecutionManager(_mockRequestData.Object, _createMockManager, 4, _runtimeProviders);
 
         // Starting parallel run will create 2 proxy managers, which we will then promptly cancel.
-        parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, new Mock<ITestRunEventsHandler>().Object);
-        parallelExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
+        parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, new Mock<IInternalTestRunEventsHandler>().Object);
+        parallelExecutionManager.Cancel(It.IsAny<IInternalTestRunEventsHandler>());
 
         Assert.AreEqual(2, _usedMockManagers.Count, "Number of Concurrent Managers created should be equal to the amount of dlls that run");
-        _usedMockManagers.ForEach(em => em.Verify(m => m.Cancel(It.IsAny<ITestRunEventsHandler>()), Times.Once));
+        _usedMockManagers.ForEach(em => em.Verify(m => m.Cancel(It.IsAny<IInternalTestRunEventsHandler>()), Times.Once));
     }
 
     [TestMethod]
@@ -189,7 +189,7 @@ public class ParallelProxyExecutionManagerTests
 
         // act
         // Tell the manager that completedManager finished work, and that it should progress to next work
-        parallelExecutionManager.HandlePartialRunComplete(completedManager.Object, completeArgs, null, null, null);
+        parallelExecutionManager.HandlePartialRunComplete(completedManager.Object, completeArgs, null!, null!, null!);
 
         // assert
         // We created 2 managers 1 for the original work and another one
@@ -265,7 +265,7 @@ public class ParallelProxyExecutionManagerTests
         SetupMockManagers(_processedSources, isCanceled: false, isAborted: false);
         SetupHandleTestRunComplete(_executionCompleted);
 
-        parallelExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
+        parallelExecutionManager.Abort(It.IsAny<IInternalTestRunEventsHandler>());
         Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
 
         Assert.IsTrue(_executionCompleted.Wait(Timeout3Seconds), "Test run not completed.");
@@ -294,7 +294,7 @@ public class ParallelProxyExecutionManagerTests
         var parallelExecutionManager = SetupExecutionManager(_createMockManager, 2);
         var mockManagers = _preCreatedMockManagers.ToArray();
         mockManagers[1].Reset();
-        mockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>()))
+        mockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<IInternalTestRunEventsHandler>()))
             .Throws<NotImplementedException>();
 
         Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
@@ -310,7 +310,7 @@ public class ParallelProxyExecutionManagerTests
         var parallelExecutionManager = SetupExecutionManager(_createMockManager, 2);
         var mockManagers = _preCreatedMockManagers.ToArray();
         mockManagers[1].Reset();
-        mockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>()))
+        mockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<IInternalTestRunEventsHandler>()))
             .Throws<NotImplementedException>();
 
         Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
@@ -325,7 +325,7 @@ public class ParallelProxyExecutionManagerTests
         var parallelExecutionManager = SetupExecutionManager(_createMockManager, 2);
         var mockManagers = _preCreatedMockManagers.ToArray();
         mockManagers[1].Reset();
-        mockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>()))
+        mockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<IInternalTestRunEventsHandler>()))
             .Throws<NotImplementedException>();
 
         Task.Run(() => parallelExecutionManager.StartTestRun(_testRunCriteriaWith2Sources, _mockEventHandler.Object));
@@ -342,13 +342,13 @@ public class ParallelProxyExecutionManagerTests
 
         foreach (var manager in _preCreatedMockManagers)
         {
-            manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
-                Callback<TestRunCriteria, ITestRunEventsHandler>(
+            manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<IInternalTestRunEventsHandler>())).
+                Callback<TestRunCriteria, IInternalTestRunEventsHandler>(
                     (criteria, handler) =>
                     {
                         lock (syncObject)
                         {
-                            _processedSources.AddRange(criteria.Sources);
+                            _processedSources.AddRange(criteria.Sources!);
                         }
 
                         Task.Delay(100).Wait();
@@ -399,10 +399,10 @@ public class ParallelProxyExecutionManagerTests
                         Assert.IsTrue(completeArgs.IsAborted, "Aborted value must be OR of all values");
                         Assert.IsTrue(completeArgs.IsCanceled, "Canceled value must be OR of all values");
 
-                        Assert.AreEqual(10, completeArgs.TestRunStatistics.ExecutedTests,
+                        Assert.AreEqual(10, completeArgs.TestRunStatistics!.ExecutedTests,
                             "Stats must be aggregated properly");
 
-                        Assert.AreEqual(6, completeArgs.TestRunStatistics.Stats[TestOutcome.Passed],
+                        Assert.AreEqual(6, completeArgs.TestRunStatistics.Stats![TestOutcome.Passed],
                             "Stats must be aggregated properly");
                         Assert.AreEqual(4, completeArgs.TestRunStatistics.Stats[TestOutcome.Failed],
                             "Stats must be aggregated properly");
@@ -520,13 +520,13 @@ public class ParallelProxyExecutionManagerTests
         var syncObject = new object();
         foreach (var manager in _preCreatedMockManagers)
         {
-            manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
-                Callback<TestRunCriteria, ITestRunEventsHandler>(
+            manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<IInternalTestRunEventsHandler>())).
+                Callback<TestRunCriteria, IInternalTestRunEventsHandler>(
                     (criteria, handler) =>
                     {
                         lock (syncObject)
                         {
-                            processedTestCases.AddRange(criteria.Tests);
+                            processedTestCases.AddRange(criteria.Tests!);
                         }
 
                         Task.Delay(100).Wait();
@@ -555,13 +555,13 @@ public class ParallelProxyExecutionManagerTests
         var syncObject = new object();
         foreach (var manager in _preCreatedMockManagers)
         {
-            manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
-                Callback<TestRunCriteria, ITestRunEventsHandler>(
+            manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<IInternalTestRunEventsHandler>())).
+                Callback<TestRunCriteria, IInternalTestRunEventsHandler>(
                     (criteria, handler) =>
                     {
                         lock (syncObject)
                         {
-                            processedSources.AddRange(criteria.Sources);
+                            processedSources.AddRange(criteria.Sources!);
                         }
                         Task.Delay(100).Wait();
 

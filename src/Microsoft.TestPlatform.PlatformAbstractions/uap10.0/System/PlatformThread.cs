@@ -8,14 +8,12 @@ using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 public class PlatformThread : IThread
 {
     /// <inheritdoc/>
-    public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
+    public void Run(Action? action, PlatformApartmentState apartmentState, bool waitForCompletion)
     {
         if (apartmentState == PlatformApartmentState.STA)
         {

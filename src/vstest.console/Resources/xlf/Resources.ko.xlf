@@ -1179,6 +1179,26 @@
         <target state="translated">vstest.console.exe가 에뮬레이트 모드에서 {0}(으)로 실행 중입니다. 더 나은 성능을 위해 네이티브 실행기 vstest.console.arm64.exe 사용을 고려하세요.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="RequestHandlerConnectionTimedOut">
+        <source>Waiting for request handler connection timed out after {0} seconds.</source>
+        <target state="translated">{0}초 후에 요청 처리기 연결 대기 시간이 초과되었습니다.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StartTestSessionTimedOut">
+        <source>Waiting for start test session timed out after {0} seconds.</source>
+        <target state="translated">{0}초 후에 테스트 시작 세션 대기 시간이 초과되었습니다.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StopTestSessionTimedOut">
+        <source>Waiting for stop test session timed out after {0} seconds.</source>
+        <target state="translated">{0}초 후에 테스트 중지 세션 대기 시간이 초과되었습니다.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ErrorHostingCommunicationChannel">
+        <source>Error hosting communication channel.</source>
+        <target state="translated">통신 채널을 호스트하는 동안 오류가 발생했습니다.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

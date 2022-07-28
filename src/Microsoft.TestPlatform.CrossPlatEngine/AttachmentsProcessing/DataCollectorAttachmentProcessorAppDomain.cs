@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
@@ -51,9 +52,9 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
     private IMessageLogger? _processAttachmentSetsLogger;
     private IProgress<int>? _progressReporter;
 
-    public DataCollectorAttachmentProcessorAppDomain(InvokedDataCollector invokedDataCollector!!, IMessageLogger dataCollectorAttachmentsProcessorsLogger)
+    public DataCollectorAttachmentProcessorAppDomain(InvokedDataCollector invokedDataCollector, IMessageLogger? dataCollectorAttachmentsProcessorsLogger)
     {
-        _invokedDataCollector = invokedDataCollector;
+        _invokedDataCollector = invokedDataCollector ?? throw new ArgumentNullException(nameof(invokedDataCollector));
         _appDomain = AppDomain.CreateDomain(invokedDataCollector.Uri.ToString());
         _dataCollectorAttachmentsProcessorsLogger = dataCollectorAttachmentsProcessorsLogger;
         _wrapper = (DataCollectorAttachmentProcessorRemoteWrapper)_appDomain.CreateInstanceFromAndUnwrap(
@@ -124,7 +125,7 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
                                 .SendMessage((TestMessageLevel)Enum.Parse(typeof(TestMessageLevel), prefix.Substring(prefix.LastIndexOf('.') + 1), false), message);
                             break;
                         case AppDomainPipeMessagePrefix.Report:
-                            _progressReporter?.Report(int.Parse(message));
+                            _progressReporter?.Report(int.Parse(message, CultureInfo.CurrentCulture));
                             break;
                         default:
                             EqtTrace.Error($"DataCollectorAttachmentProcessorAppDomain:PipeReaderTask: Unknown message: {message}");
@@ -157,7 +158,8 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
         cancellationToken.Register(() => _wrapper.CancelProcessAttachment());
         _processAttachmentSetsLogger = logger;
         _progressReporter = progressReporter;
-        return JsonDataSerializer.Instance.Deserialize<AttachmentSet[]>(await Task.Run(() => _wrapper.ProcessAttachment(configurationElement.OuterXml, JsonDataSerializer.Instance.Serialize(attachments.ToArray()))).ConfigureAwait(false));
+        var result = await Task.Run(() => _wrapper.ProcessAttachment(configurationElement.OuterXml, JsonDataSerializer.Instance.Serialize(attachments.ToArray()))).ConfigureAwait(false);
+        return JsonDataSerializer.Instance.Deserialize<AttachmentSet[]>(result)!;
     }
 
     public void Dispose()

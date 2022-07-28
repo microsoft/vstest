@@ -4,8 +4,6 @@
 using System;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 public sealed class InvokedDataCollector : IEquatable<InvokedDataCollector>
@@ -17,12 +15,12 @@ public sealed class InvokedDataCollector : IEquatable<InvokedDataCollector>
     /// <param name="assemblyQualifiedName">Data collector assembly qualified name</param>
     /// <param name="filePath">Data collector file path</param>
     /// <param name="hasAttachmentProcessor">True if data collector registers an attachment processor</param>
-    public InvokedDataCollector(Uri uri!!, string friendlyName!!, string assemblyQualifiedName!!, string filePath!!, bool hasAttachmentProcessor)
+    public InvokedDataCollector(Uri uri, string friendlyName, string assemblyQualifiedName, string filePath, bool hasAttachmentProcessor)
     {
-        Uri = uri;
-        FriendlyName = friendlyName;
-        AssemblyQualifiedName = assemblyQualifiedName; ;
-        FilePath = filePath; ;
+        Uri = uri ?? throw new ArgumentNullException(nameof(uri));
+        FriendlyName = friendlyName ?? throw new ArgumentNullException(nameof(friendlyName));
+        AssemblyQualifiedName = assemblyQualifiedName ?? throw new ArgumentNullException(nameof(assemblyQualifiedName));
+        FilePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
         HasAttachmentProcessor = hasAttachmentProcessor;
     }
 
@@ -61,22 +59,20 @@ public sealed class InvokedDataCollector : IEquatable<InvokedDataCollector>
     /// </summary>
     /// <param name="other">InvokedDataCollector instance</param>
     /// <returns>True if objects are equal</returns>
-    public bool Equals(InvokedDataCollector other)
-    {
-        return other is not null
-               && HasAttachmentProcessor == other.HasAttachmentProcessor &&
-               Uri.AbsoluteUri == other.Uri.AbsoluteUri &&
-               FriendlyName == other.FriendlyName &&
-               AssemblyQualifiedName == other.AssemblyQualifiedName &&
-               FilePath == other.FilePath;
-    }
+    public bool Equals(InvokedDataCollector? other)
+        => other is not null
+        && HasAttachmentProcessor == other.HasAttachmentProcessor
+        && Uri.AbsoluteUri == other.Uri.AbsoluteUri
+        && FriendlyName == other.FriendlyName
+        && AssemblyQualifiedName == other.AssemblyQualifiedName
+        && FilePath == other.FilePath;
 
     /// <summary>
     /// Compares InvokedDataCollector instances for equality.
     /// </summary>
     /// <param name="obj">InvokedDataCollector instance</param>
     /// <returns>True if objects are equal</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
         => Equals(obj as InvokedDataCollector);
 
     /// <summary>

@@ -10,7 +10,7 @@ using System.IO;
 using System.Threading;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -19,14 +19,12 @@ using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resourc
 
 using Resources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 /// <summary>
 /// Vstest.console process manager
 /// </summary>
-internal class VsTestConsoleProcessManager : IProcessManager
+internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
 {
     /// <summary>
     /// Port number for communicating with Vstest CLI
@@ -52,17 +50,18 @@ internal class VsTestConsoleProcessManager : IProcessManager
 
     private readonly string _vstestConsolePath;
     private readonly object _syncObject = new();
+    private readonly bool _isNetCoreRunner;
+    private readonly string? _dotnetExePath;
+    private readonly ManualResetEvent _processExitedEvent = new(false);
+    private Process? _process;
     private bool _vstestConsoleStarted;
     private bool _vstestConsoleExited;
-    private readonly bool _isNetCoreRunner;
-    private readonly string _dotnetExePath;
-    private Process _process;
-    private readonly ManualResetEvent _processExitedEvent = new(false);
+    private bool _isDisposed;
 
     internal IFileHelper FileHelper { get; set; }
 
     /// <inheritdoc/>
-    public event EventHandler ProcessExited;
+    public event EventHandler? ProcessExited;
 
     /// <summary>
     /// Creates an instance of VsTestConsoleProcessManager class.
@@ -108,7 +107,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         // extra double quotes before testing whether the file exists.
         if (!File.Exists(consoleRunnerPath.Trim('"')))
         {
-            throw new FileNotFoundException(string.Format(InternalResources.CannotFindConsoleRunner, consoleRunnerPath), consoleRunnerPath);
+            throw new FileNotFoundException(string.Format(CultureInfo.CurrentCulture, InternalResources.CannotFindConsoleRunner, consoleRunnerPath), consoleRunnerPath);
         }
 
         var arguments = string.Join(" ", BuildArguments(consoleParameters));
@@ -149,7 +148,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         }
         catch (Win32Exception ex)
         {
-            throw new Exception(string.Format(InternalResources.ProcessStartWin32Failure, consoleRunnerPath, arguments), ex);
+            throw new Exception(string.Format(CultureInfo.CurrentCulture, InternalResources.ProcessStartWin32Failure, consoleRunnerPath, arguments), ex);
         }
 
         lock (_syncObject)
@@ -158,7 +157,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
             _vstestConsoleStarted = true;
         }
 
-        _process.EnableRaisingEvents = true;
+        _process!.EnableRaisingEvents = true;
         _process.Exited += Process_Exited;
 
         _process.OutputDataReceived += Process_OutputDataReceived;
@@ -178,11 +177,14 @@ internal class VsTestConsoleProcessManager : IProcessManager
         {
             EqtTrace.Info($"VsTestConsoleProcessManager.ShutDownProcess : Terminating vstest.console process after waiting for {Endsessiontimeout} milliseconds.");
             _vstestConsoleExited = true;
-            _process.OutputDataReceived -= Process_OutputDataReceived;
-            _process.ErrorDataReceived -= Process_ErrorDataReceived;
-            SafelyTerminateProcess();
-            _process.Dispose();
-            _process = null;
+            if (_process is not null)
+            {
+                _process.OutputDataReceived -= Process_OutputDataReceived;
+                _process.ErrorDataReceived -= Process_ErrorDataReceived;
+                SafelyTerminateProcess();
+                _process.Dispose();
+                _process = null;
+            }
         }
     }
 
@@ -201,7 +203,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         }
     }
 
-    private void Process_Exited(object sender, EventArgs e)
+    private void Process_Exited(object? sender, EventArgs e)
     {
         lock (_syncObject)
         {
@@ -227,7 +229,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         }
     }
 
-    private string[] BuildArguments(ConsoleParameters parameters)
+    internal string[] BuildArguments(ConsoleParameters parameters)
     {
         var args = new List<string>
         {
@@ -236,7 +238,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
             string.Format(CultureInfo.InvariantCulture, PortArgument, parameters.PortNumber)
         };
 
-        if (!string.IsNullOrEmpty(parameters.LogFilePath))
+        if (!parameters.LogFilePath.IsNullOrEmpty())
         {
             // Extra args: --diag|/diag:<PathToLogFile>;tracelevel=<tracelevel>
             args.Add(string.Format(CultureInfo.InvariantCulture, DiagArgument, parameters.LogFilePath, parameters.TraceLevel));
@@ -251,8 +253,22 @@ internal class VsTestConsoleProcessManager : IProcessManager
     }
 
     private string GetConsoleRunner()
-        => _isNetCoreRunner ? (string.IsNullOrEmpty(_dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : _dotnetExePath) : GetEscapeSequencedPath(_vstestConsolePath);
+        => _isNetCoreRunner
+            ? _dotnetExePath.IsNullOrEmpty()
+                ? new DotnetHostHelper().GetDotnetPath()
+                : _dotnetExePath
+            : GetEscapeSequencedPath(_vstestConsolePath);
 
-    private string GetEscapeSequencedPath(string path)
-        => string.IsNullOrEmpty(path) ? path : $"\"{path.Trim('"')}\"";
+    private static string GetEscapeSequencedPath(string path)
+        => path.IsNullOrEmpty() ? path : $"\"{path.Trim('"')}\"";
+
+    public void Dispose()
+    {
+        if (!_isDisposed)
+        {
+            _processExitedEvent.Dispose();
+            _process?.Dispose();
+            _isDisposed = true;
+        }
+    }
 }

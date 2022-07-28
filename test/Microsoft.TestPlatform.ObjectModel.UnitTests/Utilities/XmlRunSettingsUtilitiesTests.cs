@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml;
 
@@ -430,7 +431,7 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRunSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingFriendlyName);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingFriendlyName)!;
         Assert.AreEqual("TestLoggerWithParameterExtension", loggerRunSettings.LoggerSettingsList.First().FriendlyName);
     }
 
@@ -449,7 +450,7 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRunSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingUri);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingUri)!;
         Assert.IsTrue(new Uri("testlogger://logger").Equals(loggerRunSettings.LoggerSettingsList.First().Uri));
     }
 
@@ -481,6 +482,7 @@ public class XmlRunSettingsUtilitiesTests
 
         Assert.IsTrue(exceptionMessage.Contains(
             string.Format(
+                CultureInfo.CurrentCulture,
                 Resources.InvalidUriInSettings,
                 "invalidUri",
                 "Logger")));
@@ -501,7 +503,7 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRunSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingAssemblyQualifiedName);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingAssemblyQualifiedName)!;
         Assert.AreEqual("Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx", loggerRunSettings.LoggerSettingsList.First().AssemblyQualifiedName);
     }
 
@@ -520,7 +522,7 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRunSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingAssemblyQualifiedName);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingAssemblyQualifiedName)!;
         Assert.AreEqual(@"C:\Sample\Sample.TestLogger.dll", loggerRunSettings.LoggerSettingsList.First().CodeBase);
     }
 
@@ -539,7 +541,7 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRunSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingEnabledAttribute);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingEnabledAttribute)!;
         Assert.IsFalse(loggerRunSettings.LoggerSettingsList.First().IsEnabled);
     }
 
@@ -558,7 +560,7 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRunSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingInvalidEnabledValue);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingInvalidEnabledValue)!;
         Assert.IsFalse(loggerRunSettings.LoggerSettingsList.First().IsEnabled);
     }
 
@@ -577,7 +579,7 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRunSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingEnabledAttribute);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingEnabledAttribute)!;
         Assert.IsTrue(loggerRunSettings.LoggerSettingsList.First().IsEnabled);
     }
 
@@ -625,7 +627,7 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRunSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingMultipleAttributes);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingMultipleAttributes)!;
         Assert.AreEqual("TestLoggerWithParameterExtension", loggerRunSettings.LoggerSettingsList.First().FriendlyName);
         Assert.IsTrue(new Uri("testlogger://logger").Equals(loggerRunSettings.LoggerSettingsList.First().Uri));
         Assert.AreEqual("Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx", loggerRunSettings.LoggerSettingsList.First().AssemblyQualifiedName);
@@ -648,7 +650,7 @@ public class XmlRunSettingsUtilitiesTests
                   </loGGerRunSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingAttributesWithRandomCasing);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingAttributesWithRandomCasing)!;
         Assert.AreEqual("TestLoggerWithParameterExtension", loggerRunSettings.LoggerSettingsList.First().FriendlyName);
         Assert.IsTrue(new Uri("testlogger://logger").Equals(loggerRunSettings.LoggerSettingsList.First().Uri));
         Assert.AreEqual("Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx", loggerRunSettings.LoggerSettingsList.First().AssemblyQualifiedName);
@@ -712,6 +714,7 @@ public class XmlRunSettingsUtilitiesTests
         }
 
         Assert.IsTrue(exceptionMessage.Contains(string.Format(
+            CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlAttribute,
             "LoggerRunSettings",
             "name")));
@@ -729,7 +732,7 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRunSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithEmptyLoggerRunSettingsNode);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithEmptyLoggerRunSettingsNode)!;
         Assert.AreEqual(0, loggerRunSettings.LoggerSettingsList.Count);
     }
 
@@ -744,7 +747,7 @@ public class XmlRunSettingsUtilitiesTests
                   <LoggerRunSettings />
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithEmptyLoggerRunSettingsNode);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithEmptyLoggerRunSettingsNode)!;
         Assert.AreEqual(0, loggerRunSettings.LoggerSettingsList.Count);
     }
 
@@ -775,6 +778,7 @@ public class XmlRunSettingsUtilitiesTests
         }
 
         Assert.IsTrue(exceptionMessage.Contains(string.Format(
+            CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlElement,
             "LoggerRUNSettings",
             "LoggersInvalid")));
@@ -807,6 +811,7 @@ public class XmlRunSettingsUtilitiesTests
         }
 
         Assert.IsTrue(exceptionMessage.Contains(string.Format(
+            CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlAttribute,
             "Loggers",
             "nameAttr")));
@@ -826,7 +831,7 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRunSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithEmptyLoggersNode);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithEmptyLoggersNode)!;
         Assert.AreEqual(0, loggerRunSettings.LoggerSettingsList.Count);
     }
 
@@ -843,7 +848,7 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRunSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithEmptyLoggersNode);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithEmptyLoggersNode)!;
         Assert.AreEqual(0, loggerRunSettings.LoggerSettingsList.Count);
     }
 
@@ -874,6 +879,7 @@ public class XmlRunSettingsUtilitiesTests
         }
 
         Assert.IsTrue(exceptionMessage.Contains(string.Format(
+            CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlElement,
             "Loggers",
             "LoggerInvalid")));
@@ -906,9 +912,7 @@ public class XmlRunSettingsUtilitiesTests
             exceptionMessage = ex.Message;
         }
 
-        Assert.IsTrue(exceptionMessage.Contains(string.Format(
-            Resources.MissingLoggerAttributes,
-            "LogGer")));
+        Assert.IsTrue(exceptionMessage.Contains(string.Format(CultureInfo.CurrentCulture, Resources.MissingLoggerAttributes, "LogGer")));
     }
 
     [TestMethod]
@@ -931,14 +935,14 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRUNSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithConfigurationElementInLoggerNode);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithConfigurationElementInLoggerNode)!;
 
         var expectedConfigurationElement = new XmlDocument().CreateElement("ConfiGUration");
         expectedConfigurationElement.InnerXml = "<Key1>Value1</Key1><Key2>Value2</Key2>";
         Assert.AreEqual(expectedConfigurationElement.Name,
-            loggerRunSettings.LoggerSettingsList.First().Configuration.Name);
+            loggerRunSettings.LoggerSettingsList.First().Configuration!.Name);
         Assert.AreEqual(expectedConfigurationElement.InnerXml,
-            loggerRunSettings.LoggerSettingsList.First().Configuration.InnerXml);
+            loggerRunSettings.LoggerSettingsList.First().Configuration!.InnerXml);
     }
 
     [TestMethod]
@@ -973,6 +977,7 @@ public class XmlRunSettingsUtilitiesTests
         }
 
         Assert.AreEqual(string.Format(
+            CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlElement,
             "Logger",
             "ConfiGUrationInvalid"), exceptionMessage);
@@ -1010,6 +1015,7 @@ public class XmlRunSettingsUtilitiesTests
         }
 
         Assert.AreEqual(string.Format(
+            CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlAttribute,
             "Logger",
             "invalidAttr"), exceptionMessage);
@@ -1043,7 +1049,7 @@ public class XmlRunSettingsUtilitiesTests
                 </RunSettings>";
 
         var loggerRunSettings =
-            XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithMultipleLoggers);
+            XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithMultipleLoggers)!;
 
         Assert.AreEqual(3, loggerRunSettings.LoggerSettingsList.Count);
 
@@ -1054,12 +1060,12 @@ public class XmlRunSettingsUtilitiesTests
         Assert.IsTrue(string.IsNullOrWhiteSpace(loggerFirst.AssemblyQualifiedName));
         Assert.IsTrue(string.IsNullOrWhiteSpace(loggerFirst.CodeBase));
         Assert.IsTrue(loggerFirst.IsEnabled);
-        Assert.AreEqual("<Key1>Value1</Key1><Key2>Value2</Key2>", loggerFirst.Configuration.InnerXml);
+        Assert.AreEqual("<Key1>Value1</Key1><Key2>Value2</Key2>", loggerFirst.Configuration!.InnerXml);
 
         // 2nd logger
         var loggerSecond = loggerRunSettings.LoggerSettingsList[1];
         Assert.AreEqual("TestLogger", loggerSecond.FriendlyName);
-        Assert.AreEqual(new Uri("testlogger://logger").ToString(), loggerSecond.Uri.ToString());
+        Assert.AreEqual(new Uri("testlogger://logger").ToString(), loggerSecond.Uri!.ToString());
         Assert.AreEqual("Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx", loggerSecond.AssemblyQualifiedName);
         Assert.AreEqual(@"C:\Sample\Sample.TestLogger.dll", loggerSecond.CodeBase);
         Assert.IsFalse(loggerSecond.IsEnabled);
@@ -1068,11 +1074,11 @@ public class XmlRunSettingsUtilitiesTests
         // 3rd logger
         var loggerThird = loggerRunSettings.LoggerSettingsList[2];
         Assert.IsTrue(string.IsNullOrWhiteSpace(loggerThird.FriendlyName));
-        Assert.AreEqual(new Uri("testlogger://loggerTemp").ToString(), loggerThird.Uri.ToString());
+        Assert.AreEqual(new Uri("testlogger://loggerTemp").ToString(), loggerThird.Uri!.ToString());
         Assert.IsTrue(string.IsNullOrWhiteSpace(loggerThird.AssemblyQualifiedName));
         Assert.IsTrue(string.IsNullOrWhiteSpace(loggerThird.CodeBase));
         Assert.IsTrue(loggerThird.IsEnabled);
-        Assert.AreEqual("<Key3>Value3</Key3><Key4>Value4</Key4>", loggerThird.Configuration.InnerXml);
+        Assert.AreEqual("<Key3>Value3</Key3><Key4>Value4</Key4>", loggerThird.Configuration!.InnerXml);
     }
 
     [TestMethod]
@@ -1094,7 +1100,7 @@ public class XmlRunSettingsUtilitiesTests
                 </RunSettings>";
 
         var loggerRunSettings =
-            XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithSelfEndingLoggers);
+            XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithSelfEndingLoggers)!;
 
         Assert.AreEqual(3, loggerRunSettings.LoggerSettingsList.Count);
         Assert.AreEqual("TestLoggerWithParameterExtension", loggerRunSettings.LoggerSettingsList[0].FriendlyName);
@@ -1127,14 +1133,14 @@ public class XmlRunSettingsUtilitiesTests
                   </LoggerRUNSettings>
                 </RunSettings>";
 
-        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithMultipleConfigurationElements);
+        var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithMultipleConfigurationElements)!;
 
         var expectedConfigurationElement = new XmlDocument().CreateElement("ConfiGUration");
         expectedConfigurationElement.InnerXml = "<Key3>Value3</Key3><Key4>Value4</Key4>";
         Assert.AreEqual(expectedConfigurationElement.Name,
-            loggerRunSettings.LoggerSettingsList.First().Configuration.Name);
+            loggerRunSettings.LoggerSettingsList.First().Configuration!.Name);
         Assert.AreEqual(expectedConfigurationElement.InnerXml,
-            loggerRunSettings.LoggerSettingsList.First().Configuration.InnerXml);
+            loggerRunSettings.LoggerSettingsList.First().Configuration!.InnerXml);
     }
 
     #endregion

@@ -57,7 +57,7 @@ public class EnableBlameArgumentProcessorTests
     public void GetExecuterShouldReturnEnableBlameArgumentProcessorCapabilities()
     {
         var processor = new EnableBlameArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is EnableBlameArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is EnableBlameArgumentExecutor);
     }
 
     [TestMethod]
@@ -79,7 +79,7 @@ public class EnableBlameArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldCreateEntryForBlameInRunSettingsIfNotAlreadyPresent()
     {
-        _ = string.Format(_defaultRunSettings, "");
+        _ = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(_defaultRunSettings);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -114,7 +114,7 @@ public class EnableBlameArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldOverwriteEntryForBlameInRunSettingsIfAlreadyPresent()
     {
-        _ = string.Format(_defaultRunSettings, "");
+        _ = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(string.Join(Environment.NewLine,
             "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -172,7 +172,7 @@ public class EnableBlameArgumentProcessorTests
     public void InitializeShouldWarnIfIncorrectParameterIsSpecifiedForCollectDumpOption()
     {
         var invalidParameter = "CollectDumpXX";
-        var runsettingsString = string.Format(_defaultRunSettings, "");
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(_defaultRunSettings);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -183,7 +183,7 @@ public class EnableBlameArgumentProcessorTests
             .Returns(PlatformArchitecture.X64);
 
         _executor.Initialize(invalidParameter);
-        _mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, invalidParameter), OutputLevel.Warning));
+        _mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.BlameIncorrectOption, invalidParameter), OutputLevel.Warning));
 
         Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
         Assert.AreEqual(string.Join(Environment.NewLine,
@@ -215,7 +215,7 @@ public class EnableBlameArgumentProcessorTests
     public void InitializeShouldThrowIfInvalidParameterFormatIsSpecifiedForCollectDumpOption()
     {
         var invalidString = "CollectDump;sdf=sdg;;as;a=";
-        var runsettingsString = string.Format(_defaultRunSettings, "");
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(_defaultRunSettings);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -226,7 +226,7 @@ public class EnableBlameArgumentProcessorTests
             .Returns(PlatformArchitecture.X64);
 
         _executor.Initialize(invalidString);
-        _mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidBlameArgument, invalidString), OutputLevel.Warning));
+        _mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidBlameArgument, invalidString), OutputLevel.Warning));
 
         Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
         Assert.AreEqual(string.Join(Environment.NewLine,
@@ -256,7 +256,7 @@ public class EnableBlameArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldCreateEntryForBlameAlongWithCollectDumpEntryIfEnabled()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, "");
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(_defaultRunSettings);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -297,7 +297,7 @@ public class EnableBlameArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldCreateEntryForBlameAlongWithCollectDumpParametersIfEnabled()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, "");
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(_defaultRunSettings);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -338,7 +338,7 @@ public class EnableBlameArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldCreateEntryForBlameAlongWithCollectHangDumpEntryIfEnabled()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, "");
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(_defaultRunSettings);
         _settingsProvider.SetActiveRunSettings(runsettings);
@@ -380,7 +380,7 @@ public class EnableBlameArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldCreateEntryForBlameAlongWithCollectHangDumpParametersIfEnabled()
     {
-        var runsettingsString = string.Format(_defaultRunSettings, "");
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
         var runsettings = new RunSettings();
         runsettings.LoadSettingsXml(_defaultRunSettings);
         _settingsProvider.SetActiveRunSettings(runsettings);

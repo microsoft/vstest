@@ -2,16 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 using System.Text;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+
 #region TestCategoryItem
 /// <summary>
 /// Stores a string which categorizes the Test
@@ -25,7 +23,7 @@ internal sealed class TestCategoryItem : IXmlTestStore
     /// Create a new item with the category set
     /// </summary>
     /// <param name="category">The category.</param>
-    public TestCategoryItem(string category)
+    public TestCategoryItem(string? category)
     {
         // Treat null as empty.
         if (category == null)
@@ -48,7 +46,7 @@ internal sealed class TestCategoryItem : IXmlTestStore
         }
     }
 
-    private string StripIllegalChars(string category)
+    private static string StripIllegalChars(string category)
     {
         string ret = category.Trim();
         ret = ret.Replace("&", string.Empty);
@@ -63,13 +61,14 @@ internal sealed class TestCategoryItem : IXmlTestStore
     /// </summary>
     /// <param name="other">Value being compared to.</param>
     /// <returns>True if the values are the same and false otherwise.</returns>
-    public override bool Equals(object other)
+    public override bool Equals(object? other)
     {
         if (other is not TestCategoryItem otherItem)
         {
             return false;
         }
-        Debug.Assert(_category != null, "category is null");
+
+        TPDebug.Assert(_category != null, "category is null");
         return string.Equals(_category, otherItem._category, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -79,7 +78,7 @@ internal sealed class TestCategoryItem : IXmlTestStore
     /// <returns>Hashcode of the category.</returns>
     public override int GetHashCode()
     {
-        Debug.Assert(_category != null, "category is null");
+        TPDebug.Assert(_category != null, "category is null");
         return _category.ToUpperInvariant().GetHashCode();
     }
 
@@ -89,7 +88,7 @@ internal sealed class TestCategoryItem : IXmlTestStore
     /// <returns>The category.</returns>
     public override string ToString()
     {
-        Debug.Assert(_category != null, "category is null");
+        TPDebug.Assert(_category != null, "category is null");
         return _category;
     }
 
@@ -100,7 +99,7 @@ internal sealed class TestCategoryItem : IXmlTestStore
     /// </summary>
     /// <param name="element"> XmlElement element </param>
     /// <param name="parameters"> XmlTestStoreParameters parameters</param>
-    public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
+    public void Save(System.Xml.XmlElement element, XmlTestStoreParameters? parameters)
     {
         new XmlPersistence().SaveSingleFields(element, this, parameters);
     }
@@ -153,7 +152,7 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
         EqtAssert.ParameterNotNull(item, nameof(item));
 
         // Don't add empty items.
-        if (!string.IsNullOrEmpty(item.TestCategory))
+        if (!item.TestCategory.IsNullOrEmpty())
         {
             base.Add(item);
         }
@@ -202,7 +201,7 @@ internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategor
     /// </summary>
     /// <param name="obj">other collection</param>
     /// <returns>true if the collections contain the same items</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         bool result = false;
 

@@ -38,7 +38,7 @@ public class DesignModeClientTests
     private readonly Mock<ITestRequestManager> _mockTestRequestManager;
     private readonly Mock<ICommunicationManager> _mockCommunicationManager;
     private readonly DesignModeClient _designModeClient;
-    private readonly int _protocolVersion = 6;
+    private readonly int _protocolVersion = 7;
     private readonly AutoResetEvent _completeEvent;
     private readonly Mock<IEnvironment> _mockPlatformEnvrironment;
 
@@ -85,16 +85,6 @@ public class DesignModeClientTests
     }
 
     [TestMethod]
-    public void TestRunMessageHandlerShouldNotCallCommmunicationManagerIfMessageisInformational()
-    {
-        _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
-
-        _designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Informational, "message"));
-
-        _mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<TestMessagePayload>()), Times.Never());
-    }
-
-    [TestMethod]
     public void DesignModeClientConnectShouldSetupChannel()
     {
         var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = _protocolVersion };
@@ -129,7 +119,8 @@ public class DesignModeClientTests
     [TestMethod]
     public void DesignModeClientDuringConnectShouldHighestCommonVersionWhenReceivedVersionIsGreaterThanSupportedVersion()
     {
-        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 6 };
+        var reallyHighProtocolVersion = 10000;
+        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = reallyHighProtocolVersion };
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
@@ -181,7 +172,7 @@ public class DesignModeClientTests
                 trm =>
                     trm.RunTests(
                         It.IsAny<TestRunRequestPayload>(),
-                        It.IsAny<ITestHostLauncher>(),
+                        It.IsAny<ITestHostLauncher3>(),
                         It.IsAny<ITestRunEventsRegistrar>(),
                         It.IsAny<ProtocolConfig>()))
             .Callback(
@@ -243,7 +234,7 @@ public class DesignModeClientTests
                 trm =>
                     trm.RunTests(
                         It.IsAny<TestRunRequestPayload>(),
-                        It.IsAny<ITestHostLauncher>(),
+                        It.IsAny<ITestHostLauncher3>(),
                         It.IsAny<ITestRunEventsRegistrar>(),
                         It.IsAny<ProtocolConfig>()))
             .Callback(
@@ -452,6 +443,7 @@ public class DesignModeClientTests
         var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JToken.FromObject(payload) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
+        _mockCommunicationManager.Setup(cm => cm.DeserializePayload<TestRunAttachmentsProcessingPayload>(It.IsAny<Message>())).Returns(payload);
 
         _mockTestRequestManager
             .Setup(
@@ -549,7 +541,7 @@ public class DesignModeClientTests
             .Callback((string _, object actualPayload) =>
             {
                 _completeEvent.Set();
-                Assert.IsNull(((StartTestSessionAckPayload)actualPayload).EventArgs.TestSessionInfo);
+                Assert.IsNull(((StartTestSessionAckPayload)actualPayload).EventArgs!.TestSessionInfo);
             });
         _mockCommunicationManager.Setup(
                 cm => cm.DeserializePayload<StartTestSessionPayload>(
@@ -559,7 +551,7 @@ public class DesignModeClientTests
         _mockTestRequestManager.Setup(
             rm => rm.StartTestSession(
                 It.IsAny<StartTestSessionPayload>(),
-                It.IsAny<ITestHostLauncher>(),
+                It.IsAny<ITestHostLauncher3>(),
                 It.IsAny<ITestSessionEventsHandler>(),
                 It.IsAny<ProtocolConfig>())).Throws(new SettingsException("DummyException"));
 
@@ -600,8 +592,8 @@ public class DesignModeClientTests
             {
                 _completeEvent.Set();
 
-                Assert.AreEqual(((StopTestSessionAckPayload)actualPayload).EventArgs.TestSessionInfo, testSessionInfo);
-                Assert.IsFalse(((StopTestSessionAckPayload)actualPayload).EventArgs.IsStopped);
+                Assert.AreEqual(((StopTestSessionAckPayload)actualPayload).EventArgs!.TestSessionInfo, testSessionInfo);
+                Assert.IsFalse(((StopTestSessionAckPayload)actualPayload).EventArgs!.IsStopped);
             });
 
         _mockCommunicationManager.Setup(

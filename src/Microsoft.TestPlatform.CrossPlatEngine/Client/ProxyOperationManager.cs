@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -25,28 +26,27 @@ using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.Comm
 using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
 /// Base class for any operations that the client needs to drive through the engine.
 /// </summary>
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class ProxyOperationManager
 {
     private readonly string _versionCheckPropertyName = "IsVersionCheckRequired";
     private readonly string _makeRunsettingsCompatiblePropertyName = "MakeRunsettingsCompatible";
     private readonly ManualResetEventSlim _testHostExited = new(false);
     private readonly IProcessHelper _processHelper;
+    private readonly IBaseProxy? _baseProxy;
 
-    private readonly IBaseProxy _baseProxy;
     private bool _versionCheckRequired = true;
     private bool _makeRunsettingsCompatible;
     private bool _makeRunsettingsCompatibleSet;
     private bool _initialized;
     private bool _testHostLaunched;
     private int _testHostProcessId;
-    private string _testHostProcessStdError;
+    private string? _testHostProcessStdError;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class.
@@ -56,13 +56,15 @@ public class ProxyOperationManager
     /// <param name="requestSender">Request sender instance.</param>
     /// <param name="testHostManager">Test host manager instance.</param>
     public ProxyOperationManager(
-        IRequestData requestData,
+        IRequestData? requestData,
         ITestRequestSender requestSender,
-        ITestRuntimeProvider testHostManager)
+        ITestRuntimeProvider testHostManager,
+        Framework testhostManagerFramework)
         : this(
             requestData,
             requestSender,
             testHostManager,
+            testhostManagerFramework,
             null)
     { }
 
@@ -75,10 +77,11 @@ public class ProxyOperationManager
     /// <param name="testHostManager">Test host manager instance.</param>
     /// <param name="baseProxy">The base proxy.</param>
     public ProxyOperationManager(
-        IRequestData requestData,
+        IRequestData? requestData,
         ITestRequestSender requestSender,
         ITestRuntimeProvider testHostManager,
-        IBaseProxy baseProxy)
+        Framework? testhostManagerFramework,
+        IBaseProxy? baseProxy)
     {
         RequestData = requestData;
         RequestSender = requestSender;
@@ -90,12 +93,13 @@ public class ProxyOperationManager
         _testHostProcessId = -1;
         _processHelper = new ProcessHelper();
         CancellationTokenSource = new CancellationTokenSource();
+        TestHostManagerFramework = testhostManagerFramework;
     }
 
     /// <summary>
     /// Gets or sets the request data.
     /// </summary>
-    public IRequestData RequestData { get; set; }
+    public IRequestData? RequestData { get; set; }
 
     /// <summary>
     /// Gets or sets the server for communication.
@@ -116,6 +120,8 @@ public class ProxyOperationManager
     /// Gets or sets the cancellation token source.
     /// </summary>
     public CancellationTokenSource CancellationTokenSource { get; set; }
+
+    public Framework? TestHostManagerFramework { get; }
 
     #region IProxyOperationManager implementation.
     /// <summary>
@@ -162,7 +168,7 @@ public class ProxyOperationManager
     /// <returns>
     /// Returns true if the communication is established b/w runner and host, false otherwise.
     /// </returns>
-    public virtual bool SetupChannel(IEnumerable<string> sources, string runSettings)
+    public virtual bool SetupChannel(IEnumerable<string> sources, string? runSettings)
     {
         CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
 
@@ -224,20 +230,17 @@ public class ProxyOperationManager
             EqtTrace.Error("ProxyOperationManager: Failed to launch testhost :{0}", ex);
 
             CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
-            throw new TestPlatformException(string.Format(
-                CultureInfo.CurrentUICulture,
-                CrossPlatEngineResources.FailedToLaunchTestHost,
-                ex.ToString()));
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.FailedToLaunchTestHost, ex.ToString()));
         }
 
         // Warn the user that execution will wait for debugger attach.
         var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
         var nativeHostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
 
-        if ((!string.IsNullOrEmpty(hostDebugEnabled)
+        if ((!StringUtils.IsNullOrEmpty(hostDebugEnabled)
              && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
             || (new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows)
-                && !string.IsNullOrEmpty(nativeHostDebugEnabled)
+                && !StringUtils.IsNullOrEmpty(nativeHostDebugEnabled)
                 && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal)))
         {
             ConsoleOutput.Instance.WriteLine(
@@ -246,6 +249,7 @@ public class ProxyOperationManager
 
             ConsoleOutput.Instance.WriteLine(
                 string.Format(
+                    CultureInfo.InvariantCulture,
                     "Process Id: {0}, Name: {1}",
                     _testHostProcessId,
                     _processHelper.GetProcessName(_testHostProcessId)),
@@ -360,7 +364,7 @@ public class ProxyOperationManager
         if (_baseProxy == null)
         {
             // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
-            var telemetryOptedIn = RequestData.IsTelemetryOptedIn ? "true" : "false";
+            var telemetryOptedIn = RequestData?.IsTelemetryOptedIn == true ? "true" : "false";
             testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
             return testProcessStartInfo;
         }
@@ -377,7 +381,7 @@ public class ProxyOperationManager
     /// <param name="runsettingsXml">Run settings string.</param>
     ///
     /// <returns>The run settings after removing non-required nodes.</returns>
-    public string RemoveNodesFromRunsettingsIfRequired(string runsettingsXml, Action<TestMessageLevel, string> logMessage)
+    public string? RemoveNodesFromRunsettingsIfRequired(string? runsettingsXml, Action<TestMessageLevel, string> logMessage)
     {
         var updatedRunSettingsXml = runsettingsXml;
         if (!_makeRunsettingsCompatibleSet)
@@ -399,15 +403,17 @@ public class ProxyOperationManager
         return updatedRunSettingsXml;
     }
 
-    private string GetTimestampedLogFile(string logFile)
+    [return: NotNullIfNotNull("logFile")]
+    private static string? GetTimestampedLogFile(string? logFile)
     {
-        return string.IsNullOrWhiteSpace(logFile)
+        return logFile.IsNullOrWhiteSpace()
             ? null
             : Path.ChangeExtension(
                 logFile,
                 string.Format(
+                    CultureInfo.InvariantCulture,
                     "host.{0}_{1}{2}",
-                    DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
+                    DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff", CultureInfo.InvariantCulture),
                     new PlatformEnvironment().GetCurrentManagedThreadId(),
                     Path.GetExtension(logFile))).AddDoubleQuote();
     }
@@ -422,27 +428,27 @@ public class ProxyOperationManager
         var versionCheckProperty = properties.FirstOrDefault(p => string.Equals(p.Name, _versionCheckPropertyName, StringComparison.OrdinalIgnoreCase));
         if (versionCheckProperty != null)
         {
-            _versionCheckRequired = (bool)versionCheckProperty.GetValue(TestHostManager);
+            _versionCheckRequired = (bool)versionCheckProperty.GetValue(TestHostManager)!;
         }
 
         var makeRunsettingsCompatibleProperty = properties.FirstOrDefault(p => string.Equals(p.Name, _makeRunsettingsCompatiblePropertyName, StringComparison.OrdinalIgnoreCase));
         if (makeRunsettingsCompatibleProperty != null)
         {
-            _makeRunsettingsCompatible = (bool)makeRunsettingsCompatibleProperty.GetValue(TestHostManager);
+            _makeRunsettingsCompatible = (bool)makeRunsettingsCompatibleProperty.GetValue(TestHostManager)!;
             _makeRunsettingsCompatibleSet = true;
         }
     }
 
-    private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)
+    private void TestHostManagerHostLaunched(object? sender, HostProviderEventArgs? e)
     {
-        EqtTrace.Verbose(e.Data);
+        EqtTrace.Verbose(e!.Data);
         _testHostProcessId = e.ProcessId;
     }
 
-    private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
+    private void TestHostManagerHostExited(object? sender, HostProviderEventArgs? e)
     {
         EqtTrace.Verbose("CrossPlatEngine.TestHostManagerHostExited: calling on client process exit callback.");
-        _testHostProcessStdError = e.Data;
+        _testHostProcessStdError = e!.Data;
 
         // This needs to be set before we call the OnClientProcess exit because the
         // OnClientProcess will short-circuit WaitForRequestHandlerConnection in SetupChannel
@@ -459,7 +465,7 @@ public class ProxyOperationManager
         {
             // We might consider passing standard output here in case standard error is not
             // available because some errors don't end up in the standard error output.
-            throw new TestPlatformException(string.Format(CrossPlatEngineResources.TestHostExitedWithError, _testHostProcessStdError));
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, _testHostProcessStdError));
         }
     }
 
@@ -472,6 +478,7 @@ public class ProxyOperationManager
         if (_testHostLaunched)
         {
             errorMsg = string.Format(
+                CultureInfo.CurrentCulture,
                 CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                 CoreUtilitiesConstants.VstestConsoleProcessName,
                 CoreUtilitiesConstants.TesthostProcessName,
@@ -480,12 +487,12 @@ public class ProxyOperationManager
         }
 
         // After testhost process launched failed with error.
-        if (!string.IsNullOrWhiteSpace(_testHostProcessStdError))
+        if (!StringUtils.IsNullOrWhiteSpace(_testHostProcessStdError))
         {
             // Testhost failed with error.
-            errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, _testHostProcessStdError);
+            errorMsg = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, _testHostProcessStdError);
         }
 
-        throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
+        throw new TestPlatformException(errorMsg);
     }
 }

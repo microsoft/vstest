@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Common.UnitTests.Filtering;
 
 [TestClass]
@@ -88,8 +86,8 @@ public class FastFilterTests
 
         Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null));
 
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test1"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test2"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test1"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test2"));
     }
 
     [TestMethod]
@@ -107,10 +105,10 @@ public class FastFilterTests
 
         Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null));
 
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test1"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "test2"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "test3"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test4"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test1"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "test2"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "test3"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test4"));
     }
 
     [TestMethod]
@@ -128,10 +126,10 @@ public class FastFilterTests
 
         Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null));
 
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test1"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test2"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test3"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test4"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test1"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test2"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test3"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test4"));
     }
 
     [TestMethod]
@@ -149,14 +147,14 @@ public class FastFilterTests
 
         Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null));
 
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test1"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test2"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test3"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test1 (123)"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test2(123)"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test3  (123)"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test4"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test4 ()"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test1"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test2"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test3"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test1 (123)"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test2(123)"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test3  (123)"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test4"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test4 ()"));
     }
 
     [TestMethod]
@@ -174,12 +172,12 @@ public class FastFilterTests
 
         Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "Category" }, null));
 
-        Assert.IsTrue(fastFilter.Evaluate((s) => new[] { "UnitTest" }));
-        Assert.IsTrue(fastFilter.Evaluate((s) => new[] { "PerfTest" }));
-        Assert.IsTrue(fastFilter.Evaluate((s) => new[] { "UnitTest", "PerfTest" }));
-        Assert.IsTrue(fastFilter.Evaluate((s) => new[] { "UnitTest", "IntegrationTest" }));
-        Assert.IsFalse(fastFilter.Evaluate((s) => new[] { "IntegrationTest" }));
-        Assert.IsFalse(fastFilter.Evaluate((s) => null));
+        Assert.IsTrue(fastFilter.Evaluate(s => new[] { "UnitTest" }));
+        Assert.IsTrue(fastFilter.Evaluate(s => new[] { "PerfTest" }));
+        Assert.IsTrue(fastFilter.Evaluate(s => new[] { "UnitTest", "PerfTest" }));
+        Assert.IsTrue(fastFilter.Evaluate(s => new[] { "UnitTest", "IntegrationTest" }));
+        Assert.IsFalse(fastFilter.Evaluate(s => new[] { "IntegrationTest" }));
+        Assert.IsFalse(fastFilter.Evaluate(s => null));
     }
 
     [TestMethod]
@@ -197,16 +195,16 @@ public class FastFilterTests
 
         Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null));
 
-        Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass(1).Test1"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass().Test1()"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass(1, 2).Test2"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass.Test3 (abcd1234)"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass(1).Test1(123)"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass(1, 2).Test2(x:1, y:2, z:3)"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass(1, 2,3).Test3(1)  (123)"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "TestClass1.Test1"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "TestClass1(1).Test1"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "TestClass((1, 2, 3)).Test1"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "TestClass(1).Test1"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "TestClass().Test1()"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "TestClass(1, 2).Test2"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "TestClass.Test3 (abcd1234)"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "TestClass(1).Test1(123)"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "TestClass(1, 2).Test2(x:1, y:2, z:3)"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "TestClass(1, 2,3).Test3(1)  (123)"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "TestClass1.Test1"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "TestClass1(1).Test1"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "TestClass((1, 2, 3)).Test1"));
     }
 
     [TestMethod]
@@ -223,7 +221,7 @@ public class FastFilterTests
         CheckFastFailureWithNotEqualClause(filterString);
     }
 
-    private void CheckFastFailureWithNotEqualClause(string filterString)
+    private static void CheckFastFailureWithNotEqualClause(string filterString)
     {
         var filterExpressionWrapper = new FilterExpressionWrapper(filterString);
         var fastFilter = filterExpressionWrapper.FastFilter;
@@ -237,8 +235,8 @@ public class FastFilterTests
 
         Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null));
 
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test1"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test2"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test1"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test2"));
     }
 
     [TestMethod]
@@ -256,10 +254,10 @@ public class FastFilterTests
 
         Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null));
 
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test1"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test2"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test3"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test4"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test1"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test2"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test3"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test4"));
     }
 
     [TestMethod]
@@ -277,14 +275,14 @@ public class FastFilterTests
 
         Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null));
 
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test1"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test2"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test3"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test1 (123)"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test2(123)"));
-        Assert.IsFalse(fastFilter.Evaluate((s) => "Test3  (123)"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test4"));
-        Assert.IsTrue(fastFilter.Evaluate((s) => "Test4 (123)"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test1"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test2"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test3"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test1 (123)"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test2(123)"));
+        Assert.IsFalse(fastFilter.Evaluate(s => "Test3  (123)"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test4"));
+        Assert.IsTrue(fastFilter.Evaluate(s => "Test4 (123)"));
     }
 
     [TestMethod]
@@ -302,12 +300,12 @@ public class FastFilterTests
 
         Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "Category" }, null));
 
-        Assert.IsFalse(fastFilter.Evaluate((s) => new[] { "UnitTest" }));
-        Assert.IsFalse(fastFilter.Evaluate((s) => new[] { "PerfTest" }));
-        Assert.IsFalse(fastFilter.Evaluate((s) => new[] { "UnitTest", "PerfTest" }));
-        Assert.IsFalse(fastFilter.Evaluate((s) => new[] { "UnitTest", "IntegrationTest" }));
-        Assert.IsTrue(fastFilter.Evaluate((s) => new[] { "IntegrationTest" }));
-        Assert.IsTrue(fastFilter.Evaluate((s) => null));
+        Assert.IsFalse(fastFilter.Evaluate(s => new[] { "UnitTest" }));
+        Assert.IsFalse(fastFilter.Evaluate(s => new[] { "PerfTest" }));
+        Assert.IsFalse(fastFilter.Evaluate(s => new[] { "UnitTest", "PerfTest" }));
+        Assert.IsFalse(fastFilter.Evaluate(s => new[] { "UnitTest", "IntegrationTest" }));
+        Assert.IsTrue(fastFilter.Evaluate(s => new[] { "IntegrationTest" }));
+        Assert.IsTrue(fastFilter.Evaluate(s => null));
     }
 
     [TestMethod]
@@ -349,50 +347,33 @@ public class FastFilterTests
         Assert.IsTrue(fastFilter.FilterProperties["Category"].SequenceEqual(new[] { "IntegrationTest" }));
 
         Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName", "Category" }, null));
-        Assert.AreEqual("FullyQualifiedName", filterExpressionWrapper.ValidForProperties(new List<string>() { "Category" }, null).Single());
+        Assert.AreEqual("FullyQualifiedName",
+            filterExpressionWrapper.ValidForProperties(new List<string>() { "Category" }, null)!.Single());
 
-        Assert.IsFalse(fastFilter.Evaluate((s) => s == "Category" ? new[] { "UnitTest" } : null));
-        Assert.IsFalse(fastFilter.Evaluate((s) => s == "Category" ? new[] { "PerfTest" } : null));
-        Assert.IsFalse(fastFilter.Evaluate((s) => s == "Category" ? new[] { "UnitTest", "PerfTest" } : null));
-        Assert.IsTrue(fastFilter.Evaluate((s) => s == "Category" ? new[] { "UnitTest", "IntegrationTest" } : null));
-        Assert.IsTrue(fastFilter.Evaluate((s) => s == "Category" ? new[] { "IntegrationTest" } : null));
-        Assert.IsTrue(fastFilter.Evaluate((s) =>
-        {
-            switch (s)
+        Assert.IsFalse(fastFilter.Evaluate(s => s == "Category" ? new[] { "UnitTest" } : null));
+        Assert.IsFalse(fastFilter.Evaluate(s => s == "Category" ? new[] { "PerfTest" } : null));
+        Assert.IsFalse(fastFilter.Evaluate(s => s == "Category" ? new[] { "UnitTest", "PerfTest" } : null));
+        Assert.IsTrue(fastFilter.Evaluate(s => s == "Category" ? new[] { "UnitTest", "IntegrationTest" } : null));
+        Assert.IsTrue(fastFilter.Evaluate(s => s == "Category" ? new[] { "IntegrationTest" } : null));
+        Assert.IsTrue(fastFilter.Evaluate(s => s switch
             {
-                case "Category":
-                    return new[] { "UnitTest" };
-                case "FullyQualifiedName":
-                    return new[] { "Test1" };
-                default:
-                    return null;
-            }
-        }));
-        Assert.IsFalse(fastFilter.Evaluate((s) =>
-        {
-            switch (s)
+                "Category" => new[] { "UnitTest" },
+                "FullyQualifiedName" => new[] { "Test1" },
+                _ => null,
+            }));
+        Assert.IsFalse(fastFilter.Evaluate(s => s switch
             {
-                case "Category":
-                    return "UnitTest";
-                case "FullyQualifiedName":
-                    return "Test2";
-                default:
-                    return null;
-            }
-        }));
-        Assert.IsTrue(fastFilter.Evaluate((s) =>
-        {
-            switch (s)
+                "Category" => "UnitTest",
+                "FullyQualifiedName" => "Test2",
+                _ => null,
+            }));
+        Assert.IsTrue(fastFilter.Evaluate(s => s switch
             {
-                case "Category":
-                    return new[] { "IntegrationTest" };
-                case "FullyQualifiedName":
-                    return new[] { "Test2" };
-                default:
-                    return null;
-            }
-        }));
-        Assert.IsFalse(fastFilter.Evaluate((s) => null));
+                "Category" => new[] { "IntegrationTest" },
+                "FullyQualifiedName" => new[] { "Test2" },
+                _ => null,
+            }));
+        Assert.IsFalse(fastFilter.Evaluate(s => null));
     }
 
     [TestMethod]
@@ -410,46 +391,29 @@ public class FastFilterTests
         Assert.IsTrue(fastFilter.FilterProperties["Category"].SequenceEqual(new[] { "IntegrationTest" }));
 
         Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName", "Category" }, null));
-        Assert.AreEqual("FullyQualifiedName", filterExpressionWrapper.ValidForProperties(new List<string>() { "Category" }, null).Single());
+        Assert.AreEqual("FullyQualifiedName",
+            filterExpressionWrapper.ValidForProperties(new List<string>() { "Category" }, null)!.Single());
 
-        Assert.IsTrue(fastFilter.Evaluate((s) => s == "Category" ? new[] { "UnitTest" } : null));
-        Assert.IsFalse(fastFilter.Evaluate((s) => s == "Category" ? new[] { "UnitTest", "IntegrationTest" } : null));
-        Assert.IsFalse(fastFilter.Evaluate((s) => s == "Category" ? new[] { "IntegrationTest" } : null));
-        Assert.IsFalse(fastFilter.Evaluate((s) =>
-        {
-            switch (s)
+        Assert.IsTrue(fastFilter.Evaluate(s => s == "Category" ? new[] { "UnitTest" } : null));
+        Assert.IsFalse(fastFilter.Evaluate(s => s == "Category" ? new[] { "UnitTest", "IntegrationTest" } : null));
+        Assert.IsFalse(fastFilter.Evaluate(s => s == "Category" ? new[] { "IntegrationTest" } : null));
+        Assert.IsFalse(fastFilter.Evaluate(s => s switch
             {
-                case "Category":
-                    return new[] { "UnitTest" };
-                case "FullyQualifiedName":
-                    return new[] { "Test1" };
-                default:
-                    return null;
-            }
-        }));
-        Assert.IsFalse(fastFilter.Evaluate((s) =>
-        {
-            switch (s)
+                "Category" => new[] { "UnitTest" },
+                "FullyQualifiedName" => new[] { "Test1" },
+                _ => null,
+            }));
+        Assert.IsFalse(fastFilter.Evaluate(s => s switch
             {
-                case "Category":
-                    return new[] { "IntegrationTest" };
-                case "FullyQualifiedName":
-                    return new[] { "Test2" };
-                default:
-                    return null;
-            }
-        }));
-        Assert.IsTrue(fastFilter.Evaluate((s) =>
-        {
-            switch (s)
+                "Category" => new[] { "IntegrationTest" },
+                "FullyQualifiedName" => new[] { "Test2" },
+                _ => null,
+            }));
+        Assert.IsTrue(fastFilter.Evaluate(s => s switch
             {
-                case "Category":
-                    return new[] { "UnitTest" };
-                case "FullyQualifiedName":
-                    return new[] { "Test2" };
-                default:
-                    return null;
-            }
-        }));
+                "Category" => new[] { "UnitTest" },
+                "FullyQualifiedName" => new[] { "Test2" },
+                _ => null,
+            }));
     }
 }

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 
@@ -22,23 +22,20 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 internal class RunSpecificTestsArgumentProcessor : IArgumentProcessor
 {
     public const string CommandName = "/Tests";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     public Lazy<IArgumentProcessorCapabilities> Metadata
         => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
             new RunSpecificTestsArgumentProcessorCapabilities());
 
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new RunSpecificTestsArgumentExecutor(
@@ -95,7 +92,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     /// <summary>
     /// Given Collection of strings for filtering test cases
     /// </summary>
-    private Collection<string> _selectedTestNames;
+    private Collection<string>? _selectedTestNames;
 
     /// <summary>
     /// Used for tracking the total no. of tests discovered from the given sources.
@@ -110,7 +107,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     /// <summary>
     /// Effective run settings applicable to test run after inferring the multi-targeting settings.
     /// </summary>
-    private string _effectiveRunSettings;
+    private string? _effectiveRunSettings;
 
     /// <summary>
     /// List of filters that have not yet been discovered
@@ -137,8 +134,8 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         IArtifactProcessingManager artifactProcessingManager,
         IOutput output)
     {
-        Contract.Requires(options != null);
-        Contract.Requires(testRequestManager != null);
+        ValidateArg.NotNull(options, nameof(options));
+        ValidateArg.NotNull(testRequestManager, nameof(testRequestManager));
 
         _commandLineOptions = options;
         _testRequestManager = testRequestManager;
@@ -149,20 +146,20 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions, artifactProcessingManager);
     }
 
-
     #region IArgumentProcessor
 
     /// <summary>
     /// Splits given the search strings and adds to selectTestNamesCollection.
     /// </summary>
     /// <param name="argument"></param>
-    public void Initialize(string argument)
+    [MemberNotNull(nameof(_selectedTestNames))]
+    public void Initialize(string? argument)
     {
-        if (!string.IsNullOrWhiteSpace(argument))
+        if (!argument.IsNullOrWhiteSpace())
         {
             _selectedTestNames = new Collection<string>(
                 argument.Tokenize(SplitDelimiter, EscapeDelimiter)
-                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Where(x => !StringUtils.IsNullOrWhiteSpace(x))
                     .Select(s => s.Trim()).ToList());
         }
 
@@ -181,14 +178,14 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     /// <returns></returns>
     public ArgumentProcessorResult Execute()
     {
-        Contract.Assert(Output != null);
-        Contract.Assert(_commandLineOptions != null);
-        Contract.Assert(_testRequestManager != null);
-        Contract.Assert(!string.IsNullOrWhiteSpace(_runSettingsManager.ActiveRunSettings.SettingsXml));
+        TPDebug.Assert(Output != null);
+        TPDebug.Assert(_commandLineOptions != null);
+        TPDebug.Assert(_testRequestManager != null);
+        TPDebug.Assert(!StringUtils.IsNullOrWhiteSpace(_runSettingsManager.ActiveRunSettings?.SettingsXml));
 
         if (!_commandLineOptions.Sources.Any())
         {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
+            throw new CommandLineException(CommandLineResources.MissingTestSourceFile);
         }
 
         _effectiveRunSettings = _runSettingsManager.ActiveRunSettings.SettingsXml;
@@ -205,6 +202,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     }
 
     #endregion
+
     /// <summary>
     /// Discovers tests from the given sources and selects only specified tests.
     /// </summary>
@@ -212,7 +210,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     private void DiscoverTestsAndSelectSpecified(IEnumerable<string> sources)
     {
         Output.WriteLine(CommandLineResources.StartingDiscovery, OutputLevel.Information);
-        if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+        if (!StringUtils.IsNullOrEmpty(EqtTrace.LogFile))
         {
             Output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
         }
@@ -248,12 +246,12 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
             if (_discoveredTestCount > 0)
             {
                 // No tests that matched any of the given strings.
-                warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsAvailableAfterFiltering, _discoveredTestCount, string.Join(", ", _selectedTestNames));
+                warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsAvailableAfterFiltering, _discoveredTestCount, string.Join(", ", _selectedTestNames!));
             }
             else
             {
                 // No tests were discovered from the given sources.
-                warningMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", _commandLineOptions.Sources));
+                warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", _commandLineOptions.Sources));
 
                 if (!_commandLineOptions.TestAdapterPathsSet)
                 {
@@ -271,10 +269,12 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="args"></param>
-    private void DiscoveryRequest_OnDiscoveredTests(object sender, DiscoveredTestsEventArgs args)
+    private void DiscoveryRequest_OnDiscoveredTests(object? sender, DiscoveredTestsEventArgs args)
     {
+        TPDebug.Assert(_selectedTestNames != null, "Initialize should have been called");
+
         _discoveredTestCount += args.DiscoveredTestCases.Count();
-        foreach (var testCase in args.DiscoveredTestCases)
+        foreach (var testCase in args.DiscoveredTestCases!)
         {
             foreach (var nameCriteria in _selectedTestNames)
             {
@@ -348,7 +348,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e">RunCompletion args</param>
-        private void TestRunRequest_OnRunCompletion(object sender, TestRunCompleteEventArgs e)
+        private void TestRunRequest_OnRunCompletion(object? sender, TestRunCompleteEventArgs e)
         {
             // If run is not aborted/canceled then check the count of executed tests.
             // we need to check if there are any tests executed - to try show some help info to user to check for installed vsix extensions
@@ -366,6 +366,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
             // Collect tests session artifacts for post processing
             if (_commandLineOptions.ArtifactProcessingMode == ArtifactProcessingMode.Collect)
             {
+                TPDebug.Assert(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml is not null, "RunSettingsManager.Instance.ActiveRunSettings.SettingsXml is null");
                 _artifactProcessingManager.CollectArtifacts(e, RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
             }
         }

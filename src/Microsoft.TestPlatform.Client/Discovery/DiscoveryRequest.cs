@@ -18,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery;
 
 /// <summary>
@@ -70,7 +68,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException(nameof(DiscoveryRequest));
             }
@@ -112,13 +110,16 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException(nameof(DiscoveryRequest));
             }
 
             if (DiscoveryInProgress)
             {
+                // TODO: COMPAT: This should not check the default protocol config, that is vstest.console maximum protocol version, not the
+                // version we negotiated with testhost. Instead this should be handled by the proxy discovery manager, based on the protocol
+                // version it has.
                 // If testhost has old version, we should use old cancel logic
                 // to be consistent and not create regression issues
                 if (Constants.DefaultProtocolConfig.Version < Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport)
@@ -148,7 +149,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     {
         EqtTrace.Verbose("DiscoveryRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
 
-        if (_disposed)
+        if (_isDisposed)
         {
             throw new ObjectDisposedException("DiscoveryRequest");
         }
@@ -161,30 +162,30 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <summary>
     /// Raised when the test discovery starts.
     /// </summary>
-    public event EventHandler<DiscoveryStartEventArgs> OnDiscoveryStart;
+    public event EventHandler<DiscoveryStartEventArgs>? OnDiscoveryStart;
 
     /// <summary>
     /// Raised when the test discovery completes.
     /// </summary>
-    public event EventHandler<DiscoveryCompleteEventArgs> OnDiscoveryComplete;
+    public event EventHandler<DiscoveryCompleteEventArgs>? OnDiscoveryComplete;
 
     /// <summary>
     /// Raised when the message is received.
     /// </summary>
     /// <remarks>TestRunMessageEventArgs should be renamed to more generic</remarks>
-    public event EventHandler<TestRunMessageEventArgs> OnDiscoveryMessage;
+    public event EventHandler<TestRunMessageEventArgs>? OnDiscoveryMessage;
 
     /// <summary>
     /// Raised when new tests are discovered in this discovery request.
     /// </summary>
-    public event EventHandler<DiscoveredTestsEventArgs> OnDiscoveredTests;
+    public event EventHandler<DiscoveredTestsEventArgs>? OnDiscoveredTests;
 
     /// <summary>
     ///  Raised when a discovery event related message is received from host
     ///  This is required if one wants to re-direct the message over the process boundary without any processing overhead
     ///  All the discovery events should come as raw messages as well as proper serialized events like OnDiscoveredTests
     /// </summary>
-    public event EventHandler<string> OnRawMessageReceived;
+    public event EventHandler<string>? OnRawMessageReceived;
 
     /// <summary>
     /// Specifies the discovery criterion
@@ -214,13 +215,13 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     #region ITestDiscoveryEventsHandler2 Methods
 
     /// <inheritdoc/>
-    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
     {
         EqtTrace.Verbose("DiscoveryRequest.HandleDiscoveryComplete: Begin processing discovery complete notification. Aborted: {0}, TotalTests: {1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("DiscoveryRequest.HandleDiscoveryComplete: Ignoring as the object is disposed.");
                 return;
@@ -261,7 +262,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 if (RequestData.IsTelemetryOptedIn)
                 {
                     TestExtensions.AddExtensionTelemetry(
-                        discoveryCompleteEventArgs.Metrics,
+                        discoveryCompleteEventArgs.Metrics!,
                         discoveryCompleteEventArgs.DiscoveredExtensions);
                 }
 
@@ -304,13 +305,13 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     }
 
     /// <inheritdoc/>
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+    public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
     {
         EqtTrace.Verbose("DiscoveryRequest.HandleDiscoveredTests: Starting.");
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("DiscoveryRequest.HandleDiscoveredTests: Ignoring as the object is disposed.");
                 return;
@@ -329,19 +330,19 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// </summary>
     /// <param name="level">Output level of the message being sent.</param>
     /// <param name="message">Actual contents of the message</param>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         EqtTrace.Verbose("DiscoveryRequest.HandleLogMessage: Starting.");
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("DiscoveryRequest.HandleLogMessage: Ignoring as the object is disposed.");
                 return;
             }
 
-            var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
+            var testRunMessageEvent = new TestRunMessageEventArgs(level, message!);
             LoggerManager.HandleDiscoveryMessage(testRunMessageEvent);
             OnDiscoveryMessage.SafeInvoke(this, testRunMessageEvent, "DiscoveryRequest.OnTestMessageRecieved");
         }
@@ -361,7 +362,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             ? _dataSerializer.DeserializeMessage(rawMessage)
             : null;
 
-        if (string.Equals(message?.MessageType, MessageType.DiscoveryComplete))
+        if (MessageType.DiscoveryComplete.Equals(message?.MessageType))
         {
             var discoveryCompletePayload = _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
             rawMessage = UpdateRawMessageWithTelemetryInfo(discoveryCompletePayload, message) ?? rawMessage;
@@ -375,7 +376,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// Handles LoggerManager's DiscoveryComplete.
     /// </summary>
     /// <param name="discoveryCompletePayload">Discovery complete payload.</param>
-    private void HandleLoggerManagerDiscoveryComplete(DiscoveryCompletePayload discoveryCompletePayload)
+    private void HandleLoggerManagerDiscoveryComplete(DiscoveryCompletePayload? discoveryCompletePayload)
     {
         if (LoggerManager.LoggersInitialized && discoveryCompletePayload != null)
         {
@@ -399,66 +400,68 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <param name="discoveryCompletePayload">Discovery complete payload.</param>
     /// <param name="message">Message.</param>
     /// <returns>Updated rawMessage.</returns>
-    private string UpdateRawMessageWithTelemetryInfo(DiscoveryCompletePayload discoveryCompletePayload, Message message)
+    private string? UpdateRawMessageWithTelemetryInfo(DiscoveryCompletePayload? discoveryCompletePayload, Message? message)
     {
         var rawMessage = default(string);
 
-        if (RequestData.IsTelemetryOptedIn)
+        if (!RequestData.IsTelemetryOptedIn)
         {
-            if (discoveryCompletePayload != null)
+            return rawMessage;
+        }
+
+        if (discoveryCompletePayload != null)
+        {
+            if (discoveryCompletePayload.Metrics == null)
             {
-                if (discoveryCompletePayload.Metrics == null)
-                {
-                    discoveryCompletePayload.Metrics = RequestData.MetricsCollection.Metrics;
-                }
-                else
-                {
-                    foreach (var kvp in RequestData.MetricsCollection.Metrics)
-                    {
-                        discoveryCompletePayload.Metrics[kvp.Key] = kvp.Value;
-                    }
-                }
-
-                var discoveryFinalTimeTakenForDesignMode = DateTime.UtcNow - _discoveryStartTime;
-
-                // Collecting Total Time Taken
-                discoveryCompletePayload.Metrics[TelemetryDataConstants.TimeTakenInSecForDiscovery] = discoveryFinalTimeTakenForDesignMode.TotalSeconds;
-
-                // Add extensions discovered by vstest.console.
-                //
-                // TODO(copoiena):
-                // Doing extension merging here is incorrect because we can end up not merging the
-                // cached extensions for the current process (i.e. vstest.console) and hence have
-                // an incomplete list of discovered extensions. This can happen because this method
-                // is called only if telemetry is opted in (see: HandleRawMessage). We should handle
-                // this merge a level above in order to be consistent, but that means we'd have to
-                // deserialize all raw messages no matter if telemetry is opted in or not and that
-                // would probably mean a performance hit.
-                discoveryCompletePayload.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
-                    discoveryCompletePayload.DiscoveredExtensions,
-                    TestPluginCache.Instance.TestExtensions?.GetCachedExtensions());
-
-                // Write extensions to telemetry data.
-                TestExtensions.AddExtensionTelemetry(
-                    discoveryCompletePayload.Metrics,
-                    discoveryCompletePayload.DiscoveredExtensions);
-            }
-
-            if (message is VersionedMessage message1)
-            {
-                var version = message1.Version;
-
-                rawMessage = _dataSerializer.SerializePayload(
-                    MessageType.DiscoveryComplete,
-                    discoveryCompletePayload,
-                    version);
+                discoveryCompletePayload.Metrics = RequestData.MetricsCollection.Metrics;
             }
             else
             {
-                rawMessage = _dataSerializer.SerializePayload(
-                    MessageType.DiscoveryComplete,
-                    discoveryCompletePayload);
+                foreach (var kvp in RequestData.MetricsCollection.Metrics)
+                {
+                    discoveryCompletePayload.Metrics[kvp.Key] = kvp.Value;
+                }
             }
+
+            var discoveryFinalTimeTakenForDesignMode = DateTime.UtcNow - _discoveryStartTime;
+
+            // Collecting Total Time Taken
+            discoveryCompletePayload.Metrics[TelemetryDataConstants.TimeTakenInSecForDiscovery] = discoveryFinalTimeTakenForDesignMode.TotalSeconds;
+
+            // Add extensions discovered by vstest.console.
+            //
+            // TODO(copoiena):
+            // Doing extension merging here is incorrect because we can end up not merging the
+            // cached extensions for the current process (i.e. vstest.console) and hence have
+            // an incomplete list of discovered extensions. This can happen because this method
+            // is called only if telemetry is opted in (see: HandleRawMessage). We should handle
+            // this merge a level above in order to be consistent, but that means we'd have to
+            // deserialize all raw messages no matter if telemetry is opted in or not and that
+            // would probably mean a performance hit.
+            discoveryCompletePayload.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
+                discoveryCompletePayload.DiscoveredExtensions,
+                TestPluginCache.Instance.TestExtensions?.GetCachedExtensions());
+
+            // Write extensions to telemetry data.
+            TestExtensions.AddExtensionTelemetry(
+                discoveryCompletePayload.Metrics,
+                discoveryCompletePayload.DiscoveredExtensions);
+        }
+
+        if (message is VersionedMessage message1)
+        {
+            var version = message1.Version;
+
+            rawMessage = _dataSerializer.SerializePayload(
+                MessageType.DiscoveryComplete,
+                discoveryCompletePayload,
+                version);
+        }
+        else
+        {
+            rawMessage = _dataSerializer.SerializePayload(
+                MessageType.DiscoveryComplete,
+                discoveryCompletePayload);
         }
 
         return rawMessage;
@@ -474,30 +477,20 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// </summary>
     public void Dispose()
     {
-        Dispose(true);
-
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
         EqtTrace.Verbose("DiscoveryRequest.Dispose: Starting.");
 
         lock (_syncObject)
         {
-            if (!_disposed)
+            if (!_isDisposed)
             {
-                if (disposing)
+                if (_discoveryCompleted != null)
                 {
-                    if (_discoveryCompleted != null)
-                    {
-                        _discoveryCompleted.Dispose();
-                    }
+                    _discoveryCompleted.Dispose();
                 }
 
                 // Indicate that object has been disposed
-                _discoveryCompleted = null;
-                _disposed = true;
+                _discoveryCompleted = null!;
+                _isDisposed = true;
             }
         }
 
@@ -513,7 +506,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <summary>
     /// If this request has been disposed.
     /// </summary>
-    private bool _disposed;
+    private bool _isDisposed;
 
     /// <summary>
     /// It get set when current discovery request is completed.

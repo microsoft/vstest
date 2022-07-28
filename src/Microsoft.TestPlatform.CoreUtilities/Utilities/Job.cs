@@ -3,7 +3,7 @@
 
 using System.Threading;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
@@ -53,7 +53,7 @@ internal class Job<TPayload>
     /// <summary>
     /// Gets the job to be processed.
     /// </summary>
-    public TPayload Payload { get; private set; }
+    public TPayload? Payload { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether the background thread should shutdown.
@@ -63,7 +63,7 @@ internal class Job<TPayload>
     /// <summary>
     /// Gets the signal that this job is being processed.
     /// </summary>
-    public ManualResetEvent WaitManualResetEvent { get; private set; }
+    public ManualResetEvent? WaitManualResetEvent { get; private set; }
 
     /// <summary>
     /// Gets the size of this job instance. This is used to manage the total size of Job Queue.
@@ -75,8 +75,10 @@ internal class Job<TPayload>
     /// </summary>
     /// <param name="waitEvent"> The wait Event. </param>
     /// <returns> The wait job. </returns>
-    public static Job<TPayload> CreateWaitJob(ManualResetEvent waitEvent!!)
+    public static Job<TPayload> CreateWaitJob(ManualResetEvent waitEvent)
     {
+        ValidateArg.NotNull(waitEvent, nameof(waitEvent));
+
         var waitJob = new Job<TPayload>();
         waitJob.WaitManualResetEvent = waitEvent;
 

@@ -14,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -40,7 +38,7 @@ public class DataCollectionTests : AcceptanceTestBase
         var arguments = PrepareArguments(assemblyPaths, null, runSettings, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = TempDirectory.Path,
         };
@@ -70,7 +68,7 @@ public class DataCollectionTests : AcceptanceTestBase
         var arguments = PrepareArguments(assemblyPaths, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
         arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /Collect:SampleDataCollector", $" /TestAdapterPath:{extensionsPath}");
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = TempDirectory.Path,
         };
@@ -87,7 +85,7 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetTestDllForFramework("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(GetTestDllForFramework("AppDomainGetAssembliesTestProject.dll", DEFAULT_HOST_NETCORE), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 0, 0);
@@ -135,13 +133,13 @@ public class DataCollectionTests : AcceptanceTestBase
         runSettingsXml.Add(new XElement("RunConfiguration", new XElement("MaxCpuCount", 2)));
 
         // Set datacollector parameters
-        runSettingsXml.Element("DataCollectionRunSettings")
-            .Element("DataCollectors")
-            .Element("DataCollector")
+        runSettingsXml.Element("DataCollectionRunSettings")!
+            .Element("DataCollectors")!
+            .Element("DataCollector")!
             .Add(new XElement("Configuration", new XElement("MergeFile", "MergedFile.txt")));
         runSettingsXml.Save(runSettings);
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["SampleDataCollectorTempPath"] = TempDirectory.Path,
         };
@@ -156,8 +154,8 @@ public class DataCollectionTests : AcceptanceTestBase
         {
             while (!streamReader.EndOfStream)
             {
-                string line = streamReader.ReadLine();
-                Assert.IsTrue(line.StartsWith("SessionEnded_Handler_"));
+                string? line = streamReader.ReadLine();
+                Assert.IsTrue(line!.StartsWith("SessionEnded_Handler_"));
                 fileContent.Add(line);
             }
         }
@@ -246,7 +244,7 @@ public class DataCollectionTests : AcceptanceTestBase
         Assert.AreEqual(3, diaglogsFileCount);
     }
 
-    private string GetRunsettingsFilePath(string resultsDir)
+    private static string GetRunsettingsFilePath(string resultsDir)
     {
         var runsettingsPath = Path.Combine(resultsDir, "test_" + Guid.NewGuid() + ".runsettings");
         var dataCollectionAttributes = new Dictionary<string, string>

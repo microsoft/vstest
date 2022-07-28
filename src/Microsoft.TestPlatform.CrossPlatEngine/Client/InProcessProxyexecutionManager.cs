@@ -17,8 +17,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 internal class InProcessProxyExecutionManager : IProxyExecutionManager
@@ -54,14 +52,14 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
     }
 
     /// <inheritdoc/>
-    public int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
+    public int StartTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler)
     {
         try
         {
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
             var testPackages = new List<string>(testRunCriteria.HasSpecificSources ? testRunCriteria.Sources :
                 // If the test execution is with a test filter, group them by sources
-                testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
+                testRunCriteria.Tests!.GroupBy(tc => tc.Source).Select(g => g.Key));
 
             // This code should be in sync with ProxyExecutionManager.StartTestRun executionContext
             var executionContext = new TestExecutionContext(
@@ -113,7 +111,7 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
     /// Aborts the test operation.
     /// </summary>
     /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
-    public void Abort(ITestRunEventsHandler eventHandler)
+    public void Abort(IInternalTestRunEventsHandler eventHandler)
     {
         Task.Run(() => _testHostManagerFactory.GetExecutionManager().Abort(eventHandler));
     }
@@ -122,7 +120,7 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
     /// Cancels the test run.
     /// </summary>
     /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
-    public void Cancel(ITestRunEventsHandler eventHandler)
+    public void Cancel(IInternalTestRunEventsHandler eventHandler)
     {
         Task.Run(() => _testHostManagerFactory.GetExecutionManager().Cancel(eventHandler));
     }
@@ -149,8 +147,7 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
         _executionManager.Initialize(Enumerable.Empty<string>(), null);
     }
 
-    public void InitializeTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
+    public void InitializeTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler)
     {
-      
     }
 }

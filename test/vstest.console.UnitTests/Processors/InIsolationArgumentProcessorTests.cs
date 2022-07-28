@@ -26,7 +26,7 @@ public class InIsolationArgumentProcessorTests
     [TestCleanup]
     public void TestCleanup()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
     }
 
     [TestMethod]
@@ -40,7 +40,7 @@ public class InIsolationArgumentProcessorTests
     public void GetExecuterShouldReturnInProcessArgumentExecutor()
     {
         var processor = new InIsolationArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is InIsolationArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is InIsolationArgumentExecutor);
     }
 
     [TestMethod]

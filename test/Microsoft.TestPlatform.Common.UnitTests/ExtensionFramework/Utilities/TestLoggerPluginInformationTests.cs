@@ -7,14 +7,12 @@ using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities;
 
 [TestClass]
 public class TestLoggerPluginInformationTests
 {
-    private TestLoggerPluginInformation _testPluginInformation;
+    private TestLoggerPluginInformation? _testPluginInformation;
 
     internal const string DefaultExtensionUri = "executor://unittest";
 

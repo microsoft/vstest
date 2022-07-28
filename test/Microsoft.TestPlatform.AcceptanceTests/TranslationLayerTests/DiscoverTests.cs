@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,17 +19,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 [TestClass]
 public class DiscoverTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private DiscoveryEventHandler _discoveryEventHandler;
-    private DiscoveryEventHandler2 _discoveryEventHandler2;
+    private IVsTestConsoleWrapper? _vstestConsoleWrapper;
+    private DiscoveryEventHandler? _discoveryEventHandler;
+    private DiscoveryEventHandler2? _discoveryEventHandler2;
 
+    [MemberNotNull(nameof(_vstestConsoleWrapper), nameof(_discoveryEventHandler), nameof(_discoveryEventHandler2))]
     public void Setup()
     {
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();
@@ -62,7 +62,7 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource()]
+    [RunnerCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -80,7 +80,7 @@ public class DiscoverTests : AcceptanceTestBase
 
         // Assert.
         Assert.AreEqual(6, _discoveryEventHandler2.DiscoveredTestCases.Count);
-        Assert.AreEqual(0, _discoveryEventHandler2.Metrics.Count);
+        Assert.AreEqual(0, _discoveryEventHandler2.Metrics!.Count);
     }
 
     [TestMethod]
@@ -95,7 +95,7 @@ public class DiscoverTests : AcceptanceTestBase
 
         // Assert.
         Assert.AreEqual(6, _discoveryEventHandler2.DiscoveredTestCases.Count);
-        Assert.IsTrue(_discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
+        Assert.IsTrue(_discoveryEventHandler2.Metrics!.ContainsKey(TelemetryDataConstants.TargetDevice));
         Assert.IsTrue(_discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests));
         Assert.IsTrue(_discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecByAllAdapters));
         Assert.IsTrue(_discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForDiscovery));
@@ -178,7 +178,7 @@ public class DiscoverTests : AcceptanceTestBase
             eventHandler2);
 
         // Assert.
-        Assert.AreEqual(2, eventHandler2.FullyDiscoveredSources.Count);
+        Assert.AreEqual(2, eventHandler2.FullyDiscoveredSources!.Count);
     }
 
     [TestMethod]
@@ -201,17 +201,18 @@ public class DiscoverTests : AcceptanceTestBase
         // Release builds optimize code, hence line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
         {
-            Assert.AreEqual(25, testCase.FirstOrDefault().LineNumber);
+            Assert.AreEqual(25, testCase.First().LineNumber);
         }
         else
         {
-            Assert.AreEqual(24, testCase.FirstOrDefault().LineNumber);
+            Assert.AreEqual(24, testCase.First().LineNumber);
         }
     }
 
     [TestMethod]
     [NetFullTargetFrameworkDataSource(inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
+    [Ignore("Flaky on CI")]
     public async Task CancelTestDiscovery(RunnerInfo runnerInfo)
     {
         var sw = Stopwatch.StartNew();

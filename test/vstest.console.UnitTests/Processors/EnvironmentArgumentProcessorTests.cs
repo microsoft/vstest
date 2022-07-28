@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -39,7 +40,7 @@ public class EnvironmentArgumentProcessorTests
     [TestCleanup]
     public void Cleanup()
     {
-        _commandLineOptions.Reset();
+        CommandLineOptions.Reset();
     }
 
     [TestMethod]
@@ -151,8 +152,8 @@ public class EnvironmentArgumentProcessorTests
         // Arrange
         _settingsProvider.UpdateRunSettingsNode("RunConfiguration.EnvironmentVariables.VARIABLE",
             "Initial value");
-        var warningMessage = string.Format(CommandLineResources.CommandLineWarning,
-            string.Format(CommandLineResources.EnvironmentVariableXIsOverriden, "VARIABLE")
+        var warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.CommandLineWarning,
+            string.Format(CultureInfo.CurrentCulture, CommandLineResources.EnvironmentVariableXIsOverriden, "VARIABLE")
         );
         _mockOutput.Setup(mock =>
             mock.WriteLine(
@@ -169,9 +170,9 @@ public class EnvironmentArgumentProcessorTests
         _mockOutput.VerifyAll();
     }
 
-    private XmlParseResult ParseSettingsXml(IRunSettingsProvider provider)
+    private static XmlParseResult ParseSettingsXml(IRunSettingsProvider provider)
     {
-        var document = XDocument.Parse(provider.ActiveRunSettings.SettingsXml);
+        var document = XDocument.Parse(provider.ActiveRunSettings!.SettingsXml!);
 
         var runConfiguration = document
             ?.Root

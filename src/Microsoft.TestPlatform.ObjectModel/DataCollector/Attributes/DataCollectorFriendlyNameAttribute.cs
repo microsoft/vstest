@@ -3,13 +3,12 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Provides a friendly name for the data collector.
 /// </summary>
+[AttributeUsage(AttributeTargets.Class)]
 public class DataCollectorFriendlyNameAttribute : Attribute
 {
     /// <summary>

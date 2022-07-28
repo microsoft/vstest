@@ -2,12 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 using System.Xml;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
@@ -19,7 +17,7 @@ internal sealed class RunInfo : IXmlTestStore
     [StoreXmlSimpleField("Text", "")]
     private readonly string _text;
 
-    private readonly Exception _exception;
+    private readonly Exception? _exception;
 
     [StoreXmlSimpleField("@computerName", "")]
     private readonly string _computer;
@@ -45,9 +43,9 @@ internal sealed class RunInfo : IXmlTestStore
     /// <param name="outcome">
     /// The outcome.
     /// </param>
-    public RunInfo(string textMessage, Exception ex, string computer, TestOutcome outcome)
+    public RunInfo(string textMessage, Exception? ex, string computer, TestOutcome outcome)
     {
-        Debug.Assert(computer != null, "computer is null");
+        TPDebug.Assert(computer != null, "computer is null");
 
         _text = textMessage;
         _exception = ex;
@@ -55,7 +53,6 @@ internal sealed class RunInfo : IXmlTestStore
         _outcome = outcome;
         _timestamp = DateTime.UtcNow;
     }
-
 
     #region IXmlTestStore Members
 
@@ -68,7 +65,7 @@ internal sealed class RunInfo : IXmlTestStore
     /// <param name="parameters">
     /// The parameters.
     /// </param>
-    public void Save(XmlElement element, XmlTestStoreParameters parameters)
+    public void Save(XmlElement element, XmlTestStoreParameters? parameters)
     {
         XmlPersistence helper = new();
         helper.SaveSingleFields(element, this, parameters);

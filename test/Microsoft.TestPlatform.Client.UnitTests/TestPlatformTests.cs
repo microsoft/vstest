@@ -10,7 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -56,12 +55,12 @@ public class TestPlatformTests
         _hostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources))
             .Returns(discoveryCriteria.Sources);
 
-        _testEngine.Setup(te => te.GetDiscoveryManager(_mockRequestData.Object, It.IsAny<DiscoveryCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_discoveryManager.Object);
+        _testEngine.Setup(te => te.GetDiscoveryManager(_mockRequestData.Object, It.IsAny<DiscoveryCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_discoveryManager.Object);
         _testEngine.Setup(te => te.GetExtensionManager()).Returns(_extensionManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
 
-        var discoveryRequest = tp.CreateDiscoveryRequest(_mockRequestData.Object, discoveryCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>());
+        var discoveryRequest = tp.CreateDiscoveryRequest(_mockRequestData.Object, discoveryCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>());
 
         _discoveryManager.Verify(dm => dm.Initialize(false), Times.Once);
         Assert.AreEqual(discoveryCriteria, discoveryRequest.DiscoveryCriteria);
@@ -106,7 +105,7 @@ public class TestPlatformTests
     {
         TestPlatform tp = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => tp.CreateDiscoveryRequest(_mockRequestData.Object, null, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>()));
+        Assert.ThrowsException<ArgumentNullException>(() => tp.CreateDiscoveryRequest(_mockRequestData.Object, null!, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
     [TestMethod]
@@ -150,16 +149,16 @@ public class TestPlatformTests
 
         var temp = Path.GetTempPath();
         var testRunCriteria = new TestRunCriteria(new List<string> { $@"{temp}foo.dll" }, 10, false, settingsXml, TimeSpan.Zero);
-        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
-            .Returns(testRunCriteria.Sources);
+        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources!))
+            .Returns(testRunCriteria.Sources!);
 
-        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_executionManager.Object);
+        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_executionManager.Object);
         _testEngine.Setup(te => te.GetExtensionManager()).Returns(_extensionManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
 
         var tp = new TestableTestPlatform(_testEngine.Object, _mockFileHelper.Object, _hostManager.Object);
 
-        var testRunRequest = tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>());
+        var testRunRequest = tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>());
         _extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
     }
 
@@ -182,13 +181,13 @@ public class TestPlatformTests
 
         var testRunCriteria = new TestRunCriteria(new List<TestCase> { new TestCase("dll1.class1.test1", new Uri("hello://x/"), $"xyz{Path.DirectorySeparatorChar}1.dll") }, 10, false, settingsXml);
 
-        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_executionManager.Object);
+        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_executionManager.Object);
         _testEngine.Setup(te => te.GetExtensionManager()).Returns(_extensionManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
 
         var tp = new TestableTestPlatform(_testEngine.Object, _mockFileHelper.Object, _hostManager.Object);
 
-        var testRunRequest = tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>());
+        var testRunRequest = tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>());
         _extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
     }
 
@@ -213,13 +212,13 @@ public class TestPlatformTests
         _hostManager.Setup(hm => hm.GetTestSources(It.IsAny<IEnumerable<string>>()))
             .Returns(new List<string> { $"xyz{Path.DirectorySeparatorChar}1.dll" });
 
-        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_executionManager.Object);
+        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_executionManager.Object);
         _testEngine.Setup(te => te.GetExtensionManager()).Returns(_extensionManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
 
         var tp = new TestableTestPlatform(_testEngine.Object, _mockFileHelper.Object, _hostManager.Object);
 
-        tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>());
+        tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>());
         _extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
         _hostManager.Verify(hm => hm.GetTestSources(It.IsAny<IEnumerable<string>>()), Times.Never);
     }
@@ -228,16 +227,16 @@ public class TestPlatformTests
     public void CreateTestRunRequestShouldInitializeManagersAndCreateTestRunRequestWithSpecifiedCriteria()
     {
         _executionManager.Setup(dm => dm.Initialize(false)).Verifiable();
-        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_executionManager.Object);
+        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_executionManager.Object);
         _testEngine.Setup(te => te.GetExtensionManager()).Returns(_extensionManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
 
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
         var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10);
-        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
-            .Returns(testRunCriteria.Sources);
+        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources!))
+            .Returns(testRunCriteria.Sources!);
 
-        var testRunRequest = tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>());
+        var testRunRequest = tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>());
 
         var actualTestRunRequest = testRunRequest as TestRunRequest;
 
@@ -284,7 +283,7 @@ public class TestPlatformTests
     {
         var tp = new TestPlatform();
 
-        Assert.ThrowsException<ArgumentNullException>(() => tp.CreateTestRunRequest(_mockRequestData.Object, null, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>()));
+        Assert.ThrowsException<ArgumentNullException>(() => tp.CreateTestRunRequest(_mockRequestData.Object, null!, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
     /// <summary>
@@ -312,13 +311,13 @@ public class TestPlatformTests
         _hostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources))
             .Returns(discoveryCriteria.Sources);
 
-        _testEngine.Setup(te => te.GetDiscoveryManager(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_discoveryManager.Object);
+        _testEngine.Setup(te => te.GetDiscoveryManager(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_discoveryManager.Object);
         _testEngine.Setup(te => te.GetExtensionManager()).Returns(_extensionManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
         var tp = new TestableTestPlatform(_testEngine.Object, _mockFileHelper.Object, _hostManager.Object);
 
         // Action
-        var discoveryRequest = tp.CreateDiscoveryRequest(_mockRequestData.Object, discoveryCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>());
+        var discoveryRequest = tp.CreateDiscoveryRequest(_mockRequestData.Object, discoveryCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>());
 
         // Verify
         _extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
@@ -330,7 +329,7 @@ public class TestPlatformTests
     [TestMethod]
     public void CreateTestRunRequestShouldInitializeLoggerManagerForDesignMode()
     {
-        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_executionManager.Object);
+        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_executionManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
 
         string settingsXml =
@@ -343,7 +342,7 @@ public class TestPlatformTests
         var testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, settingsXml);
 
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
-        tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>());
+        tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>());
 
         _loggerManager.Verify(lm => lm.Initialize(settingsXml));
     }
@@ -354,7 +353,7 @@ public class TestPlatformTests
     [TestMethod]
     public void CreateDiscoveryRequestShouldInitializeLoggerManagerForDesignMode()
     {
-        _testEngine.Setup(te => te.GetDiscoveryManager(_mockRequestData.Object, It.IsAny<DiscoveryCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_discoveryManager.Object);
+        _testEngine.Setup(te => te.GetDiscoveryManager(_mockRequestData.Object, It.IsAny<DiscoveryCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_discoveryManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
 
         string settingsXml =
@@ -367,7 +366,7 @@ public class TestPlatformTests
         var discoveryCriteria = new DiscoveryCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, settingsXml);
 
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
-        tp.CreateDiscoveryRequest(_mockRequestData.Object, discoveryCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>());
+        tp.CreateDiscoveryRequest(_mockRequestData.Object, discoveryCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>());
 
         _loggerManager.Verify(lm => lm.Initialize(settingsXml));
     }
@@ -378,7 +377,7 @@ public class TestPlatformTests
     [TestMethod]
     public void CreateTestRunRequestShouldInitializeLoggerManagerForNonDesignMode()
     {
-        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_executionManager.Object);
+        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_executionManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
 
         string settingsXml =
@@ -391,7 +390,7 @@ public class TestPlatformTests
         var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10, false, settingsXml);
 
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
-        tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>());
+        tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>());
 
         _loggerManager.Verify(lm => lm.Initialize(settingsXml));
     }
@@ -402,7 +401,7 @@ public class TestPlatformTests
     [TestMethod]
     public void CreateDiscoveryRequestShouldInitializeLoggerManagerForNonDesignMode()
     {
-        _testEngine.Setup(te => te.GetDiscoveryManager(_mockRequestData.Object, It.IsAny<DiscoveryCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_discoveryManager.Object);
+        _testEngine.Setup(te => te.GetDiscoveryManager(_mockRequestData.Object, It.IsAny<DiscoveryCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_discoveryManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
 
         string settingsXml =
@@ -415,7 +414,7 @@ public class TestPlatformTests
         var discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 10, settingsXml);
 
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
-        tp.CreateDiscoveryRequest(_mockRequestData.Object, discoveryCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>());
+        tp.CreateDiscoveryRequest(_mockRequestData.Object, discoveryCriteria, new TestPlatformOptions(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>());
 
         _loggerManager.Verify(lm => lm.Initialize(settingsXml));
     }
@@ -428,9 +427,10 @@ public class TestPlatformTests
         Assert.ThrowsException<ArgumentNullException>(() =>
             tp.StartTestSession(
                 new Mock<IRequestData>().Object,
-                null,
+                null!,
                 new Mock<ITestSessionEventsHandler>().Object,
-                new Dictionary<string, SourceDetail>()));
+                new Dictionary<string, SourceDetail>(),
+                new Mock<IWarningLogger>().Object));
     }
 
     [TestMethod]
@@ -453,7 +453,7 @@ public class TestPlatformTests
                 new Mock<IRequestData>().Object,
                 testSessionCriteria,
                 new Mock<ITestSessionEventsHandler>().Object,
-                It.IsAny<Dictionary<string, SourceDetail>>()));
+                It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
     [TestMethod]
@@ -463,7 +463,7 @@ public class TestPlatformTests
                 te => te.GetTestSessionManager(
                     It.IsAny<IRequestData>(),
                     It.IsAny<StartTestSessionCriteria>(),
-                    It.IsAny<Dictionary<string, SourceDetail>>()))
+                    It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Returns((IProxyTestSessionManager)null!);
 
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
@@ -493,7 +493,7 @@ public class TestPlatformTests
                 new Mock<IRequestData>().Object,
                 testSessionCriteria,
                 mockEventsHandler.Object,
-                It.IsAny<Dictionary<string, SourceDetail>>()));
+                It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
 
         mockEventsHandler.Verify(
             eh => eh.HandleStartTestSessionComplete(It.IsAny<StartTestSessionCompleteEventArgs>()),
@@ -527,7 +527,7 @@ public class TestPlatformTests
                 te => te.GetTestSessionManager(
                     It.IsAny<IRequestData>(),
                     It.IsAny<StartTestSessionCriteria>(),
-                    It.IsAny<Dictionary<string, SourceDetail>>()))
+                    It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Returns(mockTestSessionManager.Object);
 
         Assert.IsTrue(
@@ -535,7 +535,7 @@ public class TestPlatformTests
                 new Mock<IRequestData>().Object,
                 testSessionCriteria,
                 mockEventsHandler.Object,
-                It.IsAny<Dictionary<string, SourceDetail>>()));
+                It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
 
         mockTestSessionManager.Verify(
             tsm => tsm.StartSession(mockEventsHandler.Object, It.IsAny<IRequestData>()),
@@ -569,7 +569,7 @@ public class TestPlatformTests
                 te => te.GetTestSessionManager(
                     It.IsAny<IRequestData>(),
                     It.IsAny<StartTestSessionCriteria>(),
-                    It.IsAny<Dictionary<string, SourceDetail>>()))
+                    It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Returns(mockTestSessionManager.Object);
 
         Assert.IsFalse(
@@ -577,7 +577,7 @@ public class TestPlatformTests
                 mockRequestData.Object,
                 testSessionCriteria,
                 mockEventsHandler.Object,
-                It.IsAny<Dictionary<string, SourceDetail>>()));
+                It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
 
         mockTestSessionManager.Verify(
             tsm => tsm.StartSession(mockEventsHandler.Object, mockRequestData.Object),
@@ -591,27 +591,27 @@ public class TestPlatformTests
         _hostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources))
             .Returns(discoveryCriteria.Sources);
 
-        _testEngine.Setup(te => te.GetDiscoveryManager(_mockRequestData.Object, It.IsAny<DiscoveryCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_discoveryManager.Object);
+        _testEngine.Setup(te => te.GetDiscoveryManager(_mockRequestData.Object, It.IsAny<DiscoveryCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_discoveryManager.Object);
         _testEngine.Setup(te => te.GetExtensionManager()).Returns(_extensionManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
 
-        tp.CreateDiscoveryRequest(_mockRequestData.Object, discoveryCriteria, options, new Dictionary<string, SourceDetail>());
+        tp.CreateDiscoveryRequest(_mockRequestData.Object, discoveryCriteria, options, new Dictionary<string, SourceDetail>(), new Mock<IWarningLogger>().Object);
     }
 
     private void InvokeCreateTestRunRequest(TestPlatformOptions? options = null)
     {
         _executionManager.Setup(dm => dm.Initialize(false)).Verifiable();
-        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>())).Returns(_executionManager.Object);
+        _testEngine.Setup(te => te.GetExecutionManager(_mockRequestData.Object, It.IsAny<TestRunCriteria>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(_executionManager.Object);
         _testEngine.Setup(te => te.GetExtensionManager()).Returns(_extensionManager.Object);
         _testEngine.Setup(te => te.GetLoggerManager(_mockRequestData.Object)).Returns(_loggerManager.Object);
 
         var tp = new TestableTestPlatform(_testEngine.Object, _hostManager.Object);
         var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10);
-        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
-            .Returns(testRunCriteria.Sources);
+        _hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources!))
+            .Returns(testRunCriteria.Sources!);
 
-        tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, options, new Dictionary<string, SourceDetail>());
+        tp.CreateTestRunRequest(_mockRequestData.Object, testRunCriteria, options, new Dictionary<string, SourceDetail>(), new Mock<IWarningLogger>().Object);
     }
 
     private class TestableTestPlatform : TestPlatform
@@ -637,7 +637,7 @@ public class TestPlatformTests
             _hostProvider = hostProvider;
         }
 
-        public override ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration, List<string> _)
+        public override ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string? runConfiguration, List<string>? _)
         {
             return _hostProvider;
         }

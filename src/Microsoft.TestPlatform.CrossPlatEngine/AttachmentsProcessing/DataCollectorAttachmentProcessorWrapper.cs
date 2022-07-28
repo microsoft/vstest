@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
 /// It tries to load the extension and it receives calls from the DataCollectorAttachmentProcessorAppDomain that
 /// acts as a proxy for the main AppDomain(the runner one).
 /// </summary>
-internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObject
+internal sealed class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObject, IDisposable
 {
     private readonly AnonymousPipeServerStream _pipeServerStream = new(PipeDirection.Out, HandleInheritability.None);
     private readonly object _pipeClientLock = new();
@@ -45,9 +45,9 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
 
     public bool HasAttachmentProcessor { get; private set; }
 
-    public DataCollectorAttachmentProcessorRemoteWrapper(string pipeShutdownMessagePrefix!!)
+    public DataCollectorAttachmentProcessorRemoteWrapper(string pipeShutdownMessagePrefix)
     {
-        _pipeShutdownMessagePrefix = pipeShutdownMessagePrefix;
+        _pipeShutdownMessagePrefix = pipeShutdownMessagePrefix ?? throw new ArgumentNullException(nameof(pipeShutdownMessagePrefix));
     }
 
     public string GetClientHandleAsString() => _pipeServerStream.GetClientHandleAsString();
@@ -62,7 +62,7 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
     {
         var doc = new XmlDocument();
         doc.LoadXml(configurationElement);
-        AttachmentSet[] attachmentSets = JsonDataSerializer.Instance.Deserialize<AttachmentSet[]>(attachments);
+        AttachmentSet[] attachmentSets = JsonDataSerializer.Instance.Deserialize<AttachmentSet[]>(attachments)!;
         SynchronousProgress progress = new(Report);
         _processAttachmentCts = new CancellationTokenSource();
 
@@ -85,13 +85,14 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
     {
         var dataCollectorExtensionManager = DataCollectorExtensionManager.Create(filePath, true, new MessageLogger(this, nameof(LoadExtension)));
         var dataCollectorExtension = dataCollectorExtensionManager.TryGetTestExtension(dataCollectorUri);
-        if (dataCollectorExtension is null || dataCollectorExtension?.Metadata.HasAttachmentProcessor == false)
+        if (dataCollectorExtension is null || dataCollectorExtension.Metadata.HasAttachmentProcessor == false)
         {
             TraceInfo($"DataCollectorAttachmentsProcessorsFactory: DataCollectorExtension not found for uri '{dataCollectorUri}'");
             return false;
         }
 
-        Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension!.TestPluginInfo).AttachmentsProcessorType;
+        TPDebug.Assert(dataCollectorExtension.TestPluginInfo is not null, "dataCollectorExtension.TestPluginInfo is null");
+        Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension.TestPluginInfo).AttachmentsProcessorType!;
         try
         {
             _dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);
@@ -156,10 +157,10 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
         private readonly string _name;
         private readonly DataCollectorAttachmentProcessorRemoteWrapper _wrapper;
 
-        public MessageLogger(DataCollectorAttachmentProcessorRemoteWrapper wrapper!!, string name!!)
+        public MessageLogger(DataCollectorAttachmentProcessorRemoteWrapper wrapper, string name)
         {
-            _wrapper = wrapper;
-            _name = name;
+            _wrapper = wrapper ?? throw new ArgumentNullException(nameof(wrapper));
+            _name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
         public void SendMessage(TestMessageLevel testMessageLevel, string message)
@@ -170,7 +171,7 @@ internal class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByRefObjec
     {
         private readonly Action<int> _report;
 
-        public SynchronousProgress(Action<int> report!!) => _report = report;
+        public SynchronousProgress(Action<int> report) => _report = report ?? throw new ArgumentNullException(nameof(report));
 
         public void Report(int value) => _report(value);
     }

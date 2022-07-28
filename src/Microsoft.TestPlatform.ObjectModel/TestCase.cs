@@ -7,9 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -21,7 +20,7 @@ public sealed class TestCase : TestObject
 {
     private Guid _defaultId = Guid.Empty;
     private Guid _id;
-    private string _displayName;
+    private string? _displayName;
     private string _fullyQualifiedName;
     private string _source;
 
@@ -29,8 +28,11 @@ public sealed class TestCase : TestObject
     /// Initializes a new instance of the <see cref="TestCase"/> class.
     /// </summary>
     /// <remarks>This constructor doesn't perform any parameter validation, it is meant to be used for serialization."/></remarks>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public TestCase()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
+        // TODO: Make private
         // Default constructor for Serialization.
     }
 
@@ -46,21 +48,22 @@ public sealed class TestCase : TestObject
     /// <param name="source">
     /// Test container source from which the test is discovered.
     /// </param>
-    public TestCase(string fullyQualifiedName, Uri executorUri!!, string source)
+    public TestCase(string fullyQualifiedName, Uri executorUri, string source)
     {
         ValidateArg.NotNullOrEmpty(fullyQualifiedName, nameof(fullyQualifiedName));
         ValidateArg.NotNullOrEmpty(source, nameof(source));
 
-        FullyQualifiedName = fullyQualifiedName;
-        ExecutorUri = executorUri;
-        Source = source;
+        _fullyQualifiedName = fullyQualifiedName;
+        ExecutorUri = executorUri ?? throw new ArgumentNullException(nameof(executorUri));
+        _source = source;
         LineNumber = -1;
+        _defaultId = Guid.Empty;
     }
     /// <summary>
     /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
     /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
     /// </summary>
-    public object LocalExtensionData { get; set; }
+    public object? LocalExtensionData { get; set; }
 
     /// <summary>
     /// Gets or sets the id of the test case.
@@ -83,10 +86,7 @@ public sealed class TestCase : TestObject
             return _id;
         }
 
-        set
-        {
-            _id = value;
-        }
+        set => _id = value;
     }
 
     /// <summary>
@@ -107,14 +107,8 @@ public sealed class TestCase : TestObject
     [DataMember]
     public string DisplayName
     {
-        get
-        {
-            return string.IsNullOrEmpty(_displayName) ? GetFullyQualifiedName() : _displayName;
-        }
-        set
-        {
-            _displayName = value;
-        }
+        get => _displayName.IsNullOrEmpty() ? GetFullyQualifiedName() : _displayName;
+        set => _displayName = value;
     }
 
     /// <summary>
@@ -132,10 +126,7 @@ public sealed class TestCase : TestObject
     [DataMember]
     public string Source
     {
-        get
-        {
-            return _source;
-        }
+        get => _source;
         set
         {
             _source = value;
@@ -149,7 +140,7 @@ public sealed class TestCase : TestObject
     /// Gets or sets the source code file path of the test.
     /// </summary>
     [DataMember]
-    public string CodeFilePath
+    public string? CodeFilePath
     {
         get; set;
     }
@@ -228,8 +219,9 @@ public sealed class TestCase : TestObject
     /// Return TestProperty's value
     /// </summary>
     /// <returns></returns>
-    protected override object ProtectedGetPropertyValue(TestProperty property!!, object defaultValue)
+    protected override object? ProtectedGetPropertyValue(TestProperty property, object? defaultValue)
     {
+        ValidateArg.NotNull(property, nameof(property));
         return property.Id switch
         {
             "TestCase.CodeFilePath" => CodeFilePath,
@@ -247,8 +239,9 @@ public sealed class TestCase : TestObject
     /// <summary>
     /// Set TestProperty's value
     /// </summary>
-    protected override void ProtectedSetPropertyValue(TestProperty property!!, object value)
+    protected override void ProtectedSetPropertyValue(TestProperty property, object? value)
     {
+        ValidateArg.NotNull(property, nameof(property));
         switch (property.Id)
         {
             case "TestCase.CodeFilePath":
@@ -256,27 +249,27 @@ public sealed class TestCase : TestObject
                 return;
 
             case "TestCase.DisplayName":
-                DisplayName = value as string;
+                DisplayName = (value as string)!;
                 return;
 
             case "TestCase.ExecutorUri":
-                ExecutorUri = value as Uri ?? new Uri(value as string);
+                ExecutorUri = value as Uri ?? new Uri((value as string)!);
                 return;
 
             case "TestCase.FullyQualifiedName":
-                FullyQualifiedName = value as string;
+                FullyQualifiedName = (value as string)!;
                 return;
 
             case "TestCase.Id":
-                Id = value is Guid guid ? guid : Guid.Parse(value as string);
+                Id = value is Guid guid ? guid : Guid.Parse((value as string)!);
                 return;
 
             case "TestCase.LineNumber":
-                LineNumber = (int)value;
+                LineNumber = (int)value!;
                 return;
 
             case "TestCase.Source":
-                Source = value as string;
+                Source = (value as string)!;
                 return;
         }
 
@@ -284,18 +277,18 @@ public sealed class TestCase : TestObject
         base.ProtectedSetPropertyValue(property, value);
     }
 
-    private static readonly TestProperty ManagedTypeProperty = TestProperty.Register("TestCase.ManagedType", "ManagedType", string.Empty, string.Empty, typeof(string), o => !string.IsNullOrWhiteSpace(o as string), TestPropertyAttributes.Hidden, typeof(TestCase));
-    private static readonly TestProperty ManagedMethodProperty = TestProperty.Register("TestCase.ManagedMethod", "ManagedMethod", string.Empty, string.Empty, typeof(string), o => !string.IsNullOrWhiteSpace(o as string), TestPropertyAttributes.Hidden, typeof(TestCase));
+    private static readonly TestProperty ManagedTypeProperty = TestProperty.Register("TestCase.ManagedType", "ManagedType", string.Empty, string.Empty, typeof(string), o => !StringUtils.IsNullOrWhiteSpace(o as string), TestPropertyAttributes.Hidden, typeof(TestCase));
+    private static readonly TestProperty ManagedMethodProperty = TestProperty.Register("TestCase.ManagedMethod", "ManagedMethod", string.Empty, string.Empty, typeof(string), o => !StringUtils.IsNullOrWhiteSpace(o as string), TestPropertyAttributes.Hidden, typeof(TestCase));
 
-    private bool ContainsManagedMethodAndType => !string.IsNullOrWhiteSpace(ManagedMethod) && !string.IsNullOrWhiteSpace(ManagedType);
+    private bool ContainsManagedMethodAndType => !StringUtils.IsNullOrWhiteSpace(ManagedMethod) && !StringUtils.IsNullOrWhiteSpace(ManagedType);
 
-    private string ManagedType
+    private string? ManagedType
     {
         get => GetPropertyValue<string>(ManagedTypeProperty, null);
         set => SetPropertyAndResetId(ManagedTypeProperty, value);
     }
 
-    private string ManagedMethod
+    private string? ManagedMethod
     {
         get => GetPropertyValue<string>(ManagedMethodProperty, null);
         set => SetPropertyAndResetId(ManagedMethodProperty, value);
@@ -343,32 +336,34 @@ public static class TestCaseProperties
         Source
     };
 
-    private static bool ValidateName(object value)
+    private static bool ValidateName(object? value)
     {
-        return !string.IsNullOrWhiteSpace((string)value);
+        return !StringUtils.IsNullOrWhiteSpace((string?)value);
     }
 
-    private static bool ValidateDisplay(object value)
+    private static bool ValidateDisplay(object? value)
     {
         // only check for null and pass the rest up to UI for validation
         return value != null;
     }
 
-    private static bool ValidateExecutorUri(object value)
+    private static bool ValidateExecutorUri(object? value)
     {
         return value != null;
     }
 
-    private static bool ValidateGuid(object value)
+    private static bool ValidateGuid(object? value)
     {
-        try
-        {
-            _ = new Guid(value.ToString());
-            return true;
-        }
-        catch (ArgumentNullException)
+        if (value?.ToString() is not string sValue)
         {
             return false;
+        }
+
+        // TODO: Replace with TryParse?
+        try
+        {
+            _ = new Guid(sValue);
+            return true;
         }
         catch (FormatException)
         {

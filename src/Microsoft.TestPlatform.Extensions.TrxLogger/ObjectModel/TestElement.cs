@@ -2,16 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 using System.Globalization;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
@@ -40,10 +37,18 @@ internal abstract class TestElement : ITestElement, IXmlTestStore
 
     public TestElement(Guid id, string name, string adapter)
     {
-        Debug.Assert(!string.IsNullOrEmpty(name), "name is null");
-        Debug.Assert(!string.IsNullOrEmpty(adapter), "adapter is null");
+        TPDebug.Assert(!name.IsNullOrEmpty(), "name is null");
+        TPDebug.Assert(!adapter.IsNullOrEmpty(), "adapter is null");
 
-        Initialize();
+        _owner = string.Empty;
+        _priority = DefaultPriority;
+        _storage = string.Empty;
+        _executionId = TestExecId.Empty;
+        _parentExecutionId = TestExecId.Empty;
+        _testCategories = new TestCategoryItemCollection();
+        _workItems = new WorkItemCollection();
+        _isRunnable = true;
+        _catId = TestListCategoryId.Uncategorized;
 
         _id = new TestId(id);
         _name = name;
@@ -215,7 +220,7 @@ internal abstract class TestElement : ITestElement, IXmlTestStore
     /// <returns>
     /// The <see cref="bool"/>.
     /// </returns>
-    public override bool Equals(object other)
+    public override bool Equals(object? other)
     {
         return other is TestElement otherTest && _id.Equals(otherTest._id);
     }
@@ -231,7 +236,7 @@ internal abstract class TestElement : ITestElement, IXmlTestStore
         return _id.GetHashCode();
     }
 
-    public virtual void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
+    public virtual void Save(System.Xml.XmlElement element, XmlTestStoreParameters? parameters)
     {
         XmlPersistence h = new();
 
@@ -250,21 +255,6 @@ internal abstract class TestElement : ITestElement, IXmlTestStore
 
         XmlTestStoreParameters testIdParameters = XmlTestStoreParameters.GetParameters();
         testIdParameters[TestId.IdLocationKey] = "@id";
-        h.SaveObject(_id, element, testIdParameters);
-    }
-
-    private void Initialize()
-    {
-        _id = TestId.Empty;
-        _name = string.Empty;
-        _owner = string.Empty;
-        _priority = DefaultPriority;
-        _storage = string.Empty;
-        _executionId = TestExecId.Empty;
-        _parentExecutionId = TestExecId.Empty;
-        _testCategories = new TestCategoryItemCollection();
-        _workItems = new WorkItemCollection();
-        _isRunnable = true;
-        _catId = TestListCategoryId.Uncategorized;
+        XmlPersistence.SaveObject(_id, element, testIdParameters);
     }
 }

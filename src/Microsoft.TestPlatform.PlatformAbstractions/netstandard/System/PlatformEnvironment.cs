@@ -7,8 +7,6 @@ using System;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc />
@@ -40,6 +38,9 @@ public class PlatformEnvironment : IEnvironment
             throw new NotImplementedException();
         }
     }
+
+    /// <inheritdoc />
+    public int ProcessorCount => throw new NotImplementedException();
 
     /// <inheritdoc />
     public void Exit(int exitcode)

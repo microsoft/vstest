@@ -3,24 +3,23 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 internal class MsTestV1TelemetryHelper
 {
-    private static TestProperty s_testTypeProperty;
-    private static TestProperty s_extensionIdProperty;
+    private static TestProperty? s_testTypeProperty;
+    private static TestProperty? s_extensionIdProperty;
 
-    internal static bool IsMsTestV1Adapter(Uri executorUri)
+    internal static bool IsMsTestV1Adapter([NotNullWhen(true)] Uri? executorUri)
     {
-        return IsMsTestV1Adapter(executorUri.AbsoluteUri);
+        return IsMsTestV1Adapter(executorUri?.AbsoluteUri);
     }
 
-    internal static bool IsMsTestV1Adapter(string executorUri)
+    internal static bool IsMsTestV1Adapter([NotNullWhen(true)] string? executorUri)
     {
         return string.Equals(executorUri, "executor://mstestadapter/v1", StringComparison.OrdinalIgnoreCase);
     }
@@ -50,16 +49,16 @@ internal class MsTestV1TelemetryHelper
             // Get addional data from test result passed by MSTestv1
             // Only legacy tests have testtype.
 
-            var testType = testResult.GetPropertyValue(s_testTypeProperty, Guid.Empty);
+            var testType = testResult!.GetPropertyValue(s_testTypeProperty, Guid.Empty);
             var hasTestType = testType != Guid.Empty;
 
             string key;
             if (hasTestType)
             {
-                var testExtension = testResult.GetPropertyValue<string>(s_extensionIdProperty, null);
-                var hasExtension = !string.IsNullOrWhiteSpace(testExtension);
+                var testExtension = testResult.GetPropertyValue<string?>(s_extensionIdProperty, null);
+                var hasExtension = !testExtension.IsNullOrWhiteSpace();
 
-                if (hasExtension && testExtension.StartsWith("urn:"))
+                if (hasExtension && testExtension!.StartsWith("urn:"))
                 {
                     // remove urn: prefix
                     testExtension = testExtension.Remove(0, 4);

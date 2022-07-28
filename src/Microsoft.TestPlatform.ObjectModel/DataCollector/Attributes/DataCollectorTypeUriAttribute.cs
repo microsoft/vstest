@@ -3,14 +3,13 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Provides unique identification of a data collector in the form of a URI.
 /// Recommended format: 'datacollector://Company/Product/Version'
 /// </summary>
+[AttributeUsage(AttributeTargets.Class)]
 public class DataCollectorTypeUriAttribute : Attribute
 {
     /// <summary>

@@ -26,17 +26,17 @@ public class TestableRuntimeProvider : ITestRuntimeProvider
         Shared = shared;
     }
 
-    public event EventHandler<HostProviderEventArgs?>? HostLaunched;
+    public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
-    public event EventHandler<HostProviderEventArgs?>? HostExited;
+    public event EventHandler<HostProviderEventArgs>? HostExited;
 
     public bool Shared { get; }
 
-    public void Initialize(IMessageLogger logger, string runsettingsXml)
+    public void Initialize(IMessageLogger? logger, string runsettingsXml)
     {
     }
 
-    public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+    public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
     {
         return true;
     }
@@ -52,16 +52,16 @@ public class TestableRuntimeProvider : ITestRuntimeProvider
 
     public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
     {
-        HostLaunched?.Invoke(this, null);
+        HostLaunched?.Invoke(this, null!);
         return Task.FromResult(true);
     }
 
-    public TestProcessStartInfo? GetTestHostProcessStartInfo(
+    public TestProcessStartInfo GetTestHostProcessStartInfo(
         IEnumerable<string> sources,
-        IDictionary<string, string> environmentVariables,
+        IDictionary<string, string?>? environmentVariables,
         TestRunnerConnectionInfo connectionInfo)
     {
-        return default;
+        return default!;
     }
 
     public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)
@@ -76,7 +76,7 @@ public class TestableRuntimeProvider : ITestRuntimeProvider
 
     public Task CleanTestHostAsync(CancellationToken cancellationToken)
     {
-        HostExited?.Invoke(this, null);
+        HostExited?.Invoke(this, null!);
         return Task.FromResult(true);
     }
 }

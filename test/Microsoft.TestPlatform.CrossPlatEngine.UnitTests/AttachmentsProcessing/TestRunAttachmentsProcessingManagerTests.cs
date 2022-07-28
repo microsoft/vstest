@@ -343,8 +343,8 @@ public class TestRunAttachmentsProcessingManagerTests
             new AttachmentSet(new Uri(Uri2), "uri2_output")
         };
 
-        _mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(null, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(outputAttachmentsForHandler1);
-        _mockAttachmentHandler2.Setup(h => h.ProcessAttachmentSetsAsync(null, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(outputAttachmentsForHandler2);
+        _mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(null!, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(outputAttachmentsForHandler1);
+        _mockAttachmentHandler2.Setup(h => h.ProcessAttachmentSetsAsync(null!, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(outputAttachmentsForHandler2);
 
         // act
         await _manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, inputAttachments, Array.Empty<InvokedDataCollector>(), _mockEventsHandler.Object, _cancellationTokenSource.Token);
@@ -580,7 +580,7 @@ public class TestRunAttachmentsProcessingManagerTests
             }
         });
 
-        _mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(null, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
+        _mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(null!, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
             .Returns((XmlElement configurationElement, ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
             {
                 progress.Report(25);
@@ -591,7 +591,7 @@ public class TestRunAttachmentsProcessingManagerTests
                 return Task.FromResult(outputAttachments1);
             });
 
-        _mockAttachmentHandler2.Setup(h => h.ProcessAttachmentSetsAsync(null, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
+        _mockAttachmentHandler2.Setup(h => h.ProcessAttachmentSetsAsync(null!, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
             .Returns((XmlElement configurationElement, ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
             {
                 progress.Report(50);
@@ -666,7 +666,7 @@ public class TestRunAttachmentsProcessingManagerTests
 
         List<InvokedDataCollector> invokedDataCollectors = new()
         {
-            new InvokedDataCollector(new Uri(Uri1), withConfig ? "friendlyNameA" : "friendlyNameB", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false)
+            new InvokedDataCollector(new Uri(Uri1), withConfig ? "friendlyNameA" : "friendlyNameB", typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location, false)
         };
 
         string runSettingsXml =
@@ -878,7 +878,7 @@ public class TestRunAttachmentsProcessingManagerTests
     private void VerifyCompleteEvent(bool isCanceled, bool containsError, params AttachmentSet[] expectedSets)
     {
         _mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingComplete(
-            It.Is<TestRunAttachmentsProcessingCompleteEventArgs>(a => a.IsCanceled == isCanceled && (a.Error != null) == containsError),
+            It.Is<TestRunAttachmentsProcessingCompleteEventArgs>(a => a.IsCanceled == isCanceled && a.Error != null == containsError),
             It.Is<ICollection<AttachmentSet>>(c => c.Count == expectedSets.Length && expectedSets.All(e => c.Contains(e)))));
     }
 

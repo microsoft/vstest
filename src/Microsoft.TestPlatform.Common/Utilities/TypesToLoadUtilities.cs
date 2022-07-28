@@ -6,9 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
@@ -16,8 +15,9 @@ internal static class TypesToLoadUtilities
 {
     public const string TypesToLoadAttributeFullName = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesAttribute";
 
-    internal static IEnumerable<Type> GetTypesToLoad(Assembly assembly!!)
+    internal static IEnumerable<Type> GetTypesToLoad(Assembly assembly)
     {
+        ValidateArg.NotNull(assembly, nameof(assembly));
         var typesToLoad = assembly
             .GetCustomAttributes(TypesToLoadAttributeFullName)
             .SelectMany(i => GetTypesToLoad(i));
@@ -32,6 +32,7 @@ internal static class TypesToLoadUtilities
 
         var type = attribute.GetType();
         var typesProperty = type.GetProperty("Types");
-        return typesProperty == null ? Enumerable.Empty<Type>() : typesProperty.GetValue(attribute) as Type[];
+
+        return typesProperty?.GetValue(attribute) as Type[] ?? Enumerable.Empty<Type>();
     }
 }

@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 
@@ -12,9 +13,8 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
@@ -22,14 +22,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 /// Handles DataCollection attachments by calling DataCollection Process on Test Run Complete.
 /// Existing functionality of ITestRunEventsHandler is decorated with additional call to Data Collection Process.
 /// </summary>
-internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
+internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandler
 {
     private readonly IProxyDataCollectionManager _proxyDataCollectionManager;
-    private readonly ITestRunEventsHandler _testRunEventsHandler;
-    private CancellationToken _cancellationToken;
+    private readonly IInternalTestRunEventsHandler _testRunEventsHandler;
+    private readonly CancellationToken _cancellationToken;
     private readonly IDataSerializer _dataSerializer;
-    private Collection<AttachmentSet> _dataCollectionAttachmentSets;
-    private Collection<InvokedDataCollector> _invokedDataCollectors;
+
+    private Collection<AttachmentSet>? _dataCollectionAttachmentSets;
+    private Collection<InvokedDataCollector>? _invokedDataCollectors;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DataCollectionTestRunEventsHandler"/> class.
@@ -40,7 +41,7 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     /// <param name="proxyDataCollectionManager">
     /// The proxy Data Collection Manager.
     /// </param>
-    public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, CancellationToken cancellationToken)
+    public DataCollectionTestRunEventsHandler(IInternalTestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, CancellationToken cancellationToken)
         : this(baseTestRunEventsHandler, proxyDataCollectionManager, JsonDataSerializer.Instance, cancellationToken)
     {
     }
@@ -57,7 +58,7 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     /// <param name="dataSerializer">
     /// The data Serializer.
     /// </param>
-    public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, IDataSerializer dataSerializer, CancellationToken cancellationToken)
+    public DataCollectionTestRunEventsHandler(IInternalTestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, IDataSerializer dataSerializer, CancellationToken cancellationToken)
     {
         _proxyDataCollectionManager = proxyDataCollectionManager;
         _testRunEventsHandler = baseTestRunEventsHandler;
@@ -74,7 +75,7 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     /// <param name="message">
     /// The message.
     /// </param>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         _testRunEventsHandler.HandleLogMessage(level, message);
     }
@@ -101,7 +102,7 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
             if (_dataCollectionAttachmentSets != null && _dataCollectionAttachmentSets.Any())
             {
                 GetCombinedAttachmentSets(
-                    testRunCompletePayload.TestRunCompleteArgs.AttachmentSets,
+                    testRunCompletePayload?.TestRunCompleteArgs?.AttachmentSets,
                     _dataCollectionAttachmentSets);
             }
 
@@ -110,7 +111,7 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
             {
                 foreach (var dataCollector in _invokedDataCollectors)
                 {
-                    testRunCompletePayload.TestRunCompleteArgs.InvokedDataCollectors.Add(dataCollector);
+                    testRunCompletePayload?.TestRunCompleteArgs?.InvokedDataCollectors.Add(dataCollector);
                 }
             }
 
@@ -137,7 +138,7 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     /// <param name="executorUris">
     /// The executor uris.
     /// </param>
-    public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
+    public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris)
     {
         if (_dataCollectionAttachmentSets != null && _dataCollectionAttachmentSets.Any())
         {
@@ -163,7 +164,7 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     /// <param name="testRunChangedArgs">
     /// The test run changed args.
     /// </param>
-    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
     {
         _testRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
     }
@@ -180,9 +181,9 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     }
 
     /// <inheritdoc />
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
     {
-        return ((ITestRunEventsHandler2)_testRunEventsHandler).AttachDebuggerToProcess(pid);
+        return _testRunEventsHandler.AttachDebuggerToProcess(attachDebuggerInfo);
     }
 
     /// <summary>
@@ -197,7 +198,9 @@ internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     /// <returns>
     /// The <see cref="Collection"/>.
     /// </returns>
-    internal static ICollection<AttachmentSet> GetCombinedAttachmentSets(Collection<AttachmentSet> originalAttachmentSets, ICollection<AttachmentSet> newAttachments)
+    [return: NotNullIfNotNull("originalAttachmentSets")]
+    [return: NotNullIfNotNull("newAttachments")]
+    internal static ICollection<AttachmentSet>? GetCombinedAttachmentSets(Collection<AttachmentSet>? originalAttachmentSets, ICollection<AttachmentSet>? newAttachments)
     {
         if (newAttachments == null || newAttachments.Count == 0)
         {

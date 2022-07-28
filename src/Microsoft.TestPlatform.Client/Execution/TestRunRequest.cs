@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 
+using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -24,16 +26,14 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.Execution;
 
-public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
+public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 {
     /// <summary>
     /// Specifies whether the run is disposed or not
     /// </summary>
-    private bool _disposed;
+    private bool _isDisposed;
 
     /// <summary>
     /// Sync object for various operations
@@ -53,7 +53,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     /// <summary>
     /// Tracks the time taken by each run request
     /// </summary>
-    private Stopwatch _runRequestTimeTracker;
+    private readonly Stopwatch _runRequestTimeTracker = new();
 
     private readonly IDataSerializer _dataSerializer;
 
@@ -62,7 +62,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     /// </summary>
     private long _testSessionTimeout;
 
-    private Timer _timer;
+    private Timer? _timer;
 
     /// <summary>
     /// Execution Start Time
@@ -81,10 +81,10 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 
     internal TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager, ITestLoggerManager loggerManager, IDataSerializer dataSerializer)
     {
-        Debug.Assert(testRunCriteria != null, "Test run criteria cannot be null");
-        Debug.Assert(executionManager != null, "ExecutionManager cannot be null");
-        Debug.Assert(requestData != null, "request Data is null");
-        Debug.Assert(loggerManager != null, "LoggerManager cannot be null");
+        TPDebug.Assert(testRunCriteria != null, "Test run criteria cannot be null");
+        TPDebug.Assert(executionManager != null, "ExecutionManager cannot be null");
+        TPDebug.Assert(requestData != null, "request Data is null");
+        TPDebug.Assert(loggerManager != null, "LoggerManager cannot be null");
 
         EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Creating test run request.");
 
@@ -108,7 +108,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException("testRunRequest");
             }
@@ -147,10 +147,8 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                     _timer = new Timer(OnTestSessionTimeout, null, TimeSpan.FromMilliseconds(_testSessionTimeout), TimeSpan.FromMilliseconds(0));
                 }
 
-                _runRequestTimeTracker = new Stopwatch();
-
                 // Start the stop watch for calculating the test run time taken overall
-                _runRequestTimeTracker.Start();
+                _runRequestTimeTracker.Restart();
                 var testRunStartEvent = new TestRunStartEventArgs(TestRunCriteria);
                 LoggerManager.HandleTestRunStart(testRunStartEvent);
                 OnRunStart.SafeInvoke(this, testRunStartEvent, "TestRun.TestRunStart");
@@ -168,11 +166,11 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
         }
     }
 
-    internal void OnTestSessionTimeout(object obj)
+    internal void OnTestSessionTimeout(object? obj)
     {
         EqtTrace.Verbose("TestRunRequest.OnTestSessionTimeout: calling cancellation as test run exceeded testSessionTimeout {0} milliseconds", _testSessionTimeout);
 
-        string message = string.Format(ClientResources.TestSessionTimeoutMessage, _testSessionTimeout);
+        string message = string.Format(CultureInfo.CurrentCulture, ClientResources.TestSessionTimeoutMessage, _testSessionTimeout);
         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
         var rawMessage = _dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
 
@@ -188,7 +186,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     {
         EqtTrace.Verbose("TestRunRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
 
-        if (_disposed)
+        if (_isDisposed)
         {
             throw new ObjectDisposedException("testRunRequest");
         }
@@ -217,7 +215,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 
         lock (_cancelSyncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("Ignoring TestRunRequest.CancelAsync() as testRunRequest object has already been disposed.");
                 return;
@@ -246,7 +244,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 
         lock (_cancelSyncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("Ignoring TestRunRequest.Abort() as testRunRequest object has already been disposed");
                 return;
@@ -282,30 +280,30 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     /// <summary>
     /// Raised when the test run statistics change.
     /// </summary>
-    public event EventHandler<TestRunChangedEventArgs> OnRunStatsChange;
+    public event EventHandler<TestRunChangedEventArgs>? OnRunStatsChange;
 
     /// <summary>
     /// Raised when the test run starts.
     /// </summary>
-    public event EventHandler<TestRunStartEventArgs> OnRunStart;
+    public event EventHandler<TestRunStartEventArgs>? OnRunStart;
 
     /// <summary>
     /// Raised when the test message is received.
     /// </summary>
-    public event EventHandler<TestRunMessageEventArgs> TestRunMessage;
+    public event EventHandler<TestRunMessageEventArgs>? TestRunMessage;
 
 
     /// <summary>
     /// Raised when the test run completes.
     /// </summary>
-    public event EventHandler<TestRunCompleteEventArgs> OnRunCompletion;
+    public event EventHandler<TestRunCompleteEventArgs>? OnRunCompletion;
 
 
     /// <summary>
     /// Raised when data collection message is received.
     /// </summary>
 #pragma warning disable 67
-    public event EventHandler<DataCollectionMessageEventArgs> DataCollectionMessage;
+    public event EventHandler<DataCollectionMessageEventArgs>? DataCollectionMessage;
 #pragma warning restore 67
 
     /// <summary>
@@ -313,7 +311,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     ///  This is required if one wants to re-direct the message over the process boundary without any processing overhead
     ///  All the run events should come as raw messages as well as proper serialized events like OnRunStatsChange
     /// </summary>
-    public event EventHandler<string> OnRawMessageReceived;
+    public event EventHandler<string>? OnRawMessageReceived;
 
     /// <summary>
     /// Parent execution manager
@@ -355,8 +353,10 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     /// <summary>
     /// Invoked when test run is complete
     /// </summary>
-    public void HandleTestRunComplete(TestRunCompleteEventArgs runCompleteArgs!!, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
+    public void HandleTestRunComplete(TestRunCompleteEventArgs runCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris)
     {
+        ValidateArg.NotNull(runCompleteArgs, nameof(runCompleteArgs));
+
         bool isAborted = runCompleteArgs.IsAborted;
         bool isCanceled = runCompleteArgs.IsCanceled;
 
@@ -365,7 +365,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
         lock (_syncObject)
         {
             // If this object is disposed, don't do anything
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("TestRunRequest.TestRunComplete: Ignoring as the object is disposed.");
                 return;
@@ -414,7 +414,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 if (_requestData.IsTelemetryOptedIn)
                 {
                     TestExtensions.AddExtensionTelemetry(
-                        runCompleteArgs.Metrics,
+                        runCompleteArgs.Metrics!,
                         runCompleteArgs.DiscoveredExtensions);
                 }
 
@@ -426,14 +426,11 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
             }
             finally
             {
-                if (isCanceled)
-                {
-                    State = TestRunState.Canceled;
-                }
-                else
-                {
-                    State = isAborted ? TestRunState.Aborted : TestRunState.Completed;
-                }
+                State = isCanceled
+                    ? TestRunState.Canceled
+                    : isAborted
+                        ? TestRunState.Aborted
+                        : TestRunState.Completed;
 
                 // Notify the waiting handle that run is complete
                 _runCompletionEvent.Set();
@@ -461,59 +458,61 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     /// <summary>
     /// Invoked when test run statistics change.
     /// </summary>
-    public virtual void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    public virtual void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
     {
-        if (testRunChangedArgs != null)
+        if (testRunChangedArgs == null)
         {
-            EqtTrace.Verbose("TestRunRequest:SendTestRunStatsChange: Starting.");
-            if (testRunChangedArgs.ActiveTests != null)
-            {
-                // Do verbose check to save performance in iterating test cases
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    foreach (TestCase testCase in testRunChangedArgs.ActiveTests)
-                    {
-                        EqtTrace.Verbose("InProgress is {0}", testCase.DisplayName);
-                    }
-                }
-            }
-
-            lock (_syncObject)
-            {
-                // If this object is disposed, don't do anything
-                if (_disposed)
-                {
-                    EqtTrace.Warning("TestRunRequest.SendTestRunStatsChange: Ignoring as the object is disposed.");
-                    return;
-                }
-
-                // TODO: Invoke this event in a separate thread.
-                // For now, I am setting the ConcurrencyMode on the callback attribute to Multiple
-                LoggerManager.HandleTestRunStatsChange(testRunChangedArgs);
-                OnRunStatsChange.SafeInvoke(this, testRunChangedArgs, "TestRun.RunStatsChanged");
-            }
-
-            EqtTrace.Info("TestRunRequest:SendTestRunStatsChange: Completed.");
+            return;
         }
+
+        EqtTrace.Verbose("TestRunRequest:SendTestRunStatsChange: Starting.");
+        if (testRunChangedArgs.ActiveTests != null)
+        {
+            // Do verbose check to save performance in iterating test cases
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                foreach (TestCase testCase in testRunChangedArgs.ActiveTests)
+                {
+                    EqtTrace.Verbose("InProgress is {0}", testCase.DisplayName);
+                }
+            }
+        }
+
+        lock (_syncObject)
+        {
+            // If this object is disposed, don't do anything
+            if (_isDisposed)
+            {
+                EqtTrace.Warning("TestRunRequest.SendTestRunStatsChange: Ignoring as the object is disposed.");
+                return;
+            }
+
+            // TODO: Invoke this event in a separate thread.
+            // For now, I am setting the ConcurrencyMode on the callback attribute to Multiple
+            LoggerManager.HandleTestRunStatsChange(testRunChangedArgs);
+            OnRunStatsChange.SafeInvoke(this, testRunChangedArgs, "TestRun.RunStatsChanged");
+        }
+
+        EqtTrace.Info("TestRunRequest:SendTestRunStatsChange: Completed.");
     }
 
     /// <summary>
     /// Invoked when log messages are received
     /// </summary>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         EqtTrace.Verbose("TestRunRequest:SendTestRunMessage: Starting.");
 
         lock (_syncObject)
         {
             // If this object is disposed, don't do anything
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("TestRunRequest.SendTestRunMessage: Ignoring as the object is disposed.");
                 return;
             }
 
-            var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
+            var testRunMessageEvent = new TestRunMessageEventArgs(level, message!);
             LoggerManager.HandleTestRunMessage(testRunMessageEvent);
             TestRunMessage.SafeInvoke(this, testRunMessageEvent, "TestRun.LogMessages");
         }
@@ -532,7 +531,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
         var message = LoggerManager.LoggersInitialized || _requestData.IsTelemetryOptedIn ?
             _dataSerializer.DeserializeMessage(rawMessage) : null;
 
-        if (string.Equals(message?.MessageType, MessageType.ExecutionComplete))
+        if (MessageType.ExecutionComplete.Equals(message?.MessageType))
         {
             var testRunCompletePayload = _dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
             rawMessage = UpdateRawMessageWithTelemetryInfo(testRunCompletePayload, message) ?? rawMessage;
@@ -546,30 +545,32 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     /// Handles LoggerManager's TestRunComplete.
     /// </summary>
     /// <param name="testRunCompletePayload">TestRun complete payload.</param>
-    private void HandleLoggerManagerTestRunComplete(TestRunCompletePayload testRunCompletePayload)
+    private void HandleLoggerManagerTestRunComplete(TestRunCompletePayload? testRunCompletePayload)
     {
-        if (LoggerManager.LoggersInitialized && testRunCompletePayload != null)
+        if (!LoggerManager.LoggersInitialized || testRunCompletePayload == null)
         {
-            // Send last chunk to logger manager.
-            if (testRunCompletePayload.LastRunTests != null)
-            {
-                LoggerManager.HandleTestRunStatsChange(testRunCompletePayload.LastRunTests);
-            }
-
-            // Note: In HandleRawMessage attachments are considered from TestRunCompleteArgs, while in HandleTestRunComplete attachments are considered directly from testRunCompletePayload.
-            // Ideally we should have attachmentSets at one place only.
-            // Send test run complete to logger manager.
-            TestRunCompleteEventArgs testRunCompleteArgs =
-                new(
-                    testRunCompletePayload.TestRunCompleteArgs.TestRunStatistics,
-                    testRunCompletePayload.TestRunCompleteArgs.IsCanceled,
-                    testRunCompletePayload.TestRunCompleteArgs.IsAborted,
-                    testRunCompletePayload.TestRunCompleteArgs.Error,
-                    testRunCompletePayload.TestRunCompleteArgs.AttachmentSets,
-                    testRunCompletePayload.TestRunCompleteArgs.InvokedDataCollectors,
-                    _runRequestTimeTracker.Elapsed);
-            LoggerManager.HandleTestRunComplete(testRunCompleteArgs);
+            return;
         }
+
+        // Send last chunk to logger manager.
+        if (testRunCompletePayload.LastRunTests != null)
+        {
+            LoggerManager.HandleTestRunStatsChange(testRunCompletePayload.LastRunTests);
+        }
+
+        // Note: In HandleRawMessage attachments are considered from TestRunCompleteArgs, while in HandleTestRunComplete attachments are considered directly from testRunCompletePayload.
+        // Ideally we should have attachmentSets at one place only.
+        // Send test run complete to logger manager.
+        TestRunCompleteEventArgs testRunCompleteArgs =
+            new(
+                testRunCompletePayload.TestRunCompleteArgs!.TestRunStatistics,
+                testRunCompletePayload.TestRunCompleteArgs.IsCanceled,
+                testRunCompletePayload.TestRunCompleteArgs.IsAborted,
+                testRunCompletePayload.TestRunCompleteArgs.Error,
+                testRunCompletePayload.TestRunCompleteArgs.AttachmentSets,
+                testRunCompletePayload.TestRunCompleteArgs.InvokedDataCollectors,
+                _runRequestTimeTracker!.Elapsed);
+        LoggerManager.HandleTestRunComplete(testRunCompleteArgs);
     }
 
     /// <summary>
@@ -578,64 +579,66 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     /// <param name="testRunCompletePayload">Test run complete payload.</param>
     /// <param name="message">Updated rawMessage.</param>
     /// <returns></returns>
-    private string UpdateRawMessageWithTelemetryInfo(TestRunCompletePayload testRunCompletePayload, Message message)
+    private string? UpdateRawMessageWithTelemetryInfo(TestRunCompletePayload? testRunCompletePayload, Message? message)
     {
         var rawMessage = default(string);
-        if (_requestData.IsTelemetryOptedIn)
+        if (!_requestData.IsTelemetryOptedIn)
         {
-            if (testRunCompletePayload?.TestRunCompleteArgs != null)
+            return rawMessage;
+        }
+
+        if (testRunCompletePayload?.TestRunCompleteArgs != null)
+        {
+            if (testRunCompletePayload.TestRunCompleteArgs.Metrics == null)
             {
-                if (testRunCompletePayload.TestRunCompleteArgs.Metrics == null)
-                {
-                    testRunCompletePayload.TestRunCompleteArgs.Metrics = _requestData.MetricsCollection.Metrics;
-                }
-                else
-                {
-                    foreach (var kvp in _requestData.MetricsCollection.Metrics)
-                    {
-                        testRunCompletePayload.TestRunCompleteArgs.Metrics[kvp.Key] = kvp.Value;
-                    }
-                }
-
-                // Fill in the time taken to complete the run
-                var executionTotalTimeTakenForDesignMode = DateTime.UtcNow - _executionStartTime;
-                testRunCompletePayload.TestRunCompleteArgs.Metrics[TelemetryDataConstants.TimeTakenInSecForRun] = executionTotalTimeTakenForDesignMode.TotalSeconds;
-
-                // Add extensions discovered by vstest.console.
-                //
-                // TODO(copoiena):
-                // Doing extension merging here is incorrect because we can end up not merging the
-                // cached extensions for the current process (i.e. vstest.console) and hence have
-                // an incomplete list of discovered extensions. This can happen because this method
-                // is called only if telemetry is opted in (see: HandleRawMessage). We should handle
-                // this merge a level above in order to be consistent, but that means we'd have to
-                // deserialize all raw messages no matter if telemetry is opted in or not and that
-                // would probably mean a performance hit.
-                testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
-                    testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions,
-                    TestPluginCache.Instance.TestExtensions?.GetCachedExtensions());
-
-                // Write extensions to telemetry data.
-                TestExtensions.AddExtensionTelemetry(
-                    testRunCompletePayload.TestRunCompleteArgs.Metrics,
-                    testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions);
-            }
-
-            if (message is VersionedMessage message1)
-            {
-                var version = message1.Version;
-
-                rawMessage = _dataSerializer.SerializePayload(
-                    MessageType.ExecutionComplete,
-                    testRunCompletePayload,
-                    version);
+                testRunCompletePayload.TestRunCompleteArgs.Metrics = _requestData.MetricsCollection.Metrics;
             }
             else
             {
-                rawMessage = _dataSerializer.SerializePayload(
-                    MessageType.ExecutionComplete,
-                    testRunCompletePayload);
+                foreach (var kvp in _requestData.MetricsCollection.Metrics)
+                {
+                    testRunCompletePayload.TestRunCompleteArgs.Metrics[kvp.Key] = kvp.Value;
+                }
             }
+
+            // Fill in the time taken to complete the run
+            var executionTotalTimeTakenForDesignMode = DateTime.UtcNow - _executionStartTime;
+            testRunCompletePayload.TestRunCompleteArgs.Metrics[TelemetryDataConstants.TimeTakenInSecForRun] = executionTotalTimeTakenForDesignMode.TotalSeconds;
+
+            // Add extensions discovered by vstest.console.
+            //
+            // TODO(copoiena):
+            // Doing extension merging here is incorrect because we can end up not merging the
+            // cached extensions for the current process (i.e. vstest.console) and hence have
+            // an incomplete list of discovered extensions. This can happen because this method
+            // is called only if telemetry is opted in (see: HandleRawMessage). We should handle
+            // this merge a level above in order to be consistent, but that means we'd have to
+            // deserialize all raw messages no matter if telemetry is opted in or not and that
+            // would probably mean a performance hit.
+            testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions = TestExtensions.CreateMergedDictionary(
+                testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions,
+                TestPluginCache.Instance.TestExtensions?.GetCachedExtensions());
+
+            // Write extensions to telemetry data.
+            TestExtensions.AddExtensionTelemetry(
+                testRunCompletePayload.TestRunCompleteArgs.Metrics,
+                testRunCompletePayload.TestRunCompleteArgs.DiscoveredExtensions);
+        }
+
+        if (message is VersionedMessage message1)
+        {
+            var version = message1.Version;
+
+            rawMessage = _dataSerializer.SerializePayload(
+                MessageType.ExecutionComplete,
+                testRunCompletePayload,
+                version);
+        }
+        else
+        {
+            rawMessage = _dataSerializer.SerializePayload(
+                MessageType.ExecutionComplete,
+                testRunCompletePayload);
         }
 
         return rawMessage;
@@ -650,6 +653,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     {
         int processId = -1;
 
+        TPDebug.Assert(TestRunCriteria.TestHostLauncher is not null, "TestRunCriteria.TestHostLauncher is null");
         // Only launch while the test run is in progress and the launcher is a debug one
         if (State == TestRunState.InProgress && TestRunCriteria.TestHostLauncher.IsDebug)
         {
@@ -660,10 +664,14 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     }
 
     /// <inheritdoc />
-    public bool AttachDebuggerToProcess(int pid)
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
     {
-        return TestRunCriteria.TestHostLauncher is ITestHostLauncher2 launcher
-               && launcher.AttachDebuggerToProcess(pid);
+        return TestRunCriteria.TestHostLauncher switch
+        {
+            ITestHostLauncher3 launcher3 => launcher3.AttachDebuggerToProcess(attachDebuggerInfo, CancellationToken.None),
+            ITestHostLauncher2 launcher2 => launcher2.AttachDebuggerToProcess(attachDebuggerInfo.ProcessId),
+            _ => false
+        };
     }
 
     /// <summary>
@@ -676,7 +684,7 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
 
         lock (_syncObject)
         {
-            if (!_disposed)
+            if (!_isDisposed)
             {
                 if (disposing)
                 {
@@ -684,8 +692,8 @@ public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
                 }
 
                 // Indicate that object has been disposed
-                _runCompletionEvent = null;
-                _disposed = true;
+                _runCompletionEvent = null!;
+                _isDisposed = true;
             }
         }
 

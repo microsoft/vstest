@@ -6,8 +6,6 @@ using System;
 using System.Runtime.Serialization;
 #endif
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 /// <summary>
@@ -31,7 +29,7 @@ public class TestPlatformFormatException : Exception
     /// Initializes with the message.
     /// </summary>
     /// <param name="message">Message for the exception.</param>
-    public TestPlatformFormatException(string message)
+    public TestPlatformFormatException(string? message)
         : base(message)
     {
     }
@@ -41,7 +39,7 @@ public class TestPlatformFormatException : Exception
     /// </summary>
     /// <param name="message">Message for the exception.</param>
     /// <param name="filterValue">Filter expression.</param>
-    public TestPlatformFormatException(string message, string filterValue)
+    public TestPlatformFormatException(string? message, string? filterValue)
         : base(message)
     {
         FilterValue = filterValue;
@@ -52,7 +50,7 @@ public class TestPlatformFormatException : Exception
     /// </summary>
     /// <param name="message">Message for the exception.</param>
     /// <param name="innerException">The inner exception.</param>
-    public TestPlatformFormatException(string message, Exception innerException)
+    public TestPlatformFormatException(string? message, Exception? innerException)
         : base(message, innerException)
     {
     }
@@ -61,7 +59,7 @@ public class TestPlatformFormatException : Exception
     /// <summary>
     /// Serialization constructor.
     /// </summary>
-    protected TestPlatformFormatException(SerializationInfo info!!, StreamingContext context)
+    protected TestPlatformFormatException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {
         // Save the basic properties.
@@ -72,7 +70,7 @@ public class TestPlatformFormatException : Exception
     /// <summary>
     /// Filter expression.
     /// </summary>
-    public string FilterValue
+    public string? FilterValue
     {
         get;
         private set;
@@ -84,7 +82,7 @@ public class TestPlatformFormatException : Exception
     /// </summary>
     /// <param name="info">Serialization info to add to</param>
     /// <param name="context">not used</param>
-    public override void GetObjectData(SerializationInfo info!!, StreamingContext context)
+    public override void GetObjectData(SerializationInfo info, StreamingContext context)
     {
         base.GetObjectData(info, context);
         info.AddValue("FilterValue", FilterValue);

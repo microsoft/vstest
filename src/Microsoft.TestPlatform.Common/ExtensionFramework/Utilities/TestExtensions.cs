@@ -13,8 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 using SimpleJSON;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 
 /// <summary>
@@ -25,7 +23,7 @@ public class TestExtensions
     /// <summary>
     /// Gets or sets test discoverer extensions.
     /// </summary>
-    internal Dictionary<string, TestDiscovererPluginInformation> TestDiscoverers { get; set; }
+    internal Dictionary<string, TestDiscovererPluginInformation>? TestDiscoverers { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether are test discoverers cached.
@@ -35,7 +33,7 @@ public class TestExtensions
     /// <summary>
     /// Gets or sets test executor extensions.
     /// </summary>
-    internal Dictionary<string, TestExecutorPluginInformation> TestExecutors { get; set; }
+    internal Dictionary<string, TestExecutorPluginInformation>? TestExecutors { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether are test executors cached.
@@ -45,7 +43,7 @@ public class TestExtensions
     /// <summary>
     /// Gets or sets test executor 2 extensions.
     /// </summary>
-    internal Dictionary<string, TestExecutorPluginInformation2> TestExecutors2 { get; set; }
+    internal Dictionary<string, TestExecutorPluginInformation2>? TestExecutors2 { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether are test executors 2 cached.
@@ -55,7 +53,7 @@ public class TestExtensions
     /// <summary>
     /// Gets or sets test setting provider extensions.
     /// </summary>
-    internal Dictionary<string, TestSettingsProviderPluginInformation> TestSettingsProviders { get; set; }
+    internal Dictionary<string, TestSettingsProviderPluginInformation>? TestSettingsProviders { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether are test settings providers cached.
@@ -65,7 +63,7 @@ public class TestExtensions
     /// <summary>
     /// Gets or sets test logger extensions.
     /// </summary>
-    internal Dictionary<string, TestLoggerPluginInformation> TestLoggers { get; set; }
+    internal Dictionary<string, TestLoggerPluginInformation>? TestLoggers { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether are test loggers cached.
@@ -75,7 +73,7 @@ public class TestExtensions
     /// <summary>
     /// Gets or sets test logger extensions.
     /// </summary>
-    internal Dictionary<string, TestRuntimePluginInformation> TestHosts { get; set; }
+    internal Dictionary<string, TestRuntimePluginInformation>? TestHosts { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether are test hosts cached.
@@ -85,7 +83,7 @@ public class TestExtensions
     /// <summary>
     /// Gets or sets data collectors extensions.
     /// </summary>
-    internal Dictionary<string, DataCollectorConfig> DataCollectors { get; set; }
+    internal Dictionary<string, DataCollectorConfig>? DataCollectors { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether are test hosts cached.
@@ -95,16 +93,16 @@ public class TestExtensions
     /// <summary>
     /// Merge two extension dictionaries.
     /// </summary>
-    /// 
+    ///
     /// <param name="first">First extension dictionary.</param>
     /// <param name="second">Second extension dictionary.</param>
-    /// 
+    ///
     /// <returns>
     /// A dictionary representing the merger between the two input dictionaries.
     /// </returns>
     internal static Dictionary<string, HashSet<string>> CreateMergedDictionary(
-        Dictionary<string, HashSet<string>> first,
-        Dictionary<string, HashSet<string>> second)
+        Dictionary<string, HashSet<string>>? first,
+        Dictionary<string, HashSet<string>>? second)
     {
         var isFirstNullOrEmpty = first == null || first.Count == 0;
         var isSecondNullOrEmpty = second == null || second.Count == 0;
@@ -114,20 +112,22 @@ public class TestExtensions
         {
             return new Dictionary<string, HashSet<string>>();
         }
+
         if (isFirstNullOrEmpty)
         {
-            return new Dictionary<string, HashSet<string>>(second);
+            return new Dictionary<string, HashSet<string>>(second!);
         }
+
         if (isSecondNullOrEmpty)
         {
-            return new Dictionary<string, HashSet<string>>(first);
+            return new Dictionary<string, HashSet<string>>(first!);
         }
 
         // Copy all the keys in the first dictionary into the resulting dictionary.
-        var result = first.Where(kvp => (kvp.Value != null && kvp.Value.Count > 0))
+        var result = first!.Where(kvp => kvp.Value != null && kvp.Value.Count > 0)
             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-        foreach (var kvp in second)
+        foreach (var kvp in second!)
         {
             // If the "source" set is empty there's no reason to continue merging for this key.
             if (kvp.Value == null || kvp.Value.Count == 0)
@@ -155,7 +155,7 @@ public class TestExtensions
     /// <summary>
     /// Add extension-related telemetry.
     /// </summary>
-    /// 
+    ///
     /// <param name="metrics">A collection representing the telemetry data.</param>
     /// <param name="extensions">The input extension collection.</param>
     internal static void AddExtensionTelemetry(
@@ -179,8 +179,8 @@ public class TestExtensions
     /// <returns>
     /// The <see cref="Dictionary"/> of extensions discovered
     /// </returns>
-    internal Dictionary<string, TPluginInfo> AddExtension<TPluginInfo>(
-        Dictionary<string, TPluginInfo> newExtensions) where TPluginInfo : TestPluginInformation
+    internal Dictionary<string, TPluginInfo>? AddExtension<TPluginInfo>(Dictionary<string, TPluginInfo>? newExtensions)
+        where TPluginInfo : TestPluginInformation
     {
         var existingExtensions = GetTestExtensionCache<TPluginInfo>();
         if (newExtensions == null)
@@ -216,38 +216,24 @@ public class TestExtensions
     /// </summary>
     /// <param name="extensionAssembly"> The extension assembly.</param>
     /// <returns> The test extensions defined the extension assembly if it is already discovered. null if not.</returns>
-    internal TestExtensions GetExtensionsDiscoveredFromAssembly(string extensionAssembly)
+    internal TestExtensions? GetExtensionsDiscoveredFromAssembly(string? extensionAssembly)
     {
         var testExtensions = new TestExtensions();
 
         testExtensions.TestDiscoverers =
-            GetExtensionsDiscoveredFromAssembly(
-                TestDiscoverers,
-                extensionAssembly);
+            GetExtensionsDiscoveredFromAssembly(TestDiscoverers, extensionAssembly);
         testExtensions.TestExecutors =
-            GetExtensionsDiscoveredFromAssembly(
-                TestExecutors,
-                extensionAssembly);
+            GetExtensionsDiscoveredFromAssembly(TestExecutors, extensionAssembly);
         testExtensions.TestExecutors2 =
-            GetExtensionsDiscoveredFromAssembly(
-                TestExecutors2,
-                extensionAssembly);
+            GetExtensionsDiscoveredFromAssembly(TestExecutors2, extensionAssembly);
         testExtensions.TestSettingsProviders =
-            GetExtensionsDiscoveredFromAssembly(
-                TestSettingsProviders,
-                extensionAssembly);
+            GetExtensionsDiscoveredFromAssembly(TestSettingsProviders, extensionAssembly);
         testExtensions.TestLoggers =
-            GetExtensionsDiscoveredFromAssembly(
-                TestLoggers,
-                extensionAssembly);
+            GetExtensionsDiscoveredFromAssembly(TestLoggers, extensionAssembly);
         testExtensions.TestHosts =
-            GetExtensionsDiscoveredFromAssembly(
-                TestHosts,
-                extensionAssembly);
+            GetExtensionsDiscoveredFromAssembly(TestHosts, extensionAssembly);
         testExtensions.DataCollectors =
-            GetExtensionsDiscoveredFromAssembly(
-                DataCollectors,
-                extensionAssembly);
+            GetExtensionsDiscoveredFromAssembly(DataCollectors, extensionAssembly);
 
         if (testExtensions.TestDiscoverers.Any()
             || testExtensions.TestExecutors.Any()
@@ -264,37 +250,37 @@ public class TestExtensions
         return null;
     }
 
-    internal Dictionary<string, TPluginInfo> GetTestExtensionCache<TPluginInfo>() where TPluginInfo : TestPluginInformation
+    internal Dictionary<string, TPluginInfo>? GetTestExtensionCache<TPluginInfo>() where TPluginInfo : TestPluginInformation
     {
         Type type = typeof(TPluginInfo);
 
         if (type == typeof(TestDiscovererPluginInformation))
         {
-            return (Dictionary<string, TPluginInfo>)(object)TestDiscoverers;
+            return (Dictionary<string, TPluginInfo>?)(object?)TestDiscoverers;
         }
         else if (type == typeof(TestExecutorPluginInformation))
         {
-            return (Dictionary<string, TPluginInfo>)(object)TestExecutors;
+            return (Dictionary<string, TPluginInfo>?)(object?)TestExecutors;
         }
         else if (type == typeof(TestExecutorPluginInformation2))
         {
-            return (Dictionary<string, TPluginInfo>)(object)TestExecutors2;
+            return (Dictionary<string, TPluginInfo>?)(object?)TestExecutors2;
         }
         else if (type == typeof(TestLoggerPluginInformation))
         {
-            return (Dictionary<string, TPluginInfo>)(object)TestLoggers;
+            return (Dictionary<string, TPluginInfo>?)(object?)TestLoggers;
         }
         else if (type == typeof(TestSettingsProviderPluginInformation))
         {
-            return (Dictionary<string, TPluginInfo>)(object)TestSettingsProviders;
+            return (Dictionary<string, TPluginInfo>?)(object?)TestSettingsProviders;
         }
         else if (type == typeof(TestRuntimePluginInformation))
         {
-            return (Dictionary<string, TPluginInfo>)(object)TestHosts;
+            return (Dictionary<string, TPluginInfo>?)(object?)TestHosts;
         }
         else if (type == typeof(DataCollectorConfig))
         {
-            return (Dictionary<string, TPluginInfo>)(object)DataCollectors;
+            return (Dictionary<string, TPluginInfo>?)(object?)DataCollectors;
         }
 
         return null;
@@ -386,7 +372,7 @@ public class TestExtensions
     /// <summary>
     /// Gets the cached extensions for the current process.
     /// </summary>
-    /// 
+    ///
     /// <returns>A dictionary representing the cached extensions for the current process.</returns>
     internal Dictionary<string, HashSet<string>> GetCachedExtensions()
     {
@@ -432,9 +418,9 @@ public class TestExtensions
     /// <returns>
     /// The <see cref="Dictionary"/>. of extensions discovered in assembly
     /// </returns>
-    internal Dictionary<string, TPluginInfo> GetExtensionsDiscoveredFromAssembly<TPluginInfo>(
-        Dictionary<string, TPluginInfo> extensionCollection,
-        string extensionAssembly)
+    internal static Dictionary<string, TPluginInfo> GetExtensionsDiscoveredFromAssembly<TPluginInfo>(
+        Dictionary<string, TPluginInfo>? extensionCollection,
+        string? extensionAssembly)
     {
         var extensions = new Dictionary<string, TPluginInfo>();
         if (extensionCollection != null)
@@ -442,8 +428,9 @@ public class TestExtensions
             foreach (var extension in extensionCollection)
             {
                 var testPluginInformation = extension.Value as TestPluginInformation;
-                var extensionType = Type.GetType(testPluginInformation?.AssemblyQualifiedName);
-                if (string.Equals(extensionType.GetTypeInfo().Assembly.GetAssemblyLocation(), extensionAssembly))
+                // TODO: Avoid ArgumentNullException here
+                var extensionType = Type.GetType(testPluginInformation?.AssemblyQualifiedName!);
+                if (string.Equals(extensionType?.GetTypeInfo().Assembly.GetAssemblyLocation(), extensionAssembly))
                 {
                     extensions.Add(extension.Key, extension.Value);
                 }
@@ -487,10 +474,10 @@ public class TestExtensions
         }
     }
 
-    private void AddCachedExtensionToDictionary<T>(
+    private static void AddCachedExtensionToDictionary<T>(
         Dictionary<string, HashSet<string>> extensionDict,
         string extensionType,
-        IEnumerable<T> extensions)
+        IEnumerable<T>? extensions)
         where T : TestPluginInformation
     {
         if (extensions == null)
@@ -498,7 +485,7 @@ public class TestExtensions
             return;
         }
 
-        extensionDict.Add(extensionType, new HashSet<string>(extensions.Select(e => e.IdentifierData)));
+        extensionDict.Add(extensionType, new HashSet<string>(extensions.Select(e => e.IdentifierData!)));
     }
 
     private static string SerializeExtensionDictionary(IDictionary<string, HashSet<string>> extensions)

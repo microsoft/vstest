@@ -6,8 +6,6 @@ using System;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests;
 
 [TestClass]
@@ -50,7 +48,7 @@ public class RunSettingsManagerTests
     {
         var instance = RunSettingsManager.Instance;
 
-        Assert.ThrowsException<ArgumentNullException>(() => instance.SetActiveRunSettings(null));
+        Assert.ThrowsException<ArgumentNullException>(() => instance.SetActiveRunSettings(null!));
     }
 
     [TestMethod]

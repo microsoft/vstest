@@ -214,7 +214,7 @@
     <value>Proxy with id {0} is already available and cannot be re-enqueued.</value>
   </data>
   <data name="NoTestHostProviderFound" xml:space="preserve">
-    <value>No suitable test runtime provider found for this run.</value>
+    <value>No suitable test runtime provider was found for any source in this run.</value>
   </data>
   <data name="NoProxyMatchesDescription" xml:space="preserve">
     <value>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</value>
@@ -224,5 +224,11 @@
   </data>
   <data name="AttachmentsBanner" xml:space="preserve">
     <value>Attachments:</value>
+  </data>
+  <data name="NoSuitableRuntimeProviderFound" xml:space="preserve">
+    <value>No suitable test runtime provider was found:</value>
+  </data>
+  <data name="SkippingSource" xml:space="preserve">
+    <value>Skipping source:</value>
   </data>
 </root>

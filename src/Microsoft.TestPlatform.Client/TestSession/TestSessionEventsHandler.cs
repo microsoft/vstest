@@ -2,14 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Client;
 
@@ -33,9 +29,9 @@ internal class TestSessionEventsHandler : ITestSessionEventsHandler
     }
 
     /// <inheritdoc />
-    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs)
+    public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs? eventArgs)
     {
-        var ackPayload = new StartTestSessionAckPayload()
+        var ackPayload = new StartTestSessionAckPayload
         {
             EventArgs = eventArgs
         };
@@ -44,7 +40,7 @@ internal class TestSessionEventsHandler : ITestSessionEventsHandler
     }
 
     /// <inheritdoc />
-    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs eventArgs)
+    public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs? eventArgs)
     {
         var ackPayload = new StopTestSessionAckPayload()
         {
@@ -55,7 +51,7 @@ internal class TestSessionEventsHandler : ITestSessionEventsHandler
     }
 
     /// <inheritdoc />
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         var messagePayload = new TestMessagePayload()
         {

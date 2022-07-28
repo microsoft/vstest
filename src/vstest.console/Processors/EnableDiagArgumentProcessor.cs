@@ -18,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 internal class EnableDiagArgumentProcessor : IArgumentProcessor
@@ -31,9 +29,8 @@ internal class EnableDiagArgumentProcessor : IArgumentProcessor
 
     private readonly IFileHelper _fileHelper;
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EnableDiagArgumentProcessor"/> class.
@@ -58,7 +55,7 @@ internal class EnableDiagArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() => new EnableDiagArgumentExecutor(_fileHelper, new ProcessHelper()));
 
@@ -107,19 +104,18 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         _processHelper = processHelper;
     }
 
-
     #region IArgumentExecutor
 
     /// <summary>
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidDiagArgument, argument);
+        string exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagArgument, argument);
 
         // Throw error if argument is null or empty.
-        if (string.IsNullOrWhiteSpace(argument))
+        if (argument.IsNullOrWhiteSpace())
         {
             throw new CommandLineException(exceptionMessage);
         }
@@ -142,6 +138,13 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         // Write version to the log here, because that is the
         // first place where we know if we log or not.
         EqtTrace.Verbose($"Version: {Product.Version} Current process architecture: {_processHelper.GetCurrentProcessArchitecture()}");
+        // https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location?view=net-6.0#remarks
+        // In .NET 5 and later versions, for bundled assemblies, the value returned is an empty string.
+        string objectTypeLocation = typeof(object).Assembly.Location;
+        if (!objectTypeLocation.IsNullOrEmpty())
+        {
+            EqtTrace.Verbose($"Runtime location: {Path.GetDirectoryName(objectTypeLocation)}");
+        }
     }
 
     /// <summary>
@@ -159,7 +162,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="diagFilePath">Diag file path.</param>
     /// <param name="diagParameters">Diag parameters</param>
-    private void InitializeDiagLogging(string diagFilePath, Dictionary<string, string> diagParameters)
+    private static void InitializeDiagLogging(string diagFilePath, Dictionary<string, string> diagParameters)
     {
         // Get trace level from diag parameters.
         var traceLevel = GetDiagTraceLevel(diagParameters);
@@ -169,7 +172,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         var traceInitialized = EqtTrace.InitializeTrace(diagFilePath, traceLevel);
 
         // Show console warning in case trace is not initialized.
-        if (!traceInitialized && !string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
+        if (!traceInitialized && !StringUtils.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
         {
             ConsoleOutput.Instance.Warning(false, EqtTrace.ErrorOnInitialization);
         }
@@ -180,7 +183,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="diagParameters">Diag parameters.</param>
     /// <returns>Diag trace level.</returns>
-    private PlatformTraceLevel GetDiagTraceLevel(Dictionary<string, string> diagParameters)
+    private static PlatformTraceLevel GetDiagTraceLevel(Dictionary<string, string> diagParameters)
     {
         // If diag parameters is null, set value of trace level as verbose.
         if (diagParameters == null)
@@ -229,7 +232,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         // Create the base directory of file path if doesn't exist.
         // Directory could be empty if just a filename is provided. E.g. log.txt
         var directory = Path.GetDirectoryName(filePath);
-        if (!string.IsNullOrEmpty(directory) && !_fileHelper.DirectoryExists(directory))
+        if (!StringUtils.IsNullOrEmpty(directory) && !_fileHelper.DirectoryExists(directory))
         {
             _fileHelper.CreateDirectory(directory);
         }

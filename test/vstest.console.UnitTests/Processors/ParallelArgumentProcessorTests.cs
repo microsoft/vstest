@@ -23,7 +23,7 @@ public class ParallelArgumentProcessorTests
     [TestCleanup]
     public void TestCleanup()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
     }
 
     [TestMethod]
@@ -37,7 +37,7 @@ public class ParallelArgumentProcessorTests
     public void GetExecuterShouldReturnParallelArgumentExecutor()
     {
         var processor = new ParallelArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is ParallelArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is ParallelArgumentExecutor);
     }
 
     #region ParallelArgumentProcessorCapabilities tests

@@ -3,9 +3,9 @@
 
 #if WINDOWS_UWP
 
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using System;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
@@ -17,16 +17,22 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     }
 
     /// <inheritdoc/>
-    public event AssemblyResolveEventHandler AssemblyResolve;
+    public event AssemblyResolveEventHandler? AssemblyResolve;
 
     public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
     {
     }
 
     private void DummyEventThrower()
     {
         // need to raise this event, else compiler throws error
-        AssemblyResolve(this, null);
+        AssemblyResolve?.Invoke(this, null);
     }
 }
 

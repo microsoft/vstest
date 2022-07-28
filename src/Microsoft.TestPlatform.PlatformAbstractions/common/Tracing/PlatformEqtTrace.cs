@@ -6,10 +6,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 
-#nullable disable
+using Microsoft.TestPlatform.PlatformAbstractions;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -83,7 +84,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
 
     private static readonly object LockObject = new();
 
-    private static TraceSource s_traceSource;
+    private static TraceSource? s_traceSource;
 
     /// <summary>
     /// Specifies whether the trace is initialized or not
@@ -98,7 +99,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     private static int s_traceFileSize;
     private static readonly int DefaultTraceFileSize = 10240; // 10Mb.
 
-    public static string LogFile
+    public static string? LogFile
     {
         get;
         private set;
@@ -127,7 +128,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         }
     }
 
-    public static string ErrorOnInitialization
+    public static string? ErrorOnInitialization
     {
         get;
         set;
@@ -163,13 +164,13 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     }
 
     /// <inheritdoc/>
-    public bool InitializeVerboseTrace(string customLogFile)
+    public bool InitializeVerboseTrace(string? customLogFile)
     {
         return InitializeTrace(customLogFile, PlatformTraceLevel.Verbose);
     }
 
     /// <inheritdoc/>
-    public bool InitializeTrace(string customLogFile, PlatformTraceLevel platformTraceLevel)
+    public bool InitializeTrace(string? customLogFile, PlatformTraceLevel platformTraceLevel)
     {
         s_isInitialized = false;
 
@@ -208,16 +209,16 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     }
 
     /// <inheritdoc/>
-    public string GetLogFile()
+    public string? GetLogFile()
     {
         return LogFile;
     }
 
     /// <inheritdoc/>
-    public void WriteLine(PlatformTraceLevel level, string message)
+    public void WriteLine(PlatformTraceLevel level, string? message)
     {
-        Debug.Assert(message != null, "message != null");
-        Debug.Assert(!string.IsNullOrEmpty(ProcessName), "!string.IsNullOrEmpty(ProcessName)");
+        TPDebug.Assert(message != null, "message != null");
+        TPDebug.Assert(!string.IsNullOrEmpty(ProcessName), "!string.IsNullOrEmpty(ProcessName)");
 
         if (EnsureTraceIsInitialized())
         {
@@ -258,6 +259,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         return (PlatformTraceLevel)SourceTraceLevelsMap[Source.Switch.Level];
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public TraceLevel MapPlatformTraceToTrace(PlatformTraceLevel traceLevel)
     {
         switch (traceLevel)
@@ -282,7 +284,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     /// Setup trace listeners. It should be called when setting trace listener for child domain.
     /// </summary>
     /// <param name="listener">New listener.</param>
-    internal static void SetupRemoteListeners(TraceListener listener)
+    internal static void SetupRemoteListeners(TraceListener? listener)
     {
         lock (IsInitializationLock)
         {
@@ -302,7 +304,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     /// <param name="e">The exception to log.</param>
     private static void LogIgnoredException(Exception e)
     {
-        Debug.Assert(e != null, "e != null");
+        TPDebug.Assert(e != null, "e != null");
 
         try
         {
@@ -338,7 +340,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
             }
 
             using var process = Process.GetCurrentProcess();
-            string runnerLogFileName = $"{Path.GetFileNameWithoutExtension(process.MainModule.FileName)}_{process.Id}.{DateTime.Now:yy-MM-dd_HH-mm-ss_fffff}.diag";
+            string runnerLogFileName = $"{Path.GetFileNameWithoutExtension(process.MainModule!.FileName)}_{process.Id}.{DateTime.Now:yy-MM-dd_HH-mm-ss_fffff}.diag";
             string logsDirectory = Path.GetTempPath();
 
             // Set the trace level and add the trace listener
@@ -369,6 +371,12 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
                     runnerLogFileName = LogFile;
                 }
 
+                var runnerLogFileInfo = new FileInfo(runnerLogFileName);
+                if (!Directory.Exists(runnerLogFileInfo.DirectoryName))
+                {
+                    Directory.CreateDirectory(runnerLogFileInfo.DirectoryName!);
+                }
+
                 Source.Listeners.Add(new RollingFileTraceListener(runnerLogFileName, ListenerName, s_traceFileSize));
             }
             catch (Exception e)
@@ -391,7 +399,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     {
         try
         {
-            string processName = null;
+            string? processName = null;
 
             string[] args = Environment.GetCommandLineArgs();
 
@@ -404,7 +412,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
 
             // If we still have not got process name from command line - use the slow way.
             // This should never happen unless the process is called from execv with empty cmdline.
-            if (string.IsNullOrEmpty(processName))
+            if (processName.IsNullOrEmpty())
             {
                 Debug.Fail("Could not get process name from command line, will try to use the slow way.");
                 using var process = Process.GetCurrentProcess();

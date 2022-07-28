@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -15,8 +16,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using Resource = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
@@ -65,22 +64,22 @@ public class EventLogDataCollector : DataCollector
     /// <summary>
     /// Object containing the execution events the data collector registers for
     /// </summary>
-    private DataCollectionEvents _events;
+    private DataCollectionEvents? _events;
 
     /// <summary>
     /// The sink used by the data collector to send its data
     /// </summary>
-    private DataCollectionSink _dataSink;
+    private DataCollectionSink? _dataSink;
 
     /// <summary>
     /// The data collector context.
     /// </summary>
-    private DataCollectionContext _dataCollectorContext;
+    private DataCollectionContext? _dataCollectorContext;
 
     /// <summary>
     /// Used by the data collector to send warnings, errors, or other messages
     /// </summary>
-    private DataCollectionLogger _logger;
+    private DataCollectionLogger? _logger;
 
     /// <summary>
     /// The file helper.
@@ -91,6 +90,8 @@ public class EventLogDataCollector : DataCollector
     /// The event log map.
     /// </summary>
     private readonly IDictionary<string, IEventLogContainer> _eventLogContainerMap = new Dictionary<string, IEventLogContainer>();
+
+    private bool _isDisposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventLogDataCollector"/> class.
@@ -120,17 +121,16 @@ public class EventLogDataCollector : DataCollector
 
     internal int MaxEntries { get; private set; }
 
-    internal ISet<string> EventSources { get; private set; }
+    internal ISet<string>? EventSources { get; private set; }
 
-    internal ISet<EventLogEntryType> EntryTypes { get; private set; }
+    internal ISet<EventLogEntryType>? EntryTypes { get; private set; }
 
-    internal ISet<string> EventLogNames { get; private set; }
+    internal ISet<string>? EventLogNames { get; private set; }
 
     /// <summary>
     /// Gets the context data.
     /// </summary>
     internal Dictionary<DataCollectionContext, EventLogSessionContext> ContextMap { get; }
-
 
     #region DataCollector Members
 
@@ -149,17 +149,23 @@ public class EventLogDataCollector : DataCollector
     /// Used by the data collector to send warnings, errors, or other messages
     /// </param>
     /// <param name="dataCollectionEnvironmentContext">Provides contextual information about the agent environment</param>
+    [MemberNotNull(nameof(_events), nameof(_dataSink), nameof(_logger), nameof(_dataCollectorContext))]
     public override void Initialize(
-        XmlElement configurationElement,
-        DataCollectionEvents events!!,
-        DataCollectionSink dataSink!!,
-        DataCollectionLogger logger!!,
-        DataCollectionEnvironmentContext dataCollectionEnvironmentContext)
+        XmlElement? configurationElement,
+        DataCollectionEvents events,
+        DataCollectionSink dataSink,
+        DataCollectionLogger logger,
+        DataCollectionEnvironmentContext? dataCollectionEnvironmentContext)
     {
+        ValidateArg.NotNull(events, nameof(events));
+        ValidateArg.NotNull(dataSink, nameof(dataSink));
+        ValidateArg.NotNull(logger, nameof(logger));
+        ValidateArg.NotNull(dataCollectionEnvironmentContext, nameof(dataCollectionEnvironmentContext));
+
         _events = events;
         _dataSink = dataSink;
         _logger = logger;
-        _dataCollectorContext = dataCollectionEnvironmentContext.SessionDataCollectionContext;
+        _dataCollectorContext = dataCollectionEnvironmentContext!.SessionDataCollectionContext;
 
         // Load the configuration
         CollectorNameValueConfigurationManager nameValueSettings =
@@ -169,7 +175,7 @@ public class EventLogDataCollector : DataCollector
         ConfigureEventSources(nameValueSettings);
         ConfigureEntryTypes(nameValueSettings);
         ConfigureMaxEntries(nameValueSettings);
-        ConfigureEventLogNames(nameValueSettings);
+        ConfigureEventLogNames(nameValueSettings, _dataCollectorContext);
 
         // Register for events
         events.SessionStart += _sessionStartEventHandler;
@@ -179,6 +185,7 @@ public class EventLogDataCollector : DataCollector
     }
 
     #endregion
+
     /// <summary>
     /// The write event logs.
     /// </summary>
@@ -224,7 +231,7 @@ public class EventLogDataCollector : DataCollector
         {
             for (int i = 1; !unusedFilenameFound; i++)
             {
-                eventLogPath = eventLogBasePath + "-" + i.ToString(CultureInfo.InvariantCulture) + ".xml";
+                eventLogPath = $"{eventLogBasePath}-{i.ToString(CultureInfo.InvariantCulture)}.xml";
 
                 if (!_fileHelper.Exists(eventLogPath))
                 {
@@ -267,6 +274,7 @@ public class EventLogDataCollector : DataCollector
         // Write the event log file
         FileTransferInformation fileTransferInformation =
             new(dataCollectionContext, eventLogPath, true, _fileHelper);
+        TPDebug.Assert(_dataSink != null, "Initialize should have been called.");
         _dataSink.SendFileAsync(fileTransferInformation);
 
         EqtTrace.Verbose(
@@ -284,22 +292,33 @@ public class EventLogDataCollector : DataCollector
     /// <param name="disposing">Not used since this class does not have a finalizer.</param>
     protected override void Dispose(bool disposing)
     {
+        if (_isDisposed)
+            return;
+
         base.Dispose(disposing);
 
-        // Unregister events
-        _events.SessionStart -= _sessionStartEventHandler;
-        _events.SessionEnd -= _sessionEndEventHandler;
-        _events.TestCaseStart -= _testCaseStartEventHandler;
-        _events.TestCaseEnd -= _testCaseEndEventHandler;
-
-        // Unregister EventLogEntry Written.
-        foreach (var eventLogContainer in _eventLogContainerMap.Values)
+        if (disposing)
         {
-            eventLogContainer.Dispose();
+            // Unregister events
+            if (_events != null)
+            {
+                _events.SessionStart -= _sessionStartEventHandler;
+                _events.SessionEnd -= _sessionEndEventHandler;
+                _events.TestCaseStart -= _testCaseStartEventHandler;
+                _events.TestCaseEnd -= _testCaseEndEventHandler;
+            }
+
+            // Unregister EventLogEntry Written.
+            foreach (var eventLogContainer in _eventLogContainerMap.Values)
+            {
+                eventLogContainer.Dispose();
+            }
+
+            // Delete all the temp event log directories
+            RemoveTempEventLogDirs(_eventLogDirectories);
         }
 
-        // Delete all the temp event log directories
-        RemoveTempEventLogDirs(_eventLogDirectories);
+        _isDisposed = true;
     }
 
     #endregion
@@ -316,8 +335,9 @@ public class EventLogDataCollector : DataCollector
         return strings;
     }
 
-    private void OnSessionStart(object sender, SessionStartEventArgs e!!)
+    private void OnSessionStart(object sender, SessionStartEventArgs e)
     {
+        ValidateArg.NotNull(e, nameof(e));
         ValidateArg.NotNull(e.Context, "SessionStartEventArgs.Context");
 
         EqtTrace.Verbose("EventLogDataCollector: SessionStart received");
@@ -325,8 +345,9 @@ public class EventLogDataCollector : DataCollector
         StartCollectionForContext(e.Context);
     }
 
-    private void OnSessionEnd(object sender, SessionEndEventArgs e!!)
+    private void OnSessionEnd(object sender, SessionEndEventArgs e)
     {
+        ValidateArg.NotNull(e, nameof(e));
         ValidateArg.NotNull(e.Context, "SessionEndEventArgs.Context");
 
         EqtTrace.Verbose("EventLogDataCollector: SessionEnd received");
@@ -334,8 +355,9 @@ public class EventLogDataCollector : DataCollector
         WriteCollectedEventLogEntries(e.Context, true, TimeSpan.MaxValue, DateTime.UtcNow);
     }
 
-    private void OnTestCaseStart(object sender, TestCaseStartEventArgs e!!)
+    private void OnTestCaseStart(object sender, TestCaseStartEventArgs e)
     {
+        ValidateArg.NotNull(e, nameof(e));
         ValidateArg.NotNull(e.Context, "TestCaseStartEventArgs.Context");
 
         if (!e.Context.HasTestCase)
@@ -349,10 +371,11 @@ public class EventLogDataCollector : DataCollector
         StartCollectionForContext(e.Context);
     }
 
-    private void OnTestCaseEnd(object sender, TestCaseEndEventArgs e!!)
+    private void OnTestCaseEnd(object sender, TestCaseEndEventArgs e)
     {
-        Debug.Assert(e.Context != null, "Context is null");
-        Debug.Assert(e.Context.HasTestCase, "Context is not for a test case");
+        ValidateArg.NotNull(e, nameof(e));
+        TPDebug.Assert(e.Context != null, "Context is null");
+        TPDebug.Assert(e.Context.HasTestCase, "Context is not for a test case");
 
         EqtTrace.Verbose(
             "EventLogDataCollector: TestCaseEnd received for test '{0}' with Test Outcome: {1}.",
@@ -409,6 +432,7 @@ public class EventLogDataCollector : DataCollector
             }
             catch (Exception e)
             {
+                TPDebug.Assert(_logger != null, "Initialize should have been called.");
                 _logger.LogWarning(
                     dataCollectionContext,
                     string.Format(
@@ -430,15 +454,16 @@ public class EventLogDataCollector : DataCollector
         }
     }
 
-    private void ConfigureEventLogNames(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
+    [MemberNotNull(nameof(EventLogNames))]
+    private void ConfigureEventLogNames(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager, DataCollectionContext dataCollectorContext)
     {
         EventLogNames = new HashSet<string>();
-        string eventLogs = collectorNameValueConfigurationManager[EventLogConstants.SettingEventLogs];
+        string? eventLogs = collectorNameValueConfigurationManager[EventLogConstants.SettingEventLogs];
         if (eventLogs != null)
         {
             EventLogNames = ParseCommaSeparatedList(eventLogs);
             EqtTrace.Verbose(
-                "EventLogDataCollector configuration: " + EventLogConstants.SettingEventLogs + "=" + eventLogs);
+                $"EventLogDataCollector configuration: {EventLogConstants.SettingEventLogs}={eventLogs}");
         }
         else
         {
@@ -446,6 +471,8 @@ public class EventLogDataCollector : DataCollector
             EventLogNames.Add("System");
             EventLogNames.Add("Application");
         }
+
+        TPDebug.Assert(_logger != null && EntryTypes != null, "Initialize should have been called.");
 
         foreach (string eventLogName in EventLogNames)
         {
@@ -460,7 +487,7 @@ public class EventLogDataCollector : DataCollector
                         EntryTypes,
                         int.MaxValue,
                         _logger,
-                        _dataCollectorContext);
+                        dataCollectorContext);
                     _eventLogContainerMap.Add(eventLogName, eventLogContainer);
                 }
 
@@ -469,28 +496,28 @@ public class EventLogDataCollector : DataCollector
             catch (Exception ex)
             {
                 _logger.LogError(
-                    _dataCollectorContext,
-                    new EventLogCollectorException(string.Format(CultureInfo.InvariantCulture, Resource.ReadError, eventLogName, Environment.MachineName), ex));
+                    dataCollectorContext,
+                    new EventLogCollectorException(string.Format(CultureInfo.CurrentCulture, Resource.ReadError, eventLogName, Environment.MachineName), ex));
             }
         }
     }
 
     private void ConfigureEventSources(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
     {
-        string eventSourcesStr = collectorNameValueConfigurationManager[EventLogConstants.SettingEventSources];
-        if (!string.IsNullOrEmpty(eventSourcesStr))
+        string? eventSourcesStr = collectorNameValueConfigurationManager[EventLogConstants.SettingEventSources];
+        if (!eventSourcesStr.IsNullOrEmpty())
         {
             EventSources = ParseCommaSeparatedList(eventSourcesStr);
             EqtTrace.Verbose(
-                "EventLogDataCollector configuration: " + EventLogConstants.SettingEventSources + "="
-                + EventSources);
+                $"EventLogDataCollector configuration: {EventLogConstants.SettingEventSources}={EventSources}");
         }
     }
 
+    [MemberNotNull(nameof(EntryTypes))]
     private void ConfigureEntryTypes(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
     {
         EntryTypes = new HashSet<EventLogEntryType>();
-        string entryTypesStr = collectorNameValueConfigurationManager[EventLogConstants.SettingEntryTypes];
+        string? entryTypesStr = collectorNameValueConfigurationManager[EventLogConstants.SettingEntryTypes];
         if (entryTypesStr != null)
         {
             foreach (string entryTypestring in ParseCommaSeparatedList(entryTypesStr))
@@ -500,8 +527,7 @@ public class EventLogDataCollector : DataCollector
             }
 
             EqtTrace.Verbose(
-                "EventLogDataCollector configuration: " + EventLogConstants.SettingEntryTypes + "="
-                + EntryTypes);
+                $"EventLogDataCollector configuration: {EventLogConstants.SettingEntryTypes}={EntryTypes}");
         }
         else
         {
@@ -513,7 +539,7 @@ public class EventLogDataCollector : DataCollector
 
     private void ConfigureMaxEntries(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
     {
-        string maxEntriesstring = collectorNameValueConfigurationManager[EventLogConstants.SettingMaxEntries];
+        string? maxEntriesstring = collectorNameValueConfigurationManager[EventLogConstants.SettingMaxEntries];
         if (maxEntriesstring != null)
         {
             try
@@ -532,8 +558,7 @@ public class EventLogDataCollector : DataCollector
             }
 
             EqtTrace.Verbose(
-                "EventLogDataCollector configuration: " + EventLogConstants.SettingMaxEntries + "="
-                + MaxEntries);
+                $"EventLogDataCollector configuration: {EventLogConstants.SettingMaxEntries}={MaxEntries}");
         }
         else
         {
@@ -553,7 +578,7 @@ public class EventLogDataCollector : DataCollector
         if (!eventLogContainerFound)
         {
             string msg = string.Format(
-                CultureInfo.InvariantCulture,
+                CultureInfo.CurrentCulture,
                 Resource.ContextNotFoundException,
                 dataCollectionContext.ToString());
             throw new EventLogCollectorException(msg, null);

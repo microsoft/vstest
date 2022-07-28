@@ -19,8 +19,8 @@ public class AssemblyPropertiesTests : IntegrationTestBase
     }
 
     [TestMethod]
-    [DataRow("net451")]
-    [DataRow("netcoreapp2.1")]
+    [DataRow("net462")]
+    [DataRow("netcoreapp3.1")]
     public void GetAssemblyTypeForManagedDll(string framework)
     {
         var assemblyPath = _testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
@@ -41,14 +41,14 @@ public class AssemblyPropertiesTests : IntegrationTestBase
     [TestMethod]
     public void GetAssemblyTypeForManagedExe()
     {
-        var assemblyPath = _testEnvironment.GetTestAsset("ConsoleManagedApp.exe", "net451");
+        var assemblyPath = _testEnvironment.GetTestAsset("ConsoleManagedApp.exe", "net462");
         var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
         Assert.AreEqual(AssemblyType.Managed, assemblyType);
     }
 
     [TestMethod]
-    [DataRow("netcoreapp2.1")]
+    [DataRow("netcoreapp3.1")]
     public void GetAssemblyTypeForNetCoreManagedExe(string framework)
     {
         var assemblyPath = _testEnvironment.GetTestAsset("ConsoleManagedApp.dll", framework);

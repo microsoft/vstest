@@ -58,7 +58,13 @@ public class VsTestConsoleWrapperTests
     public void StartSessionShouldStartVsTestConsoleWithCorrectArguments()
     {
         var inputPort = 123;
-        int expectedParentProcessId = Process.GetCurrentProcess().Id;
+#if NET5_0_OR_GREATER
+        var expectedParentProcessId = Environment.ProcessId;
+#else
+        int expectedParentProcessId;
+        using (var p = Process.GetCurrentProcess())
+            expectedParentProcessId = p.Id;
+#endif
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(inputPort);
 
         _consoleWrapper.StartSession();
@@ -109,7 +115,7 @@ public class VsTestConsoleWrapperTests
             _consoleWrapper.StartTestSession(
                 _testSources,
                 null,
-                mockEventsHandler.Object).TestSessionInfo,
+                mockEventsHandler.Object)?.TestSessionInfo,
             testSessionInfo);
 
         _mockRequestSender.Verify(
@@ -144,7 +150,7 @@ public class VsTestConsoleWrapperTests
                 _testSources,
                 null,
                 testPlatformOptions,
-                mockEventsHandler.Object).TestSessionInfo,
+                mockEventsHandler.Object)?.TestSessionInfo,
             testSessionInfo);
 
         _mockRequestSender.Verify(
@@ -181,7 +187,7 @@ public class VsTestConsoleWrapperTests
                 null,
                 testPlatformOptions,
                 mockEventsHandler.Object,
-                mockTesthostLauncher.Object).TestSessionInfo,
+                mockTesthostLauncher.Object)?.TestSessionInfo,
             testSessionInfo);
 
         _mockRequestSender.Verify(

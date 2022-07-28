@@ -56,7 +56,7 @@ public class HtmlLoggerTests
     public void InitializeShouldThrowExceptionIfEventsIsNull()
     {
         Assert.ThrowsException<ArgumentNullException>(
-            () => _htmlLogger.Initialize(null, _parameters));
+            () => _htmlLogger.Initialize(null!, _parameters));
     }
 
     [TestMethod]
@@ -79,7 +79,7 @@ public class HtmlLoggerTests
             () =>
             {
                 _events = new Mock<TestLoggerEvents>();
-                _parameters[DefaultLoggerParameterNames.TestRunDirectory] = null;
+                _parameters[DefaultLoggerParameterNames.TestRunDirectory] = null!;
                 _htmlLogger.Initialize(_events.Object, _parameters);
             });
     }
@@ -88,13 +88,13 @@ public class HtmlLoggerTests
     public void InitializeShouldThrowExceptionIfParametersAreEmpty()
     {
         var events = new Mock<TestLoggerEvents>();
-        Assert.ThrowsException<ArgumentException>(() => _htmlLogger.Initialize(events.Object, new Dictionary<string, string>()));
+        Assert.ThrowsException<ArgumentException>(() => _htmlLogger.Initialize(events.Object, new Dictionary<string, string?>()));
     }
 
     [TestMethod]
     public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _htmlLogger.TestMessageHandler(new object(), default));
+        Assert.ThrowsException<ArgumentNullException>(() => _htmlLogger.TestMessageHandler(new object(), default!));
     }
 
     #endregion
@@ -107,23 +107,23 @@ public class HtmlLoggerTests
 
         _htmlLogger.TestMessageHandler(new object(), testRunMessageEventArgs);
 
-        var actualMessage = _htmlLogger.TestRunDetails.RunLevelMessageInformational.First();
+        var actualMessage = _htmlLogger.TestRunDetails!.RunLevelMessageInformational!.First();
         Assert.AreEqual(message, actualMessage);
     }
 
     [TestMethod]
     public void TestMessageHandlerShouldNotInitializelistForInformationErrorAndWarningMessages()
     {
-        Assert.IsNull(_htmlLogger.TestRunDetails.RunLevelMessageInformational);
+        Assert.IsNull(_htmlLogger.TestRunDetails!.RunLevelMessageInformational);
         Assert.IsNull(_htmlLogger.TestRunDetails.RunLevelMessageErrorAndWarning);
     }
 
     [TestMethod]
     public void TestCompleteHandlerShouldThrowExceptionIfParametersAreNull()
     {
-        Dictionary<string, string>? parameters = null;
+        Dictionary<string, string?>? parameters = null;
         var events = new Mock<TestLoggerEvents>();
-        Assert.ThrowsException<ArgumentNullException>(() => _htmlLogger.Initialize(events.Object, parameters));
+        Assert.ThrowsException<ArgumentNullException>(() => _htmlLogger.Initialize(events.Object, parameters!));
     }
 
     [TestMethod]
@@ -137,8 +137,9 @@ public class HtmlLoggerTests
         var testRunMessageEventArgs2 = new TestRunMessageEventArgs(TestMessageLevel.Warning, message2);
         _htmlLogger.TestMessageHandler(new object(), testRunMessageEventArgs2);
 
-        Assert.AreEqual(message, _htmlLogger.TestRunDetails.RunLevelMessageErrorAndWarning.First());
-        Assert.AreEqual(2, _htmlLogger.TestRunDetails.RunLevelMessageErrorAndWarning.Count);
+        var runLevelMessageErrorAndWarning = _htmlLogger.TestRunDetails!.RunLevelMessageErrorAndWarning!;
+        Assert.AreEqual(2, runLevelMessageErrorAndWarning.Count);
+        Assert.AreEqual(message, runLevelMessageErrorAndWarning.First());
     }
 
     [TestMethod]
@@ -199,7 +200,7 @@ public class HtmlLoggerTests
 
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(passTestResultExpected).Object);
 
-        Assert.AreEqual("abc", _htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.First().DisplayName);
+        Assert.AreEqual("abc", _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.First().DisplayName);
     }
 
     [TestMethod]
@@ -215,7 +216,7 @@ public class HtmlLoggerTests
 
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(passTestResultExpected).Object);
 
-        Assert.AreEqual("def", _htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.Last().DisplayName);
+        Assert.AreEqual("def", _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.Last().DisplayName);
     }
 
     [TestMethod]
@@ -239,13 +240,14 @@ public class HtmlLoggerTests
         // Act
         _htmlLogger.TestResultHandler(new object(), eventArg.Object);
 
-        var result = _htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.First();
+        var resultCollectionList = _htmlLogger.TestRunDetails!.ResultCollectionList!;
+        var result = resultCollectionList.First().ResultList!.First();
 
         Assert.AreEqual("def", result.DisplayName);
         Assert.AreEqual("error message", result.ErrorMessage);
         Assert.AreEqual("Error stack trace", result.ErrorStackTrace);
         Assert.AreEqual("fully", result.FullyQualifiedName);
-        Assert.AreEqual("abc/def.dll", _htmlLogger.TestRunDetails.ResultCollectionList.First().Source);
+        Assert.AreEqual("abc/def.dll", resultCollectionList.First().Source);
         Assert.AreEqual("1s", result.Duration);
     }
 
@@ -253,34 +255,34 @@ public class HtmlLoggerTests
     public void GetFormattedDurationStringShouldGiveCorrectFormat()
     {
         TimeSpan ts1 = new(0, 0, 0, 0, 1);
-        Assert.AreEqual("1ms", _htmlLogger.GetFormattedDurationString(ts1));
+        Assert.AreEqual("1ms", VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger.GetFormattedDurationString(ts1));
 
         TimeSpan ts2 = new(0, 0, 0, 1, 0);
-        Assert.AreEqual("1s", _htmlLogger.GetFormattedDurationString(ts2));
+        Assert.AreEqual("1s", VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger.GetFormattedDurationString(ts2));
 
         TimeSpan ts3 = new(0, 0, 1, 0, 1);
-        Assert.AreEqual("1m", _htmlLogger.GetFormattedDurationString(ts3));
+        Assert.AreEqual("1m", VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger.GetFormattedDurationString(ts3));
 
         TimeSpan ts4 = new(0, 1, 0, 2, 3);
-        Assert.AreEqual("1h", _htmlLogger.GetFormattedDurationString(ts4));
+        Assert.AreEqual("1h", VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger.GetFormattedDurationString(ts4));
 
         TimeSpan ts5 = new(0, 1, 2, 3, 4);
-        Assert.AreEqual("1h 2m", _htmlLogger.GetFormattedDurationString(ts5));
+        Assert.AreEqual("1h 2m", VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger.GetFormattedDurationString(ts5));
 
         TimeSpan ts6 = new(0, 0, 1, 2, 3);
-        Assert.AreEqual("1m 2s", _htmlLogger.GetFormattedDurationString(ts6));
+        Assert.AreEqual("1m 2s", VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger.GetFormattedDurationString(ts6));
 
         TimeSpan ts7 = new(0, 0, 0, 1, 3);
-        Assert.AreEqual("1s 3ms", _htmlLogger.GetFormattedDurationString(ts7));
+        Assert.AreEqual("1s 3ms", VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger.GetFormattedDurationString(ts7));
 
         TimeSpan ts8 = new(2);
-        Assert.AreEqual("< 1ms", _htmlLogger.GetFormattedDurationString(ts8));
+        Assert.AreEqual("< 1ms", VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger.GetFormattedDurationString(ts8));
 
         TimeSpan ts10 = new(1, 0, 0, 1, 3);
-        Assert.AreEqual("> 1d", _htmlLogger.GetFormattedDurationString(ts10));
+        Assert.AreEqual("> 1d", VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger.GetFormattedDurationString(ts10));
 
         TimeSpan ts9 = new(0, 0, 0, 0, 0);
-        Assert.IsNull(_htmlLogger.GetFormattedDurationString(ts9));
+        Assert.IsNull(VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger.GetFormattedDurationString(ts9));
     }
 
     [TestMethod]
@@ -297,7 +299,7 @@ public class HtmlLoggerTests
         _htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
         _htmlLogger.TestResultHandler(new object(), resultEventArg2.Object);
 
-        Assert.AreEqual(2, _htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.Count, "TestResultHandler is not creating test result entry for each test case");
+        Assert.AreEqual(2, _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.Count, "TestResultHandler is not creating test result entry for each test case");
     }
 
     [TestMethod]
@@ -315,7 +317,7 @@ public class HtmlLoggerTests
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result1).Object);
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result2).Object);
 
-        Assert.AreEqual(2, _htmlLogger.TestRunDetails.ResultCollectionList.Count);
+        Assert.AreEqual(2, _htmlLogger.TestRunDetails!.ResultCollectionList!.Count);
         Assert.AreEqual("abc.dll", _htmlLogger.TestRunDetails.ResultCollectionList.First().Source);
         Assert.AreEqual("def.dll", _htmlLogger.TestRunDetails.ResultCollectionList.Last().Source);
     }
@@ -328,7 +330,7 @@ public class HtmlLoggerTests
 
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result1).Object);
 
-        Assert.AreEqual(1, _htmlLogger.TestRunDetails.ResultCollectionList.First().FailedResultList.Count);
+        Assert.AreEqual(1, _htmlLogger.TestRunDetails!.ResultCollectionList!.First().FailedResultList!.Count);
     }
 
     [TestMethod]
@@ -346,8 +348,8 @@ public class HtmlLoggerTests
 
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result1).Object);
 
-        Assert.AreEqual(1, _htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.Count, "test handler is adding parent result correctly");
-        Assert.IsNull(_htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.First().InnerTestResults, "test handler is adding child result correctly");
+        Assert.AreEqual(1, _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.Count, "test handler is adding parent result correctly");
+        Assert.IsNull(_htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.First().InnerTestResults, "test handler is adding child result correctly");
 
         var result2 = new ObjectModel.TestResult(testCase2);
         result2.SetPropertyValue(HtmlLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
@@ -360,8 +362,8 @@ public class HtmlLoggerTests
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result2).Object);
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result3).Object);
 
-        Assert.AreEqual(1, _htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.Count, "test handler is adding parent result correctly");
-        Assert.AreEqual(2, _htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.First().InnerTestResults.Count, "test handler is adding child result correctly");
+        Assert.AreEqual(1, _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.Count, "test handler is adding parent result correctly");
+        Assert.AreEqual(2, _htmlLogger.TestRunDetails.ResultCollectionList!.First().ResultList!.First().InnerTestResults!.Count, "test handler is adding child result correctly");
     }
 
     [TestMethod]
@@ -387,7 +389,7 @@ public class HtmlLoggerTests
 
         _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
-        Assert.AreEqual(4, _htmlLogger.TestRunDetails.Summary.TotalTests, "summary should keep track of total tests");
+        Assert.AreEqual(4, _htmlLogger.TestRunDetails!.Summary!.TotalTests, "summary should keep track of total tests");
         Assert.AreEqual(1, _htmlLogger.TestRunDetails.Summary.FailedTests, "summary should keep track of failed tests");
         Assert.AreEqual(2, _htmlLogger.TestRunDetails.Summary.PassedTests, "summary should keep track of passed tests");
         Assert.AreEqual(1, _htmlLogger.TestRunDetails.Summary.SkippedTests, "summary should keep track of passed tests");
@@ -396,7 +398,7 @@ public class HtmlLoggerTests
     }
 
     [TestMethod]
-    public void TestCompleteHandlerShouldCreateCustumHtmlFileNamewithLogFileNameKey()
+    public void TestCompleteHandlerShouldCreateCustomHtmlFileNamewithLogFileNameKey()
     {
         var parameters = new Dictionary<string, string?>
         {
@@ -411,13 +413,13 @@ public class HtmlLoggerTests
 
         _htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
         _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
-        Assert.IsTrue(_htmlLogger.HtmlFilePath.Contains("TestResult"));
+        Assert.IsTrue(_htmlLogger.HtmlFilePath!.Contains("TestResult"));
     }
 
     [TestMethod]
-    public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefix()
+    public void TestCompleteHandlerShouldCreateCustomHtmlFileNameWithLogPrefix()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             [HtmlLoggerConstants.LogFilePrefixKey] = "sample",
             [DefaultLoggerParameterNames.TestRunDirectory] = "dsa",
@@ -431,13 +433,13 @@ public class HtmlLoggerTests
 
         _htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
         _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
-        Assert.IsFalse(_htmlLogger.HtmlFilePath.Contains("__"));
+        Assert.IsFalse(_htmlLogger.HtmlFilePath!.Contains("__"));
     }
 
     [TestMethod]
-    public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefixIfTargetFrameworkIsNull()
+    public void TestCompleteHandlerShouldCreateCustomHtmlFileNameWithLogPrefixIfTargetFrameworkIsNull()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             [HtmlLoggerConstants.LogFilePrefixKey] = "sample",
             [DefaultLoggerParameterNames.TestRunDirectory] = "dsa",
@@ -451,11 +453,11 @@ public class HtmlLoggerTests
 
         _htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
         _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
-        Assert.IsTrue(_htmlLogger.HtmlFilePath.Contains("sample_net451"));
+        Assert.IsTrue(_htmlLogger.HtmlFilePath!.Contains("sample_net451"));
     }
 
     [TestMethod]
-    public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefixNull()
+    public void TestCompleteHandlerShouldCreateCustomHtmlFileNameWithLogPrefixNull()
     {
         var parameters = new Dictionary<string, string?>
         {
@@ -468,20 +470,20 @@ public class HtmlLoggerTests
         var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
         var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
 
-        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
         {
         }).Returns(new Mock<Stream>().Object);
 
         _htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
         _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
-        _mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite), Times.Once);
+        _mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite), Times.Once);
     }
 
     [TestMethod]
     public void TestCompleteHandlerShouldThrowExceptionWithLogPrefixIfTargetFrameworkKeyIsNotPresent()
     {
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
             [HtmlLoggerConstants.LogFilePrefixKey] = "sample.html",
             [DefaultLoggerParameterNames.TestRunDirectory] = "dsa"
@@ -514,14 +516,14 @@ public class HtmlLoggerTests
         var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
         var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
 
-        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
         {
         }).Returns(new Mock<Stream>().Object);
 
         _htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
         _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
-        _mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite), Times.Once);
+        _mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite), Times.Once);
     }
 
     [TestMethod]
@@ -548,7 +550,7 @@ public class HtmlLoggerTests
         var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
         var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
 
-        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
         {
         }).Returns(new Mock<Stream>().Object);
 
@@ -564,7 +566,7 @@ public class HtmlLoggerTests
         var testCase1 = CreateTestCase("TestCase1") ?? throw new ArgumentNullException($"CreateTestCase(\"TestCase1\")");
         var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
         var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
-        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
         {
         }).Returns(new Mock<Stream>().Object);
 
@@ -572,20 +574,20 @@ public class HtmlLoggerTests
         _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
         _mockXmlSerializer.Verify(x => x.WriteObject(It.IsAny<Stream>(), It.IsAny<TestRunDetails>()), Times.Once);
-        Assert.IsTrue(_htmlLogger.XmlFilePath.Contains(".xml"));
-        Assert.IsTrue(_htmlLogger.HtmlFilePath.Contains(".html"));
+        Assert.IsTrue(_htmlLogger.XmlFilePath!.Contains(".xml"));
+        Assert.IsTrue(_htmlLogger.HtmlFilePath!.Contains(".html"));
     }
 
     [TestMethod]
     public void TestCompleteHandlerShouldNotDivideByZeroWhenThereAre0TestResults()
     {
-        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
         {
         }).Returns(new Mock<Stream>().Object);
 
         _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
-        Assert.AreEqual(0, _htmlLogger.TestRunDetails.Summary.TotalTests);
+        Assert.AreEqual(0, _htmlLogger.TestRunDetails!.Summary!.TotalTests);
         Assert.AreEqual(0, _htmlLogger.TestRunDetails.Summary.PassPercentage);
     }
 

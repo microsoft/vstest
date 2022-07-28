@@ -2,7 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+#if !NET5_0_OR_GREATER
 using System.Diagnostics;
+#endif
+using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
@@ -41,7 +44,7 @@ public class PortArgumentProcessorTests
     public void GetExecutorShouldReturnPortArgumentProcessorCapabilities()
     {
         var processor = new PortArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is PortArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is PortArgumentExecutor);
     }
 
     #region PortArgumentProcessorCapabilitiesTests
@@ -98,7 +101,7 @@ public class PortArgumentProcessorTests
         int port = 2345;
         CommandLineOptions.Instance.ParentProcessId = 0;
 
-        _executor.Initialize(port.ToString());
+        _executor.Initialize(port.ToString(CultureInfo.InvariantCulture));
 
         Assert.AreEqual(port, CommandLineOptions.Instance.Port);
         Assert.IsNotNull(DesignModeClient.Instance);
@@ -110,7 +113,7 @@ public class PortArgumentProcessorTests
         int port = 2345;
         CommandLineOptions.Instance.ParentProcessId = 0;
 
-        _executor.Initialize(port.ToString());
+        _executor.Initialize(port.ToString(CultureInfo.InvariantCulture));
 
         Assert.IsTrue(CommandLineOptions.Instance.IsDesignMode);
     }
@@ -120,12 +123,18 @@ public class PortArgumentProcessorTests
     {
         _executor = new PortArgumentExecutor(CommandLineOptions.Instance, _testRequestManager.Object, _mockProcessHelper.Object);
         int port = 2345;
-        int processId = Process.GetCurrentProcess().Id;
-        CommandLineOptions.Instance.ParentProcessId = processId;
+#if NET5_0_OR_GREATER
+        var pid = Environment.ProcessId;
+#else
+        int pid;
+        using (var p = Process.GetCurrentProcess())
+            pid = p.Id;
+#endif
+        CommandLineOptions.Instance.ParentProcessId = pid;
 
-        _executor.Initialize(port.ToString());
+        _executor.Initialize(port.ToString(CultureInfo.InvariantCulture));
 
-        _mockProcessHelper.Verify(ph => ph.SetExitCallback(processId, It.IsAny<Action<object>>()), Times.Once);
+        _mockProcessHelper.Verify(ph => ph.SetExitCallback(pid, It.IsAny<Action<object?>>()), Times.Once);
     }
 
     [TestMethod]
@@ -135,7 +144,7 @@ public class PortArgumentProcessorTests
             (parentProcessId, ph) => _testDesignModeClient.Object, _mockProcessHelper.Object);
 
         int port = 2345;
-        _executor.Initialize(port.ToString());
+        _executor.Initialize(port.ToString(CultureInfo.InvariantCulture));
         var result = _executor.Execute();
 
         _testDesignModeClient.Verify(td =>
@@ -154,7 +163,7 @@ public class PortArgumentProcessorTests
             It.IsAny<ITestRequestManager>())).Callback(() => throw new TimeoutException());
 
         int port = 2345;
-        _executor.Initialize(port.ToString());
+        _executor.Initialize(port.ToString(CultureInfo.InvariantCulture));
         Assert.ThrowsException<CommandLineException>(() => _executor.Execute());
 
         _testDesignModeClient.Verify(td => td.ConnectToClientAndProcessRequests(port, _testRequestManager.Object), Times.Once);
@@ -166,7 +175,7 @@ public class PortArgumentProcessorTests
     {
         var parentProcessId = 2346;
         var parentProcessIdArgumentExecutor = new ParentProcessIdArgumentExecutor(CommandLineOptions.Instance);
-        parentProcessIdArgumentExecutor.Initialize(parentProcessId.ToString());
+        parentProcessIdArgumentExecutor.Initialize(parentProcessId.ToString(CultureInfo.InvariantCulture));
 
         int actualParentProcessId = -1;
         _executor = new PortArgumentExecutor(CommandLineOptions.Instance,
@@ -180,7 +189,7 @@ public class PortArgumentProcessorTests
         );
 
         int port = 2345;
-        _executor.Initialize(port.ToString());
+        _executor.Initialize(port.ToString(CultureInfo.InvariantCulture));
         var result = _executor.Execute();
 
         _testDesignModeClient.Verify(td =>

@@ -25,7 +25,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests;
 public class CodeCoverageDataAttachmentsHandlerTests
 {
     private readonly Mock<IProgress<int>> _mockProgressReporter;
-    private readonly XmlElement? _configurationElement;
+    private readonly XmlElement _configurationElement;
     private readonly CodeCoverageDataAttachmentsHandler _coverageDataAttachmentsHandler;
     private readonly string _filePrefix;
 
@@ -37,7 +37,7 @@ public class CodeCoverageDataAttachmentsHandlerTests
     {
         var doc = new XmlDocument();
         doc.LoadXml("<configurationElement/>");
-        _configurationElement = doc.DocumentElement;
+        _configurationElement = doc.DocumentElement!;
         _mockProgressReporter = new Mock<IProgress<int>>();
         _coverageDataAttachmentsHandler = new CodeCoverageDataAttachmentsHandler();
 #if NETFRAMEWORK

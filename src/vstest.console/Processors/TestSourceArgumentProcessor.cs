@@ -2,9 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -18,9 +17,8 @@ internal class TestSourceArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/TestSource";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -32,7 +30,7 @@ internal class TestSourceArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new TestSourceArgumentExecutor(CommandLineOptions.Instance));
@@ -71,7 +69,7 @@ internal class TestSourceArgumentExecutor : IArgumentExecutor
     /// </param>
     public TestSourceArgumentExecutor(CommandLineOptions testSources)
     {
-        Contract.Requires(testSources != null);
+        ValidateArg.NotNull(testSources, nameof(testSources));
         _testSources = testSources;
     }
 
@@ -82,10 +80,12 @@ internal class TestSourceArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        Contract.Assert(_testSources != null);
-        _testSources.AddSource(argument);
+        if (!argument.IsNullOrEmpty())
+        {
+            _testSources.AddSource(argument);
+        }
     }
 
     /// <summary>

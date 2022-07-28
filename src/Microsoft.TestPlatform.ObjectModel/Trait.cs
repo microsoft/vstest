@@ -1,14 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
-#if NETFRAMEWORK
 using System;
-#endif
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -33,9 +28,9 @@ public class Trait
     {
     }
 
-    public Trait(string name!!, string value)
+    public Trait(string name, string value)
     {
-        Name = name;
+        Name = name ?? throw new ArgumentNullException(nameof(name));
         Value = value;
     }
 }

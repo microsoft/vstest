@@ -7,13 +7,11 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using Microsoft.Win32;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 internal class WindowsRegistryHelper : IWindowsRegistryHelper
 {
-    public IRegistryKey OpenBaseKey(RegistryHive hKey, RegistryView view)
+    public IRegistryKey? OpenBaseKey(RegistryHive hKey, RegistryView view)
     {
         var keyRegistry = RegistryKey.OpenBaseKey(hKey, view);
         return keyRegistry is null ? null : new RegistryKeyWrapper(keyRegistry);
@@ -29,18 +27,18 @@ internal class RegistryKeyWrapper : IRegistryKey
         _registryKey = registryKey;
     }
 
-    public object GetValue(string name)
+    public object? GetValue(string name)
     {
         return _registryKey?.GetValue(name)?.ToString();
     }
 
-    public IRegistryKey OpenSubKey(string name)
+    public IRegistryKey? OpenSubKey(string name)
     {
         var keyRegistry = _registryKey.OpenSubKey(name);
         return keyRegistry is null ? null : new RegistryKeyWrapper(keyRegistry);
     }
 
-    public string[] GetSubKeyNames()
+    public string[]? GetSubKeyNames()
         => _registryKey?.GetSubKeyNames();
 
     public void Dispose()

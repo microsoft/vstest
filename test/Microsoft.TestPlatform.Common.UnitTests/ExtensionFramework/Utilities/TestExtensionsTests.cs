@@ -10,17 +10,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using FluentAssertions;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities;
 
 [TestClass]
 public class TestExtensionsTests
 {
-    private TestExtensions _testExtensions;
+    private readonly TestExtensions _testExtensions;
 
-    [TestInitialize]
-    public void TestInit()
+    public TestExtensionsTests()
     {
         _testExtensions = new TestExtensions();
     }
@@ -150,7 +147,7 @@ public class TestExtensionsTests
         {
             { "td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)) }
         };
-        CollectionAssert.AreEqual(expectedExtensions.Keys, extensions.TestDiscoverers.Keys);
+        CollectionAssert.AreEqual(expectedExtensions.Keys, extensions!.TestDiscoverers!.Keys);
     }
 
     [TestMethod]
@@ -170,7 +167,7 @@ public class TestExtensionsTests
         {
             { "te", new TestExecutorPluginInformation(typeof(TestExtensionsTests)) }
         };
-        CollectionAssert.AreEqual(expectedExtensions.Keys, extensions.TestExecutors.Keys);
+        CollectionAssert.AreEqual(expectedExtensions.Keys, extensions!.TestExecutors!.Keys);
     }
 
     [TestMethod]
@@ -190,7 +187,7 @@ public class TestExtensionsTests
         {
             { "tsp", new TestSettingsProviderPluginInformation(typeof(TestExtensionsTests)) }
         };
-        CollectionAssert.AreEqual(expectedExtensions.Keys, extensions.TestSettingsProviders.Keys);
+        CollectionAssert.AreEqual(expectedExtensions.Keys, extensions!.TestSettingsProviders!.Keys);
     }
 
     [TestMethod]
@@ -210,7 +207,7 @@ public class TestExtensionsTests
         {
             { "tl", new TestLoggerPluginInformation(typeof(TestExtensionsTests)) }
         };
-        CollectionAssert.AreEqual(expectedExtensions.Keys, extensions.TestLoggers.Keys);
+        CollectionAssert.AreEqual(expectedExtensions.Keys, extensions!.TestLoggers!.Keys);
     }
 
     [TestMethod]
@@ -234,13 +231,13 @@ public class TestExtensionsTests
         {
             { "td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)) }
         };
-        CollectionAssert.AreEqual(expectedDiscoverers.Keys, extensions.TestDiscoverers.Keys);
+        CollectionAssert.AreEqual(expectedDiscoverers.Keys, extensions!.TestDiscoverers!.Keys);
 
         var expectedLoggers = new Dictionary<string, TestLoggerPluginInformation>
         {
             { "tl", new TestLoggerPluginInformation(typeof(TestExtensionsTests)) }
         };
-        CollectionAssert.AreEqual(expectedLoggers.Keys, extensions.TestLoggers.Keys);
+        CollectionAssert.AreEqual(expectedLoggers.Keys, extensions.TestLoggers!.Keys);
     }
 
     [TestMethod]

@@ -10,8 +10,6 @@ using System.Text.RegularExpressions;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
 internal sealed class FastFilter
@@ -20,9 +18,9 @@ internal sealed class FastFilter
 
     internal bool IsFilteredOutWhenMatched { get; }
 
-    internal Regex PropertyValueRegex { get; set; }
+    internal Regex? PropertyValueRegex { get; set; }
 
-    internal string PropertyValueRegexReplacement { get; set; }
+    internal string? PropertyValueRegexReplacement { get; set; }
 
     internal FastFilter(ImmutableDictionary<string, ISet<string>> filterProperties, Operation filterOperation, Operator filterOperator)
     {
@@ -30,48 +28,52 @@ internal sealed class FastFilter
 
         FilterProperties = filterProperties;
 
-        if (filterOperation == Operation.Equal && (filterOperator == Operator.Or || filterOperator == Operator.None))
-        {
-            IsFilteredOutWhenMatched = false;
-        }
-        else
-        {
-            IsFilteredOutWhenMatched = filterOperation == Operation.NotEqual && (filterOperator == Operator.And || filterOperator == Operator.None)
+        IsFilteredOutWhenMatched =
+            (filterOperation != Operation.Equal || filterOperator != Operator.Or && filterOperator != Operator.None)
+            && (filterOperation == Operation.NotEqual && (filterOperator == Operator.And || filterOperator == Operator.None)
                 ? true
-                : throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.FastFilterException));
-        }
+                : throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.FastFilterException)));
     }
 
-    internal string[] ValidForProperties(IEnumerable<string> properties)
+    internal string[]? ValidForProperties(IEnumerable<string>? properties)
     {
+        if (properties is null)
+        {
+            return null;
+        }
+
         return FilterProperties.Keys.All(name => properties.Contains(name))
             ? null
             : FilterProperties.Keys.Where(name => !properties.Contains(name)).ToArray();
     }
 
-    internal bool Evaluate(Func<string, Object> propertyValueProvider!!)
+    internal bool Evaluate(Func<string, object?> propertyValueProvider)
     {
+        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
+
         bool matched = false;
         foreach (var name in FilterProperties.Keys)
         {
             // If there is no value corresponding to given name, treat it as unmatched.
-            if (TryGetPropertyValue(name, propertyValueProvider, out var singleValue, out var multiValues))
+            if (!TryGetPropertyValue(name, propertyValueProvider, out var singleValue, out var multiValues))
             {
-                if (singleValue != null)
-                {
-                    var value = PropertyValueRegex == null ? singleValue : ApplyRegex(singleValue);
-                    matched = value != null && FilterProperties[name].Contains(value);
-                }
-                else
-                {
-                    matched = (PropertyValueRegex == null ? multiValues : multiValues.Select(value => ApplyRegex(value)))
-                        .Any(result => result != null && FilterProperties[name].Contains(result));
-                }
+                continue;
+            }
 
-                if (matched)
-                {
-                    break;
-                }
+            if (singleValue != null)
+            {
+                var value = PropertyValueRegex == null ? singleValue : ApplyRegex(singleValue);
+                matched = value != null && FilterProperties[name].Contains(value);
+            }
+            else
+            {
+                var values = PropertyValueRegex == null ? multiValues : multiValues?.Select(value => ApplyRegex(value));
+                matched = values?.Any(result => result != null && FilterProperties[name].Contains(result)) == true;
+            }
+
+            if (matched)
+            {
+                break;
             }
         }
 
@@ -82,11 +84,11 @@ internal sealed class FastFilter
     /// Apply regex matching or replacement to given value.
     /// </summary>
     /// <returns>For matching, returns the result of matching, null if no match found. For replacement, returns the result of replacement.</returns>
-    private string ApplyRegex(string value)
+    private string? ApplyRegex(string value)
     {
         TPDebug.Assert(PropertyValueRegex != null);
 
-        string result = null;
+        string? result = null;
         if (PropertyValueRegexReplacement == null)
         {
             var match = PropertyValueRegex.Match(value);
@@ -105,7 +107,7 @@ internal sealed class FastFilter
     /// <summary>
     /// Returns property value for Property using propertValueProvider.
     /// </summary>
-    private static bool TryGetPropertyValue(string name, Func<string, Object> propertyValueProvider, out string singleValue, out string[] multiValues)
+    private static bool TryGetPropertyValue(string name, Func<string, object?> propertyValueProvider, out string? singleValue, out string[]? multiValues)
     {
         var propertyValue = propertyValueProvider(name);
         if (null != propertyValue)
@@ -199,14 +201,14 @@ internal sealed class FastFilter
         {
             if (!_filterDictionaryBuilder.TryGetValue(name, out var values))
             {
-                values = ImmutableHashSet.CreateBuilder(StringComparer.OrdinalIgnoreCase);
+                values = ImmutableHashSet.CreateBuilder<string>(StringComparer.OrdinalIgnoreCase);
                 _filterDictionaryBuilder.Add(name, values);
             }
 
             values.Add(value);
         }
 
-        internal FastFilter ToFastFilter()
+        internal FastFilter? ToFastFilter()
         {
             return ContainsValidFilter
                 ? new FastFilter(

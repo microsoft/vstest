@@ -3,14 +3,14 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.AttachVS;
 
@@ -25,8 +25,9 @@ internal class DebuggerUtility
                 Trace($"FAIL: Pid is null.");
                 return false;
             }
+
             var process = Process.GetProcessById(pid.Value);
-            Trace($"Starting with pid '{pid}({process?.ProcessName})', and vsPid '{vsPid}'");
+            Trace($"Starting with pid '{pid}({process.ProcessName})', and vsPid '{vsPid}'");
             Trace($"Using pid: {pid} to get parent VS.");
             var vs = GetVsFromPid(Process.GetProcessById(vsPid ?? process.Id));
 
@@ -34,11 +35,13 @@ internal class DebuggerUtility
             {
                 Trace($"Parent VS is {vs.ProcessName} ({vs.Id}).");
                 AttachTo(process, vs);
+                return true;
             }
-            else
-            {
-                Trace($"Parent VS not found, finding the first VS that started.");
-                var processes = Process.GetProcesses().Where(p => p.ProcessName == "devenv").Select(p =>
+
+            Trace($"Parent VS not found, finding the first VS that started.");
+            var firstVs = Process.GetProcesses()
+                .Where(p => p.ProcessName == "devenv")
+                .Select(p =>
                 {
                     try
                     {
@@ -48,19 +51,26 @@ internal class DebuggerUtility
                     {
                         return null;
                     }
-                }).Where(p => p != null && !p.HasExited).OrderBy(p => p.StartTime).ToList();
+                })
+                .Where(p => p != null && !p.HasExited)
+                .OrderBy(p => p!.StartTime)
+                .FirstOrDefault();
 
-                var firstVs = processes.FirstOrDefault();
+            if (firstVs != null)
+            {
                 Trace($"Found VS {firstVs.Process.Id}");
                 AttachTo(process, firstVs.Process);
+                return true;
             }
-            return true;
+
+            Trace("Could not find any started VS.");
         }
         catch (Exception ex)
         {
             Trace($"ERROR: {ex}, {ex.StackTrace}");
-            return false;
         }
+
+        return false;
     }
 
     private static void AttachTo(Process process, Process vs)
@@ -79,9 +89,9 @@ internal class DebuggerUtility
 
     private static bool AttachVs(Process vs, int pid)
     {
-        IBindCtx bindCtx = null;
-        IRunningObjectTable runninObjectTable = null;
-        IEnumMoniker enumMoniker = null;
+        IBindCtx? bindCtx = null;
+        IRunningObjectTable? runninObjectTable = null;
+        IEnumMoniker? enumMoniker = null;
         try
         {
             var r = CreateBindCtx(0, out bindCtx);
@@ -123,17 +133,17 @@ internal class DebuggerUtility
                     {
                         try
                         {
-                            dbg = dte.GetType().InvokeMember("Debugger", BindingFlags.GetProperty, null, dte, null);
-                            lps = dbg.GetType().InvokeMember("LocalProcesses", BindingFlags.GetProperty, null, dbg, null);
-                            var lpn = (System.Collections.IEnumerator)lps.GetType().InvokeMember("GetEnumerator", BindingFlags.InvokeMethod, null, lps, null);
+                            dbg = dte.GetType().InvokeMember("Debugger", BindingFlags.GetProperty, null, dte, null, CultureInfo.InvariantCulture);
+                            lps = dbg.GetType().InvokeMember("LocalProcesses", BindingFlags.GetProperty, null, dbg, null, CultureInfo.InvariantCulture);
+                            var lpn = (System.Collections.IEnumerator)lps.GetType().InvokeMember("GetEnumerator", BindingFlags.InvokeMethod, null, lps, null, CultureInfo.InvariantCulture);
 
                             while (lpn.MoveNext())
                             {
-                                var pn = Convert.ToInt32(lpn.Current.GetType().InvokeMember("ProcessID", BindingFlags.GetProperty, null, lpn.Current, null));
+                                var pn = Convert.ToInt32(lpn.Current.GetType().InvokeMember("ProcessID", BindingFlags.GetProperty, null, lpn.Current, null, CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
 
                                 if (pn == pid)
                                 {
-                                    lpn.Current.GetType().InvokeMember("Attach", BindingFlags.InvokeMethod, null, lpn.Current, null);
+                                    lpn.Current.GetType().InvokeMember("Attach", BindingFlags.InvokeMethod, null, lpn.Current, null, CultureInfo.InvariantCulture);
                                     return true;
                                 }
                             }
@@ -183,7 +193,7 @@ internal class DebuggerUtility
         }
     }
 
-    private static Process GetVsFromPid(Process process)
+    private static Process? GetVsFromPid(Process process)
     {
         var parent = process;
         while (!IsVsOrNull(parent))
@@ -194,7 +204,7 @@ internal class DebuggerUtility
         return parent;
     }
 
-    private static bool IsVsOrNull(Process process)
+    private static bool IsVsOrNull([NotNullWhen(false)] Process? process)
     {
         if (process == null)
         {
@@ -219,7 +229,7 @@ internal class DebuggerUtility
     {
         try
         {
-            // Parent needs to start before the child, otherwise it might be a different process 
+            // Parent needs to start before the child, otherwise it might be a different process
             // that is just reusing the same PID.
             if (parent.StartTime <= currentProcess.StartTime)
             {
@@ -227,38 +237,25 @@ internal class DebuggerUtility
             }
 
             Trace($"Process {parent.ProcessName} ({parent.Id}) is not a valid parent because it started after the current process.");
-            return false;
         }
         catch
         {
             // Access denied or process exited while we were holding the Process object.
-            return false;
         }
+
+        return false;
     }
 
-    private static Process GetParentProcess(Process process)
+    private static Process? GetParentProcess(Process process)
     {
-        int id;
-        try
-        {
-            var handle = process.Handle;
-            var res = NtQueryInformationProcess(handle, 0, out var pbi, Marshal.SizeOf<PROCESS_BASIC_INFORMATION>(), out int size);
-
-            var p = res != 0 ? -1 : pbi.InheritedFromUniqueProcessId.ToInt32();
-
-            id = p;
-        }
-        catch
-        {
-            id = -1;
-        }
-
-        Process parent = null;
+        int id = GetParentProcessId(process);
         if (id != -1)
         {
             try
             {
-                parent = Process.GetProcessById(id);
+                var parent = Process.GetProcessById(id);
+                if (IsCorrectParent(process, parent))
+                    return parent;
             }
             catch
             {
@@ -266,10 +263,27 @@ internal class DebuggerUtility
             }
         }
 
-        return IsCorrectParent(process, parent) ? parent : null;
+        return null;
+
+        static int GetParentProcessId(Process process)
+        {
+            try
+            {
+                var handle = process.Handle;
+                var res = NtQueryInformationProcess(handle, 0, out var pbi, Marshal.SizeOf<PROCESS_BASIC_INFORMATION>(), out int size);
+
+                var p = res != 0 ? -1 : pbi.InheritedFromUniqueProcessId.ToInt32();
+
+                return p;
+            }
+            catch
+            {
+                return -1;
+            }
+        }
     }
 
-    private static void Trace(string message, [CallerMemberName] string methodName = null)
+    private static void Trace(string message, [CallerMemberName] string? methodName = null)
     {
         System.Diagnostics.Trace.WriteLine($"[AttachVS]{methodName}: {message}");
     }

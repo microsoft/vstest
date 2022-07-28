@@ -5,8 +5,6 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 /// <summary>
@@ -72,13 +70,13 @@ public interface ICommunicationManager
     /// Reads message from the binary reader
     /// </summary>
     /// <returns>Returns message read from the binary reader</returns>
-    Message ReceiveMessage();
+    Message? ReceiveMessage();
 
     /// <summary>
     /// Reads message from the binary reader
     /// </summary>
     /// <returns> Raw message string </returns>
-    string ReceiveRawMessage();
+    string? ReceiveRawMessage();
 
     /// <summary>
     /// Reads message from the binary reader using read timeout
@@ -89,7 +87,7 @@ public interface ICommunicationManager
     /// <returns>
     /// Returns message read from the binary reader
     /// </returns>
-    Task<Message> ReceiveMessageAsync(CancellationToken cancellationToken);
+    Task<Message?> ReceiveMessageAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Reads message from the binary reader using read timeout
@@ -100,7 +98,7 @@ public interface ICommunicationManager
     /// <returns>
     /// Raw message string
     /// </returns>
-    Task<string> ReceiveRawMessageAsync(CancellationToken cancellationToken);
+    Task<string?> ReceiveRawMessageAsync(CancellationToken cancellationToken);
 
     /// <summary>
     ///  Writes message to the binary writer with payload
@@ -129,5 +127,5 @@ public interface ICommunicationManager
     /// <typeparam name="T"> The type of object to deserialize to. </typeparam>
     /// <param name="message"> Message object </param>
     /// <returns> TestPlatform object </returns>
-    T DeserializePayload<T>(Message message);
+    T? DeserializePayload<T>(Message message);
 }

@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -16,19 +15,16 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 
 internal class RunTestsWithTests : BaseRunTests
 {
     private readonly IEnumerable<TestCase> _testCases;
+    private readonly ITestCaseEventsHandler? _testCaseEventsHandler;
 
-    private Dictionary<Tuple<Uri, string>, List<TestCase>> _executorUriVsTestList;
+    private Dictionary<Tuple<Uri, string>, List<TestCase>>? _executorUriVsTestList;
 
-    private readonly ITestCaseEventsHandler _testCaseEventsHandler;
-
-    public RunTestsWithTests(IRequestData requestData, IEnumerable<TestCase> testCases, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
+    public RunTestsWithTests(IRequestData requestData, IEnumerable<TestCase> testCases, string? package, string? runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler? testCaseEventsHandler, IInternalTestRunEventsHandler testRunEventsHandler)
         : this(requestData, testCases, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
     {
     }
@@ -44,7 +40,7 @@ internal class RunTestsWithTests : BaseRunTests
     /// <param name="testCaseEventsHandler"></param>
     /// <param name="testRunEventsHandler"></param>
     /// <param name="executorUriVsTestList"></param>
-    internal RunTestsWithTests(IRequestData requestData, IEnumerable<TestCase> testCases, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
+    internal RunTestsWithTests(IRequestData requestData, IEnumerable<TestCase> testCases, string? package, string? runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler? testCaseEventsHandler, IInternalTestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>>? executorUriVsTestList)
         : base(requestData, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
     {
         _testCases = testCases;
@@ -61,7 +57,7 @@ internal class RunTestsWithTests : BaseRunTests
     {
         _executorUriVsTestList = GetExecutorVsTestCaseList(_testCases);
 
-        Debug.Assert(TestExecutionContext.TestCaseFilter == null, "TestCaseFilter should be null for specific tests.");
+        TPDebug.Assert(TestExecutionContext.TestCaseFilter == null, "TestCaseFilter should be null for specific tests.");
         runContext.FilterExpressionWrapper = null;
 
         return _executorUriVsTestList.Keys;
@@ -70,10 +66,10 @@ internal class RunTestsWithTests : BaseRunTests
     protected override void InvokeExecutor(
         LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
         Tuple<Uri, string> executorUri,
-        RunContext runContext,
-        IFrameworkHandle frameworkHandle)
+        RunContext? runContext,
+        IFrameworkHandle? frameworkHandle)
     {
-        executor?.Value.RunTests(_executorUriVsTestList[executorUri], runContext, frameworkHandle);
+        executor?.Value.RunTests(_executorUriVsTestList?[executorUri], runContext, frameworkHandle);
     }
 
     /// <inheritdoc />
@@ -85,7 +81,7 @@ internal class RunTestsWithTests : BaseRunTests
         // If the adapter doesn't implement the new test executor interface we should attach to
         // the default test host by default to preserve old behavior.
         return executor?.Value is not ITestExecutor2 convertedExecutor
-               || convertedExecutor.ShouldAttachToTestHost(_executorUriVsTestList[executorUri], runContext);
+               || convertedExecutor.ShouldAttachToTestHost(_executorUriVsTestList?[executorUri], runContext);
     }
 
     /// <summary>
@@ -107,9 +103,9 @@ internal class RunTestsWithTests : BaseRunTests
             return;
         }
 
-        var properties = new Dictionary<string, object>
+        var properties = new Dictionary<string, object?>
         {
-            { "TestSources", TestSourcesUtility.GetSources(_testCases) }
+            { "TestSources", TestSourcesUtility.GetSources(_testCases)! }
         };
 
         _testCaseEventsHandler.SendSessionStart(properties);
@@ -118,7 +114,7 @@ internal class RunTestsWithTests : BaseRunTests
     /// <summary>
     /// Returns the executor Vs TestCase list
     /// </summary>
-    private Dictionary<Tuple<Uri, string>, List<TestCase>> GetExecutorVsTestCaseList(IEnumerable<TestCase> tests)
+    private static Dictionary<Tuple<Uri, string>, List<TestCase>> GetExecutorVsTestCaseList(IEnumerable<TestCase> tests)
     {
         var result = new Dictionary<Tuple<Uri, string>, List<TestCase>>();
         foreach (var test in tests)
@@ -129,16 +125,13 @@ internal class RunTestsWithTests : BaseRunTests
                 test.ExecutorUri,
                 ObjectModel.Constants.UnspecifiedAdapterPath);
 
-            if (result.TryGetValue(executorUriExtensionTuple, out List<TestCase> testList))
+            if (result.TryGetValue(executorUriExtensionTuple, out List<TestCase>? testList))
             {
                 testList.Add(test);
             }
             else
             {
-                testList = new List<TestCase>
-                {
-                    test
-                };
+                testList = new List<TestCase> { test };
                 result.Add(executorUriExtensionTuple, testList);
             }
         }

@@ -3,10 +3,6 @@
 
 using System;
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
-
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -25,11 +21,7 @@ public sealed class FileExtensionAttribute : Attribute
     /// <param name="fileExtension">The file extensions that the test discoverer can process tests from.</param>
     public FileExtensionAttribute(string fileExtension)
     {
-        if (string.IsNullOrWhiteSpace(fileExtension))
-        {
-            throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(fileExtension));
-        }
-
+        ValidateArg.NotNullOrWhiteSpace(fileExtension, nameof(fileExtension));
         FileExtension = fileExtension;
     }
 

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -11,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
@@ -89,8 +88,9 @@ internal class Condition
     /// <summary>
     /// Evaluate this condition for testObject.
     /// </summary>
-    internal bool Evaluate(Func<string, object> propertyValueProvider!!)
+    internal bool Evaluate(Func<string, object?> propertyValueProvider)
     {
+        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
         var result = false;
         var multiValue = GetPropertyValue(propertyValueProvider);
         switch (Operation)
@@ -169,7 +169,7 @@ internal class Condition
     /// <summary>
     /// Returns a condition object after parsing input string of format '<propertyName>Operation<propertyValue>'
     /// </summary>
-    internal static Condition Parse(string conditionString)
+    internal static Condition Parse(string? conditionString)
     {
         if (conditionString.IsNullOrWhiteSpace())
         {
@@ -203,7 +203,8 @@ internal class Condition
         return condition;
     }
 
-    private static void ThrownFormatExceptionForInvalidCondition(string conditionString)
+    [DoesNotReturn]
+    private static void ThrownFormatExceptionForInvalidCondition(string? conditionString)
     {
         throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException,
             string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidCondition, conditionString)));
@@ -212,7 +213,7 @@ internal class Condition
     /// <summary>
     /// Check if condition validates any property in properties.
     /// </summary>
-    internal bool ValidForProperties(IEnumerable<string> properties, Func<string, TestProperty> propertyProvider)
+    internal bool ValidForProperties(IEnumerable<string> properties, Func<string, TestProperty?>? propertyProvider)
     {
         bool valid = false;
 
@@ -229,7 +230,7 @@ internal class Condition
         return valid;
     }
 
-    private bool ValidForContainsOperation(Func<string, TestProperty> propertyProvider)
+    private bool ValidForContainsOperation(Func<string, TestProperty?>? propertyProvider)
     {
         bool valid = true;
 
@@ -239,7 +240,7 @@ internal class Condition
         // if null, it might be custom validation ignore it.
         if (null != propertyProvider)
         {
-            TestProperty testProperty = propertyProvider(Name);
+            TestProperty? testProperty = propertyProvider(Name);
             if (null != testProperty)
             {
                 Type propertyType = testProperty.GetValueType();
@@ -255,27 +256,20 @@ internal class Condition
     /// </summary>
     private static Operation GetOperator(string operationString)
     {
-        switch (operationString)
+        return operationString switch
         {
-            case "=":
-                return Operation.Equal;
-
-            case "!=":
-                return Operation.NotEqual;
-
-            case "~":
-                return Operation.Contains;
-
-            case "!~":
-                return Operation.NotContains;
-        }
-        throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidOperator, operationString)));
+            "=" => Operation.Equal,
+            "!=" => Operation.NotEqual,
+            "~" => Operation.Contains,
+            "!~" => Operation.NotContains,
+            _ => throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidOperator, operationString))),
+        };
     }
 
     /// <summary>
     /// Returns property value for Property using propertValueProvider.
     /// </summary>
-    private string[] GetPropertyValue(Func<string, Object> propertyValueProvider)
+    private string[]? GetPropertyValue(Func<string, object?> propertyValueProvider)
     {
         var propertyValue = propertyValueProvider(Name);
         if (null != propertyValue)
@@ -283,7 +277,7 @@ internal class Condition
             if (propertyValue is not string[] multiValue)
             {
                 multiValue = new string[1];
-                multiValue[0] = propertyValue.ToString();
+                multiValue[0] = propertyValue.ToString()!;
             }
             return multiValue;
         }

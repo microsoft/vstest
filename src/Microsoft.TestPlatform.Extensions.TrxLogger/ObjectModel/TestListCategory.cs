@@ -1,15 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Diagnostics;
-
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
@@ -18,9 +14,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 /// </summary>
 internal class TestListCategory : IXmlTestStore
 {
-    private static TestListCategory s_uncategorizedResults;
-
-    private static TestListCategory s_allResults;
+    private static TestListCategory? s_uncategorizedResults;
+    private static TestListCategory? s_allResults;
 
     private static readonly object ReservedCategoryLock = new();
     [StoreXmlSimpleField("@name", DefaultValue = "")]
@@ -141,14 +136,14 @@ internal class TestListCategory : IXmlTestStore
     /// <returns>
     /// The <see cref="bool"/>.
     /// </returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is not TestListCategory cat)
         {
             return false;
         }
 
-        Debug.Assert(Id != null, "id is null");
+        TPDebug.Assert(Id != null, "id is null");
         return Id.Equals(cat.Id);
     }
 
@@ -175,7 +170,7 @@ internal class TestListCategory : IXmlTestStore
     /// <param name="parameters">
     /// The parameter
     /// </param>
-    public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
+    public void Save(System.Xml.XmlElement element, XmlTestStoreParameters? parameters)
     {
         XmlPersistence h = new();
 

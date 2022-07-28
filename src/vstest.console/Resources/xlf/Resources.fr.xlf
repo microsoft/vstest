@@ -1179,6 +1179,26 @@ Comportements actuellement pris en charge :
         <target state="translated">vstest.console.exe s’exécute en mode émulé en tant que {0}. Pour de meilleures performances, utilisez l’exécuteur natif vstest.console.arm64.exe.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="RequestHandlerConnectionTimedOut">
+        <source>Waiting for request handler connection timed out after {0} seconds.</source>
+        <target state="translated">L’attente de la connexion du gestionnaire de demandes a expiré après {0} secondes.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StartTestSessionTimedOut">
+        <source>Waiting for start test session timed out after {0} seconds.</source>
+        <target state="translated">L’attente du démarrage de la session de test a expiré après {0} secondes.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StopTestSessionTimedOut">
+        <source>Waiting for stop test session timed out after {0} seconds.</source>
+        <target state="translated">L’attente d’arrêt de la session de test a expiré après {0} secondes.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ErrorHostingCommunicationChannel">
+        <source>Error hosting communication channel.</source>
+        <target state="translated">Erreur lors de l’hébergement du canal de communication</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

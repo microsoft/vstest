@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Xml;
 
@@ -61,7 +62,7 @@ public class EventLogDataCollectorTests
         Assert.ThrowsException<ArgumentNullException>(
             () => _eventLogDataCollector.Initialize(
                 null,
-                null,
+                null!,
                 _mockDataCollectionSink,
                 _mockDataCollectionLogger.Object,
                 _dataCollectionEnvironmentContext));
@@ -74,7 +75,7 @@ public class EventLogDataCollectorTests
             () => _eventLogDataCollector.Initialize(
                 null,
                 _mockDataCollectionEvents.Object,
-                null,
+                null!,
                 _mockDataCollectionLogger.Object,
                 _dataCollectionEnvironmentContext));
     }
@@ -87,7 +88,7 @@ public class EventLogDataCollectorTests
                 null,
                 _mockDataCollectionEvents.Object,
                 _mockDataCollectionSink,
-                null,
+                null!,
                 _dataCollectionEnvironmentContext));
     }
 
@@ -287,7 +288,7 @@ public class EventLogDataCollectorTests
         var eventLogDataCollector = new EventLogDataCollector();
         eventLogDataCollector.Initialize(null, _mockDataCollectionEvents.Object, _mockDataCollectionSink, _mockDataCollectionLogger.Object, _dataCollectionEnvironmentContext);
         var testcase = new TestCase() { Id = Guid.NewGuid() };
-        _mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs(_dataCollectionEnvironmentContext.SessionDataCollectionContext, new Dictionary<string, object>()));
+        _mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs(_dataCollectionEnvironmentContext.SessionDataCollectionContext, new Dictionary<string, object?>()));
         _mockDataCollectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(_dataCollectionEnvironmentContext.SessionDataCollectionContext));
         Assert.IsTrue(_mockDataCollectionSink.IsSendFileAsyncInvoked);
     }
@@ -367,11 +368,11 @@ public class EventLogDataCollectorTests
             x => x.WriteAllTextToFile(
                 It.IsAny<string>(),
                 It.Is<string>(
-                    str => str.Contains(filteredEntries[0].InstanceId.ToString())
-                           && str.Contains(filteredEntries[1].InstanceId.ToString())
-                           && str.Contains(filteredEntries[2].InstanceId.ToString())
-                           && str.Contains(filteredEntries[3].InstanceId.ToString())
-                           && str.Contains(filteredEntries[4].InstanceId.ToString()))));
+                    str => str.Contains(filteredEntries[0].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[1].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[2].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[3].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[4].InstanceId.ToString(CultureInfo.CurrentCulture)))));
     }
 
     [TestMethod]
@@ -410,11 +411,11 @@ public class EventLogDataCollectorTests
             x => x.WriteAllTextToFile(
                 It.IsAny<string>(),
                 It.Is<string>(
-                    str => str.Contains(filteredEntries[0].InstanceId.ToString())
-                           && str.Contains(filteredEntries[1].InstanceId.ToString())
-                           && str.Contains(filteredEntries[2].InstanceId.ToString())
-                           && str.Contains(filteredEntries[3].InstanceId.ToString())
-                           && str.Contains(filteredEntries[4].InstanceId.ToString()))));
+                    str => str.Contains(filteredEntries[0].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[1].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[2].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[3].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[4].InstanceId.ToString(CultureInfo.CurrentCulture)))));
     }
 }
 

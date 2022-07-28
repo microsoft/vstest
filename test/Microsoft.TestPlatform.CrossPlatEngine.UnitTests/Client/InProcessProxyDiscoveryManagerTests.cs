@@ -17,17 +17,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#nullable disable
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
 public class InProcessProxyDiscoveryManagerTests
 {
-    private Mock<ITestHostManagerFactory> _mockTestHostManagerFactory;
+    private readonly Mock<ITestHostManagerFactory> _mockTestHostManagerFactory;
     private InProcessProxyDiscoveryManager _inProcessProxyDiscoveryManager;
-    private Mock<IDiscoveryManager> _mockDiscoveryManager;
-    private Mock<ITestRuntimeProvider> _mockTestHostManager;
+    private readonly Mock<IDiscoveryManager> _mockDiscoveryManager;
+    private readonly Mock<ITestRuntimeProvider> _mockTestHostManager;
 
     public InProcessProxyDiscoveryManagerTests()
     {
@@ -38,15 +36,6 @@ public class InProcessProxyDiscoveryManagerTests
         _inProcessProxyDiscoveryManager = new InProcessProxyDiscoveryManager(_mockTestHostManager.Object, _mockTestHostManagerFactory.Object);
     }
 
-    [TestCleanup]
-    public void TestCleanup()
-    {
-        _mockDiscoveryManager = null;
-        _mockTestHostManagerFactory = null;
-        _inProcessProxyDiscoveryManager = null;
-        _mockTestHostManager = null;
-    }
-
     [TestMethod]
     public void DiscoverTestsShouldCallInitialize()
     {
@@ -55,7 +44,7 @@ public class InProcessProxyDiscoveryManagerTests
             () => manualResetEvent.Set());
 
         var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
-        _inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, null);
+        _inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, null!);
 
         Assert.IsTrue(manualResetEvent.WaitOne(5000), "DiscoverTests should call Initialize");
     }
@@ -73,7 +62,7 @@ public class InProcessProxyDiscoveryManagerTests
         expectedResult.Add(path);
         var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
 
-        _inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, null);
+        _inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, null!);
 
         Assert.IsTrue(manualResetEvent.WaitOne(5000), "DiscoverTests should call Initialize");
         CollectionAssert.AreEquivalent(expectedResult, TestPluginCache.Instance.GetExtensionPaths(string.Empty));

@@ -4,17 +4,15 @@
 using System;
 using System.Collections.Generic;
 #if NETFRAMEWORK
-using System.Diagnostics;
 using System.IO;
 #endif
 using System.Linq;
 using System.Reflection;
 
 #if NETFRAMEWORK
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 #endif
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -32,8 +30,9 @@ public static class AssemblyHelper
     /// Only assembly name and public key token are match. Version is ignored for matching.
     /// Returns null if not able to check if source references assembly.
     /// </summary>
-    public static bool? DoesReferencesAssembly(string source, AssemblyName referenceAssembly!!)
+    public static bool? DoesReferencesAssembly(string source, AssemblyName referenceAssembly)
     {
+        ValidateArg.NotNull(referenceAssembly, nameof(referenceAssembly));
         try
         {
             ValidateArg.NotNullOrEmpty(source, nameof(source));
@@ -51,13 +50,13 @@ public static class AssemblyHelper
             //   assemblies that have been added to the global assembly cache.
             setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
 
-            AppDomain ad = null;
+            AppDomain? ad = null;
             try
             {
                 ad = AppDomain.CreateDomain("Dependency finder domain", null, setupInfo);
 
                 var assemblyLoadWorker = typeof(AssemblyLoadWorker);
-                AssemblyLoadWorker worker = null;
+                AssemblyLoadWorker? worker = null;
                 if (assemblyLoadWorker.Assembly.GlobalAssemblyCache)
                 {
                     worker = (AssemblyLoadWorker)ad.CreateInstanceAndUnwrap(
@@ -76,7 +75,7 @@ public static class AssemblyHelper
                         null, null, null);
                 }
 
-                return worker.CheckAssemblyReference(source, referenceAssemblyName, referenceAssemblyPublicKeyToken);
+                return AssemblyLoadWorker.CheckAssemblyReference(source, referenceAssemblyName, referenceAssemblyPublicKeyToken);
             }
             finally
             {
@@ -107,13 +106,13 @@ public static class AssemblyHelper
         var setupInfo = new AppDomainSetup();
         setupInfo.ApplicationBase = sourceDirectory;
         setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
-        AppDomain ad = null;
+        AppDomain? ad = null;
         try
         {
             ad = AppDomain.CreateDomain("Multiargeting settings domain", null, setupInfo);
 
             Type assemblyLoadWorker = typeof(AssemblyLoadWorker);
-            AssemblyLoadWorker worker = null;
+            AssemblyLoadWorker? worker = null;
 
             // This has to be LoadFrom, otherwise we will have to use AssemblyResolver to find self.
             worker = (AssemblyLoadWorker)ad.CreateInstanceFromAndUnwrap(
@@ -122,7 +121,7 @@ public static class AssemblyHelper
                 false, BindingFlags.Default, null,
                 null, null, null);
 
-            worker.GetPlatformAndFrameworkSettings(testSource, out var procArchType, out var frameworkVersion);
+            AssemblyLoadWorker.GetPlatformAndFrameworkSettings(testSource, out var procArchType, out var frameworkVersion);
 
             Architecture targetPlatform = (Architecture)Enum.Parse(typeof(Architecture), procArchType);
             var targetFramework = frameworkVersion.ToUpperInvariant() switch
@@ -153,9 +152,9 @@ public static class AssemblyHelper
     /// Returns null on failure and an empty array if there is no reference in the project.
     /// </summary>
     /// <param name="source">Full path to the assembly to get dependencies for.</param>
-    public static string[] GetReferencedAssemblies(string source)
+    public static string[]? GetReferencedAssemblies(string source)
     {
-        Debug.Assert(!string.IsNullOrEmpty(source));
+        TPDebug.Assert(!source.IsNullOrEmpty());
 
         var setupInfo = new AppDomainSetup();
         setupInfo.ApplicationBase = Path.GetDirectoryName(Path.GetFullPath(source));
@@ -167,13 +166,13 @@ public static class AssemblyHelper
         //   assemblies that have been added to the global assembly cache.
         setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
 
-        AppDomain ad = null;
+        AppDomain? ad = null;
         try
         {
             ad = AppDomain.CreateDomain("Dependency finder domain", null, setupInfo);
 
             var assemblyLoadWorker = typeof(AssemblyLoadWorker);
-            AssemblyLoadWorker worker = null;
+            AssemblyLoadWorker? worker = null;
             if (assemblyLoadWorker.Assembly.GlobalAssemblyCache)
             {
                 worker = (AssemblyLoadWorker)ad.CreateInstanceAndUnwrap(
@@ -192,7 +191,7 @@ public static class AssemblyHelper
                     null, null, null);
             }
 
-            return worker.GetReferencedAssemblies(source);
+            return AssemblyLoadWorker.GetReferencedAssemblies(source);
         }
         finally
         {
@@ -229,7 +228,7 @@ public static class AssemblyHelper
     /// <returns>String representation of the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
     internal static string GetTargetFrameworkVersionString(string path)
     {
-        Debug.Assert(!string.IsNullOrEmpty(path));
+        TPDebug.Assert(!path.IsNullOrEmpty());
 
         var setupInfo = new AppDomainSetup();
         setupInfo.ApplicationBase = Path.GetDirectoryName(Path.GetFullPath(path));
@@ -241,45 +240,45 @@ public static class AssemblyHelper
         //   assemblies that have been added to the global assembly cache.
         setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
 
-        if (File.Exists(path))
+        if (!File.Exists(path))
         {
-            AppDomain ad = null;
-            try
-            {
-                ad = AppDomain.CreateDomain("Framework Version String Domain", null, setupInfo);
-
-                var assemblyLoadWorker = typeof(AssemblyLoadWorker);
-                AssemblyLoadWorker worker = null;
-                if (assemblyLoadWorker.Assembly.GlobalAssemblyCache)
-                {
-                    worker = (AssemblyLoadWorker)ad.CreateInstanceAndUnwrap(
-                        assemblyLoadWorker.Assembly.FullName,
-                        assemblyLoadWorker.FullName,
-                        false, BindingFlags.Default, null,
-                        null, null, null);
-                }
-                else
-                {
-                    // This has to be LoadFrom, otherwise we will have to use AssemblyResolver to find self.
-                    worker = (AssemblyLoadWorker)ad.CreateInstanceFromAndUnwrap(
-                        assemblyLoadWorker.Assembly.Location,
-                        assemblyLoadWorker.FullName,
-                        false, BindingFlags.Default, null,
-                        null, null, null);
-                }
-
-                return worker.GetTargetFrameworkVersionStringFromPath(path);
-            }
-            finally
-            {
-                if (ad != null)
-                {
-                    AppDomain.Unload(ad);
-                }
-            }
+            return string.Empty;
         }
 
-        return string.Empty;
+        AppDomain? ad = null;
+        try
+        {
+            ad = AppDomain.CreateDomain("Framework Version String Domain", null, setupInfo);
+
+            var assemblyLoadWorker = typeof(AssemblyLoadWorker);
+            AssemblyLoadWorker? worker = null;
+            if (assemblyLoadWorker.Assembly.GlobalAssemblyCache)
+            {
+                worker = (AssemblyLoadWorker)ad.CreateInstanceAndUnwrap(
+                    assemblyLoadWorker.Assembly.FullName,
+                    assemblyLoadWorker.FullName,
+                    false, BindingFlags.Default, null,
+                    null, null, null);
+            }
+            else
+            {
+                // This has to be LoadFrom, otherwise we will have to use AssemblyResolver to find self.
+                worker = (AssemblyLoadWorker)ad.CreateInstanceFromAndUnwrap(
+                    assemblyLoadWorker.Assembly.Location,
+                    assemblyLoadWorker.FullName,
+                    false, BindingFlags.Default, null,
+                    null, null, null);
+            }
+
+            return AssemblyLoadWorker.GetTargetFrameworkVersionStringFromPath(path);
+        }
+        finally
+        {
+            if (ad != null)
+            {
+                AppDomain.Unload(ad);
+            }
+        }
     }
 
     /// <summary>
@@ -306,9 +305,9 @@ public static class AssemblyHelper
     {
         try
         {
-            RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runContext.RunSettings.SettingsXml);
+            RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runContext.RunSettings?.SettingsXml);
             if (null != runConfiguration && (Equals(runConfiguration.TargetFramework, FrameworkVersion.Framework40) ||
-                string.Equals(runConfiguration.TargetFramework.ToString(), Constants.DotNetFramework40, StringComparison.OrdinalIgnoreCase)))
+                string.Equals(runConfiguration.TargetFramework?.ToString(), Constants.DotNetFramework40, StringComparison.OrdinalIgnoreCase)))
             {
                 EqtTrace.Verbose("AssemblyHelper.SetNETFrameworkCompatiblityMode: setting .NetFramework,Version=v4.0 compatibility mode.");
                 setup.TargetFrameworkName = Constants.DotNetFramework40;
@@ -321,8 +320,9 @@ public static class AssemblyHelper
     }
 #endif
 
-    public static IEnumerable<Attribute> GetCustomAttributes(this Assembly assembly!!, string fullyQualifiedName)
+    public static IEnumerable<Attribute> GetCustomAttributes(this Assembly assembly, string fullyQualifiedName)
     {
+        ValidateArg.NotNull(assembly, nameof(assembly));
         ValidateArg.NotNullOrWhiteSpace(fullyQualifiedName, nameof(fullyQualifiedName));
 
         return assembly.GetType(fullyQualifiedName) is Type attribute

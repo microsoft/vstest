@@ -74,7 +74,7 @@ public class ExecutorUnitTests
         // Just check first 20 characters - don't need to check whole thing as assembly version is variable
         Assert.IsFalse(
             mockOutput.Messages.First()
-                .Message.Contains(CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20)),
+                .Message!.Contains(CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20)),
             "First Printed message must be Microsoft Copyright");
     }
 
@@ -86,7 +86,7 @@ public class ExecutorUnitTests
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
-        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(CommandLineResources.NoArgumentsProvided)));
+        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message!.Contains(CommandLineResources.NoArgumentsProvided)));
     }
 
     /// <summary>
@@ -100,7 +100,7 @@ public class ExecutorUnitTests
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
-        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(CommandLineResources.NoArgumentsProvided)));
+        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message!.Contains(CommandLineResources.NoArgumentsProvided)));
     }
 
     [TestMethod]
@@ -112,7 +112,7 @@ public class ExecutorUnitTests
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
-        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(string.Format(CommandLineResources.InvalidArgument, badArg))));
+        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message!.Contains(string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidArgument, badArg))));
     }
 
     [TestMethod]
@@ -124,7 +124,7 @@ public class ExecutorUnitTests
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
-        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(string.Format(CommandLineResources.InvalidArgument, badArg))));
+        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message!.Contains(string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidArgument, badArg))));
     }
 
     [TestMethod]
@@ -136,7 +136,7 @@ public class ExecutorUnitTests
 
         Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
-        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(string.Format(CommandLineResources.InvalidArgument, badArg))));
+        Assert.IsTrue(mockOutput.Messages.Any(message => message.Message!.Contains(string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidArgument, badArg))));
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public class ExecutorUnitTests
         _ = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(null);
         RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
         Assert.AreEqual(Constants.DefaultResultsDirectory, runConfiguration.ResultsDirectory);
-        Assert.AreEqual(Framework.DefaultFramework.ToString(), runConfiguration.TargetFramework.ToString());
+        Assert.AreEqual(Framework.DefaultFramework.ToString(), runConfiguration.TargetFramework!.ToString());
         Assert.AreEqual(Constants.DefaultPlatform, runConfiguration.TargetPlatform);
     }
 
@@ -179,7 +179,7 @@ public class ExecutorUnitTests
 
         var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(args);
 
-        var errorMessageCount = mockOutput.Messages.Count(msg => msg.Level == OutputLevel.Error && msg.Message.Contains(
+        var errorMessageCount = mockOutput.Messages.Count(msg => msg.Level == OutputLevel.Error && msg.Message!.Contains(
             string.Format(CultureInfo.CurrentCulture, CommandLineResources.OpenResponseFileError, args[0].Substring(1))));
         Assert.AreEqual(1, errorMessageCount, "Response File Exception should display error.");
         Assert.AreEqual(1, exitCode, "Response File Exception execution should exit with error.");
@@ -214,7 +214,7 @@ public class ExecutorUnitTests
 
             var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(args);
 
-            var result = mockOutput.Messages.Any(o => o.Level == OutputLevel.Error && o.Message.Contains("Invalid settings 'Logger'. Unexpected XmlAttribute: 'invalidName'."));
+            var result = mockOutput.Messages.Any(o => o.Level == OutputLevel.Error && o.Message!.Contains("Invalid settings 'Logger'. Unexpected XmlAttribute: 'invalidName'."));
             Assert.IsTrue(result, "expecting error message : Invalid settings 'Logger'.Unexpected XmlAttribute: 'invalidName'.");
         }
         finally
@@ -287,7 +287,7 @@ public class ExecutorUnitTests
 
             var exitCode = new Executor(mockOutput, _mockTestPlatformEventSource.Object, new ProcessHelper(), new PlatformEnvironment()).Execute(args);
 
-            var result = mockOutput.Messages.Any(o => o.Level == OutputLevel.Error && o.Message.Contains("Invalid setting 'RunConfiguration'. Invalid value 'Invalid' specified for 'TargetPlatform'."));
+            var result = mockOutput.Messages.Any(o => o.Level == OutputLevel.Error && o.Message!.Contains("Invalid setting 'RunConfiguration'. Invalid value 'Invalid' specified for 'TargetPlatform'."));
             Assert.AreEqual(1, exitCode, "Exit code should be one because it throws exception");
             Assert.IsTrue(result, "expecting error message : Invalid setting 'RunConfiguration'. Invalid value 'Invalid' specified for 'TargetPlatform'.");
         }
@@ -334,20 +334,20 @@ public class ExecutorUnitTests
         var assemblyVersion = typeof(Executor).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
 
         Assert.AreEqual(4, mockOutput.Messages.Count);
-        Assert.IsTrue(Regex.IsMatch(mockOutput.Messages[0].Message, @"Microsoft \(R\) Test Execution Command Line Tool Version .* \(x64\)"));
-        Assert.IsFalse(mockOutput.Messages.Any(message => message.Message.Contains("vstest.console.exe is running in emulated mode")));
+        Assert.IsTrue(Regex.IsMatch(mockOutput.Messages[0].Message!, @"Microsoft \(R\) Test Execution Command Line Tool Version .* \(x64\)"));
+        Assert.IsFalse(mockOutput.Messages.Any(message => message.Message!.Contains("vstest.console.exe is running in emulated mode")));
     }
 
     private class MockOutput : IOutput
     {
         public List<OutputMessage> Messages { get; set; } = new List<OutputMessage>();
 
-        public void Write(string message, OutputLevel level)
+        public void Write(string? message, OutputLevel level)
         {
             Messages.Add(new OutputMessage() { Message = message, Level = level });
         }
 
-        public void WriteLine(string message, OutputLevel level)
+        public void WriteLine(string? message, OutputLevel level)
         {
             Messages.Add(new OutputMessage() { Message = message, Level = level });
         }
@@ -355,7 +355,7 @@ public class ExecutorUnitTests
 
     private class OutputMessage
     {
-        public string Message { get; set; } = "";
+        public string? Message { get; set; } = "";
         public OutputLevel Level { get; set; }
     }
 }

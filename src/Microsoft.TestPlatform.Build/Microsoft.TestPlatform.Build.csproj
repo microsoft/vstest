@@ -10,6 +10,7 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
+    <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
@@ -20,6 +21,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="NullableHelpers.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>NullableHelpers.tt</DependentUpon>
+    </Compile>
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -37,9 +43,22 @@
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="$(MicrosoftBuildUtilitiesCorePackageVersion)" />
   </ItemGroup>
   <ItemGroup>
+    <AdditionalFiles Include="BannedSymbols.txt" />
     <!-- API that is common to all frameworks that we build for. -->
     <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="NullableHelpers.tt">
+      <LastGenOutput>NullableHelpers.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

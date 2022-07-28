@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -449,7 +450,7 @@ public partial class ManagedNameRoundTripTests
             containingTypeSymbol: implT,
             methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod0")!,
             managedTypeName: "TestClasses.Impl`1",
-            managedMethodName: "'TestClasses.IImplementation<T>.ImplMethod0'");
+            managedMethodName: "TestClasses.IImplementation<T>.ImplMethod0");
     }
 
     [TestMethod]
@@ -462,7 +463,7 @@ public partial class ManagedNameRoundTripTests
             containingTypeSymbol: implT,
             methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod1")!,
             managedTypeName: "TestClasses.Impl`1",
-            managedMethodName: "'TestClasses.IImplementation<T>.ImplMethod1'(!0)");
+            managedMethodName: "TestClasses.IImplementation<T>.ImplMethod1(!0)");
     }
 
     [TestMethod]
@@ -475,7 +476,7 @@ public partial class ManagedNameRoundTripTests
             containingTypeSymbol: implT,
             methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod2")!,
             managedTypeName: "TestClasses.Impl`1",
-            managedMethodName: "'TestClasses.IImplementation<T>.ImplMethod2'`1(!0,!!0,System.String)");
+            managedMethodName: "TestClasses.IImplementation<T>.ImplMethod2`1(!0,!!0,System.String)");
     }
 
     [TestMethod]
@@ -818,6 +819,7 @@ public partial class ManagedNameRoundTripTests
     }
 
     #region Helpers
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Code using the parameters is commented out temporarly.")]
     private static void VerifyRoundTrip(
         MethodInfo methodInfo,
         INamedTypeSymbol containingTypeSymbol,
@@ -827,6 +829,7 @@ public partial class ManagedNameRoundTripTests
     {
         VerifyRoundTripFromMethodInfo(methodInfo, managedTypeName, managedMethodName);
         VerifyRoundTripFromName(managedTypeName, managedMethodName, methodInfo);
+        // TODO: Enable these checks and remove attributes on method
         // VerifyRoundTripFromMethodSymbol(containingTypeSymbol, methodSymbol, managedTypeName, managedMethodName);
         // VerifyRoundTripFromName(managedTypeName, managedMethodName, containingTypeSymbol, methodSymbol);
     }

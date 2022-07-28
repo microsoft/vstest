@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
@@ -19,8 +20,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
@@ -28,16 +27,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 /// </summary>
 public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2
 {
-    private readonly TestSessionInfo _testSessionInfo;
-    private readonly Func<string, ProxyDiscoveryManager, ProxyOperationManager> _proxyOperationManagerCreator;
+    private readonly TestSessionInfo? _testSessionInfo;
+    private readonly Func<string, ProxyDiscoveryManager, ProxyOperationManager>? _proxyOperationManagerCreator;
     private readonly DiscoveryDataAggregator _discoveryDataAggregator;
     private readonly IFileHelper _fileHelper;
     private readonly IDataSerializer _dataSerializer;
 
-    private ITestRuntimeProvider _testHostManager;
+    private ITestRuntimeProvider? _testHostManager;
     private bool _isCommunicationEstablished;
-    private ProxyOperationManager _proxyOperationManager;
-    private ITestDiscoveryEventsHandler2 _baseTestDiscoveryEventsHandler;
+    private ProxyOperationManager? _proxyOperationManager;
+    private ITestDiscoveryEventsHandler2? _baseTestDiscoveryEventsHandler;
     private string _previousSource;
 
     /// <summary>
@@ -101,9 +100,10 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         IRequestData requestData,
         ITestRequestSender requestSender,
         ITestRuntimeProvider testHostManager,
-        DiscoveryDataAggregator discoveryDataAggregator = null,
-        IDataSerializer dataSerializer = null,
-        IFileHelper fileHelper = null)
+        Framework? testhostManagerFramework,
+        DiscoveryDataAggregator? discoveryDataAggregator = null,
+        IDataSerializer? dataSerializer = null,
+        IFileHelper? fileHelper = null)
     {
         _testHostManager = testHostManager;
         _discoveryDataAggregator = discoveryDataAggregator ?? new();
@@ -111,7 +111,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         _fileHelper = fileHelper ?? new FileHelper();
 
         // Create a new proxy operation manager.
-        _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
+        _proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, testhostManagerFramework, this);
     }
 
     #region IProxyDiscoveryManager implementation.
@@ -130,9 +130,9 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
 
         if (_proxyOperationManager == null)
         {
+            TPDebug.Assert(_proxyOperationManagerCreator is not null, "_proxyOperationManagerCreator is null");
             // Passing only first because that is how the testhost pool is keyed.
             _proxyOperationManager = _proxyOperationManagerCreator(discoverySources[0], this);
-
             _testHostManager = _proxyOperationManager.TestHostManager;
         }
 
@@ -277,7 +277,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     }
 
     /// <inheritdoc/>
-    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
     {
         // Currently, TestRequestSender always passes null for lastChunk in case of an aborted
         // discovery but we are not making this assumption here to ease potential future
@@ -295,14 +295,14 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
             _discoveryDataAggregator.MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
             _previousSource = null;
         }
-        _baseTestDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
+        _baseTestDiscoveryEventsHandler?.HandleDiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
     }
 
     /// <inheritdoc/>
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+    public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
     {
         _previousSource = _discoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases(_previousSource, discoveredTestCases);
-        _baseTestDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
+        _baseTestDiscoveryEventsHandler?.HandleDiscoveredTests(discoveredTestCases);
     }
 
     /// <inheritdoc/>
@@ -314,13 +314,13 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
             Close();
         }
 
-        _baseTestDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+        _baseTestDiscoveryEventsHandler?.HandleRawMessage(rawMessage);
     }
 
     /// <inheritdoc/>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
-        _baseTestDiscoveryEventsHandler.HandleLogMessage(level, message);
+        _baseTestDiscoveryEventsHandler?.HandleLogMessage(level, message);
     }
 
     #endregion
@@ -330,8 +330,8 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
     {
         // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
-        var telemetryOptedIn = _proxyOperationManager.RequestData.IsTelemetryOptedIn ? "true" : "false";
-        testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
+        var telemetryOptedIn = _proxyOperationManager?.RequestData?.IsTelemetryOptedIn == true ? "true" : "false";
+        testProcessStartInfo.Arguments += $" --telemetryoptedin {telemetryOptedIn}";
         return testProcessStartInfo;
     }
     #endregion
@@ -344,16 +344,16 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         var nonExistingExtensions = extensions.Where(extension => !_fileHelper.Exists(extension));
         if (nonExistingExtensions.Any())
         {
-            LogMessage(TestMessageLevel.Warning, string.Format(Resources.Resources.NonExistingExtensions, string.Join(",", nonExistingExtensions)));
+            LogMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, Resources.Resources.NonExistingExtensions, string.Join(",", nonExistingExtensions)));
         }
 
         var sourceList = sources.ToList();
-        var platformExtensions = _testHostManager.GetTestPlatformExtensions(sourceList, extensions.Except(nonExistingExtensions));
+        var platformExtensions = _testHostManager?.GetTestPlatformExtensions(sourceList, extensions.Except(nonExistingExtensions));
 
         // Only send this if needed.
-        if (platformExtensions.Any())
+        if (platformExtensions is not null && platformExtensions.Any())
         {
-            _proxyOperationManager.RequestSender.InitializeDiscovery(platformExtensions);
+            _proxyOperationManager?.RequestSender.InitializeDiscovery(platformExtensions);
         }
     }
 

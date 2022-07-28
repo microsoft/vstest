@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" />
   <PropertyGroup>
     <VersionPrefix>15.0.0</VersionPrefix>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>$(TargetNetFxVersion)</TargetFramework>
     <AssemblyName>Microsoft.TestPlatform.E2ETest</AssemblyName>
     <OutputType>Exe</OutputType>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
@@ -19,7 +19,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
     <ProjectReference Include="..\UnitTestProject\UnitTestProject.csproj" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />

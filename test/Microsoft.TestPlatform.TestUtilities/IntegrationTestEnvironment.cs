@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Xml;
 
-using Microsoft.VisualStudio.TestPlatform;
+using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.TestUtilities;
@@ -31,8 +33,8 @@ public class IntegrationTestEnvironment
         // If the variables are not set, valid defaults are assumed.
         if (TargetFramework.IsNullOrEmpty())
         {
-            // Run integration tests for net451 by default.
-            TargetFramework = "net451";
+            // Run integration tests for net462 by default.
+            TargetFramework = "net462";
         }
 
         if (TestPlatformRootDirectory.IsNullOrEmpty())
@@ -49,7 +51,7 @@ public class IntegrationTestEnvironment
         PackageDirectory = Path.Combine(TestPlatformRootDirectory, @"packages");
         ToolsDirectory = Path.Combine(TestPlatformRootDirectory, @"tools");
         TestArtifactsDirectory = Path.Combine(TestPlatformRootDirectory, "artifacts", "testArtifacts");
-        RunnerFramework = "net451";
+        RunnerFramework = "net462";
     }
 
     /// <summary>
@@ -67,7 +69,7 @@ public class IntegrationTestEnvironment
         }
     }
 
-    public Dictionary<string, string> DependencyVersions
+    public static Dictionary<string, string> DependencyVersions
         => s_dependencyVersions ??= GetDependencies(TestPlatformRootDirectory);
 
     /// <summary>
@@ -105,8 +107,9 @@ public class IntegrationTestEnvironment
 
     /// <summary>
     /// Gets the target framework.
-    /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
+    /// Supported values = <c>net462</c>, <c>netcoreapp3.1</c>.
     /// </summary>
+    [NotNull]
     public string? TargetFramework { get; set; }
 
     /// <summary>
@@ -160,7 +163,7 @@ public class IntegrationTestEnvironment
 
     /// <summary>
     /// Gets the application type.
-    /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
+    /// Supported values = <c>net462</c>, <c>netcoreapp3.1</c>.
     /// </summary>
     public string RunnerFramework { get; set; }
 
@@ -180,7 +183,7 @@ public class IntegrationTestEnvironment
     /// (a) They are built for supported frameworks. See <see cref="TargetFramework"/>.
     /// (b) They are built for provided build configuration.
     /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.csproj</c> must
-    /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net451\SimpleUnitTest.dll</c>
+    /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net462\SimpleUnitTest.dll</c>
     /// </remarks>
     public string GetTestAsset(string assetName)
     {
@@ -191,14 +194,14 @@ public class IntegrationTestEnvironment
     /// Gets the full path to a test asset.
     /// </summary>
     /// <param name="assetName">Name of the asset with extension. E.g. <c>SimpleUnitTest.dll</c></param>
-    /// <param name="targetFramework">asset project target framework. E.g <c>net451</c></param>
+    /// <param name="targetFramework">asset project target framework. E.g <c>net462</c></param>
     /// <returns>Full path to the test asset.</returns>
     /// <remarks>
     /// Test assets follow several conventions:
     /// (a) They are built for supported frameworks. See <see cref="TargetFramework"/>.
     /// (b) They are built for provided build configuration.
     /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.csproj</c> must
-    /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net451\SimpleUnitTest.dll</c>
+    /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net462\SimpleUnitTest.dll</c>
     /// </remarks>
     public string GetTestAsset(string assetName, string targetFramework)
     {
@@ -214,10 +217,11 @@ public class IntegrationTestEnvironment
         // Update the path to be taken from the compatibility matrix instead of from the root folder.
         if (DllInfos.Count > 0)
         {
-            foreach (var dllInfo in DllInfos)
-            {
-                assetPath = dllInfo.UpdatePath(assetPath);
-            }
+            // The path is really ugly: S:\p\vstest3\test\GeneratedTestAssets\NETTestSdkLegacyStable-15.9.2--MSTestMostDownloaded-2.1.0--MSTestProject2\bin\Debug\net462\MSTestProject2-NETTestSdkLegacyStable-15.9.2--MSTestMostDownloaded-2.1.0.dll
+            // And we need to hash the versions in it to get shorter path as well.
+            var versions = string.Join("--", DllInfos.Select(d => d.Path));
+            var versionsHash = Hash(versions);
+            assetPath = Path.Combine(TestAssetsPath, "..", "GeneratedTestAssets", $"{simpleAssetName}--{versionsHash}", "bin", BuildConfiguration, targetFramework, $"{simpleAssetName}--{versionsHash}.dll");
         }
 
         Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: \"{0}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", assetPath);
@@ -225,6 +229,20 @@ public class IntegrationTestEnvironment
         // If you are thinking about wrapping the path in double quotes here,
         // then don't. File.Exist cannot handle quoted paths, and we use it in a lot of places.
         return assetPath;
+
+        static string Hash(string value)
+        {
+            unchecked
+            {
+                long hash = 23;
+                foreach (char ch in value)
+                {
+                    hash = hash * 31 + ch;
+                }
+
+                return $"{hash:X}";
+            }
+        }
     }
 
     /// <summary>

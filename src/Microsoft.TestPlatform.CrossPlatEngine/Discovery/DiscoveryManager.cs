@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -24,23 +24,23 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 
 /// <summary>
 /// Orchestrates discovery operations for the engine communicating with the test host process.
 /// </summary>
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class DiscoveryManager : IDiscoveryManager
 {
     private readonly TestSessionMessageLogger _sessionMessageLogger;
     private readonly ITestPlatformEventSource _testPlatformEventSource;
     private readonly IRequestData _requestData;
-    private ITestDiscoveryEventsHandler2 _testDiscoveryEventsHandler;
-    private DiscoveryCriteria _discoveryCriteria;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly DiscoveryDataAggregator _discoveryDataAggregator = new();
-    private string _previousSource;
+
+    private DiscoveryCriteria? _discoveryCriteria;
+    private ITestDiscoveryEventsHandler2? _testDiscoveryEventsHandler;
+    private string? _previousSource;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
@@ -61,18 +61,21 @@ public class DiscoveryManager : IDiscoveryManager
     /// </param>
     protected DiscoveryManager(IRequestData requestData, ITestPlatformEventSource testPlatformEventSource)
     {
+        _requestData = requestData ?? throw new ArgumentNullException(nameof(requestData));
         _sessionMessageLogger = TestSessionMessageLogger.Instance;
         _sessionMessageLogger.TestRunMessage += TestSessionMessageHandler;
         _testPlatformEventSource = testPlatformEventSource;
-        _requestData = requestData;
     }
 
     /// <summary>
     /// Initializes the discovery manager.
     /// </summary>
     /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-    public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestDiscoveryEventsHandler2 eventHandler)
+    public void Initialize(IEnumerable<string>? pathToAdditionalExtensions, ITestDiscoveryEventsHandler2? eventHandler)
     {
+        // Clear the request data metrics left over from a potential previous run.
+        _requestData.MetricsCollection?.Metrics?.Clear();
+
         _testPlatformEventSource.AdapterSearchStart();
         _testDiscoveryEventsHandler = eventHandler;
         if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())
@@ -120,11 +123,9 @@ public class DiscoveryManager : IDiscoveryManager
             // If there are sources to discover
             if (verifiedExtensionSourceMap.Any())
             {
-                new DiscovererEnumerator(_requestData, discoveryResultCache, _cancellationTokenSource.Token).LoadTests(
-                    verifiedExtensionSourceMap,
-                    RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
-                    discoveryCriteria.TestCaseFilter,
-                    _sessionMessageLogger);
+                var runSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings);
+                var discovererEnumerator = new DiscovererEnumerator(_requestData, discoveryResultCache, _cancellationTokenSource.Token);
+                discovererEnumerator.LoadTests(verifiedExtensionSourceMap, runSettings, discoveryCriteria.TestCaseFilter, _sessionMessageLogger);
             }
         }
         finally
@@ -141,7 +142,7 @@ public class DiscoveryManager : IDiscoveryManager
             {
                 if (lastChunk != null)
                 {
-                    UpdateTestCases(lastChunk, _discoveryCriteria.Package);
+                    UpdateTestCases(lastChunk, _discoveryCriteria?.Package);
                 }
 
                 // Collecting Discovery State
@@ -174,6 +175,7 @@ public class DiscoveryManager : IDiscoveryManager
                     FullyDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
                     PartiallyDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
                     NotDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered),
+                    SkippedDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.SkippedDiscovery),
                     DiscoveredExtensions = TestPluginCache.Instance.TestExtensions?.GetCachedExtensions(),
                     Metrics = _requestData.MetricsCollection.Metrics,
                 };
@@ -213,13 +215,14 @@ public class DiscoveryManager : IDiscoveryManager
             FullyDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
             PartiallyDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
             NotDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered),
+            SkippedDiscoveredSources = _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.SkippedDiscovery),
         };
         eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
     }
 
     private void OnReportTestCases(ICollection<TestCase> testCases)
     {
-        UpdateTestCases(testCases, _discoveryCriteria.Package);
+        UpdateTestCases(testCases, _discoveryCriteria?.Package);
 
         if (_testDiscoveryEventsHandler != null)
         {
@@ -239,10 +242,13 @@ public class DiscoveryManager : IDiscoveryManager
     /// <param name="logger">logger</param>
     /// <param name="package">package</param>
     /// <returns> The list of verified sources. </returns>
-    internal static HashSet<string> GetValidSources(IEnumerable<string> sources, IMessageLogger logger, string package)
+    internal static HashSet<string> GetValidSources(IEnumerable<string>? sources, IMessageLogger logger, string? package)
     {
-        Debug.Assert(sources != null, "sources");
         var verifiedSources = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (sources is null)
+        {
+            return verifiedSources;
+        }
 
         foreach (string source in sources)
         {
@@ -257,7 +263,7 @@ public class DiscoveryManager : IDiscoveryManager
                     logger.SendMessage(TestMessageLevel.Warning, errorMessage);
                 }
 
-                if (string.IsNullOrEmpty(package))
+                if (package.IsNullOrEmpty())
                 {
                     SendWarning();
 
@@ -265,7 +271,7 @@ public class DiscoveryManager : IDiscoveryManager
                 }
 
                 // It is also possible that this is a packaged app, so the tests might be inside the package
-                src = !Path.IsPathRooted(source) ? Path.Combine(Path.GetDirectoryName(package), source) : source;
+                src = !Path.IsPathRooted(source) ? Path.Combine(Path.GetDirectoryName(package)!, source) : source;
 
                 if (!File.Exists(src))
                 {
@@ -300,7 +306,7 @@ public class DiscoveryManager : IDiscoveryManager
         return verifiedSources;
     }
 
-    private void TestSessionMessageHandler(object sender, TestRunMessageEventArgs e)
+    private void TestSessionMessageHandler(object? sender, TestRunMessageEventArgs e)
     {
         EqtTrace.Info(
             "TestDiscoveryManager.RunMessage: calling TestRunMessage({0}, {1}) callback.",
@@ -319,11 +325,11 @@ public class DiscoveryManager : IDiscoveryManager
         }
     }
 
-    private static void UpdateTestCases(IEnumerable<TestCase> testCases, string package)
+    private static void UpdateTestCases(IEnumerable<TestCase> testCases, string? package)
     {
         // Update TestCase objects Source data to contain the actual source(package) provided by IDE(users),
         // else these test cases are not displayed in TestWindow.
-        if (!string.IsNullOrEmpty(package))
+        if (!package.IsNullOrEmpty())
         {
             foreach (var tc in testCases)
             {

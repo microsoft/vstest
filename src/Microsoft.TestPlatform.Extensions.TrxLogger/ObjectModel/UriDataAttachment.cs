@@ -2,15 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Xml;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
@@ -36,8 +33,11 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     public UriDataAttachment(string description, Uri uri, TrxFileHelper trxFileHelper)
     {
         _trxFileHelper = trxFileHelper;
+        EqtAssert.ParameterNotNull(description, nameof(description));
+        EqtAssert.ParameterNotNull(uri, nameof(uri));
 
-        Initialize(description, uri);
+        Description = description;
+        Uri = uri;
     }
 
     #region IDataAttachment Members
@@ -65,7 +65,7 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     /// <param name="parameters">
     /// The parameter
     /// </param>
-    public void Save(XmlElement element, XmlTestStoreParameters parameters)
+    public void Save(XmlElement element, XmlTestStoreParameters? parameters)
     {
         EqtAssert.ParameterNotNull(element, nameof(element));
 
@@ -94,14 +94,14 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     /// <returns>A clone of the instance, with the URI made absolute</returns>
     internal UriDataAttachment Clone(string baseDirectory, bool useAbsoluteUri)
     {
-        Debug.Assert(!string.IsNullOrEmpty(baseDirectory), "'baseDirectory' is null or empty");
-        Debug.Assert(baseDirectory == baseDirectory.Trim(), "'baseDirectory' contains whitespace at the ends");
+        TPDebug.Assert(!baseDirectory.IsNullOrEmpty(), "'baseDirectory' is null or empty");
+        TPDebug.Assert(baseDirectory == baseDirectory.Trim(), "'baseDirectory' contains whitespace at the ends");
 
         if (useAbsoluteUri != Uri.IsAbsoluteUri)
         {
             Uri uriToUse = useAbsoluteUri
                 ? new Uri(Path.Combine(baseDirectory, Uri.OriginalString), UriKind.Absolute)
-                : new Uri(_trxFileHelper.MakePathRelative(Uri.OriginalString, baseDirectory), UriKind.Relative);
+                : new Uri(TrxFileHelper.MakePathRelative(Uri.OriginalString, baseDirectory), UriKind.Relative);
             return new UriDataAttachment(Description, uriToUse, _trxFileHelper);
         }
 
@@ -110,13 +110,4 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     }
 
     #endregion
-    private void Initialize(string desc, Uri uri)
-    {
-        EqtAssert.ParameterNotNull(desc, nameof(desc));
-        EqtAssert.ParameterNotNull(uri, nameof(uri));
-
-        Description = desc;
-        Uri = uri;
-    }
-
 }

@@ -9,8 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSender
@@ -18,7 +16,6 @@ public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSen
     private static readonly object SyncObject = new();
 
     private readonly ICommunicationManager _communicationManager;
-
     private readonly IDataSerializer _dataSerializer;
 
     /// <summary>
@@ -44,7 +41,7 @@ public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSen
     /// Gets the singleton instance of DataCollectionTestCaseEventSender.
     /// </summary>
     // TODO : Re-factor to pass the instance as singleton.
-    public static DataCollectionTestCaseEventSender Instance { get; private set; }
+    public static DataCollectionTestCaseEventSender? Instance { get; private set; }
 
     /// <summary>
     /// Gets singleton instance of DataCollectionRequestHandler.
@@ -98,7 +95,7 @@ public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSen
     }
 
     /// <inheritdoc />
-    public Collection<AttachmentSet> SendTestCaseEnd(TestCaseEndEventArgs e)
+    public Collection<AttachmentSet>? SendTestCaseEnd(TestCaseEndEventArgs e)
     {
         var attachmentSets = new Collection<AttachmentSet>();
         _communicationManager.SendMessage(MessageType.DataCollectionTestEnd, e);

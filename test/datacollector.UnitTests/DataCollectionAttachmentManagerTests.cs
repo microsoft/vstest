@@ -95,13 +95,13 @@ public class DataCollectionAttachmentManagerTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfSessionIdIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _attachmentManager.Initialize(null, string.Empty, _messageSink.Object));
+        Assert.ThrowsException<ArgumentNullException>(() => _attachmentManager.Initialize(null!, string.Empty, _messageSink.Object));
     }
 
     [TestMethod]
     public void InitializeShouldThrowExceptionIfMessageSinkIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _attachmentManager.Initialize(_sessionId, string.Empty, null));
+        Assert.ThrowsException<ArgumentNullException>(() => _attachmentManager.Initialize(_sessionId, string.Empty, null!));
     }
 
     [TestMethod]
@@ -263,7 +263,7 @@ public class DataCollectionAttachmentManagerTests
     [TestMethod]
     public void AddAttachmentShouldNotAddNewFileTransferIfNullIsPassed()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _attachmentManager.AddAttachment(null, null, null, null));
+        Assert.ThrowsException<ArgumentNullException>(() => _attachmentManager.AddAttachment(null!, null, null!, null!));
     }
 
     [TestMethod]

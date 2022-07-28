@@ -158,8 +158,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="NoTestHostProviderFound">
-        <source>No suitable test runtime provider found for this run.</source>
-        <target state="translated">Pro tento běh se nenašel žádný vhodný zprostředkovatel testů v režimu runtime.</target>
+        <source>No suitable test runtime provider was found for any source in this run.</source>
+        <target state="translated">V tomto běhu se nenašel žádný vhodný zprostředkovatel testovacího modulu runtime pro žádný zdroj.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="NoProxyMatchesDescription">
@@ -175,6 +175,16 @@
       <trans-unit id="AttachmentsBanner">
         <source>Attachments:</source>
         <target state="translated">Přílohy:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoSuitableRuntimeProviderFound">
+        <source>No suitable test runtime provider was found:</source>
+        <target state="translated">Nenašel se žádný vhodný zprostředkovatel testovacího modulu runtime:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SkippingSource">
+        <source>Skipping source:</source>
+        <target state="translated">Přeskočení zdroje:</target>
         <note></note>
       </trans-unit>
     </body>

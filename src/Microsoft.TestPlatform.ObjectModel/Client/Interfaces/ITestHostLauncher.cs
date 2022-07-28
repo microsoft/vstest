@@ -3,8 +3,6 @@
 
 using System.Threading;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
 /// <summary>

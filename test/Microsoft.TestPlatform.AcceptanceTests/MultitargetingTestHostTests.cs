@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -17,8 +15,8 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
     [TestCategory("Windows-Review")]
     // the underlying test is using xUnit to avoid AppDomain enhancements in MSTest that make this pass even without multitargetting
     // xUnit supports net452 onwards, so that is why this starts at net452, I also don't test all framework versions
-    [NetCoreRunner(NETFX452_48)]
-    [NetFrameworkRunner(NETFX452_48)]
+    [NetCoreRunner(NETFX462_48)]
+    [NetFrameworkRunner(NETFX462_48)]
     public void TestRunInATesthostThatTargetsTheirChosenNETFramework(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -28,7 +26,7 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
 
         // Tell the test project which target framework we are expecting it to run as.
         // It has this value conditionally compiled, so it can compare it.
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             ["EXPECTED_TARGET_FRAMEWORK"] = runnerInfo.TargetFramework
         };

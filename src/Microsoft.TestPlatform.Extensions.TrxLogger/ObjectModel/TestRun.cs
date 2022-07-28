@@ -8,12 +8,9 @@ using System.IO;
 using System.Security.Principal;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
 using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
@@ -39,15 +36,15 @@ internal sealed class TestRun
     private string _name;
 
     [StoreXmlSimpleField("@runUser", "")]
-    private string _runUser;
+    private readonly string _runUser;
 
-    private TestRunConfiguration _runConfig;
+    private TestRunConfiguration? _runConfig;
 
     [StoreXmlSimpleField("Times/@creation")]
-    private DateTime _created;
+    private readonly DateTime _created;
 
     [StoreXmlSimpleField("Times/@queuing")]
-    private DateTime _queued;
+    private readonly DateTime _queued;
 
     [StoreXmlSimpleField("Times/@start")]
     private DateTime _started;
@@ -63,7 +60,23 @@ internal sealed class TestRun
     /// </param>
     internal TestRun(Guid runId)
     {
-        Initialize();
+        _id = Guid.NewGuid();
+        _name = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_TestRunName, Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
+
+        // Fix for issue (https://github.com/Microsoft/vstest/issues/213). Since there is no way to find current user in linux machine.
+        // We are catching PlatformNotSupportedException for non windows machine.
+        try
+        {
+            _runUser = WindowsIdentity.GetCurrent().Name;
+        }
+        catch (PlatformNotSupportedException)
+        {
+            _runUser = string.Empty;
+        }
+        _created = DateTime.UtcNow;
+        _queued = DateTime.UtcNow;
+        _started = DateTime.UtcNow;
+        _finished = DateTime.UtcNow;
 
         EqtAssert.IsTrue(!Guid.Empty.Equals(runId), "Can't use Guid.Empty for run ID.");
         _id = runId;
@@ -72,7 +85,7 @@ internal sealed class TestRun
     /// <summary>
     /// Gets or sets the run configuration.
     /// </summary>
-    internal TestRunConfiguration RunConfiguration
+    internal TestRunConfiguration? RunConfiguration
     {
         get
         {
@@ -163,13 +176,13 @@ internal sealed class TestRun
         if (RunConfiguration == null)
         {
             Debug.Fail("'RunConfiguration' is null");
-            throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunConfigInRun));
+            throw new Exception(TrxLoggerResources.Common_MissingRunConfigInRun);
         }
 
         if (string.IsNullOrEmpty(RunConfiguration.RunDeploymentRootDirectory))
         {
             Debug.Fail("'RunConfiguration.RunDeploymentRootDirectory' is null or empty");
-            throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunDeploymentRootInRunConfig));
+            throw new Exception(TrxLoggerResources.Common_MissingRunDeploymentRootInRunConfig);
         }
 
         return RunConfiguration.RunDeploymentInDirectory;
@@ -180,26 +193,5 @@ internal sealed class TestRun
         // We use custom format string to make sure that runs are sorted in the same way on all intl machines.
         // This is both for directory names and for Data Warehouse.
         return timeStamp.ToString("yyyy-MM-dd HH:mm:ss", DateTimeFormatInfo.InvariantInfo);
-    }
-
-    private void Initialize()
-    {
-        _id = Guid.NewGuid();
-        _name = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_TestRunName, Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
-
-        // Fix for issue (https://github.com/Microsoft/vstest/issues/213). Since there is no way to find current user in linux machine.
-        // We are catching PlatformNotSupportedException for non windows machine.
-        try
-        {
-            _runUser = WindowsIdentity.GetCurrent().Name;
-        }
-        catch (PlatformNotSupportedException)
-        {
-            _runUser = string.Empty;
-        }
-        _created = DateTime.UtcNow;
-        _queued = DateTime.UtcNow;
-        _started = DateTime.UtcNow;
-        _finished = DateTime.UtcNow;
     }
 }

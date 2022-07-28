@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
@@ -24,9 +23,9 @@ public class DiscoveryEventsHandleConverter : ITestDiscoveryEventsHandler2
     /// Converts the ITestDiscoveryEventsHandler to ITestDiscoveryEventsHandler2
     /// </summary>
     /// <param name="testDiscoveryEventsHandler"></param>
-    public DiscoveryEventsHandleConverter(ITestDiscoveryEventsHandler testDiscoveryEventsHandler!!)
+    public DiscoveryEventsHandleConverter(ITestDiscoveryEventsHandler testDiscoveryEventsHandler)
     {
-        _testDiscoveryEventsHandler = testDiscoveryEventsHandler;
+        _testDiscoveryEventsHandler = testDiscoveryEventsHandler ?? throw new ArgumentNullException(nameof(testDiscoveryEventsHandler));
     }
 
     /// <summary>
@@ -43,7 +42,7 @@ public class DiscoveryEventsHandleConverter : ITestDiscoveryEventsHandler2
     /// </summary>
     /// <param name="level"></param>
     /// <param name="message"></param>
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         _testDiscoveryEventsHandler.HandleLogMessage(level, message);
     }
@@ -53,7 +52,7 @@ public class DiscoveryEventsHandleConverter : ITestDiscoveryEventsHandler2
     /// </summary>
     /// <param name="discoveryCompleteEventArgs"></param>
     /// <param name="lastChunk"></param>
-    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
     {
         _testDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs.TotalCount, lastChunk, discoveryCompleteEventArgs.IsAborted);
     }
@@ -62,7 +61,7 @@ public class DiscoveryEventsHandleConverter : ITestDiscoveryEventsHandler2
     /// Handles Discovery Tests
     /// </summary>
     /// <param name="discoveredTestCases"></param>
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+    public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
     {
         _testDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
     }

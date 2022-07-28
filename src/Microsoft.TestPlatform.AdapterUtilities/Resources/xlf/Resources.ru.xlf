@@ -8,8 +8,8 @@
         <target state="translated">ManagedName является неполным.</target>
       </trans-unit>
       <trans-unit id="ErrorMethodArityMustBeNumeric">
-        <source>Method arity must be numeric</source>
-        <note />
+        <source>Method arity must be numeric.</source>
+        <note></note>
         <target state="translated">Арность метода должна быть числовым значением</target>
       </trans-unit>
       <trans-unit id="ErrorMethodNotFound">
@@ -48,6 +48,16 @@ Example: 'System.Reflection.MethodBase' is not implemented on this platform!</no
         <source>A closing single quote was expected at the end of the segment! (segment: {0})</source>
         <target state="translated">В конце сегмента ожидалась закрывающая одинарная кавычка (сегмент: {0}).</target>
         <note>An error thrown when the type name ended but opened single quote was not matched.</note>
+      </trans-unit>
+      <trans-unit id="ErrorMethodExpectedAsAnArgument">
+        <source>Argument must be a method. (Argument name: {0})</source>
+        <target state="translated">Аргумент должен быть методом. (Имя аргумента: {0})</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ErrorCannotAppendAfterHashCalculation">
+        <source>Cannot append to a TestIdProvider, after GetId or GetHash method is called.</source>
+        <target state="translated">Невозможно добавить к TestIdProvider после вызова метода GetId или GetHash.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

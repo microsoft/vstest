@@ -3,11 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 
@@ -54,9 +51,9 @@ internal class DiscoveryResultCache
     /// <param name="onReportTestCases"> The on report test cases. </param>
     public DiscoveryResultCache(long cacheSize, TimeSpan discoveredTestEventTimeout, OnReportTestCases onReportTestCases)
     {
-        Debug.Assert(cacheSize > 0, "Buffer size cannot be less than zero");
-        Debug.Assert(onReportTestCases != null, "Callback which listens for cache size limit cannot be null.");
-        Debug.Assert(discoveredTestEventTimeout > TimeSpan.MinValue, "The cache timeout must be greater than min value.");
+        TPDebug.Assert(cacheSize > 0, "Buffer size cannot be less than zero");
+        TPDebug.Assert(onReportTestCases != null, "Callback which listens for cache size limit cannot be null.");
+        TPDebug.Assert(discoveredTestEventTimeout > TimeSpan.MinValue, "The cache timeout must be greater than min value.");
 
         _cacheSize = cacheSize;
         _onReportTestCases = onReportTestCases;
@@ -95,7 +92,7 @@ internal class DiscoveryResultCache
     /// <param name="test"> The test. </param>
     public void AddTest(TestCase test)
     {
-        Debug.Assert(test != null, "DiscoveryResultCache.AddTest called with no new test.");
+        TPDebug.Assert(test != null, "DiscoveryResultCache.AddTest called with no new test.");
 
         if (test == null)
         {

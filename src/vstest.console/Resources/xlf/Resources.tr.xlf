@@ -1179,6 +1179,26 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
         <target state="translated">vstest.console.exe, öykünülen modda {0} olarak çalışıyor. Daha iyi performans için vstest.console.arm64.exe yerel çalıştırıcısını kullanmayı deneyin.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="RequestHandlerConnectionTimedOut">
+        <source>Waiting for request handler connection timed out after {0} seconds.</source>
+        <target state="translated">İstek işleyicisi bağlantısını bekleme süresi {0} saniye sonra zaman aşımına uğradı.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StartTestSessionTimedOut">
+        <source>Waiting for start test session timed out after {0} seconds.</source>
+        <target state="translated">Test oturumunun başlamasını bekleme süresi {0} saniye sonra zaman aşımına uğradı.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StopTestSessionTimedOut">
+        <source>Waiting for stop test session timed out after {0} seconds.</source>
+        <target state="translated">Test oturumunun durdurulmasını bekleme süresi {0} saniye sonra zaman aşımına uğradı.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ErrorHostingCommunicationChannel">
+        <source>Error hosting communication channel.</source>
+        <target state="translated">İletişim kanalını barındırma hatası.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -30,7 +31,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution;
 public class RunTestsWithSourcesTests
 {
     private readonly TestExecutionContext _testExecutionContext;
-    private readonly Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
+    private readonly Mock<IInternalTestRunEventsHandler> _mockTestRunEventsHandler;
     private TestableRunTestsWithSources? _runTestsInstance;
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
@@ -50,7 +51,7 @@ public class RunTestsWithSourcesTests
             isDebug: false,
             testCaseFilter: null,
             filterOptions: null);
-        _mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        _mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
         _mockMetricsCollection = new Mock<IMetricsCollection>();
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(_mockMetricsCollection.Object);
@@ -97,7 +98,7 @@ public class RunTestsWithSourcesTests
 
         var messageFormat =
             "No test is available in {0}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.";
-        var message = string.Format(messageFormat, "a aa b ab");
+        var message = string.Format(CultureInfo.CurrentCulture, messageFormat, "a aa b ab");
         _mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, message),
             Times.Once);
     }
@@ -279,10 +280,10 @@ public class RunTestsWithSourcesTests
 
         _runTestsInstance.CallSendSessionStart();
 
-        mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<string, object>>(
+        mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<string, object?>>(
             y => y.ContainsKey("TestSources")
-                 && ((IEnumerable<string>)y["TestSources"]).Contains("1.dll")
-                 && ((IEnumerable<string>)y["TestSources"]).Contains("2.dll")
+                 && ((IEnumerable<string>)y["TestSources"]!).Contains("1.dll")
+                 && ((IEnumerable<string>)y["TestSources"]!).Contains("2.dll")
         )));
     }
 
@@ -338,7 +339,7 @@ public class RunTestsWithSourcesTests
     private class TestableRunTestsWithSources : RunTestsWithSources
     {
         public TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string? runSettings,
-            TestExecutionContext testExecutionContext, ITestCaseEventsHandler? testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler,
+            TestExecutionContext testExecutionContext, ITestCaseEventsHandler? testCaseEventsHandler, IInternalTestRunEventsHandler testRunEventsHandler,
             IRequestData requestData)
             : base(requestData, adapterSourceMap, null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler)
         {
@@ -346,7 +347,7 @@ public class RunTestsWithSourcesTests
 
         internal TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string? runSettings,
             TestExecutionContext testExecutionContext,
-            ITestCaseEventsHandler? testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>,
+            ITestCaseEventsHandler? testCaseEventsHandler, IInternalTestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>,
             IEnumerable<string>> executorUriVsSourceList, IRequestData requestData)
             : base(requestData, adapterSourceMap, null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler,
                   executorUriVsSourceList)
@@ -395,20 +396,20 @@ public class RunTestsWithSourcesTests
     [ExtensionUri(RunTestsWithSourcesTestsExecutorUri)]
     internal class RunTestWithSourcesExecutor : ITestExecutor
     {
-        public static Action<IEnumerable<string>, IRunContext, IFrameworkHandle>? RunTestsWithSourcesCallback { get; set; }
-        public static Action<IEnumerable<TestCase>, IRunContext, IFrameworkHandle>? RunTestsWithTestsCallback { get; set; }
+        public static Action<IEnumerable<string>?, IRunContext?, IFrameworkHandle?>? RunTestsWithSourcesCallback { get; set; }
+        public static Action<IEnumerable<TestCase>?, IRunContext?, IFrameworkHandle?>? RunTestsWithTestsCallback { get; set; }
 
         public void Cancel()
         {
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             RunTestsWithSourcesCallback?.Invoke(sources, runContext, frameworkHandle);
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             RunTestsWithTestsCallback?.Invoke(tests, runContext, frameworkHandle);
         }

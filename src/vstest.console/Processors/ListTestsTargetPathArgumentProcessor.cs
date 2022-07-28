@@ -2,10 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
-using System.Globalization;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -17,9 +15,8 @@ internal class ListTestsTargetPathArgumentProcessor : IArgumentProcessor
 {
     public const string CommandName = "/ListTestsTargetPath";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -31,7 +28,7 @@ internal class ListTestsTargetPathArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new ListTestsTargetPathArgumentExecutor(CommandLineOptions.Instance));
@@ -66,7 +63,7 @@ internal class ListTestsTargetPathArgumentExecutor : IArgumentExecutor
     /// </param>
     public ListTestsTargetPathArgumentExecutor(CommandLineOptions options)
     {
-        Contract.Requires(options != null);
+        ValidateArg.NotNull(options, nameof(options));
         _commandLineOptions = options;
     }
 
@@ -76,12 +73,12 @@ internal class ListTestsTargetPathArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        if (string.IsNullOrWhiteSpace(argument))
+        if (argument.IsNullOrWhiteSpace())
         {
             // Not adding this string to resources because this processor is only used internally.
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, "ListTestsTargetPath is required with ListFullyQualifiedTests!"));
+            throw new CommandLineException("ListTestsTargetPath is required with ListFullyQualifiedTests!");
         }
 
         _commandLineOptions.ListTestsTargetPath = argument;

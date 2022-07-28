@@ -9,8 +9,6 @@ using System.Runtime.Loader;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc/>
@@ -36,28 +34,27 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     }
 
     /// <inheritdoc/>
-    public event AssemblyResolveEventHandler AssemblyResolve;
+    public event AssemblyResolveEventHandler? AssemblyResolve;
 
     public void Dispose()
     {
         Dispose(true);
-
-        // Use SupressFinalize in case a subclass
-        // of this type implements a finalizer.
         GC.SuppressFinalize(this);
     }
 
-    protected void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (_disposed)
         {
-            if (disposing)
-            {
-                AssemblyLoadContext.Default.Resolving -= AssemblyResolverEvent;
-            }
-
-            _disposed = true;
+            return;
         }
+
+        if (disposing)
+        {
+            AssemblyLoadContext.Default.Resolving -= AssemblyResolverEvent;
+        }
+
+        _disposed = true;
     }
 
     /// <summary>
@@ -72,9 +69,9 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     /// <returns>
     /// The <see cref="Assembly"/>.
     /// </returns>
-    private Assembly AssemblyResolverEvent(object sender, object eventArgs)
+    private Assembly? AssemblyResolverEvent(object sender, object eventArgs)
     {
-        return eventArgs is not AssemblyName args ? null : AssemblyResolve(this, new AssemblyResolveEventArgs(args.Name));
+        return eventArgs is not AssemblyName args ? null : AssemblyResolve?.Invoke(this, new AssemblyResolveEventArgs(args.Name));
     }
 }
 

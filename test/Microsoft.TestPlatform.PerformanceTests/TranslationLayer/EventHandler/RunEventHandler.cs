@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer;
 
 /// <inheritdoc />
-public class RunEventHandler : ITestRunEventsHandler2
+public class RunEventHandler : ITestRunEventsHandler
 {
     /// <summary>
     /// Gets the test results.
@@ -20,7 +20,7 @@ public class RunEventHandler : ITestRunEventsHandler2
     /// <summary>
     /// Gets the metrics.
     /// </summary>
-    public IDictionary<string, object> Metrics { get; private set; } = new Dictionary<string, object>();
+    public IDictionary<string, object>? Metrics { get; private set; } = new Dictionary<string, object>();
 
     /// <summary>
     /// Gets the log message.
@@ -32,16 +32,16 @@ public class RunEventHandler : ITestRunEventsHandler2
         TestResults = new List<TestResult>();
     }
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         LogMessages.Add($"[{level.ToString().ToUpperInvariant()}]: {message}");
     }
 
     public void HandleTestRunComplete(
         TestRunCompleteEventArgs testRunCompleteArgs,
-        TestRunChangedEventArgs lastChunkArgs,
-        ICollection<AttachmentSet> runContextAttachments,
-        ICollection<string> executorUris)
+        TestRunChangedEventArgs? lastChunkArgs,
+        ICollection<AttachmentSet>? runContextAttachments,
+        ICollection<string>? executorUris)
     {
         if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)
         {
@@ -55,7 +55,7 @@ public class RunEventHandler : ITestRunEventsHandler2
         }
     }
 
-    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
     {
         if (testRunChangedArgs != null && testRunChangedArgs.NewTestResults != null)
         {
@@ -72,11 +72,5 @@ public class RunEventHandler : ITestRunEventsHandler2
     {
         // No op
         return -1;
-    }
-
-    public bool AttachDebuggerToProcess(int pid)
-    {
-        // No op
-        return true;
     }
 }

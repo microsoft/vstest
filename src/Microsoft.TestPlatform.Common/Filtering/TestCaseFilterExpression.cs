@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
 /// <summary>
@@ -28,9 +26,9 @@ public class TestCaseFilterExpression : ITestCaseFilterExpression
     /// <summary>
     /// Adapter specific filter expression.
     /// </summary>
-    public TestCaseFilterExpression(FilterExpressionWrapper filterWrapper!!)
+    public TestCaseFilterExpression(FilterExpressionWrapper filterWrapper)
     {
-        _filterWrapper = filterWrapper;
+        _filterWrapper = filterWrapper ?? throw new ArgumentNullException(nameof(filterWrapper));
         _validForMatch = filterWrapper.ParseError.IsNullOrEmpty();
     }
 
@@ -48,9 +46,9 @@ public class TestCaseFilterExpression : ITestCaseFilterExpression
     /// <summary>
     /// Validate if underlying filter expression is valid for given set of supported properties.
     /// </summary>
-    public string[] ValidForProperties(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
+    public string[]? ValidForProperties(IEnumerable<string>? supportedProperties, Func<string, TestProperty?> propertyProvider)
     {
-        string[] invalidProperties = null;
+        string[]? invalidProperties = null;
         if (null != _filterWrapper && _validForMatch)
         {
             invalidProperties = _filterWrapper.ValidForProperties(supportedProperties, propertyProvider);
@@ -61,8 +59,11 @@ public class TestCaseFilterExpression : ITestCaseFilterExpression
     /// <summary>
     /// Match test case with filter criteria.
     /// </summary>
-    public bool MatchTestCase(TestCase testCase!!, Func<string, Object> propertyValueProvider!!)
+    public bool MatchTestCase(TestCase testCase, Func<string, object?> propertyValueProvider)
     {
+        ValidateArg.NotNull(testCase, nameof(testCase));
+        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
+
         if (!_validForMatch)
         {
             return false;
@@ -73,6 +74,7 @@ public class TestCaseFilterExpression : ITestCaseFilterExpression
             // can be null when parsing error occurs. Invalid filter results in no match.
             return false;
         }
+
         return _filterWrapper.Evaluate(propertyValueProvider);
     }
 

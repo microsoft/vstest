@@ -33,7 +33,7 @@ public class RunSettingsArgumentProcessorTests
     [TestCleanup]
     public void TestCleanup()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
     }
 
     [TestMethod]
@@ -47,7 +47,7 @@ public class RunSettingsArgumentProcessorTests
     public void GetExecuterShouldReturnRunSettingsArgumentExecutor()
     {
         var processor = new RunSettingsArgumentProcessor();
-        Assert.IsTrue(processor.Executor.Value is RunSettingsArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is RunSettingsArgumentExecutor);
     }
 
     #region RunSettingsArgumentProcessorCapabilities tests
@@ -76,7 +76,7 @@ public class RunSettingsArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfArgumentIsNull()
     {
-        Action action = () => new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null).Initialize(null);
+        Action action = () => new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null!).Initialize(null);
 
         ExceptionUtilities.ThrowsException<CommandLineException>(
             action,
@@ -86,7 +86,7 @@ public class RunSettingsArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfArgumentIsWhiteSpace()
     {
-        Action action = () => new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null).Initialize("  ");
+        Action action = () => new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null!).Initialize("  ");
 
         ExceptionUtilities.ThrowsException<CommandLineException>(
             action,
@@ -98,7 +98,7 @@ public class RunSettingsArgumentProcessorTests
     {
         var fileName = "C:\\Imaginary\\nonExistentFile.txt";
 
-        var executor = new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null);
+        var executor = new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null!);
         var mockFileHelper = new Mock<IFileHelper>();
         mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(false);
 
@@ -208,7 +208,7 @@ public class RunSettingsArgumentProcessorTests
         RunConfiguration runConfiguration =
             XmlRunSettingsUtilities.GetRunConfigurationNode(_settingsProvider.ActiveRunSettings.SettingsXml);
         Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
-        Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
+        Assert.AreEqual(runConfiguration.TargetFramework!.ToString(), Framework.DefaultFramework.ToString());
         Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
 
     }
@@ -323,7 +323,7 @@ public class RunSettingsArgumentProcessorTests
             null);
 
         executor.Initialize(runsettingsFile);
-        Assert.IsTrue(_settingsProvider.ActiveRunSettings!.SettingsXml.Contains(@"C:\新しいフォルダー"));
+        Assert.IsTrue(_settingsProvider.ActiveRunSettings!.SettingsXml!.Contains(@"C:\新しいフォルダー"));
         File.Delete(runsettingsFile);
     }
 

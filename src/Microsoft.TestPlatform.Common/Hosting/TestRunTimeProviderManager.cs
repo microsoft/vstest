@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 
 /// <summary>
@@ -17,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 /// </summary>
 public class TestRuntimeProviderManager : ITestRuntimeProviderManager
 {
-    private static TestRuntimeProviderManager s_testHostManager;
+    private static TestRuntimeProviderManager? s_testHostManager;
 
     private readonly TestRuntimeExtensionManager _testHostExtensionManager;
 
@@ -39,20 +37,20 @@ public class TestRuntimeProviderManager : ITestRuntimeProviderManager
     public static TestRuntimeProviderManager Instance
         => s_testHostManager ??= new TestRuntimeProviderManager(TestSessionMessageLogger.Instance);
 
-    public ITestRuntimeProvider GetTestHostManagerByUri(string hostUri)
+    public ITestRuntimeProvider? GetTestHostManagerByUri(string hostUri)
     {
         var host = _testHostExtensionManager.TryGetTestExtension(hostUri);
         return host?.Value;
     }
 
-    public virtual ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration, List<string> _)
+    public virtual ITestRuntimeProvider? GetTestHostManagerByRunConfiguration(string? runConfiguration, List<string>? _)
     {
         foreach (var testExtension in _testHostExtensionManager.TestExtensions)
         {
             if (testExtension.Value.CanExecuteCurrentRunConfiguration(runConfiguration))
             {
                 // we are creating a new Instance of ITestRuntimeProvider so that each POM gets it's own object of ITestRuntimeProvider
-                return (ITestRuntimeProvider)Activator.CreateInstance(testExtension.Value.GetType());
+                return (ITestRuntimeProvider?)Activator.CreateInstance(testExtension.Value.GetType());
             }
         }
 

@@ -10,15 +10,11 @@ using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.Utilities;
 
 [TestClass]
 public class MetadataReaderHelperTests
 {
-    private readonly MetadataReaderExtensionsHelper _metadataReaderHelper = new();
-
     [TestMethod]
     public void MetadataReaderHelper_GetCollectorExtensionTypes()
     {
@@ -27,17 +23,17 @@ public class MetadataReaderHelperTests
             Directory.GetFiles(testAssetsPath, "AttachmentProcessorDataCollector.dll", SearchOption.AllDirectories)
             .Where(x => x.Contains("bin") && x.Contains(IntegrationTestEnvironment.BuildConfiguration))
             .Single();
-        var types = _metadataReaderHelper.DiscoverTestExtensionTypesV2Attribute(Assembly.LoadFile(dataCollectorFilePath), dataCollectorFilePath);
+        var types = MetadataReaderExtensionsHelper.DiscoverTestExtensionTypesV2Attribute(Assembly.LoadFile(dataCollectorFilePath), dataCollectorFilePath);
         Assert.IsTrue(types.Any(), $"File {dataCollectorFilePath}");
-        Assert.IsTrue(types[0].AssemblyQualifiedName.StartsWith("AttachmentProcessorDataCollector.SampleDataCollectorV2"), $"File {dataCollectorFilePath}");
+        Assert.IsTrue(types[0].AssemblyQualifiedName!.StartsWith("AttachmentProcessorDataCollector.SampleDataCollectorV2"), $"File {dataCollectorFilePath}");
         Assert.AreEqual(dataCollectorFilePath.Replace("/", @"\"), types[0].Assembly.Location.Replace("/", @"\"), $"File {dataCollectorFilePath}");
-        Assert.IsTrue(types[1].AssemblyQualifiedName.StartsWith("AttachmentProcessorDataCollector.SampleDataCollectorV1"), $"File {dataCollectorFilePath}");
+        Assert.IsTrue(types[1].AssemblyQualifiedName!.StartsWith("AttachmentProcessorDataCollector.SampleDataCollectorV1"), $"File {dataCollectorFilePath}");
         Assert.AreEqual(dataCollectorFilePath.Replace("/", @"\"), types[1].Assembly.Location.Replace("/", @"\"), $"File {dataCollectorFilePath}");
     }
 
-    private string GetTestAssetsFolder()
+    private static string GetTestAssetsFolder()
     {
-        string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         while (true)
         {
             if (File.Exists(Path.Combine(current, "TestPlatform.sln")))
@@ -46,7 +42,7 @@ public class MetadataReaderHelperTests
                 Assert.IsTrue(Directory.Exists(testAssetsPath), $"Directory not found '{testAssetsPath}'");
                 return testAssetsPath;
             }
-            current = Path.GetDirectoryName(current);
+            current = Path.GetDirectoryName(current)!;
             if (current == Path.GetPathRoot(current))
             {
                 throw new Exception("Repo root path not tound");

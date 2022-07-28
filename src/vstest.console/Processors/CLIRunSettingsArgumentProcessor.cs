@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Xml.XPath;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
@@ -13,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -28,9 +27,8 @@ internal class CliRunSettingsArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "--";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -42,7 +40,7 @@ internal class CliRunSettingsArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new CliRunSettingsArgumentExecutor(RunSettingsManager.Instance, CommandLineOptions.Instance));
@@ -77,12 +75,12 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
         _commandLineOptions = commandLineOptions;
     }
 
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         throw new NotImplementedException();
     }
 
-    public void Initialize(string[] arguments)
+    public void Initialize(string[]? arguments)
     {
         // if argument is null or doesn't contain any element, don't do anything.
         if (arguments == null || arguments.Length == 0)
@@ -142,7 +140,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
             // hoping that we find the end of the parameter
             if (merge)
             {
-                mergedArg += string.IsNullOrWhiteSpace(mergedArg) ? arg : $" {arg}";
+                mergedArg += StringUtils.IsNullOrWhiteSpace(mergedArg) ? arg : $" {arg}";
             }
             else
             {
@@ -188,7 +186,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
             var key = arg.Substring(0, indexOfSeparator).Trim();
             var value = arg.Substring(indexOfSeparator + 1);
 
-            if (string.IsNullOrWhiteSpace(key))
+            if (StringUtils.IsNullOrWhiteSpace(key))
             {
                 continue;
             }
@@ -200,7 +198,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
         }
     }
 
-    private bool UpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
+    private static bool UpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
     {
         if (!node.Contains(Constants.TestRunParametersName))
         {
@@ -215,7 +213,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
             return true;
         }
 
-        var exceptionMessage = string.Format(CommandLineResources.InvalidTestRunParameterArgument, node);
+        var exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestRunParameterArgument, node);
         throw new CommandLineException(exceptionMessage);
     }
 
@@ -223,7 +221,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
     {
         if (key.Equals(FrameworkArgumentExecutor.RunSettingsPath))
         {
-            Framework framework = Framework.FromString(value);
+            Framework? framework = Framework.FromString(value);
             if (framework != null)
             {
                 _commandLineOptions.TargetFrameworkVersion = framework;

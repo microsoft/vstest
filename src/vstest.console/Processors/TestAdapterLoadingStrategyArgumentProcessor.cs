@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 /// <summary>
@@ -29,9 +27,8 @@ internal class TestAdapterLoadingStrategyArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/TestAdapterLoadingStrategy";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -43,7 +40,7 @@ internal class TestAdapterLoadingStrategyArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new TestAdapterLoadingStrategyArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, ConsoleOutput.Instance, new FileHelper()));
@@ -104,12 +101,12 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="options"> The options. </param>
     /// <param name="testPlatform">The test platform</param>
-    public TestAdapterLoadingStrategyArgumentExecutor(CommandLineOptions options!!, IRunSettingsProvider runSettingsManager!!, IOutput output!!, IFileHelper fileHelper!!)
+    public TestAdapterLoadingStrategyArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager, IOutput output, IFileHelper fileHelper)
     {
-        _commandLineOptions = options;
-        _runSettingsManager = runSettingsManager;
-        _output = output;
-        _fileHelper = fileHelper;
+        _commandLineOptions = options ?? throw new ArgumentNullException(nameof(options));
+        _runSettingsManager = runSettingsManager ?? throw new ArgumentNullException(nameof(runSettingsManager));
+        _output = output ?? throw new ArgumentNullException(nameof(output));
+        _fileHelper = fileHelper ?? throw new ArgumentNullException(nameof(fileHelper));
     }
 
     #region IArgumentExecutor
@@ -117,7 +114,7 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         ExtractStrategy(argument, out var strategy);
 
@@ -146,11 +143,11 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
     }
     #endregion
 
-    private void ExtractStrategy(string value, out TestAdapterLoadingStrategy strategy)
+    private void ExtractStrategy(string? value, out TestAdapterLoadingStrategy strategy)
     {
         value ??= _runSettingsManager.QueryRunSettingsNode(RunSettingsPath);
 
-        if (string.IsNullOrWhiteSpace(value))
+        if (value.IsNullOrWhiteSpace())
         {
             strategy = TestAdapterLoadingStrategy.Default;
             return;

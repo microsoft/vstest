@@ -27,7 +27,7 @@ public class CommandLineOptionsTests
     {
         _fileHelper = new Mock<IFileHelper>();
         _filePatternParser = new FilePatternParser(new Mock<Matcher>().Object, _fileHelper.Object);
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.FileHelper = _fileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = _filePatternParser;
         _fileHelper.Setup(fh => fh.GetCurrentDirectory()).Returns(_currentDirectory);
@@ -65,7 +65,7 @@ public class CommandLineOptionsTests
     [TestMethod]
     public void CommandLineOptionsAddSourceShouldThrowCommandLineExceptionForNullSource()
     {
-        Assert.ThrowsException<TestSourceException>(() => CommandLineOptions.Instance.AddSource(null));
+        Assert.ThrowsException<TestSourceException>(() => CommandLineOptions.Instance.AddSource(null!));
     }
 
     [TestMethod]

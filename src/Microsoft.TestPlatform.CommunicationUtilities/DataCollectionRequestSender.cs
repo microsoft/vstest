@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 
 /// <summary>
@@ -100,10 +98,10 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     }
 
     /// <inheritdoc/>
-    public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, IEnumerable<string> sources, bool isTelemetryOptedIn, ITestMessageEventHandler runEventsHandler)
+    public BeforeTestRunStartResult? SendBeforeTestRunStartAndGetResult(string? settingsXml, IEnumerable<string> sources, bool isTelemetryOptedIn, ITestMessageEventHandler? runEventsHandler)
     {
         var isDataCollectionStarted = false;
-        BeforeTestRunStartResult result = null;
+        BeforeTestRunStartResult? result = null;
 
         EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult: Send BeforeTestRunStart message with settingsXml {0} and sources {1}: ", settingsXml, sources.ToString());
 
@@ -119,12 +117,14 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         while (!isDataCollectionStarted)
         {
             var message = _communicationManager.ReceiveMessage();
+            TPDebug.Assert(message is not null, "message is null");
 
             EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult: Received message: {0}", message);
 
             if (message.MessageType == MessageType.DataCollectionMessage)
             {
                 var dataCollectionMessageEventArgs = _dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
+                TPDebug.Assert(dataCollectionMessageEventArgs is not null, $"{nameof(dataCollectionMessageEventArgs)} is null");
                 LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
             }
             else if (message.MessageType == MessageType.BeforeTestRunStartResult)
@@ -138,10 +138,10 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     }
 
     /// <inheritdoc/>
-    public AfterTestRunEndResult SendAfterTestRunEndAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled)
+    public AfterTestRunEndResult? SendAfterTestRunEndAndGetResult(ITestMessageEventHandler? runEventsHandler, bool isCancelled)
     {
         var isDataCollectionComplete = false;
-        AfterTestRunEndResult result = null;
+        AfterTestRunEndResult? result = null;
 
         EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult: Send AfterTestRunEnd message with isCancelled: {0}", isCancelled);
 
@@ -152,12 +152,14 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         while (!isDataCollectionComplete && !isCancelled)
         {
             var message = _communicationManager.ReceiveMessage();
+            TPDebug.Assert(message is not null, "message is null");
 
             EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult: Received message: {0}", message);
 
             if (message.MessageType == MessageType.DataCollectionMessage)
             {
                 var dataCollectionMessageEventArgs = _dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
+                TPDebug.Assert(dataCollectionMessageEventArgs is not null, $"{nameof(dataCollectionMessageEventArgs)} is null");
                 LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
             }
             else if (message.MessageType == MessageType.AfterTestRunEndResult)
@@ -170,10 +172,10 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
         return result;
     }
 
-    private void LogDataCollectorMessage(DataCollectionMessageEventArgs dataCollectionMessageEventArgs, ITestMessageEventHandler requestHandler)
+    private static void LogDataCollectorMessage(DataCollectionMessageEventArgs dataCollectionMessageEventArgs, ITestMessageEventHandler? requestHandler)
     {
         string logMessage;
-        if (string.IsNullOrWhiteSpace(dataCollectionMessageEventArgs.FriendlyName))
+        if (dataCollectionMessageEventArgs.FriendlyName.IsNullOrWhiteSpace())
         {
             // Message from data collection framework.
             logMessage = string.Format(CultureInfo.CurrentCulture, CommonResources.DataCollectionMessageFormat, dataCollectionMessageEventArgs.Message);
@@ -184,6 +186,6 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
             logMessage = string.Format(CultureInfo.CurrentCulture, CommonResources.DataCollectorMessageFormat, dataCollectionMessageEventArgs.FriendlyName, dataCollectionMessageEventArgs.Message);
         }
 
-        requestHandler.HandleLogMessage(dataCollectionMessageEventArgs.Level, logMessage);
+        requestHandler?.HandleLogMessage(dataCollectionMessageEventArgs.Level, logMessage);
     }
 }

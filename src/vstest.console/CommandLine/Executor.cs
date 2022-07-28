@@ -4,10 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -43,8 +44,6 @@ using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Res
 //   Required
 //   Single or multiple
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 /// <summary>
@@ -63,10 +62,30 @@ internal class Executor
     /// </summary>
     public Executor(IOutput output) : this(output, TestPlatformEventSource.Instance, new ProcessHelper(), new PlatformEnvironment())
     {
+        // TODO: Get rid of this by making vstest.console code properly async.
+        // The current implementation of vstest.console is blocking many threads that just wait
+        // for completion in non-async way. Because threadpool is setting the limit based on processor count,
+        // we exhaust the threadpool threads quickly when we set maxCpuCount to use as many workers as we have threads.
+        //
+        // This setting allow the threadpool to start start more threads than it normally would without any delay.
+        // This won't pre-start the threads, it just pushes the limit of how many are allowed to start without waiting,
+        // and in effect makes callbacks processed earlier, because we don't have to wait that much to receive the callback.
+        // The correct fix would be to re-visit all code that offloads work to threadpool and avoid blocking any thread,
+        // and also use async await when we need to await a completion of an action. But that is a far away goal, so this
+        // is a "temporary" measure to remove the threadpool contention.
+        //
+        // The increase to 5* (1* is the standard + 4*) the standard limit is arbitrary. I saw that making it 2* did not help
+        // and there are usually 2-3 threads blocked by waiting for other actions, so 5 seemed like a good limit.
+        var additionalThreadsCount = Environment.ProcessorCount * 4;
+        ThreadPool.GetMinThreads(out var workerThreads, out var completionPortThreads);
+        ThreadPool.SetMinThreads(workerThreads + additionalThreadsCount, completionPortThreads + additionalThreadsCount);
     }
 
     internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource, IProcessHelper processHelper, IEnvironment environment)
     {
+        DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_RUNNER_DEBUG_ATTACHVS");
+        DebuggerBreakpoint.WaitForDebugger("VSTEST_RUNNER_DEBUG");
+
         Output = output;
         _testPlatformEventSource = testPlatformEventSource;
         _showHelp = true;
@@ -88,7 +107,7 @@ internal class Executor
     /// <returns>
     /// Exit Codes - Zero (for successful command execution), One (for bad command)
     /// </returns>
-    internal int Execute(params string[] args)
+    internal int Execute(params string[]? args)
     {
         _testPlatformEventSource.VsTestConsoleStart();
 
@@ -112,7 +131,7 @@ internal class Executor
         int exitCode = 0;
 
         // If we have no arguments, set exit code to 1, add a message, and include the help processor in the args.
-        if (args == null || args.Length == 0 || args.Any(string.IsNullOrWhiteSpace))
+        if (args == null || args.Length == 0 || args.Any(StringUtils.IsNullOrWhiteSpace))
         {
             Output.Error(true, CommandLineResources.NoArgumentsProvided);
             args = new string[] { HelpArgumentProcessor.CommandName };
@@ -125,7 +144,7 @@ internal class Executor
             var diag = Environment.GetEnvironmentVariable("VSTEST_DIAG");
             // This takes Verbose, Info (not Information), Warning, and Error.
             var diagVerbosity = Environment.GetEnvironmentVariable("VSTEST_DIAG_VERBOSITY");
-            if (!string.IsNullOrWhiteSpace(diag))
+            if (!StringUtils.IsNullOrWhiteSpace(diag))
             {
                 var verbosity = TraceLevel.Verbose;
                 if (diagVerbosity != null)
@@ -201,7 +220,7 @@ internal class Executor
             if (arg.Equals("--"))
             {
                 var cliRunSettingsProcessor = processorFactory.CreateArgumentProcessor(arg, args.Skip(index + 1).ToArray());
-                processors.Add(cliRunSettingsProcessor);
+                processors.Add(cliRunSettingsProcessor!);
                 break;
             }
 
@@ -220,7 +239,7 @@ internal class Executor
                 if (result == 0)
                 {
                     result = 1;
-                    processors.Add(processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName));
+                    processors.Add(processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName)!);
                 }
             }
         }
@@ -250,12 +269,12 @@ internal class Executor
         processors.Sort((p1, p2) => Comparer<ArgumentProcessorPriority>.Default.Compare(p1.Metadata.Value.Priority, p2.Metadata.Value.Priority));
         foreach (var processor in processors)
         {
-            IArgumentExecutor executorInstance;
+            IArgumentExecutor? executorInstance;
             try
             {
                 // Ensure the instance is created.  Note that the Lazy not only instantiates
                 // the argument processor, but also initializes it.
-                executorInstance = processor.Executor.Value;
+                executorInstance = processor.Executor?.Value;
             }
             catch (Exception ex)
             {
@@ -284,7 +303,7 @@ internal class Executor
         // If some argument was invalid, add help argument processor in beginning(i.e. at highest priority)
         if (result == 1 && _showHelp && processors.First().Metadata.Value.CommandName != HelpArgumentProcessor.CommandName)
         {
-            processors.Insert(0, processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName));
+            processors.Insert(0, processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName)!);
         }
         return result;
     }
@@ -308,20 +327,22 @@ internal class Executor
         // Check each processor.
         foreach (var processor in argumentProcessors)
         {
-            if (!processor.Metadata.Value.AllowMultiple)
+            if (processor.Metadata.Value.AllowMultiple)
             {
-                if (!commandSeenCount.TryGetValue(processor.Metadata.Value.CommandName, out int count))
-                {
-                    commandSeenCount.Add(processor.Metadata.Value.CommandName, 1);
-                }
-                else if (count == 1)
-                {
-                    result = 1;
+                continue;
+            }
 
-                    // Update the count so we do not print the error out for this argument multiple times.
-                    commandSeenCount[processor.Metadata.Value.CommandName] = ++count;
-                    Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
-                }
+            if (!commandSeenCount.TryGetValue(processor.Metadata.Value.CommandName, out int count))
+            {
+                commandSeenCount.Add(processor.Metadata.Value.CommandName, 1);
+            }
+            else if (count == 1)
+            {
+                result = 1;
+
+                // Update the count so we do not print the error out for this argument multiple times.
+                commandSeenCount[processor.Metadata.Value.CommandName] = ++count;
+                Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
             }
         }
         return result;
@@ -332,10 +353,10 @@ internal class Executor
     /// </summary>
     /// <param name="argumentProcessors">The arguments that are being processed.</param>
     /// <param name="processorFactory">A factory for creating argument processors.</param>
-    private void EnsureActionArgumentIsPresent(List<IArgumentProcessor> argumentProcessors, ArgumentProcessorFactory processorFactory)
+    private static void EnsureActionArgumentIsPresent(List<IArgumentProcessor> argumentProcessors, ArgumentProcessorFactory processorFactory)
     {
-        Contract.Requires(argumentProcessors != null);
-        Contract.Requires(processorFactory != null);
+        ValidateArg.NotNull(argumentProcessors, nameof(argumentProcessors));
+        ValidateArg.NotNull(processorFactory, nameof(processorFactory));
 
         // Determine if any of the argument processors are actions.
         var isActionIncluded = argumentProcessors.Any((processor) => processor.Metadata.Value.IsAction);
@@ -359,7 +380,9 @@ internal class Executor
         ArgumentProcessorResult result;
         try
         {
-            result = processor.Executor.Value.Execute();
+            // TODO: Only executor that could return null is ResponseFileArgumentProcessor, maybe it could be updated
+            // to follow a pattern similar to other processors and avoid returning null.
+            result = processor.Executor!.Value.Execute();
         }
         catch (Exception ex)
         {
@@ -385,7 +408,7 @@ internal class Executor
             }
         }
 
-        Debug.Assert(
+        TPDebug.Assert(
             result is >= ArgumentProcessorResult.Success and <= ArgumentProcessorResult.Abort,
             "Invalid argument processor result.");
 
@@ -406,7 +429,7 @@ internal class Executor
     /// </summary>
     private void PrintSplashScreen(bool isDiag)
     {
-        string assemblyVersion = Product.Version;
+        string? assemblyVersion = Product.Version;
         if (!isDiag)
         {
             var end = Product.Version?.IndexOf("-release");
@@ -418,7 +441,7 @@ internal class Executor
         }
 
         string assemblyVersionAndArchitecture = $"{assemblyVersion} ({_processHelper.GetCurrentProcessArchitecture().ToString().ToLowerInvariant()})";
-        string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersionAndArchitecture);
+        string commandLineBanner = string.Format(CultureInfo.CurrentCulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersionAndArchitecture);
         Output.WriteLine(commandLineBanner, OutputLevel.Information);
         Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
         PrintWarningIfRunningEmulatedOnArm64();
@@ -464,8 +487,8 @@ internal class Executor
                 }
                 else
                 {
-                    Output.WriteLine(string.Format("vstest.console.exe {0}", responseFileArgs), OutputLevel.Information);
-                    outputArguments.AddRange(nestedArgs);
+                    Output.WriteLine($"vstest.console.exe {responseFileArgs}", OutputLevel.Information);
+                    outputArguments.AddRange(nestedArgs!);
                 }
             }
             else
@@ -485,18 +508,14 @@ internal class Executor
     /// <param name="args">argument in the file as string.</param>
     /// <param name="arguments">Modified argument after sanitizing the contents of the file.</param>
     /// <returns>0 if successful and 1 otherwise.</returns>
-    public bool ReadArgumentsAndSanitize(string fileName, out string args, out string[] arguments)
+    public bool ReadArgumentsAndSanitize(string fileName, out string? args, out string[]? arguments)
     {
         arguments = null;
-        if (GetContentUsingFile(fileName, out args))
-        {
-            return true;
-        }
-
-        return !string.IsNullOrEmpty(args) && Utilities.CommandLineUtilities.SplitCommandLineIntoArguments(args, out arguments);
+        return GetContentUsingFile(fileName, out args)
+            || (!args.IsNullOrEmpty() && Utilities.CommandLineUtilities.SplitCommandLineIntoArguments(args, out arguments));
     }
 
-    private bool GetContentUsingFile(string fileName, out string contents)
+    private bool GetContentUsingFile(string fileName, out string? contents)
     {
         contents = null;
         try

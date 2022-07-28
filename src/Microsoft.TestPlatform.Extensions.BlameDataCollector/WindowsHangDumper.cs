@@ -13,8 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 internal class WindowsHangDumper : IHangDumper
@@ -22,25 +20,25 @@ internal class WindowsHangDumper : IHangDumper
     private readonly Action<string> _logWarning;
     private readonly IProcessHelper _processHelper;
 
-    public WindowsHangDumper(IProcessHelper processHelper, Action<string> logWarning)
+    public WindowsHangDumper(IProcessHelper processHelper, Action<string>? logWarning)
     {
         _logWarning = logWarning ?? (_ => { });
         _processHelper = processHelper;
     }
 
-    private static Action<object, string> OutputReceivedCallback => (process, data) =>
+    private static Action<object?, string?> OutputReceivedCallback => (process, data) =>
         // useful for visibility when debugging this tool
         // Console.ForegroundColor = ConsoleColor.Cyan;
         // Console.WriteLine(data);
         // Console.ForegroundColor = ConsoleColor.White;
         // Log all standard output message of procdump in diag files.
         // Otherwise they end up coming on console in pipleine.
-        EqtTrace.Info("ProcDumpDumper.OutputReceivedCallback: Output received from procdump process: " + data);
+        EqtTrace.Info($"ProcDumpDumper.OutputReceivedCallback: Output received from procdump process: {data ?? "<null>"}");
 
     public void Dump(int processId, string outputDirectory, DumpTypeOption type)
     {
         var process = Process.GetProcessById(processId);
-        var processTree = process.GetProcessTree().Where(p => p.Process.ProcessName is not "conhost" and not "WerFault").ToList();
+        var processTree = process.GetProcessTree().Where(p => p.Process?.ProcessName is not null and not "conhost" and not "WerFault").ToList();
 
         if (processTree.Count > 1)
         {
@@ -48,20 +46,20 @@ internal class WindowsHangDumper : IHangDumper
             EqtTrace.Verbose("WindowsHangDumper.Dump: Dumping this process tree (from bottom):");
             foreach (var p in tree)
             {
-                EqtTrace.Verbose($"WindowsHangDumper.Dump: {new string(' ', p.Level)}{(p.Level != 0 ? " +" : " >-")} {p.Process.Id} - {p.Process.ProcessName}");
+                EqtTrace.Verbose($"WindowsHangDumper.Dump: {new string(' ', p.Level)}{(p.Level != 0 ? " +" : " >-")} {p.Process!.Id} - {p.Process.ProcessName}");
             }
 
             // logging warning separately to avoid interleving the messages in the log which make this tree unreadable
             _logWarning(Resources.Resources.DumpingTree);
             foreach (var p in tree)
             {
-                _logWarning($"{new string(' ', p.Level)}{(p.Level != 0 ? "+-" : ">")} {p.Process.Id} - {p.Process.ProcessName}");
+                _logWarning($"{new string(' ', p.Level)}{(p.Level != 0 ? "+-" : ">")} {p.Process!.Id} - {p.Process.ProcessName}");
             }
         }
         else
         {
             EqtTrace.Verbose($"NetClientHangDumper.Dump: Dumping {process.Id} - {process.ProcessName}.");
-            var message = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.Dumping, process.Id, process.ProcessName);
+            var message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.Dumping, process.Id, process.ProcessName);
             _logWarning(message);
         }
 
@@ -70,6 +68,7 @@ internal class WindowsHangDumper : IHangDumper
         {
             foreach (var p in bottomUpTree)
             {
+                TPDebug.Assert(p != null);
                 try
                 {
                     p.Suspend();
@@ -83,6 +82,8 @@ internal class WindowsHangDumper : IHangDumper
 
         foreach (var p in bottomUpTree)
         {
+            TPDebug.Assert(p != null);
+
             try
             {
                 var outputFile = Path.Combine(outputDirectory, $"{p.ProcessName}_{p.Id}_{DateTime.Now:yyyyMMddTHHmmss}_hangdump.dmp");
@@ -149,14 +150,14 @@ internal class WindowsHangDumper : IHangDumper
             }
 
             EqtTrace.Info($"ProcDumpDumper.CollectDump: Running DumpMinitool: '{dumpMinitoolPath} {args}'.");
-            var dumpMiniTool = new ProcessHelper().LaunchProcess(
+            var dumpMiniTool = (Process)new ProcessHelper().LaunchProcess(
                 dumpMinitoolPath,
                 args,
                 Path.GetDirectoryName(outputFile),
                 null,
                 null,
                 null,
-                OutputReceivedCallback) as Process;
+                OutputReceivedCallback);
             dumpMiniTool.WaitForExit();
             EqtTrace.Info($"ProcDumpDumper.CollectDump: {dumpMinitoolName} exited with exitcode: '{dumpMiniTool.ExitCode}'.");
         }

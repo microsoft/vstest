@@ -3,15 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
@@ -41,13 +41,13 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
     /// The logger.
     /// </param>
     protected TestExtensionManager(
-        IEnumerable<LazyExtension<TExtension, Dictionary<string, object>>> unfilteredTestExtensions!!,
-        IEnumerable<LazyExtension<TExtension, TMetadata>> testExtensions!!,
-        IMessageLogger logger!!)
+        IEnumerable<LazyExtension<TExtension, Dictionary<string, object>>> unfilteredTestExtensions,
+        IEnumerable<LazyExtension<TExtension, TMetadata>> testExtensions,
+        IMessageLogger logger)
     {
-        _logger = logger;
-        TestExtensions = testExtensions;
-        UnfilteredTestExtensions = unfilteredTestExtensions;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        TestExtensions = testExtensions ?? throw new ArgumentNullException(nameof(testExtensions));
+        UnfilteredTestExtensions = unfilteredTestExtensions ?? throw new ArgumentNullException(nameof(unfilteredTestExtensions));
 
         // Populate the map to avoid threading issues
         PopulateMap();
@@ -96,8 +96,9 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
     /// </summary>
     /// <param name="extensionUri">The URI of the test extension to be looked up.</param>
     /// <returns>The test extension or null if one was not found.</returns>
-    public LazyExtension<TExtension, TMetadata> TryGetTestExtension(Uri extensionUri!!)
+    public LazyExtension<TExtension, TMetadata>? TryGetTestExtension(Uri extensionUri)
     {
+        ValidateArg.NotNull(extensionUri, nameof(extensionUri));
         TestExtensionByUri.TryGetValue(extensionUri, out var testExtension);
 
         return testExtension;
@@ -108,9 +109,10 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
     /// </summary>
     /// <param name="extensionUri">The URI of the test extension to be looked up.</param>
     /// <returns>The test extension or null if one was not found.</returns>
-    public LazyExtension<TExtension, TMetadata> TryGetTestExtension(string extensionUri!!)
+    public LazyExtension<TExtension, TMetadata>? TryGetTestExtension(string extensionUri)
     {
-        LazyExtension<TExtension, TMetadata> testExtension = null;
+        ValidateArg.NotNull(extensionUri, nameof(extensionUri));
+        LazyExtension<TExtension, TMetadata>? testExtension = null;
         foreach (var availableExtensionUri in TestExtensionByUri.Keys)
         {
             if (string.Equals(extensionUri, availableExtensionUri.AbsoluteUri, StringComparison.OrdinalIgnoreCase))
@@ -126,6 +128,7 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
     /// <summary>
     /// Populate the extension map.
     /// </summary>
+    [MemberNotNull(nameof(TestExtensionByUri))]
     private void PopulateMap()
     {
         TestExtensionByUri = new Dictionary<Uri, LazyExtension<TExtension, TMetadata>>();
@@ -138,7 +141,7 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
         foreach (var extension in TestExtensions)
         {
             // Convert the extension uri string to an actual uri.
-            Uri uri = null;
+            Uri? uri = null;
             try
             {
                 uri = new Uri(extension.Metadata.ExtensionUri);
@@ -149,26 +152,25 @@ internal abstract class TestExtensionManager<TExtension, TMetadata>
                 {
                     _logger.SendMessage(
                         TestMessageLevel.Warning,
-                        string.Format(CultureInfo.CurrentUICulture, CommonResources.InvalidExtensionUriFormat, extension.Metadata.ExtensionUri, e));
+                        string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidExtensionUriFormat, extension.Metadata.ExtensionUri, e));
                 }
             }
 
-            if (uri != null)
+            if (uri == null)
             {
-                // Make sure we are not trying to add an extension with a duplicate uri.
-                if (!TestExtensionByUri.ContainsKey(uri))
-                {
-                    TestExtensionByUri.Add(uri, extension);
-                }
-                else
-                {
-                    if (_logger != null)
-                    {
-                        _logger.SendMessage(
-                            TestMessageLevel.Warning,
-                            string.Format(CultureInfo.CurrentUICulture, CommonResources.DuplicateExtensionUri, extension.Metadata.ExtensionUri));
-                    }
-                }
+                continue;
+            }
+
+            // Make sure we are not trying to add an extension with a duplicate uri.
+            if (!TestExtensionByUri.ContainsKey(uri))
+            {
+                TestExtensionByUri.Add(uri, extension);
+            }
+            else if (_logger != null)
+            {
+                _logger.SendMessage(
+                    TestMessageLevel.Warning,
+                    string.Format(CultureInfo.CurrentCulture, CommonResources.DuplicateExtensionUri, extension.Metadata.ExtensionUri));
             }
         }
     }

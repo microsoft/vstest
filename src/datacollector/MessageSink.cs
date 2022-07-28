@@ -5,8 +5,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector;
 
 /// <inheritdoc />
@@ -18,6 +16,6 @@ internal class MessageSink : IMessageSink
     /// <param name="args">Data collection message event args.</param>
     public void SendMessage(DataCollectionMessageEventArgs args)
     {
-        DataCollectionRequestHandler.Instance.SendDataCollectionMessage(args);
+        DataCollectionRequestHandler.Instance?.SendDataCollectionMessage(args);
     }
 }

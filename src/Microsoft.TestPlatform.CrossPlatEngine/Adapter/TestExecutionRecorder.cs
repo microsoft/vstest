@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
 
 /// <summary>
@@ -22,7 +20,7 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
 {
     private readonly List<AttachmentSet> _attachmentSets;
     private readonly ITestRunCache _testRunCache;
-    private readonly ITestCaseEventsHandler _testCaseEventsHandler;
+    private readonly ITestCaseEventsHandler? _testCaseEventsHandler;
 
     /// <summary>
     /// Contains TestCase Ids for test cases that are in progress
@@ -37,7 +35,7 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// </summary>
     /// <param name="testCaseEventsHandler"> The test Case Events Handler. </param>
     /// <param name="testRunCache"> The test run cache.  </param>
-    public TestExecutionRecorder(ITestCaseEventsHandler testCaseEventsHandler, ITestRunCache testRunCache)
+    public TestExecutionRecorder(ITestCaseEventsHandler? testCaseEventsHandler, ITestRunCache testRunCache)
     {
         _testRunCache = testRunCache;
         _testCaseEventsHandler = testCaseEventsHandler;
@@ -70,7 +68,7 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// <param name="testCase">test case which will be started.</param>
     public void RecordStart(TestCase testCase)
     {
-        EqtTrace.Verbose("TestExecutionRecorder.RecordStart: Starting test: {0}.", testCase?.FullyQualifiedName);
+        EqtTrace.Verbose("TestExecutionRecorder.RecordStart: Starting test: {0}.", testCase.FullyQualifiedName);
         _testRunCache.OnTestStarted(testCase);
 
         if (_testCaseEventsHandler != null)
@@ -95,7 +93,7 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// test result to the framework when the test(s) is canceled. </exception>
     public void RecordResult(TestResult testResult)
     {
-        EqtTrace.Verbose("TestExecutionRecorder.RecordResult: Received result for test: {0}.", testResult?.TestCase?.FullyQualifiedName);
+        EqtTrace.Verbose("TestExecutionRecorder.RecordResult: Received result for test: {0}.", testResult.TestCase.FullyQualifiedName);
         if (_testCaseEventsHandler != null)
         {
             // Send TestCaseEnd in case RecordEnd was not called.
@@ -109,13 +107,13 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
 
     /// <summary>
     /// Notify the framework about completion of the test case.
-    /// Framework sends this event to data collectors enabled in the run. If no data collector is enabled, then the event is ignored. 
+    /// Framework sends this event to data collectors enabled in the run. If no data collector is enabled, then the event is ignored.
     /// </summary>
     /// <param name="testCase">test case which has completed.</param>
     /// <param name="outcome">outcome of the test case.</param>
     public void RecordEnd(TestCase testCase, TestOutcome outcome)
     {
-        EqtTrace.Verbose("TestExecutionRecorder.RecordEnd: test: {0} execution completed.", testCase?.FullyQualifiedName);
+        EqtTrace.Verbose("TestExecutionRecorder.RecordEnd: test: {0} execution completed.", testCase.FullyQualifiedName);
         _testRunCache.OnTestCompletion(testCase);
         SendTestCaseEnd(testCase, outcome);
     }

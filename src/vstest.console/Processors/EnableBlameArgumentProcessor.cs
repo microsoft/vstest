@@ -21,8 +21,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 internal class EnableBlameArgumentProcessor : IArgumentProcessor
@@ -32,9 +30,8 @@ internal class EnableBlameArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/Blame";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EnableBlameArgumentProcessor"/> class.
@@ -50,7 +47,7 @@ internal class EnableBlameArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new EnableBlameArgumentExecutor(RunSettingsManager.Instance, new PlatformEnvironment(), new FileHelper()));
@@ -119,14 +116,14 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
         var enableDump = false;
         var enableHangDump = false;
-        var exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidBlameArgument, argument);
-        Dictionary<string, string> collectDumpParameters = null;
+        var exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidBlameArgument, argument);
+        Dictionary<string, string>? collectDumpParameters = null;
 
-        if (!string.IsNullOrWhiteSpace(argument))
+        if (!argument.IsNullOrWhiteSpace())
         {
             // Get blame argument list.
             var blameArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
@@ -145,7 +142,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
 
             if (!enableDump && !enableHangDump)
             {
-                Output.Warning(false, string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, argument));
+                Output.Warning(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.BlameIncorrectOption, argument));
             }
             else
             {
@@ -174,7 +171,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="enableCrashDump">Enable dump.</param>
     /// <param name="blameParameters">Blame parameters.</param>
-    private void InitializeBlame(bool enableCrashDump, bool enableHangDump, Dictionary<string, string> collectDumpParameters)
+    private void InitializeBlame(bool enableCrashDump, bool enableHangDump, Dictionary<string, string>? collectDumpParameters)
     {
         // Add Blame Logger
         LoggerUtilities.AddLoggerToRunSettings(BlameFriendlyName, null, _runSettingsManager);
@@ -231,7 +228,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
 
             if (!hangDumpParameters.ContainsKey("TestTimeout"))
             {
-                hangDumpParameters.Add("TestTimeout", TimeSpan.FromHours(1).TotalMilliseconds.ToString());
+                hangDumpParameters.Add("TestTimeout", TimeSpan.FromHours(1).TotalMilliseconds.ToString(CultureInfo.CurrentCulture));
             }
 
             if (!hangDumpParameters.ContainsKey("HangDumpType"))
@@ -245,7 +242,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         // Add blame configuration element to blame collector.
         foreach (var item in dataCollectionRunSettings.DataCollectorSettingsList)
         {
-            if (item.FriendlyName.Equals(BlameFriendlyName))
+            if (string.Equals(item.FriendlyName, BlameFriendlyName))
             {
                 item.Configuration = outernode;
             }
@@ -260,20 +257,22 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="settings">Settings xml.</param>
     /// <returns>Results directory.</returns>
-    private string GetResultsDirectory(string settings)
+    private static string? GetResultsDirectory(string? settings)
     {
-        string resultsDirectory = null;
-        if (settings != null)
+        string? resultsDirectory = null;
+        if (settings == null)
         {
-            try
-            {
-                RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settings);
-                resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
-            }
-            catch (SettingsException se)
-            {
-                EqtTrace.Error("EnableBlameArgumentProcessor: Unable to get the test results directory: Error {0}", se);
-            }
+            return resultsDirectory;
+        }
+
+        try
+        {
+            RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settings);
+            resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
+        }
+        catch (SettingsException se)
+        {
+            EqtTrace.Error("EnableBlameArgumentProcessor: Unable to get the test results directory: Error {0}", se);
         }
 
         return resultsDirectory;
@@ -285,7 +284,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// <param name="parameters">Parameters.</param>
     /// <param name="xmlDocument">Xml document.</param>
     /// <param name="outernode">Outer node.</param>
-    private void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
+    private static void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
     {
         var dumpNode = xmlDocument.CreateElement(Constants.BlameCollectDumpKey);
         if (parameters != null && parameters.Count > 0)
@@ -306,7 +305,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// <param name="parameters">Parameters.</param>
     /// <param name="xmlDocument">Xml document.</param>
     /// <param name="outernode">Outer node.</param>
-    private void AddCollectHangDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
+    private static void AddCollectHangDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
     {
         var dumpNode = xmlDocument.CreateElement(Constants.CollectDumpOnTestSessionHang);
         if (parameters != null && parameters.Count > 0)

@@ -3,8 +3,6 @@
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Client;
 
 /// <summary>
@@ -12,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client;
 /// </summary>
 public class TestPlatformFactory
 {
-    private static ITestPlatform s_testPlatform;
+    private static ITestPlatform? s_testPlatform;
 
     /// <summary>
     /// Gets an instance of the test platform.

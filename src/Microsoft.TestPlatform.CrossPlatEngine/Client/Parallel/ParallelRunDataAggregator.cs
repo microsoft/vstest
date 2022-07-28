@@ -5,14 +5,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
@@ -30,9 +29,9 @@ internal class ParallelRunDataAggregator
 
     private readonly object _dataUpdateSyncObject = new();
 
-    public ParallelRunDataAggregator(string runSettingsXml!!)
+    public ParallelRunDataAggregator(string runSettingsXml)
     {
-        RunSettings = runSettingsXml;
+        RunSettings = runSettingsXml ?? throw new ArgumentNullException(nameof(runSettingsXml));
         ElapsedTime = TimeSpan.Zero;
         RunContextAttachments = new Collection<AttachmentSet>();
         RunCompleteArgsAttachments = new List<AttachmentSet>();
@@ -80,7 +79,7 @@ internal class ParallelRunDataAggregator
             foreach (var runStats in _testRunStatsList)
             {
                 // TODO: we get nullref here if the stats are empty.
-                foreach (var outcome in runStats.Stats.Keys)
+                foreach (var outcome in runStats.Stats!.Keys)
                 {
                     if (!testOutcomeMap.ContainsKey(outcome))
                     {
@@ -125,9 +124,9 @@ internal class ParallelRunDataAggregator
         return _metricsAggregator;
     }
 
-    public Exception GetAggregatedException()
+    public Exception? GetAggregatedException()
     {
-        return Exceptions == null || Exceptions.Count < 1 ? null : (Exception)new AggregateException(Exceptions);
+        return Exceptions == null || Exceptions.Count < 1 ? null : new AggregateException(Exceptions);
     }
 
     /// <summary>
@@ -135,16 +134,16 @@ internal class ParallelRunDataAggregator
     /// Must be thread-safe as this is expected to be called by parallel managers
     /// </summary>
     public void Aggregate(
-        ITestRunStatistics testRunStats,
-        ICollection<string> executorUris,
-        Exception exception,
+        ITestRunStatistics? testRunStats,
+        ICollection<string>? executorUris,
+        Exception? exception,
         TimeSpan elapsedTime,
         bool isAborted,
         bool isCanceled,
-        ICollection<AttachmentSet> runContextAttachments,
-        Collection<AttachmentSet> runCompleteArgsAttachments,
-        Collection<InvokedDataCollector> invokedDataCollectors,
-        Dictionary<string, HashSet<string>> discoveredExtensions)
+        ICollection<AttachmentSet>? runContextAttachments,
+        Collection<AttachmentSet>? runCompleteArgsAttachments,
+        Collection<InvokedDataCollector>? invokedDataCollectors,
+        Dictionary<string, HashSet<string>>? discoveredExtensions)
     {
         lock (_dataUpdateSyncObject)
         {
@@ -185,7 +184,7 @@ internal class ParallelRunDataAggregator
     /// Aggregates Run Data Metrics from each Test Host Process
     /// </summary>
     /// <param name="metrics"></param>
-    public void AggregateRunDataMetrics(IDictionary<string, object> metrics)
+    public void AggregateRunDataMetrics(IDictionary<string, object>? metrics)
     {
         if (metrics == null || metrics.Count == 0 || _metricsAggregator == null)
         {
@@ -196,11 +195,11 @@ internal class ParallelRunDataAggregator
         {
             if (metric.Key.Contains(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter) || metric.Key.Contains(TelemetryDataConstants.TimeTakenByAllAdaptersInSec) || (metric.Key.Contains(TelemetryDataConstants.TotalTestsRun) || metric.Key.Contains(TelemetryDataConstants.TotalTestsRanByAdapter)))
             {
-                var newValue = Convert.ToDouble(metric.Value);
+                var newValue = Convert.ToDouble(metric.Value, CultureInfo.InvariantCulture);
 
                 if (_metricsAggregator.TryGetValue(metric.Key, out var oldValue))
                 {
-                    var oldDoubleValue = Convert.ToDouble(oldValue);
+                    var oldDoubleValue = Convert.ToDouble(oldValue, CultureInfo.InvariantCulture);
                     _metricsAggregator[metric.Key] = newValue + oldDoubleValue;
                 }
                 else
@@ -208,6 +207,15 @@ internal class ParallelRunDataAggregator
                     _metricsAggregator.TryAdd(metric.Key, newValue);
                 }
             }
+        }
+    }
+
+
+    public void MarkAsAborted()
+    {
+        lock (_dataUpdateSyncObject)
+        {
+            IsAborted = true;
         }
     }
 }

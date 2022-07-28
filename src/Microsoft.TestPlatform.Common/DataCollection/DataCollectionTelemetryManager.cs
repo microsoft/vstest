@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>
@@ -93,6 +91,6 @@ internal class DataCollectionTelemetryManager : IDataCollectionTelemetryManager
 
     private static string GetTelemetryKey(string telemetryPrefix, DataCollectorInformation dataCollectorInformation)
     {
-        return string.Format("{0}.{1}", telemetryPrefix, dataCollectorInformation.DataCollectorConfig?.TypeUri?.ToString());
+        return $"{telemetryPrefix}.{dataCollectorInformation.DataCollectorConfig?.TypeUri}";
     }
 }

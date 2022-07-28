@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace TestPlatform.Common.UnitTests.Logging;
 
 /// <summary>
@@ -98,7 +96,7 @@ public class TestHostProviderManagerTests
 
         var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
 
-        Assert.AreEqual(typeof(TestableTestHostManager), testHostManager.GetType());
+        Assert.AreEqual(typeof(TestableTestHostManager), testHostManager!.GetType());
     }
 
     [TestMethod]
@@ -111,7 +109,7 @@ public class TestHostProviderManagerTests
             "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
 
         var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
-        testHostManager.Initialize(null, runSettingsXml);
+        testHostManager!.Initialize(null, runSettingsXml);
         Assert.IsNotNull(testHostManager);
 
         Assert.IsTrue(testHostManager.Shared, "Default TestHostManager must be shared if DisableAppDomain is false");
@@ -127,7 +125,7 @@ public class TestHostProviderManagerTests
             "</TargetFrameworkVersion><DisableAppDomain>true</DisableAppDomain></RunConfiguration></RunSettings> ");
 
         var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml, null);
-        testHostManager.Initialize(null, runSettingsXml);
+        testHostManager!.Initialize(null, runSettingsXml);
         Assert.IsNotNull(testHostManager);
 
         Assert.IsFalse(testHostManager.Shared, "Default TestHostManager must NOT be shared if DisableAppDomain is true");
@@ -155,24 +153,24 @@ public class TestHostProviderManagerTests
     [FriendlyName("DesktopTestHost")]
     private class CustomTestHost : ITestRuntimeProvider
     {
-        public event EventHandler<HostProviderEventArgs> HostLaunched;
+        public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
-        public event EventHandler<HostProviderEventArgs> HostExited;
+        public event EventHandler<HostProviderEventArgs>? HostExited;
 
         public bool Shared { get; private set; }
 
 
-        public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+        public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             var framework = config.TargetFramework;
             Shared = !config.DisableAppDomain;
 
             // This is expected to be called once every run so returning a new instance every time.
-            return framework.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0;
+            return framework!.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
+        public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string?>? environmentVariables, TestRunnerConnectionInfo connectionInfo)
         {
             throw new NotImplementedException();
         }
@@ -187,7 +185,7 @@ public class TestHostProviderManagerTests
             return sources;
         }
 
-        public void Initialize(IMessageLogger logger, string runsettingsXml)
+        public void Initialize(IMessageLogger? logger, string runsettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             Shared = !config.DisableAppDomain;
@@ -200,12 +198,12 @@ public class TestHostProviderManagerTests
 
         public void OnHostExited(HostProviderEventArgs _)
         {
-            HostExited.Invoke(this, new HostProviderEventArgs("Error"));
+            HostExited?.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
         public void OnHostLaunched(HostProviderEventArgs _)
         {
-            HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
+            HostLaunched?.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
@@ -228,24 +226,24 @@ public class TestHostProviderManagerTests
     [FriendlyName("NetCoreTestHost")]
     private class TestableTestHostManager : ITestRuntimeProvider
     {
-        public event EventHandler<HostProviderEventArgs> HostLaunched;
+        public event EventHandler<HostProviderEventArgs>? HostLaunched;
 
-        public event EventHandler<HostProviderEventArgs> HostExited;
+        public event EventHandler<HostProviderEventArgs>? HostExited;
 
         public bool Shared { get; private set; }
 
-        public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+        public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             var framework = config.TargetFramework;
             Shared = !config.DisableAppDomain;
 
             // This is expected to be called once every run so returning a new instance every time.
-            return framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+            return framework!.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
                    || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
+        public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string?>? environmentVariables, TestRunnerConnectionInfo connectionInfo)
         {
             throw new NotImplementedException();
         }
@@ -255,7 +253,7 @@ public class TestHostProviderManagerTests
             throw new NotImplementedException();
         }
 
-        public void Initialize(IMessageLogger logger, string runsettingsXml)
+        public void Initialize(IMessageLogger? logger, string runsettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             Shared = !config.DisableAppDomain;
@@ -268,12 +266,12 @@ public class TestHostProviderManagerTests
 
         public void OnHostExited(HostProviderEventArgs _)
         {
-            HostExited.Invoke(this, new HostProviderEventArgs("Error"));
+            HostExited?.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
         public void OnHostLaunched(HostProviderEventArgs _)
         {
-            HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
+            HostLaunched?.Invoke(this, new HostProviderEventArgs("Error"));
         }
 
         public void SetCustomLauncher(ITestHostLauncher customLauncher)

@@ -1179,6 +1179,26 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
         <target state="translated">vstest.console.exe está sendo executado no modo emulado como {0}. Para obter um melhor desempenho, considere usar o executor nativo vstest.console.arm64.exe.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="RequestHandlerConnectionTimedOut">
+        <source>Waiting for request handler connection timed out after {0} seconds.</source>
+        <target state="translated">A espera pela conexão do manipulador de solicitação expirou após {0} segundos.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StartTestSessionTimedOut">
+        <source>Waiting for start test session timed out after {0} seconds.</source>
+        <target state="translated">Aguardando o início da sessão de teste expirou após {0} segundos.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StopTestSessionTimedOut">
+        <source>Waiting for stop test session timed out after {0} seconds.</source>
+        <target state="translated">A espera da sessão de teste de parada expirou após {0} segundos.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ErrorHostingCommunicationChannel">
+        <source>Error hosting communication channel.</source>
+        <target state="translated">Erro ao hospedar o canal de comunicação.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

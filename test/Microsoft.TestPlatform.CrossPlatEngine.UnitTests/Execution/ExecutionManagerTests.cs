@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+using FluentAssertions;
 
 using static TestPlatform.CrossPlatEngine.UnitTests.Execution.RunTestsWithSourcesTests;
 
@@ -87,7 +88,7 @@ public class ExecutionManagerTests
         Assert.IsNotNull(TestPluginCache.Instance.TestExtensions);
 
         // Executors
-        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestExecutors.Count > 0);
+        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestExecutors!.Count > 0);
         var allExecutors = TestExecutorExtensionManager.Create().TestExtensions;
 
         foreach (var executor in allExecutors)
@@ -96,13 +97,45 @@ public class ExecutionManagerTests
         }
 
         // Settings Providers
-        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestSettingsProviders.Count > 0);
+        Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestSettingsProviders!.Count > 0);
         var settingsProviders = SettingsProviderExtensionManager.Create().SettingsProvidersMap.Values;
 
         foreach (var provider in settingsProviders)
         {
             Assert.IsTrue(provider.IsExtensionCreated);
         }
+    }
+
+    [TestMethod]
+    public void InitializeShouldClearMetricsCollection()
+    {
+        var metricsCollection = new MetricsCollection();
+
+        metricsCollection.Add("metric", "value");
+        _mockRequestData.Setup(rd => rd.MetricsCollection).Returns(metricsCollection);
+        _mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
+
+        var discoveryManager = new ExecutionManager(_mockRequestData.Object);
+
+        metricsCollection.Metrics.Should().ContainKey("metric");
+        discoveryManager.Initialize(null, new Mock<ITestDiscoveryEventsHandler2>().Object);
+        metricsCollection.Metrics.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void InitializeShouldNotFailIfMetricsFieldIsNull()
+    {
+        var mockRequestData = new Mock<IRequestData>();
+        var mockMetricsCollection = new Mock<IMetricsCollection>();
+
+        mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+        mockRequestData.Object.MetricsCollection.Metrics.Should().BeNull();
+
+        var action = () => (new ExecutionManager(mockRequestData.Object))
+            .Initialize(null, new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+        action.Should().NotThrow();
     }
 
     [TestMethod]
@@ -121,7 +154,7 @@ public class ExecutionManagerTests
             { assemblyLocation, new List<string> { assemblyLocation } }
         };
 
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         var isExecutorCalled = false;
         RunTestWithSourcesExecutor.RunTestsWithSourcesCallback = (s, rc, fh) =>
@@ -133,7 +166,7 @@ public class ExecutionManagerTests
                         "A.C.M",
                         new Uri("e://d/"),
                         "A.dll"));
-            fh.RecordResult(tr);
+            fh!.RecordResult(tr);
         };
 
         _executionManager.StartTestRun(adapterSourceMap, null, null, _testExecutionContext, null, mockTestRunEventsHandler.Object);
@@ -159,7 +192,7 @@ public class ExecutionManagerTests
             new TestCase("A.C.M1", new Uri(RunTestsWithSourcesTestsExecutorUri), assemblyLocation)
         };
 
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         var isExecutorCalled = false;
         RunTestWithSourcesExecutor.RunTestsWithTestsCallback = (s, rc, fh) =>
@@ -171,7 +204,7 @@ public class ExecutionManagerTests
                         "A.C.M",
                         new Uri(RunTestsWithSourcesTestsExecutorUri),
                         "A.dll"));
-            fh.RecordResult(tr);
+            fh!.RecordResult(tr);
         };
         TestPluginCacheHelper.SetupMockExtensions(new string[] { assemblyLocation }, () => { });
 
@@ -192,7 +225,7 @@ public class ExecutionManagerTests
     [TestMethod]
     public void StartTestRunShouldAbortTheRunIfAnyExceptionComesForTheProvidedTests()
     {
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         // Call StartTestRun with faulty runsettings so that it will throw exception
         _executionManager.StartTestRun(new List<TestCase>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", _testExecutionContext, null, mockTestRunEventsHandler.Object);
@@ -205,7 +238,7 @@ public class ExecutionManagerTests
     [TestMethod]
     public void StartTestRunShouldAbortTheRunIfAnyExceptionComesForTheProvidedSources()
     {
-        var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        var mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
 
         // Call StartTestRun with faulty runsettings so that it will throw exception
         _executionManager.StartTestRun(new Dictionary<string, IEnumerable<string>>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", _testExecutionContext, null, mockTestRunEventsHandler.Object);
@@ -285,12 +318,12 @@ public class ExecutionManagerTests
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
@@ -304,12 +337,12 @@ public class ExecutionManagerTests
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
@@ -323,12 +356,12 @@ public class ExecutionManagerTests
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
         {
             throw new NotImplementedException();
         }
@@ -403,11 +436,11 @@ public class ExecutionManagerTests
     public class InvalidDataCollector : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
 
         }
@@ -427,11 +460,11 @@ public class ExecutionManagerTests
     public class ValidDataCollector : DataCollector
     {
         public override void Initialize(
-            XmlElement configurationElement,
+            XmlElement? configurationElement,
             DataCollectionEvents events,
             DataCollectionSink dataSink,
             DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+            DataCollectionEnvironmentContext? environmentContext)
         {
 
         }

@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 
 using TestPlatform.TestUtilities;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -37,7 +35,7 @@ public class ExecutionTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [TestPlatformCompatibilityDataSource()]
+    [TestPlatformCompatibilityDataSource]
     public void RunTestsFromMultipleMSTestAssemblies(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -97,9 +95,7 @@ public class ExecutionTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll");
-        var xunitAssemblyPath = _testEnvironment.TargetFramework.Equals("net451") ?
-            _testEnvironment.GetTestAsset("XUTestProject.dll", "net46") :
-            _testEnvironment.GetTestAsset("XUTestProject.dll");
+        var xunitAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll");
 
         assemblyPaths = string.Join(" ", assemblyPaths, xunitAssemblyPath.AddDoubleQuote());
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: string.Empty, FrameworkArgValue, string.Empty);
@@ -218,7 +214,7 @@ public class ExecutionTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var errorMessage = "Process is terminated due to StackOverflowException.";
-        if (runnerInfo.TargetFramework.StartsWith("netcoreapp2."))
+        if (runnerInfo.TargetFramework.StartsWith("netcoreapp"))
         {
             errorMessage = "Process is terminating due to StackOverflowException.";
         }
@@ -247,7 +243,10 @@ public class ExecutionTests : AcceptanceTestBase
 
         InvokeVsTest(arguments);
 
-        var errorFirstLine = "Test host standard error line: Unhandled Exception: System.InvalidOperationException: Operation is not valid due to the current state of the object.";
+        var errorFirstLine =
+            runnerInfo.TargetFramework.StartsWith("netcoreapp")
+            ? "Test host standard error line: Unhandled exception. System.InvalidOperationException: Operation is not valid due to the current state of the object."
+            : "Test host standard error line: Unhandled Exception: System.InvalidOperationException: Operation is not valid due to the current state of the object.";
         FileAssert.Contains(diagLogFilePath, errorFirstLine);
         File.Delete(diagLogFilePath);
     }
@@ -259,7 +258,7 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X64 platform. SimpleTestProjectx86.dll would use Framework .NETFramework,Version=v4.5.1 and Platform X86";
+        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.6.2 framework and X64 platform. SimpleTestProjectx86.dll would use Framework .NETFramework,Version=v4.6.2 and Platform X86";
         var assemblyPaths =
             BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProjectx86.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -281,7 +280,7 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProjectx86 would use Framework .NETFramework,Version=v4.5.1 and Platform X86";
+        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.6.2 framework and X86 platform. SimpleTestProjectx86 would use Framework .NETFramework,Version=v4.6.2 and Platform X86";
         var assemblyPaths =
             BuildMultipleAssemblyPath("SimpleTestProjectx86.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
@@ -301,7 +300,7 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProject2.dll would use Framework .NETFramework,Version=v4.5.1 and Platform X64";
+        var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.6.2 framework and X86 platform. SimpleTestProject2.dll would use Framework .NETFramework,Version=v4.6.2 and Platform X64";
         var assemblyPaths =
             BuildMultipleAssemblyPath("SimpleTestProject2.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);

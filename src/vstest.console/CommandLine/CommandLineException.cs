@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
 /// <summary>
@@ -24,7 +22,7 @@ public class CommandLineException : Exception
     /// Initializes with the message.
     /// </summary>
     /// <param name="message">Message for the exception.</param>
-    public CommandLineException(string message)
+    public CommandLineException(string? message)
         : base(message)
     {
     }
@@ -34,7 +32,7 @@ public class CommandLineException : Exception
     /// </summary>
     /// <param name="message">Message for the exception.</param>
     /// <param name="innerException">The inner exception.</param>
-    public CommandLineException(string message, Exception innerException)
+    public CommandLineException(string? message, Exception? innerException)
         : base(message, innerException)
     {
     }

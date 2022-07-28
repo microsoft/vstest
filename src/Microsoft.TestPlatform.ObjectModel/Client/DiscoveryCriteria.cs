@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -20,7 +18,9 @@ public class DiscoveryCriteria
     /// Initializes a new instance of the <see cref="DiscoveryCriteria"/> class.
     /// </summary>
     /// <remarks>This constructor doesn't perform any parameter validation, it is meant to be used for serialization."/></remarks>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public DiscoveryCriteria()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
         // Parameterless constructor is used for Serialization.
     }
@@ -40,7 +40,7 @@ public class DiscoveryCriteria
     public DiscoveryCriteria(
         IEnumerable<string> sources,
         long frequencyOfDiscoveredTestsEvent,
-        string testSettings)
+        string? testSettings)
         : this(
             sources,
             frequencyOfDiscoveredTestsEvent,
@@ -67,7 +67,7 @@ public class DiscoveryCriteria
         IEnumerable<string> sources,
         long frequencyOfDiscoveredTestsEvent,
         TimeSpan discoveredTestEventTimeout,
-        string runSettings)
+        string? runSettings)
         : this(
             sources,
             frequencyOfDiscoveredTestsEvent,
@@ -96,8 +96,8 @@ public class DiscoveryCriteria
         IEnumerable<string> sources,
         long frequencyOfDiscoveredTestsEvent,
         TimeSpan discoveredTestEventTimeout,
-        string runSettings,
-        TestSessionInfo testSessionInfo)
+        string? runSettings,
+        TestSessionInfo? testSessionInfo)
     {
         ValidateArg.NotNullOrEmpty(sources, nameof(sources));
         if (frequencyOfDiscoveredTestsEvent <= 0)
@@ -140,7 +140,7 @@ public class DiscoveryCriteria
     /// Gets the test Containers (e.g. .appx, .appxrecipie)
     /// </summary>
     [DataMember]
-    public string Package { get; set; }
+    public string? Package { get; set; }
 
     /// <summary>
     /// Gets the test adapter and source map which would look like below:
@@ -173,17 +173,17 @@ public class DiscoveryCriteria
     /// Gets the test settings used for the discovery request.
     /// </summary>
     [DataMember]
-    public string RunSettings { get; private set; }
+    public string? RunSettings { get; private set; }
 
     /// <summary>
     /// Gets or sets the criteria for filtering test cases.
     /// </summary>
     [DataMember]
-    public string TestCaseFilter { get; set; }
+    public string? TestCaseFilter { get; set; }
 
     /// <summary>
     /// Gets or sets the test session info object.
     /// </summary>
     [DataMember]
-    public TestSessionInfo TestSessionInfo { get; set; }
+    public TestSessionInfo? TestSessionInfo { get; set; }
 }

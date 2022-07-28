@@ -9,12 +9,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 
 /// <inheritdoc />
-public class RunEventHandler : ITestRunEventsHandler2
+public class RunEventHandler : ITestRunEventsHandler
 {
     /// <summary>
     /// Gets the test results.
@@ -34,14 +32,14 @@ public class RunEventHandler : ITestRunEventsHandler2
     /// <summary>
     /// Gets the metrics.
     /// </summary>
-    public IDictionary<string, object> Metrics { get; private set; }
+    public IDictionary<string, object>? Metrics { get; private set; }
 
     /// <summary>
     /// Gets the log message.
     /// </summary>
-    public string LogMessage { get; private set; }
+    public string? LogMessage { get; private set; }
 
-    public List<string> Errors { get; set; }
+    public List<string?> Errors { get; set; }
 
     /// <summary>
     /// Gets the test message level.
@@ -51,7 +49,7 @@ public class RunEventHandler : ITestRunEventsHandler2
     public RunEventHandler()
     {
         TestResults = new List<TestResult>();
-        Errors = new List<string>();
+        Errors = new List<string?>();
         Attachments = new List<AttachmentSet>();
         InvokedDataCollectors = new List<InvokedDataCollector>();
     }
@@ -64,7 +62,7 @@ public class RunEventHandler : ITestRunEventsHandler2
         }
     }
 
-    public void HandleLogMessage(TestMessageLevel level, string message)
+    public void HandleLogMessage(TestMessageLevel level, string? message)
     {
         LogMessage = message;
         TestMessageLevel = level;
@@ -76,9 +74,9 @@ public class RunEventHandler : ITestRunEventsHandler2
 
     public void HandleTestRunComplete(
         TestRunCompleteEventArgs testRunCompleteArgs,
-        TestRunChangedEventArgs lastChunkArgs,
-        ICollection<AttachmentSet> runContextAttachments,
-        ICollection<string> executorUris)
+        TestRunChangedEventArgs? lastChunkArgs,
+        ICollection<AttachmentSet>? runContextAttachments,
+        ICollection<string>? executorUris)
     {
         if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)
         {
@@ -98,7 +96,7 @@ public class RunEventHandler : ITestRunEventsHandler2
         Metrics = testRunCompleteArgs.Metrics;
     }
 
-    public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
     {
         if (testRunChangedArgs != null && testRunChangedArgs.NewTestResults != null)
         {
@@ -115,11 +113,5 @@ public class RunEventHandler : ITestRunEventsHandler2
     {
         // No op
         return -1;
-    }
-
-    public virtual bool AttachDebuggerToProcess(int pid)
-    {
-        // No op
-        return true;
     }
 }

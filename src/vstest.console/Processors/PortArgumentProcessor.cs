@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
@@ -14,8 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
@@ -29,9 +26,8 @@ internal class PortArgumentProcessor : IArgumentProcessor
     /// </summary>
     public const string CommandName = "/Port";
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -42,7 +38,7 @@ internal class PortArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new PortArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance));
@@ -89,7 +85,7 @@ internal class PortArgumentExecutor : IArgumentExecutor
     /// <summary>
     /// IDesignModeClient
     /// </summary>
-    private IDesignModeClient _designModeClient;
+    private IDesignModeClient? _designModeClient;
 
     /// <summary>
     /// Process helper for process management actions.
@@ -121,7 +117,7 @@ internal class PortArgumentExecutor : IArgumentExecutor
     /// </summary>
     internal PortArgumentExecutor(CommandLineOptions options, ITestRequestManager testRequestManager, Func<int, IProcessHelper, IDesignModeClient> designModeInitializer, IProcessHelper processHelper)
     {
-        Contract.Requires(options != null);
+        ValidateArg.NotNull(options, nameof(options));
         _commandLineOptions = options;
         _testRequestManager = testRequestManager;
         _designModeInitializer = designModeInitializer;
@@ -135,9 +131,9 @@ internal class PortArgumentExecutor : IArgumentExecutor
     /// Initializes with the argument that was provided with the command.
     /// </summary>
     /// <param name="argument">Argument that was provided with the command.</param>
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
-        if (string.IsNullOrWhiteSpace(argument) || !int.TryParse(argument, out int portNumber))
+        if (argument.IsNullOrWhiteSpace() || !int.TryParse(argument, out int portNumber))
         {
             throw new CommandLineException(CommandLineResources.InvalidPortArgument);
         }
@@ -160,7 +156,7 @@ internal class PortArgumentExecutor : IArgumentExecutor
         }
         catch (TimeoutException ex)
         {
-            throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, string.Format(CommandLineResources.DesignModeClientTimeoutError, _commandLineOptions.Port)), ex);
+            throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.DesignModeClientTimeoutError, _commandLineOptions.Port), ex);
         }
 
         return ArgumentProcessorResult.Success;

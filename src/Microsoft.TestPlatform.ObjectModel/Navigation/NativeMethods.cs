@@ -7,8 +7,6 @@ using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
 internal static class HResult
@@ -390,7 +388,7 @@ internal interface IDiaSymbol
     int Stub82();
 
     [PreserveSig]
-    int FindChildren(SymTagEnum tag, string str, int flags, out IDiaEnumSymbols symbol);
+    int FindChildren(SymTagEnum tag, string? str, int flags, out IDiaEnumSymbols symbol);
 
     int Stub84();
 
@@ -557,7 +555,7 @@ internal static class DiaSourceObject
     [DllImport("kernel32.dll", SetLastError = true)]
     public static extern IntPtr LoadLibraryEx(string lpFileName, IntPtr hReservedNull, int dwFlags);
 
-    public static IDiaDataSource GetDiaSourceObject()
+    public static IDiaDataSource? GetDiaSourceObject()
     {
         var nativeDllDirectory = new ProcessHelper().GetNativeDllDirectory();
 
@@ -565,7 +563,7 @@ internal static class DiaSourceObject
 
         if (modHandle == IntPtr.Zero)
         {
-            throw new COMException(string.Format(Resources.Resources.FailedToLoadMsDia));
+            throw new COMException(Resources.Resources.FailedToLoadMsDia);
         }
 
         var diaSourceClassGuid = new Guid("{E6756135-1E65-4D17-8576-610761398C3C}");
@@ -581,7 +579,7 @@ internal static class DiaSourceObject
     private interface IClassFactory
     {
         void CreateInstance(
-            [MarshalAs(UnmanagedType.Interface)] object aggregator,
+            [MarshalAs(UnmanagedType.Interface)] object? aggregator,
             ref Guid refiid,
             [MarshalAs(UnmanagedType.Interface)] out object createdObject);
 
@@ -611,7 +609,7 @@ internal interface IDiaDataSource
     [PreserveSig]
     int LoadDataForExe(
         [MarshalAs(UnmanagedType.LPWStr)] string executable,
-        [MarshalAs(UnmanagedType.LPWStr)] string searchPath,
+        [MarshalAs(UnmanagedType.LPWStr)] string? searchPath,
         IntPtr callback);
 
     int Stub5();

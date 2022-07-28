@@ -63,10 +63,10 @@ internal class FakeProcessHelper : IProcessHelper
         throw new NotImplementedException();
     }
 
-    public int GetProcessId(object process)
+    public int GetProcessId(object? process)
     {
         var fakeProcess = FakeProcess.EnsureFakeProcess(process);
-        return fakeProcess.Id;
+        return fakeProcess?.Id ?? -1;
     }
 
     public string GetProcessName(int processId)
@@ -80,7 +80,7 @@ internal class FakeProcessHelper : IProcessHelper
         throw new NotImplementedException();
     }
 
-    public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallback)
+    public object LaunchProcess(string processPath, string? arguments, string? workingDirectory, IDictionary<string, string?>? environmentVariables, Action<object?, string>? errorCallback, Action<object>? exitCallBack, Action<object?, string>? outputCallback)
     {
         // TODO: Throw if setting says we can't start new processes;
         var process = new FakeProcess(FakeErrorAggregator, processPath, arguments, workingDirectory, environmentVariables, errorCallback, exitCallBack, outputCallback);
@@ -90,24 +90,24 @@ internal class FakeProcessHelper : IProcessHelper
         return process;
     }
 
-    public void SetExitCallback(int processId, Action<object> callbackAction)
+    public void SetExitCallback(int processId, Action<object?>? callbackAction)
     {
         // TODO: implement?
     }
 
-    public void TerminateProcess(object process)
+    public void TerminateProcess(object? process)
     {
-        var fakeProcess = (FakeProcess)process;
-        fakeProcess.Exit();
+        if (process is FakeProcess fakeProcess)
+            fakeProcess.Exit();
     }
 
-    public bool TryGetExitCode(object process, out int exitCode)
+    public bool TryGetExitCode(object? process, out int exitCode)
     {
-        exitCode = ((FakeProcess)process).ExitCode;
+        exitCode = (process as FakeProcess)?.ExitCode ?? -1;
         return true;
     }
 
-    public void WaitForProcessExit(object process)
+    public void WaitForProcessExit(object? process)
     {
         // todo: implement for timeouts?
     }

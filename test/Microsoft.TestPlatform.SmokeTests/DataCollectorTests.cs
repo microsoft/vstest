@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Globalization;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.SmokeTests;
 
@@ -42,7 +41,7 @@ public class DataCollectorTests : IntegrationTestBase
 
     private string GetInProcDataCollectionRunsettingsFile()
     {
-        var runSettings = Path.Combine(Path.GetDirectoryName(_testEnvironment.GetTestAsset(InProDataCollectorTestProject)), "runsettingstest.runsettings");
+        var runSettings = Path.Combine(Path.GetDirectoryName(_testEnvironment.GetTestAsset(InProDataCollectorTestProject))!, "runsettingstest.runsettings");
         var inprocasm = _testEnvironment.GetTestAsset("SimpleDataCollector.dll");
         var fileContents = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>
@@ -56,7 +55,7 @@ public class DataCollectorTests : IntegrationTestBase
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-        fileContents = string.Format(fileContents, AssemblyUtility.GetAssemblyName(inprocasm), inprocasm);
+        fileContents = string.Format(CultureInfo.CurrentCulture, fileContents, AssemblyUtility.GetAssemblyName(inprocasm), inprocasm);
         File.WriteAllText(runSettings, fileContents);
 
         return runSettings;

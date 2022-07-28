@@ -4,12 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -25,7 +26,7 @@ public abstract class TestObject
     /// <summary>
     /// The store for all the properties registered.
     /// </summary>
-    private readonly Dictionary<TestProperty, object> _store;
+    private readonly Dictionary<TestProperty, object?> _store;
 
     /// <summary>
     /// Property used for Json (de)serialization of store dictionary. Serialization of dictionaries
@@ -33,12 +34,9 @@ public abstract class TestObject
     /// other hand provides a clean Key, Value entries for <c>TestProperty</c> and it's value.
     /// </summary>
     [DataMember(Name = "Properties")]
-    private List<KeyValuePair<TestProperty, object>> StoreKeyValuePairs
+    private List<KeyValuePair<TestProperty, object?>> StoreKeyValuePairs
     {
-        get
-        {
-            return _store.ToList();
-        }
+        get => _store.ToList();
 
         set
         {
@@ -63,14 +61,14 @@ public abstract class TestObject
         }
     }
 
-    public IEnumerable<KeyValuePair<TestProperty, object>> GetProperties()
+    public IEnumerable<KeyValuePair<TestProperty, object?>> GetProperties()
     {
         return _store;
     }
 
     protected TestObject()
     {
-        _store = new Dictionary<TestProperty, object>();
+        _store = new Dictionary<TestProperty, object?>();
     }
 
     [OnSerializing]
@@ -84,8 +82,8 @@ public abstract class TestObject
 
         foreach (var kvp in lazyValues)
         {
-            var lazyValue = (ILazyPropertyValue)kvp.Value;
-            var value = lazyValue.Value;
+            var lazyValue = (ILazyPropertyValue?)kvp.Value;
+            var value = lazyValue?.Value;
             _store.Remove(kvp.Key);
 
             if (value != null)
@@ -108,9 +106,10 @@ public abstract class TestObject
     /// </summary>
     /// <param name="property">TestObject's TestProperty</param>
     /// <returns>property value</returns>
-    public object GetPropertyValue(TestProperty property!!)
+    public object? GetPropertyValue(TestProperty property)
     {
-        object defaultValue = null;
+        ValidateArg.NotNull(property, nameof(property));
+        object? defaultValue = null;
         var valueType = property.GetValueType();
 
         if (valueType != null && valueType.GetTypeInfo().IsValueType)
@@ -128,7 +127,8 @@ public abstract class TestObject
     /// <param name="property">TestObject's TestProperty</param>
     /// <param name="defaultValue">default property value if property is not present</param>
     /// <returns>property value</returns>
-    public T GetPropertyValue<T>(TestProperty property, T defaultValue)
+    [return: NotNullIfNotNull("defaultValue")]
+    public T? GetPropertyValue<T>(TestProperty property, T? defaultValue)
     {
         return GetPropertyValue(property, defaultValue, CultureInfo.InvariantCulture);
     }
@@ -160,7 +160,7 @@ public abstract class TestObject
     /// </summary>
     /// <param name="property">TestObject's TestProperty</param>
     /// <param name="value">value to be set</param>
-    public void SetPropertyValue(TestProperty property, object value)
+    public void SetPropertyValue(TestProperty property, object? value)
     {
         ProtectedSetPropertyValue(property, value);
     }
@@ -169,8 +169,9 @@ public abstract class TestObject
     ///  Remove test property from the current TestObject.
     /// </summary>
     /// <param name="property"></param>
-    public void RemovePropertyValue(TestProperty property!!)
+    public void RemovePropertyValue(TestProperty property)
     {
+        ValidateArg.NotNull(property, nameof(property));
         if (_store.TryGetValue(property, out _))
         {
             _store.Remove(property);
@@ -181,9 +182,12 @@ public abstract class TestObject
     /// Returns TestProperty's value
     /// </summary>
     /// <returns>property's value. default value is returned if the property is not present</returns>
-    public T GetPropertyValue<T>(TestProperty property!!, T defaultValue, CultureInfo culture!!)
+    [return: NotNullIfNotNull("defaultValue")]
+    public T? GetPropertyValue<T>(TestProperty property, T? defaultValue, CultureInfo culture)
     {
-        object objValue = ProtectedGetPropertyValue(property, defaultValue);
+        ValidateArg.NotNull(property, nameof(property));
+        ValidateArg.NotNull(culture, nameof(culture));
+        object? objValue = ProtectedGetPropertyValue(property, defaultValue);
 
         return ConvertPropertyTo<T>(property, culture, objValue);
     }
@@ -191,9 +195,11 @@ public abstract class TestObject
     /// <summary>
     /// Set TestProperty's value to the specified value T.
     /// </summary>
-    public void SetPropertyValue<T>(TestProperty property!!, T value, CultureInfo culture!!)
+    public void SetPropertyValue<T>(TestProperty property, T value, CultureInfo culture)
     {
-        object objValue = ConvertPropertyFrom<T>(property, culture, value);
+        ValidateArg.NotNull(property, nameof(property));
+        ValidateArg.NotNull(culture, nameof(culture));
+        object? objValue = ConvertPropertyFrom<T>(property, culture, value);
 
         ProtectedSetPropertyValue(property, objValue);
     }
@@ -201,9 +207,11 @@ public abstract class TestObject
     /// <summary>
     /// Set TestProperty's value to the specified value T.
     /// </summary>
-    public void SetPropertyValue<T>(TestProperty property!!, LazyPropertyValue<T> value, CultureInfo culture!!)
+    public void SetPropertyValue<T>(TestProperty property, LazyPropertyValue<T> value, CultureInfo culture)
     {
-        object objValue = ConvertPropertyFrom<T>(property, culture, value);
+        ValidateArg.NotNull(property, nameof(property));
+        ValidateArg.NotNull(culture, nameof(culture));
+        object? objValue = ConvertPropertyFrom<T>(property, culture, value);
 
         ProtectedSetPropertyValue(property, objValue);
     }
@@ -212,8 +220,10 @@ public abstract class TestObject
     /// Return TestProperty's value
     /// </summary>
     /// <returns></returns>
-    protected virtual object ProtectedGetPropertyValue(TestProperty property!!, object defaultValue)
+    [return: NotNullIfNotNull("defaultValue")]
+    protected virtual object? ProtectedGetPropertyValue(TestProperty property, object? defaultValue)
     {
+        ValidateArg.NotNull(property, nameof(property));
         if (!_store.TryGetValue(property, out var value) || value == null)
         {
             value = defaultValue;
@@ -225,8 +235,9 @@ public abstract class TestObject
     /// <summary>
     /// Set TestProperty's value
     /// </summary>
-    protected virtual void ProtectedSetPropertyValue(TestProperty property!!, object value)
+    protected virtual void ProtectedSetPropertyValue(TestProperty property, object? value)
     {
+        ValidateArg.NotNull(property, nameof(property));
         _store[property] = property.ValidateValueCallback == null || property.ValidateValueCallback(value)
             ? value
             : throw new ArgumentException(property.Label);
@@ -236,8 +247,10 @@ public abstract class TestObject
     /// Convert passed in value from TestProperty's specified value type.
     /// </summary>
     /// <returns>Converted object</returns>
-    private static object ConvertPropertyFrom<T>(TestProperty property!!, CultureInfo culture!!, object value)
+    private static object? ConvertPropertyFrom<T>(TestProperty property, CultureInfo culture, object? value)
     {
+        ValidateArg.NotNull(property, nameof(property));
+        ValidateArg.NotNull(culture, nameof(culture));
         var valueType = property.GetValueType();
 
         // Do not try conversion if the object is already of the type we're trying to convert.
@@ -251,15 +264,16 @@ public abstract class TestObject
         // Traits are KeyValuePair based. Use the custom converter in that case.
         if (valueType == typeof(KeyValuePair<string, string>[]))
         {
-            return KeyValueConverter.ConvertFrom(null, culture, (string)value);
+            return KeyValueConverter.ConvertFrom(null, culture, (string?)value);
         }
 
         // Use a custom string array converter for string[] types.
         if (valueType == typeof(string[]))
         {
-            return StringArrayConverter.ConvertFrom(null, culture, (string)value);
+            return StringArrayConverter.ConvertFrom(null, culture, (string?)value);
         }
 
+        TPDebug.Assert(valueType is not null, "valueType is null");
         TypeConverter converter = TypeDescriptor.GetConverter(valueType);
         if (converter == null)
         {
@@ -268,7 +282,7 @@ public abstract class TestObject
 
         try
         {
-            return converter.ConvertFrom(null, culture, value);
+            return converter.ConvertFrom(null, culture, value!);
         }
         catch (FormatException)
         {
@@ -285,8 +299,12 @@ public abstract class TestObject
     /// Convert passed in value into the specified type when property is registered.
     /// </summary>
     /// <returns>Converted object</returns>
-    private static T ConvertPropertyTo<T>(TestProperty property!!, CultureInfo culture!!, object value)
+    [return: NotNullIfNotNull("value")]
+    private static T? ConvertPropertyTo<T>(TestProperty property, CultureInfo culture, object? value)
     {
+        ValidateArg.NotNull(property, nameof(property));
+        ValidateArg.NotNull(culture, nameof(culture));
+
         if (value == null)
         {
             return default;
@@ -297,7 +315,7 @@ public abstract class TestObject
         }
         else if (value is LazyPropertyValue<T> lazyValue)
         {
-            return lazyValue.Value;
+            return lazyValue.Value!;
         }
 
         var valueType = property.GetValueType();
@@ -311,7 +329,7 @@ public abstract class TestObject
 
         try
         {
-            return (T)converter.ConvertTo(null, culture, value, typeof(T));
+            return (T?)converter.ConvertTo(null, culture, value, typeof(T))!;
         }
         catch (FormatException)
         {
@@ -324,7 +342,7 @@ public abstract class TestObject
         }
     }
 
-    private TraitCollection _traits;
+    private TraitCollection? _traits;
 
     public TraitCollection Traits
     {

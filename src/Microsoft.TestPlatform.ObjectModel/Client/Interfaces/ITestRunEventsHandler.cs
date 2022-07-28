@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -21,13 +19,13 @@ public interface ITestRunEventsHandler : ITestMessageEventHandler
     /// <param name="lastChunkArgs">Last set of test results</param>
     /// <param name="runContextAttachments">Attachments of the test run</param>
     /// <param name="executorUris">ExecutorURIs of the adapters involved in test run</param>
-    void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris);
+    void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris);
 
     /// <summary>
     /// Handle a change in TestRun i.e. new testresults and stats
     /// </summary>
     /// <param name="testRunChangedArgs">TestRunChanged Data</param>
-    void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs);
+    void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs);
 
     /// <summary>
     /// Launches a process with a given process info under debugger
@@ -55,5 +53,5 @@ public interface ITestMessageEventHandler
     /// </summary>
     /// <param name="level">Message Level</param>
     /// <param name="message">string message</param>
-    void HandleLogMessage(TestMessageLevel level, string message);
+    void HandleLogMessage(TestMessageLevel level, string? message);
 }

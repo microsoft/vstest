@@ -7,11 +7,8 @@ using System.IO;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 
@@ -25,7 +22,7 @@ public class TextFileTelemetryPublisher : IMetricsPublisher
     /// </summary>
     /// <param name="eventName"></param>
     /// <param name="metrics"></param>
-    public void PublishMetrics(string eventName, IDictionary<string, object> metrics)
+    public void PublishMetrics(string eventName, IDictionary<string, object?> metrics)
     {
         // Log to Text File
         LogToFile(eventName, metrics, new FileHelper());
@@ -35,6 +32,12 @@ public class TextFileTelemetryPublisher : IMetricsPublisher
     /// Will do NO-OP
     /// </summary>
     public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
     {
         // No operation
     }
@@ -52,7 +55,7 @@ public class TextFileTelemetryPublisher : IMetricsPublisher
     /// <param name="fileHelper">
     /// The file Helper.
     /// </param>
-    internal void LogToFile(string eventName, IDictionary<string, object> metrics, IFileHelper fileHelper)
+    internal static void LogToFile(string eventName, IDictionary<string, object?> metrics, IFileHelper fileHelper)
     {
         string resultDirectory = Environment.GetEnvironmentVariable("VSTEST_LOGTELEMETRY_PATH")
             ?? Path.GetTempPath() + "TelemetryLogs";

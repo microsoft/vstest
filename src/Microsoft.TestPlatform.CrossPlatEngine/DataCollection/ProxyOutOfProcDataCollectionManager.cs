@@ -10,8 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfa
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
 /// <summary>
@@ -50,12 +48,12 @@ internal class ProxyOutOfProcDataCollectionManager
         _attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
     }
 
-    private void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)
+    private void TriggerTestCaseStart(object? sender, TestCaseStartEventArgs e)
     {
         _dataCollectionTestCaseEventSender.SendTestCaseStart(e);
     }
 
-    private void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)
+    private void TriggerTestCaseEnd(object? sender, TestCaseEndEventArgs e)
     {
         var attachments = _dataCollectionTestCaseEventSender.SendTestCaseEnd(e);
 
@@ -63,7 +61,7 @@ internal class ProxyOutOfProcDataCollectionManager
         {
             lock (_syncObject)
             {
-                if (!_attachmentsCache.TryGetValue(e.TestCaseId, out Collection<AttachmentSet> attachmentSets))
+                if (!_attachmentsCache.TryGetValue(e.TestCaseId, out Collection<AttachmentSet>? attachmentSets))
                 {
                     attachmentSets = new Collection<AttachmentSet>();
                     _attachmentsCache.Add(e.TestCaseId, attachmentSets);
@@ -77,11 +75,11 @@ internal class ProxyOutOfProcDataCollectionManager
         }
     }
 
-    private void TriggerSendTestResult(object sender, TestResultEventArgs e)
+    private void TriggerSendTestResult(object? sender, TestResultEventArgs e)
     {
         lock (_syncObject)
         {
-            if (_attachmentsCache.TryGetValue(e.TestCaseId, out Collection<AttachmentSet> attachmentSets))
+            if (_attachmentsCache.TryGetValue(e.TestCaseId, out Collection<AttachmentSet>? attachmentSets))
             {
                 foreach (var attachment in attachmentSets)
                 {
@@ -93,7 +91,7 @@ internal class ProxyOutOfProcDataCollectionManager
         }
     }
 
-    private void TriggerTestSessionEnd(object sender, SessionEndEventArgs e)
+    private void TriggerTestSessionEnd(object? sender, SessionEndEventArgs e)
     {
         _dataCollectionTestCaseEventSender.SendTestSessionEnd(e);
     }

@@ -3,13 +3,12 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 /// <summary>
 /// Registers an attachment processor for a data collector.
 /// </summary>
+[AttributeUsage(AttributeTargets.Class)]
 public class DataCollectorAttachmentProcessorAttribute : Attribute
 {
     /// <summary>

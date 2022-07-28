@@ -94,6 +94,10 @@ function Verify-Assemblies
                     elseif ($signature.SignerCertificate.Thumbprint -eq "81C25099511180D15B858DC2B7EC4C057B1CE4BF") {
                         Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
                     }
+                    # .NET Foundation, Newtonsoft.Json.dll 13.0.1
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "4CFB89FAA49539A58968D81960B3C1258E8F6A34") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [.NET Foundation Signed]"
+                    }
                     else {
                         Write-FailLog "Invalid ($($signature.SignerCertificate.Thumbprint)). File: $Path. [$($signature.SignerCertificate.Subject)]"
                     }

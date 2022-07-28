@@ -78,8 +78,8 @@ public class BlameCollectorTests
             _configurationElement,
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
-            null,
-            null));
+            null!,
+            null!));
     }
 
     /// <summary>
@@ -550,7 +550,7 @@ public class BlameCollectorTests
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         // Verify
-        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, "Xyz"))), Times.Once);
+        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentCulture, Resources.Resources.BlameParameterKeyIncorrect, "Xyz"))), Times.Once);
     }
 
     /// <summary>
@@ -576,7 +576,7 @@ public class BlameCollectorTests
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         // Verify
-        var expectedMessage = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, "DumpType", "random", string.Join(", ", Enum.GetNames(typeof(CrashDumpType))));
+        var expectedMessage = string.Format(CultureInfo.CurrentCulture, Resources.Resources.BlameParameterValueIncorrect, "DumpType", "random", string.Join(", ", Enum.GetNames(typeof(CrashDumpType))));
         _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == expectedMessage)), Times.Once);
     }
 
@@ -603,7 +603,7 @@ public class BlameCollectorTests
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         // Verify
-        var expectedMessage = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, "CollectAlways", "random", string.Join(", ", new object[] { Constants.TrueConfigurationValue, Constants.FalseConfigurationValue }));
+        var expectedMessage = string.Format(CultureInfo.CurrentCulture, Resources.Resources.BlameParameterValueIncorrect, "CollectAlways", "random", string.Join(", ", new object[] { Constants.TrueConfigurationValue, Constants.FalseConfigurationValue }));
         _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == expectedMessage)), Times.Once);
     }
 
@@ -653,7 +653,7 @@ public class BlameCollectorTests
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         // Verify
-        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, tpex.Message))), Times.Once);
+        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentCulture, Resources.Resources.ProcDumpCouldNotStart, tpex.Message))), Times.Once);
     }
 
     /// <summary>
@@ -679,7 +679,7 @@ public class BlameCollectorTests
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         // Verify
-        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, ex.ToString()))), Times.Once);
+        _mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentCulture, Resources.Resources.ProcDumpCouldNotStart, ex.ToString()))), Times.Once);
     }
 
     [TestCleanup]

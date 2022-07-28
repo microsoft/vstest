@@ -23,8 +23,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 using TranslationLayerResources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
 /// <summary>
@@ -38,20 +36,17 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     private const int MinimumProtocolVersionWithTestSessionSupport = 5;
 
     private readonly ICommunicationManager _communicationManager;
-
     private readonly IDataSerializer _dataSerializer;
     private readonly ITestPlatformEventSource _testPlatformEventSource;
-
     private readonly ManualResetEvent _handShakeComplete = new(false);
 
     private bool _handShakeSuccessful;
-
-    private int _protocolVersion = 6;
+    private int _protocolVersion = ProtocolVersioning.HighestSupportedVersion;
 
     /// <summary>
     /// Used to cancel blocking tasks associated with the vstest.console process.
     /// </summary>
-    private CancellationTokenSource _processExitCancellationTokenSource;
+    private CancellationTokenSource? _processExitCancellationTokenSource;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VsTestConsoleRequestSender"/> class.
@@ -171,9 +166,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public void DiscoverTests(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestDiscoveryEventsHandler2 eventHandler)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTests: Starting test discovery.");
@@ -189,9 +184,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public async Task DiscoverTestsAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestDiscoveryEventsHandler2 eventHandler)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTestsAsync: Starting test discovery.");
@@ -207,9 +202,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public void StartTestRun(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
@@ -230,9 +225,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public async Task StartTestRunAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
@@ -253,9 +248,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public void StartTestRun(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
@@ -276,9 +271,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public async Task StartTestRunAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
@@ -299,9 +294,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public void StartTestRunWithCustomHost(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler,
         ITestHostLauncher customHostLauncher)
     {
@@ -324,9 +319,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public async Task StartTestRunWithCustomHostAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler,
         ITestHostLauncher customHostLauncher)
     {
@@ -349,9 +344,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public void StartTestRunWithCustomHost(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler,
         ITestHostLauncher customHostLauncher)
     {
@@ -374,9 +369,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public async Task StartTestRunWithCustomHostAsync(
         IEnumerable<TestCase> testCases,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler,
         ITestHostLauncher customHostLauncher)
     {
@@ -397,12 +392,12 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     }
 
     /// <inheritdoc/>
-    public TestSessionInfo StartTestSession(
+    public TestSessionInfo? StartTestSession(
         IList<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler,
-        ITestHostLauncher testHostLauncher)
+        ITestHostLauncher? testHostLauncher)
     {
         // Make sure vstest.console knows how to handle start/stop test session messages.
         // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
@@ -448,23 +443,23 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 switch (message.MessageType)
                 {
                     case MessageType.StartTestSessionCallback:
-                        var ackPayload = _dataSerializer
-                            .DeserializePayload<StartTestSessionAckPayload>(message);
-                        eventsHandler?.HandleStartTestSessionComplete(
-                            ackPayload.EventArgs);
-                        return ackPayload.EventArgs.TestSessionInfo;
+                        var ackPayload = _dataSerializer.DeserializePayload<StartTestSessionAckPayload>(message);
+                        TPDebug.Assert(ackPayload is not null, "ackPayload is null");
+                        eventsHandler?.HandleStartTestSessionComplete(ackPayload.EventArgs);
+                        return ackPayload.EventArgs!.TestSessionInfo;
 
                     case MessageType.CustomTestHostLaunch:
                         HandleCustomHostLaunch(testHostLauncher, message);
                         break;
 
                     case MessageType.EditorAttachDebugger:
+                    case MessageType.EditorAttachDebugger2:
                         AttachDebuggerToProcess(testHostLauncher, message);
                         break;
 
                     case MessageType.TestMessage:
-                        var testMessagePayload = _dataSerializer
-                            .DeserializePayload<TestMessagePayload>(message);
+                        var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
                         eventsHandler?.HandleLogMessage(
                             testMessagePayload.MessageLevel,
                             testMessagePayload.Message);
@@ -498,12 +493,12 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     }
 
     /// <inheritdoc/>
-    public async Task<TestSessionInfo> StartTestSessionAsync(
+    public async Task<TestSessionInfo?> StartTestSessionAsync(
         IList<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
+        string? runSettings,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler,
-        ITestHostLauncher testHostLauncher)
+        ITestHostLauncher? testHostLauncher)
     {
         // Make sure vstest.console knows how to handle start/stop test session messages.
         // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
@@ -511,7 +506,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         if (_protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
         {
             eventsHandler?.HandleStartTestSessionComplete(new());
-            return await Task.FromResult((TestSessionInfo)null);
+            return await Task.FromResult((TestSessionInfo?)null);
         }
 
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestSession: Starting test session.");
@@ -532,7 +527,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 Sources = sources,
                 RunSettings = runSettings,
                 HasCustomHostLauncher = testHostLauncher != null,
-                IsDebuggingEnabled = (testHostLauncher != null) && testHostLauncher.IsDebug,
+                IsDebuggingEnabled = testHostLauncher != null && testHostLauncher.IsDebug,
                 TestPlatformOptions = options
             };
 
@@ -548,23 +543,23 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 switch (message.MessageType)
                 {
                     case MessageType.StartTestSessionCallback:
-                        var ackPayload = _dataSerializer
-                            .DeserializePayload<StartTestSessionAckPayload>(message);
-                        eventsHandler?.HandleStartTestSessionComplete(
-                            ackPayload.EventArgs);
-                        return ackPayload.EventArgs.TestSessionInfo;
+                        var ackPayload = _dataSerializer.DeserializePayload<StartTestSessionAckPayload>(message);
+                        TPDebug.Assert(ackPayload is not null, "ackPayload is null");
+                        eventsHandler?.HandleStartTestSessionComplete(ackPayload.EventArgs);
+                        return ackPayload.EventArgs!.TestSessionInfo;
 
                     case MessageType.CustomTestHostLaunch:
                         HandleCustomHostLaunch(testHostLauncher, message);
                         break;
 
                     case MessageType.EditorAttachDebugger:
+                    case MessageType.EditorAttachDebugger2:
                         AttachDebuggerToProcess(testHostLauncher, message);
                         break;
 
                     case MessageType.TestMessage:
-                        var testMessagePayload = _dataSerializer
-                            .DeserializePayload<TestMessagePayload>(message);
+                        var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
                         eventsHandler?.HandleLogMessage(
                             testMessagePayload.MessageLevel,
                             testMessagePayload.Message);
@@ -597,8 +592,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     /// <inheritdoc/>
     public bool StopTestSession(
-        TestSessionInfo testSessionInfo,
-        TestPlatformOptions options,
+        TestSessionInfo? testSessionInfo,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler)
     {
         // Make sure vstest.console knows how to handle start/stop test session messages.
@@ -645,12 +640,13 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 {
                     case MessageType.StopTestSessionCallback:
                         var payload = _dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
+                        TPDebug.Assert(payload is not null, "payload is null");
                         eventsHandler?.HandleStopTestSessionComplete(payload.EventArgs);
-                        return payload.EventArgs.IsStopped;
+                        return payload.EventArgs!.IsStopped;
 
                     case MessageType.TestMessage:
-                        var testMessagePayload = _dataSerializer
-                            .DeserializePayload<TestMessagePayload>(message);
+                        var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
                         eventsHandler?.HandleLogMessage(
                             testMessagePayload.MessageLevel,
                             testMessagePayload.Message);
@@ -686,8 +682,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     /// <inheritdoc/>
     public async Task<bool> StopTestSessionAsync(
-        TestSessionInfo testSessionInfo,
-        TestPlatformOptions options,
+        TestSessionInfo? testSessionInfo,
+        TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler)
     {
         // Make sure vstest.console knows how to handle start/stop test session messages.
@@ -734,12 +730,13 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 {
                     case MessageType.StopTestSessionCallback:
                         var payload = _dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
+                        TPDebug.Assert(payload is not null, "payload is null");
                         eventsHandler?.HandleStopTestSessionComplete(payload.EventArgs);
-                        return payload.EventArgs.IsStopped;
+                        return payload.EventArgs!.IsStopped;
 
                     case MessageType.TestMessage:
-                        var testMessagePayload = _dataSerializer
-                            .DeserializePayload<TestMessagePayload>(message);
+                        var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
                         eventsHandler?.HandleLogMessage(
                             testMessagePayload.MessageLevel,
                             testMessagePayload.Message);
@@ -800,7 +797,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public void OnProcessExited()
     {
-        _processExitCancellationTokenSource.Cancel();
+        _processExitCancellationTokenSource?.Cancel();
     }
 
     /// <inheritdoc/>
@@ -818,8 +815,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     /// <inheritdoc/>
     public Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
-        IEnumerable<InvokedDataCollector> invokedDataCollectors,
-        string runSettings,
+        IEnumerable<InvokedDataCollector>? invokedDataCollectors,
+        string? runSettings,
         bool collectMetrics,
         ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
         CancellationToken cancellationToken)
@@ -843,41 +840,40 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     private bool HandShakeWithVsTestConsole()
     {
-        var success = false;
         var message = _communicationManager.ReceiveMessage();
 
-        if (message.MessageType == MessageType.SessionConnected)
+        if (message?.MessageType != MessageType.SessionConnected)
         {
-            _communicationManager.SendMessage(
-                MessageType.VersionCheck,
-                _protocolVersion);
+            EqtTrace.Error(
+                "VsTestConsoleRequestSender.HandShakeWithVsTestConsole: SessionConnected Message Expected but different message received: Received MessageType: {0}",
+                message?.MessageType);
+            return false;
+        }
 
-            message = _communicationManager.ReceiveMessage();
+        _communicationManager.SendMessage(
+            MessageType.VersionCheck,
+            _protocolVersion);
 
-            if (message.MessageType == MessageType.VersionCheck)
-            {
-                _protocolVersion = _dataSerializer
-                    .DeserializePayload<int>(message);
-                success = true;
-            }
-            else if (message.MessageType == MessageType.ProtocolError)
-            {
-                // TODO : Payload for ProtocolError needs to finalized.
-                EqtTrace.Error(
-                    "VsTestConsoleRequestSender.HandShakeWithVsTestConsole: Version Check failed. ProtolError was received from the runner");
-            }
-            else
-            {
-                EqtTrace.Error(
-                    "VsTestConsoleRequestSender.HandShakeWithVsTestConsole: VersionCheck Message Expected but different message received: Received MessageType: {0}",
-                    message.MessageType);
-            }
+        message = _communicationManager.ReceiveMessage();
+        var success = false;
+
+        if (message?.MessageType == MessageType.VersionCheck)
+        {
+            _protocolVersion = _dataSerializer
+                .DeserializePayload<int>(message);
+            success = true;
+        }
+        else if (message?.MessageType == MessageType.ProtocolError)
+        {
+            // TODO : Payload for ProtocolError needs to finalized.
+            EqtTrace.Error(
+                "VsTestConsoleRequestSender.HandShakeWithVsTestConsole: Version Check failed. ProtolError was received from the runner");
         }
         else
         {
             EqtTrace.Error(
-                "VsTestConsoleRequestSender.HandShakeWithVsTestConsole: SessionConnected Message Expected but different message received: Received MessageType: {0}",
-                message.MessageType);
+                "VsTestConsoleRequestSender.HandShakeWithVsTestConsole: VersionCheck Message Expected but different message received: Received MessageType: {0}",
+                message?.MessageType);
         }
 
         return success;
@@ -885,42 +881,42 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     private async Task<bool> HandShakeWithVsTestConsoleAsync()
     {
-        var success = false;
+        TPDebug.Assert(_processExitCancellationTokenSource is not null, "_processExitCancellationTokenSource is null");
         var message = await _communicationManager.ReceiveMessageAsync(
             _processExitCancellationTokenSource.Token).ConfigureAwait(false);
 
-        if (message.MessageType == MessageType.SessionConnected)
+        if (message?.MessageType != MessageType.SessionConnected)
         {
-            _communicationManager.SendMessage(
-                MessageType.VersionCheck,
-                _protocolVersion);
+            EqtTrace.Error(
+                "VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: SessionConnected Message Expected but different message received: Received MessageType: {0}",
+                message?.MessageType);
+            return false;
+        }
 
-            message = await _communicationManager.ReceiveMessageAsync(
-                _processExitCancellationTokenSource.Token).ConfigureAwait(false);
+        _communicationManager.SendMessage(
+            MessageType.VersionCheck,
+            _protocolVersion);
 
-            if (message.MessageType == MessageType.VersionCheck)
-            {
-                _protocolVersion = _dataSerializer.DeserializePayload<int>(message);
-                success = true;
-            }
-            else if (message.MessageType == MessageType.ProtocolError)
-            {
-                // TODO : Payload for ProtocolError needs to finalized.
-                EqtTrace.Error(
-                    "VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: Version Check failed. ProtolError was received from the runner");
-            }
-            else
-            {
-                EqtTrace.Error(
-                    "VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: VersionCheck Message Expected but different message received: Received MessageType: {0}",
-                    message.MessageType);
-            }
+        message = await _communicationManager.ReceiveMessageAsync(
+            _processExitCancellationTokenSource.Token).ConfigureAwait(false);
+
+        var success = false;
+        if (message?.MessageType == MessageType.VersionCheck)
+        {
+            _protocolVersion = _dataSerializer.DeserializePayload<int>(message);
+            success = true;
+        }
+        else if (message?.MessageType == MessageType.ProtocolError)
+        {
+            // TODO : Payload for ProtocolError needs to finalized.
+            EqtTrace.Error(
+                "VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: Version Check failed. ProtolError was received from the runner");
         }
         else
         {
             EqtTrace.Error(
-                "VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: SessionConnected Message Expected but different message received: Received MessageType: {0}",
-                message.MessageType);
+                "VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: VersionCheck Message Expected but different message received: Received MessageType: {0}",
+                message?.MessageType);
         }
 
         return success;
@@ -928,9 +924,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     private void SendMessageAndListenAndReportTestCases(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestDiscoveryEventsHandler2 eventHandler)
     {
         try
@@ -969,6 +965,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCases: Discovery complete.");
 
                     var discoveryCompletePayload = _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+                    TPDebug.Assert(discoveryCompletePayload is not null, "discoveryCompletePayload is null");
 
                     var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs
                     {
@@ -977,6 +974,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         FullyDiscoveredSources = discoveryCompletePayload.FullyDiscoveredSources,
                         PartiallyDiscoveredSources = discoveryCompletePayload.PartiallyDiscoveredSources,
                         NotDiscoveredSources = discoveryCompletePayload.NotDiscoveredSources,
+                        SkippedDiscoveredSources = discoveryCompletePayload.SkippedDiscoverySources,
                         DiscoveredExtensions = discoveryCompletePayload.DiscoveredExtensions,
                         Metrics = discoveryCompletePayload.Metrics,
                     };
@@ -988,8 +986,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 }
                 else if (string.Equals(MessageType.TestMessage, message.MessageType))
                 {
-                    var testMessagePayload = _dataSerializer
-                        .DeserializePayload<TestMessagePayload>(message);
+                    var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                    TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
                     eventHandler.HandleLogMessage(
                         testMessagePayload.MessageLevel,
                         testMessagePayload.Message);
@@ -1018,9 +1016,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     private async Task SendMessageAndListenAndReportTestCasesAsync(
         IEnumerable<string> sources,
-        string runSettings,
-        TestPlatformOptions options,
-        TestSessionInfo testSessionInfo,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
         ITestDiscoveryEventsHandler2 eventHandler)
     {
         try
@@ -1060,7 +1058,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
                     var discoveryCompletePayload =
                         _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
-
+                    TPDebug.Assert(discoveryCompletePayload is not null, "discoveryCompletePayload is null");
                     var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs
                     {
                         TotalCount = discoveryCompletePayload.TotalTests,
@@ -1068,6 +1066,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                         FullyDiscoveredSources = discoveryCompletePayload.FullyDiscoveredSources,
                         PartiallyDiscoveredSources = discoveryCompletePayload.PartiallyDiscoveredSources,
                         NotDiscoveredSources = discoveryCompletePayload.NotDiscoveredSources,
+                        SkippedDiscoveredSources = discoveryCompletePayload.SkippedDiscoverySources,
                         DiscoveredExtensions = discoveryCompletePayload.DiscoveredExtensions,
                     };
 
@@ -1083,6 +1082,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 {
                     var testMessagePayload = _dataSerializer
                         .DeserializePayload<TestMessagePayload>(message);
+                    TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
                     eventHandler.HandleLogMessage(
                         testMessagePayload.MessageLevel,
                         testMessagePayload.Message);
@@ -1114,7 +1114,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         string messageType,
         object payload,
         ITestRunEventsHandler eventHandler,
-        ITestHostLauncher customHostLauncher)
+        ITestHostLauncher? customHostLauncher)
     {
         try
         {
@@ -1144,9 +1144,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
                     var testRunCompletePayload = _dataSerializer
                         .DeserializePayload<TestRunCompletePayload>(message);
-
+                    TPDebug.Assert(testRunCompletePayload is not null, "testRunCompletePayload is null");
                     eventHandler.HandleTestRunComplete(
-                        testRunCompletePayload.TestRunCompleteArgs,
+                        testRunCompletePayload.TestRunCompleteArgs!,
                         testRunCompletePayload.LastRunTests,
                         testRunCompletePayload.RunAttachments,
                         testRunCompletePayload.ExecutorUris);
@@ -1156,6 +1156,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 {
                     var testMessagePayload = _dataSerializer
                         .DeserializePayload<TestMessagePayload>(message);
+                    TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
                     eventHandler.HandleLogMessage(
                         testMessagePayload.MessageLevel,
                         testMessagePayload.Message);
@@ -1164,7 +1165,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 {
                     HandleCustomHostLaunch(customHostLauncher, message);
                 }
-                else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
+                else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType) || string.Equals(MessageType.EditorAttachDebugger2, message.MessageType))
                 {
                     AttachDebuggerToProcess(customHostLauncher, message);
                 }
@@ -1195,7 +1196,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         string messageType,
         object payload,
         ITestRunEventsHandler eventHandler,
-        ITestHostLauncher customHostLauncher)
+        ITestHostLauncher? customHostLauncher)
     {
         try
         {
@@ -1224,9 +1225,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
                     var testRunCompletePayload = _dataSerializer
                         .DeserializePayload<TestRunCompletePayload>(message);
-
+                    TPDebug.Assert(testRunCompletePayload is not null, "testRunCompletePayload is null");
                     eventHandler.HandleTestRunComplete(
-                        testRunCompletePayload.TestRunCompleteArgs,
+                        testRunCompletePayload.TestRunCompleteArgs!,
                         testRunCompletePayload.LastRunTests,
                         testRunCompletePayload.RunAttachments,
                         testRunCompletePayload.ExecutorUris);
@@ -1234,8 +1235,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 }
                 else if (string.Equals(MessageType.TestMessage, message.MessageType))
                 {
-                    var testMessagePayload = _dataSerializer
-                        .DeserializePayload<TestMessagePayload>(message);
+                    var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                    TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
                     eventHandler.HandleLogMessage(
                         testMessagePayload.MessageLevel,
                         testMessagePayload.Message);
@@ -1273,8 +1274,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     private async Task SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
         IEnumerable<AttachmentSet> attachments,
-        IEnumerable<InvokedDataCollector> invokedDataCollectors,
-        string runSettings,
+        IEnumerable<InvokedDataCollector>? invokedDataCollectors,
+        string? runSettings,
         bool collectMetrics,
         ITestRunAttachmentsProcessingEventsHandler eventHandler,
         CancellationToken cancellationToken)
@@ -1315,9 +1316,10 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
                         var testRunAttachmentsProcessingCompletePayload = _dataSerializer
                             .DeserializePayload<TestRunAttachmentsProcessingCompletePayload>(message);
+                        TPDebug.Assert(testRunAttachmentsProcessingCompletePayload is not null, "testRunAttachmentsProcessingCompletePayload is null");
 
                         eventHandler.HandleTestRunAttachmentsProcessingComplete(
-                            testRunAttachmentsProcessingCompletePayload.AttachmentsProcessingCompleteEventArgs,
+                            testRunAttachmentsProcessingCompletePayload.AttachmentsProcessingCompleteEventArgs!,
                             testRunAttachmentsProcessingCompletePayload.Attachments);
                         isTestRunAttachmentsProcessingComplete = true;
                     }
@@ -1327,13 +1329,16 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                     {
                         var testRunAttachmentsProcessingProgressPayload = _dataSerializer
                             .DeserializePayload<TestRunAttachmentsProcessingProgressPayload>(message);
+                        TPDebug.Assert(testRunAttachmentsProcessingProgressPayload is not null, "testRunAttachmentsProcessingProgressPayload is null");
+
                         eventHandler.HandleTestRunAttachmentsProcessingProgress(
-                            testRunAttachmentsProcessingProgressPayload.AttachmentsProcessingProgressEventArgs);
+                            testRunAttachmentsProcessingProgressPayload.AttachmentsProcessingProgressEventArgs!);
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
                     {
-                        var testMessagePayload = _dataSerializer
-                            .DeserializePayload<TestMessagePayload>(message);
+                        var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
+
                         eventHandler.HandleLogMessage(
                             testMessagePayload.MessageLevel,
                             testMessagePayload.Message);
@@ -1371,25 +1376,21 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
     private Message TryReceiveMessage()
     {
-        var receiverMessageTask = _communicationManager.ReceiveMessageAsync(
-            _processExitCancellationTokenSource.Token);
-        receiverMessageTask.Wait();
-        Message message = receiverMessageTask.Result;
-
-        return message ?? throw new TransationLayerException(
-            TranslationLayerResources.FailedToReceiveMessage);
+        return TryReceiveMessageAsync().GetAwaiter().GetResult();
     }
 
     private async Task<Message> TryReceiveMessageAsync()
     {
-        Message message = await _communicationManager.ReceiveMessageAsync(
-            _processExitCancellationTokenSource.Token).ConfigureAwait(false);
+        // TODO: Rework logic of this class to avoid relying on throwing/catching exceptions:
+        // - NRE on null _processExitCancellationTokenSource
+        // - TransationLayerException on null message
+        Message? message = await _communicationManager.ReceiveMessageAsync(_processExitCancellationTokenSource!.Token)
+            .ConfigureAwait(false);
 
-        return message ?? throw new TransationLayerException(
-            TranslationLayerResources.FailedToReceiveMessage);
+        return message ?? throw new TransationLayerException(TranslationLayerResources.FailedToReceiveMessage);
     }
 
-    private void HandleCustomHostLaunch(ITestHostLauncher customHostLauncher, Message message)
+    private void HandleCustomHostLaunch(ITestHostLauncher? customHostLauncher, Message message)
     {
         var ackPayload = new CustomHostLaunchAckPayload()
         {
@@ -1399,11 +1400,10 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
         try
         {
-            var testProcessStartInfo = _dataSerializer
-                .DeserializePayload<TestProcessStartInfo>(message);
+            var testProcessStartInfo = _dataSerializer.DeserializePayload<TestProcessStartInfo>(message);
 
             ackPayload.HostProcessId = customHostLauncher != null
-                ? customHostLauncher.LaunchTestHost(testProcessStartInfo)
+                ? customHostLauncher.LaunchTestHost(testProcessStartInfo!)
                 : -1;
         }
         catch (Exception ex)
@@ -1426,7 +1426,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         }
     }
 
-    private void AttachDebuggerToProcess(ITestHostLauncher customHostLauncher, Message message)
+    private void AttachDebuggerToProcess(ITestHostLauncher? customHostLauncher, Message message)
     {
         var ackPayload = new EditorAttachDebuggerAckPayload()
         {
@@ -1436,16 +1436,53 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
         try
         {
-            var pid = _dataSerializer.DeserializePayload<int>(message);
+            // Handle EditorAttachDebugger2.
+            if (message.MessageType == MessageType.EditorAttachDebugger2)
+            {
+                var attachDebuggerPayload = _dataSerializer.DeserializePayload<EditorAttachDebuggerPayload>(message);
+                TPDebug.Assert(attachDebuggerPayload is not null, "attachDebuggerPayload is null");
+                switch (customHostLauncher)
+                {
+                    case ITestHostLauncher3 launcher3:
+                        var attachDebuggerInfo = new AttachDebuggerInfo
+                        {
+                            ProcessId = attachDebuggerPayload.ProcessID,
+                            TargetFramework = attachDebuggerPayload.TargetFramework,
+                            Sources = attachDebuggerPayload.Sources,
+                        };
+                        ackPayload.Attached = launcher3.AttachDebuggerToProcess(attachDebuggerInfo, CancellationToken.None);
+                        break;
+                    case ITestHostLauncher2 launcher2:
+                        ackPayload.Attached = launcher2.AttachDebuggerToProcess(attachDebuggerPayload.ProcessID);
+                        break;
+                    default:
+                        // TODO: Maybe we should do something, but the rest of the story is broken, so it's better to not block users.
+                        break;
+                }
+            }
 
-            ackPayload.Attached = customHostLauncher is ITestHostLauncher2 launcher
-                                  && launcher.AttachDebuggerToProcess(pid);
+            // Handle EditorAttachDebugger.
+            if (message.MessageType == MessageType.EditorAttachDebugger)
+            {
+                var pid = _dataSerializer.DeserializePayload<int>(message);
+
+                switch (customHostLauncher)
+                {
+                    case ITestHostLauncher3 launcher3:
+                        ackPayload.Attached = launcher3.AttachDebuggerToProcess(new AttachDebuggerInfo { ProcessId = pid }, CancellationToken.None);
+                        break;
+                    case ITestHostLauncher2 launcher2:
+                        ackPayload.Attached = launcher2.AttachDebuggerToProcess(pid);
+                        break;
+                    default:
+                        // TODO: Maybe we should do something, but the rest of the story is broken, so it's better to not block users.
+                        break;
+                }
+            }
         }
         catch (Exception ex)
         {
-            EqtTrace.Error(
-                "VsTestConsoleRequestSender.AttachDebuggerToProcess: Error while attaching debugger to process: {0}",
-                ex);
+            EqtTrace.Error("VsTestConsoleRequestSender.AttachDebuggerToProcess: Error while attaching debugger to process: {0}", ex);
 
             // vstest.console will send the abort message properly while cleaning up all the
             // flow, so do not abort here.

@@ -49,7 +49,7 @@ public class DataCollectorInformationTests
         _dataCollectorInfo.InitializeDataCollector();
         _dataCollectorInfo.SetTestExecutionEnvironmentVariables();
 
-        CollectionAssert.AreEqual(_envVarList, _dataCollectorInfo.TestExecutionEnvironmentVariables.ToList());
+        CollectionAssert.AreEqual(_envVarList, _dataCollectorInfo.TestExecutionEnvironmentVariables!.ToList());
     }
 
     [TestMethod]

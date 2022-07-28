@@ -16,8 +16,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
 
 /// <summary>
@@ -29,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
 /// </remarks>
 public class SettingsProviderExtensionManager
 {
-    private static SettingsProviderExtensionManager s_settingsProviderExtensionManager;
+    private static SettingsProviderExtensionManager? s_settingsProviderExtensionManager;
     private static readonly object Synclock = new();
 
     /// <summary>
@@ -50,31 +48,37 @@ public class SettingsProviderExtensionManager
     /// instances to be used for each run settings.
     /// </remarks>
     protected SettingsProviderExtensionManager(
-        IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settingsProviders!!,
-        IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredSettingsProviders!!,
-        IMessageLogger logger!!)
+        IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settingsProviders,
+        IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredSettingsProviders,
+        IMessageLogger logger)
     {
-        _settingsProviders = settingsProviders;
-        UnfilteredSettingsProviders = unfilteredSettingsProviders;
-        _logger = logger;
+        _settingsProviders = settingsProviders ?? throw new ArgumentNullException(nameof(settingsProviders));
+        UnfilteredSettingsProviders = unfilteredSettingsProviders ?? throw new ArgumentNullException(nameof(unfilteredSettingsProviders));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         // Populate the map to avoid threading issues
         SettingsProvidersMap = new Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>();
 
         foreach (var settingsProvider in _settingsProviders)
         {
-            if (SettingsProvidersMap.ContainsKey(settingsProvider.Metadata.SettingsName))
+            var settingsName = settingsProvider.Metadata?.SettingsName;
+            if (settingsName is null)
+            {
+                continue;
+            }
+
+            if (SettingsProvidersMap.ContainsKey(settingsName))
             {
                 _logger.SendMessage(
                     TestMessageLevel.Error,
                     string.Format(
-                        CultureInfo.CurrentUICulture,
+                        CultureInfo.CurrentCulture,
                         CommonResources.DuplicateSettingsName,
-                        settingsProvider.Metadata.SettingsName));
+                        settingsName));
             }
             else
             {
-                SettingsProvidersMap.Add(settingsProvider.Metadata.SettingsName, settingsProvider);
+                SettingsProvidersMap.Add(settingsName, settingsProvider);
             }
         }
     }
@@ -160,14 +164,14 @@ public class SettingsProviderExtensionManager
     /// </summary>
     /// <param name="settingsName">Name of the settings to get.</param>
     /// <returns>Settings provider with the provided name or null if one was not found.</returns>
-    internal LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> GetSettingsProvider(string settingsName)
+    internal LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>? GetSettingsProvider(string settingsName)
     {
         if (settingsName.IsNullOrWhiteSpace())
         {
             throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(settingsName));
         }
 
-        SettingsProvidersMap.TryGetValue(settingsName, out LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> settingsProvider);
+        SettingsProvidersMap.TryGetValue(settingsName, out var settingsProvider);
 
         return settingsProvider;
     }

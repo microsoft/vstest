@@ -3,8 +3,6 @@
 
 using System;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -15,12 +13,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 #endif
 public class TestPlatformException : Exception
 {
-    public TestPlatformException(string message)
+    public TestPlatformException(string? message)
         : base(message)
     {
     }
 
-    public TestPlatformException(string message, Exception innerException)
+    public TestPlatformException(string? message, Exception? innerException)
         : base(message, innerException)
     {
     }
@@ -38,8 +36,9 @@ public class TestPlatformException : Exception
         /// <param name="faultEx">FaultException</param>
         /// <returns>strongly typed exception that is wrapped in Fault Exception</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
-        public static Exception ConvertException(FaultException faultEx!!)
+        public static Exception ConvertException(FaultException faultEx)
         {
+            ValidateArg.NotNull(faultEx, nameof(faultEx));
             if (faultEx.Code == null || faultEx.Code.Name == null)
             {
                 return new TestPlatformException(faultEx.Message, faultEx);
@@ -100,6 +99,6 @@ public class TestPlatformException : Exception
 #endif
 public class ProcessExitedException : TestPlatformException
 {
-    public ProcessExitedException(string message) : base(message) { }
-    public ProcessExitedException(string message, Exception inner) : base(message, inner) { }
+    public ProcessExitedException(string? message) : base(message) { }
+    public ProcessExitedException(string? message, Exception? inner) : base(message, inner) { }
 }

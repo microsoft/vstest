@@ -2,10 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.VisualStudio.TestPlatform.Execution;
-
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 
@@ -19,11 +16,11 @@ public static class Program
     /// </summary>
     /// <param name="args">Arguments provided on the command line.</param>
     /// <returns>0 if everything was successful and 1 otherwise.</returns>
-    public static int Main(string[] args)
+    public static int Main(string[]? args) => Run(args, new());
+
+    internal static int Run(string[]? args, UiLanguageOverride uiLanguageOverride)
     {
-        DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_RUNNER_DEBUG_ATTACHVS");
-        DebuggerBreakpoint.WaitForDebugger("VSTEST_RUNNER_DEBUG");
-        UiLanguageOverride.SetCultureSpecifiedByUser();
+        uiLanguageOverride.SetCultureSpecifiedByUser();
         return new Executor(ConsoleOutput.Instance).Execute(args);
     }
 }

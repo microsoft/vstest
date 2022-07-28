@@ -5,8 +5,6 @@ using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
 public static class CancellationTokenExtensions

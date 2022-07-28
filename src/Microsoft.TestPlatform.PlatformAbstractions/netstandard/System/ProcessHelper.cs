@@ -8,8 +8,6 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <summary>
@@ -18,20 +16,13 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 public class ProcessHelper : IProcessHelper
 {
     /// <inheritdoc/>
-    public object LaunchProcess(
-        string processPath,
-        string arguments,
-        string workingDirectory,
-        IDictionary<string, string> environmentVariables,
-        Action<object, string> errorCallback,
-        Action<object> exitCallBack,
-        Action<object, string> ouputCallBack)
+    public object LaunchProcess(string processPath, string? arguments, string? workingDirectory, IDictionary<string, string?>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public string GetCurrentProcessFileName()
+    public string? GetCurrentProcessFileName()
     {
         throw new NotImplementedException();
     }
@@ -43,7 +34,7 @@ public class ProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc/>
-    public string GetTestEngineDirectory()
+    public string? GetTestEngineDirectory()
     {
         throw new NotImplementedException();
     }
@@ -61,25 +52,25 @@ public class ProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc/>
-    public bool TryGetExitCode(object process, out int exitCode)
+    public bool TryGetExitCode(object? process, out int exitCode)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public void SetExitCallback(int parentProcessId, Action<object> callbackAction)
+    public void SetExitCallback(int parentProcessId, Action<object?>? callbackAction)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public void TerminateProcess(object process)
+    public void TerminateProcess(object? process)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public int GetProcessId(object process)
+    public int GetProcessId(object? process)
     {
         throw new NotImplementedException();
     }
@@ -97,7 +88,7 @@ public class ProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc/>
-    public void WaitForProcessExit(object process)
+    public void WaitForProcessExit(object? process)
     {
         throw new NotImplementedException();
     }

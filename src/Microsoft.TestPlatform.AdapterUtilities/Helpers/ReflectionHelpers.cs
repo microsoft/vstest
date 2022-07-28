@@ -7,8 +7,6 @@ using System.Text;
 
 using Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 internal static partial class ReflectionHelpers
@@ -18,7 +16,7 @@ internal static partial class ReflectionHelpers
     {
         if (obj == null)
         {
-            throw new NotImplementedException(string.Format(Resources.Resources.MethodNotImplementedOnPlatform, className, methodName));
+            throw new NotImplementedException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.MethodNotImplementedOnPlatform, className, methodName));
         }
     }
 

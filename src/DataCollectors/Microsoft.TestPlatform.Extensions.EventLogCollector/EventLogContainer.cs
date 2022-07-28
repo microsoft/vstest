@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 using Resource = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 
 /// <summary>
@@ -20,13 +18,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector;
 /// </summary>
 internal class EventLogContainer : IEventLogContainer
 {
-    private readonly ISet<string> _eventSources;
+    private readonly ISet<string>? _eventSources;
 
     private readonly ISet<EventLogEntryType> _entryTypes;
     private readonly int _maxLogEntries;
 
     private readonly DataCollectionLogger _dataCollectionLogger;
-
     private readonly DataCollectionContext _dataCollectionContext;
 
     /// <summary>
@@ -55,7 +52,7 @@ internal class EventLogContainer : IEventLogContainer
     /// <param name="dataCollectionContext">
     /// Data Collection Context
     /// </param>
-    public EventLogContainer(string eventLogName, ISet<string> eventSources, ISet<EventLogEntryType> entryTypes, int maxLogEntries, DataCollectionLogger dataCollectionLogger, DataCollectionContext dataCollectionContext)
+    public EventLogContainer(string eventLogName, ISet<string>? eventSources, ISet<EventLogEntryType> entryTypes, int maxLogEntries, DataCollectionLogger dataCollectionLogger, DataCollectionContext dataCollectionContext)
     {
         EventLog = new EventLog(eventLogName);
         EventLog.EnableRaisingEvents = true;
@@ -119,7 +116,7 @@ internal class EventLogContainer : IEventLogContainer
     /// </summary>
     /// <param name="source">Source</param>
     /// <param name="e">The System.Diagnostics.EntryWrittenEventArgs object describing the entry that was written.</param>
-    public void OnEventLogEntryWritten(object source, EntryWrittenEventArgs e)
+    public void OnEventLogEntryWritten(object? source, EntryWrittenEventArgs? e)
     {
         while (!LimitReached)
         {
@@ -154,7 +151,7 @@ internal class EventLogContainer : IEventLogContainer
                         _dataCollectionLogger.LogWarning(
                             _dataCollectionContext,
                             string.Format(
-                                CultureInfo.InvariantCulture,
+                                CultureInfo.CurrentCulture,
                                 Resource.EventsLostWarning,
                                 EventLog.Log));
 
@@ -206,7 +203,7 @@ internal class EventLogContainer : IEventLogContainer
                 _dataCollectionLogger.LogError(
                     _dataCollectionContext,
                     string.Format(
-                        CultureInfo.InvariantCulture,
+                        CultureInfo.CurrentCulture,
                         Resource.EventsLostError,
                         EventLog.Log,
                         exception), exception);

@@ -6,8 +6,6 @@
 using System;
 using System.IO;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
@@ -16,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 public class ConsoleOutput : IOutput
 {
     private static readonly object LockObject = new();
-    private static ConsoleOutput s_consoleOutput;
+    private static ConsoleOutput? s_consoleOutput;
 
     private readonly TextWriter _standardOutput;
     private readonly TextWriter _standardError;
@@ -59,7 +57,7 @@ public class ConsoleOutput : IOutput
     /// </summary>
     /// <param name="message">Message to be output.</param>
     /// <param name="level">Level of the message.</param>
-    public void WriteLine(string message, OutputLevel level)
+    public void WriteLine(string? message, OutputLevel level)
     {
         Write(message, level);
         Write(Environment.NewLine, level);
@@ -70,7 +68,7 @@ public class ConsoleOutput : IOutput
     /// </summary>
     /// <param name="message">Message to be output.</param>
     /// <param name="level">Level of the message.</param>
-    public void Write(string message, OutputLevel level)
+    public void Write(string? message, OutputLevel level)
     {
         switch (level)
         {

@@ -18,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>
@@ -36,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 /// we don't know how the user will implement the datacollector and they could send file out of events(wrong usage, no more expected sequential access AddAttachment->GetAttachments),
 /// so we prefer protect every collection. This not means that outcome will be "always correct"(file attached in a correct way) but at least we avoid exceptions.
 /// </summary>
-internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManager
+internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManager, IDisposable
 {
     private readonly object _attachmentTaskLock = new();
 
@@ -48,7 +46,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     /// <summary>
     /// Logger for data collection messages
     /// </summary>
-    private IMessageSink _messageSink;
+    private IMessageSink? _messageSink;
 
     /// <summary>
     /// Attachment transfer tasks associated with a given datacollection context.
@@ -88,7 +86,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     /// <summary>
     /// Gets the session output directory.
     /// </summary>
-    internal string SessionOutputDirectory { get; private set; }
+    internal string? SessionOutputDirectory { get; private set; }
 
     /// <summary>
     /// Gets the attachment sets for the given datacollection context.
@@ -98,8 +96,11 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
         get; private set;
     }
     /// <inheritdoc/>
-    public void Initialize(SessionId id!!, string outputDirectory, IMessageSink messageSink!!)
+    public void Initialize(SessionId id, string outputDirectory, IMessageSink messageSink)
     {
+        ValidateArg.NotNull(id, nameof(id));
+        ValidateArg.NotNull(messageSink, nameof(messageSink));
+
         _messageSink = messageSink;
 
         if (outputDirectory.IsNullOrEmpty())
@@ -159,8 +160,10 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     }
 
     /// <inheritdoc/>
-    public void AddAttachment(FileTransferInformation fileTransferInfo!!, AsyncCompletedEventHandler sendFileCompletedCallback, Uri uri, string friendlyName)
+    public void AddAttachment(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler? sendFileCompletedCallback, Uri uri, string friendlyName)
     {
+        ValidateArg.NotNull(fileTransferInfo, nameof(fileTransferInfo));
+
         if (SessionOutputDirectory.IsNullOrEmpty())
         {
             EqtTrace.Error("DataCollectionAttachmentManager.AddAttachment: Initialize not invoked.");
@@ -203,7 +206,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
         {
             throw new FileNotFoundException(
                 string.Format(
-                    CultureInfo.CurrentCulture,
+                    CultureInfo.InvariantCulture,
                     "Could not find source file '{0}'.",
                     fileTransferInfo.FileName));
         }
@@ -212,7 +215,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
 
         if (!Directory.Exists(directoryName))
         {
-            Directory.CreateDirectory(directoryName);
+            Directory.CreateDirectory(directoryName!);
         }
         else if (File.Exists(localFilePath))
         {
@@ -235,7 +238,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
     /// <param name="friendlyName">
     /// The friendly Name.
     /// </param>
-    private void AddNewFileTransfer(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler sendFileCompletedCallback, Uri uri, string friendlyName)
+    private void AddNewFileTransfer(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler? sendFileCompletedCallback, Uri uri, string friendlyName)
     {
         var context = fileTransferInfo.Context;
         TPDebug.Assert(
@@ -246,6 +249,7 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
             ? fileTransferInfo.Context.TestExecId.Id.ToString()
             : string.Empty;
 
+        TPDebug.Assert(SessionOutputDirectory is not null, "SessionOutputDirectory is null.");
         var directoryPath = Path.Combine(
             SessionOutputDirectory,
             testCaseId);
@@ -349,7 +353,20 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
             args.TestCaseId = testCaseId;
         }
 
-        _messageSink.SendMessage(args);
+        _messageSink?.SendMessage(args);
     }
 
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _cancellationTokenSource.Dispose();
+        }
+    }
 }

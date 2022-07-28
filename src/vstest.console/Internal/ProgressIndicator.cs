@@ -1,24 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using Timer = System.Timers.Timer;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
 /// <summary>
 /// Indicates the test run progress
 /// </summary>
-internal class ProgressIndicator : IProgressIndicator
+internal sealed class ProgressIndicator : IProgressIndicator, IDisposable
 {
     private readonly object _syncObject = new();
     private int _dotCounter;
-    private Timer _timer;
+    private Timer? _timer;
     private readonly string _testRunProgressString;
 
     /// <summary>
@@ -116,5 +115,10 @@ internal class ProgressIndicator : IProgressIndicator
                 Clear(ConsoleHelper.CursorLeft - 3);
             }
         }
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
     }
 }

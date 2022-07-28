@@ -2,12 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 
 using Microsoft.TestPlatform.AdapterUtilities.Helpers;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
 
@@ -66,7 +63,7 @@ public class ManagedNameParser
     /// <exception cref="InvalidManagedNameException">
     /// Thrown if <paramref name="managedMethodName"/> contains spaces, incomplete, or the arity isn't numeric.
     /// </exception>
-    public static void ParseManagedMethodName(string managedMethodName, out string methodName, out int arity, out string[] parameterTypes)
+    public static void ParseManagedMethodName(string managedMethodName, out string methodName, out int arity, out string[]? parameterTypes)
     {
         int pos = ParseMethodName(managedMethodName, 0, out var escapedMethodName, out arity);
         methodName = ReflectionHelpers.ParseEscapedString(escapedMethodName);
@@ -118,7 +115,7 @@ public class ManagedNameParser
     // parse arity in the form `nn where nn is an integer value.
     private static int ParseArity(string managedMethodName, int start, out int arity)
     {
-        Debug.Assert(managedMethodName[start] == '`');
+        TPDebug.Assert(managedMethodName[start] == '`');
 
         int i = start + 1; // skip initial '`' char
         for (; i < managedMethodName.Length; i++)
@@ -127,20 +124,19 @@ public class ManagedNameParser
         }
         if (!int.TryParse(Capture(managedMethodName, start + 1, i), out arity))
         {
-            string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorMethodArityMustBeNumeric);
-            throw new InvalidManagedNameException(message);
+            throw new InvalidManagedNameException(Resources.Resources.ErrorMethodArityMustBeNumeric);
         }
         return i;
     }
 
-    private static int ParseParameterTypeList(string managedMethodName, int start, out string[] parameterTypes)
+    private static int ParseParameterTypeList(string managedMethodName, int start, out string[]? parameterTypes)
     {
         parameterTypes = null;
         if (start == managedMethodName.Length)
         {
             return start;
         }
-        Debug.Assert(managedMethodName[start] == '(');
+        TPDebug.Assert(managedMethodName[start] == '(');
 
         var types = new List<string>();
 
@@ -166,8 +162,7 @@ public class ManagedNameParser
             }
         }
 
-        string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorIncompleteManagedName);
-        throw new InvalidManagedNameException(message);
+        throw new InvalidManagedNameException(Resources.Resources.ErrorIncompleteManagedName);
     }
 
     private static int ParseParameterType(string managedMethodName, int start, out string parameterType)
@@ -229,8 +224,7 @@ public class ManagedNameParser
             }
         }
 
-        string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorIncompleteManagedName);
-        throw new InvalidManagedNameException(message);
+        throw new InvalidManagedNameException(Resources.Resources.ErrorIncompleteManagedName);
     }
 
     private static int ParseGenericBrackets(string managedMethodName, int start)
@@ -260,7 +254,6 @@ public class ManagedNameParser
             }
         }
 
-        string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorIncompleteManagedName);
-        throw new InvalidManagedNameException(message);
+        throw new InvalidManagedNameException(Resources.Resources.ErrorIncompleteManagedName);
     }
 }

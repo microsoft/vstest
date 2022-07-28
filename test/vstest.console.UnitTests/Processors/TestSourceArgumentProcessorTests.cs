@@ -37,7 +37,7 @@ public class TestSourceArgumentProcessorTests
     public void GetExecuterShouldReturnTestSourceArgumentProcessorCapabilities()
     {
         TestSourceArgumentProcessor processor = new();
-        Assert.IsTrue(processor.Executor.Value is TestSourceArgumentExecutor);
+        Assert.IsTrue(processor.Executor!.Value is TestSourceArgumentExecutor);
     }
 
     #region TestSourceArgumentProcessorCapabilitiesTests
@@ -81,7 +81,8 @@ public class TestSourceArgumentProcessorTests
         catch (Exception ex)
         {
             Assert.IsTrue(ex is TestSourceException);
-            Assert.AreEqual("The test source file \"" + testFilePath + "\" provided was not found.", ex.Message);
+            StringAssert.StartsWith(ex.Message, "The test source file \"");
+            StringAssert.EndsWith(ex.Message, testFilePath + "\" provided was not found.");
         }
     }
 
@@ -94,7 +95,7 @@ public class TestSourceArgumentProcessorTests
         mockFileHelper.Setup(x => x.GetCurrentDirectory()).Returns("");
 
         var options = CommandLineOptions.Instance;
-        options.Reset();
+        CommandLineOptions.Reset();
         options.FileHelper = mockFileHelper.Object;
         options.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, mockFileHelper.Object);
         var executor = new TestSourceArgumentExecutor(options);

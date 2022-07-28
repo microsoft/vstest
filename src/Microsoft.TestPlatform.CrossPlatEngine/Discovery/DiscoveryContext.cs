@@ -12,8 +12,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 
 /// <summary>
@@ -24,7 +22,7 @@ public class DiscoveryContext : IDiscoveryContext
     /// <summary>
     /// Gets the run settings specified for this request.
     /// </summary>
-    public IRunSettings RunSettings { get; internal set; }
+    public IRunSettings? RunSettings { get; internal set; }
 
     /// <summary>
     /// Returns TestCaseFilterExpression validated for supportedProperties.
@@ -33,28 +31,30 @@ public class DiscoveryContext : IDiscoveryContext
     /// <param name="supportedProperties"> The supported Properties. </param>
     /// <param name="propertyProvider"> The property Provider. </param>
     /// <returns> The <see cref="ITestCaseFilterExpression"/>. </returns>
-    public ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
+    public ITestCaseFilterExpression? GetTestCaseFilter(IEnumerable<string>? supportedProperties, Func<string, TestProperty?> propertyProvider)
     {
-        TestCaseFilterExpression adapterSpecificTestCaseFilter = null;
-        if (FilterExpressionWrapper != null)
+        TestCaseFilterExpression? adapterSpecificTestCaseFilter = null;
+        if (FilterExpressionWrapper == null)
         {
-            if (!string.IsNullOrEmpty(FilterExpressionWrapper.ParseError))
-            {
-                throw new TestPlatformFormatException(FilterExpressionWrapper.ParseError, FilterExpressionWrapper.FilterString);
-            }
+            return adapterSpecificTestCaseFilter;
+        }
 
-            adapterSpecificTestCaseFilter = new TestCaseFilterExpression(FilterExpressionWrapper);
-            var invalidProperties = adapterSpecificTestCaseFilter.ValidForProperties(supportedProperties, propertyProvider);
+        if (!StringUtils.IsNullOrEmpty(FilterExpressionWrapper.ParseError))
+        {
+            throw new TestPlatformFormatException(FilterExpressionWrapper.ParseError, FilterExpressionWrapper.FilterString);
+        }
 
-            if (invalidProperties != null)
-            {
-                var invalidPropertiesString = string.Join(CrossPlatEngineResources.StringSeperator, invalidProperties);
-                var validPropertiesSttring = supportedProperties == null ? string.Empty : string.Join(CrossPlatEngineResources.StringSeperator, supportedProperties.ToArray());
-                var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.UnsupportedPropertiesInTestCaseFilter, invalidPropertiesString, validPropertiesSttring);
+        adapterSpecificTestCaseFilter = new TestCaseFilterExpression(FilterExpressionWrapper);
+        var invalidProperties = adapterSpecificTestCaseFilter.ValidForProperties(supportedProperties, propertyProvider);
 
-                // For unsupported property don’t throw exception, just log the message. Later it is going to handle properly with TestCaseFilterExpression.MatchTestCase().
-                EqtTrace.Info(errorMessage);
-            }
+        if (invalidProperties != null)
+        {
+            var invalidPropertiesString = string.Join(CrossPlatEngineResources.StringSeperator, invalidProperties);
+            var validPropertiesSttring = supportedProperties == null ? string.Empty : string.Join(CrossPlatEngineResources.StringSeperator, supportedProperties.ToArray());
+            var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.UnsupportedPropertiesInTestCaseFilter, invalidPropertiesString, validPropertiesSttring);
+
+            // For unsupported property don’t throw exception, just log the message. Later it is going to handle properly with TestCaseFilterExpression.MatchTestCase().
+            EqtTrace.Info(errorMessage);
         }
 
         return adapterSpecificTestCaseFilter;
@@ -63,5 +63,5 @@ public class DiscoveryContext : IDiscoveryContext
     /// <summary>
     /// Gets or sets the FilterExpressionWrapper instance as created from filter string.
     /// </summary>
-    internal FilterExpressionWrapper FilterExpressionWrapper { get; set; }
+    internal FilterExpressionWrapper? FilterExpressionWrapper { get; set; }
 }

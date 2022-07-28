@@ -4,8 +4,6 @@
 using System;
 using System.Net;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 /// <summary>

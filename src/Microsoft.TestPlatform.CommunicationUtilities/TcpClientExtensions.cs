@@ -9,10 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
@@ -24,10 +21,10 @@ internal static class TcpClientExtensions
     internal static Task MessageLoopAsync(
         this TcpClient client,
         ICommunicationChannel channel,
-        Action<Exception> errorHandler,
+        Action<Exception?> errorHandler,
         CancellationToken cancellationToken)
     {
-        Exception error = null;
+        Exception? error = null;
 
         var remoteEndPoint = string.Empty;
         var localEndPoint = string.Empty;
@@ -103,9 +100,9 @@ internal static class TcpClientExtensions
     /// </summary>
     /// <param name="value">Input endpoint address</param>
     /// <returns>IPEndpoint from give string, if its not a valid string. It will create endpoint with loop back address with port 0</returns>
-    internal static IPEndPoint GetIpEndPoint(this string value)
+    internal static IPEndPoint GetIpEndPoint(this string? value)
     {
-        return Uri.TryCreate(string.Concat("tcp://", value), UriKind.Absolute, out Uri uri)
+        return Uri.TryCreate(string.Concat("tcp://", value), UriKind.Absolute, out Uri? uri)
             ? new IPEndPoint(IPAddress.Parse(uri.Host), uri.Port < 0 ? 0 : uri.Port)
             : new IPEndPoint(IPAddress.Loopback, 0);
     }

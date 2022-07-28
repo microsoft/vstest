@@ -8,8 +8,6 @@ using System.Threading;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 /// <summary>
@@ -65,14 +63,14 @@ public interface ITestRequestSender : IDisposable
     /// </summary>
     /// <param name="runCriteria">RunCriteria for test run</param>
     /// <param name="eventHandler">EventHandler for test run events</param>
-    void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler);
+    void StartTestRun(TestRunCriteriaWithSources runCriteria, IInternalTestRunEventsHandler eventHandler);
 
     /// <summary>
     /// Starts the TestRun with given test cases and criteria
     /// </summary>
     /// <param name="runCriteria">RunCriteria for test run</param>
     /// <param name="eventHandler">EventHandler for test run events</param>
-    void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler);
+    void StartTestRun(TestRunCriteriaWithTests runCriteria, IInternalTestRunEventsHandler eventHandler);
 
     /// <summary>
     /// Ends the Session

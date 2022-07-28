@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
 /// <summary>
@@ -13,7 +11,7 @@ public interface INavigationData
     /// <summary>
     /// Gets or sets the file name of the file containing the method being navigated.
     /// </summary>
-    string FileName { get; set; }
+    string? FileName { get; set; }
 
     /// <summary>
     /// Gets or sets the min line number of the method being navigated in the file.

@@ -3,14 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Xml;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-
 using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-
-#nullable disable
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
@@ -25,32 +23,32 @@ internal class CollectorDataEntry : IXmlTestStore
     /// List of data attachments. These attachments can be things such as files that the
     /// collector wants to make available to the publishers.
     /// </summary>
-    private readonly List<IDataAttachment> _attachments;
+    private readonly List<IDataAttachment> _attachments = new();
 
     /// <summary>
     /// Name of the agent from which we received the data
     /// </summary>
-    private string _agentName;
+    private readonly string _agentName;
 
     /// <summary>
     /// Display name of the agent from which we received the data
     /// </summary>
-    private string _agentDisplayName;
+    private readonly string _agentDisplayName;
 
     /// <summary>
     /// Flag indicating whether this data is coming from a remote (not hosted) agent
     /// </summary>
-    private bool _isFromRemoteAgent;
+    private readonly bool _isFromRemoteAgent;
 
     /// <summary>
     /// URI of the collector.
     /// </summary>
-    private Uri _uri;
+    private readonly Uri _uri;
 
     /// <summary>
     /// Name of the collector that should be displayed to the user.
     /// </summary>
-    private string _collectorDisplayName;
+    private readonly string _collectorDisplayName;
 
     /// <summary>
     /// Used by the aggregator to put collector Uri, agentName, string agentDisplayName, whether it's remote data, and
@@ -74,10 +72,28 @@ internal class CollectorDataEntry : IXmlTestStore
     /// <param name="attachments">
     /// The attachments.
     /// </param>
-    public CollectorDataEntry(Uri uri, string collectorDisplayName, string agentName, string agentDisplayName, bool isFromRemoteAgent, IList<IDataAttachment> attachments)
-        : this()
+    public CollectorDataEntry(Uri uri, string collectorDisplayName, string agentName, string agentDisplayName, bool isFromRemoteAgent, IList<IDataAttachment>? attachments)
     {
-        Initialize(uri, collectorDisplayName, agentName, agentDisplayName, isFromRemoteAgent, attachments);
+        EqtAssert.ParameterNotNull(uri, nameof(uri));
+        EqtAssert.StringNotNullOrEmpty(collectorDisplayName, nameof(collectorDisplayName));
+        EqtAssert.StringNotNullOrEmpty(agentName, nameof(agentName));
+        EqtAssert.StringNotNullOrEmpty(agentDisplayName, nameof(agentDisplayName));
+
+        if (null != attachments)
+        {
+            // Copy the attachments
+            foreach (IDataAttachment attachment in attachments)
+            {
+                AddAttachment(attachment);
+            }
+        }
+
+        // Note that the data can be null.
+        _uri = uri;
+        _collectorDisplayName = collectorDisplayName;
+        _agentName = agentName.Trim();
+        _agentDisplayName = agentDisplayName.Trim();
+        _isFromRemoteAgent = isFromRemoteAgent;
     }
 
     /// <summary>
@@ -88,39 +104,10 @@ internal class CollectorDataEntry : IXmlTestStore
     /// </remarks>
     internal CollectorDataEntry()
     {
-        _attachments = new List<IDataAttachment>();
-    }
-
-    /// <summary>
-    /// Copies the specified collector data entry, making the paths in the data attachments absolute or relative, with
-    /// respect to the results directory
-    /// </summary>
-    /// <param name="other">The instance to copy from</param>
-    /// <param name="resultsDirectory">The results directory to use to make paths in the data attachments relative or absolute</param>
-    /// <param name="useAbsolutePaths">True to use absolute paths in this instance, false to use relative paths</param>
-    private CollectorDataEntry(CollectorDataEntry other, string resultsDirectory, bool useAbsolutePaths)
-    {
-        Debug.Assert(other != null, "'other' is null");
-        Debug.Assert(other._attachments != null, "'other.m_attachments' is null");
-        Debug.Assert(!string.IsNullOrEmpty(resultsDirectory), "'resultsDirectory' is null or empty");
-
-        _attachments = new List<IDataAttachment>(other._attachments.Count);
-        Initialize(other._uri, other._collectorDisplayName, other._agentName, other._agentDisplayName, other._isFromRemoteAgent, null);
-
-        // Clone the attachments
-        foreach (IDataAttachment attachment in other._attachments)
-        {
-            Debug.Assert(attachment != null, "'attachment' is null");
-
-            if (attachment is UriDataAttachment uriDataAttachment)
-            {
-                _attachments.Add(uriDataAttachment.Clone(resultsDirectory, useAbsolutePaths));
-            }
-            else
-            {
-                _attachments.Add(attachment);
-            }
-        }
+        _agentName = null!;
+        _agentDisplayName = null!;
+        _uri = null!;
+        _collectorDisplayName = null!;
     }
 
     /// <summary>
@@ -142,7 +129,7 @@ internal class CollectorDataEntry : IXmlTestStore
     /// </summary>
     /// <param name="element">The XML element to save to</param>
     /// <param name="parameters">Parameters to customize the save behavior</param>
-    public void Save(XmlElement element, XmlTestStoreParameters parameters)
+    public void Save(XmlElement element, XmlTestStoreParameters? parameters)
     {
         EqtAssert.ParameterNotNull(element, nameof(element));
 
@@ -170,8 +157,9 @@ internal class CollectorDataEntry : IXmlTestStore
     /// Adds a data attachment to the list of data attachments
     /// </summary>
     /// <param name="attachment">The attachment to add</param>
-    internal void AddAttachment(IDataAttachment attachment!!)
+    internal void AddAttachment(IDataAttachment attachment)
     {
+        ValidateArg.NotNull(attachment, nameof(attachment));
         _attachments.Add(attachment);
     }
 
@@ -183,34 +171,26 @@ internal class CollectorDataEntry : IXmlTestStore
     /// <returns>A clone of the instance containing cloned attachments with file paths made absolute or relative</returns>
     internal CollectorDataEntry Clone(string resultsDirectory, bool useAbsolutePaths)
     {
-        Debug.Assert(!string.IsNullOrEmpty(resultsDirectory), "'resultsDirectory' is null or empty");
-        Debug.Assert(resultsDirectory == resultsDirectory.Trim(), "'resultsDirectory' contains whitespace at the ends");
+        TPDebug.Assert(!resultsDirectory.IsNullOrEmpty(), "'resultsDirectory' is null or empty");
+        TPDebug.Assert(resultsDirectory == resultsDirectory.Trim(), "'resultsDirectory' contains whitespace at the ends");
 
-        return new CollectorDataEntry(this, resultsDirectory, useAbsolutePaths);
-    }
+        var collector = new CollectorDataEntry(_uri, _collectorDisplayName, _agentName, _agentDisplayName, _isFromRemoteAgent, null);
 
-    private void Initialize(Uri uri, string collectorDisplayName, string agentName, string agentDisplayName, bool isFromRemoteAgent, IEnumerable<IDataAttachment> attachments)
-    {
-        EqtAssert.ParameterNotNull(uri, nameof(uri));
-        EqtAssert.StringNotNullOrEmpty(collectorDisplayName, nameof(collectorDisplayName));
-        EqtAssert.StringNotNullOrEmpty(agentName, nameof(agentName));
-        EqtAssert.StringNotNullOrEmpty(agentDisplayName, nameof(agentDisplayName));
-
-        if (null != attachments)
+        // Clone the attachments
+        foreach (IDataAttachment attachment in _attachments)
         {
-            // Copy the attachments
-            foreach (IDataAttachment attachment in attachments)
+            TPDebug.Assert(attachment is not null, "'attachment' is null");
+
+            if (attachment is UriDataAttachment uriDataAttachment)
             {
-                AddAttachment(attachment);
+                collector._attachments.Add(uriDataAttachment.Clone(resultsDirectory, useAbsolutePaths));
+            }
+            else
+            {
+                collector._attachments.Add(attachment);
             }
         }
 
-        // Note that the data can be null.
-        _uri = uri;
-        _collectorDisplayName = collectorDisplayName;
-        _agentName = agentName.Trim();
-        _agentDisplayName = agentDisplayName.Trim();
-        _isFromRemoteAgent = isFromRemoteAgent;
+        return collector;
     }
-
 }

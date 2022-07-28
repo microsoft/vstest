@@ -7,6 +7,7 @@ using System.Threading;
 #endif
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,17 +19,16 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
 /// <summary>
 /// The test plugin cache.
 /// </summary>
 /// <remarks>Making this a singleton to offer better unit testing.</remarks>
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class TestPluginCache
 {
-    private readonly Dictionary<string, Assembly> _resolvedAssemblies;
+    private readonly Dictionary<string, Assembly?> _resolvedAssemblies = new();
 
     private List<string> _filterableExtensionPaths;
     private List<string> _unfilterableExtensionPaths;
@@ -36,14 +36,14 @@ public class TestPluginCache
     /// <summary>
     /// Assembly resolver used to resolve the additional extensions
     /// </summary>
-    private AssemblyResolver _assemblyResolver;
+    private AssemblyResolver? _assemblyResolver;
 
     /// <summary>
     /// Lock for extensions update
     /// </summary>
     private readonly object _lockForExtensionsUpdate;
 
-    private static TestPluginCache s_instance;
+    private static TestPluginCache? s_instance;
 
     private readonly List<string> _defaultExtensionPaths = new();
 
@@ -52,13 +52,13 @@ public class TestPluginCache
     /// </summary>
     protected TestPluginCache()
     {
-        _resolvedAssemblies = new Dictionary<string, Assembly>();
         _filterableExtensionPaths = new List<string>();
         _unfilterableExtensionPaths = new List<string>();
         _lockForExtensionsUpdate = new object();
         TestExtensions = null;
     }
 
+    [AllowNull]
     public static TestPluginCache Instance
     {
         get
@@ -76,7 +76,7 @@ public class TestPluginCache
     /// Gets the test extensions discovered by the cache until now.
     /// </summary>
     /// <remarks>Returns null if discovery of extensions is not done.</remarks>
-    internal TestExtensions TestExtensions { get; private set; }
+    internal TestExtensions? TestExtensions { get; private set; }
 
     /// <summary>
     /// Gets a list of all extension paths filtered by input string.
@@ -117,7 +117,7 @@ public class TestPluginCache
     /// <returns>
     /// The <see cref="Dictionary"/>. of test plugin info.
     /// </returns>
-    public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(
+    public Dictionary<string, TPluginInfo>? DiscoverTestExtensions<TPluginInfo, TExtension>(
         string endsWithPattern)
         where TPluginInfo : TestPluginInformation
     {
@@ -128,7 +128,7 @@ public class TestPluginCache
             return TestExtensions.GetTestExtensionCache<TPluginInfo>();
         }
 
-        Dictionary<string, TPluginInfo> pluginInfos = null;
+        Dictionary<string, TPluginInfo>? pluginInfos = null;
         SetupAssemblyResolver(null);
 
         // Some times TestPlatform.core.dll assembly fails to load in the current appdomain (from devenv.exe).
@@ -210,7 +210,7 @@ public class TestPluginCache
     /// </summary>
     /// <param name="additionalExtensionsPath">List of extension paths</param>
     /// <param name="skipExtensionFilters">Skip extension name filtering (if true)</param>
-    public void UpdateExtensions(IEnumerable<string> additionalExtensionsPath, bool skipExtensionFilters)
+    public void UpdateExtensions(IEnumerable<string>? additionalExtensionsPath, bool skipExtensionFilters)
     {
         lock (_lockForExtensionsUpdate)
         {
@@ -273,7 +273,7 @@ public class TestPluginCache
     /// <param name="directories"></param>
     public void AddResolverSearchDirectories(string[] directories)
     {
-        _assemblyResolver.AddSearchDirectories(directories);
+        _assemblyResolver?.AddSearchDirectories(directories);
     }
 
     internal IEnumerable<string> DefaultExtensionPaths
@@ -321,8 +321,8 @@ public class TestPluginCache
         }
 
         // Check if extensions from this assembly have already been discovered.
-        var extensions = TestExtensions?.GetExtensionsDiscoveredFromAssembly(
-            TestExtensions.GetTestExtensionCache<TPluginInfo>(),
+        var extensions = TestExtensions.GetExtensionsDiscoveredFromAssembly(
+            TestExtensions?.GetTestExtensionCache<TPluginInfo>(),
             extensionAssembly);
 
         if (extensions?.Count > 0)
@@ -348,14 +348,14 @@ public class TestPluginCache
     /// </summary>
     /// <param name="extensionAssembly">The extension assembly.</param>
     /// <returns>Resolution paths for the assembly.</returns>
-    internal IList<string> GetResolutionPaths(string extensionAssembly)
+    internal static IList<string> GetResolutionPaths(string extensionAssembly)
     {
         var resolutionPaths = new List<string>();
 
-        var extensionDirectory = Path.GetDirectoryName(Path.GetFullPath(extensionAssembly));
+        var extensionDirectory = Path.GetDirectoryName(Path.GetFullPath(extensionAssembly))!;
         resolutionPaths.Add(extensionDirectory);
 
-        var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.GetAssemblyLocation());
+        var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.GetAssemblyLocation())!;
         if (!resolutionPaths.Contains(currentDirectory))
         {
             resolutionPaths.Add(currentDirectory);
@@ -373,14 +373,14 @@ public class TestPluginCache
         var resolutionPaths = new List<string>();
 
         // Add the extension directories for assembly resolution
-        var extensionDirectories = GetExtensionPaths(string.Empty).Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct().ToList();
+        var extensionDirectories = GetExtensionPaths(string.Empty).Select(e => Path.GetDirectoryName(Path.GetFullPath(e))!).Distinct().ToList();
         if (extensionDirectories.Any())
         {
             resolutionPaths.AddRange(extensionDirectories);
         }
 
         // Keep current directory for resolution
-        var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.GetAssemblyLocation());
+        var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.GetAssemblyLocation())!;
         if (!resolutionPaths.Contains(currentDirectory))
         {
             resolutionPaths.Add(currentDirectory);
@@ -464,12 +464,14 @@ public class TestPluginCache
             SetupAssemblyResolver(extensionPath);
         }
 
-        return new TestPluginDiscoverer().GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
+        return TestPluginDiscoverer.GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
     }
 
-    protected void SetupAssemblyResolver(string extensionAssembly)
+    protected void SetupAssemblyResolver(string? extensionAssembly)
     {
-        IList<string> resolutionPaths = extensionAssembly.IsNullOrEmpty() ? GetDefaultResolutionPaths() : GetResolutionPaths(extensionAssembly);
+        IList<string> resolutionPaths = extensionAssembly.IsNullOrEmpty()
+            ? GetDefaultResolutionPaths()
+            : GetResolutionPaths(extensionAssembly);
 
         // Add assembly resolver which can resolve the extensions from the specified directory.
         if (_assemblyResolver == null)
@@ -482,11 +484,13 @@ public class TestPluginCache
         }
     }
 
-    private Assembly CurrentDomainAssemblyResolve(object sender, AssemblyResolveEventArgs args)
+    private Assembly? CurrentDomainAssemblyResolve(object? sender, AssemblyResolveEventArgs? args)
     {
-        var assemblyName = new AssemblyName(args.Name);
+        // TODO: Avoid ArgumentNullException
+        var assemblyName = new AssemblyName(args?.Name!);
+        TPDebug.Assert(args?.Name is not null);
 
-        Assembly assembly = null;
+        Assembly? assembly = null;
         lock (_resolvedAssemblies)
         {
             try
@@ -524,29 +528,33 @@ public class TestPluginCache
     /// </summary>
     private void LogExtensions()
     {
-        if (EqtTrace.IsVerboseEnabled)
+        if (!EqtTrace.IsVerboseEnabled)
         {
-            var discoverers = TestExtensions.TestDiscoverers != null ? string.Join(",", TestExtensions.TestDiscoverers.Keys.ToArray()) : null;
-            EqtTrace.Verbose("TestPluginCache: Discoverers are '{0}'.", discoverers);
-
-            var executors = TestExtensions.TestExecutors != null ? string.Join(",", TestExtensions.TestExecutors.Keys.ToArray()) : null;
-            EqtTrace.Verbose("TestPluginCache: Executors are '{0}'.", executors);
-
-            var executors2 = TestExtensions.TestExecutors2 != null ? string.Join(",", TestExtensions.TestExecutors2.Keys.ToArray()) : null;
-            EqtTrace.Verbose("TestPluginCache: Executors2 are '{0}'.", executors2);
-
-            var settingsProviders = TestExtensions.TestSettingsProviders != null ? string.Join(",", TestExtensions.TestSettingsProviders.Keys.ToArray()) : null;
-            EqtTrace.Verbose("TestPluginCache: Setting providers are '{0}'.", settingsProviders);
-
-            var loggers = TestExtensions.TestLoggers != null ? string.Join(",", TestExtensions.TestLoggers.Keys.ToArray()) : null;
-            EqtTrace.Verbose("TestPluginCache: Loggers are '{0}'.", loggers);
-
-            var testhosts = TestExtensions.TestHosts != null ? string.Join(",", TestExtensions.TestHosts.Keys.ToArray()) : null;
-            EqtTrace.Verbose("TestPluginCache: TestHosts are '{0}'.", testhosts);
-
-            var dataCollectors = TestExtensions.DataCollectors != null ? string.Join(",", TestExtensions.DataCollectors.Keys.ToArray()) : null;
-            EqtTrace.Verbose("TestPluginCache: DataCollectors are '{0}'.", dataCollectors);
+            return;
         }
+
+        TPDebug.Assert(TestExtensions is not null, "TestExtensions is null");
+
+        var discoverers = TestExtensions.TestDiscoverers != null ? string.Join(",", TestExtensions.TestDiscoverers.Keys.ToArray()) : null;
+        EqtTrace.Verbose("TestPluginCache: Discoverers are '{0}'.", discoverers);
+
+        var executors = TestExtensions.TestExecutors != null ? string.Join(",", TestExtensions.TestExecutors.Keys.ToArray()) : null;
+        EqtTrace.Verbose("TestPluginCache: Executors are '{0}'.", executors);
+
+        var executors2 = TestExtensions.TestExecutors2 != null ? string.Join(",", TestExtensions.TestExecutors2.Keys.ToArray()) : null;
+        EqtTrace.Verbose("TestPluginCache: Executors2 are '{0}'.", executors2);
+
+        var settingsProviders = TestExtensions.TestSettingsProviders != null ? string.Join(",", TestExtensions.TestSettingsProviders.Keys.ToArray()) : null;
+        EqtTrace.Verbose("TestPluginCache: Setting providers are '{0}'.", settingsProviders);
+
+        var loggers = TestExtensions.TestLoggers != null ? string.Join(",", TestExtensions.TestLoggers.Keys.ToArray()) : null;
+        EqtTrace.Verbose("TestPluginCache: Loggers are '{0}'.", loggers);
+
+        var testhosts = TestExtensions.TestHosts != null ? string.Join(",", TestExtensions.TestHosts.Keys.ToArray()) : null;
+        EqtTrace.Verbose("TestPluginCache: TestHosts are '{0}'.", testhosts);
+
+        var dataCollectors = TestExtensions.DataCollectors != null ? string.Join(",", TestExtensions.DataCollectors.Keys.ToArray()) : null;
+        EqtTrace.Verbose("TestPluginCache: DataCollectors are '{0}'.", dataCollectors);
     }
 
 }

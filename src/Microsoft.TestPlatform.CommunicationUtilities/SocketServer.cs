@@ -2,39 +2,32 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
 /// Communication server implementation over sockets.
 /// </summary>
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class SocketServer : ICommunicationEndPoint
 {
     private readonly CancellationTokenSource _cancellation;
-
     private readonly Func<Stream, ICommunicationChannel> _channelFactory;
 
-    private ICommunicationChannel _channel;
-
-    private TcpListener _tcpListener;
-
-    private TcpClient _tcpClient;
-
+    private ICommunicationChannel? _channel;
+    private TcpListener? _tcpListener;
+    private TcpClient? _tcpClient;
     private bool _stopped;
-
-    private string _endPoint;
+    private string? _endPoint;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SocketServer"/> class.
@@ -58,12 +51,12 @@ public class SocketServer : ICommunicationEndPoint
     }
 
     /// <inheritdoc />
-    public event EventHandler<ConnectedEventArgs> Connected;
+    public event EventHandler<ConnectedEventArgs>? Connected;
 
     /// <inheritdoc />
-    public event EventHandler<DisconnectedEventArgs> Disconnected;
+    public event EventHandler<DisconnectedEventArgs>? Disconnected;
 
-    public string Start(string endPoint)
+    public string? Start(string endPoint)
     {
         try
         {
@@ -102,16 +95,18 @@ public class SocketServer : ICommunicationEndPoint
         _tcpClient = client;
         _tcpClient.Client.NoDelay = true;
 
-        if (Connected != null)
+        if (Connected == null)
         {
-            _channel = _channelFactory(_tcpClient.GetStream());
-            Connected.SafeInvoke(this, new ConnectedEventArgs(_channel), "SocketServer: ClientConnected");
-
-            EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endPoint: {0}, starting MessageLoopAsync:", _endPoint);
-
-            // Start the message loop
-            Task.Run(() => _tcpClient.MessageLoopAsync(_channel, error => StopOnError(error), _cancellation.Token)).ConfigureAwait(false);
+            return;
         }
+
+        _channel = _channelFactory(_tcpClient.GetStream());
+        Connected.SafeInvoke(this, new ConnectedEventArgs(_channel), "SocketServer: ClientConnected");
+
+        EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endPoint: {0}, starting MessageLoopAsync:", _endPoint);
+
+        // Start the message loop
+        Task.Run(() => _tcpClient.MessageLoopAsync(_channel, error => StopOnError(error), _cancellation.Token)).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -119,31 +114,36 @@ public class SocketServer : ICommunicationEndPoint
     /// that we aborted.
     /// </summary>
     /// <param name="error"></param>
-    private void StopOnError(Exception error)
+    private void StopOnError(Exception? error)
     {
         EqtTrace.Info("SocketServer.PrivateStop: Stopping server endPoint: {0} error: {1}", _endPoint, error);
 
-        if (!_stopped)
+        if (_stopped)
         {
-            // Do not allow stop to be called multiple times.
-            _stopped = true;
-
-            // Stop accepting any other connections
-            _tcpListener.Stop();
-
-            // Close the client and dispose the underlying stream
-#if NETFRAMEWORK
-            // tcpClient.Close() calls tcpClient.Dispose().
-            _tcpClient?.Close();
-#else
-            // tcpClient.Close() not available for netstandard1.5.
-            _tcpClient?.Dispose();
-#endif
-            _channel.Dispose();
-            _cancellation.Dispose();
-
-            EqtTrace.Info("SocketServer.Stop: Raise disconnected event endPoint: {0} error: {1}", _endPoint, error);
-            Disconnected?.SafeInvoke(this, new DisconnectedEventArgs { Error = error }, "SocketServer: ClientDisconnected");
+            return;
         }
+
+        TPDebug.Assert(_tcpListener is not null, $"{nameof(_tcpListener)} is null");
+        TPDebug.Assert(_channel is not null, $"{nameof(_channel)} is null");
+
+        // Do not allow stop to be called multiple times.
+        _stopped = true;
+
+        // Stop accepting any other connections
+        _tcpListener.Stop();
+
+        // Close the client and dispose the underlying stream
+#if NETFRAMEWORK
+        // tcpClient.Close() calls tcpClient.Dispose().
+        _tcpClient?.Close();
+#else
+        // tcpClient.Close() not available for netstandard1.5.
+        _tcpClient?.Dispose();
+#endif
+        _channel.Dispose();
+        _cancellation.Dispose();
+
+        EqtTrace.Info("SocketServer.Stop: Raise disconnected event endPoint: {0} error: {1}", _endPoint, error);
+        Disconnected?.SafeInvoke(this, new DisconnectedEventArgs { Error = error }, "SocketServer: ClientDisconnected");
     }
 }

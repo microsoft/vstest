@@ -2,11 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Globalization;
+
+using SettingsMigrator;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.SettingsMigrator.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator;
 
@@ -23,9 +22,9 @@ public static class Program
     public static int Main(string[] args)
     {
         var pathResolver = new PathResolver();
-        string newFilePath = pathResolver.GetTargetPath(args);
+        string? newFilePath = pathResolver.GetTargetPath(args);
 
-        if (!string.IsNullOrEmpty(newFilePath))
+        if (!newFilePath.IsNullOrEmpty())
         {
             string oldFilePath = args[0];
             var migrator = new Migrator();
@@ -33,7 +32,7 @@ public static class Program
         }
         else
         {
-            Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
+            Console.WriteLine(CommandLineResources.ValidUsage);
             return 1;
         }
 

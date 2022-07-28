@@ -10,8 +10,6 @@ using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -22,7 +20,7 @@ public class TelemetryTests : AcceptanceTestBase
     private const string LOG_TELEMETRY_PATH = "VSTEST_LOGTELEMETRY_PATH";
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsShouldPublishMetrics(RunnerInfo runnerInfo)
     {
@@ -32,7 +30,7 @@ public class TelemetryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsShouldPublishMetrics(RunnerInfo runnerInfo)
     {
@@ -51,7 +49,7 @@ public class TelemetryTests : AcceptanceTestBase
 
         var assemblyPaths = GetAssetFullPath("SimpleTestProject2.dll");
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             [LOG_TELEMETRY_PATH] = TempDirectory.Path,
             [TELEMETRY_OPTEDIN] = "1",
@@ -72,7 +70,7 @@ public class TelemetryTests : AcceptanceTestBase
 
         var assemblyPaths = GetAssetFullPath("SimpleTestProject2.dll");
 
-        var env = new Dictionary<string, string>
+        var env = new Dictionary<string, string?>
         {
             [LOG_TELEMETRY_PATH] = TempDirectory.Path,
             [TELEMETRY_OPTEDIN] = "1",
@@ -83,7 +81,7 @@ public class TelemetryTests : AcceptanceTestBase
         ValidateOutput("Discovery", TempDirectory);
     }
 
-    private void ValidateOutput(string command, TempDirectory tempDirectory)
+    private static void ValidateOutput(string command, TempDirectory tempDirectory)
     {
         if (!Directory.Exists(tempDirectory.Path))
         {

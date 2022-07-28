@@ -9,16 +9,14 @@ using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable disable
-
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
 public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
 {
-    private IList<string> _adapterDependencies;
-    private IList<string> _copiedFiles;
+    private readonly IList<string> _adapterDependencies;
+    private readonly IList<string> _copiedFiles;
 
     [TestCleanup]
     public void Cleanup()
@@ -36,11 +34,10 @@ public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
         }
     }
 
-    [TestInitialize]
-    public void CopyAdapterToExtensions()
+    public DeprecateExtensionsPathWarningTests()
     {
         _copiedFiles = new List<string>();
-        var extensionsDir = Path.Combine(Path.GetDirectoryName(GetConsoleRunnerPath()), "Extensions");
+        var extensionsDir = Path.Combine(Path.GetDirectoryName(GetConsoleRunnerPath())!, "Extensions");
         _adapterDependencies = Directory.GetFiles(GetTestAdapterPath(), "*.dll", SearchOption.TopDirectoryOnly);
 
         try
@@ -69,8 +66,8 @@ public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
 
     public override string GetConsoleRunnerPath()
     {
-        DirectoryInfo currentDirectory = new DirectoryInfo(typeof(DeprecateExtensionsPathWarningTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent.Parent.Parent.Parent.Parent.Parent;
+        DirectoryInfo currentDirectory = new DirectoryInfo(typeof(DeprecateExtensionsPathWarningTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent!.Parent!.Parent!.Parent!.Parent!.Parent!;
 
-        return Path.Combine(currentDirectory.FullName, "artifacts", BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
+        return Path.Combine(currentDirectory.FullName, "artifacts", BuildConfiguration, DEFAULT_RUNNER_NETFX, "win7-x64", "vstest.console.exe");
     }
 }

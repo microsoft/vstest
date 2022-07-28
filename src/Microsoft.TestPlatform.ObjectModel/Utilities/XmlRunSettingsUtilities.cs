@@ -7,6 +7,8 @@ using System.Globalization;
 using System.IO;
 using System.Xml;
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
+
 #if !NETSTANDARD1_0
 using System.Xml.XPath;
 #endif
@@ -14,8 +16,6 @@ using System.Xml.XPath;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 using ObjectModelResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -63,14 +63,17 @@ public static class XmlRunSettingsUtilities
     /// <param name="runSettingDocument"> XPathNavigable representation of a runsettings file </param>
     /// <param name="dataCollectorUri"> The data Collector Uri. </param>
     /// <returns> True if there is a datacollector configured. </returns>
-    public static bool ContainsDataCollector(IXPathNavigable runSettingDocument!!, string dataCollectorUri!!)
+    public static bool ContainsDataCollector(IXPathNavigable runSettingDocument, string dataCollectorUri)
     {
-        var navigator = runSettingDocument.CreateNavigator();
-        var nodes = navigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+        ValidateArg.NotNull(runSettingDocument, nameof(runSettingDocument));
+        ValidateArg.NotNull(dataCollectorUri, nameof(dataCollectorUri));
 
-        foreach (XPathNavigator dataCollectorNavigator in nodes)
+        var navigator = runSettingDocument.CreateNavigator();
+        var nodes = navigator!.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+
+        foreach (XPathNavigator? dataCollectorNavigator in nodes)
         {
-            var uri = dataCollectorNavigator.GetAttribute("uri", string.Empty);
+            var uri = dataCollectorNavigator?.GetAttribute("uri", string.Empty);
             if (string.Equals(dataCollectorUri, uri, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
@@ -85,10 +88,10 @@ public static class XmlRunSettingsUtilities
     /// </summary>
     /// <param name="runsettingsXml">runsettings xml string</param>
     /// <returns>List of friendly name</returns>
-    public static IList<string> GetDataCollectorsFriendlyName(string runsettingsXml)
+    public static IList<string> GetDataCollectorsFriendlyName(string? runsettingsXml)
     {
         var friendlyNameList = new List<string>();
-        if (!string.IsNullOrWhiteSpace(runsettingsXml))
+        if (!runsettingsXml.IsNullOrWhiteSpace())
         {
             using var stream = new StringReader(runsettingsXml);
             using var reader = XmlReader.Create(stream, ReaderSettings);
@@ -96,12 +99,12 @@ public static class XmlRunSettingsUtilities
             document.Load(reader);
 
             var runSettingsNavigator = document.CreateNavigator();
-            var nodes = runSettingsNavigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+            var nodes = runSettingsNavigator!.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
 
-            foreach (XPathNavigator dataCollectorNavigator in nodes)
+            foreach (XPathNavigator? dataCollectorNavigator in nodes)
             {
-                var friendlyName = dataCollectorNavigator.GetAttribute("friendlyName", string.Empty);
-                friendlyNameList.Add(friendlyName);
+                var friendlyName = dataCollectorNavigator?.GetAttribute("friendlyName", string.Empty);
+                friendlyNameList.Add(friendlyName!);
             }
         }
 
@@ -113,13 +116,16 @@ public static class XmlRunSettingsUtilities
     /// </summary>
     /// <param name="runSettingDocument">runSettingDocument</param>
     /// <param name="settings">settings</param>
-    public static void InsertDataCollectorsNode(IXPathNavigable runSettingDocument!!, DataCollectorSettings settings!!)
+    public static void InsertDataCollectorsNode(IXPathNavigable runSettingDocument, DataCollectorSettings settings)
     {
-        var navigator = runSettingDocument.CreateNavigator();
+        ValidateArg.NotNull(runSettingDocument, nameof(runSettingDocument));
+        ValidateArg.NotNull(settings, nameof(settings));
+
+        var navigator = runSettingDocument.CreateNavigator()!;
         MoveToDataCollectorsNode(ref navigator);
 
         var settingsXml = settings.ToXml();
-        var dataCollectorNode = settingsXml.CreateNavigator();
+        var dataCollectorNode = settingsXml.CreateNavigator()!;
         dataCollectorNode.MoveToRoot();
 
         navigator.AppendChild(dataCollectorNode);
@@ -131,7 +137,7 @@ public static class XmlRunSettingsUtilities
     /// </summary>
     /// <param name="settingsXml">The run settings.</param>
     /// <returns> The RunConfiguration node as defined in the settings xml.</returns>
-    public static RunConfiguration GetRunConfigurationNode(string settingsXml)
+    public static RunConfiguration GetRunConfigurationNode(string? settingsXml)
     {
         var nodeValue = GetNodeValue(settingsXml, Constants.RunConfigurationSettingsName, RunConfiguration.FromXml);
         if (nodeValue == default(RunConfiguration))
@@ -149,7 +155,7 @@ public static class XmlRunSettingsUtilities
     /// <param name="settingsXml">The run settings xml.</param>
     /// <returns>The test run parameters defined in the run settings.</returns>
     /// <remarks>If there is no test run parameters section defined in the settings xml a blank dictionary is returned.</remarks>
-    public static Dictionary<string, object> GetTestRunParameters(string settingsXml)
+    public static Dictionary<string, object> GetTestRunParameters(string? settingsXml)
     {
         var nodeValue = GetNodeValue(settingsXml, Constants.TestRunParametersName, TestRunParameters.FromXml);
         if (nodeValue == default(Dictionary<string, object>))
@@ -199,7 +205,7 @@ public static class XmlRunSettingsUtilities
     /// </summary>
     /// <param name="runSettingsXml"> The run Settings Xml. </param>
     /// <returns> True if data collection is enabled. </returns>
-    public static bool IsDataCollectionEnabled(string runSettingsXml)
+    public static bool IsDataCollectionEnabled(string? runSettingsXml)
     {
         var dataCollectionRunSettings = GetDataCollectionRunSettings(runSettingsXml);
 
@@ -211,7 +217,7 @@ public static class XmlRunSettingsUtilities
     /// </summary>
     /// <param name="runSettingsXml"> The run Settings Xml. </param>
     /// <returns> True if data collection is enabled. </returns>
-    public static bool IsInProcDataCollectionEnabled(string runSettingsXml)
+    public static bool IsInProcDataCollectionEnabled(string? runSettingsXml)
     {
         var dataCollectionRunSettings = GetInProcDataCollectionRunSettings(runSettingsXml);
 
@@ -223,10 +229,10 @@ public static class XmlRunSettingsUtilities
     /// </summary>
     /// <param name="runSettingsXml"> The run Settings Xml. </param>
     /// <returns> The <see cref="DataCollectionRunSettings"/>. </returns>
-    public static DataCollectionRunSettings GetDataCollectionRunSettings(string runSettingsXml)
+    public static DataCollectionRunSettings? GetDataCollectionRunSettings(string? runSettingsXml)
     {
         // use XmlReader to avoid loading of the plugins in client code (mainly from VS).
-        if (string.IsNullOrWhiteSpace(runSettingsXml))
+        if (runSettingsXml.IsNullOrWhiteSpace())
         {
             return null;
         }
@@ -268,10 +274,10 @@ public static class XmlRunSettingsUtilities
     /// The run Settings Xml.
     /// </param>
     /// <returns>Data collection run settings.</returns>
-    public static DataCollectionRunSettings GetInProcDataCollectionRunSettings(string runSettingsXml)
+    public static DataCollectionRunSettings? GetInProcDataCollectionRunSettings(string? runSettingsXml)
     {
         // use XmlReader to avoid loading of the plugins in client code (mainly from VS).
-        if (string.IsNullOrWhiteSpace(runSettingsXml))
+        if (runSettingsXml.IsNullOrWhiteSpace())
         {
             return null;
         }
@@ -307,7 +313,7 @@ public static class XmlRunSettingsUtilities
     /// </summary>
     /// <param name="runSettings">The run Settings Xml.</param>
     /// <returns> The <see cref="LoggerRunSettings"/>. </returns>
-    public static LoggerRunSettings GetLoggerRunSettings(string runSettings)
+    public static LoggerRunSettings? GetLoggerRunSettings(string? runSettings)
     {
         return GetNodeValue(
             runSettings,
@@ -349,40 +355,42 @@ public static class XmlRunSettingsUtilities
                 reader.Name));
     }
 
-    private static T GetNodeValue<T>(string settingsXml, string nodeName, Func<XmlReader, T> nodeParser)
+    private static T? GetNodeValue<T>(string? settingsXml, string nodeName, Func<XmlReader, T> nodeParser)
     {
         // use XmlReader to avoid loading of the plugins in client code (mainly from VS).
-        if (!string.IsNullOrWhiteSpace(settingsXml))
+        if (settingsXml.IsNullOrWhiteSpace())
         {
-            try
+            return default;
+        }
+
+        try
+        {
+            using var stringReader = new StringReader(settingsXml);
+            XmlReader reader = XmlReader.Create(stringReader, ReaderSettings);
+
+            // read to the fist child
+            XmlReaderUtilities.ReadToRootNode(reader);
+            reader.ReadToNextElement();
+
+            // Read till we reach nodeName element or reach EOF
+            while (!string.Equals(reader.Name, nodeName, StringComparison.OrdinalIgnoreCase)
+                   &&
+                   !reader.EOF)
             {
-                using var stringReader = new StringReader(settingsXml);
-                XmlReader reader = XmlReader.Create(stringReader, ReaderSettings);
-
-                // read to the fist child
-                XmlReaderUtilities.ReadToRootNode(reader);
-                reader.ReadToNextElement();
-
-                // Read till we reach nodeName element or reach EOF
-                while (!string.Equals(reader.Name, nodeName, StringComparison.OrdinalIgnoreCase)
-                       &&
-                       !reader.EOF)
-                {
-                    reader.SkipToNextElement();
-                }
-
-                if (!reader.EOF)
-                {
-                    // read nodeName element.
-                    return nodeParser(reader);
-                }
+                reader.SkipToNextElement();
             }
-            catch (XmlException ex)
+
+            if (!reader.EOF)
             {
-                throw new SettingsException(
-                    string.Format(CultureInfo.CurrentCulture, "{0} {1}", Resources.CommonResources.MalformedRunSettingsFile, ex.Message),
-                    ex);
+                // read nodeName element.
+                return nodeParser(reader);
             }
+        }
+        catch (XmlException ex)
+        {
+            throw new SettingsException(
+                string.Format(CultureInfo.CurrentCulture, "{0} {1}", Resources.CommonResources.MalformedRunSettingsFile, ex.Message),
+                ex);
         }
 
         return default;

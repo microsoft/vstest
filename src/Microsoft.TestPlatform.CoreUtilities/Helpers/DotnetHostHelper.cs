@@ -4,6 +4,8 @@
 #if !NETSTANDARD1_0
 
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Reflection.PortableExecutable;
 
@@ -16,8 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.Win32;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 
@@ -76,7 +76,7 @@ public class DotnetHostHelper : IDotnetHostHelper
     {
         if (!TryGetExecutablePath("dotnet", out var dotnetPath))
         {
-            string errorMessage = string.Format(Resources.NoDotnetExeFound, "dotnet");
+            string errorMessage = string.Format(CultureInfo.CurrentCulture, Resources.NoDotnetExeFound, "dotnet");
 
             EqtTrace.Error(errorMessage);
             throw new FileNotFoundException(errorMessage);
@@ -89,7 +89,7 @@ public class DotnetHostHelper : IDotnetHostHelper
     {
         if (!TryGetExecutablePath(MONOEXENAME, out var monoPath))
         {
-            string errorMessage = string.Format(Resources.NoDotnetExeFound, MONOEXENAME);
+            string errorMessage = string.Format(CultureInfo.CurrentCulture, Resources.NoDotnetExeFound, MONOEXENAME);
 
             EqtTrace.Error(errorMessage);
             throw new FileNotFoundException(errorMessage);
@@ -106,7 +106,7 @@ public class DotnetHostHelper : IDotnetHostHelper
         }
 
         executablePath = string.Empty;
-        var pathString = Environment.GetEnvironmentVariable("PATH");
+        var pathString = Environment.GetEnvironmentVariable("PATH")!;
         foreach (string path in pathString.Split(Path.PathSeparator))
         {
             string exeFullPath = Path.Combine(path.Trim(), executableBaseName);
@@ -120,12 +120,12 @@ public class DotnetHostHelper : IDotnetHostHelper
         return false;
     }
 
-    public bool TryGetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture, out string muxerPath)
+    public bool TryGetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture, [NotNullWhen(true)] out string? muxerPath)
     {
         // If current process is the same as the target architecture we return the current process filename.
         if (_processHelper.GetCurrentProcessArchitecture() == targetArchitecture)
         {
-            string currentProcessFileName = _processHelper.GetCurrentProcessFileName();
+            string currentProcessFileName = _processHelper.GetCurrentProcessFileName()!;
             if (Path.GetFileName(currentProcessFileName) == _muxerName)
             {
                 muxerPath = currentProcessFileName;
@@ -150,7 +150,7 @@ public class DotnetHostHelper : IDotnetHostHelper
         string envKey = $"DOTNET_ROOT_{targetArchitecture.ToString().ToUpperInvariant()}";
 
         // Try on arch specific env var
-        string envVar = _environmentVariableHelper.GetEnvironmentVariable(envKey);
+        string? envVar = _environmentVariableHelper.GetEnvironmentVariable(envKey);
 
         // Try on non virtualized x86 var(should happen only on non-x86 architecture)
         if ((envVar == null || !_fileHelper.DirectoryExists(envVar)) &&
@@ -234,14 +234,14 @@ public class DotnetHostHelper : IDotnetHostHelper
             if ((_environment.Architecture == PlatformArchitecture.X64 || _environment.Architecture == PlatformArchitecture.ARM64) &&
                  targetArchitecture == PlatformArchitecture.X86)
             {
-                muxerPath = Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", _muxerName);
+                muxerPath = Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles(x86)")!, "dotnet", _muxerName);
             }
             else
             {
                 // If we're on ARM and target is x64 we expect correct installation inside x64 folder
                 muxerPath = _environment.Architecture == PlatformArchitecture.ARM64 && targetArchitecture == PlatformArchitecture.X64
-                    ? Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "dotnet", "x64", _muxerName)
-                    : Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "dotnet", _muxerName);
+                    ? Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles")!, "dotnet", "x64", _muxerName)
+                    : Path.Combine(_environmentVariableHelper.GetEnvironmentVariable("ProgramFiles")!, "dotnet", _muxerName);
             }
         }
         else
@@ -279,48 +279,40 @@ public class DotnetHostHelper : IDotnetHostHelper
         return true;
     }
 
-    private string GetMuxerFromGlobalRegistrationWin(PlatformArchitecture targetArchitecture)
+    private string? GetMuxerFromGlobalRegistrationWin(PlatformArchitecture targetArchitecture)
     {
         // Installed version are always in 32-bit view of registry
         // https://github.com/dotnet/designs/blob/main/accepted/2020/install-locations.md#globally-registered-install-location-new
         // "Note that this registry key is "redirected" that means that 32-bit processes see different copy of the key than 64bit processes.
         // So it's important that both installers and the host access only the 32-bit view of the registry."
-        using (IRegistryKey hklm = _windowsRegistryHelper.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+        using IRegistryKey? hklm = _windowsRegistryHelper.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+        if (hklm == null)
         {
-            if (hklm != null)
-            {
-                using IRegistryKey dotnetInstalledVersion = hklm.OpenSubKey(@"SOFTWARE\dotnet\Setup\InstalledVersions");
-                if (dotnetInstalledVersion != null)
-                {
-                    using IRegistryKey nativeArch = dotnetInstalledVersion.OpenSubKey(targetArchitecture.ToString().ToLowerInvariant());
-                    string installLocation = nativeArch?.GetValue("InstallLocation")?.ToString();
-
-                    if (installLocation != null)
-                    {
-                        string path = Path.Combine(installLocation.Trim(), _muxerName);
-                        EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Muxer resolved using win registry key 'SOFTWARE\dotnet\Setup\InstalledVersions\{targetArchitecture.ToString().ToLowerInvariant()}\InstallLocation' in '{path}'");
-                        return path;
-                    }
-                    else
-                    {
-                        EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Missing registry InstallLocation");
-                    }
-                }
-                else
-                {
-                    EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Missing RegistryHive.LocalMachine for RegistryView.Registry32");
-                }
-            }
-            else
-            {
-                EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Missing SOFTWARE\dotnet\Setup\InstalledVersions subkey");
-            }
+            EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Missing SOFTWARE\dotnet\Setup\InstalledVersions subkey");
+            return null;
         }
 
-        return null;
+        using IRegistryKey? dotnetInstalledVersion = hklm.OpenSubKey(@"SOFTWARE\dotnet\Setup\InstalledVersions");
+        if (dotnetInstalledVersion == null)
+        {
+            EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Missing RegistryHive.LocalMachine for RegistryView.Registry32");
+            return null;
+        }
+
+        using IRegistryKey? nativeArch = dotnetInstalledVersion.OpenSubKey(targetArchitecture.ToString().ToLowerInvariant());
+        string? installLocation = nativeArch?.GetValue("InstallLocation")?.ToString();
+        if (installLocation == null)
+        {
+            EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Missing registry InstallLocation");
+            return null;
+        }
+
+        string path = Path.Combine(installLocation.Trim(), _muxerName);
+        EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Muxer resolved using win registry key 'SOFTWARE\dotnet\Setup\InstalledVersions\{targetArchitecture.ToString().ToLowerInvariant()}\InstallLocation' in '{path}'");
+        return path;
     }
 
-    private string GetMuxerFromGlobalRegistrationOnUnix(PlatformArchitecture targetArchitecture)
+    private string? GetMuxerFromGlobalRegistrationOnUnix(PlatformArchitecture targetArchitecture)
     {
         string baseInstallLocation = "/etc/dotnet/";
 
@@ -333,22 +325,24 @@ public class DotnetHostHelper : IDotnetHostHelper
             installLocation = $"{baseInstallLocation}install_location";
         }
 
-        if (_fileHelper.Exists(installLocation))
+        if (!_fileHelper.Exists(installLocation))
         {
-            try
-            {
-                using Stream stream = _fileHelper.GetStream(installLocation, FileMode.Open, FileAccess.Read);
-                using StreamReader streamReader = new(stream);
-                string content = streamReader.ReadToEnd().Trim();
-                EqtTrace.Verbose($"DotnetHostHelper: '{installLocation}' content '{content}'");
-                string path = Path.Combine(content, _muxerName);
-                EqtTrace.Verbose($"DotnetHostHelper: Muxer resolved using '{installLocation}' in '{path}'");
-                return path;
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Error($"DotnetHostHelper.GetMuxerFromGlobalRegistrationOnUnix: Exception during '{installLocation}' muxer resolution.\n{ex}");
-            }
+            return null;
+        }
+
+        try
+        {
+            using Stream stream = _fileHelper.GetStream(installLocation, FileMode.Open, FileAccess.Read);
+            using StreamReader streamReader = new(stream);
+            string content = streamReader.ReadToEnd().Trim();
+            EqtTrace.Verbose($"DotnetHostHelper: '{installLocation}' content '{content}'");
+            string path = Path.Combine(content, _muxerName);
+            EqtTrace.Verbose($"DotnetHostHelper: Muxer resolved using '{installLocation}' in '{path}'");
+            return path;
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error($"DotnetHostHelper.GetMuxerFromGlobalRegistrationOnUnix: Exception during '{installLocation}' muxer resolution.\n{ex}");
         }
 
         return null;

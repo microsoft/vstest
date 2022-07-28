@@ -5,16 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
-
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
 
 public static class GenerateFakesUtilities
 {
-    internal static void GenerateFakesSettings(CommandLineOptions commandLineOptions, IEnumerable<string> sources, ref string runSettingsXml)
+    internal static void GenerateFakesSettings(CommandLineOptions? commandLineOptions, IEnumerable<string> sources, ref string runSettingsXml)
     {
         // dynamically compute the fakes datacollector settings
         // This runs with or without design mode.

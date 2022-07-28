@@ -9,8 +9,6 @@ using System.Reflection;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
 /// <summary>
@@ -24,10 +22,10 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
     /// <param name="type">
     /// The type.
     /// </param>
-    public DataCollectorConfig(Type type!!)
+    public DataCollectorConfig(Type type)
         : base(type)
     {
-        DataCollectorType = type;
+        DataCollectorType = type ?? throw new ArgumentNullException(nameof(type));
         TypeUri = GetTypeUri(type);
         FriendlyName = GetFriendlyName(type);
         AttachmentsProcessorType = GetAttachmentsProcessors(type);
@@ -41,7 +39,7 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
     /// <summary>
     /// Gets the type uri.
     /// </summary>
-    public Uri TypeUri { get; private set; }
+    public Uri? TypeUri { get; private set; }
 
     /// <summary>
     /// Gets the friendly name.
@@ -49,7 +47,7 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
     public string FriendlyName { get; private set; }
 
     /// <inheritdoc />
-    public override string IdentifierData
+    public override string? IdentifierData
     {
         get
         {
@@ -58,18 +56,18 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
     }
 
     /// <inheritdoc />
-    public override ICollection<object> Metadata
+    public override ICollection<object?> Metadata
     {
         get
         {
-            return new object[] { TypeUri.ToString(), FriendlyName, AttachmentsProcessorType != null };
+            return new object?[] { TypeUri?.ToString(), FriendlyName, AttachmentsProcessorType != null };
         }
     }
 
     /// <summary>
     /// Gets attachments processor
     /// </summary>
-    public Type AttachmentsProcessorType { get; private set; }
+    public Type? AttachmentsProcessorType { get; private set; }
 
     /// <summary>
     /// Check if collector registers an attachment processor.
@@ -82,20 +80,19 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
     /// </summary>
     /// <param name="dataCollectorType">The data collector to get the Type URI for.</param>
     /// <returns>Type Uri of the data collector.</returns>
-    private static Uri GetTypeUri(Type dataCollectorType)
+    private static Uri? GetTypeUri(Type dataCollectorType)
     {
-        Uri typeUri = null;
         var typeUriAttributes = GetAttributes(dataCollectorType, typeof(DataCollectorTypeUriAttribute));
-        if (typeUriAttributes != null && typeUriAttributes.Length > 0)
+        if (typeUriAttributes.Length > 0)
         {
             var typeUriAttribute = (DataCollectorTypeUriAttribute)typeUriAttributes[0];
             if (!typeUriAttribute.TypeUri.IsNullOrWhiteSpace())
             {
-                typeUri = new Uri(typeUriAttribute.TypeUri);
+                return new Uri(typeUriAttribute.TypeUri);
             }
         }
 
-        return typeUri;
+        return null;
     }
 
     /// <summary>
@@ -103,20 +100,19 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
     /// </summary>
     /// <param name="dataCollectorType">The data collector to get the attachment processor for.</param>
     /// <returns>Type of the attachment processor.</returns>
-    private static Type GetAttachmentsProcessors(Type dataCollectorType)
+    private static Type? GetAttachmentsProcessors(Type dataCollectorType)
     {
-        Type attachmentsProcessor = null;
-        var attachmenstProcessors = GetAttributes(dataCollectorType, typeof(DataCollectorAttachmentProcessorAttribute));
-        if (attachmenstProcessors != null && attachmenstProcessors.Length > 0)
+        var attachmentsProcessor = GetAttributes(dataCollectorType, typeof(DataCollectorAttachmentProcessorAttribute));
+        if (attachmentsProcessor.Length > 0)
         {
-            var attachmenstProcessorsAttribute = (DataCollectorAttachmentProcessorAttribute)attachmenstProcessors[0];
+            var attachmenstProcessorsAttribute = (DataCollectorAttachmentProcessorAttribute)attachmentsProcessor[0];
             if (attachmenstProcessorsAttribute.Type != null)
             {
-                attachmentsProcessor = attachmenstProcessorsAttribute.Type;
+                return attachmenstProcessorsAttribute.Type;
             }
         }
 
-        return attachmentsProcessor;
+        return null;
     }
 
     /// <summary>
@@ -126,8 +122,6 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
     /// <returns>Friendly name of the data collector.</returns>
     private static string GetFriendlyName(Type dataCollectorType)
     {
-        string friendlyName = string.Empty;
-
         // Get the friendly name from the attribute.
         var friendlyNameAttributes = GetAttributes(dataCollectorType, typeof(DataCollectorFriendlyNameAttribute));
         if (friendlyNameAttributes != null && friendlyNameAttributes.Length > 0)
@@ -135,11 +129,11 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
             var friendlyNameAttribute = (DataCollectorFriendlyNameAttribute)friendlyNameAttributes[0];
             if (!friendlyNameAttribute.FriendlyName.IsNullOrEmpty())
             {
-                friendlyName = friendlyNameAttribute.FriendlyName;
+                return friendlyNameAttribute.FriendlyName;
             }
         }
 
-        return friendlyName;
+        return string.Empty;
     }
 
     /// <summary>

@@ -15,8 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-#nullable disable
-
 #pragma warning disable IDE1006 // Naming Styles
 namespace vstest.console.Internal;
 #pragma warning restore IDE1006 // Naming Styles
@@ -65,7 +63,7 @@ public class FilePatternParser
             if (!_fileHelper.Exists(filePattern))
             {
                 throw new TestSourceException(
-                    string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, filePattern));
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourceFileNotFound, filePattern));
             }
 
             matchingFiles.Add(filePattern);

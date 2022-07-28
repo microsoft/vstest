@@ -4,8 +4,6 @@
 using System;
 using System.Threading.Tasks;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 
 /// <summary>
@@ -22,7 +20,7 @@ public class MetricsPublisherFactory
     public static async Task<IMetricsPublisher> GetMetricsPublisher(bool isTelemetryOptedIn, bool isDesignMode)
     {
         var logEnabled = Environment.GetEnvironmentVariable("VSTEST_LOGTELEMETRY");
-        bool logTelemery = !string.IsNullOrEmpty(logEnabled) && logEnabled.Equals("1", StringComparison.Ordinal);
+        bool logTelemery = string.Equals(logEnabled, "1", StringComparison.Ordinal);
 
         return isTelemetryOptedIn && !isDesignMode && logTelemery
             ? await Task.FromResult<IMetricsPublisher>(new TextFileTelemetryPublisher())

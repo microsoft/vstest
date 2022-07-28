@@ -7,8 +7,6 @@ using System;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 /// <inheritdoc/>
@@ -20,16 +18,22 @@ public class PlatformAssemblyResolver : IAssemblyResolver
     }
 
     /// <inheritdoc/>
-    public event AssemblyResolveEventHandler AssemblyResolve;
+    public event AssemblyResolveEventHandler? AssemblyResolve;
 
     public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
     {
         throw new NotImplementedException();
     }
 
     private void DummyEventThrower()
     {
-        AssemblyResolve(this, null);
+        AssemblyResolve?.Invoke(this, null);
     }
 }
 

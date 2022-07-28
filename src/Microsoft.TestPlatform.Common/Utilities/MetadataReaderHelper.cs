@@ -13,8 +13,6 @@ using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 /* Expected attribute shape
 
@@ -40,16 +38,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities;
         }
     }
 */
-internal class MetadataReaderExtensionsHelper
+internal static class MetadataReaderExtensionsHelper
 {
     private const string TestExtensionTypesAttributeV2 = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesV2Attribute";
     private static readonly ConcurrentDictionary<string, Type[]> AssemblyCache = new();
     private static readonly Type[] EmptyTypeArray = new Type[0];
 
-    public Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)
+    public static Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)
         => AssemblyCache.GetOrAdd(assemblyFilePath, DiscoverTestExtensionTypesV2AttributeInternal(loadedAssembly, assemblyFilePath));
 
-    private Type[] DiscoverTestExtensionTypesV2AttributeInternal(Assembly loadedAssembly, string assemblyFilePath)
+    private static Type[] DiscoverTestExtensionTypesV2AttributeInternal(Assembly loadedAssembly, string assemblyFilePath)
     {
         EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Discovering extensions inside assembly '{loadedAssembly.FullName}' file path '{assemblyFilePath}'");
 
@@ -69,7 +67,7 @@ internal class MetadataReaderExtensionsHelper
         Assembly assemblyToAnalyze = loadedAssembly;
 #endif
 
-        List<Tuple<int, Type>> extensions = null;
+        List<Tuple<int, Type>>? extensions = null;
         using (var stream = new FileStream(assemblyFilePath, FileMode.Open, FileAccess.Read))
         using (var reader = new PEReader(stream, PEStreamOptions.Default))
         {
@@ -78,7 +76,7 @@ internal class MetadataReaderExtensionsHelper
             // Search for the custom attribute TestExtensionTypesAttributeV2 - ECMA-335 II.22.10 CustomAttribute : 0x0C
             foreach (var customAttributeHandle in metadataReader.CustomAttributes)
             {
-                string attributeFullName = null;
+                string? attributeFullName = null;
                 try
                 {
                     if (customAttributeHandle.IsNil)
@@ -138,8 +136,8 @@ internal class MetadataReaderExtensionsHelper
                             // string is null, its PackedLen has the value 0xFF(with no following characters).If
                             // the string is empty(“”), then PackedLen has the value 0x00(with no following
                             // characters).
-                            string extension = valueReader.ReadSerializedString();
-                            string extensionIdentifier = valueReader.ReadSerializedString();
+                            string? extension = valueReader.ReadSerializedString();
+                            string? extensionIdentifier = valueReader.ReadSerializedString();
 
                             // If the parameter kind is System.Type, (also, the middle line in above diagram) its
                             // value is stored as a SerString(as defined in the previous paragraph), representing its
@@ -148,7 +146,7 @@ internal class MetadataReaderExtensionsHelper
                             // assembly name is omitted, the CLI looks first in the current assembly, and then in
                             // the system library(mscorlib); in these two special cases, it is permitted to omit the
                             // assembly-name, version, culture and public-key-token.
-                            string extensionImplementation = valueReader.ReadSerializedString();
+                            string? extensionImplementation = valueReader.ReadSerializedString();
 
                             // If the parameter kind is simple(first line in the above diagram) (bool, char, float32,
                             // float64, int8, int16, int32, int64, unsigned int8, unsigned int16, unsigned int32 or
@@ -159,6 +157,7 @@ internal class MetadataReaderExtensionsHelper
                             int version = valueReader.ReadInt32();
                             try
                             {
+                                TPDebug.Assert(extensionImplementation is not null, "extensionImplementation is null");
                                 var extensionType = assemblyToAnalyze.GetType(extensionImplementation);
                                 if (extensionType is null)
                                 {
@@ -187,10 +186,10 @@ internal class MetadataReaderExtensionsHelper
         return extensions?.OrderByDescending(t => t.Item1).Select(t => t.Item2).ToArray() ?? EmptyTypeArray;
     }
 
-    private string FormatException(Exception ex)
+    private static string FormatException(Exception ex)
     {
         StringBuilder log = new();
-        Exception current = ex;
+        Exception? current = ex;
         while (current != null)
         {
             log.AppendLine(current.ToString());

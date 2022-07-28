@@ -29,7 +29,7 @@ public class ParallelDataCollectionEventsHandlerTests
 
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IProxyExecutionManager> _mockProxyExecutionManager;
-    private readonly Mock<ITestRunEventsHandler> _mockTestRunEventsHandler;
+    private readonly Mock<IInternalTestRunEventsHandler> _mockTestRunEventsHandler;
     private readonly Mock<IParallelProxyExecutionManager> _mockParallelProxyExecutionManager;
     private readonly Mock<ITestRunAttachmentsProcessingManager> _mockTestRunAttachmentsProcessingManager;
     private readonly CancellationTokenSource _cancellationTokenSource;
@@ -40,7 +40,7 @@ public class ParallelDataCollectionEventsHandlerTests
         _mockRequestData = new Mock<IRequestData>();
         _mockRequestData.Setup(r => r.ProtocolConfig).Returns(new ProtocolConfig());
         _mockProxyExecutionManager = new Mock<IProxyExecutionManager>();
-        _mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+        _mockTestRunEventsHandler = new Mock<IInternalTestRunEventsHandler>();
         _mockParallelProxyExecutionManager = new Mock<IParallelProxyExecutionManager>();
         _mockTestRunAttachmentsProcessingManager = new Mock<ITestRunAttachmentsProcessingManager>();
         _cancellationTokenSource = new CancellationTokenSource();
@@ -87,7 +87,7 @@ public class ParallelDataCollectionEventsHandlerTests
             new AttachmentSet(new Uri(Uri3), "uri3_input1")
         };
 
-        _mockTestRunAttachmentsProcessingManager.Setup(f => f.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<InvokedDataCollector>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult((Collection<AttachmentSet>?)null));
+        _mockTestRunAttachmentsProcessingManager.Setup(f => f.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, _mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<InvokedDataCollector>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult((Collection<AttachmentSet>)null!));
 
         // act
         _parallelDataCollectionEventsHandler.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromSeconds(1)), null, inputAttachments, null);

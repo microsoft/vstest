@@ -13,20 +13,14 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests;
 [TestClass]
 public class DiaSessionTests : IntegrationTestBase
 {
-#if NETFRAMEWORK
-    private const string NET451 = "net451";
-#else
-    private const string NETCOREAPP21 = "netcoreapp2.1";
-#endif
-
     public static string? GetAndSetTargetFrameWork(IntegrationTestEnvironment testEnvironment)
     {
         var currentTargetFrameWork = testEnvironment.TargetFramework;
         testEnvironment.TargetFramework =
 #if NETFRAMEWORK
-            NET451;
+            "net462";
 #else
-            NETCOREAPP21;
+            "netcoreapp3.1";
 #endif
         return currentTargetFrameWork;
     }
@@ -38,7 +32,7 @@ public class DiaSessionTests : IntegrationTestBase
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var diaSession = new DiaSession(assemblyPath);
-        DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "PassingTest");
+        DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "PassingTest");
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
@@ -56,7 +50,7 @@ public class DiaSessionTests : IntegrationTestBase
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var diaSession = new DiaSession(assemblyPath);
-        DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1+<AsyncTestMethod>d__1", "MoveNext");
+        DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1+<AsyncTestMethod>d__1", "MoveNext");
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
@@ -74,7 +68,7 @@ public class DiaSessionTests : IntegrationTestBase
         var assemblyPath = GetAssetFullPath("SimpleClassLibrary.dll");
 
         var diaSession = new DiaSession(assemblyPath);
-        DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "OverLoadedMethod");
+        DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "OverLoadedMethod");
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
@@ -95,7 +89,7 @@ public class DiaSessionTests : IntegrationTestBase
         var diaSession = new DiaSession(assemblyPath);
 
         // Not exist method name
-        DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "NotExistMethod");
+        DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "NotExistMethod");
         Assert.IsNull(diaNavigationData);
 
         // Not Exist Type name
@@ -113,7 +107,7 @@ public class DiaSessionTests : IntegrationTestBase
 
         var watch = Stopwatch.StartNew();
         var diaSession = new DiaSession(assemblyPath);
-        DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.HugeMethodSet", "MSTest_D1_01");
+        DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.HugeMethodSet", "MSTest_D1_01");
         watch.Stop();
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
@@ -121,7 +115,7 @@ public class DiaSessionTests : IntegrationTestBase
         ValidateMinLineNumber(9, diaNavigationData.MinLineNumber);
         Assert.AreEqual(10, diaNavigationData.MaxLineNumber);
         var expectedTime = 150;
-        Assert.IsTrue(watch.Elapsed.Milliseconds < expectedTime, string.Format("DiaSession Perf test Actual time:{0} ms Expected time:{1} ms", watch.Elapsed.Milliseconds, expectedTime));
+        Assert.IsTrue(watch.Elapsed.Milliseconds < expectedTime, $"DiaSession Perf test Actual time:{watch.Elapsed.Milliseconds} ms Expected time:{expectedTime} ms");
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
     }

@@ -27,7 +27,7 @@ public class EnableDiagArgumentProcessorTests
     private readonly Mock<IFileHelper> _mockFileHelper;
 
     private readonly TraceLevel _traceLevel;
-    private readonly string _traceFileName;
+    private readonly string? _traceFileName;
 
     public EnableDiagArgumentProcessorTests()
     {
@@ -78,16 +78,16 @@ public class EnableDiagArgumentProcessorTests
     [DataRow("")]
     public void EnableDiagArgumentProcessorExecutorThrowsIfDiagArgumentIsNullOrEmpty(string argument)
     {
-        string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidDiagArgument, argument);
+        string exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagArgument, argument);
         EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(argument, exceptionMessage);
     }
 
     [TestMethod]
     public void EnableDiagArgumentProcessorExecutorDoesNotThrowsIfFileDotOpenThrow()
     {
-        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath))).Returns(true);
+        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath)!)).Returns(true);
 
-        _diagProcessor.Executor.Value.Initialize(_dummyFilePath);
+        _diagProcessor.Executor!.Value.Initialize(_dummyFilePath);
     }
 
     [TestMethod]
@@ -120,7 +120,7 @@ public class EnableDiagArgumentProcessorTests
     {
         try
         {
-            _diagProcessor.Executor.Value.Initialize(argument);
+            _diagProcessor.Executor!.Value.Initialize(argument);
         }
         catch (Exception ex)
         {
@@ -143,42 +143,28 @@ public class EnableDiagArgumentProcessorTests
         EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
 #endif
 
-        _diagProcessor.Executor.Value.Initialize(argument);
+        _diagProcessor.Executor!.Value.Initialize(argument);
 
         Assert.AreEqual(TraceLevel.Info, (TraceLevel)EqtTrace.TraceLevel);
-        Assert.IsTrue(EqtTrace.LogFile.Contains("abc.txt"));
+        Assert.IsTrue(EqtTrace.LogFile?.Contains("abc.txt"));
     }
 
     [TestMethod]
     public void EnableDiagArgumentProcessorExecutorShouldCreateDirectoryOfLogFileIfNotExists()
     {
-        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath))).Returns(false);
+        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath)!)).Returns(false);
 
-        _diagProcessor.Executor.Value.Initialize(_dummyFilePath);
+        _diagProcessor.Executor!.Value.Initialize(_dummyFilePath);
 
-        _mockFileHelper.Verify(fh => fh.CreateDirectory(Path.GetDirectoryName(_dummyFilePath)), Times.Once);
+        _mockFileHelper.Verify(fh => fh.CreateDirectory(Path.GetDirectoryName(_dummyFilePath)!), Times.Once);
     }
 
     [TestMethod]
     public void EnableDiagArgumentProcessorExecutorShouldNotCreateDirectoryIfAFileIsProvided()
     {
-        _diagProcessor.Executor.Value.Initialize("log.txt");
+        _diagProcessor.Executor!.Value.Initialize("log.txt");
 
         _mockFileHelper.Verify(fh => fh.CreateDirectory(It.IsAny<string>()), Times.Never);
-    }
-
-    [TestMethod]
-    public void EnableDiagArgumentProcessorExecutorShouldDisableVerboseLoggingIfEqtTraceThowException()
-    {
-        _mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(_dummyFilePath))).Returns(true);
-        _diagProcessor.Executor.Value.Initialize(_dummyFilePath);
-
-        Assert.IsFalse(EqtTrace.IsVerboseEnabled);
-#if NETFRAMEWORK
-        EqtTrace.TraceLevel = TraceLevel.Off;
-#else
-        EqtTrace.TraceLevel = PlatformTraceLevel.Off;
-#endif
     }
 
     private class TestableEnableDiagArgumentProcessor : EnableDiagArgumentProcessor
@@ -192,7 +178,7 @@ public class EnableDiagArgumentProcessorTests
 
     private void EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(string argument, string exceptionMessage)
     {
-        var e = Assert.ThrowsException<CommandLineException>(() => _diagProcessor.Executor.Value.Initialize(argument));
+        var e = Assert.ThrowsException<CommandLineException>(() => _diagProcessor.Executor!.Value.Initialize(argument));
         StringAssert.Contains(e.Message, exceptionMessage);
     }
 }

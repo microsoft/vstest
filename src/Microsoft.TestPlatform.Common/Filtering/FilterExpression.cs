@@ -14,8 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
 /// <summary>
@@ -30,33 +28,33 @@ internal class FilterExpression
     /// <summary>
     /// Condition, if expression is conditional expression.
     /// </summary>
-    private readonly Condition _condition;
+    private readonly Condition? _condition;
 
     /// <summary>
     /// Left operand, when expression is logical expression.
     /// </summary>
-    private readonly FilterExpression _left;
+    private readonly FilterExpression? _left;
 
     /// <summary>
     /// Right operand, when expression is logical expression.
     /// </summary>
-    private readonly FilterExpression _right;
+    private readonly FilterExpression? _right;
 
     /// <summary>
     /// If logical expression is using logical And ('&') operator.
     /// </summary>
     private readonly bool _areJoinedByAnd;
 
-    private FilterExpression(FilterExpression left!!, FilterExpression right!!, bool areJoinedByAnd)
+    private FilterExpression(FilterExpression left, FilterExpression right, bool areJoinedByAnd)
     {
-        _left = left;
-        _right = right;
+        _left = left ?? throw new ArgumentNullException(nameof(left));
+        _right = right ?? throw new ArgumentNullException(nameof(right));
         _areJoinedByAnd = areJoinedByAnd;
     }
 
-    private FilterExpression(Condition condition!!)
+    private FilterExpression(Condition condition)
     {
-        _condition = condition;
+        _condition = condition ?? throw new ArgumentNullException(nameof(condition));
     }
     /// <summary>
     /// Create a new filter expression 'And'ing 'this' with 'filter'.
@@ -119,9 +117,9 @@ internal class FilterExpression
     /// True, if filter is valid for given set of properties.
     /// When False, invalidProperties would contain properties making filter invalid.
     /// </summary>
-    internal string[] ValidForProperties(IEnumerable<string> properties, Func<string, TestProperty> propertyProvider)
+    internal string[]? ValidForProperties(IEnumerable<string>? properties, Func<string, TestProperty?>? propertyProvider)
     {
-        string[] invalidProperties = null;
+        string[]? invalidProperties = null;
 
         if (null == properties)
         {
@@ -140,8 +138,8 @@ internal class FilterExpression
         }
         else
         {
-            invalidProperties = _left.ValidForProperties(properties, propertyProvider);
-            var invalidRight = _right.ValidForProperties(properties, propertyProvider);
+            invalidProperties = _left!.ValidForProperties(properties, propertyProvider);
+            var invalidRight = _right!.ValidForProperties(properties, propertyProvider);
             if (null == invalidProperties)
             {
                 invalidProperties = invalidRight;
@@ -151,14 +149,17 @@ internal class FilterExpression
                 invalidProperties = invalidProperties.Concat(invalidRight).ToArray();
             }
         }
+
         return invalidProperties;
     }
 
     /// <summary>
     /// Return FilterExpression after parsing the given filter expression, and a FastFilter when possible.
     /// </summary>
-    internal static FilterExpression Parse(string filterString!!, out FastFilter fastFilter)
+    internal static FilterExpression Parse(string filterString, out FastFilter? fastFilter)
     {
+        ValidateArg.NotNull(filterString, nameof(filterString));
+
         // Below parsing doesn't error out on pattern (), so explicitly search for that (empty parenthesis).
         var invalidInput = Regex.Match(filterString, @"\(\s*\)");
         if (invalidInput.Success)
@@ -170,7 +171,7 @@ internal class FilterExpression
         var operatorStack = new Stack<Operator>();
         var filterStack = new Stack<FilterExpression>();
 
-        var fastFilterBuilder = FastFilter.CreateBuilder();
+        FastFilter.Builder fastFilterBuilder = FastFilter.CreateBuilder();
 
         // This is based on standard parsing of in order expression using two stacks (operand stack and operator stack)
         // Precedence(And) > Precedence(Or)
@@ -270,8 +271,9 @@ internal class FilterExpression
     /// </summary>
     /// <param name="propertyValueProvider"> The property Value Provider.</param>
     /// <returns> True if evaluation is successful. </returns>
-    internal bool Evaluate(Func<string, object> propertyValueProvider!!)
+    internal bool Evaluate(Func<string, object?> propertyValueProvider)
     {
+        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
         bool filterResult = false;
         if (null != _condition)
         {
@@ -280,15 +282,16 @@ internal class FilterExpression
         else
         {
             // & or | operator
-            bool leftResult = _left.Evaluate(propertyValueProvider);
-            bool rightResult = _right.Evaluate(propertyValueProvider);
+            bool leftResult = _left!.Evaluate(propertyValueProvider);
+            bool rightResult = _right!.Evaluate(propertyValueProvider);
             filterResult = _areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
         }
         return filterResult;
     }
 
-    internal static IEnumerable<string> TokenizeFilterExpressionString(string str!!)
+    internal static IEnumerable<string> TokenizeFilterExpressionString(string str)
     {
+        ValidateArg.NotNull(str, nameof(str));
         return TokenizeFilterExpressionStringHelper(str);
 
         static IEnumerable<string> TokenizeFilterExpressionStringHelper(string s)

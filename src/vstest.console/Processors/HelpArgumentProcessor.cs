@@ -3,13 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 // <summary>
@@ -28,9 +25,8 @@ internal class HelpArgumentProcessor : IArgumentProcessor
     public const string ShortCommandName = "/?";
 
 
-    private Lazy<IArgumentProcessorCapabilities> _metadata;
-
-    private Lazy<IArgumentExecutor> _executor;
+    private Lazy<IArgumentProcessorCapabilities>? _metadata;
+    private Lazy<IArgumentExecutor>? _executor;
 
     /// <summary>
     /// Gets the metadata.
@@ -41,7 +37,7 @@ internal class HelpArgumentProcessor : IArgumentProcessor
     /// <summary>
     /// Gets or sets the executor.
     /// </summary>
-    public Lazy<IArgumentExecutor> Executor
+    public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() => new HelpArgumentExecutor());
 
@@ -88,7 +84,7 @@ internal class HelpArgumentExecutor : IArgumentExecutor
 
     #region IArgumentExecutor Members
 
-    public void Initialize(string argument)
+    public void Initialize(string? argument)
     {
     }
 
@@ -105,7 +101,8 @@ internal class HelpArgumentExecutor : IArgumentExecutor
         processors.Sort((p1, p2) => Comparer<HelpContentPriority>.Default.Compare(p1.Metadata.Value.HelpPriority, p2.Metadata.Value.HelpPriority));
 
         // Output the help description for RunTestsArgumentProcessor
-        IArgumentProcessor runTestsArgumentProcessor = processors.Find(p1 => p1.GetType() == typeof(RunTestsArgumentProcessor));
+        IArgumentProcessor? runTestsArgumentProcessor = processors.Find(p1 => p1.GetType() == typeof(RunTestsArgumentProcessor));
+        TPDebug.Assert(runTestsArgumentProcessor is not null, "runTestsArgumentProcessor is null");
         processors.Remove(runTestsArgumentProcessor);
         var helpDescription = LookupHelpDescription(runTestsArgumentProcessor);
         if (helpDescription != null)
@@ -135,17 +132,15 @@ internal class HelpArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="argumentProcessor">The argument processor for which to discover any help content</param>
     /// <returns>The formatted string containing the help description if found null otherwise</returns>
-    private string LookupHelpDescription(IArgumentProcessor argumentProcessor)
+    private string? LookupHelpDescription(IArgumentProcessor argumentProcessor)
     {
-        string result = null;
+        string? result = null;
 
         if (argumentProcessor.Metadata.Value.HelpContentResourceName != null)
         {
             try
             {
-                result = string.Format(
-                    CultureInfo.CurrentUICulture,
-                    argumentProcessor.Metadata.Value.HelpContentResourceName);
+                result = argumentProcessor.Metadata.Value.HelpContentResourceName;
                 //ResourceHelper.GetString(argumentProcessor.Metadata.HelpContentResourceName, assembly, CultureInfo.CurrentUICulture);
             }
             catch (Exception e)

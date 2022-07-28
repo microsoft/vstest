@@ -5,13 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
@@ -24,8 +22,7 @@ internal class PortableSymbolReader : ISymbolReader
     ///     Key in first dict is Type FullName
     ///     Key in second dict is method name
     /// </summary>
-    private Dictionary<string, Dictionary<string, DiaNavigationData>> _methodsNavigationDataForType =
-        new();
+    private readonly Dictionary<string, Dictionary<string, DiaNavigationData>> _methodsNavigationDataForType = new();
 
     /// <summary>
     /// The cache symbols.
@@ -36,7 +33,7 @@ internal class PortableSymbolReader : ISymbolReader
     /// <param name="searchPath">
     /// The search path.
     /// </param>
-    public void CacheSymbols(string binaryPath, string searchPath)
+    public void CacheSymbols(string binaryPath, string? searchPath)
     {
         PopulateCacheForTypeAndMethodSymbols(binaryPath);
     }
@@ -52,7 +49,6 @@ internal class PortableSymbolReader : ISymbolReader
         }
 
         _methodsNavigationDataForType.Clear();
-        _methodsNavigationDataForType = null;
     }
 
     /// <summary>
@@ -67,9 +63,9 @@ internal class PortableSymbolReader : ISymbolReader
     /// <returns>
     /// The <see cref="INavigationData"/>.
     /// </returns>
-    public INavigationData GetNavigationData(string declaringTypeName, string methodName)
+    public INavigationData? GetNavigationData(string declaringTypeName, string methodName)
     {
-        INavigationData navigationData = null;
+        INavigationData? navigationData = null;
         if (_methodsNavigationDataForType.ContainsKey(declaringTypeName))
         {
             var methodDict = _methodsNavigationDataForType[declaringTypeName];
@@ -131,17 +127,13 @@ internal class PortableSymbolReader : ISymbolReader
                     }
                     else
                     {
-                        EqtTrace.Error(
-                            string.Format(
-                                "Unable to find source information for method: {0} type: {1}",
-                                methodInfo.Name,
-                                type.FullName));
+                        EqtTrace.Error($"Unable to find source information for method: {methodInfo.Name} type: {type.FullName}");
                     }
                 }
 
                 if (methodsNavigationData.Count != 0)
                 {
-                    _methodsNavigationDataForType[type.FullName] = methodsNavigationData;
+                    _methodsNavigationDataForType[type.FullName!] = methodsNavigationData;
                 }
             }
         }
@@ -166,7 +158,7 @@ internal class PortableSymbolReader : ISymbolReader
         using var dllStream = new FileStream(binaryPath, FileMode.Open, FileAccess.Read);
         using var peReader = new PEReader(dllStream);
 
-        var hasPdb = peReader.TryOpenAssociatedPortablePdb(binaryPath, pdbPath => new FileStream(pdbPath, FileMode.Open, FileAccess.Read), out MetadataReaderProvider mp, pdbPath: out _);
+        var hasPdb = peReader.TryOpenAssociatedPortablePdb(binaryPath, pdbPath => new FileStream(pdbPath, FileMode.Open, FileAccess.Read), out var mp, pdbPath: out _);
 
         // The out parameters don't give additional info about the pdbFile in case it is not found. So we have few reasons to fail:
         if (!hasPdb)
@@ -178,6 +170,7 @@ internal class PortableSymbolReader : ISymbolReader
                 + "\n- Additionally if your dll is built with <DebugType>full</DebugType>, see FullPdbReader instead.");
         }
 
+        TPDebug.Assert(mp is not null, "mp is null");
         return new PortablePdbReader(mp);
     }
 

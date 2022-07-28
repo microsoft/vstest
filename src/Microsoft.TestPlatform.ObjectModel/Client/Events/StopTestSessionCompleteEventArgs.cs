@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-#nullable disable
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 /// <summary>
@@ -24,9 +22,9 @@ public class StopTestSessionCompleteEventArgs : EventArgs
     /// <summary>
     /// Creates an instance of the current class.
     /// </summary>
-    /// 
+    ///
     /// <param name="testSessionInfo">The test session info.</param>
-    public StopTestSessionCompleteEventArgs(TestSessionInfo testSessionInfo)
+    public StopTestSessionCompleteEventArgs(TestSessionInfo? testSessionInfo)
     {
         TestSessionInfo = testSessionInfo;
     }
@@ -35,13 +33,13 @@ public class StopTestSessionCompleteEventArgs : EventArgs
     /// Gets or sets the test session info.
     /// </summary>
     [DataMember]
-    public TestSessionInfo TestSessionInfo { get; set; } = null;
+    public TestSessionInfo? TestSessionInfo { get; set; }
 
     /// <summary>
     /// Gets or sets the metrics.
     /// </summary>
     [DataMember]
-    public IDictionary<string, object> Metrics { get; set; } = null;
+    public IDictionary<string, object>? Metrics { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating if the session was successfully stopped or not.

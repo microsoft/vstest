@@ -2,12 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -55,7 +54,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     // C++ tests cannot run in .NET Framework host under .NET Core, because we only ship .NET Standard CPP adapter in .NET Core
     // We also don't test x86 for .NET Core, because the resolver there does not switch between x86 and x64 correctly, it just uses the parent process bitness.
     // We run this on netcore31 and not the default netcore21 because netcore31 is the minimum tfm that has the runtime features we need, such as additionaldeps.
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false, useCoreRunner: true, useNetCore21Target: false, useNetCore31Target: true)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false, useCoreRunner: true)]
     public void CPPRunAllTestExecutionPlatformx64Net(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -170,17 +169,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        string testAssemblyPath;
-        // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
-        if (_testEnvironment.TargetFramework.Equals("net451"))
-        {
-            testAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll", "net46");
-        }
-        else
-        {
-            testAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll");
-        }
-
+        string testAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll");
         var arguments = PrepareArguments(
             testAssemblyPath,
             GetTestAdapterPath(UnitTestFramework.XUnit),
@@ -194,8 +183,8 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
         string assemblyRelativePathFormat = @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\{0}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
         var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
-            ? string.Format(assemblyRelativePathFormat, platform)
-            : string.Format(assemblyRelativePathFormat, "");
+            ? string.Format(CultureInfo.CurrentCulture, assemblyRelativePathFormat, platform)
+            : string.Format(CultureInfo.CurrentCulture, assemblyRelativePathFormat, "");
         var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
         var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
 

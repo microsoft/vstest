@@ -2,12 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-#nullable disable
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 
@@ -21,10 +20,10 @@ internal class TestSourcesUtility
     /// </summary>
     /// <param name="adapterSourceMap"> The test list. </param>
     /// <returns> List of test Sources </returns>
-    internal static IEnumerable<string> GetSources(Dictionary<string, IEnumerable<string>> adapterSourceMap)
+    internal static IEnumerable<string>? GetSources(Dictionary<string, IEnumerable<string>?>? adapterSourceMap)
     {
         IEnumerable<string> sources = new List<string>();
-        return adapterSourceMap?.Values?.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
+        return adapterSourceMap?.Values?.Aggregate(sources, (current, enumerable) => enumerable is not null ? current.Concat(enumerable) : current);
     }
 
     /// <summary>
@@ -32,7 +31,8 @@ internal class TestSourcesUtility
     /// </summary>
     /// <param name="tests"> The test list. </param>
     /// <returns> List of test Sources </returns>
-    internal static IEnumerable<string> GetSources(IEnumerable<TestCase> tests)
+    [return: NotNullIfNotNull("tests")]
+    internal static IEnumerable<string>? GetSources(IEnumerable<TestCase>? tests)
     {
         return tests?.Select(tc => tc.Source).Distinct();
     }
@@ -42,7 +42,7 @@ internal class TestSourcesUtility
     /// </summary>
     /// <param name="adapterSourceMap"> The test list. </param>
     /// <returns> List of test Sources </returns>
-    internal static string GetDefaultCodebasePath(Dictionary<string, IEnumerable<string>> adapterSourceMap)
+    internal static string? GetDefaultCodebasePath(Dictionary<string, IEnumerable<string>?> adapterSourceMap)
     {
         var source = GetSources(adapterSourceMap)?.FirstOrDefault();
         return source != null ? Path.GetDirectoryName(source) : null;
@@ -53,7 +53,7 @@ internal class TestSourcesUtility
     /// </summary>
     /// <param name="tests"> The test list. </param>
     /// <returns> List of test Sources </returns>
-    internal static string GetDefaultCodebasePath(IEnumerable<TestCase> tests)
+    internal static string? GetDefaultCodebasePath(IEnumerable<TestCase> tests)
     {
         var source = GetSources(tests)?.FirstOrDefault();
         return source != null ? Path.GetDirectoryName(source) : null;

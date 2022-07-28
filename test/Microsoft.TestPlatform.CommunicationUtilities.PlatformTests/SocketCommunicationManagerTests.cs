@@ -29,9 +29,7 @@ public class SocketCommunicationManagerTests : IDisposable
     private const string DummyPayload = "Dummy Payload";
 
     private readonly SocketCommunicationManager _communicationManager;
-
     private readonly TcpClient _tcpClient;
-
     private readonly TcpListener _tcpListener;
 
     public SocketCommunicationManagerTests()
@@ -44,13 +42,8 @@ public class SocketCommunicationManagerTests : IDisposable
     public void Dispose()
     {
         _tcpListener.Stop();
-#if NETFRAMEWORK
         // tcpClient.Close() calls tcpClient.Dispose().
         _tcpClient?.Close();
-#else
-        // tcpClient.Close() not available for netcoreapp1.0
-        _tcpClient?.Dispose();
-#endif
         _communicationManager.StopServer();
         _communicationManager.StopClient();
         GC.SuppressFinalize(this);
@@ -228,11 +221,11 @@ public class SocketCommunicationManagerTests : IDisposable
 
         var message = _communicationManager.ReceiveMessage();
 
-        Assert.AreEqual(MessageType.StartDiscovery, message.MessageType);
+        Assert.AreEqual(MessageType.StartDiscovery, message?.MessageType);
         // Payload property is present on the Message, but we don't populate it in the newer versions,
-        // instead we populate internal field with the rawMessage, and wait until Serializer.DeserializePayload<T>(message) 
+        // instead we populate internal field with the rawMessage, and wait until Serializer.DeserializePayload<T>(message)
         // is called by the message consumer. This avoids deserializing the payload when we just want to route the message.
-        Assert.IsNull(message.Payload);
+        Assert.IsNull(message!.Payload);
     }
 
     [TestMethod]
@@ -242,11 +235,11 @@ public class SocketCommunicationManagerTests : IDisposable
         WriteToStream(client.GetStream(), TestDiscoveryStartMessageWithVersionAndPayload);
 
         var message = await _communicationManager.ReceiveMessageAsync(CancellationToken.None);
-        var versionedMessage = (VersionedMessage)message;
+        var versionedMessage = (VersionedMessage)message!;
         Assert.AreEqual(MessageType.StartDiscovery, versionedMessage.MessageType);
         Assert.AreEqual(2, versionedMessage.Version);
         // Payload property is present on the Message, but we don't populate it in the newer versions,
-        // instead we populate internal field with the rawMessage, and wait until Serializer.DeserializePayload<T>(message) 
+        // instead we populate internal field with the rawMessage, and wait until Serializer.DeserializePayload<T>(message)
         // is called by the message consumer. This avoids deserializing the payload when we just want to route the message.
         Assert.IsNull(versionedMessage.Payload);
     }
@@ -295,7 +288,7 @@ public class SocketCommunicationManagerTests : IDisposable
         var dataReceived = 0;
         while (dataReceived < 2048 * 5)
         {
-            dataReceived += server.ReceiveRawMessageAsync(CancellationToken.None).Result.Length;
+            dataReceived += server.ReceiveRawMessageAsync(CancellationToken.None).Result!.Length;
             Task.Delay(1000).Wait();
         }
 

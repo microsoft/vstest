@@ -3,14 +3,13 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 
 using Microsoft.TestPlatform.TestUtilities;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#nullable disable
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -22,22 +21,22 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
      */
     protected const double ExpectedMinimalModuleCoverage = 30.0;
 
-    protected string GetNetStandardAdapterPath()
+    protected static string GetNetStandardAdapterPath()
     {
         return Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
     }
 
-    protected string GetNetFrameworkAdapterPath()
+    protected static string GetNetFrameworkAdapterPath()
     {
-        return Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "net451", "win7-x64", "Extensions");
+        return Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, DEFAULT_RUNNER_NETFX, "win7-x64", "Extensions");
     }
 
-    protected string GetCodeCoverageExePath()
+    protected static string GetCodeCoverageExePath()
     {
         return Path.Combine(GetNetStandardAdapterPath(), "CodeCoverage", "CodeCoverage.exe");
     }
 
-    protected XmlNode GetModuleNode(XmlNode node, string name)
+    protected static XmlNode? GetModuleNode(XmlNode node, string name)
     {
         var moduleNode = GetNode(node, "module", name);
 
@@ -54,12 +53,12 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
         return moduleNode;
     }
 
-    protected XmlNode GetNode(XmlNode node, string type, string name)
+    protected static XmlNode? GetNode(XmlNode node, string type, string name)
     {
-        return node.SelectSingleNode($"//{type}[@name='{name}']") ?? node.SelectSingleNode($"//{type}[@name='{name.ToLower()}']");
+        return node.SelectSingleNode($"//{type}[@name='{name}']") ?? node.SelectSingleNode($"//{type}[@name='{name.ToLower(CultureInfo.CurrentCulture)}']");
     }
 
-    protected XmlDocument GetXmlCoverage(string coverageResult, TempDirectory tempDirectory)
+    protected static XmlDocument GetXmlCoverage(string coverageResult, TempDirectory tempDirectory)
     {
         var coverage = new XmlDocument();
 
@@ -84,7 +83,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
             UseShellExecute = false
         });
 
-        string analysisOutput = analyze.StandardOutput.ReadToEnd();
+        string analysisOutput = analyze!.StandardOutput.ReadToEnd();
 
         analyze.WaitForExit();
         watch.Stop();
@@ -96,13 +95,13 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
         return coverage;
     }
 
-    protected void AssertCoverage(XmlNode node, double expectedCoverage)
+    protected static void AssertCoverage(XmlNode node, double expectedCoverage)
     {
-        var coverage = node.Attributes["block_coverage"] != null
-            ? double.Parse(node.Attributes["block_coverage"].Value)
-            : double.Parse(node.Attributes["line-rate"].Value) * 100;
-        Console.WriteLine($"Checking coverage for {node.Name} {node.Attributes["name"].Value}. Expected at least: {expectedCoverage}. Result: {coverage}");
-        Assert.IsTrue(coverage > expectedCoverage, $"Coverage check failed for {node.Name} {node.Attributes["name"].Value}. Expected at least: {expectedCoverage}. Found: {coverage}");
+        var coverage = node.Attributes!["block_coverage"] != null
+            ? double.Parse(node.Attributes!["block_coverage"]!.Value, CultureInfo.InvariantCulture)
+            : double.Parse(node.Attributes!["line-rate"]!.Value, CultureInfo.InvariantCulture) * 100;
+        Console.WriteLine($"Checking coverage for {node.Name} {node.Attributes!["name"]!.Value}. Expected at least: {expectedCoverage}. Result: {coverage}");
+        Assert.IsTrue(coverage > expectedCoverage, $"Coverage check failed for {node.Name} {node.Attributes!["name"]!.Value}. Expected at least: {expectedCoverage}. Found: {coverage}");
     }
 
     protected static string GetCoverageFileNameFromTrx(string trxFilePath, string resultsDirectory)
@@ -114,18 +113,18 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
         var deploymentElements = doc.GetElementsByTagName("Deployment");
         Assert.IsTrue(deploymentElements.Count == 1,
             "None or more than one Deployment tags found in trx file:{0}", trxFilePath);
-        var deploymentDir = deploymentElements[0].Attributes.GetNamedItem("runDeploymentRoot")?.Value;
+        var deploymentDir = deploymentElements[0]!.Attributes!.GetNamedItem("runDeploymentRoot")?.Value;
         Assert.IsTrue(string.IsNullOrEmpty(deploymentDir) == false,
             "runDeploymentRoot attribute not found in trx file:{0}", trxFilePath);
         var collectors = doc.GetElementsByTagName("Collector");
 
-        string fileName = string.Empty;
+        string? fileName = string.Empty;
         for (int i = 0; i < collectors.Count; i++)
         {
-            if (string.Equals(collectors[i].Attributes.GetNamedItem("collectorDisplayName").Value,
+            if (string.Equals(collectors[i]!.Attributes!.GetNamedItem("collectorDisplayName")!.Value,
                     "Code Coverage", StringComparison.OrdinalIgnoreCase))
             {
-                fileName = collectors[i].FirstChild?.FirstChild?.FirstChild?.Attributes.GetNamedItem("href")
+                fileName = collectors[i]?.FirstChild?.FirstChild?.FirstChild?.Attributes?.GetNamedItem("href")
                     ?.Value;
             }
         }
