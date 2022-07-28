@@ -35,7 +35,6 @@ internal class Program
 
         var thisAssemblyPath = Assembly.GetEntryAssembly().Location;
         var here = Path.GetDirectoryName(thisAssemblyPath);
-        var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
 
