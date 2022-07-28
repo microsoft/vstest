@@ -57,6 +57,7 @@ public class InProcDataCollectionExtensionManagerTests
     public void CheckExtensionPathsDuplicates()
     {
         var testPluginCache = new TestPluginCache();
+        // the boolean argument refers too adding the pathes to which list(we have two lists)and the bug happend when we merge the two lists and they have the same path
         testPluginCache.UpdateExtensions(new List<string> { @"c:\test1\Collector.dll" }, false);
         testPluginCache.UpdateExtensions(new List<string> { @"c:\test1\Collector.dll", @"c:\test2\Collector.dll" }, true);
 
