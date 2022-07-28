@@ -220,18 +220,23 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
     /// <param name="ProxyDiscoveryManager">Proxy discovery manager instance.</param>
     private Task InitializeDiscoverTestsOnConcurrentManager(IProxyDiscoveryManager proxyDiscoveryManager, ITestDiscoveryEventsHandler2 eventHandler, DiscoveryCriteria discoveryCriteria)
     {
-        // Kick off another discovery task for the next source
-        return Task.Run(() =>
+        try
         {
-            EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery preparation started.");
+            // Kick off another discovery task for the next source
+            return Task.Run(() =>
+            {
+                EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery preparation started.");
 
-            proxyDiscoveryManager.Initialize(_skipDefaultAdapters);
-            proxyDiscoveryManager.InitializeDiscovery(discoveryCriteria, eventHandler, _skipDefaultAdapters);
+                proxyDiscoveryManager.Initialize(_skipDefaultAdapters);
+                proxyDiscoveryManager.InitializeDiscovery(discoveryCriteria, eventHandler, _skipDefaultAdapters);
 
-            System.Diagnostics.Debug.WriteLine($"Init only: {discoveryCriteria.Sources.Single().ToString()}");
-        });
-
-        EqtTrace.Verbose("ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: No sources available for discovery.");
+                System.Diagnostics.Debug.WriteLine($"Init only: {discoveryCriteria.Sources.Single()}");
+            });
+        }
+        finally
+        {
+            EqtTrace.Verbose("ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: No sources available for discovery.");
+        }
     }
 
     /// <summary>
@@ -247,7 +252,7 @@ internal class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryManager
                 EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery started.");
                 if (!initialized)
                 {
-                    System.Diagnostics.Debug.WriteLine($"initialize right before run: {discoveryCriteria.Sources.Single().ToString()}");
+                    System.Diagnostics.Debug.WriteLine($"initialize right before run: {discoveryCriteria.Sources.Single()}");
                     proxyDiscoveryManager.Initialize(_skipDefaultAdapters);
                     proxyDiscoveryManager.InitializeDiscovery(discoveryCriteria, eventHandler, _skipDefaultAdapters);
                 }
