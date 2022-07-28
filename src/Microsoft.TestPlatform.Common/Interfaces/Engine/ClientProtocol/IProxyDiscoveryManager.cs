@@ -16,6 +16,13 @@ public interface IProxyDiscoveryManager
     /// </summary>
     void Initialize(bool skipDefaultAdapters);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// 
+    /// <param name="discoveryCriteria"></param>
+    /// <param name="eventHandler"></param>
+    /// <param name="skipDefaultAdapters"></param>
     void InitializeDiscovery(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler, bool skipDefaultAdapters);
 
     /// <summary>
