@@ -379,7 +379,12 @@ internal sealed class ParallelProxyExecutionManager : IParallelProxyExecutionMan
     /// </summary>
     /// <param name="proxyExecutionManager">Proxy execution manager instance.</param>
     /// <returns>True, if execution triggered</returns>
-    private void StartTestRunOnConcurrentManager(IProxyExecutionManager proxyExecutionManager, IInternalTestRunEventsHandler eventHandler, TestRunCriteria testRunCriteria, bool initialized, Task initTask)
+    private void StartTestRunOnConcurrentManager(
+        IProxyExecutionManager proxyExecutionManager,
+        IInternalTestRunEventsHandler eventHandler,
+        TestRunCriteria testRunCriteria,
+        bool initialized,
+        Task? initTask)
     {
         if (testRunCriteria != null)
         {
@@ -397,7 +402,7 @@ internal sealed class ParallelProxyExecutionManager : IParallelProxyExecutionMan
                     }
                     else
                     {
-                        initTask.Wait();
+                        initTask!.Wait();
                     }
 
                     EqtTrace.Verbose("ParallelProxyExecutionManager: Execution started. Started clients: " + _runStartedClients);

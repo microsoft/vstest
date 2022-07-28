@@ -69,10 +69,6 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
             .ToDictionary(pair => pair.Key, pair => pair.Value);
     }
 
-    public ParallelProxyDiscoveryManager()
-    {
-    }
-
     #region IProxyDiscoveryManager
 
     /// <inheritdoc/>
@@ -281,7 +277,12 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
     /// Each concurrent discoverer calls this method, once its completed working on previous data
     /// </summary>
     /// <param name="ProxyDiscoveryManager">Proxy discovery manager instance.</param>
-    private void DiscoverTestsOnConcurrentManager(IProxyDiscoveryManager proxyDiscoveryManager, ITestDiscoveryEventsHandler2 eventHandler, DiscoveryCriteria discoveryCriteria, bool initialized, Task task)
+    private void DiscoverTestsOnConcurrentManager(
+        IProxyDiscoveryManager proxyDiscoveryManager,
+        ITestDiscoveryEventsHandler2 eventHandler,
+        DiscoveryCriteria discoveryCriteria,
+        bool initialized,
+        Task? task)
     {
         // Kick off another discovery task for the next source
         Task.Run(() =>
@@ -313,9 +314,9 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
         EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
 
         var handler = eventHandler;
-        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
+        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception?.ToString() };
         handler.HandleRawMessage(_dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
-        handler.HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
+        handler.HandleLogMessage(TestMessageLevel.Error, t.Exception?.ToString());
 
         // Send discovery complete. Similar logic is also used in ProxyDiscoveryManager.DiscoverTests.
         // Differences:

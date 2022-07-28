@@ -4,10 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-using Microsoft.TestPlatform;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -19,7 +17,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkload> : IDisposable
 {
     private const int PreStart = 2;
-    private readonly static int VSTEST_HOSTPRESTART_COUNT = int.TryParse(Environment.GetEnvironmentVariable(nameof(VSTEST_HOSTPRESTART_COUNT)) ?? PreStart.ToString(), out int num) ? num : PreStart;
+    private readonly static int VSTEST_HOSTPRESTART_COUNT =
+        int.TryParse(
+                Environment.GetEnvironmentVariable(nameof(VSTEST_HOSTPRESTART_COUNT)),
+                out int num)
+        ? num
+        : PreStart;
     private readonly Func<TestRuntimeProviderInfo, TManager> _createNewManager;
 
     /// <summary>
@@ -27,8 +30,8 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
     /// </summary>
     private TEventHandler? _eventHandler;
     private Func<TEventHandler, TManager, TEventHandler>? _getEventHandler;
-    private Func<TManager, TEventHandler, TWorkload, Task> _initializeWorkload;
-    private Action<TManager, TEventHandler, TWorkload, bool, Task?> _runWorkload;
+    private Func<TManager, TEventHandler, TWorkload, Task>? _initializeWorkload;
+    private Action<TManager, TEventHandler, TWorkload, bool, Task?>? _runWorkload;
     private bool _acceptMoreWork;
     private readonly List<ProviderSpecificWorkload<TWorkload>> _workloads = new();
     private readonly List<Slot> _managerSlots = new();
@@ -165,7 +168,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         {
             startedWork++;
             slot.IsRunning = true;
-            System.Diagnostics.Debug.Write($">>>>>>>>> run on pre-started host: {(DateTime.Now.TimeOfDay - slot.PreStartTime).TotalMilliseconds}ms {slot.InitTask.Status}");
+            System.Diagnostics.Debug.Write($">>>>>>>>> run on pre-started host: {(DateTime.Now.TimeOfDay - slot.PreStartTime).TotalMilliseconds}ms {slot.InitTask?.Status}");
             _runWorkload(slot.Manager!, slot.EventHandler!, slot.Work!, slot.IsPreStarted, slot.InitTask);
 
             // We already started as many as we were allowed, jump out;
@@ -209,7 +212,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                 slot.PreStartTime = DateTime.Now.TimeOfDay;
                 slot.IsPreStarted = true;
                 System.Diagnostics.Debug.Write($">>>>>>>>> pre-start a host");
-                slot.InitTask = _initializeWorkload(slot.Manager!, slot.EventHandler!, slot.Work!);
+                slot.InitTask = _initializeWorkload!(slot.Manager!, slot.EventHandler!, slot.Work!);
             }
         }
 

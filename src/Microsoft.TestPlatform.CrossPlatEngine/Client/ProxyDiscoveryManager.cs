@@ -37,7 +37,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     private bool _isCommunicationEstablished;
     private ProxyOperationManager? _proxyOperationManager;
     private ITestDiscoveryEventsHandler2? _baseTestDiscoveryEventsHandler;
-    private string _previousSource;
+    private string? _previousSource;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
@@ -160,6 +160,8 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
 
     public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
     {
+        TPDebug.Assert(_proxyOperationManager is not null, "ProxyOperationManager is null.");
+
         // Multiple method calls will iterate over this sources collection so we want to ensure
         // it's built once.
         var discoverySources = discoveryCriteria.Sources.ToArray();
@@ -168,7 +170,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         {
             if (_isCommunicationEstablished)
             {
-                discoveryCriteria.UpdateDiscoveryCriteria(_testHostManager);
+                discoveryCriteria.UpdateDiscoveryCriteria(_testHostManager!);
             }
 
             // Consider the first source as the previous source so that if we are discovering a source

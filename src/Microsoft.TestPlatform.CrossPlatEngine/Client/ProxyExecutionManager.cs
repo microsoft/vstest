@@ -205,6 +205,8 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
     /// <inheritdoc/>
     public virtual int StartTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler)
     {
+        TPDebug.Assert(_proxyOperationManager is not null, "ProxyOperationManager is null.");
+
         try
         {
             if (_isCommunicationEstablished)
