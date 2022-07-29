@@ -55,11 +55,11 @@ public class InProcDataCollectionExtensionManagerTests
     }
 
     [TestMethod]
-    public void CodeBasePathsAreDeduplicated()
+    public void CodeBasePathsAreDeduplicatedWithCaseIgnoring()
     {
         var testPluginCache = new TestableTestPluginCache();
         // the boolean argument refers to adding the paths to which list(we have two lists)and the duplicate happened when we merged the two lists and they had the same path
-        testPluginCache.UpdateExtensions(new List<string> { @"c:\Test1\Collector.dll" }, false);
+        testPluginCache.UpdateExtensions(new List<string> { @"C:\TEST1\Collector.dll" }, false);
         testPluginCache.UpdateExtensions(new List<string> { @"c:\test1\Collector.dll", @"c:\test2\Collector.dll" }, true);
 
         var inProcDataCollectionExtensionManager = new TestableInProcDataCollectionExtensionManager(_settingsXml, _mockTestEventsPublisher.Object, null, testPluginCache, _mockFileHelper.Object);
