@@ -61,8 +61,7 @@ internal class InProcDataCollectionExtensionManager
         _inProcDataCollectionSink = new InProcDataCollectionSink();
         _defaultCodeBase = defaultCodeBase;
         _fileHelper = fileHelper;
-        CodeBasePaths = new HashSet<string?>(StringComparer.OrdinalIgnoreCase);
-        CodeBasePaths.Add(_defaultCodeBase);
+        CodeBasePaths = new HashSet<string?>(StringComparer.OrdinalIgnoreCase) { _defaultCodeBase };
 
         // Get Datacollector code base paths from test plugin cache
         var extensionPaths = testPluginCache.GetExtensionPaths(DataCollectorEndsWithPattern);
