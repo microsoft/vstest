@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -54,11 +55,11 @@ public class InProcDataCollectionExtensionManagerTests
     }
 
     [TestMethod]
-    public void CheckExtensionPathsDuplicates()
+    public void CodeBasePathsAreDeduplicated()
     {
-        var testPluginCache = new TestPluginCache();
+        var testPluginCache = new TestableTestPluginCache();
         // the boolean argument refers to adding the paths to which list(we have two lists)and the duplicate happened when we merged the two lists and they had the same path
-        testPluginCache.UpdateExtensions(new List<string> { @"c:\test1\Collector.dll" }, false);
+        testPluginCache.UpdateExtensions(new List<string> { @"c:\Test1\Collector.dll" }, false);
         testPluginCache.UpdateExtensions(new List<string> { @"c:\test1\Collector.dll", @"c:\test2\Collector.dll" }, true);
 
         var inProcDataCollectionExtensionManager = new TestableInProcDataCollectionExtensionManager(_settingsXml, _mockTestEventsPublisher.Object, _defaultCodebase, testPluginCache, _mockFileHelper.Object);
@@ -68,8 +69,6 @@ public class InProcDataCollectionExtensionManagerTests
         Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(_defaultCodebase));
         Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(Path.GetDirectoryName(@"c:\test1\Collector.dll")));
         Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(Path.GetDirectoryName(@"c:\test2\Collector.dll")));
-
-
     }
 
 

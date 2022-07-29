@@ -50,7 +50,7 @@ public class TestPluginCache
     /// <summary>
     /// Initializes a new instance of the <see cref="TestPluginCache"/> class.
     /// </summary>
-    public TestPluginCache()
+    protected TestPluginCache()
     {
         _filterableExtensionPaths = new List<string>();
         _unfilterableExtensionPaths = new List<string>();
