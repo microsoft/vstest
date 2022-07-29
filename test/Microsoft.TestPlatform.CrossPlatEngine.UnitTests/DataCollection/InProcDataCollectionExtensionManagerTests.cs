@@ -62,11 +62,11 @@ public class InProcDataCollectionExtensionManagerTests
         testPluginCache.UpdateExtensions(new List<string> { @"c:\Test1\Collector.dll" }, false);
         testPluginCache.UpdateExtensions(new List<string> { @"c:\test1\Collector.dll", @"c:\test2\Collector.dll" }, true);
 
-        var inProcDataCollectionExtensionManager = new TestableInProcDataCollectionExtensionManager(_settingsXml, _mockTestEventsPublisher.Object, _defaultCodebase, testPluginCache, _mockFileHelper.Object);
+        var inProcDataCollectionExtensionManager = new TestableInProcDataCollectionExtensionManager(_settingsXml, _mockTestEventsPublisher.Object, null, testPluginCache, _mockFileHelper.Object);
 
         Assert.AreEqual(3, inProcDataCollectionExtensionManager.CodeBasePaths.Count); // "CodeBasePaths" contains the two extensions(after removing duplicates) and the "_defaultCodebase"
 
-        Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(_defaultCodebase));
+        Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(null));
         Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(Path.GetDirectoryName(@"c:\test1\Collector.dll")));
         Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(Path.GetDirectoryName(@"c:\test2\Collector.dll")));
     }
