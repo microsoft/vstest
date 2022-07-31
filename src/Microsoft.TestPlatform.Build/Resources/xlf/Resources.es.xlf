@@ -12,6 +12,11 @@
         <target state="translated">Compilación iniciada, espere...</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestFilePathCannotBeEmptyOrNull">
+        <source>Test file path cannot be empty or null.</source>
+        <target state="new">Test file path cannot be empty or null.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="TestRunningSummary">
         <source>Test run for {0} ({1})</source>
         <target state="translated">Serie de pruebas para {0} ({1})</target>

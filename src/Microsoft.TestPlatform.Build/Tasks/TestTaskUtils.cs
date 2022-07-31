@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Microsoft.Build.Utilities;
 
@@ -38,7 +37,7 @@ internal static class TestTaskUtils
             builder.AppendSwitchIfNotNull("--settings:", task.VSTestSetting);
         }
 
-        if (task.VSTestTestAdapterPath != null && task.VSTestTestAdapterPath.Any())
+        if (task.VSTestTestAdapterPath != null)
         {
             foreach (var arg in task.VSTestTestAdapterPath)
             {
@@ -56,13 +55,13 @@ internal static class TestTaskUtils
 
         builder.AppendSwitchIfNotNull("--testCaseFilter:", task.VSTestTestCaseFilter);
 
-        if (task.VSTestLogger != null && task.VSTestLogger.Any())
+        if (task.VSTestLogger != null)
         {
             foreach (var arg in task.VSTestLogger)
             {
                 builder.AppendSwitchIfNotNull("--logger:", arg);
 
-                if ((arg != null) && arg.StartsWith("console", StringComparison.OrdinalIgnoreCase))
+                if (arg != null && arg.StartsWith("console", StringComparison.OrdinalIgnoreCase))
                 {
                     isConsoleLoggerSpecifiedByUser = true;
                 }
@@ -94,11 +93,12 @@ internal static class TestTaskUtils
             var quietTestLogging = new List<string>() { "q", "quiet" };
 
             string vsTestVerbosity = "minimal";
-            if (normalTestLogging.Contains(task.VSTestVerbosity.ToLowerInvariant()))
+            string taskVsTestVerbosity = task.VSTestVerbosity.ToLowerInvariant();
+            if (normalTestLogging.Contains(taskVsTestVerbosity))
             {
                 vsTestVerbosity = "normal";
             }
-            else if (quietTestLogging.Contains(task.VSTestVerbosity.ToLowerInvariant()))
+            else if (quietTestLogging.Contains(taskVsTestVerbosity))
             {
                 vsTestVerbosity = "quiet";
             }
@@ -141,7 +141,7 @@ internal static class TestTaskUtils
                 }
             }
 
-            if (dumpArgs.Any())
+            if (dumpArgs.Count != 0)
             {
                 builder.AppendSwitchIfNotNull("--Blame:", string.Join(";", dumpArgs));
             }
@@ -151,22 +151,24 @@ internal static class TestTaskUtils
             }
         }
 
-        if (task.VSTestCollect != null && task.VSTestCollect.Any())
+        if (task.VSTestCollect != null)
         {
             foreach (var arg in task.VSTestCollect)
             {
-                if (arg != null)
+                if (arg == null)
                 {
-                    // For collecting code coverage, argument value can be either "Code Coverage" or "Code Coverage;a=b;c=d".
-                    // Split the argument with ';' and compare first token value.
-                    var tokens = arg.Split(';');
-
-                    if (arg.Equals(codeCoverageString, StringComparison.OrdinalIgnoreCase) ||
-                        tokens[0].Equals(codeCoverageString, StringComparison.OrdinalIgnoreCase))
-                    {
-                        isCollectCodeCoverageEnabled = true;
-                    }
+                    continue;
                 }
+
+                // For collecting code coverage, argument value can be either "Code Coverage" or "Code Coverage;a=b;c=d".
+                // Split the argument with ';' and compare first token value.
+                var tokens = arg.Split(';');
+                if (arg.Equals(codeCoverageString, StringComparison.OrdinalIgnoreCase) ||
+                    tokens[0].Equals(codeCoverageString, StringComparison.OrdinalIgnoreCase))
+                {
+                    isCollectCodeCoverageEnabled = true;
+                }
+
                 builder.AppendSwitchIfNotNull("--collect:", arg);
             }
         }
@@ -184,14 +186,11 @@ internal static class TestTaskUtils
             {
                 builder.AppendSwitchIfNotNull("--testAdapterPath:", task.VSTestTraceDataCollectorDirectoryPath);
             }
-            else
+            else if (isCollectCodeCoverageEnabled)
             {
-                if (isCollectCodeCoverageEnabled)
-                {
-                    // Not showing message in runsettings scenario, because we are not sure that code coverage is enabled.
-                    // User might be using older Microsoft.NET.Test.Sdk which don't have CodeCoverage infra.
-                    task.Log.LogWarning(Resources.Resources.UpdateTestSdkForCollectingCodeCoverage);
-                }
+                // Not showing message in runsettings scenario, because we are not sure that code coverage is enabled.
+                // User might be using older Microsoft.NET.Test.Sdk which don't have CodeCoverage infra.
+                task.Log.LogWarning(Resources.Resources.UpdateTestSdkForCollectingCodeCoverage);
             }
         }
 
@@ -200,15 +199,15 @@ internal static class TestTaskUtils
             builder.AppendSwitch("--nologo");
         }
 
-        if (!task.VSTestArtifactsProcessingMode.IsNullOrEmpty() && task.VSTestArtifactsProcessingMode.Equals("collect", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(task.VSTestArtifactsProcessingMode, "collect", StringComparison.OrdinalIgnoreCase))
         {
             builder.AppendSwitch("--artifactsProcessingMode-collect");
         }
 
         builder.AppendSwitchIfNotNull("--testSessionCorrelationId:", task.VSTestSessionCorrelationId);
 
-        // VSTestCLIRunSettings should be last argument as vstest.console ignore options after "--"(CLIRunSettings option).
-        if (task.VSTestCLIRunSettings != null && task.VSTestCLIRunSettings.Any())
+        // VSTestCLIRunSettings should be last argument as vstest.console ignore options after "--" (CLIRunSettings option).
+        if (task.VSTestCLIRunSettings != null)
         {
             builder.AppendSwitch("--");
             foreach (var arg in task.VSTestCLIRunSettings)

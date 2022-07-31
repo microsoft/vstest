@@ -66,7 +66,7 @@ public class VSTestTask : ToolTask, ITestTask
     {
         if (!ToolPath.IsNullOrEmpty())
         {
-            return Path.Combine(Path.GetDirectoryName(Path.GetFullPath(ToolPath)), ToolExe);
+            return Path.Combine(Path.GetDirectoryName(Path.GetFullPath(ToolPath))!, ToolExe);
         }
 
         //TODO: https://github.com/dotnet/sdk/issues/20 Need to get the dotnet path from MSBuild?
@@ -74,7 +74,7 @@ public class VSTestTask : ToolTask, ITestTask
         var dhp = Environment.GetEnvironmentVariable("DOTNET_HOST_PATH");
         if (!dhp.IsNullOrEmpty())
         {
-            var path = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(dhp)), ToolExe);
+            var path = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(dhp))!, ToolExe);
             if (File.Exists(path))
             {
                 return path;
@@ -87,7 +87,7 @@ public class VSTestTask : ToolTask, ITestTask
         }
 
         var values = Environment.GetEnvironmentVariable("PATH");
-        foreach (var p in values.Split(Path.PathSeparator))
+        foreach (var p in values!.Split(Path.PathSeparator))
         {
             var fullPath = Path.Combine(p, ToolExe);
             if (File.Exists(fullPath))
