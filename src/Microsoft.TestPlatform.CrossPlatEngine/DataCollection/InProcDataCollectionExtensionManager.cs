@@ -29,7 +29,7 @@ internal class InProcDataCollectionExtensionManager
 
     private readonly IDataCollectionSink _inProcDataCollectionSink;
     private readonly string? _defaultCodeBase;
-    private readonly List<string?> _codeBasePaths;
+    internal /* for testing purposes */ readonly HashSet<string?> CodeBasePaths;
     private readonly IFileHelper _fileHelper;
 
     internal IDictionary<string, IInProcDataCollector> InProcDataCollectors;
@@ -61,13 +61,13 @@ internal class InProcDataCollectionExtensionManager
         _inProcDataCollectionSink = new InProcDataCollectionSink();
         _defaultCodeBase = defaultCodeBase;
         _fileHelper = fileHelper;
-        _codeBasePaths = new List<string?> { _defaultCodeBase };
+        CodeBasePaths = new HashSet<string?>(StringComparer.OrdinalIgnoreCase) { _defaultCodeBase };
 
         // Get Datacollector code base paths from test plugin cache
         var extensionPaths = testPluginCache.GetExtensionPaths(DataCollectorEndsWithPattern);
         foreach (var extensionPath in extensionPaths)
         {
-            _codeBasePaths.Add(Path.GetDirectoryName(extensionPath)!);
+            CodeBasePaths.Add(Path.GetDirectoryName(extensionPath)!);
         }
 
         // Initialize InProcDataCollectors
@@ -248,7 +248,7 @@ internal class InProcDataCollectionExtensionManager
             return codeBase;
         }
 
-        foreach (var extensionPath in _codeBasePaths)
+        foreach (var extensionPath in CodeBasePaths)
         {
             if (extensionPath is null)
             {
