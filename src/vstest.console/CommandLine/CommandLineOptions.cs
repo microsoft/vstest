@@ -26,7 +26,7 @@ internal class CommandLineOptions
     /// <summary>
     /// The default batch size for Run.
     /// </summary>
-    public const long DefaultBatchSize = 10;
+    public const long DefaultRunBatchSize = 10;
 
     /// <summary>
     /// The default batch size for Discovery.
@@ -67,7 +67,7 @@ internal class CommandLineOptions
     /// </summary>
     internal CommandLineOptions()
     {
-        BatchSize = DefaultBatchSize;
+        BatchSize = DefaultRunBatchSize;
         TestStatsEventTimeout = _defaultRetrievalTimeout;
         FileHelper = new FileHelper();
         FilePatternParser = new FilePatternParser();

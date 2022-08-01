@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 
 using FluentAssertions;
 
@@ -2516,6 +2517,79 @@ public class TestRequestManagerTests
         _mockTestPlatformEventSource.Verify(
             tpes => tpes.StopTestSessionStop(),
             Times.Once);
+    }
+
+    [TestMethod]
+    public void AddOrUpdateBatchSizeWhenNotDiscoveryReturnsFalseAndDoesNotUpdateXmlDocument()
+    {
+        // Arrange
+        var xmlDocument = new XmlDocument();
+        var configuration = new RunConfiguration();
+
+        // Act
+        var result = TestRequestManager.AddOrUpdateBatchSize(xmlDocument, configuration, false);
+
+        // Assert
+        Assert.IsFalse(result);
+        Assert.AreEqual("", xmlDocument.OuterXml);
+    }
+
+    [TestMethod]
+    public void AddOrUpdateBatchSizeWhenBatchSizeSetReturnsFalse()
+    {
+        // Arrange
+        var xmlDocument = new XmlDocument();
+        var configuration = new RunConfiguration { BatchSize = 10 };
+
+        // Sanity check
+        Assert.IsTrue(configuration.BatchSizeSet);
+
+        // Act
+        var result = TestRequestManager.AddOrUpdateBatchSize(xmlDocument, configuration, true);
+
+        // Assert
+        Assert.IsFalse(result);
+        Assert.AreEqual("", xmlDocument.OuterXml);
+    }
+
+    [TestMethod]
+    public void AddOrUpdateBatchSizeSetsBatchSize()
+    {
+        // Arrange
+        var xmlDocument = new XmlDocument();
+        xmlDocument.LoadXml("""
+            <RunSettings>
+                <RunConfiguration>
+                </RunConfiguration>
+            </RunSettings>
+            """);
+        var configuration = new RunConfiguration();
+
+        // Act
+        var result = TestRequestManager.AddOrUpdateBatchSize(xmlDocument, configuration, true);
+
+        // Assert
+        Assert.IsTrue(result);
+        Assert.AreEqual("<RunSettings><RunConfiguration><BatchSize>1000</BatchSize></RunConfiguration></RunSettings>", xmlDocument.OuterXml);
+    }
+
+    [TestMethod]
+    public void AddOrUpdateBatchSizeSetsRunConfigurationAndBatchSize()
+    {
+        // Arrange
+        var xmlDocument = new XmlDocument();
+        xmlDocument.LoadXml("""
+            <RunSettings>
+            </RunSettings>
+            """);
+        var configuration = new RunConfiguration();
+
+        // Act
+        var result = TestRequestManager.AddOrUpdateBatchSize(xmlDocument, configuration, true);
+
+        // Assert
+        Assert.IsTrue(result);
+        Assert.AreEqual("<RunSettings><RunConfiguration><BatchSize>1000</BatchSize></RunConfiguration></RunSettings>", xmlDocument.OuterXml);
     }
 
     private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)

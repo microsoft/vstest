@@ -182,8 +182,6 @@ internal class TestRequestManager : ITestRequestManager
             runsettings = updatedRunsettings;
         }
 
-
-
         var sourceToSourceDetailMap = discoveryPayload.Sources.Select(source => new SourceDetail
         {
             Source = source,
@@ -917,7 +915,7 @@ internal class TestRequestManager : ITestRequestManager
         return updateRequired;
     }
 
-    private bool AddOrUpdateBatchSize(XmlDocument document, RunConfiguration runConfiguration, bool isDiscovery)
+    internal /* for testing purposes */ static bool AddOrUpdateBatchSize(XmlDocument document, RunConfiguration runConfiguration, bool isDiscovery)
     {
         // On run keep it as is to fall back to the current default value (which is 10 right now).
         if (!isDiscovery)
@@ -925,7 +923,6 @@ internal class TestRequestManager : ITestRequestManager
             // We did not update runnsettings.
             return false;
         }
-
 
         // If user is already setting batch size via runsettings or CLI args; we skip.
         bool updateRequired = !runConfiguration.BatchSizeSet;
@@ -935,6 +932,7 @@ internal class TestRequestManager : ITestRequestManager
                 document,
                 CommandLineOptions.DefaultDiscoveryBatchSize);
         }
+
         return updateRequired;
     }
 
