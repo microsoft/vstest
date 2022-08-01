@@ -256,8 +256,7 @@ public class HtmlLogger : ITestLoggerWithParameters
 
         if (Results.TryGetValue(parentExecutionId, out var parentTestResult))
         {
-            if (parentTestResult.InnerTestResults == null)
-                parentTestResult.InnerTestResults = new List<ObjectModel.TestResult>();
+            parentTestResult.InnerTestResults ??= new List<ObjectModel.TestResult>();
 
             parentTestResult.InnerTestResults.Add(testResult);
         }

@@ -361,10 +361,7 @@ public class Migrator
     private static void AddDataCollectorNodes(XmlNodeList oldDatacollectorNodes, XmlDocument newXmlDoc)
     {
         var dataCollectionRunSettingsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings");
-        if (dataCollectionRunSettingsNode == null)
-        {
-            dataCollectionRunSettingsNode = newXmlDoc.CreateNode(XmlNodeType.Element, DataCollectionRunSettingsNodeName, null);
-        }
+        dataCollectionRunSettingsNode ??= newXmlDoc.CreateNode(XmlNodeType.Element, DataCollectionRunSettingsNodeName, null);
 
         var dataCollectorsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings/DataCollectors");
         if (dataCollectorsNode == null)
@@ -389,10 +386,7 @@ public class Migrator
     private static void AddRunTimeoutNode(string runTimeout, XmlDocument newXmlDoc)
     {
         var runConfigurationNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/RunConfiguration");
-        if (runConfigurationNode == null)
-        {
-            runConfigurationNode = newXmlDoc.CreateNode(XmlNodeType.Element, RunConfigurationNodeName, null);
-        }
+        runConfigurationNode ??= newXmlDoc.CreateNode(XmlNodeType.Element, RunConfigurationNodeName, null);
 
         var testSessionTimeoutNode = newXmlDoc.CreateNode(XmlNodeType.Element, TestSessionTimeoutNodeName, null);
         testSessionTimeoutNode.InnerText = runTimeout;

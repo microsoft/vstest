@@ -183,11 +183,8 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore where T : no
     {
         get
         {
-            if (_childElementName == null)
-            {
-                // All we can do here is to delegate to T. Cannot cast T to IXmlTestStoreCustom as T is a type, not an instance.
-                _childElementName = typeof(T).Name;
-            }
+            // All we can do here is to delegate to T. Cannot cast T to IXmlTestStoreCustom as T is a type, not an instance.
+            _childElementName ??= typeof(T).Name;
             return _childElementName;
         }
     }

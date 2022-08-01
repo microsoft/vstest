@@ -61,14 +61,11 @@ internal class FakeTestDllBuilder
 
     internal FakeTestDllFile Build()
     {
-        if (_testBatches == null)
-        {
-            _testBatches = new FakeTestBatchBuilder()
+        _testBatches ??= new FakeTestBatchBuilder()
             .WithDllPath(_path)
             .WithTotalCount(10)
             .WithBatchSize(5)
             .Build();
-        }
         return new FakeTestDllFile(_path, _framework, _architecture, _testBatches);
     }
 }

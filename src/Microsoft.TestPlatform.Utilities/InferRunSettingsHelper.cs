@@ -103,10 +103,7 @@ public class InferRunSettingsHelper
         }
         else if (runSettingsNavigator.HasChildren)
         {
-            if (listOfInValidRunConfigurationSettings is null)
-            {
-                listOfInValidRunConfigurationSettings = new HashSet<string>();
-            }
+            listOfInValidRunConfigurationSettings ??= new HashSet<string>();
 
             // Find all invalid RunConfiguration Settings
             runSettingsNavigator.MoveToFirstChild();

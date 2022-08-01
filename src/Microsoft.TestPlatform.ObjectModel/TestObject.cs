@@ -348,10 +348,7 @@ public abstract class TestObject
     {
         get
         {
-            if (_traits == null)
-            {
-                _traits = new TraitCollection(this);
-            }
+            _traits ??= new TraitCollection(this);
 
             return _traits;
         }

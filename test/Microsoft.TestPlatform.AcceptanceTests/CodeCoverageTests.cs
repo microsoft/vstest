@@ -326,10 +326,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
         var module = GetModuleNode(document.DocumentElement!, moduleName.ToLowerInvariant());
 
-        if (module == null)
-        {
-            module = GetModuleNode(document.DocumentElement!, moduleName);
-        }
+        module ??= GetModuleNode(document.DocumentElement!, moduleName);
         Assert.IsNotNull(module);
 
         AssertCoverage(module, ExpectedMinimalModuleCoverage);

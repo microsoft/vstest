@@ -192,10 +192,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
 
         // Get data collection run settings. Create if not present.
         var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
-        if (dataCollectionRunSettings == null)
-        {
-            dataCollectionRunSettings = new DataCollectionRunSettings();
-        }
+        dataCollectionRunSettings ??= new DataCollectionRunSettings();
 
         // Create blame configuration element.
         var xmlDocument = new XmlDocument();

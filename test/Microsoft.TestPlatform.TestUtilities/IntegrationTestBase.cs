@@ -766,10 +766,7 @@ public class IntegrationTestBase
     private void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode,
         Dictionary<string, string?>? environmentVariables = null)
     {
-        if (environmentVariables is null)
-        {
-            environmentVariables = new();
-        }
+        environmentVariables ??= new();
 
         environmentVariables["DOTNET_MULTILEVEL_LOOKUP"] = "0";
 

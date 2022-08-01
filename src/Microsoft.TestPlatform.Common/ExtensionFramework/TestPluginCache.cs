@@ -152,10 +152,7 @@ public class TestPluginCache
             // Discover the test extensions from candidate assemblies.
             pluginInfos = GetTestExtensions<TPluginInfo, TExtension>(allExtensionPaths);
 
-            if (TestExtensions == null)
-            {
-                TestExtensions = new TestExtensions();
-            }
+            TestExtensions ??= new TestExtensions();
 
             TestExtensions.AddExtension(pluginInfos);
 
@@ -333,10 +330,7 @@ public class TestPluginCache
         var pluginInfos = GetTestExtensions<TPluginInfo, TExtension>(new List<string>() { extensionAssembly });
 
         // Add extensions discovered to the cache.
-        if (TestExtensions == null)
-        {
-            TestExtensions = new TestExtensions();
-        }
+        TestExtensions ??= new TestExtensions();
 
         TestExtensions.AddExtension(pluginInfos);
 

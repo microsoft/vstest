@@ -45,10 +45,7 @@ internal sealed class TestEntry : IXmlTestStore
     {
         get
         {
-            if (_testEntries == null)
-            {
-                _testEntries = new List<TestEntry>();
-            }
+            _testEntries ??= new List<TestEntry>();
 
             return _testEntries;
         }

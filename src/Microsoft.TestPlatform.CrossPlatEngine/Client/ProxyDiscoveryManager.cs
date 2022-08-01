@@ -215,10 +215,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
             return;
         }
 
-        if (_baseTestDiscoveryEventsHandler is null)
-        {
-            _baseTestDiscoveryEventsHandler = eventHandler;
-        }
+        _baseTestDiscoveryEventsHandler ??= eventHandler;
 
         if (_isCommunicationEstablished)
         {

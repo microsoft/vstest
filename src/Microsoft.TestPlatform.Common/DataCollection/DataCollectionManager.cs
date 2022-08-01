@@ -116,11 +116,8 @@ internal class DataCollectionManager : IDataCollectionManager
     {
         get
         {
-            if (_dataCollectorExtensionManager == null)
-            {
-                // TODO : change IMessageSink and use IMessageLogger instead.
-                _dataCollectorExtensionManager = DataCollectorExtensionManager.Create(TestSessionMessageLogger.Instance);
-            }
+            // TODO : change IMessageSink and use IMessageLogger instead.
+            _dataCollectorExtensionManager ??= DataCollectorExtensionManager.Create(TestSessionMessageLogger.Instance);
 
             return _dataCollectorExtensionManager;
         }
@@ -141,10 +138,7 @@ internal class DataCollectionManager : IDataCollectionManager
         {
             lock (SyncObject)
             {
-                if (Instance == null)
-                {
-                    Instance = new DataCollectionManager(messageSink, requestData);
-                }
+                Instance ??= new DataCollectionManager(messageSink, requestData);
             }
         }
 
