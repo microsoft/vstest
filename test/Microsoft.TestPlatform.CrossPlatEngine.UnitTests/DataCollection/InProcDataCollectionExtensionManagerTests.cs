@@ -62,11 +62,11 @@ public class InProcDataCollectionExtensionManagerTests
         testPluginCache.UpdateExtensions(new List<string> { @"C:\DEDUPLICATINGWITHCASEIGNORING1\Collector.dll" }, false);
         testPluginCache.UpdateExtensions(new List<string> { @"c:\DeduplicatingWithCaseIgnoring1\Collector.dll", @"c:\DeduplicatingWithCaseIgnoring2\Collector.dll" }, true);
 
-        var inProcDataCollectionExtensionManager = new TestableInProcDataCollectionExtensionManager(_settingsXml, _mockTestEventsPublisher.Object, _defaultCodebase, testPluginCache, _mockFileHelper.Object);
+        var inProcDataCollectionExtensionManager = new TestableInProcDataCollectionExtensionManager(_settingsXml, _mockTestEventsPublisher.Object, null, testPluginCache, _mockFileHelper.Object);
 
         Assert.AreEqual(3, inProcDataCollectionExtensionManager.CodeBasePaths.Count); // "CodeBasePaths" contains the two extensions(after removing duplicates) and the "_defaultCodebase"
 
-        Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(_defaultCodebase));
+        Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(null));
         Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(Path.GetDirectoryName(@"c:\DeduplicatingWithCaseIgnoring1\Collector.dll")));
         Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(Path.GetDirectoryName(@"c:\DeduplicatingWithCaseIgnoring2\Collector.dll")));
     }
@@ -294,7 +294,7 @@ public class InProcDataCollectionExtensionManagerTests
 
     internal class TestableInProcDataCollectionExtensionManager : InProcDataCollectionExtensionManager
     {
-        public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher, string defaultCodebase, TestPluginCache testPluginCache, IFileHelper fileHelper)
+        public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher, string? defaultCodebase, TestPluginCache testPluginCache, IFileHelper fileHelper)
             : base(runSettings, mockTestEventsPublisher, defaultCodebase, testPluginCache, fileHelper)
         {
         }
