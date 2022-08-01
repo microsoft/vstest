@@ -148,10 +148,7 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
     {
         if (_dataCollectionEnvironmentVariables != null)
         {
-            if (testProcessStartInfo.EnvironmentVariables == null)
-            {
-                testProcessStartInfo.EnvironmentVariables = new Dictionary<string, string?>();
-            }
+            testProcessStartInfo.EnvironmentVariables ??= new Dictionary<string, string?>();
 
             foreach (var envVariable in _dataCollectionEnvironmentVariables)
             {

@@ -42,10 +42,7 @@ public class ConsoleOutput : IOutput
 
             lock (LockObject)
             {
-                if (s_consoleOutput == null)
-                {
-                    s_consoleOutput = new ConsoleOutput();
-                }
+                s_consoleOutput ??= new ConsoleOutput();
             }
 
             return s_consoleOutput;

@@ -165,7 +165,7 @@ internal static class MetadataReaderExtensionsHelper
                                     continue;
                                 }
 
-                                if (extensions is null) extensions = new List<Tuple<int, Type>>();
+                                extensions ??= new List<Tuple<int, Type>>();
                                 extensions.Add(Tuple.Create(version, extensionType));
                                 EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Valid extension found: extension type '{extension}' identifier '{extensionIdentifier}' implementation '{extensionType}' version '{version}'");
                             }

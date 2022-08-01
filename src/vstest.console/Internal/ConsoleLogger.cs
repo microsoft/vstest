@@ -174,10 +174,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     {
         ValidateArg.NotNull(events, nameof(events));
 
-        if (Output == null)
-        {
-            Output = ConsoleOutput.Instance;
-        }
+        Output ??= ConsoleOutput.Instance;
 
         if (_progressIndicator == null && !Console.IsOutputRedirected && EnableProgress)
         {
@@ -898,10 +895,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <param name="warningMessage"></param>
     public static void RaiseTestRunWarning(string warningMessage)
     {
-        if (Output == null)
-        {
-            Output = ConsoleOutput.Instance;
-        }
+        Output ??= ConsoleOutput.Instance;
 
         Output.Warning(AppendPrefix, warningMessage);
     }

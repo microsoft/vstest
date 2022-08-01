@@ -66,11 +66,8 @@ internal class TestListCategory : IXmlTestStore
             {
                 lock (ReservedCategoryLock)
                 {
-                    if (s_uncategorizedResults == null)
-                    {
-                        s_uncategorizedResults = new TestListCategory(
+                    s_uncategorizedResults ??= new TestListCategory(
                             TrxLoggerResources.TS_UncategorizedResults, TestListCategoryId.Uncategorized, TestListCategoryId.Root);
-                    }
                 }
             }
 
@@ -89,11 +86,8 @@ internal class TestListCategory : IXmlTestStore
             {
                 lock (ReservedCategoryLock)
                 {
-                    if (s_allResults == null)
-                    {
-                        s_allResults = new TestListCategory(
+                    s_allResults ??= new TestListCategory(
                             TrxLoggerResources.TS_AllResults, TestListCategoryId.AllItems, TestListCategoryId.Root);
-                    }
                 }
             }
 

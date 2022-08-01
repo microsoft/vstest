@@ -142,10 +142,7 @@ internal class XmlPersistence
 
     private XmlElement CreateRootElement(string name, string namespaceUri)
     {
-        if (namespaceUri == null)
-        {
-            namespaceUri = _namespaceUri;
-        }
+        namespaceUri ??= _namespaceUri;
 
         XmlDocument dom = new();
         dom.AppendChild(dom.CreateXmlDeclaration("1.0", "UTF-8", null));
@@ -713,10 +710,7 @@ internal class XmlPersistence
             string firstPart = parts[0];
 
             XmlNode? firstChild = LocationToXmlNode(xml, firstPart);
-            if (firstChild == null)
-            {
-                firstChild = CreateElement(xml, firstPart, GetNamespaceUriOrDefault(nameSpaceUri));
-            }
+            firstChild ??= CreateElement(xml, firstPart, GetNamespaceUriOrDefault(nameSpaceUri));
 
             return parts.Length > 1 ? EnsureLocationExists((XmlElement)firstChild, parts[1]) : firstChild;
         }
@@ -775,15 +769,9 @@ internal class XmlPersistence
             toReturn.NamespaceUri = custom.NamespaceUri;
         }
 
-        if (toReturn.ElementName == null)
-        {
-            toReturn.ElementName = persistee.GetType().Name;
-        }
+        toReturn.ElementName ??= persistee.GetType().Name;
 
-        if (toReturn.NamespaceUri == null)
-        {
-            toReturn.NamespaceUri = _namespaceUri;
-        }
+        toReturn.NamespaceUri ??= _namespaceUri;
 
         return toReturn;
     }

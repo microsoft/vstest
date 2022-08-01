@@ -419,10 +419,7 @@ public class JsonDataSerializer : IDataSerializer
 
     private static JsonSerializer GetPayloadSerializer(int? version)
     {
-        if (version == null)
-        {
-            version = 1;
-        }
+        version ??= 1;
 
         return version switch
         {

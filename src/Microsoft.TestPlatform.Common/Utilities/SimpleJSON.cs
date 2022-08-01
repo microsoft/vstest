@@ -465,8 +465,7 @@ internal abstract partial class JSONNode
     {
         get
         {
-            if (s_escapeBuilder == null)
-                s_escapeBuilder = new StringBuilder();
+            s_escapeBuilder ??= new StringBuilder();
             return s_escapeBuilder;
         }
     }

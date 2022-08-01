@@ -299,8 +299,7 @@ internal class TestResult : ITestResult, IXmlTestStore
         get { return _errorInfo?.Message ?? string.Empty; }
         set
         {
-            if (_errorInfo == null)
-                _errorInfo = new TestResultErrorInfo();
+            _errorInfo ??= new TestResultErrorInfo();
 
             _errorInfo.Message = value;
         }
@@ -315,8 +314,7 @@ internal class TestResult : ITestResult, IXmlTestStore
 
         set
         {
-            if (_errorInfo == null)
-                _errorInfo = new TestResultErrorInfo();
+            _errorInfo ??= new TestResultErrorInfo();
 
             _errorInfo.StackTrace = value;
         }

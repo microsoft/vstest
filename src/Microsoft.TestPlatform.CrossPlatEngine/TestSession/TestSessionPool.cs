@@ -46,10 +46,7 @@ public class TestSessionPool
             {
                 lock (InstanceLockObject)
                 {
-                    if (s_instance == null)
-                    {
-                        s_instance = new TestSessionPool();
-                    }
+                    s_instance ??= new TestSessionPool();
                 }
             }
 

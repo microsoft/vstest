@@ -49,10 +49,7 @@ public static class TestPluginCacheHelper
     public static void SetupMockExtensions(string[] extensions, Action callback, Mock<IFileHelper>? mockFileHelper = null)
     {
         // Setup mocks.
-        if (mockFileHelper == null)
-        {
-            mockFileHelper = new Mock<IFileHelper>();
-        }
+        mockFileHelper ??= new Mock<IFileHelper>();
 
         mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
 

@@ -117,10 +117,7 @@ internal class TestLoggerManager : ITestLoggerManager
     {
         get
         {
-            if (_testLoggerExtensionManager == null)
-            {
-                _testLoggerExtensionManager = TestLoggerExtensionManager.Create(_messageLogger);
-            }
+            _testLoggerExtensionManager ??= TestLoggerExtensionManager.Create(_messageLogger);
 
             return _testLoggerExtensionManager;
         }
