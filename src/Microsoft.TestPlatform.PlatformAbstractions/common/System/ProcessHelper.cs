@@ -6,9 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-#if !NETCOREAPP1_0
 using System.Globalization;
-#endif
 using System.IO;
 using System.Reflection;
 using System.Threading;

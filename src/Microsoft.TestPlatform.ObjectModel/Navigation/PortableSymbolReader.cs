@@ -103,7 +103,7 @@ internal class PortableSymbolReader : ISymbolReader
             }
             catch (FileNotFoundException)
             {
-#if !NETSTANDARD1_3 && !WINDOWS_UWP && !NETCOREAPP1_0
+#if !WINDOWS_UWP
                 // fallback when the assembly is not loaded
                 asm = Assembly.LoadFile(binaryPath);
 #else

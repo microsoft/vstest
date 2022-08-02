@@ -8,7 +8,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 internal static partial class ReflectionHelpers
 {
-#if NETSTANDARD1_0 || NETSTANDARD1_3 || WINDOWS_UWP
+#if WINDOWS_UWP
     private static readonly Type MethodBase = typeof(MethodBase);
 
     private const string MemberTypePropertyName = "MemberType";
@@ -22,7 +22,7 @@ internal static partial class ReflectionHelpers
 
     internal static bool IsMethod(MethodBase method)
     {
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
+#if !WINDOWS_UWP
         return method.MemberType == MemberTypes.Method;
 #else
         AssertSupport(MemberTypeProperty, MemberTypePropertyName, MethodBase.FullName);
@@ -33,7 +33,7 @@ internal static partial class ReflectionHelpers
 
     internal static Type? GetReflectedType(MethodBase method)
     {
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
+#if !WINDOWS_UWP
         return method.ReflectedType;
 #else
         AssertSupport(MemberTypeProperty, ReflectedTypePropertyName, MethodBase.FullName);
@@ -44,7 +44,7 @@ internal static partial class ReflectionHelpers
 
     internal static RuntimeMethodHandle GetMethodHandle(MethodBase method)
     {
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
+#if !WINDOWS_UWP
         return method.MethodHandle;
 #else
         AssertSupport(MemberTypeProperty, MethodHandlePropertyName, MethodBase.FullName);

@@ -2,9 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-#if !NETSTANDARD1_0
 using System.Security.Cryptography;
-#endif
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -17,16 +15,10 @@ internal static class Sha1Helper
 {
     public static byte[] ComputeSha1(byte[] message)
     {
-#if NETSTANDARD1_0
-        var hasher = new Sha1Implementation();
-
-        return hasher.ComputeHash(message);
-#else
         using HashAlgorithm provider = SHA1.Create();
         byte[] hash = provider.ComputeHash(message);
 
         return hash;
-#endif
     }
 
     /// <summary>

@@ -24,12 +24,6 @@
     <!-- Directory with netcoreapp3.1 binaries -->
     <ArtifactsCore31Directory Condition="'$(ArtifactsCore31Directory)' == ''">$(ArtifactsBaseDirectory)netcoreapp3.1\</ArtifactsCore31Directory>
 
-    <!-- Directory with NetStandard1.0 binaries -->
-    <ArtifactsNS10Directory Condition="'$(ArtifactsNS10Directory)' == ''">$(ArtifactsBaseDirectory)netstandard1.0\</ArtifactsNS10Directory>
-
-    <!-- Directory with NetStandard1.3 binaries -->
-    <ArtifactsNS13Directory Condition="'$(ArtifactsNS13Directory)' == ''">$(ArtifactsBaseDirectory)netstandard1.3\</ArtifactsNS13Directory>
-
     <!-- Directory with NetStandard2.0 binaries -->
     <ArtifactsNS20Directory Condition="'$(ArtifactsNS20Directory)' == ''">$(ArtifactsBaseDirectory)netstandard2.0\</ArtifactsNS20Directory>
 
@@ -198,19 +192,6 @@
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\datacollector.exe" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\datacollector.arm64.exe" />
 
-      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
-      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.AdapterUtilities.dll" />
-
-      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
-      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.CrossPlatEngine.dll" />
-      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.CommunicationUtilities.dll" />
-      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.Utilities.dll" />
-      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.VisualStudio.TestPlatform.Common.dll" />
-
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
@@ -233,8 +214,6 @@
 
       <!-- Localized resources -->
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)%(ResxLang.Identity)\*.*" />
-      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)%(ResxLang.Identity)\*.*" />
-      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)%(ResxLang.Identity)\*.*" />
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)%(ResxLang.Identity)\*.*" />
       <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)%(ResxLang.Identity)\*.*" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)Extensions\%(ResxLang.Identity)\*.*" />
@@ -320,16 +299,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <NetStandard10AssembliesToSign>
-        <Authenticode>Microsoft400</Authenticode>
-        <StrongName>StrongName</StrongName>
-      </NetStandard10AssembliesToSign>
-
-      <NetStandard13AssembliesToSign>
-        <Authenticode>Microsoft400</Authenticode>
-        <StrongName>StrongName</StrongName>
-      </NetStandard13AssembliesToSign>
-
       <NetStandard20AssembliesToSign>
         <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
@@ -383,18 +352,6 @@
     <Message Text="Signing native libraries using authenticode certificate '%(NativeBinariesToSign.Authenticode)' for @(NativeBinariesToSign)"/>
     <SignFiles Files="@(NativeBinariesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)"
-               IntermediatesDirectory="$(IntermediatesDirectory)"
-               Type="$(SignType)" />
-
-    <Message Text="Signing using authenticode certificate '%(NetStandard10AssembliesToSign.Authenticode)' for @(NetStandard10AssembliesToSign)"/>
-    <SignFiles Files="@(NetStandard10AssembliesToSign)"
-               BinariesDirectory="$(ArtifactsNS10Directory)"
-               IntermediatesDirectory="$(IntermediatesDirectory)"
-               Type="$(SignType)" />
-
-    <Message Text="Signing using authenticode certificate NetStandard13AssembliesToSign:'%(NetStandard13AssembliesToSign.Authenticode)' for @(NetStandard13AssembliesToSign)"/>
-    <SignFiles Files="@(NetStandard13AssembliesToSign)"
-               BinariesDirectory="$(ArtifactsNS13Directory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 

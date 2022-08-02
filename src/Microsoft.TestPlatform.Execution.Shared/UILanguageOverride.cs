@@ -58,7 +58,6 @@ internal class UiLanguageOverride
             catch (CultureNotFoundException) { }
         }
 
-#if !NETCOREAPP1_0 && !NETSTANDARD1_3
         // VSLANG=<lcid> is set by VS and we respect that as well so that we will respect the VS
         // language preference if we're invoked by VS.
         string? vsLang = environmentVariableHelper.GetEnvironmentVariable(VSLANG);
@@ -71,7 +70,7 @@ internal class UiLanguageOverride
             catch (ArgumentOutOfRangeException) { }
             catch (CultureNotFoundException) { }
         }
-# endif
+
         return null;
     }
 
@@ -79,9 +78,7 @@ internal class UiLanguageOverride
     {
         // Do not override any environment variables that are already set as we do not want to clobber a more granular setting with our global setting.
         SetIfNotAlreadySet(DOTNET_CLI_UI_LANGUAGE, language.Name, environmentVariableHelper);
-#if !NETCOREAPP1_0 && !NETSTANDARD1_3
         SetIfNotAlreadySet(VSLANG, language.LCID.ToString(CultureInfo.CurrentCulture), environmentVariableHelper); // for tools following VS guidelines to just work in CLI
-#endif
         SetIfNotAlreadySet(PreferredUILang, language.Name, environmentVariableHelper); // for C#/VB targets that pass $(PreferredUILang) to compiler
     }
 

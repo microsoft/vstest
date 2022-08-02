@@ -522,11 +522,7 @@ internal abstract partial class JSONNode
             return token;
         if (token.Length <= 5)
         {
-            string tmp = token.ToLower(
-#if !NETSTANDARD1_3
-                CultureInfo.InvariantCulture
-#endif
-                );
+            string tmp = token.ToLower(CultureInfo.InvariantCulture);
             if (tmp is "false" or "true")
                 return tmp == "true";
             if (tmp == "null")

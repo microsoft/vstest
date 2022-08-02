@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.CrossPlatEngine</AssemblyName>
-    <TargetFrameworks>net6.0;netstandard2.0;netstandard1.3;$(TargetNetFxVersion)</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.0;$(TargetNetFxVersion)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
@@ -24,9 +24,6 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Diagnostics.Process" Condition="'$(TargetFramework)' == 'netstandard1.3'" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
     <Reference Include="System" />

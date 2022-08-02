@@ -435,7 +435,6 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public string? DotnetHostPath { get; private set; }
 
-#if !NETSTANDARD1_0
     /// <inheritdoc/>
     public override XmlElement ToXml()
     {
@@ -553,7 +552,6 @@ public class RunConfiguration : TestRunSettings
 
         return root;
     }
-#endif
 
     /// <summary>
     /// Loads RunConfiguration from XmlReader.
@@ -600,7 +598,7 @@ public class RunConfiguration : TestRunSettings
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         string collectSourceInformationStr = reader.ReadElementContentAsString();
 
-                        bool bCollectSourceInformation = true;
+                        bool bCollectSourceInformation;
                         if (!bool.TryParse(collectSourceInformationStr, out bCollectSourceInformation))
                         {
                             throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
@@ -813,7 +811,7 @@ public class RunConfiguration : TestRunSettings
 
                     case "TreatTestAdapterErrorsAsWarnings":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                        bool treatTestAdapterErrorsAsWarnings = false;
+                        bool treatTestAdapterErrorsAsWarnings;
 
                         value = reader.ReadElementContentAsString();
 
@@ -838,16 +836,10 @@ public class RunConfiguration : TestRunSettings
                     case "SolutionDirectory":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         string? solutionDirectory = reader.ReadElementContentAsString();
-
-#if !NETSTANDARD1_0
                         solutionDirectory = Environment.ExpandEnvironmentVariables(solutionDirectory);
-#endif
 
-                        if (StringUtils.IsNullOrEmpty(solutionDirectory)
-#if !NETSTANDARD1_0
-                            || !System.IO.Directory.Exists(solutionDirectory)
-#endif
-                           )
+                        if (solutionDirectory.IsNullOrEmpty()
+                            || !System.IO.Directory.Exists(solutionDirectory))
                         {
                             EqtTrace.Error(string.Format(CultureInfo.CurrentCulture, Resources.Resources.SolutionDirectoryNotExists, solutionDirectory));
                             solutionDirectory = null;

@@ -5,7 +5,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard2.0;$(TargetNetFxVersion)</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;$(TargetNetFxVersion)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.AdapterUtilities</AssemblyName>
@@ -72,8 +72,8 @@
     <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
     <!-- API that is common to all frameworks except for .NET Standard 1.0 and UAP10. -->
-    <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' AND '$(TargetFramework)' != 'uap10.0' " Include="PublicAPI\net\PublicAPI.Shipped.txt" />
-    <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' AND '$(TargetFramework)' != 'uap10.0' " Include="PublicAPI\net\PublicAPI.Unshipped.txt" />
+    <AdditionalFiles Condition=" '$(TargetFramework)' != 'uap10.0' " Include="PublicAPI\net\PublicAPI.Shipped.txt" />
+    <AdditionalFiles Condition=" '$(TargetFramework)' != 'uap10.0' " Include="PublicAPI\net\PublicAPI.Unshipped.txt" />
   </ItemGroup>
 
   <ItemGroup>

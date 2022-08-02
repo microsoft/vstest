@@ -228,7 +228,7 @@ public static partial class ManagedNameHelper
 
         var parsedManagedTypeName = ReflectionHelpers.ParseEscapedString(managedTypeName);
 
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
+#if !WINDOWS_UWP
         type = assembly.GetType(parsedManagedTypeName, throwOnError: false, ignoreCase: false);
 #else
         try
@@ -297,7 +297,7 @@ public static partial class ManagedNameHelper
 
         MemberInfo[] methods;
 
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
+#if !WINDOWS_UWP
         var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
         methods = type.FindMembers(MemberTypes.Method, bindingFlags, Filter, null);
 #else
@@ -511,7 +511,7 @@ public static partial class ManagedNameHelper
     {
         Type[] genericArguments;
 
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
+#if !WINDOWS_UWP
         genericArguments = type.GetGenericArguments();
 #else
         genericArguments = type.GetTypeInfo().GenericTypeArguments;
