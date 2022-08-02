@@ -220,8 +220,8 @@ public class TestRequestManagerTests
         Assert.AreEqual("a", actualDiscoveryCriteria.Sources.First(), "First Source in list is incorrect");
         Assert.AreEqual("b", actualDiscoveryCriteria.Sources.ElementAt(1), "Second Source in list is incorrect");
 
-        // Default frequency is set to 10, unless specified in runsettings.
-        Assert.AreEqual(10, actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent);
+        // Default frequency is set to BatchSize (which is set to 1000).
+        Assert.AreEqual(1000, actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent);
 
         mockDiscoveryRegistrar.Verify(md => md.RegisterDiscoveryEvents(It.IsAny<IDiscoveryRequest>()), Times.Once);
         mockDiscoveryRegistrar.Verify(md => md.UnregisterDiscoveryEvents(It.IsAny<IDiscoveryRequest>()), Times.Once);
