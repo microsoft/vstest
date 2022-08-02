@@ -40,6 +40,12 @@ public class CommandLineOptionsTests
     }
 
     [TestMethod]
+    public void CommandLineOptionsDiscoveryDefaultBatchSizeIsThousand()
+    {
+        Assert.AreEqual(1000, CommandLineOptions.DefaultDiscoveryBatchSize);
+    }
+
+    [TestMethod]
     public void CommandLineOptionsDefaultTestRunStatsEventTimeoutIsOnePointFiveSec()
     {
         var timeout = new TimeSpan(0, 0, 0, 1, 500);
