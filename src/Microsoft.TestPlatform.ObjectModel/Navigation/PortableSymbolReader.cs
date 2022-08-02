@@ -103,13 +103,8 @@ internal class PortableSymbolReader : ISymbolReader
             }
             catch (FileNotFoundException)
             {
-#if !WINDOWS_UWP
                 // fallback when the assembly is not loaded
                 asm = Assembly.LoadFile(binaryPath);
-#else
-                // fallback is not supported
-                throw;
-#endif
             }
 
             foreach (var type in asm.GetTypes())

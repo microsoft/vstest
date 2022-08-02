@@ -10,19 +10,11 @@ internal static partial class ReflectionHelpers
 {
     internal static bool IsGenericType(Type type)
     {
-#if !WINDOWS_UWP
         return type.IsGenericType;
-#else
-        return type.GetTypeInfo().IsGenericType;
-#endif
     }
 
     internal static MethodBase? GetDeclaringMethod(Type type)
     {
-#if !WINDOWS_UWP
         return type.DeclaringMethod;
-#else
-        return type.GetTypeInfo().DeclaringMethod;
-#endif
     }
 }

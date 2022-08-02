@@ -8,21 +8,9 @@
     <AssemblyName>Microsoft.TestPlatform.PlatformAbstractions</AssemblyName>
     <RootNamespace>Microsoft.TestPlatform.PlatformAbstractions</RootNamespace>
     <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion);netstandard2.0;net6.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
     <NoWarn>$(NoWarn);NU1605</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
-    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
-    <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetCoreVersion)' ">
@@ -39,21 +27,6 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="5.1.0" />
-    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
-    <PackageReference Include="System.Net.Http" Version="$(SystemNetHttpVersion)" />
-
-    <!-- CVE-2018-8356 mitigation -->
-    <PackageReference Include="System.ServiceModel.Duplex" Version="$(SystemServiceModelVersion)" />
-    <PackageReference Include="System.ServiceModel.NetTcp" Version="$(SystemServiceModelVersion)" />
-    <PackageReference Include="System.ServiceModel.Primitives" Version="$(SystemServiceModelVersion)" />
-    <PackageReference Include="System.ServiceModel.Security" Version="$(SystemServiceModelVersion)" />
-    <PackageReference Include="System.Private.ServiceModel" Version="$(SystemServiceModelVersion)" />
-    <PackageReference Include="System.ServiceModel.Http" Version="$(SystemServiceModelVersion)" />
-    <!-- / CVE-2018-8356 mitigation -->
   </ItemGroup>
 
   <ItemGroup>

@@ -3,9 +3,7 @@
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
-#if !WINDOWS_UWP
 using System.Globalization;
-#endif
 
 using NuGet.Frameworks;
 
@@ -60,12 +58,7 @@ public class Framework
         {
             // IDE always sends framework in form of ENUM, which always throws exception
             // This throws up in first chance exception, refer Bug https://devdiv.visualstudio.com/DefaultCollection/DevDiv/_workitems/edit/591142
-            var formattedFrameworkString = frameworkString.Trim()
-                .ToLower(
-#if !WINDOWS_UWP
-                    CultureInfo.InvariantCulture
-#endif
-                );
+            var formattedFrameworkString = frameworkString.Trim().ToLower(CultureInfo.InvariantCulture);
             switch (formattedFrameworkString)
             {
                 case "framework35":

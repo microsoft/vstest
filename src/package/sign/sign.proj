@@ -197,11 +197,6 @@
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.AdapterUtilities.dll" />
 
-      <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-      <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)Microsoft.TestPlatform.AdapterUtilities.dll" />
-      <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
-      <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
-
       <!-- NetCoreExtensions -->
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" />
@@ -215,7 +210,6 @@
       <!-- Localized resources -->
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)%(ResxLang.Identity)\*.*" />
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)%(ResxLang.Identity)\*.*" />
-      <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)%(ResxLang.Identity)\*.*" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)Extensions\%(ResxLang.Identity)\*.*" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\%(ResxLang.Identity)\*.*" />
 
@@ -232,7 +226,6 @@
 
     <!-- Sign Microsoft.TestPlatform.TestHost -->
     <ItemGroup>
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\testhost.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\testhost.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\testhost.exe" />
       <NativeBinariesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win7-x64\testhost.exe" />
@@ -251,15 +244,6 @@
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.Common.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\Microsoft.TestPlatform.CoreUtilities.dll" />
-
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\testhost.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.TestPlatform.CommunicationUtilities.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.TestPlatform.CrossPlatEngine.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.TestPlatform.Utilities.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.VisualStudio.TestPlatform.Common.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.TestPlatform.CoreUtilities.dll" />
 
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\$(TargetFramework)\$(TargetRuntime)\Microsoft.TestPlatform.CommunicationUtilities.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\$(TargetFramework)\$(TargetRuntime)\Microsoft.TestPlatform.CoreUtilities.dll" />
@@ -290,11 +274,9 @@
       <!-- Localized resources -->
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\$(TargetFramework)\$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\%(ResxLang.Identity)\*.*" />
 
       <!-- Third Party assemblies to sign -->
       <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\Newtonsoft.Json.dll" />
-      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Newtonsoft.Json.dll" />
       <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\$(TargetFramework)\$(TargetRuntime)\Newtonsoft.Json.dll" />
     </ItemGroup>
 
@@ -303,11 +285,6 @@
         <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </NetStandard20AssembliesToSign>
-
-      <UAP100AssembliesToSign>
-        <Authenticode>Microsoft400</Authenticode>
-        <StrongName>StrongName</StrongName>
-      </UAP100AssembliesToSign>
 
       <AssembliesToSign>
         <Authenticode>Microsoft400</Authenticode>
@@ -358,12 +335,6 @@
     <Message Text="Signing using authenticode certificate NetStandard20AssembliesToSign:'%(NetStandard20AssembliesToSign.Authenticode)' for @(NetStandard20AssembliesToSign)"/>
     <SignFiles Files="@(NetStandard20AssembliesToSign)"
                BinariesDirectory="$(ArtifactsNS20Directory)"
-               IntermediatesDirectory="$(IntermediatesDirectory)"
-               Type="$(SignType)" />
-
-    <Message Text="Signing using authenticode certificate UAP100AssembliesToSign:'%(UAP100AssembliesToSign.Authenticode)' for @(UAP100AssembliesToSign)"/>
-    <SignFiles Files="@(UAP100AssembliesToSign)"
-               BinariesDirectory="$(ArtifactsUAP100Directory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
