@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
 
 using Moq;
 
@@ -855,8 +856,10 @@ public class ConsoleLoggerTests
         // Assert
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp1.Tests.dll", ""), OutputLevel.Information), Times.Once());
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp2.Tests.dll", ""), OutputLevel.Information), Times.Once());
-        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp3.Tests.dll", ""), OutputLevel.Information), Times.Once());
-        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp4.Tests.dll", ""), OutputLevel.Information), Times.Once());
+        // On Linux and MAC we don't support backslash for path so source name will contain backslashes.
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, TestUtils.IsWindows ? "MyApp3.Tests.dll" : "MyApp3.Tests\\MyApp3.Tests.dll", ""), OutputLevel.Information), Times.Once());
+        // On Linux and MAC we don't support backslash for path so source name will contain backslashes.
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, TestUtils.IsWindows ? "MyApp4.Tests.dll" : "C:\\MyApp4\\Tests\\MyApp4.Tests\\MyApp4.Tests.dll", ""), OutputLevel.Information), Times.Once());
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp5.Tests.dll", ""), OutputLevel.Information), Times.Once());
     }
 
