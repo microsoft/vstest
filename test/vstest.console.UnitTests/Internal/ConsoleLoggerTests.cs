@@ -827,6 +827,40 @@ public class ConsoleLoggerTests
     }
 
     [TestMethod]
+    public void TestRunCompleteHandlerCorrectlySplitPathsForSourceName()
+    {
+        // Arrange
+        var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+        loggerEvents.EnableEvents();
+        var parameters = new Dictionary<string, string?>
+        {
+            { "verbosity", "minimal" }
+        };
+        _consoleLogger.Initialize(loggerEvents, parameters);
+
+        // Linux-like path
+        loggerEvents.RaiseTestResult(new(new(new("FQN1", new Uri("some://uri"), "/home/MyApp1/Tests/MyApp1.Tests/MyApp1.Tests.dll"))));
+        // Double forward slashes path
+        loggerEvents.RaiseTestResult(new(new(new("FQN2", new Uri("some://uri"), "/home//MyApp2//Tests//MyApp2.Tests//MyApp2.Tests.dll"))));
+        // Backslashes path
+        loggerEvents.RaiseTestResult(new(new(new("FQN3", new Uri("some://uri"), @"C:\MyApp3/Tests/MyApp3.Tests\MyApp3.Tests.dll"))));
+        // Multiple Backslashes path
+        loggerEvents.RaiseTestResult(new(new(new("FQN4", new Uri("some://uri"), "C:\\\\MyApp4\\\\Tests\\\\MyApp4.Tests\\\\MyApp4.Tests.dll"))));
+        // Mix backslashes and forward slashes path
+        loggerEvents.RaiseTestResult(new(new(new("FQN5", new Uri("some://uri"), "C:\\MyApp5/Tests\\\\MyApp5.Tests///MyApp5.Tests.dll"))));
+
+        // Act
+        loggerEvents.CompleteTestRun(null, false, false, null, null, null, new TimeSpan(1, 0, 0, 0));
+
+        // Assert
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp1.Tests.dll", ""), OutputLevel.Information), Times.Once());
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp2.Tests.dll", ""), OutputLevel.Information), Times.Once());
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp3.Tests.dll", ""), OutputLevel.Information), Times.Once());
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp4.Tests.dll", ""), OutputLevel.Information), Times.Once());
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp5.Tests.dll", ""), OutputLevel.Information), Times.Once());
+    }
+
+    [TestMethod]
     public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsPass()
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);

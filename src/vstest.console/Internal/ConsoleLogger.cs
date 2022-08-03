@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -160,7 +161,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// tracking counts per source for the minimal and quiet output.
     /// </summary>
     private ConcurrentDictionary<Guid, MinimalTestResult>? LeafTestResults { get; set; }
-
 
     #region ITestLoggerWithParameters
 
@@ -678,8 +678,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         Output.WriteLine(string.Empty, OutputLevel.Information);
 
         // Printing Run-level Attachments
-        var runLevelAttachementCount = e.AttachmentSets == null ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
-        if (runLevelAttachementCount > 0)
+        var runLevelAttachmentsCount = e.AttachmentSets == null ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
+        if (runLevelAttachmentsCount > 0)
         {
             // If ARTIFACTS_POSTPROCESSING is disabled
             if (_featureFlag.IsSet(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING) ||
@@ -689,7 +689,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                 CommandLineOptions.Instance.TestSessionCorrelationId is null)
             {
                 Output.Information(false, CommandLineResources.AttachmentsBanner);
-                TPDebug.Assert(e.AttachmentSets != null, "e.AttachmentSets should not be null when runLevelAttachementCount > 0.");
+                TPDebug.Assert(e.AttachmentSets != null, "e.AttachmentSets should not be null when runLevelAttachmentsCount > 0.");
                 foreach (var attachmentSet in e.AttachmentSets)
                 {
                     foreach (var uriDataAttachment in attachmentSet.Attachments)
@@ -765,7 +765,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     : $"({_targetFramework})";
 
                 var duration = GetFormattedDurationString(sourceSummary.Duration);
-                var sourceName = sd.Key.Split('\\').Last();
+                var sourceName = sd.Key.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Last();
 
                 var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
                     resultString,
