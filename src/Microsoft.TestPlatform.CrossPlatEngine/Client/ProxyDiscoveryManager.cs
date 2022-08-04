@@ -37,6 +37,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     private bool _isCommunicationEstablished;
     private ProxyOperationManager? _proxyOperationManager;
     private ITestDiscoveryEventsHandler2? _baseTestDiscoveryEventsHandler;
+    private bool _skipDefaultAdapters;
     private string? _previousSource;
 
     /// <summary>
@@ -118,7 +119,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
 
     public void Initialize(bool skipDefaultAdapters)
     {
-
+        _skipDefaultAdapters = skipDefaultAdapters;
     }
 
     /// <inheritdoc/>
@@ -160,25 +161,30 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
 
     public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
     {
-        TPDebug.Assert(_proxyOperationManager is not null, "ProxyOperationManager is null.");
-
         // Multiple method calls will iterate over this sources collection so we want to ensure
         // it's built once.
         var discoverySources = discoveryCriteria.Sources.ToArray();
 
         try
         {
+            if (!_isCommunicationEstablished)
+            {
+                InitializeDiscovery(discoveryCriteria, eventHandler, _skipDefaultAdapters);
+            }
+
+            TPDebug.Assert(_proxyOperationManager is not null, "ProxyOperationManager is null.");
+
             if (_isCommunicationEstablished)
             {
                 discoveryCriteria.UpdateDiscoveryCriteria(_testHostManager!);
+
+                // Consider the first source as the previous source so that if we are discovering a source
+                // with no tests, we will always consider the source as fully discovered when reaching the
+                // discovery complete event.
+                _previousSource = discoverySources[0];
+
+                _proxyOperationManager.RequestSender.DiscoverTests(discoveryCriteria, this);
             }
-
-            // Consider the first source as the previous source so that if we are discovering a source
-            // with no tests, we will always consider the source as fully discovered when reaching the
-            // discovery complete event.
-            _previousSource = discoverySources[0];
-
-            _proxyOperationManager.RequestSender.DiscoverTests(discoveryCriteria, this);
         }
         catch (Exception exception)
         {

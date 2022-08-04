@@ -273,7 +273,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
     {
         // We don't need to lock here, we just grab the current list of
         // slots that are occupied (have managers) and run action on each one of them.
-        var managers = _managerSlots.Where(slot => !slot.HasWork).Select(slot => slot.Manager).ToList();
+        var managers = _managerSlots.Where(slot => slot.HasWork).Select(slot => slot.Manager).ToList();
         int i = 0;
         var actionTasks = new Task[managers.Count];
         foreach (var manager in managers)

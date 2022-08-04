@@ -367,7 +367,14 @@ internal sealed class ParallelProxyExecutionManager : IParallelProxyExecutionMan
             {
                 proxyExecutionManager.Initialize(_skipDefaultAdapters);
             }
-            Interlocked.Increment(ref _runStartedClients);
+
+            // NOTE: No need to increment the number of started clients on initialization since the
+            // client doesn't really count as started unless some work is done on it. Incrementing
+            // the number of clients will result in failing acceptance tests because they expect all
+            // clients to be done running their workloads when aborting/cancelling and that doesn't
+            // happen with an initialized workload that is never run.
+            //
+            // Interlocked.Increment(ref _runStartedClients);
             proxyExecutionManager.InitializeTestRun(testRunCriteria, eventHandler);
 
         });
