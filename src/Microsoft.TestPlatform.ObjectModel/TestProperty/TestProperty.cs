@@ -171,10 +171,7 @@ public class TestProperty : IEquatable<TestProperty>
     /// <returns>The valueType of the test property</returns>
     public Type GetValueType()
     {
-        if (_valueType == null)
-        {
-            _valueType = GetType(ValueType);
-        }
+        _valueType ??= GetType(ValueType);
 
         return _valueType;
     }
@@ -208,10 +205,8 @@ public class TestProperty : IEquatable<TestProperty>
                 }
             }
 
-            if (type == null)
-            {
-                type = Type.GetType(typeName.Replace("Version=4.0.0.0", "Version=2.0.0.0")); // Try 2.0 version as discovery returns version of 4.0 for all cases
-            }
+            // Try 2.0 version as discovery returns version of 4.0 for all cases
+            type ??= Type.GetType(typeName.Replace("Version=4.0.0.0", "Version=2.0.0.0"));
 
             // For UAP the type namespace for System.Uri,System.TimeSpan and System.DateTimeOffset differs from the desktop version.
             if (type == null && typeName.StartsWith("System.Uri"))
@@ -263,10 +258,7 @@ public class TestProperty : IEquatable<TestProperty>
         finally
         {
             // default is of string type.
-            if (type == null)
-            {
-                type = typeof(string);
-            }
+            type ??= typeof(string);
         }
 
         if (!DisableFastJson)
@@ -404,9 +396,7 @@ public class TestProperty : IEquatable<TestProperty>
     public object GetRealObject(StreamingContext context)
     {
         var registeredProperty = Find(Id);
-        if (registeredProperty == null)
-        {
-            registeredProperty = Register(
+        registeredProperty ??= Register(
                 Id,
                 Label,
                 Category,
@@ -415,7 +405,6 @@ public class TestProperty : IEquatable<TestProperty>
                 ValidateValueCallback,
                 Attributes,
                 typeof(TestObject));
-        }
 
         return registeredProperty;
     }

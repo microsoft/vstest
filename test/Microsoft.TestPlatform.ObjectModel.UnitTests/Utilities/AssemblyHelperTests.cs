@@ -4,6 +4,7 @@
 #if NETFRAMEWORK
 
 using System;
+using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
@@ -73,6 +74,20 @@ public class AssemblyHelperTests
         AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, runContext.Object);
 
         Assert.IsNull(appDomainSetup.TargetFrameworkName);
+    }
+
+    [TestMethod]
+    [DataRow(null)]
+    [DataRow("")]
+    public void DoesReferencesAssemblyWhenSourceIsNullOrEmptyReturnsNull(string source)
+    {
+        Assert.IsNull(AssemblyHelper.DoesReferencesAssembly(source, AssemblyName.GetAssemblyName(Assembly.GetExecutingAssembly().Location)));
+    }
+
+    [TestMethod]
+    public void DoesReferencesAssemblyWhenReferenceAssemblyIsNullReturnsNull()
+    {
+        Assert.IsNull(AssemblyHelper.DoesReferencesAssembly("C:\\some.dll", null!));
     }
 }
 #endif

@@ -46,10 +46,7 @@ internal class RunSettingsManager : IRunSettingsProvider
 
             lock (LockObject)
             {
-                if (s_runSettingsManagerInstance == null)
-                {
-                    s_runSettingsManagerInstance = new RunSettingsManager();
-                }
+                s_runSettingsManagerInstance ??= new RunSettingsManager();
             }
 
             return s_runSettingsManagerInstance;

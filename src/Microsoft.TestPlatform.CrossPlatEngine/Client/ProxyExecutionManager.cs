@@ -307,10 +307,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
     public virtual void Cancel(IInternalTestRunEventsHandler eventHandler)
     {
         // Just in case ExecuteAsync isn't called yet, set the eventhandler.
-        if (_baseTestRunEventsHandler == null)
-        {
-            _baseTestRunEventsHandler = eventHandler;
-        }
+        _baseTestRunEventsHandler ??= eventHandler;
 
         // Do nothing if the proxy is not initialized yet.
         if (_proxyOperationManager == null)
@@ -330,10 +327,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
     public void Abort(IInternalTestRunEventsHandler eventHandler)
     {
         // Just in case ExecuteAsync isn't called yet, set the eventhandler.
-        if (_baseTestRunEventsHandler == null)
-        {
-            _baseTestRunEventsHandler = eventHandler;
-        }
+        _baseTestRunEventsHandler ??= eventHandler;
 
         // Do nothing if the proxy is not initialized yet.
         if (_proxyOperationManager == null)
@@ -386,10 +380,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
         // TestHost did not provide any additional TargetFramework info for the process it wants to attach to,
         // specify the TargetFramework of the testhost, in case it is just an old testhost that is not aware
         // of this capability.
-        if (attachDebuggerInfo.TargetFramework is null)
-        {
-            attachDebuggerInfo.TargetFramework = _proxyOperationManager?.TestHostManagerFramework?.ToString();
-        };
+        attachDebuggerInfo.TargetFramework ??= _proxyOperationManager?.TestHostManagerFramework?.ToString();
 
         if (attachDebuggerInfo.Sources is null || !attachDebuggerInfo.Sources.Any())
         {

@@ -44,10 +44,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
         {
             moduleNode = GetNode(node, "package", name);
 
-            if (moduleNode == null)
-            {
-                moduleNode = GetNode(node, "package", Path.GetFileNameWithoutExtension(name));
-            }
+            moduleNode ??= GetNode(node, "package", Path.GetFileNameWithoutExtension(name));
         }
 
         return moduleNode;

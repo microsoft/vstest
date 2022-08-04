@@ -30,22 +30,16 @@ internal class MsTestV1TelemetryHelper
         // add additional info for mstestadapter/v1
         if (IsMsTestV1Adapter(executorUri))
         {
-            if (s_testTypeProperty == null)
-            {
-                // this is present when the legacy runner is used, and contains a guid which
-                // is the test type.
-                // GenericTestType 982B8C01-1A8A-48F5-B98A-67EE64BC8687
-                // OrderedTestType ec4800e8-40e5-4ab3-8510-b8bf29b1904d
-                // UnitTestType 13CDC9D9-DDB5-4fa4-A97D-D965CCFC6D4B
-                // WebTestType 4e7599fa-5ecb-43e9-a887-cd63cf72d207
-                // CodedWebTestType 37e36796-fb51-4610-8d5c-e00ceaa68b9f
-                s_testTypeProperty = TestProperty.Register("TestType", "TestType", typeof(Guid), typeof(TestResult));
-            }
+            // this is present when the legacy runner is used, and contains a guid which
+            // is the test type.
+            // GenericTestType 982B8C01-1A8A-48F5-B98A-67EE64BC8687
+            // OrderedTestType ec4800e8-40e5-4ab3-8510-b8bf29b1904d
+            // UnitTestType 13CDC9D9-DDB5-4fa4-A97D-D965CCFC6D4B
+            // WebTestType 4e7599fa-5ecb-43e9-a887-cd63cf72d207
+            // CodedWebTestType 37e36796-fb51-4610-8d5c-e00ceaa68b9f
+            s_testTypeProperty ??= TestProperty.Register("TestType", "TestType", typeof(Guid), typeof(TestResult));
 
-            if (s_extensionIdProperty == null)
-            {
-                s_extensionIdProperty = TestProperty.Register("ExtensionId", "ExtensionId", typeof(string), typeof(TestResult));
-            }
+            s_extensionIdProperty ??= TestProperty.Register("ExtensionId", "ExtensionId", typeof(string), typeof(TestResult));
             // Get addional data from test result passed by MSTestv1
             // Only legacy tests have testtype.
 

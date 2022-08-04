@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -52,6 +53,26 @@ public class InProcDataCollectionExtensionManagerTests
         _testPluginCache = TestPluginCache.Instance;
         _inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(_settingsXml, _mockTestEventsPublisher.Object, _defaultCodebase, _testPluginCache, _mockFileHelper.Object);
     }
+
+    [TestMethod]
+    public void CodeBasePathsAreDeduplicatedWithCaseIgnoring()
+    {
+        var testPluginCache = new TestableTestPluginCache();
+        // the boolean argument refers to adding the paths to which list(we have two lists)and the duplicate happened when we merged the two lists and they had the same path
+        testPluginCache.UpdateExtensions(new List<string> { Path.Combine(Temp, "DEDUPLICATINGWITHCASEIGNORING1", "Collector.dll") }, false);
+        var directory1 = Path.Combine(Temp, "DeduplicatingWithCaseIgnoring1");
+        var directory2 = Path.Combine(Temp, "DeduplicatingWithCaseIgnoring2");
+        testPluginCache.UpdateExtensions(new List<string> { Path.Combine(directory1, "Collector.dll"), Path.Combine(directory2, "Collector.dll") }, true);
+
+        var inProcDataCollectionExtensionManager = new TestableInProcDataCollectionExtensionManager(_settingsXml, _mockTestEventsPublisher.Object, null, testPluginCache, _mockFileHelper.Object);
+
+        Assert.AreEqual(3, inProcDataCollectionExtensionManager.CodeBasePaths.Count); // "CodeBasePaths" contains the two extensions(after removing duplicates) and the "_defaultCodebase"
+
+        Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(null));
+        Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(directory1));
+        Assert.IsTrue(inProcDataCollectionExtensionManager.CodeBasePaths.Contains(directory2));
+    }
+
 
     [TestMethod]
     public void InProcDataCollectionExtensionManagerShouldLoadsDataCollectorsFromRunSettings()
@@ -275,7 +296,7 @@ public class InProcDataCollectionExtensionManagerTests
 
     internal class TestableInProcDataCollectionExtensionManager : InProcDataCollectionExtensionManager
     {
-        public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher, string defaultCodebase, TestPluginCache testPluginCache, IFileHelper fileHelper)
+        public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher, string? defaultCodebase, TestPluginCache testPluginCache, IFileHelper fileHelper)
             : base(runSettings, mockTestEventsPublisher, defaultCodebase, testPluginCache, fileHelper)
         {
         }

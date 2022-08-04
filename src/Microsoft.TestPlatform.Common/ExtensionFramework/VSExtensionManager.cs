@@ -130,10 +130,7 @@ public class VSExtensionManager : IVSExtensionManager
     {
         get
         {
-            if (_extensionManagerAssembly == null)
-            {
-                _extensionManagerAssembly = Assembly.Load(new AssemblyName(ExtensionManagerAssemblyName));
-            }
+            _extensionManagerAssembly ??= Assembly.Load(new AssemblyName(ExtensionManagerAssemblyName));
             return _extensionManagerAssembly;
         }
     }
@@ -183,10 +180,7 @@ public class VSExtensionManager : IVSExtensionManager
     {
         get
         {
-            if (_settingsManagerAssembly == null)
-            {
-                _settingsManagerAssembly = Assembly.Load(new AssemblyName(SettingsManagerAssemblyName));
-            }
+            _settingsManagerAssembly ??= Assembly.Load(new AssemblyName(SettingsManagerAssemblyName));
 
             return _settingsManagerAssembly;
         }

@@ -21,10 +21,7 @@ public static class StringUtilities
     public static string PrepareForOutput(string? input)
     {
         string? result = input;
-        if (result == null)
-        {
-            result = Resources.Resources.NullString;
-        }
+        result ??= Resources.Resources.NullString;
 
         result = result.TrimEnd(Environment.NewLine.ToCharArray());
 

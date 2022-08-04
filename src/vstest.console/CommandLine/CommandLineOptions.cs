@@ -24,9 +24,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine;
 internal class CommandLineOptions
 {
     /// <summary>
-    /// The default batch size.
+    /// The default batch size for Run.
     /// </summary>
-    public const long DefaultBatchSize = 10;
+    public const long DefaultRunBatchSize = 10;
+
+    /// <summary>
+    /// The default batch size for Discovery.
+    /// </summary>
+    public const long DefaultDiscoveryBatchSize = 1000;
 
     /// <summary>
     /// The use vsix extensions key.
@@ -62,7 +67,7 @@ internal class CommandLineOptions
     /// </summary>
     internal CommandLineOptions()
     {
-        BatchSize = DefaultBatchSize;
+        BatchSize = DefaultRunBatchSize;
         TestStatsEventTimeout = _defaultRetrievalTimeout;
         FileHelper = new FileHelper();
         FilePatternParser = new FilePatternParser();
