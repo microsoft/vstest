@@ -65,7 +65,7 @@
     <TestPlatformRemoteExternalsVersion>17.3.32621.448</TestPlatformRemoteExternalsVersion>
     <TestPlatformMSDiaVersion>17.3.32621.448</TestPlatformMSDiaVersion>
     <InteropExternalsVersion>17.3.32621.448</InteropExternalsVersion>
-    <MicrosoftFakesVersion>17.4.0-beta.22378.9</MicrosoftFakesVersion>
+    <MicrosoftFakesVersion>17.4.0-beta.22405.1</MicrosoftFakesVersion>
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
     <MicrosoftBuildFrameworkPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>
