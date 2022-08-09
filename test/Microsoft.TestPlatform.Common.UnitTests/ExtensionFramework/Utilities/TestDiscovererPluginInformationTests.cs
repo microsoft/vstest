@@ -38,6 +38,7 @@ public class TestDiscovererPluginInformationTests
         _testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithNoFileExtensions));
         Assert.IsNotNull(_testPluginInformation.FileExtensions);
         Assert.AreEqual(0, _testPluginInformation.FileExtensions.Count);
+        Assert.IsFalse(_testPluginInformation.IsDirectoryBased);
     }
 
     [TestMethod]
@@ -45,6 +46,7 @@ public class TestDiscovererPluginInformationTests
     {
         _testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithOneFileExtensions));
         CollectionAssert.AreEqual(new List<string> { "csv" }, _testPluginInformation.FileExtensions);
+        Assert.IsFalse(_testPluginInformation.IsDirectoryBased);
     }
 
     [TestMethod]
@@ -52,6 +54,7 @@ public class TestDiscovererPluginInformationTests
     {
         _testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithTwoFileExtensions));
         CollectionAssert.AreEqual(new List<string> { "csv", "docx" }, _testPluginInformation.FileExtensions);
+        Assert.IsFalse(_testPluginInformation.IsDirectoryBased);
     }
 
     [TestMethod]
@@ -129,6 +132,36 @@ public class TestDiscovererPluginInformationTests
         CollectionAssert.AreEqual(expectedFileExtensions, ((List<string>)testPluginMetada[0]!).ToArray());
         Assert.AreEqual("csvexecutor", testPluginMetada[1] as string);
         Assert.AreEqual(AssemblyType.Managed, Enum.Parse(typeof(AssemblyType), testPluginMetada[2]!.ToString()!));
+        Assert.IsFalse(bool.Parse(testPluginMetada[3]!.ToString()!));
+    }
+
+    [TestMethod]
+    public void IsDirectoryBasedShouldReturnTrueIfDiscovererIsDirectoryBased()
+    {
+        _testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyDirectoryBasedTestDiscoverer));
+        var testPluginMetada = _testPluginInformation.Metadata.ToArray();
+
+        Assert.IsNotNull(_testPluginInformation.FileExtensions);
+        Assert.AreEqual(0, _testPluginInformation.FileExtensions.Count);
+        Assert.IsNotNull(testPluginMetada[0]);
+        Assert.AreEqual(0, ((List<string>)testPluginMetada[0]!).Count);
+
+        Assert.IsTrue(_testPluginInformation.IsDirectoryBased);
+        Assert.IsTrue(bool.Parse(testPluginMetada[3]!.ToString()!));
+    }
+
+    [TestMethod]
+    public void FileExtensionsAndIsDirectroyBasedShouldReturnCorrectValuesWhenBothAreSupported()
+    {
+        _testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyDirectoryBasedTestDiscovererWithFileExtensions));
+        var testPluginMetada = _testPluginInformation.Metadata.ToArray();
+        var expectedFileExtensions = new List<string> { "csv", "docx" };
+
+        CollectionAssert.AreEqual(expectedFileExtensions, _testPluginInformation.FileExtensions);
+        CollectionAssert.AreEqual(expectedFileExtensions, ((List<string>)testPluginMetada[0]!));
+
+        Assert.IsTrue(_testPluginInformation.IsDirectoryBased);
+        Assert.IsTrue(bool.Parse(testPluginMetada[3]!.ToString()!));
     }
 }
 
@@ -193,4 +226,15 @@ public class DummyTestDiscovererWithTwoFileExtensions
 {
 }
 
+[DirectoryBasedTestDiscoverer]
+public class DummyDirectoryBasedTestDiscoverer
+{
+}
+
+[DirectoryBasedTestDiscoverer]
+[FileExtension("csv")]
+[FileExtension("docx")]
+public class DummyDirectoryBasedTestDiscovererWithFileExtensions
+{
+}
 #endregion

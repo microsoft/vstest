@@ -238,7 +238,7 @@ public class DiscoveryManager : IDiscoveryManager
     /// <summary>
     /// Verify/Normalize the test source files.
     /// </summary>
-    /// <param name="sources"> Paths to source file to look for tests in.  </param>
+    /// <param name="sources"> Paths to source file (or directory) in which to look for tests. </param>
     /// <param name="logger">logger</param>
     /// <param name="package">package</param>
     /// <returns> The list of verified sources. </returns>
@@ -255,7 +255,7 @@ public class DiscoveryManager : IDiscoveryManager
             // It is possible that runtime provider sent relative source path for remote scenario.
             string src = !Path.IsPathRooted(source) ? Path.Combine(Directory.GetCurrentDirectory(), source) : source;
 
-            if (!File.Exists(src))
+            if (!File.Exists(src) && !Directory.Exists(src))
             {
                 void SendWarning()
                 {

@@ -8,11 +8,21 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 /// <summary>
-/// Interface implemented to provide tests to the test platform.  A class that
-//  implements this interface will be available for use if its containing
-//  assembly is either placed in the Extensions folder or is marked as a 'UnitTestExtension' type
-//  in the vsix package.
+/// Interface implemented to provide tests to the test platform.
 /// </summary>
+/// <remarks>
+/// <para>
+/// A class that implements this interface will be available for use if its containing assembly is either placed in
+/// the Extensions folder or is marked as a 'UnitTestExtension' type in the vsix package.
+/// </para>
+/// <para>
+/// Provide one or more <see cref="FileExtensionAttribute"/>s on the implementing class to indicate the set of file
+/// extensions that are supported for test discovery. If the discoverer supports discovering tests present inside
+/// directories, provide <see cref="DirectoryBasedTestDiscovererAttribute"/> instead. If neither
+/// <see cref="DirectoryBasedTestDiscovererAttribute"/> nor <see cref="FileExtensionAttribute"/> is provided, the
+/// discoverer will be called for all relevant test files and directories.
+/// </para>
+/// </remarks>
 public interface ITestDiscoverer
 {
     /// <summary>
