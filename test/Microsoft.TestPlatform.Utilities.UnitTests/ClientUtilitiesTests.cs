@@ -195,7 +195,7 @@ public class ClientUtilitiesTests
             Environment.SetEnvironmentVariable("TEST_TEMP", Path.GetTempPath());
             // using TEST_TEMP because TMP or TEMP, or HOME are not defined across all tested OSes
             // Using \\ instead of platform specifc path separator does not matter, because the paths are not interpreted by the OS.
-            var runSettingsXml = "<RunSettings><RunConfiguration><ResultsDirectory>%TEST_TEMP%\\results</ResultsDirectory></RunConfiguration></RunSettings>";
+            var runSettingsXml = "<RunSettings><RunConfiguration><ResultsDirectory>%TEST_TEMP%\\results</ResultsDirectory><DotNetHostPath>%TEST_TEMP%\\hostpath</DotNetHostPath></RunConfiguration></RunSettings>";
 
             var doc = new XmlDocument();
             doc.LoadXml(runSettingsXml);
@@ -206,12 +206,15 @@ public class ClientUtilitiesTests
 
             var finalSettingsXml = doc.OuterXml;
 
-            var expectedPath = $"{Environment.GetEnvironmentVariable("TEST_TEMP")}\\results";
+            var expectedResultsPath = $"{Environment.GetEnvironmentVariable("TEST_TEMP")}\\results";
+            var expectedDotNetHostPath = $"{Environment.GetEnvironmentVariable("TEST_TEMP")}\\hostpath";
 
             var expectedSettingsXml = string.Concat(
                 "<RunSettings><RunConfiguration><ResultsDirectory>",
-                expectedPath,
-                "</ResultsDirectory></RunConfiguration><RunSettingsDirectory>",
+                expectedResultsPath,
+                "</ResultsDirectory><DotNetHostPath>",
+                expectedDotNetHostPath,
+                "</DotNetHostPath></RunConfiguration><RunSettingsDirectory>",
                 Path.GetDirectoryName(currentAssemblyLocation),
                 "</RunSettingsDirectory></RunSettings>");
 
