@@ -82,7 +82,7 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
     }
 
     /// <summary>
-    /// Helper to get file extensions from the <see cref="FileExtensionAttribute"/>S on the discover plugin.
+    /// Helper to get file extensions from the <see cref="FileExtensionAttribute"/> on the discover plugin.
     /// </summary>
     /// <param name="testDiscovererType">Data type of the test discoverer</param>
     /// <returns>List of file extensions</returns>
