@@ -84,6 +84,7 @@ public class TestDiscovererMetadataTests
         var metadata = new TestDiscovererMetadata(null, null);
 
         Assert.IsNull(metadata.FileExtension);
+        Assert.IsFalse(metadata.IsDirectoryBased);
     }
 
     [TestMethod]
@@ -92,6 +93,7 @@ public class TestDiscovererMetadataTests
         var metadata = new TestDiscovererMetadata(new List<string>(), null);
 
         Assert.IsNull(metadata.FileExtension);
+        Assert.IsFalse(metadata.IsDirectoryBased);
     }
 
     [TestMethod]
@@ -100,6 +102,7 @@ public class TestDiscovererMetadataTests
         var metadata = new TestDiscovererMetadata(new List<string>(), null);
 
         Assert.IsNull(metadata.DefaultExecutorUri);
+        Assert.IsFalse(metadata.IsDirectoryBased);
     }
 
     [TestMethod]
@@ -108,6 +111,7 @@ public class TestDiscovererMetadataTests
         var metadata = new TestDiscovererMetadata(new List<string>(), " ");
 
         Assert.IsNull(metadata.DefaultExecutorUri);
+        Assert.IsFalse(metadata.IsDirectoryBased);
     }
 
     [TestMethod]
@@ -117,6 +121,7 @@ public class TestDiscovererMetadataTests
         var metadata = new TestDiscovererMetadata(extensions, null);
 
         CollectionAssert.AreEqual(extensions, metadata.FileExtension!.ToList());
+        Assert.IsFalse(metadata.IsDirectoryBased);
     }
 
     [TestMethod]
@@ -125,6 +130,7 @@ public class TestDiscovererMetadataTests
         var metadata = new TestDiscovererMetadata(null, "executor://helloworld");
 
         Assert.AreEqual("executor://helloworld/", metadata.DefaultExecutorUri!.AbsoluteUri);
+        Assert.IsFalse(metadata.IsDirectoryBased);
     }
 
     [TestMethod]
@@ -133,5 +139,14 @@ public class TestDiscovererMetadataTests
         var metadata = new TestDiscovererMetadata(null, "executor://helloworld", AssemblyType.Native);
 
         Assert.AreEqual(AssemblyType.Native, metadata.AssemblyType);
+        Assert.IsFalse(metadata.IsDirectoryBased);
+    }
+
+    [TestMethod]
+    public void TestDiscovererMetadataCtorSetsIsDirectoryBased()
+    {
+        var metadata = new TestDiscovererMetadata(null, "executor://helloworld", isDirectoryBased: true);
+
+        Assert.IsTrue(metadata.IsDirectoryBased);
     }
 }

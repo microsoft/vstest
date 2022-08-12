@@ -3,14 +3,18 @@
 
 using System;
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
-/// This attribute is applied to ITestDiscoverers.  It indicates
-/// which file extensions the test discoverer knows how to process.
-/// If this attribute is not provided on the test discoverer it will be
-/// called for all file types.
+/// This attribute is applied to <see cref="ITestDiscoverer"/>s. It indicates that the discoverer discovers tests
+/// present in files with the specified extension.
 /// </summary>
+/// <remarks>
+/// If neither this attribute nor the <see cref="DirectoryBasedTestDiscovererAttribute"/> is provided on the test
+/// discoverer, it will be called for all relevant test files and directories.
+/// </remarks>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 public sealed class FileExtensionAttribute : Attribute
 {

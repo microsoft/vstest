@@ -94,6 +94,7 @@ public class LazyExtensionTests
         CollectionAssert.AreEqual(new List<string> { "csv" }, metadata.FileExtension!.ToArray());
         Assert.AreEqual("executor://unittestexecutor/", metadata.DefaultExecutorUri!.AbsoluteUri);
         Assert.AreEqual(AssemblyType.Native, metadata.AssemblyType);
+        Assert.IsFalse(metadata.IsDirectoryBased);
     }
 
     #endregion
@@ -120,14 +121,20 @@ public class LazyExtensionTests
             private set;
         }
 
-        public DummyDiscovererCapability(List<string> fileExtensions, string executorUri, AssemblyType assemblyType)
+        public bool IsDirectoryBased
+        {
+            get;
+            private set;
+        }
+
+        public DummyDiscovererCapability(List<string> fileExtensions, string executorUri, AssemblyType assemblyType, bool isDirectoryBased)
         {
             FileExtension = fileExtensions;
             DefaultExecutorUri = new Uri(executorUri);
             AssemblyType = assemblyType;
+            IsDirectoryBased = isDirectoryBased;
         }
     }
-
 
     [FileExtension("csv")]
     [DefaultExecutorUri("executor://unittestexecutor")]
