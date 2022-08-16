@@ -29,6 +29,7 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
             FileExtensions = GetFileExtensions(testDiscovererType);
             DefaultExecutorUri = GetDefaultExecutorUri(testDiscovererType);
             AssemblyType = GetAssemblyType(testDiscovererType);
+            IsDirectoryBased = GetIsDirectoryBased(testDiscovererType);
         }
     }
 
@@ -39,7 +40,7 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
     {
         get
         {
-            return new object?[] { FileExtensions, DefaultExecutorUri, AssemblyType };
+            return new object?[] { FileExtensions, DefaultExecutorUri, AssemblyType, IsDirectoryBased };
         }
     }
 
@@ -71,15 +72,25 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
     }
 
     /// <summary>
-    /// Helper to get file extensions from the FileExtensionAttribute on the discover plugin.
+    /// <c>true</c> if the discoverer plugin is decorated with <see cref="DirectoryBasedTestDiscovererAttribute"/>,
+    /// <c>false</c> otherwise.
     /// </summary>
-    /// <param name="testDicovererType">Data type of the test discoverer</param>
+    public bool IsDirectoryBased
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// Helper to get file extensions from the <see cref="FileExtensionAttribute"/> on the discover plugin.
+    /// </summary>
+    /// <param name="testDiscovererType">Data type of the test discoverer</param>
     /// <returns>List of file extensions</returns>
-    private static List<string> GetFileExtensions(Type testDicovererType)
+    private static List<string> GetFileExtensions(Type testDiscovererType)
     {
         var fileExtensions = new List<string>();
 
-        var attributes = testDicovererType.GetTypeInfo().GetCustomAttributes(typeof(FileExtensionAttribute), false).ToArray();
+        var attributes = testDiscovererType.GetTypeInfo().GetCustomAttributes(typeof(FileExtensionAttribute), inherit: false).ToArray();
         if (attributes != null && attributes.Length > 0)
         {
             foreach (var attribute in attributes)
@@ -96,15 +107,15 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
     }
 
     /// <summary>
-    /// Returns the value of default executor Uri on this type. 'Null' if not present.
+    /// Returns the value of default executor Uri on this type. <c>null</c> if not present.
     /// </summary>
     /// <param name="testDiscovererType"> The test discoverer Type. </param>
     /// <returns> The default executor URI. </returns>
     private static string GetDefaultExecutorUri(Type testDiscovererType)
     {
-        string result = string.Empty;
+        var result = string.Empty;
 
-        object[] attributes = testDiscovererType.GetTypeInfo().GetCustomAttributes(typeof(DefaultExecutorUriAttribute), false).ToArray();
+        var attributes = testDiscovererType.GetTypeInfo().GetCustomAttributes(typeof(DefaultExecutorUriAttribute), inherit: false).ToArray();
         if (attributes != null && attributes.Length > 0)
         {
             DefaultExecutorUriAttribute executorUriAttribute = (DefaultExecutorUriAttribute)attributes[0];
@@ -119,7 +130,7 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
     }
 
     /// <summary>
-    /// Helper to get the supported assembly type from the CategoryAttribute on the discover plugin.
+    /// Helper to get the supported assembly type from the <see cref="CategoryAttribute"/> on the discover plugin.
     /// </summary>
     /// <param name="testDiscovererType"> The test discoverer Type. </param>
     /// <returns> Supported assembly type. </returns>
@@ -133,5 +144,16 @@ internal class TestDiscovererPluginInformation : TestPluginInformation
         // Get assembly type from category.
         Enum.TryParse(category, true, out AssemblyType assemblyType);
         return assemblyType;
+    }
+
+    /// <summary>
+    /// Returns <c>true</c> if the discoverer plugin is decorated with
+    /// <see cref="DirectoryBasedTestDiscovererAttribute"/>, <c>false</c> otherwise.
+    /// </summary>
+    /// <param name="testDiscovererType">Data type of the test discoverer</param>
+    private static bool GetIsDirectoryBased(Type testDiscovererType)
+    {
+        var attribute = testDiscovererType.GetTypeInfo().GetCustomAttribute(typeof(DirectoryBasedTestDiscovererAttribute), inherit: false);
+        return attribute is DirectoryBasedTestDiscovererAttribute;
     }
 }

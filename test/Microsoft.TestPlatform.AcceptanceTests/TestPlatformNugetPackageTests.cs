@@ -25,13 +25,13 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
         ZipFile.ExtractToDirectory(nugetPackage, s_nugetPackageFolder);
 
         TryMoveDirectory(
-            sourceDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team%20Tools"),
-            destDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team Tools")
+            sourceDirName: Path.Combine(s_nugetPackageFolder, "tools", "net462", "Team%20Tools"),
+            destDirName: Path.Combine(s_nugetPackageFolder, "tools", "net462", "Team Tools")
         );
 
         TryMoveDirectory(
-            sourceDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic%20Code%20Coverage%20Tools"),
-            destDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic Code Coverage Tools")
+            sourceDirName: Path.Combine(s_nugetPackageFolder, "tools", "net462", "Team Tools", "Dynamic%20Code%20Coverage%20Tools"),
+            destDirName: Path.Combine(s_nugetPackageFolder, "tools", "net462", "Team Tools", "Dynamic Code Coverage Tools")
         );
     }
 
