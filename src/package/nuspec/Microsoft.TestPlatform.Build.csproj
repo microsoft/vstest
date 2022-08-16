@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework Condition=" '$(DotNetBuildFromSource)' != 'true' ">netstandard2.0</TargetFramework>
-    <TargetFramework Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFramework>
+    <TargetFramework Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0</TargetFramework>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <NuspecFile>TestPlatform.Build.nuspec</NuspecFile>
     <NuspecProperties>BranchName=$(BranchName);CommitId=$(CommitId);Version=$(Version);TargetFramework=$(TargetFramework)</NuspecProperties>

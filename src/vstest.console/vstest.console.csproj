@@ -8,8 +8,8 @@
   <PropertyGroup>
     <AssemblyName>vstest.console</AssemblyName>
     <AssemblyName Condition=" '$(RuntimeIdentifier)' == 'win10-arm64' ">vstest.console.arm64</AssemblyName>
-    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0;</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <RollForward>Major</RollForward>
     <IsTestProject>false</IsTestProject>
