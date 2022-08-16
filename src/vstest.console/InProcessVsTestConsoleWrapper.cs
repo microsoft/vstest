@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -81,7 +80,12 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
 
         // Fill the parameters.
-        consoleParameters.ParentProcessId = Process.GetCurrentProcess().Id;
+        consoleParameters.ParentProcessId =
+#if NET7_0_OR_GREATER
+            Environment.ProcessId;
+#else
+            System.Diagnostics.Process.GetCurrentProcess().Id;
+#endif
         consoleParameters.PortNumber = port;
 
         // Start vstest.console.

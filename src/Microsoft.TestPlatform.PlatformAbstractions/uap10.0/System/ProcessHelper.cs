@@ -94,7 +94,7 @@ public partial class ProcessHelper : IProcessHelper
         throw new NotImplementedException();
     }
 
-    public IntPtr GetProcessHandle(int processId)
+    public nint GetProcessHandle(int processId)
     {
         throw new NotImplementedException();
     }

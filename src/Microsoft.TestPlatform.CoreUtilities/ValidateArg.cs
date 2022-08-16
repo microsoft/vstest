@@ -34,7 +34,7 @@ public static class ValidateArg
     /// Type of argument.
     /// </returns>
     [DebuggerStepThrough]
-    public static T NotNull<T>([ValidatedNotNull] T? arg, string parameterName)
+    public static T NotNull<T>([NotNull] T? arg, string parameterName)
     {
         return arg ?? throw new ArgumentNullException(parameterName);
     }
@@ -55,7 +55,7 @@ public static class ValidateArg
     /// Thrown if the input string is null or empty.
     /// </exception>
     [DebuggerStepThrough]
-    public static string NotNullOrEmpty([ValidatedNotNull] string? arg, string parameterName)
+    public static string NotNullOrEmpty([NotNull] string? arg, string parameterName)
     {
         return arg.IsNullOrEmpty() ? throw new ArgumentNullException(parameterName) : arg;
     }
@@ -76,7 +76,7 @@ public static class ValidateArg
     /// Thrown if the input string is null, empty or consists only of white-space characters.
     /// </exception>
     [DebuggerStepThrough]
-    public static string NotNullOrWhiteSpace([ValidatedNotNull] string? arg, string parameterName)
+    public static string NotNullOrWhiteSpace([NotNull] string? arg, string parameterName)
     {
         return arg.IsNullOrWhiteSpace() ? throw new ArgumentNullException(parameterName) : arg;
     }
@@ -118,7 +118,7 @@ public static class ValidateArg
     /// <param name="arg">The argument to check.</param>
     /// <param name="parameterName">The parameter name of the argument.</param>
     [DebuggerStepThrough]
-    public static void NotNullOrEmpty<T>([ValidatedNotNull] IEnumerable<T>? arg, string parameterName)
+    public static void NotNullOrEmpty<T>([NotNull] IEnumerable<T>? arg, string parameterName)
     {
         NotNull(arg, parameterName);
 
@@ -136,7 +136,7 @@ public static class ValidateArg
     /// <param name="parameterName">The parameter name of the argument.</param>
     /// <typeparam name="T">The type of the expected argument.</typeparam>
     [DebuggerStepThrough]
-    public static void TypeOf<T>([ValidatedNotNull] object? arg, string parameterName)
+    public static void TypeOf<T>([NotNull] object? arg, string parameterName)
         where T : class
     {
         NotNull(arg, parameterName);
@@ -161,7 +161,7 @@ public static class ValidateArgProperty
     /// <param name="parameterName">The parameter name of the argument.</param>
     /// <param name="propertyName">The property name of the argument.</param>
     [DebuggerStepThrough]
-    public static void NotNull([ValidatedNotNull] object? arg, string parameterName, string propertyName)
+    public static void NotNull([NotNull] object? arg, string parameterName, string propertyName)
     {
         if (arg == null)
         {
@@ -193,7 +193,7 @@ public static class ValidateArgProperty
     /// <param name="parameterName">The parameter name of the argument.</param>
     /// <param name="propertyName">The property name of the argument.</param>
     [DebuggerStepThrough]
-    public static void NotNullOrEmpty([ValidatedNotNull] string? arg, string parameterName, string propertyName)
+    public static void NotNullOrEmpty([NotNull] string? arg, string parameterName, string propertyName)
     {
         NotNull(arg, parameterName, propertyName);
 
@@ -212,7 +212,7 @@ public static class ValidateArgProperty
     /// <param name="propertyName">The property name of the argument.</param>
     /// <typeparam name="T">The type of the expected argument.</typeparam>
     [DebuggerStepThrough]
-    public static void TypeOf<T>([ValidatedNotNull] object? arg, string parameterName, string propertyName)
+    public static void TypeOf<T>([NotNull] object? arg, string parameterName, string propertyName)
         where T : class
     {
         NotNull(arg, parameterName, propertyName);

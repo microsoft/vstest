@@ -10,7 +10,7 @@
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0;</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == '$(TargetNetFxVersion)' ">
+  <ItemGroup Condition="'$(TargetFramework)' == '$(TargetNetFxVersion)'">
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Xml" />

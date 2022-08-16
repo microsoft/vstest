@@ -116,5 +116,5 @@ public interface IProcessHelper
     /// </summary>
     /// <param name="processId">process id</param>
     /// <returns>Process Handle</returns>
-    IntPtr GetProcessHandle(int processId);
+    nint GetProcessHandle(int processId);
 }

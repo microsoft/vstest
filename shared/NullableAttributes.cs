@@ -3,9 +3,6 @@
 
 // This was copied from https://github.com/dotnet/coreclr/blob/60f1e6265bd1039f023a82e0643b524d6aaf7845/src/System.Private.CoreLib/shared/System/Diagnostics/CodeAnalysis/NullableAttributes.cs
 // and updated to have the scope of the attributes be internal.
-
-#pragma warning disable CA1019 // Define accessors for attribute arguments
-
 namespace System.Diagnostics.CodeAnalysis;
 
 #if NETFRAMEWORK || WINDOWS_UWP || NETSTANDARD && !NETSTANDARD2_1 || NETCOREAPP && !NETCOREAPP3_0_OR_GREATER
@@ -149,11 +146,3 @@ internal sealed class MemberNotNullWhenAttribute : Attribute
 }
 
 #endif
-
-/// <summary>
-/// Secret attribute that tells the CA1062 validate arguments rule that this method validates the argument is not null.
-/// </summary>
-[AttributeUsage(AttributeTargets.Parameter)]
-internal sealed class ValidatedNotNullAttribute : Attribute
-{
-}

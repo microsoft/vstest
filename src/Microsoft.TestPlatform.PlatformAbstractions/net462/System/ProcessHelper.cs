@@ -21,7 +21,7 @@ public partial class ProcessHelper : IProcessHelper
         => Path.GetDirectoryName(GetCurrentProcessFileName());
 
     /// <inheritdoc/>
-    public IntPtr GetProcessHandle(int processId) =>
+    public nint GetProcessHandle(int processId) =>
         processId == _currentProcess.Id
             ? _currentProcess.Handle
             : Process.GetProcessById(processId).Handle;

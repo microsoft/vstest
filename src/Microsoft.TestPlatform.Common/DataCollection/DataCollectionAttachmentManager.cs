@@ -290,7 +290,12 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
                         ex.ToString(),
                         uri,
                         friendlyName,
-                        Guid.Parse(testCaseId));
+#if NET7_0_OR_GREATER
+                        Guid.Parse(testCaseId, CultureInfo.InvariantCulture)
+#else
+                        Guid.Parse(testCaseId)
+#endif
+                        );
 
                     throw;
                 }

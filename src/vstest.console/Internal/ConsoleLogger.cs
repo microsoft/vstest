@@ -701,115 +701,118 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             }
         }
 
-        var leafTestResultsPerSource = LeafTestResults.Select(p => p.Value).GroupBy(r => r.TestCase.Source);
-        foreach (var sd in leafTestResultsPerSource)
+        var leafTestResultsPerSource = LeafTestResults?.Select(p => p.Value).GroupBy(r => r.TestCase.Source);
+        if (leafTestResultsPerSource != null)
         {
-            var source = sd.Key;
-            var sourceSummary = new SourceSummary();
-
-            var results = sd.ToArray();
-            // duration of the whole source is the difference between the test that ended last and the one that started first
-            sourceSummary.Duration = !results.Any() ? TimeSpan.Zero : results.Max(r => r.EndTime) - results.Min(r => r.StartTime);
-            foreach (var result in results)
+            foreach (var sd in leafTestResultsPerSource)
             {
-                switch (result.Outcome)
+                var source = sd.Key;
+                var sourceSummary = new SourceSummary();
+
+                var results = sd.ToArray();
+                // duration of the whole source is the difference between the test that ended last and the one that started first
+                sourceSummary.Duration = !results.Any() ? TimeSpan.Zero : results.Max(r => r.EndTime) - results.Min(r => r.StartTime);
+                foreach (var result in results)
                 {
-                    case TestOutcome.Passed:
-                        sourceSummary.TotalTests++;
-                        sourceSummary.PassedTests++;
-                        break;
-                    case TestOutcome.Failed:
-                        sourceSummary.TotalTests++;
-                        sourceSummary.FailedTests++;
-                        break;
-                    case TestOutcome.Skipped:
-                        sourceSummary.TotalTests++;
-                        sourceSummary.SkippedTests++;
-                        break;
-                    default:
-                        break;
+                    switch (result.Outcome)
+                    {
+                        case TestOutcome.Passed:
+                            sourceSummary.TotalTests++;
+                            sourceSummary.PassedTests++;
+                            break;
+                        case TestOutcome.Failed:
+                            sourceSummary.TotalTests++;
+                            sourceSummary.FailedTests++;
+                            break;
+                        case TestOutcome.Skipped:
+                            sourceSummary.TotalTests++;
+                            sourceSummary.SkippedTests++;
+                            break;
+                        default:
+                            break;
+                    }
                 }
+
+                if (VerbosityLevel is Verbosity.Quiet or Verbosity.Minimal)
+                {
+                    TestOutcome sourceOutcome = TestOutcome.None;
+                    if (sourceSummary.FailedTests > 0)
+                    {
+                        sourceOutcome = TestOutcome.Failed;
+                    }
+                    else if (sourceSummary.PassedTests > 0)
+                    {
+                        sourceOutcome = TestOutcome.Passed;
+                    }
+                    else if (sourceSummary.SkippedTests > 0)
+                    {
+                        sourceOutcome = TestOutcome.Skipped;
+                    }
+
+                    string resultString = sourceOutcome switch
+                    {
+                        TestOutcome.Failed => (CommandLineResources.FailedTestIndicator + "!").PadRight(LongestResultIndicator),
+                        TestOutcome.Passed => (CommandLineResources.PassedTestIndicator + "!").PadRight(LongestResultIndicator),
+                        TestOutcome.Skipped => (CommandLineResources.SkippedTestIndicator + "!").PadRight(LongestResultIndicator),
+                        _ => CommandLineResources.None.PadRight(LongestResultIndicator),
+                    };
+                    var failed = sourceSummary.FailedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
+                    var passed = sourceSummary.PassedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
+                    var skipped = sourceSummary.SkippedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
+                    var total = sourceSummary.TotalTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
+
+
+                    var frameworkString = _targetFramework.IsNullOrEmpty()
+                        ? string.Empty
+                        : $"({_targetFramework})";
+
+                    var duration = GetFormattedDurationString(sourceSummary.Duration);
+                    var sourceName = sd.Key.Split('\\').Last();
+
+                    var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
+                        resultString,
+                        failed,
+                        passed,
+                        skipped,
+                        total,
+                        duration,
+                        sourceName,
+                        frameworkString);
+
+
+                    ConsoleColor? color = null;
+                    if (sourceOutcome == TestOutcome.Failed)
+                    {
+                        color = ConsoleColor.Red;
+                    }
+                    else if (sourceOutcome == TestOutcome.Passed)
+                    {
+                        color = ConsoleColor.Green;
+                    }
+                    else if (sourceOutcome == TestOutcome.Skipped)
+                    {
+                        color = ConsoleColor.Yellow;
+                    }
+
+                    if (color != null)
+                    {
+                        Output.Write(outputLine, OutputLevel.Information, color.Value);
+                    }
+                    else
+                    {
+                        Output.Write(outputLine, OutputLevel.Information);
+                    }
+
+                    Output.Information(false, CommandLineResources.TestRunSummaryAssemblyAndFramework,
+                        sourceName,
+                        frameworkString);
+                }
+
+                passedTests += sourceSummary.PassedTests;
+                failedTests += sourceSummary.FailedTests;
+                skippedTests += sourceSummary.SkippedTests;
+                totalTests += sourceSummary.TotalTests;
             }
-
-            if (VerbosityLevel is Verbosity.Quiet or Verbosity.Minimal)
-            {
-                TestOutcome sourceOutcome = TestOutcome.None;
-                if (sourceSummary.FailedTests > 0)
-                {
-                    sourceOutcome = TestOutcome.Failed;
-                }
-                else if (sourceSummary.PassedTests > 0)
-                {
-                    sourceOutcome = TestOutcome.Passed;
-                }
-                else if (sourceSummary.SkippedTests > 0)
-                {
-                    sourceOutcome = TestOutcome.Skipped;
-                }
-
-                string resultString = sourceOutcome switch
-                {
-                    TestOutcome.Failed => (CommandLineResources.FailedTestIndicator + "!").PadRight(LongestResultIndicator),
-                    TestOutcome.Passed => (CommandLineResources.PassedTestIndicator + "!").PadRight(LongestResultIndicator),
-                    TestOutcome.Skipped => (CommandLineResources.SkippedTestIndicator + "!").PadRight(LongestResultIndicator),
-                    _ => CommandLineResources.None.PadRight(LongestResultIndicator),
-                };
-                var failed = sourceSummary.FailedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
-                var passed = sourceSummary.PassedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
-                var skipped = sourceSummary.SkippedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
-                var total = sourceSummary.TotalTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
-
-
-                var frameworkString = _targetFramework.IsNullOrEmpty()
-                    ? string.Empty
-                    : $"({_targetFramework})";
-
-                var duration = GetFormattedDurationString(sourceSummary.Duration);
-                var sourceName = sd.Key.Split('\\').Last();
-
-                var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
-                    resultString,
-                    failed,
-                    passed,
-                    skipped,
-                    total,
-                    duration,
-                    sourceName,
-                    frameworkString);
-
-
-                ConsoleColor? color = null;
-                if (sourceOutcome == TestOutcome.Failed)
-                {
-                    color = ConsoleColor.Red;
-                }
-                else if (sourceOutcome == TestOutcome.Passed)
-                {
-                    color = ConsoleColor.Green;
-                }
-                else if (sourceOutcome == TestOutcome.Skipped)
-                {
-                    color = ConsoleColor.Yellow;
-                }
-
-                if (color != null)
-                {
-                    Output.Write(outputLine, OutputLevel.Information, color.Value);
-                }
-                else
-                {
-                    Output.Write(outputLine, OutputLevel.Information);
-                }
-
-                Output.Information(false, CommandLineResources.TestRunSummaryAssemblyAndFramework,
-                    sourceName,
-                    frameworkString);
-            }
-
-            passedTests += sourceSummary.PassedTests;
-            failedTests += sourceSummary.FailedTests;
-            skippedTests += sourceSummary.SkippedTests;
-            totalTests += sourceSummary.TotalTests;
         }
 
         if (VerbosityLevel is Verbosity.Quiet or Verbosity.Minimal)

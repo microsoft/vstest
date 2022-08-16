@@ -29,7 +29,7 @@ public static class ClientUtilities
         ValidateArg.NotNull(xmlDocument, nameof(xmlDocument));
         ValidateArg.NotNullOrEmpty(path, nameof(path));
 
-        string root = Path.GetDirectoryName(path);
+        var root = Path.GetDirectoryName(path)!;
 
         AddRunSettingsDirectoryNode(xmlDocument, root);
 
@@ -54,6 +54,8 @@ public static class ClientUtilities
 
     private static void AddRunSettingsDirectoryNode(XmlDocument doc, string path)
     {
+        ValidateArg.NotNull(doc.DocumentElement, nameof(doc.DocumentElement));
+
         var node = doc.CreateNode(XmlNodeType.Element, RunsettingsDirectory, string.Empty);
         node.InnerXml = path;
         doc.DocumentElement.AppendChild(node);

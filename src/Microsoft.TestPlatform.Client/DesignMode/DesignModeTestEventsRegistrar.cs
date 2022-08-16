@@ -52,7 +52,7 @@ public class DesignModeTestEventsRegistrar : ITestDiscoveryEventsRegistrar, ITes
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="rawMessage">RawMessage from the testhost</param>
-    private void OnRawMessageReceived(object sender, string rawMessage)
+    private void OnRawMessageReceived(object? sender, string rawMessage)
     {
         // Directly send the data to translation layer instead of de-serializing it here
         _designModeClient.SendRawMessage(rawMessage);
