@@ -27,4 +27,10 @@ public interface ITestDiscovererCapabilities
     /// Assembly type that the test discoverer supports.
     /// </summary>
     AssemblyType AssemblyType { get; }
+
+    /// <summary>
+    /// <c>true</c> if the discoverer plugin is decorated with <see cref="DirectoryBasedTestDiscovererAttribute"/>,
+    /// <c>false</c> otherwise.
+    /// </summary>
+    bool IsDirectoryBased { get; }
 }

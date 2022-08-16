@@ -371,32 +371,62 @@ internal class DiscovererEnumerator
         var result = new Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>>();
         var sourcesForWhichNoDiscovererIsAvailable = new List<string>(sources);
 
+        sources = sources.Distinct().ToList();
+        IEnumerable<string> allDirectoryBasedSources = sources.Where(Directory.Exists).ToList();
+        IEnumerable<string> allFileBasedSources = sources.Except(allDirectoryBasedSources).ToList();
+
         foreach (var discoverer in allDiscoverers)
         {
-            var sourcesToCheck = sources;
-
+            var applicableFileBasedSources = allFileBasedSources;
             if (discoverer.Metadata.AssemblyType is AssemblyType.Native or AssemblyType.Managed)
             {
-                assemblyTypeToSoucesMap ??= GetAssemblyTypeToSoucesMap(sources, assemblyProperties);
-                sourcesToCheck = assemblyTypeToSoucesMap[AssemblyType.None].Concat(assemblyTypeToSoucesMap[discoverer.Metadata.AssemblyType]);
+                assemblyTypeToSoucesMap ??= GetAssemblyTypeToSoucesMap(applicableFileBasedSources, assemblyProperties);
+                applicableFileBasedSources = assemblyTypeToSoucesMap[AssemblyType.None].Concat(assemblyTypeToSoucesMap[discoverer.Metadata.AssemblyType]);
             }
 
             // Find the sources which this discoverer can look at.
-            // Based on whether it is registered for a matching file extension or no file extensions at all.
-            var matchingSources = (from source in sourcesToCheck
-                                   where
-                                       (discoverer.Metadata.FileExtension == null
-                                        || discoverer.Metadata.FileExtension.Contains(
-                                            Path.GetExtension(source),
-                                            StringComparer.OrdinalIgnoreCase))
-                                   select source).ToList(); // ToList is required to actually execute the query
+            var matchingSources = Enumerable.Empty<string>();
+            var discovererFileExtensions = discoverer.Metadata.FileExtension;
+            var discovererIsApplicableToFiles = discovererFileExtensions is not null;
+            var discovererIsApplicableToDirectories = discoverer.Metadata.IsDirectoryBased;
+
+            if (!discovererIsApplicableToFiles && !discovererIsApplicableToDirectories)
+            {
+                // Discoverer is applicable for all sources (regardless of whether they are files or directories).
+                // Include all files and directories.
+                matchingSources = applicableFileBasedSources.Concat(allDirectoryBasedSources);
+            }
+            else
+            {
+                if (discovererIsApplicableToFiles)
+                {
+                    // Include matching files.
+                    var matchingFileBasedSources =
+                        applicableFileBasedSources.Where(source =>
+                            discovererFileExtensions!.Contains(
+                                Path.GetExtension(source),
+                                StringComparer.OrdinalIgnoreCase));
+
+                    matchingSources = matchingSources.Concat(matchingFileBasedSources);
+                }
+
+                if (discovererIsApplicableToDirectories)
+                {
+                    // Include all directories.
+                    matchingSources = matchingSources.Concat(allDirectoryBasedSources);
+                }
+            }
+
+            matchingSources = matchingSources.ToList(); // ToList is required to actually execute the query
 
             // Update the source list for which no matching source is available.
             if (matchingSources.Any())
             {
                 sourcesForWhichNoDiscovererIsAvailable =
-                    sourcesForWhichNoDiscovererIsAvailable.Except(matchingSources, StringComparer.OrdinalIgnoreCase)
+                    sourcesForWhichNoDiscovererIsAvailable
+                        .Except(matchingSources, StringComparer.OrdinalIgnoreCase)
                         .ToList();
+
                 result.Add(discoverer, matchingSources);
             }
         }
