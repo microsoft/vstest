@@ -67,6 +67,8 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// </summary>
     public ConcurrentDictionary<string, TestResultCollection>? ResultCollectionDictionary { get; private set; }
 
+    public ConcurrentDictionary<string, TestResultByClass>? ResultCollectionByClass { get; private set; }
+
     /// <summary>
     /// Test results stores all the summary and the details of every results in hierarchical order.
     /// </summary>
@@ -103,7 +105,7 @@ public class HtmlLogger : ITestLoggerWithParameters
     public string? HtmlFilePath { get; private set; }
 
     /// <inheritdoc/>
-    [MemberNotNull(nameof(TestResultsDirPath), nameof(TestRunDetails), nameof(Results), nameof(ResultCollectionDictionary))]
+    [MemberNotNull(nameof(TestResultsDirPath), nameof(TestRunDetails), nameof(Results), nameof(ResultCollectionDictionary), nameof(ResultCollectionByClass))]
     public void Initialize(TestLoggerEvents events, string testResultsDirPath)
     {
         ValidateArg.NotNull(events, nameof(events));
@@ -116,9 +118,10 @@ public class HtmlLogger : ITestLoggerWithParameters
 
         TestResultsDirPath = testResultsDirPath;
         TestRunDetails = new TestRunDetails();
+        TestRunDetails.ResultCollectionList = new List<TestResultCollection>();
         Results = new ConcurrentDictionary<Guid, ObjectModel.TestResult>();
         ResultCollectionDictionary = new ConcurrentDictionary<string, TestResultCollection>();
-
+        ResultCollectionByClass = new ConcurrentDictionary<string, TestResultByClass>();
         // Ensure test results directory exists.
         Directory.CreateDirectory(testResultsDirPath);
     }
@@ -188,13 +191,29 @@ public class HtmlLogger : ITestLoggerWithParameters
     public void TestResultHandler(object? sender, TestResultEventArgs e)
     {
         ValidateArg.NotNull(e, nameof(e));
-        TPDebug.Assert(ResultCollectionDictionary != null && TestRunDetails != null && Results != null, "Initialize must be called before this method.");
+        TPDebug.Assert(ResultCollectionDictionary != null && TestRunDetails != null && Results != null && ResultCollectionByClass != null, "Initialize must be called before this method.");
+        int idx = e.Result.TestCase.FullyQualifiedName.IndexOf('.');
+        /*
+         1. will add getting namespace/classname from Hierarchy
+         */
+        string? className = null;
+
+        var property = TestProperty.Find("TestCase.ManagedType");
+        if (property is not null)
+        {
+            className = e.Result.TestCase.GetPropertyValue<string>(property, null)?.ToString();
+        }
+        idx = idx == -1 ? idx : e.Result.TestCase.FullyQualifiedName.IndexOf('.'); // get the second occerance
+
+        className = className == null && idx != -1 ? e.Result.TestCase.FullyQualifiedName.Remove(idx) : className;
 
         var testResult = new ObjectModel.TestResult
         {
             DisplayName = e.Result.DisplayName ?? e.Result.TestCase.FullyQualifiedName,
             FullyQualifiedName = e.Result.TestCase.FullyQualifiedName,
+            //get the class and namespace to group results by them
             ErrorStackTrace = e.Result.ErrorStackTrace,
+            NamespaceAndClassName = className == null ? e.Result.TestCase.FullyQualifiedName : className,
             ErrorMessage = e.Result.ErrorMessage,
             TestResultId = e.Result.TestCase.Id,
             Duration = GetFormattedDurationString(e.Result.Duration),
@@ -203,17 +222,24 @@ public class HtmlLogger : ITestLoggerWithParameters
 
         var executionId = GetExecutionId(e.Result);
         var parentExecutionId = GetParentExecutionId(e.Result);
-
         ResultCollectionDictionary.TryGetValue(e.Result.TestCase.Source, out var testResultCollection);
         if (testResultCollection == null)
         {
-            testResultCollection = new TestResultCollection(e.Result.TestCase.Source)
+            testResultCollection = new TestResultCollection(e.Result.TestCase.Source);
+            ResultCollectionDictionary.TryAdd(e.Result.TestCase.Source, testResultCollection);
+            TestRunDetails.ResultCollectionList!.Add(testResultCollection);
+        }
+        ResultCollectionByClass.TryGetValue(String.Concat(e.Result.TestCase.Source, testResult.NamespaceAndClassName), out var testResultCollectionByClass); //using the source in the key to handle the case when the same namespace/class names come from diffrent dlls
+        if (testResultCollectionByClass == null)
+        {
+            testResultCollectionByClass = new TestResultByClass(testResult.NamespaceAndClassName)
             {
                 ResultList = new List<ObjectModel.TestResult>(),
                 FailedResultList = new List<ObjectModel.TestResult>(),
             };
-            ResultCollectionDictionary.TryAdd(e.Result.TestCase.Source, testResultCollection);
-            TestRunDetails.ResultCollectionList!.Add(testResultCollection);
+            ResultCollectionByClass.TryAdd(String.Concat(e.Result.TestCase.Source, testResult.NamespaceAndClassName), testResultCollectionByClass);
+
+            testResultCollection.ResultCollectionListByClass!.Add(testResultCollectionByClass);
         }
 
         TotalTests++;
@@ -239,10 +265,10 @@ public class HtmlLogger : ITestLoggerWithParameters
         {
             if (e.Result.Outcome == TestOutcome.Failed)
             {
-                testResultCollection.FailedResultList!.Add(testResult);
+                testResultCollectionByClass.FailedResultList!.Add(testResult);
             }
 
-            testResultCollection.ResultList!.Add(testResult);
+            testResultCollectionByClass.ResultList!.Add(testResult);
         }
         else
         {

@@ -21,6 +21,11 @@ public class TestResult
     [DataMember] public string? FullyQualifiedName { get; set; }
 
     /// <summary>
+    /// The namespace and the class name.
+    /// </summary>
+    [DataMember] public string? NamespaceAndClassName { get; set; }
+
+    /// <summary>
     /// Unique identifier for test result
     /// </summary>
     [DataMember] public Guid TestResultId { get; set; }

@@ -1,1 +1,11 @@
 #nullable enable
+Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger.ResultCollectionByClass.get -> System.Collections.Concurrent.ConcurrentDictionary<string!, Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResultByClass!>?
+Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResultByClass
+Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResultByClass.ClassName.get -> string!
+Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResultByClass.FailedResultList.get -> System.Collections.Generic.List<Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResult!>?
+Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResultByClass.FailedResultList.set -> void
+Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResultByClass.ResultList.get -> System.Collections.Generic.List<Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResult!>?
+Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResultByClass.ResultList.set -> void
+Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResultByClass.TestResultByClass(string! source) -> void
+Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResultByClass.UniqueId.get -> int
+Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResultCollection.ResultCollectionListByClass -> System.Collections.Generic.List<Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel.TestResultByClass!>?

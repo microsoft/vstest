@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
 
@@ -11,6 +12,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
 /// Stores the list of failed results and list of all results corresponding to the source.
 /// </summary>
 [DataContract]
+[SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Part of the public API")]
+
 public class TestResultCollection
 {
     private readonly string _source;
@@ -38,12 +41,7 @@ public class TestResultCollection
     }
 
     /// <summary>
-    /// List of test results.
+    /// List of all the results
     /// </summary>
-    [DataMember] public List<TestResult>? ResultList { get; set; }
-
-    /// <summary>
-    /// List of failed test results.
-    /// </summary>
-    [DataMember] public List<TestResult>? FailedResultList { get; set; }
+    [DataMember] public List<TestResultByClass>? ResultCollectionListByClass = new();
 }

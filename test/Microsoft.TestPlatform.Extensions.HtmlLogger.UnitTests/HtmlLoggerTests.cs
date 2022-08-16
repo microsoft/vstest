@@ -200,7 +200,7 @@ public class HtmlLoggerTests
 
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(passTestResultExpected).Object);
 
-        Assert.AreEqual("abc", _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.First().DisplayName);
+        Assert.AreEqual("abc", _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultCollectionListByClass!.First().ResultList!.First().DisplayName);
     }
 
     [TestMethod]
@@ -216,7 +216,7 @@ public class HtmlLoggerTests
 
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(passTestResultExpected).Object);
 
-        Assert.AreEqual("def", _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.Last().DisplayName);
+        Assert.AreEqual("def", _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultCollectionListByClass!.First().ResultList!.Last().DisplayName);
     }
 
     [TestMethod]
@@ -241,7 +241,7 @@ public class HtmlLoggerTests
         _htmlLogger.TestResultHandler(new object(), eventArg.Object);
 
         var resultCollectionList = _htmlLogger.TestRunDetails!.ResultCollectionList!;
-        var result = resultCollectionList.First().ResultList!.First();
+        var result = resultCollectionList.First().ResultCollectionListByClass!.First().ResultList!.First();
 
         Assert.AreEqual("def", result.DisplayName);
         Assert.AreEqual("error message", result.ErrorMessage);
@@ -289,7 +289,7 @@ public class HtmlLoggerTests
     public void TestResultHandlerShouldCreateOneTestEntryForEachTestCase()
     {
         TestCase testCase1 = CreateTestCase("TestCase1");
-        TestCase testCase2 = CreateTestCase("TestCase2");
+        TestCase testCase2 = CreateTestCase("TestCase1"); // to be in same class name
         ObjectModel.TestResult result1 = new(testCase1) { Outcome = TestOutcome.Failed };
         ObjectModel.TestResult result2 = new(testCase2) { Outcome = TestOutcome.Passed };
         Mock<TestResultEventArgs> resultEventArg1 = new(result1);
@@ -299,7 +299,7 @@ public class HtmlLoggerTests
         _htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
         _htmlLogger.TestResultHandler(new object(), resultEventArg2.Object);
 
-        Assert.AreEqual(2, _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.Count, "TestResultHandler is not creating test result entry for each test case");
+        Assert.AreEqual(2, _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultCollectionListByClass!.First().ResultList!.Count, "TestResultHandler is not creating test result entry for each test case");
     }
 
     [TestMethod]
@@ -330,7 +330,7 @@ public class HtmlLoggerTests
 
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result1).Object);
 
-        Assert.AreEqual(1, _htmlLogger.TestRunDetails!.ResultCollectionList!.First().FailedResultList!.Count);
+        Assert.AreEqual(1, _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultCollectionListByClass!.First().FailedResultList!.Count);
     }
 
     [TestMethod]
@@ -348,8 +348,8 @@ public class HtmlLoggerTests
 
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result1).Object);
 
-        Assert.AreEqual(1, _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.Count, "test handler is adding parent result correctly");
-        Assert.IsNull(_htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.First().InnerTestResults, "test handler is adding child result correctly");
+        Assert.AreEqual(1, _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultCollectionListByClass!.First().ResultList!.Count, "test handler is adding parent result correctly");
+        Assert.IsNull(_htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultCollectionListByClass!.First().ResultList!.First().InnerTestResults, "test handler is adding child result correctly");
 
         var result2 = new ObjectModel.TestResult(testCase2);
         result2.SetPropertyValue(HtmlLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
@@ -362,8 +362,8 @@ public class HtmlLoggerTests
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result2).Object);
         _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result3).Object);
 
-        Assert.AreEqual(1, _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.Count, "test handler is adding parent result correctly");
-        Assert.AreEqual(2, _htmlLogger.TestRunDetails.ResultCollectionList!.First().ResultList!.First().InnerTestResults!.Count, "test handler is adding child result correctly");
+        Assert.AreEqual(1, _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultCollectionListByClass!.First().ResultList!.Count, "test handler is adding parent result correctly");
+        Assert.AreEqual(2, _htmlLogger.TestRunDetails.ResultCollectionList!.First().ResultCollectionListByClass!.First().ResultList!.First().InnerTestResults!.Count, "test handler is adding child result correctly");
     }
 
     [TestMethod]
