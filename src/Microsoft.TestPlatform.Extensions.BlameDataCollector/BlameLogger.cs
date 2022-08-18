@@ -78,7 +78,7 @@ public class BlameLogger : ITestLogger
     /// </summary>
     /// <param name="sender">Sender</param>
     /// <param name="e">TestRunCompleteEventArgs</param>
-    private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
+    private void TestRunCompleteHandler(object? sender, TestRunCompleteEventArgs e)
     {
         ValidateArg.NotNull(sender, nameof(sender));
         ValidateArg.NotNull(e, nameof(e));

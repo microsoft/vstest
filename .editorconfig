@@ -312,7 +312,7 @@ csharp_prefer_simple_default_expression = true:suggestion
 csharp_style_deconstructed_variable_declaration = true:suggestion
 csharp_style_inlined_variable_declaration = true:suggestion
 csharp_style_prefer_local_over_anonymous_function = false:suggestion # not default, default is true, avoided because we use anonymous functions in multiple places and it does not make the code clearer
-csharp_style_prefer_index_operator = true:suggestion
+csharp_style_prefer_index_operator = false:suggestion # not default, default is true, disabled because Index operator is not supported in all the TFMs we support.
 csharp_style_prefer_range_operator = false:suggestion # not default, default is true, disabled because Range operator is not supported in all the TFMs we support.
 csharp_style_throw_expression = true:suggestion
 csharp_style_unused_value_assignment_preference = discard_variable:suggestion
@@ -333,7 +333,6 @@ dotnet_diagnostic.IDE0055.severity = warning # ensure all formatting rules are e
 
 # IDE0057: Use range operator
 dotnet_diagnostic.IDE0057.severity = none # Range operator is not supported in some TFMs.
-
 
 #### C# Formatting Rules ####
 

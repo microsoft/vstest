@@ -51,7 +51,7 @@ Microsoft.TestPlatform.Extensions.BlameDataCollector.InactivityTimer.Dispose() -
 Microsoft.TestPlatform.Extensions.BlameDataCollector.InactivityTimer.InactivityTimer(System.Action! timerCallback) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.InactivityTimer.ResetTimer(System.TimeSpan inactivityTimespan) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.INativeMethodsHelper
-Microsoft.TestPlatform.Extensions.BlameDataCollector.INativeMethodsHelper.Is64Bit(System.IntPtr processHandle) -> bool
+Microsoft.TestPlatform.Extensions.BlameDataCollector.INativeMethodsHelper.Is64Bit(nint processHandle) -> bool
 Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcDumpArgsBuilder
 Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcDumpArgsBuilder.BuildHangBasedProcDumpArgs(int processId, string! filename, bool isFullDump) -> string!
 Microsoft.TestPlatform.Extensions.BlameDataCollector.IProcDumpArgsBuilder.BuildTriggerBasedProcDumpArgs(int processId, string! filename, System.Collections.Generic.IEnumerable<string!>! procDumpExceptionsList, bool isFullDump) -> string!

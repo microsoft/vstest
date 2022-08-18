@@ -12,5 +12,5 @@ public interface INativeMethodsHelper
     /// </summary>
     /// <param name="processHandle">Process Handle</param>
     /// <returns>Bool for Is64Bit</returns>
-    bool Is64Bit(IntPtr processHandle);
+    bool Is64Bit(nint processHandle);
 }
