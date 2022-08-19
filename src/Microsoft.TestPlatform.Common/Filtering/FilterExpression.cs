@@ -135,20 +135,48 @@ internal class FilterExpression
             {
                 invalidProperties = new string[1] { _condition.Name };
             }
+            return invalidProperties;
         }
-        else
+
+        FilterExpression? current = this;
+        Stack<FilterExpression> filterStack = new();
+        Stack<string[]?> result = new(); 
+        do
         {
-            invalidProperties = _left!.ValidForProperties(properties, propertyProvider);
-            var invalidRight = _right!.ValidForProperties(properties, propertyProvider);
-            if (null == invalidProperties)
+            //Push root's right child and then root to stack then Set root as root's left child
+            while (current != null)
             {
-                invalidProperties = invalidRight;
+                if (current._right != null)
+                {
+                    filterStack.Push(current._right);
+                }
+                filterStack.Push(current);
+                current = current._left;
             }
-            else if (null != invalidRight)
+            //If the popped item has a right child and the right child is at top of stack, then remove the right child from stack, push the root back and set root as root's right child.
+            current = filterStack.Pop();
+            if (current._right == filterStack.First())
             {
-                invalidProperties = invalidProperties.Concat(invalidRight).ToArray();
+                filterStack.Pop();
+                filterStack.Push(current);
+                current = current._right;
             }
-        }
+            else
+            {
+                var invalidRight = current._right != null ? result.Pop() : null;
+                invalidProperties = current._left != null ? result.Pop() : null;
+                if (null == invalidProperties)
+                {
+                    invalidProperties = invalidRight;
+                }
+                else if (null != invalidRight)
+                {
+                    invalidProperties = invalidProperties.Concat(invalidRight).ToArray();
+                }
+                result.Push(invalidProperties);
+                current = null;
+            }
+        } while (filterStack.Count() > 0);
 
         return invalidProperties;
     }
