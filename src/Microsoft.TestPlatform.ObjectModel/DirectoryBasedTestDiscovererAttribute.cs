@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 /// If neither this attribute nor the <see cref="FileExtensionAttribute"/> is provided on the test discoverer,
 /// it will be called for all relevant test files and directories.
 /// </remarks>
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Class)]
 public sealed class DirectoryBasedTestDiscovererAttribute : Attribute
 {
 }
