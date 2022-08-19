@@ -128,7 +128,10 @@ public class DataCollectorMain
             });
 
         // Get server port and initialize communication.
-        int port = argsDictionary.TryGetValue(PortArgument, out var portValue) ? int.Parse(portValue) : 0;
+        int port = argsDictionary.TryGetValue(PortArgument, out var portValue)
+            && int.TryParse(portValue, NumberStyles.Integer, CultureInfo.CurrentCulture, out var p)
+            ? p
+            : 0;
 
         if (port <= 0)
         {
@@ -140,7 +143,7 @@ public class DataCollectorMain
         // Can only do this after InitializeCommunication because datacollector cannot "Send Log" unless communications are initialized
         if (!string.IsNullOrEmpty(EqtTrace.LogFile))
         {
-            (_requestHandler as DataCollectionRequestHandler)?.SendDataCollectionMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Informational, string.Format("Logging DataCollector Diagnostics in file: {0}", EqtTrace.LogFile)));
+            (_requestHandler as DataCollectionRequestHandler)?.SendDataCollectionMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Informational, $"Logging DataCollector Diagnostics in file: {EqtTrace.LogFile}"));
         }
 
         // Start processing async in a different task
@@ -168,7 +171,7 @@ public class DataCollectorMain
 
             throw new TestPlatformException(
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                     CoreUtilitiesConstants.DatacollectorProcessName,
                     CoreUtilitiesConstants.VstestConsoleProcessName,

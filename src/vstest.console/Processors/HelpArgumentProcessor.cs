@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
@@ -102,7 +101,8 @@ internal class HelpArgumentExecutor : IArgumentExecutor
         processors.Sort((p1, p2) => Comparer<HelpContentPriority>.Default.Compare(p1.Metadata.Value.HelpPriority, p2.Metadata.Value.HelpPriority));
 
         // Output the help description for RunTestsArgumentProcessor
-        IArgumentProcessor runTestsArgumentProcessor = processors.Find(p1 => p1.GetType() == typeof(RunTestsArgumentProcessor));
+        IArgumentProcessor? runTestsArgumentProcessor = processors.Find(p1 => p1.GetType() == typeof(RunTestsArgumentProcessor));
+        TPDebug.Assert(runTestsArgumentProcessor is not null, "runTestsArgumentProcessor is null");
         processors.Remove(runTestsArgumentProcessor);
         var helpDescription = LookupHelpDescription(runTestsArgumentProcessor);
         if (helpDescription != null)
@@ -140,9 +140,7 @@ internal class HelpArgumentExecutor : IArgumentExecutor
         {
             try
             {
-                result = string.Format(
-                    CultureInfo.CurrentUICulture,
-                    argumentProcessor.Metadata.Value.HelpContentResourceName);
+                result = argumentProcessor.Metadata.Value.HelpContentResourceName;
                 //ResourceHelper.GetString(argumentProcessor.Metadata.HelpContentResourceName, assembly, CultureInfo.CurrentUICulture);
             }
             catch (Exception e)

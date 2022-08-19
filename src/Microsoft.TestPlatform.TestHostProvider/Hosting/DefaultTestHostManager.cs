@@ -48,9 +48,9 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private const string DefaultTestHostFriendlyName = "DefaultTestHost";
     private const string TestAdapterEndsWithPattern = @"TestAdapter.dll";
 
-    // Any version (older or newer) that is not in this list will use the default testhost.exe that is built using net451.
+    // Any version (older or newer) that is not in this list will use the default testhost.exe that is built using net462.
     // TODO: Add net481 when it is published, if it uses a new moniker.
-    private static readonly ImmutableArray<string> SupportedTargetFrameworks = ImmutableArray.Create("net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48");
+    private static readonly ImmutableArray<string> SupportedTargetFrameworks = ImmutableArray.Create("net47", "net471", "net472", "net48");
 
     private readonly IProcessHelper _processHelper;
     private readonly IFileHelper _fileHelper;
@@ -112,6 +112,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     /// <summary>
     /// Gets the properties of the test executor launcher. These could be the targetID for emulator/phone specific scenarios.
     /// </summary>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public IDictionary<string, string> Properties => new Dictionary<string, string>();
 
     /// <summary>
@@ -163,17 +164,23 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         string testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
 
-        var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location)!, "..//");
+        var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
         var argumentsString = " " + connectionInfo.ToCommandLineOptions();
+
+        TPDebug.Assert(currentWorkingDirectory is not null, "Current working directory must not be null.");
 
         // check in current location for testhost exe
         var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
 
-        if (!File.Exists(testhostProcessPath))
+        var originalTestHostProcessName = testHostProcessName;
+
+        if (!_fileHelper.Exists(testhostProcessPath))
         {
-            // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies, in dotnet SDK.
-            testHostProcessName = Path.Combine("TestHost", testHostProcessName);
-            testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+            // We assume that we could not find testhost.exe in the root folder so we are going to lookup in the
+            // TestHostNetFramework folder (assuming we are currently running under netcoreapp3.1) or in dotnet SDK
+            // context.
+            testHostProcessName = Path.Combine("TestHostNetFramework", originalTestHostProcessName);
+            testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", testHostProcessName);
         }
 
         if (!Shared)
@@ -183,14 +190,31 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             argumentsString += " --testsourcepath " + sources.FirstOrDefault()?.AddDoubleQuote();
         }
 
-        EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
+        EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Trying to use {0} from {1}", originalTestHostProcessName, testhostProcessPath);
 
         var launcherPath = testhostProcessPath;
-        if (!_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
-            !_processHelper.GetCurrentProcessFileName()!.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
+        var processName = _processHelper.GetCurrentProcessFileName();
+        if (processName is not null)
         {
-            launcherPath = _dotnetHostHelper.GetMonoPath();
-            argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;
+            if (!_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
+                && !processName.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
+            {
+                launcherPath = _dotnetHostHelper.GetMonoPath();
+                argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;
+            }
+            else
+            {
+                // Patching the relative path for IDE scenarios.
+                if (_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
+                    && !(processName.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
+                        || processName.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
+                    && !File.Exists(testhostProcessPath))
+                {
+                    testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", originalTestHostProcessName);
+                    EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Could not find {0} in previous location, now using {1}", originalTestHostProcessName, testhostProcessPath);
+                    launcherPath = testhostProcessPath;
+                }
+            }
         }
 
         // For IDEs and other scenario, current directory should be the
@@ -208,7 +232,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         };
     }
 
-    private string GetTestHostName(Architecture architecture, Framework targetFramework, PlatformArchitecture processArchitecture)
+    private static string GetTestHostName(Architecture architecture, Framework targetFramework, PlatformArchitecture processArchitecture)
     {
         // We ship multiple executables for testhost that follow this naming schema:
         // testhost<.tfm><.architecture>.exe
@@ -429,7 +453,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         // Log warning if conflicting version extensions are found
         if (conflictingExtensions.Any())
         {
-            var extensionsString = string.Join("\n", conflictingExtensions.Select(kv => string.Format("  {0} : {1}", kv.Key, kv.Value)));
+            var extensionsString = string.Join("\n", conflictingExtensions.Select(kv => $"  {kv.Key} : {kv.Value}"));
             string message = string.Format(CultureInfo.CurrentCulture, Resources.MultipleFileVersions, extensionsString);
             _messageLogger.SendMessage(TestMessageLevel.Warning, message);
         }

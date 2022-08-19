@@ -68,7 +68,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException(nameof(DiscoveryRequest));
             }
@@ -110,7 +110,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException(nameof(DiscoveryRequest));
             }
@@ -149,7 +149,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     {
         EqtTrace.Verbose("DiscoveryRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
 
-        if (_disposed)
+        if (_isDisposed)
         {
             throw new ObjectDisposedException("DiscoveryRequest");
         }
@@ -221,7 +221,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("DiscoveryRequest.HandleDiscoveryComplete: Ignoring as the object is disposed.");
                 return;
@@ -311,7 +311,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("DiscoveryRequest.HandleDiscoveredTests: Ignoring as the object is disposed.");
                 return;
@@ -336,7 +336,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
 
         lock (_syncObject)
         {
-            if (_disposed)
+            if (_isDisposed)
             {
                 EqtTrace.Warning("DiscoveryRequest.HandleLogMessage: Ignoring as the object is disposed.");
                 return;
@@ -477,30 +477,20 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// </summary>
     public void Dispose()
     {
-        Dispose(true);
-
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
         EqtTrace.Verbose("DiscoveryRequest.Dispose: Starting.");
 
         lock (_syncObject)
         {
-            if (!_disposed)
+            if (!_isDisposed)
             {
-                if (disposing)
+                if (_discoveryCompleted != null)
                 {
-                    if (_discoveryCompleted != null)
-                    {
-                        _discoveryCompleted.Dispose();
-                    }
+                    _discoveryCompleted.Dispose();
                 }
 
                 // Indicate that object has been disposed
                 _discoveryCompleted = null!;
-                _disposed = true;
+                _isDisposed = true;
             }
         }
 
@@ -516,7 +506,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <summary>
     /// If this request has been disposed.
     /// </summary>
-    private bool _disposed;
+    private bool _isDisposed;
 
     /// <summary>
     /// It get set when current discovery request is completed.

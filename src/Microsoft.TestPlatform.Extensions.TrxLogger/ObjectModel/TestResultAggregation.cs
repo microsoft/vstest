@@ -37,10 +37,7 @@ internal class TestResultAggregation : TestResult, ITestResultAggregation
     {
         get
         {
-            if (_innerResults == null)
-            {
-                _innerResults = new List<ITestResult>();
-            }
+            _innerResults ??= new List<ITestResult>();
             return _innerResults;
         }
     }

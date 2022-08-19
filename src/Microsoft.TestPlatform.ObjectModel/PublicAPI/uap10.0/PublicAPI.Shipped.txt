@@ -1,1 +1,2 @@
-﻿
+﻿#nullable enable
+static Microsoft.VisualStudio.TestPlatform.ObjectModel.Framework.DefaultFramework.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Framework!

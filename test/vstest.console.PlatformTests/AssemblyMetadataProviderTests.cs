@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -54,32 +55,32 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
     }
 
     [TestMethod]
-    [DataRow("net451")]
-    [DataRow("netcoreapp2.1")]
+    [DataRow("net462")]
+    [DataRow("netcoreapp3.1")]
     public void GetArchitectureShouldReturnCorrentArchForx64Assembly(string framework)
     {
         TestDotnetAssemblyArch("SimpleTestProject3", framework, Architecture.X64, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
     }
 
     [TestMethod]
-    [DataRow("net451")]
-    [DataRow("netcoreapp2.1")]
+    [DataRow("net462")]
+    [DataRow("netcoreapp3.1")]
     public void GetArchitectureShouldReturnCorrentArchForx86Assembly(string framework)
     {
         TestDotnetAssemblyArch("SimpleTestProjectx86", framework, Architecture.X86, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
     }
 
     [TestMethod]
-    [DataRow("net451")]
-    [DataRow("netcoreapp2.1")]
+    [DataRow("net462")]
+    [DataRow("netcoreapp3.1")]
     public void GetArchitectureShouldReturnCorrentArchForAnyCpuAssembly(string framework)
     {
         TestDotnetAssemblyArch("SimpleTestProject", framework, Architecture.AnyCPU, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
     }
 
     [TestMethod]
-    [DataRow("net451")]
-    [DataRow("netcoreapp2.1")]
+    [DataRow("net462")]
+    [DataRow("netcoreapp3.1")]
     public void GetArchitectureShouldReturnCorrentArchForArmAssembly(string framework)
     {
         TestDotnetAssemblyArch("SimpleTestProjectARM", framework, Architecture.ARM, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
@@ -99,7 +100,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
         var arch = _assemblyMetadataProvider.GetArchitecture(assemblyPath);
         stopWatch.Stop();
 
-        Console.WriteLine("Platform:{0}, {1}", platform, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+        Console.WriteLine("Platform:{0}, {1}", platform, string.Format(CultureInfo.CurrentCulture, PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         Assert.AreEqual(Enum.Parse(typeof(Architecture), platform, ignoreCase: true), arch);
 
         // We should not assert on time elapsed, it will vary depending on machine, & their state, commenting below assert
@@ -107,8 +108,8 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
     }
 
     [TestMethod]
-    [DataRow("net451")]
-    [DataRow("netcoreapp2.1")]
+    [DataRow("net462")]
+    [DataRow("netcoreapp3.1")]
     public void GetFrameWorkForDotNetAssembly(string framework)
     {
         var expectedElapsedTime = 5;
@@ -118,18 +119,18 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
         var actualFx = _assemblyMetadataProvider.GetFrameworkName(assemblyPath);
         stopWatch.Stop();
 
-        if (framework.Equals("net451"))
+        if (framework.Equals("net462"))
         {
             // Reason is unknown for why full framework it is taking more time. Need to investigate.
             expectedElapsedTime = 100;
-            Assert.AreEqual(Constants.DotNetFramework451, actualFx.FullName);
+            Assert.AreEqual(".NETFramework,Version=v4.6.2", actualFx.FullName);
         }
         else
         {
-            Assert.AreEqual(".NETCoreApp,Version=v2.1", actualFx.FullName);
+            Assert.AreEqual(".NETCoreApp,Version=v3.1", actualFx.FullName);
         }
 
-        Console.WriteLine("Framework:{0}, {1}", framework, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+        Console.WriteLine("Framework:{0}, {1}", framework, string.Format(CultureInfo.CurrentCulture, PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
 
         // We should not assert on time elapsed, it will vary depending on machine, & their state.
         // Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
@@ -161,7 +162,7 @@ public class AssemblyMetadataProviderTests : IntegrationTestBase
         var arch = _assemblyMetadataProvider.GetArchitecture(assemblyPath);
         stopWatch.Stop();
 
-        Console.WriteLine("Framework:{0}, {1}", framework, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+        Console.WriteLine("Framework:{0}, {1}", framework, string.Format(CultureInfo.CurrentCulture, PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         Assert.AreEqual(expectedArch, arch, $"Expected: {expectedArch} Actual: {arch}");
 
         // We should not assert on time elapsed, it will vary depending on machine, & their state.

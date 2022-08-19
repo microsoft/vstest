@@ -68,7 +68,7 @@ public class EnableLoggersArgumentProcessorTests
         }
         catch (Exception e)
         {
-            string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.LoggerUriInvalid, argument);
+            string exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.LoggerUriInvalid, argument);
             Assert.IsTrue(e.GetType().Equals(typeof(CommandLineException)));
             Assert.IsTrue(e.Message.Contains(exceptionMessage));
         }

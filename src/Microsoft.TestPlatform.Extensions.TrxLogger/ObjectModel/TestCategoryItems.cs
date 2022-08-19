@@ -26,10 +26,7 @@ internal sealed class TestCategoryItem : IXmlTestStore
     public TestCategoryItem(string? category)
     {
         // Treat null as empty.
-        if (category == null)
-        {
-            category = string.Empty;
-        }
+        category ??= string.Empty;
 
 
         _category = StripIllegalChars(category);

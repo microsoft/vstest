@@ -24,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 public class InferRunSettingsHelper
 {
     private const string DesignModeNodeName = "DesignMode";
+    private const string BatchSizeNodeName = "BatchSize";
     private const string CollectSourceInformationNodeName = "CollectSourceInformation";
     private const string RunSettingsNodeName = "RunSettings";
     private const string RunConfigurationNodeName = "RunConfiguration";
@@ -33,6 +34,7 @@ public class InferRunSettingsHelper
     private const string TargetDevice = "TargetDevice";
 
     private const string DesignModeNodePath = @"/RunSettings/RunConfiguration/DesignMode";
+    private const string BatchSizeNodePath = @"/RunSettings/RunConfiguration/BatchSize";
     private const string CollectSourceInformationNodePath = @"/RunSettings/RunConfiguration/CollectSourceInformation";
     private const string RunConfigurationNodePath = @"/RunSettings/RunConfiguration";
     private const string TargetPlatformNodePath = @"/RunSettings/RunConfiguration/TargetPlatform";
@@ -103,10 +105,7 @@ public class InferRunSettingsHelper
         }
         else if (runSettingsNavigator.HasChildren)
         {
-            if (listOfInValidRunConfigurationSettings is null)
-            {
-                listOfInValidRunConfigurationSettings = new HashSet<string>();
-            }
+            listOfInValidRunConfigurationSettings ??= new HashSet<string>();
 
             // Find all invalid RunConfiguration Settings
             runSettingsNavigator.MoveToFirstChild();
@@ -202,6 +201,16 @@ public class InferRunSettingsHelper
     public static void UpdateDesignMode(XmlDocument runSettingsDocument, bool designModeValue)
     {
         AddNodeIfNotPresent(runSettingsDocument, DesignModeNodePath, DesignModeNodeName, designModeValue);
+    }
+
+    /// <summary>
+    /// Updates the <c>RunConfiguration.BatchSize</c> value for a run settings. Doesn't do anything if the value is already set.
+    /// </summary>
+    /// <param name="runSettingsDocument">Document for runsettings xml</param>
+    /// <param name="batchSizeValue">Value to set</param>
+    public static void UpdateBatchSize(XmlDocument runSettingsDocument, long batchSizeValue)
+    {
+        AddNodeIfNotPresent(runSettingsDocument, BatchSizeNodePath, BatchSizeNodeName, batchSizeValue);
     }
 
     /// <summary>
@@ -643,6 +652,7 @@ public class InferRunSettingsHelper
     /// Returns the sources matching the specified platform and framework settings.
     /// For incompatible sources, warning is added to incompatibleSettingWarning.
     /// </summary>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Part of the public API")]
     public static IEnumerable<string> FilterCompatibleSources(Architecture chosenPlatform, Architecture defaultArchitecture, Framework chosenFramework, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, out string incompatibleSettingWarning)
     {
         incompatibleSettingWarning = string.Empty;

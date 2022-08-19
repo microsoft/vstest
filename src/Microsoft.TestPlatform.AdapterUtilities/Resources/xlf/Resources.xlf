@@ -43,6 +43,16 @@ Example: 'System.Reflection.MethodBase' is not implemented on this platform!</no
         <target state="new">A closing single quote was expected at the end of the segment! (segment: {0})</target>
         <note>An error thrown when the type name ended but opened single quote was not matched.</note>
       </trans-unit>
+      <trans-unit id="ErrorMethodExpectedAsAnArgument">
+        <source>Argument must be a method. (Argument name: {0})</source>
+        <target state="new">Argument must be a method.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ErrorCannotAppendAfterHashCalculation">
+        <source>Cannot append to a TestIdProvider, after GetId or GetHash method is called.</source>
+        <target state="new">Cannot append to a TestIdProvider, after GetId or GetHash method is called.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

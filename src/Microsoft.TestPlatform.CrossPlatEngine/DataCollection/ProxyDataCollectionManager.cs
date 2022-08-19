@@ -250,7 +250,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
             EqtTrace.Error("ProxyDataCollectionManager.Initialize: failed to connect to datacollector process, processId: {0} port: {1}", _dataCollectionProcessId, _dataCollectionPort);
             throw new TestPlatformException(
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                     CoreUtilitiesConstants.VstestConsoleProcessName,
                     CoreUtilitiesConstants.DatacollectorProcessName,
@@ -271,7 +271,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         {
             ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.DataCollectorDebuggerWarning, OutputLevel.Warning);
             ConsoleOutput.Instance.WriteLine(
-                string.Format("Process Id: {0}, Name: {1}", processId, _processHelper.GetProcessName(processId)),
+                string.Format(CultureInfo.InvariantCulture, "Process Id: {0}, Name: {1}", processId, _processHelper.GetProcessName(processId)),
                 OutputLevel.Information);
 
             // Increase connection timeout when debugging is enabled.
@@ -281,7 +281,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         return connectionTimeout;
     }
 
-    private void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler? runEventsHandler)
+    private static void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler? runEventsHandler)
     {
         try
         {
@@ -307,10 +307,10 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         var commandlineArguments = new List<string>
         {
             PortOption,
-            portNumber.ToString(),
+            portNumber.ToString(CultureInfo.CurrentCulture),
 
             ParentProcessIdOption,
-            _processHelper.GetCurrentProcessId().ToString()
+            _processHelper.GetCurrentProcessId().ToString(CultureInfo.CurrentCulture)
         };
 
         if (!StringUtils.IsNullOrEmpty(EqtTrace.LogFile))
@@ -319,7 +319,7 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
             commandlineArguments.Add(GetTimestampedLogFile(EqtTrace.LogFile));
 
             commandlineArguments.Add(TraceLevelOption);
-            commandlineArguments.Add(((int)EqtTrace.TraceLevel).ToString());
+            commandlineArguments.Add(((int)EqtTrace.TraceLevel).ToString(CultureInfo.CurrentCulture));
         }
 
         return commandlineArguments;
@@ -330,8 +330,9 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
         return Path.ChangeExtension(
             logFile,
             string.Format(
+                CultureInfo.InvariantCulture,
                 "datacollector.{0}_{1}{2}",
-                DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
+                DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff", CultureInfo.CurrentCulture),
                 new PlatformEnvironment().GetCurrentManagedThreadId(),
                 Path.GetExtension(logFile))).AddDoubleQuote();
     }

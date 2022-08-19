@@ -89,7 +89,7 @@ public class TelemetryPerfTestBase : PerformanceTestBase
         _client.Flush();
     }
 
-    private string GetAdapterName(string projectName)
+    private static string GetAdapterName(string projectName)
     {
         var name = projectName.ToLowerInvariant();
         if (name.Contains("xunit"))
@@ -116,12 +116,9 @@ public class TelemetryPerfTestBase : PerformanceTestBase
     public string[] GetPerfAssetFullPath(string name, string framework = "net6.0")
     {
         var dllPath = Path.Combine(_rootDirectory, "test", "TestAssets", "performance", name, "bin", BuildConfiguration, framework, $"{name}.dll");
-        if (!File.Exists(dllPath))
-        {
-            throw new FileNotFoundException(null, dllPath);
-        }
-
-        return new[] { dllPath };
+        return !File.Exists(dllPath)
+            ? throw new FileNotFoundException(null, dllPath)
+            : new[] { dllPath };
     }
 
     /// <summary>
@@ -130,5 +127,5 @@ public class TelemetryPerfTestBase : PerformanceTestBase
     /// <returns></returns>
 
     // DONT make this just <RunSettings></RunSettings> it makes Translation layer hang... https://github.com/microsoft/vstest/issues/3519
-    public string GetDefaultRunSettings() => "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+    public static string GetDefaultRunSettings() => "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
 }

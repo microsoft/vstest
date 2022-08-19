@@ -459,15 +459,15 @@ public class RunConfiguration : TestRunSettings
         }
 
         XmlElement maxCpuCount = doc.CreateElement("MaxCpuCount");
-        maxCpuCount.InnerXml = MaxCpuCount.ToString();
+        maxCpuCount.InnerXml = MaxCpuCount.ToString(CultureInfo.CurrentCulture);
         root.AppendChild(maxCpuCount);
 
         XmlElement batchSize = doc.CreateElement("BatchSize");
-        batchSize.InnerXml = BatchSize.ToString();
+        batchSize.InnerXml = BatchSize.ToString(CultureInfo.CurrentCulture);
         root.AppendChild(batchSize);
 
         XmlElement testSessionTimeout = doc.CreateElement("TestSessionTimeout");
-        testSessionTimeout.InnerXml = TestSessionTimeout.ToString();
+        testSessionTimeout.InnerXml = TestSessionTimeout.ToString(CultureInfo.CurrentCulture);
         root.AppendChild(testSessionTimeout);
 
         XmlElement designMode = doc.CreateElement("DesignMode");
@@ -804,15 +804,10 @@ public class RunConfiguration : TestRunSettings
                     case "TestAdapterLoadingStrategy":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         value = reader.ReadElementContentAsString();
-                        if (Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy))
-                        {
-                            runConfiguration.TestAdapterLoadingStrategy = loadingStrategy;
-                        }
-                        else
-                        {
-                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                        runConfiguration.TestAdapterLoadingStrategy = Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy)
+                            ? loadingStrategy
+                            : throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
-                        }
 
                         break;
 
@@ -896,7 +891,13 @@ public class RunConfiguration : TestRunSettings
 
                     case "DotNetHostPath":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                        runConfiguration.DotnetHostPath = reader.ReadElementContentAsString();
+                        string? dotnetHostPath = reader.ReadElementContentAsString();
+
+#if !NETSTANDARD1_0
+                        dotnetHostPath = Environment.ExpandEnvironmentVariables(dotnetHostPath);
+#endif
+
+                        runConfiguration.DotnetHostPath = dotnetHostPath;
                         break;
                     case "TreatNoTestsAsError":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);

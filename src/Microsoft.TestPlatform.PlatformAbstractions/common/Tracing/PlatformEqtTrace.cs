@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 
@@ -151,10 +152,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
             {
                 lock (LockObject)
                 {
-                    if (s_traceSource == null)
-                    {
-                        s_traceSource = new TraceSource("TpTrace", SourceLevels.Off);
-                    }
+                    s_traceSource ??= new TraceSource("TpTrace", SourceLevels.Off);
                 }
             }
 
@@ -258,6 +256,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
         return (PlatformTraceLevel)SourceTraceLevelsMap[Source.Switch.Level];
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public TraceLevel MapPlatformTraceToTrace(PlatformTraceLevel traceLevel)
     {
         switch (traceLevel)
@@ -342,12 +341,7 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
             string logsDirectory = Path.GetTempPath();
 
             // Set the trace level and add the trace listener
-            if (LogFile == null)
-            {
-                // In case of parallel execution, there may be several processes with same name.
-                // Add a process id to make the traces unique.
-                LogFile = Path.Combine(logsDirectory, runnerLogFileName);
-            }
+            LogFile ??= Path.Combine(logsDirectory, runnerLogFileName);
 
             // Add a default listener
             s_traceFileSize = DefaultTraceFileSize;

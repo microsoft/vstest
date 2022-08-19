@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
@@ -10,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
 /// It stores the all relevant information of the test run.
 /// </summary>
 [DataContract]
+[SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Part of the public API")]
 public sealed class TestRunDetails
 {
     /// <summary>

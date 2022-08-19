@@ -89,7 +89,7 @@ internal class ListDiscoverersArgumentExecutor : IArgumentExecutor
         {
             ConsoleOutput.Instance.WriteLine(extension.Value.GetType().FullName, OutputLevel.Information);
             ConsoleOutput.Instance.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.UriOfDefaultExecutor, extension.Metadata.DefaultExecutorUri), OutputLevel.Information);
-            ConsoleOutput.Instance.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SupportedFileTypesIndicator + " " + string.Join(", ", extension.Metadata.FileExtension)), OutputLevel.Information);
+            ConsoleOutput.Instance.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SupportedFileTypesIndicator + " " + string.Join(", ", extension.Metadata.FileExtension!)), OutputLevel.Information);
         }
 
         return ArgumentProcessorResult.Success;

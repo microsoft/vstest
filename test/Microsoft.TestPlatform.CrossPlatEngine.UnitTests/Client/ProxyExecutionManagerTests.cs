@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -784,7 +785,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
         }
     }
 
-    private void SignalEvent(ManualResetEvent manualResetEvent)
+    private static void SignalEvent(ManualResetEvent manualResetEvent)
     {
         // Wait for the 100 ms.
         Task.Delay(200).Wait();

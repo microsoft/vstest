@@ -53,10 +53,7 @@ public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSen
         {
             lock (SyncObject)
             {
-                if (Instance == null)
-                {
-                    Instance = new DataCollectionTestCaseEventSender();
-                }
+                Instance ??= new DataCollectionTestCaseEventSender();
             }
         }
 

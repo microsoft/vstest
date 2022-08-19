@@ -59,7 +59,7 @@ internal class WindowsHangDumper : IHangDumper
         else
         {
             EqtTrace.Verbose($"NetClientHangDumper.Dump: Dumping {process.Id} - {process.ProcessName}.");
-            var message = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.Dumping, process.Id, process.ProcessName);
+            var message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.Dumping, process.Id, process.ProcessName);
             _logWarning(message);
         }
 

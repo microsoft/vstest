@@ -77,6 +77,7 @@ Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyLoadCon
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyResolver
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyResolver.AssemblyResolve -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.AssemblyResolveEventHandler?
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyResolver.Dispose() -> void
+virtual Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyResolver.Dispose(bool disposing) -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyResolver.PlatformAssemblyResolver() -> void
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformEnvironment
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformEnvironment.Architecture.get -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture

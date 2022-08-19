@@ -45,10 +45,7 @@ internal sealed class TestEntry : IXmlTestStore
     {
         get
         {
-            if (_testEntries == null)
-            {
-                _testEntries = new List<TestEntry>();
-            }
+            _testEntries ??= new List<TestEntry>();
 
             return _testEntries;
         }
@@ -108,7 +105,7 @@ internal sealed class TestEntry : IXmlTestStore
         XmlPersistence helper = new();
         helper.SaveSingleFields(element, this, parameters);
 
-        helper.SaveObject(_testId, element, null);
+        XmlPersistence.SaveObject(_testId, element, null);
         helper.SaveGuid(element, "@executionId", ExecutionId);
         if (ParentExecutionId != Guid.Empty)
             helper.SaveGuid(element, "@parentExecutionId", ParentExecutionId);

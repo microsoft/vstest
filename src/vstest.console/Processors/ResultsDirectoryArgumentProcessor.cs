@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Security;
 
@@ -117,7 +118,7 @@ internal class ResultsDirectoryArgumentExecutor : IArgumentExecutor
         }
         catch (Exception ex) when (ex is NotSupportedException or SecurityException or ArgumentException or PathTooLongException or IOException)
         {
-            throw new CommandLineException(string.Format(CommandLineResources.InvalidResultsDirectoryPathCommand, argument, ex.Message));
+            throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidResultsDirectoryPathCommand, argument, ex.Message));
         }
 
         _commandLineOptions.ResultsDirectory = argument;

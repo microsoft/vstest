@@ -260,14 +260,14 @@ public class TestPluginCacheTests
     [TestMethod]
     public void GetResolutionPathsShouldThrowIfExtensionAssemblyIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => TestPluginCache.Instance.GetResolutionPaths(null!));
+        Assert.ThrowsException<ArgumentNullException>(() => TestPluginCache.GetResolutionPaths(null!));
     }
 
     [TestMethod]
     public void GetResolutionPathsShouldReturnExtensionAssemblyDirectoryAndTpCommonDirectory()
     {
         var temp = Path.GetTempPath();
-        var resolutionPaths = TestPluginCache.Instance.GetResolutionPaths($@"{temp}{Path.DirectorySeparatorChar}Idonotexist.dll").Select(p => p.Replace("/", "\\")).ToList();
+        var resolutionPaths = TestPluginCache.GetResolutionPaths($@"{temp}{Path.DirectorySeparatorChar}Idonotexist.dll").Select(p => p.Replace("/", "\\")).ToList();
 
         var tpCommonDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location)!;
         var expectedPaths = new List<string> { temp, tpCommonDirectory }.ConvertAll(p => p.Replace("/", "\\").TrimEnd('\\'));
@@ -280,7 +280,7 @@ public class TestPluginCacheTests
     {
         var tpCommonlocation = typeof(TestPluginCache).GetTypeInfo().Assembly.Location;
 
-        var resolutionPaths = TestPluginCache.Instance.GetResolutionPaths(tpCommonlocation);
+        var resolutionPaths = TestPluginCache.GetResolutionPaths(tpCommonlocation);
 
         var expectedPaths = new List<string> { Path.GetDirectoryName(tpCommonlocation)! };
 

@@ -22,7 +22,7 @@ public class PathResolverTests
     [TestMethod]
     public void PathResolverShouldReturnNullForEmptyArguments()
     {
-        var newFilePath = _pathResolver.GetTargetPath(new string[] { });
+        var newFilePath = _pathResolver.GetTargetPath(Array.Empty<string>());
         Assert.IsNull(newFilePath, "Empty arguments should return null");
     }
 

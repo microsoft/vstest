@@ -563,7 +563,7 @@ internal static class DiaSourceObject
 
         if (modHandle == IntPtr.Zero)
         {
-            throw new COMException(string.Format(Resources.Resources.FailedToLoadMsDia));
+            throw new COMException(Resources.Resources.FailedToLoadMsDia);
         }
 
         var diaSourceClassGuid = new Guid("{E6756135-1E65-4D17-8576-610761398C3C}");

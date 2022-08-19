@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading;
 
@@ -66,8 +67,7 @@ public class TestLoggerManagerTests
     [TestMethod]
     public void GetResultsDirectoryShouldReturnNullIfRunSettingsIsNull()
     {
-        var testLoggerManager = new DummyTestLoggerManager();
-        var result = testLoggerManager.GetResultsDirectory(null);
+        var result = TestLoggerManager.GetResultsDirectory(null);
         Assert.IsNull(result);
     }
 
@@ -84,8 +84,7 @@ public class TestLoggerManagerTests
       </RunConfiguration>
     </RunSettings> ";
 
-        var testLoggerManager = new DummyTestLoggerManager();
-        var result = testLoggerManager.GetResultsDirectory(runSettingsXml);
+        var result = TestLoggerManager.GetResultsDirectory(runSettingsXml);
         Assert.AreEqual(0, string.Compare("DummyTestResultsFolder", result));
     }
 
@@ -101,8 +100,7 @@ public class TestLoggerManagerTests
       </RunConfiguration>
     </RunSettings> ";
 
-        var testLoggerManager = new DummyTestLoggerManager();
-        var result = testLoggerManager.GetResultsDirectory(runSettingsXml);
+        var result = TestLoggerManager.GetResultsDirectory(runSettingsXml);
 
         Assert.AreEqual(0, string.Compare(Constants.DefaultResultsDirectory, result));
     }
@@ -119,8 +117,7 @@ public class TestLoggerManagerTests
                                           </RunConfiguration>
                                         </RunSettings> ";
 
-        var testLoggerManager = new DummyTestLoggerManager();
-        var framework = testLoggerManager.GetTargetFramework(runSettingsXml);
+        var framework = TestLoggerManager.GetTargetFramework(runSettingsXml);
 
         Assert.AreEqual(".NETFramework,Version=v4.5", framework?.Name);
     }
@@ -1629,6 +1626,7 @@ public class TestLoggerManagerTests
     {
         public static int Counter;
 
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Usage is unclear so keeping as non-static")]
         public void Initialize(TestLoggerEvents _, string _2)
         {
             Counter++;

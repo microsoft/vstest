@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 
 using FluentAssertions;
 
@@ -29,6 +30,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
@@ -107,7 +109,7 @@ public class TestRequestManagerTests
     [TestCleanup]
     public void Cleanup()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
 
         // Opt out the Telemetry
         Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
@@ -218,8 +220,8 @@ public class TestRequestManagerTests
         Assert.AreEqual("a", actualDiscoveryCriteria.Sources.First(), "First Source in list is incorrect");
         Assert.AreEqual("b", actualDiscoveryCriteria.Sources.ElementAt(1), "Second Source in list is incorrect");
 
-        // Default frequency is set to 10, unless specified in runsettings.
-        Assert.AreEqual(10, actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent);
+        // Default frequency is set to BatchSize (which is set to 1000).
+        Assert.AreEqual(1000, actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent);
 
         mockDiscoveryRegistrar.Verify(md => md.RegisterDiscoveryEvents(It.IsAny<IDiscoveryRequest>()), Times.Once);
         mockDiscoveryRegistrar.Verify(md => md.UnregisterDiscoveryEvents(It.IsAny<IDiscoveryRequest>()), Times.Once);
@@ -2517,6 +2519,79 @@ public class TestRequestManagerTests
             Times.Once);
     }
 
+    [TestMethod]
+    public void AddOrUpdateBatchSizeWhenNotDiscoveryReturnsFalseAndDoesNotUpdateXmlDocument()
+    {
+        // Arrange
+        var xmlDocument = new XmlDocument();
+        var configuration = new RunConfiguration();
+
+        // Act
+        var result = TestRequestManager.AddOrUpdateBatchSize(xmlDocument, configuration, false);
+
+        // Assert
+        Assert.IsFalse(result);
+        Assert.AreEqual("", xmlDocument.OuterXml);
+    }
+
+    [TestMethod]
+    public void AddOrUpdateBatchSizeWhenBatchSizeSetReturnsFalse()
+    {
+        // Arrange
+        var xmlDocument = new XmlDocument();
+        var configuration = new RunConfiguration { BatchSize = 10 };
+
+        // Sanity check
+        Assert.IsTrue(configuration.BatchSizeSet);
+
+        // Act
+        var result = TestRequestManager.AddOrUpdateBatchSize(xmlDocument, configuration, true);
+
+        // Assert
+        Assert.IsFalse(result);
+        Assert.AreEqual("", xmlDocument.OuterXml);
+    }
+
+    [TestMethod]
+    public void AddOrUpdateBatchSizeSetsBatchSize()
+    {
+        // Arrange
+        var xmlDocument = new XmlDocument();
+        xmlDocument.LoadXml("""
+            <RunSettings>
+                <RunConfiguration>
+                </RunConfiguration>
+            </RunSettings>
+            """);
+        var configuration = new RunConfiguration();
+
+        // Act
+        var result = TestRequestManager.AddOrUpdateBatchSize(xmlDocument, configuration, true);
+
+        // Assert
+        Assert.IsTrue(result);
+        Assert.AreEqual("<RunSettings><RunConfiguration><BatchSize>1000</BatchSize></RunConfiguration></RunSettings>", xmlDocument.OuterXml);
+    }
+
+    [TestMethod]
+    public void AddOrUpdateBatchSizeSetsRunConfigurationAndBatchSize()
+    {
+        // Arrange
+        var xmlDocument = new XmlDocument();
+        xmlDocument.LoadXml("""
+            <RunSettings>
+            </RunSettings>
+            """);
+        var configuration = new RunConfiguration();
+
+        // Act
+        var result = TestRequestManager.AddOrUpdateBatchSize(xmlDocument, configuration, true);
+
+        // Assert
+        Assert.IsTrue(result);
+        Assert.AreEqual("<RunSettings><RunConfiguration><BatchSize>1000</BatchSize></RunConfiguration></RunSettings>", xmlDocument.OuterXml);
+    }
+
     private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)
     {
         var discoveryPayload = new DiscoveryRequestPayload
@@ -2578,9 +2653,14 @@ public class TestRequestManagerTests
     [DataRow("x86")]
     [DataRow("x64")]
     [DataRow("arm64")]
+    // Don't parallelize because we can run into conflict with GetDefaultArchitecture -> RunSettingsHelper.Instance.IsDefaultTargetArchitecture
+    // which is set by some other test.
+    [DoNotParallelize]
     public void SettingDefaultPlatformUsesItForAnyCPUSourceButNotForNonAnyCPUSource(string defaultPlatform)
     {
         // -- Arrange
+
+        RunSettingsHelper.Instance.IsDefaultTargetArchitecture = true;
         var payload = new DiscoveryRequestPayload()
         {
             Sources = new List<string>() { "AnyCPU.dll", "x64.dll" },

@@ -7,6 +7,7 @@ using System.Diagnostics;
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 [Conditional("DEBUG")]
+[AttributeUsage(AttributeTargets.Field)]
 internal class ProtocolVersionAttribute : Attribute
 {
     public ProtocolVersionAttribute(int added, Type payloadType)

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
 /// <summary>
 /// Orchestrates discovery operations for the engine communicating with the test host process.
 /// </summary>
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class DiscoveryManager : IDiscoveryManager
 {
     private readonly TestSessionMessageLogger _sessionMessageLogger;
@@ -236,7 +238,7 @@ public class DiscoveryManager : IDiscoveryManager
     /// <summary>
     /// Verify/Normalize the test source files.
     /// </summary>
-    /// <param name="sources"> Paths to source file to look for tests in.  </param>
+    /// <param name="sources"> Paths to source file (or directory) in which to look for tests. </param>
     /// <param name="logger">logger</param>
     /// <param name="package">package</param>
     /// <returns> The list of verified sources. </returns>
@@ -253,7 +255,7 @@ public class DiscoveryManager : IDiscoveryManager
             // It is possible that runtime provider sent relative source path for remote scenario.
             string src = !Path.IsPathRooted(source) ? Path.Combine(Directory.GetCurrentDirectory(), source) : source;
 
-            if (!File.Exists(src))
+            if (!File.Exists(src) && !Directory.Exists(src))
             {
                 void SendWarning()
                 {

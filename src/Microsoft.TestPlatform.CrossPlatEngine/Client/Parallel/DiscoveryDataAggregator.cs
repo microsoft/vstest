@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 
@@ -141,11 +142,11 @@ internal sealed class DiscoveryDataAggregator
                 || metric.Key.Contains(TelemetryDataConstants.TotalTestsByAdapter)
                 || metric.Key.Contains(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec))
             {
-                var newValue = Convert.ToDouble(metric.Value);
+                var newValue = Convert.ToDouble(metric.Value, CultureInfo.InvariantCulture);
 
                 if (_metricsAggregator.TryGetValue(metric.Key, out object? oldValue))
                 {
-                    double oldDoubleValue = Convert.ToDouble(oldValue);
+                    double oldDoubleValue = Convert.ToDouble(oldValue, CultureInfo.InvariantCulture);
                     _metricsAggregator[metric.Key] = newValue + oldDoubleValue;
                 }
                 else

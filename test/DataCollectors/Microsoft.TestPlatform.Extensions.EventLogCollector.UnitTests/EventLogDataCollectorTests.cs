@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Xml;
 
@@ -367,11 +368,11 @@ public class EventLogDataCollectorTests
             x => x.WriteAllTextToFile(
                 It.IsAny<string>(),
                 It.Is<string>(
-                    str => str.Contains(filteredEntries[0].InstanceId.ToString())
-                           && str.Contains(filteredEntries[1].InstanceId.ToString())
-                           && str.Contains(filteredEntries[2].InstanceId.ToString())
-                           && str.Contains(filteredEntries[3].InstanceId.ToString())
-                           && str.Contains(filteredEntries[4].InstanceId.ToString()))));
+                    str => str.Contains(filteredEntries[0].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[1].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[2].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[3].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[4].InstanceId.ToString(CultureInfo.CurrentCulture)))));
     }
 
     [TestMethod]
@@ -410,11 +411,11 @@ public class EventLogDataCollectorTests
             x => x.WriteAllTextToFile(
                 It.IsAny<string>(),
                 It.Is<string>(
-                    str => str.Contains(filteredEntries[0].InstanceId.ToString())
-                           && str.Contains(filteredEntries[1].InstanceId.ToString())
-                           && str.Contains(filteredEntries[2].InstanceId.ToString())
-                           && str.Contains(filteredEntries[3].InstanceId.ToString())
-                           && str.Contains(filteredEntries[4].InstanceId.ToString()))));
+                    str => str.Contains(filteredEntries[0].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[1].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[2].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[3].InstanceId.ToString(CultureInfo.CurrentCulture))
+                           && str.Contains(filteredEntries[4].InstanceId.ToString(CultureInfo.CurrentCulture)))));
     }
 }
 

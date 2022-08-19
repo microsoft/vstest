@@ -25,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 /// The test plugin cache.
 /// </summary>
 /// <remarks>Making this a singleton to offer better unit testing.</remarks>
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class TestPluginCache
 {
     private readonly Dictionary<string, Assembly?> _resolvedAssemblies = new();
@@ -151,10 +152,7 @@ public class TestPluginCache
             // Discover the test extensions from candidate assemblies.
             pluginInfos = GetTestExtensions<TPluginInfo, TExtension>(allExtensionPaths);
 
-            if (TestExtensions == null)
-            {
-                TestExtensions = new TestExtensions();
-            }
+            TestExtensions ??= new TestExtensions();
 
             TestExtensions.AddExtension(pluginInfos);
 
@@ -320,8 +318,8 @@ public class TestPluginCache
         }
 
         // Check if extensions from this assembly have already been discovered.
-        var extensions = TestExtensions?.GetExtensionsDiscoveredFromAssembly(
-            TestExtensions.GetTestExtensionCache<TPluginInfo>(),
+        var extensions = TestExtensions.GetExtensionsDiscoveredFromAssembly(
+            TestExtensions?.GetTestExtensionCache<TPluginInfo>(),
             extensionAssembly);
 
         if (extensions?.Count > 0)
@@ -332,10 +330,7 @@ public class TestPluginCache
         var pluginInfos = GetTestExtensions<TPluginInfo, TExtension>(new List<string>() { extensionAssembly });
 
         // Add extensions discovered to the cache.
-        if (TestExtensions == null)
-        {
-            TestExtensions = new TestExtensions();
-        }
+        TestExtensions ??= new TestExtensions();
 
         TestExtensions.AddExtension(pluginInfos);
 
@@ -347,7 +342,7 @@ public class TestPluginCache
     /// </summary>
     /// <param name="extensionAssembly">The extension assembly.</param>
     /// <returns>Resolution paths for the assembly.</returns>
-    internal IList<string> GetResolutionPaths(string extensionAssembly)
+    internal static IList<string> GetResolutionPaths(string extensionAssembly)
     {
         var resolutionPaths = new List<string>();
 
@@ -463,7 +458,7 @@ public class TestPluginCache
             SetupAssemblyResolver(extensionPath);
         }
 
-        return new TestPluginDiscoverer().GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
+        return TestPluginDiscoverer.GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
     }
 
     protected void SetupAssemblyResolver(string? extensionAssembly)

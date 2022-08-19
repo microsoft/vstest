@@ -7,12 +7,11 @@
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.PlatformAbstractions</AssemblyName>
     <RootNamespace>Microsoft.TestPlatform.PlatformAbstractions</RootNamespace>
-    <TargetFrameworks>net45;net451;netcoreapp1.0;netcoreapp2.1;netstandard1.3;netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion);netstandard1.3;netstandard2.0;net6.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0;netstandard1.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
-    <!-- This causes a build error on netcoreapp1.0 -->
-    <NoWarn Condition="'$(TargetFramework)' != 'netcoreapp1.0'">$(NoWarn);NU1605</NoWarn>
+    <NoWarn>$(NoWarn);NU1605</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
@@ -26,7 +25,7 @@
     <DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' OR '$(TargetFramework)' == 'netcoreapp1.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetCoreVersion)' ">
     <PackageReference Include="System.Threading.Thread" Version="4.0.0" />
     <PackageReference Include="System.Diagnostics.Process" Version="4.1.0" />
     <PackageReference Include="System.Diagnostics.TextWriterTraceListener" Version="4.0.0" />
@@ -36,9 +35,7 @@
     <PackageReference Include="System.Net.Http" Version="$(SystemNetHttpVersion)" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' OR '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="Microsoft.Internal.Dia.Interop" Version="$(TestPlatformMSDiaVersion)" />
-
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
     <Reference Include="System.Configuration" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
@@ -55,6 +52,7 @@
     <PackageReference Include="System.ServiceModel.Primitives" Version="$(SystemServiceModelVersion)" />
     <PackageReference Include="System.ServiceModel.Security" Version="$(SystemServiceModelVersion)" />
     <PackageReference Include="System.Private.ServiceModel" Version="$(SystemServiceModelVersion)" />
+    <PackageReference Include="System.ServiceModel.Http" Version="$(SystemServiceModelVersion)" />
     <!-- / CVE-2018-8356 mitigation -->
   </ItemGroup>
 

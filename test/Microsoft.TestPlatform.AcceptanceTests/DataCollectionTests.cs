@@ -85,7 +85,7 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var arguments = PrepareArguments(GetTestDllForFramework("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
+        var arguments = PrepareArguments(GetTestDllForFramework("AppDomainGetAssembliesTestProject.dll", DEFAULT_HOST_NETCORE), string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 0, 0);
@@ -244,7 +244,7 @@ public class DataCollectionTests : AcceptanceTestBase
         Assert.AreEqual(3, diaglogsFileCount);
     }
 
-    private string GetRunsettingsFilePath(string resultsDir)
+    private static string GetRunsettingsFilePath(string resultsDir)
     {
         var runsettingsPath = Path.Combine(resultsDir, "test_" + Guid.NewGuid() + ".runsettings");
         var dataCollectionAttributes = new Dictionary<string, string>

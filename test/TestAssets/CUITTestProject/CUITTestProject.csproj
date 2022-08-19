@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <AssemblyName>CUITTestProject</AssemblyName>
-    <TargetFrameworks>net451</TargetFrameworks>
+    <TargetFrameworks>$(TargetNetFxVersion)</TargetFrameworks>
     <OutputType Condition="$(NetCoreAppTargetFramework) == 'true' ">Exe</OutputType>
   </PropertyGroup>
 

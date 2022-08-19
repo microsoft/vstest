@@ -27,8 +27,7 @@ public class CuitTest : AcceptanceTestBase
             return;
         }
 
-        var assemblyAbsolutePath = _testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
-
+        var assemblyAbsolutePath = _testEnvironment.GetTestAsset("CUITTestProject.dll", "net462");
         var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, resultsDirectory: TempDirectory.Path);
         arguments += " -- RunConfiguration.TargetPlatform=x86";
 

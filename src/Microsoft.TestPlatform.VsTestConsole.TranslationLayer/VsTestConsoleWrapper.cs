@@ -1042,7 +1042,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
             var processName = _processHelper.GetCurrentProcessFileName();
             throw new TransationLayerException(
                 string.Format(
-                    CultureInfo.CurrentUICulture,
+                    CultureInfo.CurrentCulture,
                     CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                     processName,
                     CoreUtilitiesConstants.VstestConsoleProcessName,

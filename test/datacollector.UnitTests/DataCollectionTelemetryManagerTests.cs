@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
@@ -207,7 +208,7 @@ public class DataCollectionTelemetryManagerTests
     public void RecordEnvironmentVariableConflict_ShouldCollectTelemetry_IfCorProfilerVariableAndBothValuesSame(string profilerGuid, string profilerName)
     {
         // act
-        _telemetryManager.RecordEnvironmentVariableConflict(_dataCollectorInformation, "COR_PROFILER", profilerGuid, profilerGuid.ToLower());
+        _telemetryManager.RecordEnvironmentVariableConflict(_dataCollectorInformation, "COR_PROFILER", profilerGuid, profilerGuid.ToLower(CultureInfo.InvariantCulture));
 
         // assert
         _mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{_dataCollectorInformation.DataCollectorConfig.TypeUri}", profilerName), Times.Once);
@@ -225,7 +226,7 @@ public class DataCollectionTelemetryManagerTests
     public void RecordEnvironmentVariableConflict_ShouldCollectTelemetry_IfCoreClrProfilerVariableAndBothValuesSame(string profilerGuid, string profilerName)
     {
         // act
-        _telemetryManager.RecordEnvironmentVariableConflict(_dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, profilerGuid.ToUpper());
+        _telemetryManager.RecordEnvironmentVariableConflict(_dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, profilerGuid.ToUpper(CultureInfo.InvariantCulture));
 
         // assert
         _mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{_dataCollectorInformation.DataCollectorConfig.TypeUri}", profilerName), Times.Once);

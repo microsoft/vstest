@@ -22,7 +22,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
     [DataRow("X86")]
     public void VerifyHostArchitecture(string architecture)
     {
-        _testEnvironment.RunnerFramework = "netcoreapp2.1";
+        _testEnvironment.RunnerFramework = "netcoreapp3.1";
         string dotnetPath = GetDownloadedDotnetMuxerFromTools(architecture);
         var vstestConsolePath = GetDotnetRunnerPath();
         var dotnetRunnerPath = TempDirectory.CreateDirectory("dotnetrunner");
@@ -32,7 +32,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
         string sdkVersion = GetLatestSdkVersion(dotnetPath);
         string runtimeConfigFile = Path.Combine(dotnetRunnerPath.FullName, "vstest.console.runtimeconfig.json");
         JObject patchRuntimeConfig = JObject.Parse(File.ReadAllText(runtimeConfigFile));
-        patchRuntimeConfig["runtimeOptions"]["framework"]["version"] = sdkVersion;
+        patchRuntimeConfig!["runtimeOptions"]!["framework"]!["version"] = sdkVersion;
         File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToString());
 
         var environmentVariables = new Dictionary<string, string?>

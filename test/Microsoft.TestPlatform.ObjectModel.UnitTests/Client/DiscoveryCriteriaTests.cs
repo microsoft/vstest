@@ -44,7 +44,7 @@ public class DiscoveryCriteriaTests
     {
         var json = "{\"Sources\":[\"sampleTest.dll\"],\"AdapterSourceMap\":{\"_none_\":[\"sampleTest.dll\"]},\"FrequencyOfDiscoveredTestsEvent\":100,\"DiscoveredTestEventTimeout\":\"10675199.02:48:05.4775807\",\"RunSettings\":\"<RunConfiguration></RunConfiguration>\",\"TestCaseFilter\":\"TestFilter\"}";
 
-        var criteria = JsonConvert.DeserializeObject<DiscoveryCriteria>(json, Settings);
+        var criteria = JsonConvert.DeserializeObject<DiscoveryCriteria>(json, Settings)!;
 
         Assert.AreEqual(TimeSpan.MaxValue, criteria.DiscoveredTestEventTimeout);
         Assert.AreEqual(100, criteria.FrequencyOfDiscoveredTestsEvent);

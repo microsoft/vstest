@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 using vstest.ProgrammerTests.Fakes;
 using Intent;
+using System.Diagnostics.CodeAnalysis;
 
 #pragma warning disable IDE1006 // Naming Styles
 namespace vstest.ProgrammerTests;
@@ -24,6 +25,7 @@ public class BasicRunAndDiscovery
 
         Then all 108 tests are executed.
     ")]
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
     public async Task A()
     {
         // -- arrange
@@ -78,6 +80,7 @@ public class BasicRunAndDiscovery
 
         Then all tests from all assemblies are run.
     ")]
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Specific test needs to be non-static")]
     public async Task B()
     {
         // -- arrange

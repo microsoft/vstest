@@ -114,13 +114,13 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource()]
+    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingWithInvokedDataCollectors(RunnerInfo runnerInfo)
         => await TestRunWithCodeCoverageAndAttachmentsProcessingInternal(runnerInfo, true);
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource()]
+    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public async Task TestRunWithCodeCoverageAndAttachmentsProcessingWithoutInvokedDataCollectors(RunnerInfo runnerInfo)
         => await TestRunWithCodeCoverageAndAttachmentsProcessingInternal(runnerInfo, false);
@@ -441,7 +441,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         return GetProjects().Select(p => GetAssetFullPath(p)).ToList();
     }
 
-    private IList<string> GetProjects()
+    private static IList<string> GetProjects()
     {
         return new List<string> { "SimpleTestProject.dll", "SimpleTestProject2.dll" };
     }

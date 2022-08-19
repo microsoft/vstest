@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
@@ -214,10 +215,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
             return;
         }
 
-        if (_baseTestDiscoveryEventsHandler is null)
-        {
-            _baseTestDiscoveryEventsHandler = eventHandler;
-        }
+        _baseTestDiscoveryEventsHandler ??= eventHandler;
 
         if (_isCommunicationEstablished)
         {
@@ -323,7 +321,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         var nonExistingExtensions = extensions.Where(extension => !_fileHelper.Exists(extension));
         if (nonExistingExtensions.Any())
         {
-            LogMessage(TestMessageLevel.Warning, string.Format(Resources.Resources.NonExistingExtensions, string.Join(",", nonExistingExtensions)));
+            LogMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, Resources.Resources.NonExistingExtensions, string.Join(",", nonExistingExtensions)));
         }
 
         var sourceList = sources.ToList();

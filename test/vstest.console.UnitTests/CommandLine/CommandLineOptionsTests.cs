@@ -27,7 +27,7 @@ public class CommandLineOptionsTests
     {
         _fileHelper = new Mock<IFileHelper>();
         _filePatternParser = new FilePatternParser(new Mock<Matcher>().Object, _fileHelper.Object);
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         CommandLineOptions.Instance.FileHelper = _fileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = _filePatternParser;
         _fileHelper.Setup(fh => fh.GetCurrentDirectory()).Returns(_currentDirectory);
@@ -37,6 +37,12 @@ public class CommandLineOptionsTests
     public void CommandLineOptionsDefaultBatchSizeIsTen()
     {
         Assert.AreEqual(10, CommandLineOptions.Instance.BatchSize);
+    }
+
+    [TestMethod]
+    public void CommandLineOptionsDiscoveryDefaultBatchSizeIsThousand()
+    {
+        Assert.AreEqual(1000, CommandLineOptions.DefaultDiscoveryBatchSize);
     }
 
     [TestMethod]

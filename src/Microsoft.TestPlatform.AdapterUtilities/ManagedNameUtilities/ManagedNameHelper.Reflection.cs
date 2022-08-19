@@ -5,9 +5,7 @@ using Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 using System;
 using System.Globalization;
-#if !NET20
 using System.Linq;
-#endif
 using System.Reflection;
 using System.Text;
 
@@ -45,7 +43,7 @@ public static partial class ManagedNameHelper
     /// <see href="https://github.com/microsoft/vstest-docs/blob/main/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
     /// </remarks>
     public static void GetManagedName(MethodBase method, out string managedTypeName, out string managedMethodName)
-        => GetManagedName(method, out managedTypeName, out managedMethodName, out _);
+     => GetManagedNameAndHierarchy(method, false, out managedTypeName, out managedMethodName, out _);
 
     /// <summary>
     /// Gets fully qualified managed type and method name from given <see href="MethodBase" /> instance.
@@ -82,19 +80,49 @@ public static partial class ManagedNameHelper
     /// </remarks>
     public static void GetManagedName(MethodBase method, out string managedTypeName, out string managedMethodName, out string[] hierarchyValues)
     {
+        GetManagedName(method, out managedTypeName, out managedMethodName);
+        GetManagedNameAndHierarchy(method, true, out _, out _, out hierarchyValues);
+    }
+
+    /// <summary>
+    /// Gets default hierarchy values for a given <paramref name="method"/>.
+    /// </summary>
+    /// <param name="method">
+    /// A <see cref="MethodBase" /> instance to get default hierarchy values.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="method"/> is null.
+    /// </exception>
+    /// <exception cref="NotSupportedException">
+    /// <paramref name="method"/> must describe a method.
+    /// </exception>
+    /// <exception cref="NotImplementedException">
+    /// Required functionality on <paramref name="method"/> is missing on the current platform.
+    /// </exception>
+    /// <returns>
+    /// The hierarchy values.
+    /// </returns>
+    public static string[] GetManagedHierarchy(MethodBase method)
+    {
+        GetManagedNameAndHierarchy(method, true, out _, out _, out var hierarchyValues);
+
+        return hierarchyValues;
+    }
+
+    private static void GetManagedNameAndHierarchy(MethodBase method, bool useClosedTypes, out string managedTypeName, out string managedMethodName, out string[] hierarchyValues)
+    {
         _ = method ?? throw new ArgumentNullException(nameof(method));
 
         if (!ReflectionHelpers.IsMethod(method))
         {
-            // TODO: @Haplois, exception expects a message and not a param name.
-            throw new NotSupportedException(nameof(method));
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorMethodExpectedAsAnArgument, nameof(method)));
         }
 
         var semanticType = ReflectionHelpers.GetReflectedType(method)
             // TODO: @Haplois, exception expects a message and not a param name.
             ?? throw new NotSupportedException(nameof(method));
 
-        if (ReflectionHelpers.IsGenericType(semanticType))
+        if (ReflectionHelpers.IsGenericType(semanticType) && !useClosedTypes)
         {
             // The type might have some of its generic parameters specified, so make
             // sure we are working with the open form of the generic type.
@@ -108,7 +136,7 @@ public static partial class ManagedNameHelper
             method = MethodBase.GetMethodFromHandle(methodHandle, semanticType.TypeHandle)!;
         }
 
-        if (method.IsGenericMethod)
+        if (method.IsGenericMethod && !useClosedTypes)
         {
             // If this method is generic, then convert to the generic method definition
             // so that we get the open generic type definitions for parameters.
@@ -119,11 +147,11 @@ public static partial class ManagedNameHelper
         var methodBuilder = new StringBuilder();
 
         // Namespace and Type Name (with arity designation)
-        var hierarchyPos = AppendTypeString(typeBuilder, semanticType, closedType: false);
-        if (hierarchyPos is null || hierarchyPos.Length != HierarchyConstants.Levels.TotalLevelCount)
+        // hierarchyPos contains [startIndexOfNamespace, endIndexOfNameSpace, endIndexOfTypeName]
+        var hierarchyPos = AppendTypeString(typeBuilder, semanticType, closedType: useClosedTypes);
+        if (hierarchyPos is null || hierarchyPos.Length != 3)
         {
-            // TODO: @Haplois, exception expects a message and not a param name.
-            throw new NotSupportedException(nameof(method));
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorMethodExpectedAsAnArgument, nameof(method)));
         }
 
         // Method Name with method arity
@@ -131,8 +159,15 @@ public static partial class ManagedNameHelper
         AppendMethodString(methodBuilder, method.Name, arity);
         if (arity > 0)
         {
-            methodBuilder.Append('`');
-            methodBuilder.Append(arity);
+            if (useClosedTypes)
+            {
+                AppendGenericMethodParameters(methodBuilder, method);
+            }
+            else
+            {
+                methodBuilder.Append('`');
+                methodBuilder.Append(arity);
+            }
         }
 
         // Type Parameters
@@ -142,20 +177,23 @@ public static partial class ManagedNameHelper
             methodBuilder.Append('(');
             foreach (var p in paramList)
             {
+                // closedType is always true here by RFC
                 AppendTypeString(methodBuilder, p.ParameterType, closedType: true);
                 methodBuilder.Append(',');
             }
             // Replace the last ',' with ')'
             methodBuilder[methodBuilder.Length - 1] = ')';
         }
+        var methodNameEndIndex = methodBuilder.Length;
 
         managedTypeName = typeBuilder.ToString();
         managedMethodName = methodBuilder.ToString();
-        hierarchyValues = new[]
-        {
-            managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]),
-            managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1),
-        };
+
+        hierarchyValues = new string[HierarchyConstants.Levels.TotalLevelCount];
+        hierarchyValues[HierarchyConstants.Levels.TestGroupIndex] = managedMethodName.Substring(0, methodNameEndIndex);
+        hierarchyValues[HierarchyConstants.Levels.ClassIndex] = managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1);
+        hierarchyValues[HierarchyConstants.Levels.NamespaceIndex] = managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]);
+        hierarchyValues[HierarchyConstants.Levels.ContainerIndex] = method.DeclaringType.GetTypeInfo().Assembly.GetName().Name;
     }
 
     /// <summary>
@@ -247,7 +285,8 @@ public static partial class ManagedNameHelper
 
             for (int i = 0; i < paramList.Length; i++)
             {
-                if (GetTypeString(paramList[i].ParameterType, closedType: true) != parameterTypes[i])
+                var parameterType = GetTypeString(paramList[i].ParameterType, closedType: true);
+                if (parameterType != parameterTypes[i])
                 {
                     return false;
                 }
@@ -265,7 +304,12 @@ public static partial class ManagedNameHelper
         methods = type.GetRuntimeMethods().Where(m => Filter(m, null)).ToArray();
 #endif
 
-        return (MethodInfo?)methods.SingleOrDefault();
+        return (MethodInfo?)(methods.Length switch
+        {
+            1 => methods[0],
+            > 1 => methods.SingleOrDefault(i => i.DeclaringType == type),
+            _ => null
+        });
     }
 
     private static int[]? AppendTypeString(StringBuilder b, Type? type, bool closedType)
@@ -305,11 +349,12 @@ public static partial class ManagedNameHelper
 
             b.Append('.');
 
-            AppendNestedTypeName(b, type);
+            AppendNestedTypeName(b, type, closedType);
             if (closedType)
             {
                 AppendGenericTypeParameters(b, type);
             }
+
             hierarchies[2] = b.Length;
         }
 
@@ -412,7 +457,7 @@ public static partial class ManagedNameHelper
         b.Append('\'');
     }
 
-    private static int AppendNestedTypeName(StringBuilder b, Type? type)
+    private static int AppendNestedTypeName(StringBuilder b, Type? type, bool closedType)
     {
         if (type is null)
         {
@@ -422,7 +467,7 @@ public static partial class ManagedNameHelper
         var outerArity = 0;
         if (type.IsNested)
         {
-            outerArity = AppendNestedTypeName(b, type.DeclaringType);
+            outerArity = AppendNestedTypeName(b, type.DeclaringType, closedType);
             b.Append('+');
         }
 
@@ -453,20 +498,34 @@ public static partial class ManagedNameHelper
         return arity;
     }
 
+    private static void AppendGenericMethodParameters(StringBuilder methodBuilder, MethodBase method)
+    {
+        Type[] genericArguments;
+
+        genericArguments = method.GetGenericArguments();
+
+        AppendGenericArguments(methodBuilder, genericArguments);
+    }
+
     private static void AppendGenericTypeParameters(StringBuilder b, Type type)
     {
-        Type[] genargs;
+        Type[] genericArguments;
 
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
-        genargs = type.GetGenericArguments();
+        genericArguments = type.GetGenericArguments();
 #else
-        genargs = type.GetTypeInfo().GenericTypeArguments;
+        genericArguments = type.GetTypeInfo().GenericTypeArguments;
 #endif
 
-        if (genargs.Length != 0)
+        AppendGenericArguments(b, genericArguments);
+    }
+
+    private static void AppendGenericArguments(StringBuilder b, Type[] genericArguments)
+    {
+        if (genericArguments.Length != 0)
         {
             b.Append('<');
-            foreach (var argType in genargs)
+            foreach (var argType in genericArguments)
             {
                 AppendTypeString(b, argType, closedType: true);
                 b.Append(',');
@@ -478,15 +537,33 @@ public static partial class ManagedNameHelper
 
     private static bool IsNormalized(string s)
     {
+        var brackets = 0;
+
         for (int i = 0; i < s.Length; i++)
         {
-            if (NeedsEscaping(s[i], i) && s[i] != '.')
+            var c = s[i];
+            if (NeedsEscaping(c, i) && c != '.')
             {
+                if (i != 0)
+                {
+                    if (c == '<')
+                    {
+                        brackets++;
+                        continue;
+                    }
+
+                    if (c == '>' && s[i - 1] != '<' && brackets > 0)
+                    {
+                        brackets--;
+                        continue;
+                    }
+                }
+
                 return false;
             }
         }
 
-        return true;
+        return brackets == 0;
     }
 
     private static bool NeedsEscaping(char c, int pos)

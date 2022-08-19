@@ -30,7 +30,7 @@ public class MainTests
         Assert.IsTrue(threadCultureWasSet, "DefaultThreadCurrentUICulture was not set");
         envVarMock.Verify(x => x.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE"), Times.Exactly(2));
         envVarMock.Verify(x => x.GetEnvironmentVariable("VSLANG"), Times.Once);
-        envVarMock.Verify(x => x.SetEnvironmentVariable("VSLANG", culture.LCID.ToString()), Times.Once);
+        envVarMock.Verify(x => x.SetEnvironmentVariable("VSLANG", culture.LCID.ToString(CultureInfo.InvariantCulture)), Times.Once);
         envVarMock.Verify(x => x.GetEnvironmentVariable("PreferredUILang"), Times.Once);
         envVarMock.Verify(x => x.SetEnvironmentVariable("PreferredUILang", culture.Name), Times.Once);
     }
@@ -41,7 +41,7 @@ public class MainTests
         // Arrange
         var culture = new CultureInfo("fr-fr");
         var envVarMock = new Mock<IEnvironmentVariableHelper>();
-        envVarMock.Setup(x => x.GetEnvironmentVariable("VSLANG")).Returns(culture.LCID.ToString());
+        envVarMock.Setup(x => x.GetEnvironmentVariable("VSLANG")).Returns(culture.LCID.ToString(CultureInfo.InvariantCulture));
 
         bool threadCultureWasSet = false;
 

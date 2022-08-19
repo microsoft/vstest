@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -62,13 +63,15 @@ public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProce
         // No op
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Usage is unclear so keeping as non-static")]
     public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo _)
     {
         // No op
         return -1;
     }
 
-    public bool AttachDebuggerToProcess(int pid)
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Usage is unclear so keeping as non-static")]
+    public bool AttachDebuggerToProcess(int _)
     {
         // No op
         return true;

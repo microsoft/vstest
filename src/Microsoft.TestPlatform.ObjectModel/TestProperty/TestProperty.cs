@@ -2,7 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+#if !NETSTANDARD1_0
+using System.Collections.Concurrent;
+#endif
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -19,7 +23,11 @@ public delegate bool ValidateValueCallback(object? value);
 public class TestProperty : IEquatable<TestProperty>
 {
     private Type _valueType;
+#if !NETSTANDARD1_0
+    private static readonly ConcurrentDictionary<string, Type> TypeCache = new();
+#else
     private static readonly Dictionary<string, Type> TypeCache = new();
+#endif
 
 #if NETSTANDARD1_0
     private static bool DisableFastJson { get; set; } = true;
@@ -163,10 +171,7 @@ public class TestProperty : IEquatable<TestProperty>
     /// <returns>The valueType of the test property</returns>
     public Type GetValueType()
     {
-        if (_valueType == null)
-        {
-            _valueType = GetType(ValueType);
-        }
+        _valueType ??= GetType(ValueType);
 
         return _valueType;
     }
@@ -191,15 +196,17 @@ public class TestProperty : IEquatable<TestProperty>
             {
                 if (type != null)
                 {
+#if !NETSTANDARD1_0
+                    TypeCache.TryAdd(typeName, type);
+#else
                     TypeCache[typeName] = type;
+#endif
                     return type;
                 }
             }
 
-            if (type == null)
-            {
-                type = Type.GetType(typeName.Replace("Version=4.0.0.0", "Version=2.0.0.0")); // Try 2.0 version as discovery returns version of 4.0 for all cases
-            }
+            // Try 2.0 version as discovery returns version of 4.0 for all cases
+            type ??= Type.GetType(typeName.Replace("Version=4.0.0.0", "Version=2.0.0.0"));
 
             // For UAP the type namespace for System.Uri,System.TimeSpan and System.DateTimeOffset differs from the desktop version.
             if (type == null && typeName.StartsWith("System.Uri"))
@@ -251,15 +258,16 @@ public class TestProperty : IEquatable<TestProperty>
         finally
         {
             // default is of string type.
-            if (type == null)
-            {
-                type = typeof(string);
-            }
+            type ??= typeof(string);
         }
 
         if (!DisableFastJson)
         {
+#if !NETSTANDARD1_0
+            TypeCache.TryAdd(typeName, type);
+#else
             TypeCache[typeName] = type;
+#endif
         }
         return type;
     }
@@ -384,12 +392,11 @@ public class TestProperty : IEquatable<TestProperty>
         return false;
     }
 
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Part of the public API")]
     public object GetRealObject(StreamingContext context)
     {
         var registeredProperty = Find(Id);
-        if (registeredProperty == null)
-        {
-            registeredProperty = Register(
+        registeredProperty ??= Register(
                 Id,
                 Label,
                 Category,
@@ -398,7 +405,6 @@ public class TestProperty : IEquatable<TestProperty>
                 ValidateValueCallback,
                 Attributes,
                 typeof(TestObject));
-        }
 
         return registeredProperty;
     }

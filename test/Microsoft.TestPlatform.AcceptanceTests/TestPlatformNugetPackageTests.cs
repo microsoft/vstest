@@ -25,13 +25,13 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
         ZipFile.ExtractToDirectory(nugetPackage, s_nugetPackageFolder);
 
         TryMoveDirectory(
-            sourceDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team%20Tools"),
-            destDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team Tools")
+            sourceDirName: Path.Combine(s_nugetPackageFolder, "tools", "net462", "Team%20Tools"),
+            destDirName: Path.Combine(s_nugetPackageFolder, "tools", "net462", "Team Tools")
         );
 
         TryMoveDirectory(
-            sourceDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic%20Code%20Coverage%20Tools"),
-            destDirName: Path.Combine(s_nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic Code Coverage Tools")
+            sourceDirName: Path.Combine(s_nugetPackageFolder, "tools", "net462", "Team Tools", "Dynamic%20Code%20Coverage%20Tools"),
+            destDirName: Path.Combine(s_nugetPackageFolder, "tools", "net462", "Team Tools", "Dynamic Code Coverage Tools")
         );
     }
 
@@ -43,8 +43,8 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSourceAttribute(useCoreRunner: false)]
+    [NetCoreTargetFrameworkDataSourceAttribute(useCoreRunner: false)]
     public void RunMultipleTestAssembliesWithCodeCoverage(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -67,7 +67,7 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
 
         if (IsDesktopRunner())
         {
-            consoleRunnerPath = Path.Combine(s_nugetPackageFolder, "tools", "net451", "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe");
+            consoleRunnerPath = Path.Combine(s_nugetPackageFolder, "tools", Net462TargetFramework, "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe");
         }
 
         Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: \"{0}\"", consoleRunnerPath);

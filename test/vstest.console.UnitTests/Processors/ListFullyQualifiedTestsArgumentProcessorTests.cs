@@ -67,7 +67,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
     public void Cleanup()
     {
         File.Delete(_dummyFilePath);
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
     }
 
     public ListFullyQualifiedTestsArgumentProcessorTests()
@@ -142,7 +142,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
     [TestMethod]
     public void ExecutorExecuteForNoSourcesShouldReturnFail()
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _mockEnvironment.Object);
         var executor = GetExecutor(testRequestManager, null);
 
@@ -331,7 +331,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
 
     private void ResetAndAddSourceToCommandLineOptions(bool legitPath)
     {
-        CommandLineOptions.Instance.Reset();
+        CommandLineOptions.Reset();
 
         CommandLineOptions.Instance.FileHelper = _mockFileHelper.Object;
         CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, _mockFileHelper.Object);

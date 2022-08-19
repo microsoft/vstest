@@ -21,10 +21,10 @@ public class DisableAppdomainTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var diableAppdomainTest1 = _testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
-        var diableAppdomainTest2 = _testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
+        var diableAppdomainTest1 = _testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", Net462TargetFramework);
+        var diableAppdomainTest2 = _testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", Net462TargetFramework);
 
-        RunTests(runnerInfo, string.Format("{0}\" \"{1}", diableAppdomainTest1, diableAppdomainTest2), 2);
+        RunTests(runnerInfo, $"{diableAppdomainTest1}\" \"{diableAppdomainTest2}", 2);
     }
 
     [TestMethod]
@@ -34,7 +34,7 @@ public class DisableAppdomainTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var newtonSoftDependnecyTest = _testEnvironment.GetTestAsset("NewtonSoftDependency.dll", "net451");
+        var newtonSoftDependnecyTest = _testEnvironment.GetTestAsset("NewtonSoftDependency.dll", Net462TargetFramework);
 
         RunTests(runnerInfo, newtonSoftDependnecyTest, 1);
     }
@@ -62,9 +62,9 @@ public class DisableAppdomainTests : AcceptanceTestBase
         ValidateSummaryStatus(passedTestCount, 0, 0);
     }
 
-    private string GetRunsettingsFilePath(TempDirectory tempDirectory, Dictionary<string, string> runConfigurationDictionary)
+    private static string GetRunsettingsFilePath(TempDirectory tempDirectory, Dictionary<string, string> runConfigurationDictionary)
     {
-        var runsettingsPath = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
+        var runsettingsPath = Path.Combine(tempDirectory.Path, $"test_{Guid.NewGuid()}.runsettings");
         CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
         return runsettingsPath;
     }

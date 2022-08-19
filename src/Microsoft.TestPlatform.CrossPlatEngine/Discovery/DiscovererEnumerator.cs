@@ -232,8 +232,8 @@ internal class DiscovererEnumerator
             // Record Total Tests Discovered By each Discoverer.
             var totalTestsDiscoveredByCurrentDiscoverer = _discoveryResultCache.TotalDiscoveredTests - currentTotalTests;
             _requestData.MetricsCollection.Add(
-                string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsByAdapter,
-                    discoverer.Metadata.DefaultExecutorUri), totalTestsDiscoveredByCurrentDiscoverer);
+                $"{TelemetryDataConstants.TotalTestsByAdapter}.{discoverer.Metadata.DefaultExecutorUri}",
+                totalTestsDiscoveredByCurrentDiscoverer);
 
             totalAdaptersUsed++;
 
@@ -249,14 +249,14 @@ internal class DiscovererEnumerator
 
             // Collecting Data Point for Time Taken to Discover Tests by each Adapter
             _requestData.MetricsCollection.Add(
-                string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter,
-                    discoverer.Metadata.DefaultExecutorUri), totalAdapterRunTime.TotalSeconds);
+                $"{TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter}.{discoverer.Metadata.DefaultExecutorUri}",
+                totalAdapterRunTime.TotalSeconds);
             totalTimeTakenByAdapters += totalAdapterRunTime.TotalSeconds;
         }
         catch (Exception e)
         {
             var message = string.Format(
-                CultureInfo.CurrentUICulture,
+                CultureInfo.CurrentCulture,
                 CrossPlatEngineResources.ExceptionFromLoadTests,
                 discovererType.Name,
                 e.Message);
@@ -277,10 +277,7 @@ internal class DiscovererEnumerator
         }
         catch (Exception e)
         {
-            var mesage = string.Format(
-                CultureInfo.CurrentUICulture,
-                CrossPlatEngineResources.DiscovererInstantiationException,
-                e.Message);
+            var mesage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DiscovererInstantiationException, e.Message);
             logger.SendMessage(TestMessageLevel.Warning, mesage);
             EqtTrace.Error("DiscovererEnumerator.LoadTestsFromAnExtension: {0} ", e);
 
@@ -316,16 +313,13 @@ internal class DiscovererEnumerator
 
             logger.SendMessage(
                 TestMessageLevel.Warning,
-                string.Format(CrossPlatEngineResources.NoTestsAvailableForGivenTestCaseFilter, testCaseFilterToShow, sourcesString));
+                string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.NoTestsAvailableForGivenTestCaseFilter, testCaseFilterToShow, sourcesString));
         }
         else
         {
             logger.SendMessage(
                 TestMessageLevel.Warning,
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
-                    sourcesString));
+                string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources, sourcesString));
         }
     }
 
@@ -377,32 +371,62 @@ internal class DiscovererEnumerator
         var result = new Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>>();
         var sourcesForWhichNoDiscovererIsAvailable = new List<string>(sources);
 
+        sources = sources.Distinct().ToList();
+        IEnumerable<string> allDirectoryBasedSources = sources.Where(Directory.Exists).ToList();
+        IEnumerable<string> allFileBasedSources = sources.Except(allDirectoryBasedSources).ToList();
+
         foreach (var discoverer in allDiscoverers)
         {
-            var sourcesToCheck = sources;
-
+            var applicableFileBasedSources = allFileBasedSources;
             if (discoverer.Metadata.AssemblyType is AssemblyType.Native or AssemblyType.Managed)
             {
-                assemblyTypeToSoucesMap ??= GetAssemblyTypeToSoucesMap(sources, assemblyProperties);
-                sourcesToCheck = assemblyTypeToSoucesMap[AssemblyType.None].Concat(assemblyTypeToSoucesMap[discoverer.Metadata.AssemblyType]);
+                assemblyTypeToSoucesMap ??= GetAssemblyTypeToSoucesMap(applicableFileBasedSources, assemblyProperties);
+                applicableFileBasedSources = assemblyTypeToSoucesMap[AssemblyType.None].Concat(assemblyTypeToSoucesMap[discoverer.Metadata.AssemblyType]);
             }
 
             // Find the sources which this discoverer can look at.
-            // Based on whether it is registered for a matching file extension or no file extensions at all.
-            var matchingSources = (from source in sourcesToCheck
-                                   where
-                                       (discoverer.Metadata.FileExtension == null
-                                        || discoverer.Metadata.FileExtension.Contains(
-                                            Path.GetExtension(source),
-                                            StringComparer.OrdinalIgnoreCase))
-                                   select source).ToList(); // ToList is required to actually execute the query
+            var matchingSources = Enumerable.Empty<string>();
+            var discovererFileExtensions = discoverer.Metadata.FileExtension;
+            var discovererIsApplicableToFiles = discovererFileExtensions is not null;
+            var discovererIsApplicableToDirectories = discoverer.Metadata.IsDirectoryBased;
+
+            if (!discovererIsApplicableToFiles && !discovererIsApplicableToDirectories)
+            {
+                // Discoverer is applicable for all sources (regardless of whether they are files or directories).
+                // Include all files and directories.
+                matchingSources = applicableFileBasedSources.Concat(allDirectoryBasedSources);
+            }
+            else
+            {
+                if (discovererIsApplicableToFiles)
+                {
+                    // Include matching files.
+                    var matchingFileBasedSources =
+                        applicableFileBasedSources.Where(source =>
+                            discovererFileExtensions!.Contains(
+                                Path.GetExtension(source),
+                                StringComparer.OrdinalIgnoreCase));
+
+                    matchingSources = matchingSources.Concat(matchingFileBasedSources);
+                }
+
+                if (discovererIsApplicableToDirectories)
+                {
+                    // Include all directories.
+                    matchingSources = matchingSources.Concat(allDirectoryBasedSources);
+                }
+            }
+
+            matchingSources = matchingSources.ToList(); // ToList is required to actually execute the query
 
             // Update the source list for which no matching source is available.
             if (matchingSources.Any())
             {
                 sourcesForWhichNoDiscovererIsAvailable =
-                    sourcesForWhichNoDiscovererIsAvailable.Except(matchingSources, StringComparer.OrdinalIgnoreCase)
+                    sourcesForWhichNoDiscovererIsAvailable
+                        .Except(matchingSources, StringComparer.OrdinalIgnoreCase)
                         .ToList();
+
                 result.Add(discoverer, matchingSources);
             }
         }

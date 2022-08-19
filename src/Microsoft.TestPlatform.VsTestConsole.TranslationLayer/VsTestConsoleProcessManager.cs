@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 /// <summary>
 /// Vstest.console process manager
 /// </summary>
-internal class VsTestConsoleProcessManager : IProcessManager
+internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
 {
     /// <summary>
     /// Port number for communicating with Vstest CLI
@@ -56,6 +56,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
     private Process? _process;
     private bool _vstestConsoleStarted;
     private bool _vstestConsoleExited;
+    private bool _isDisposed;
 
     internal IFileHelper FileHelper { get; set; }
 
@@ -106,7 +107,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         // extra double quotes before testing whether the file exists.
         if (!File.Exists(consoleRunnerPath.Trim('"')))
         {
-            throw new FileNotFoundException(string.Format(InternalResources.CannotFindConsoleRunner, consoleRunnerPath), consoleRunnerPath);
+            throw new FileNotFoundException(string.Format(CultureInfo.CurrentCulture, InternalResources.CannotFindConsoleRunner, consoleRunnerPath), consoleRunnerPath);
         }
 
         var arguments = string.Join(" ", BuildArguments(consoleParameters));
@@ -147,7 +148,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         }
         catch (Win32Exception ex)
         {
-            throw new Exception(string.Format(InternalResources.ProcessStartWin32Failure, consoleRunnerPath, arguments), ex);
+            throw new Exception(string.Format(CultureInfo.CurrentCulture, InternalResources.ProcessStartWin32Failure, consoleRunnerPath, arguments), ex);
         }
 
         lock (_syncObject)
@@ -228,7 +229,7 @@ internal class VsTestConsoleProcessManager : IProcessManager
         }
     }
 
-    private string[] BuildArguments(ConsoleParameters parameters)
+    internal string[] BuildArguments(ConsoleParameters parameters)
     {
         var args = new List<string>
         {
@@ -260,4 +261,14 @@ internal class VsTestConsoleProcessManager : IProcessManager
 
     private static string GetEscapeSequencedPath(string path)
         => path.IsNullOrEmpty() ? path : $"\"{path.Trim('"')}\"";
+
+    public void Dispose()
+    {
+        if (!_isDisposed)
+        {
+            _processExitedEvent.Dispose();
+            _process?.Dispose();
+            _isDisposed = true;
+        }
+    }
 }

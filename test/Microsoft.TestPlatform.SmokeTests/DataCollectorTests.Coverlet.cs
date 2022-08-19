@@ -17,6 +17,7 @@ public class DataCollectorTestsCoverlets : IntegrationTestBase
     [TestMethod]
     public void RunCoverletCoverage()
     {
+        // REVIEW ME: @Marco do we need to update this test?
         // Collector is supported only for netcoreapp2.1, is compiled for netcoreapp2.1 and packaged as netstandard
         if (_testEnvironment.TargetFramework != CoreRunnerFramework)
         {
@@ -24,7 +25,7 @@ public class DataCollectorTestsCoverlets : IntegrationTestBase
         }
 
         // We use netcoreapp runner
-        // "...\vstest\tools\dotnet\dotnet.exe "...\vstest\artifacts\Debug\netcoreapp2.1\vstest.console.dll" --collect:"XPlat Code Coverage" ...
+        // "...\vstest\tools\dotnet\dotnet.exe "...\vstest\artifacts\Debug\netcoreapp3.1\vstest.console.dll" --collect:"XPlat Code Coverage" ...
         _testEnvironment.RunnerFramework = CoreRunnerFramework;
         var resultsDir = new TempDirectory();
 

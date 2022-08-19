@@ -101,7 +101,7 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
         {
             Uri uriToUse = useAbsoluteUri
                 ? new Uri(Path.Combine(baseDirectory, Uri.OriginalString), UriKind.Absolute)
-                : new Uri(_trxFileHelper.MakePathRelative(Uri.OriginalString, baseDirectory), UriKind.Relative);
+                : new Uri(TrxFileHelper.MakePathRelative(Uri.OriginalString, baseDirectory), UriKind.Relative);
             return new UriDataAttachment(Description, uriToUse, _trxFileHelper);
         }
 
