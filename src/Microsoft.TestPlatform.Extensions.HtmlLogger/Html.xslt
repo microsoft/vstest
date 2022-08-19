@@ -1,90 +1,90 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="2.0"
-  xmlns:tp="http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"
-  xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxs tp">
-  <xsl:output method="html" indent="yes" />
+    xmlns:tp="http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"
+    xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxs tp">
+  <xsl:output method="html" indent="yes"/>
   <xsl:template match="/">
     <html>
       <body>
-        <h1>Test rrrrrun details</h1>
-        <xsl:apply-templates select="/tp:TestRunDetails" />
+        <h1>Test run details</h1>
+        <xsl:apply-templates select ="/tp:TestRunDetails"/>
       </body>
       <script language="javascript">
-                function ToggleClass(id) {
-                var elem = document.getElementById(id);
-                if (elem.style.display == "none") {
-                elem.style.display = "block";
-                }
-                else {
-                elem.style.display = "none";
-                }
-                }
-            </script>
+        function ToggleClass(id) {
+        var elem = document.getElementById(id);
+        if (elem.style.display == "none") {
+        elem.style.display = "block";
+        }
+        else {
+        elem.style.display = "none";
+        }
+        }
+      </script>
       <style>
-                body { font-family: Calibri, Verdana, Arial, sans-serif; background-color: White; color: Black; }
-                h2 {
-                margin-top: 15px;
-                margin-bottom:10px;
-                }
-                pre {
-                white-space: pre-wrap;
-                }
-                .summary {font-family:monospace;
-                display: -webkit-flex; /* Safari */
-                -webkit-flex-wrap: wrap; /* Safari 6.1+ */
-                display: flex;
-                flex-wrap: wrap;
-                }
-                .row {
-                border: 2px solid #ffffff;
-                width:100%;
-                cursor:pointer;
-                background-color:#d7e9fa;
-                }
-                .list-row {
-                border: 2px solid #ffffff;
-                width:100%;
-                cursor:pointer;
-                background-color:#ffffff;
-                }
-                .inner-row{
-                border: 2px solid #ffffff;
-                padding-left:1%;
-                margin-left:1%;
-                background-color:#ffffff;
-                }
-                .block{
-                width : 150px;
-                }
-                .leaf-division{
-                border: 2px solid #ffffff;
-                background-color:#e6eff7;
-                }
-                .pass { color: #0c0; }
-                .fail { color: #c00; }
-                .error-message { color : brown; }
-                .error-stack-trace { color: brown; }
-                .duration {float:right;padding-right:1%;}
-                .total-tests { font-size : 30px}
-                .test-run-time { font-size : 30px}
-                .pass-percentage { font-size : 30px}
-                .error-info{
-                margin-left:16px;
-                }
-            </style>
+        body { font-family: Calibri, Verdana, Arial, sans-serif; background-color: White; color: Black; }
+        h2 {
+        margin-top: 15px;
+        margin-bottom:10px;
+        }
+        pre {
+        white-space: pre-wrap;
+        }
+        .summary {font-family:monospace;
+        display: -webkit-flex; /* Safari */
+        -webkit-flex-wrap: wrap; /* Safari 6.1+ */
+        display: flex;
+        flex-wrap: wrap;
+        }
+        .row {
+        border: 2px solid #ffffff;
+        width:100%;
+        cursor:pointer;
+        background-color:#d7e9fa;
+        }
+        .list-row {
+        border: 2px solid #ffffff;
+        width:100%;
+        cursor:pointer;
+        background-color:#ffffff;
+        }
+        .inner-row{
+        border: 2px solid #ffffff;
+        padding-left:1%;
+        margin-left:1%;
+        background-color:#ffffff;
+        }
+        .block{
+        width : 150px;
+        }
+        .leaf-division{
+        border: 2px solid #ffffff;
+        background-color:#e6eff7;
+        }
+        .pass { color: #0c0; }
+        .fail { color: #c00; }
+        .error-message { color : brown; }
+        .error-stack-trace { color: brown; }
+        .duration {float:right;padding-right:1%;}
+        .total-tests { font-size : 30px}
+        .test-run-time { font-size : 30px}
+        .pass-percentage { font-size : 30px}
+        .error-info{
+        margin-left:16px;
+        }
+      </style>
     </html>
   </xsl:template>
 
   <xsl:template match="/tp:TestRunDetails">
-    <xsl:apply-templates select="/tp:TestRunDetails/tp:Summary" />
-    <xsl:apply-templates select="/tp:TestRunDetails/tp:ResultCollectionList" />
+    <xsl:apply-templates select="/tp:TestRunDetails/tp:Summary"/>
+    <xsl:apply-templates select="/tp:TestRunDetails/tp:ResultCollectionList"/>
     <xsl:if test="tp:RunLevelMessageInformational != ''">
-      <xsl:apply-templates select="tp:RunLevelMessageInformational" />
+      <xsl:apply-templates select="tp:RunLevelMessageInformational"/>
     </xsl:if>
     <xsl:if test="tp:RunLevelMessageErrorAndWarning != ''">
-      <xsl:apply-templates select="tp:RunLevelMessageErrorAndWarning" />
+      <xsl:apply-templates select="tp:RunLevelMessageErrorAndWarning"/>
     </xsl:if>
   </xsl:template>
 
