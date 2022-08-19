@@ -20,7 +20,7 @@ namespace TestPlatform.Playground;
 
 internal class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
         // This project references TranslationLayer, vstest.console, TestHostProvider, testhost and MSTest1 projects, to make sure
         // we build all the dependencies of that are used to run tests via VSTestConsoleWrapper. It then copies the components from
