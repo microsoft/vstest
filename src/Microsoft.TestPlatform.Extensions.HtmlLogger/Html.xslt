@@ -78,13 +78,13 @@
   </xsl:template>
 
   <xsl:template match="/tp:TestRunDetails">
-    <xsl:apply-templates select="/tp:TestRunDetails/tp:Summary"/>
-    <xsl:apply-templates select="/tp:TestRunDetails/tp:ResultCollectionList"/>
+    <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary"/>
+    <xsl:apply-templates select ="/tp:TestRunDetails/tp:ResultCollectionList"/>
     <xsl:if test="tp:RunLevelMessageInformational != ''">
-      <xsl:apply-templates select="tp:RunLevelMessageInformational"/>
+      <xsl:apply-templates select ="tp:RunLevelMessageInformational"/>
     </xsl:if>
     <xsl:if test="tp:RunLevelMessageErrorAndWarning != ''">
-      <xsl:apply-templates select="tp:RunLevelMessageErrorAndWarning"/>
+      <xsl:apply-templates select ="tp:RunLevelMessageErrorAndWarning"/>
     </xsl:if>
   </xsl:template>
 
@@ -107,11 +107,10 @@
       <br />
     </div>
   </xsl:template>
-  <!--lists-->
   <xsl:template match="/tp:TestRunDetails/tp:ResultCollectionList">
     <xsl:if test="count(tp:TestResultCollection/tp:ResultCollectionListByClass/tp:TestResultByClass/tp:FailedResultList/tp:TestResult)>0">
       <h2>Failed Results</h2>
-      <xsl:call-template name="FailedResults" />
+      <xsl:call-template name ="FailedResults"/>
     </xsl:if>
     <h2>All Results</h2>
     <xsl:call-template name="Results" />
