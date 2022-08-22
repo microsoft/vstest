@@ -465,7 +465,7 @@ public class ProxyOperationManager
         {
             // We might consider passing standard output here in case standard error is not
             // available because some errors don't end up in the standard error output.
-            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, string.Join(", ", sources), _testHostProcessStdError));
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, string.Join("', '", sources), _testHostProcessStdError));
         }
     }
 
@@ -490,7 +490,7 @@ public class ProxyOperationManager
         if (!StringUtils.IsNullOrWhiteSpace(_testHostProcessStdError))
         {
             // Testhost failed with error.
-            errorMsg = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, string.Join(", ", sources), _testHostProcessStdError);
+            errorMsg = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, string.Join("', '", sources), _testHostProcessStdError);
         }
 
         throw new TestPlatformException(errorMsg);
