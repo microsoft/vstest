@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 
+using Microsoft.VisualStudio.TestPlatform.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
@@ -118,6 +119,8 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         DataCollectionLogger logger,
         DataCollectionEnvironmentContext? environmentContext)
     {
+        DebuggerBreakpoint.WaitForDebugger("VSTEST_BLAMEDATACOLLECTOR_DEBUG");
+
         _events = events;
         _dataCollectionSink = dataSink;
         _context = environmentContext;

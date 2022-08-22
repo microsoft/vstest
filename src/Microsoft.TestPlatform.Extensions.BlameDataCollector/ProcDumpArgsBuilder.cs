@@ -42,7 +42,10 @@ public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
         }
 
         procDumpArgument.Append($"{processId} {filename}.dmp");
-        var argument = procdumpArgumentsFromEnv.IsNullOrWhiteSpace() ? procDumpArgument.ToString() : procdumpArgumentsFromEnv;
+        var argument = procdumpArgumentsFromEnv.IsNullOrWhiteSpace()
+            ? procDumpArgument.ToString()
+            : $"-accepteula {procdumpArgumentsFromEnv} {processId} {filename}.dmp";
+
         if (!argument.ToUpperInvariant().Contains("-accepteula".ToUpperInvariant()))
         {
             argument = $"-accepteula {argument}";
