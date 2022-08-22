@@ -160,7 +160,6 @@ internal class FilterExpression
                     {
                         invalidProperties = new string[1] { current._condition.Name };
                     }
-                    result.Push(invalidProperties);
                 }
                 else
                 {
@@ -174,8 +173,8 @@ internal class FilterExpression
                     {
                         invalidProperties = invalidProperties.Concat(invalidRight).ToArray();
                     }
-                    result.Push(invalidProperties);
                 }
+                result.Push(invalidProperties);
                 current = null;
             }
         } while (filterStack.Count() > 0);
@@ -304,19 +303,49 @@ internal class FilterExpression
     internal bool Evaluate(Func<string, object?> propertyValueProvider)
     {
         ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
-        bool filterResult = false;
-        if (null != _condition)
+
+        FilterExpression? current = this;
+        Stack<FilterExpression> filterStack = new();
+        Stack<bool> result = new();
+        do
         {
-            filterResult = _condition.Evaluate(propertyValueProvider);
-        }
-        else
-        {
-            // & or | operator
-            bool leftResult = _left!.Evaluate(propertyValueProvider);
-            bool rightResult = _right!.Evaluate(propertyValueProvider);
-            filterResult = _areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
-        }
-        return filterResult;
+            //Push root's right child and then root to stack then Set root as root's left child
+            while (current != null)
+            {
+                if (current._right != null)
+                {
+                    filterStack.Push(current._right);
+                }
+                filterStack.Push(current);
+                current = current._left;
+            }
+            //If the popped item has a right child and the right child is at top of stack, then remove the right child from stack, push the root back and set root as root's right child.
+            current = filterStack.Pop();
+            if (filterStack.Count > 0 && current._right == filterStack.First())
+            {
+                filterStack.Pop();
+                filterStack.Push(current);
+                current = current._right;
+            }
+            else
+            {
+                bool filterResult = false;
+                if (null != current._condition)
+                {
+                    filterResult = current._condition.Evaluate(propertyValueProvider);
+                }
+                else
+                {
+                    // & or | operator
+                    bool rightResult = current._right != null ? result.Pop() : false;
+                    bool leftResult = current._left != null ? result.Pop() : false;
+                    filterResult = current._areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
+                }
+                result.Push(filterResult);
+                current = null;
+            }
+        } while (filterStack.Count() > 0);
+        return result.First();
     }
 
     internal static IEnumerable<string> TokenizeFilterExpressionString(string str)
