@@ -194,7 +194,7 @@ public class Migrator
         }
 
         // DataCollectors node.
-        if (testSettingsNodes?.Datacollectors != null && testSettingsNodes.Datacollectors.Count > 0)
+        if (testSettingsNodes.Datacollectors != null && testSettingsNodes.Datacollectors.Count > 0)
         {
             AddDataCollectorNodes(testSettingsNodes.Datacollectors, runSettingsXmlDoc!);
         }
