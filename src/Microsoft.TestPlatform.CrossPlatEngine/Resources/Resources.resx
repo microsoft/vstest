@@ -169,7 +169,8 @@
     <value>Logging TestHost Diagnostics in file: {0}</value>
   </data>
   <data name="TestHostExitedWithError" xml:space="preserve">
-    <value>Testhost process exited with error: {0}. Please check the diagnostic logs for more information.</value>
+    <value>Testhost process for source(s) '{0}' exited with error: {1}. Please check the diagnostic logs for more information.</value>
+    <comment>{0} a source, or very rarely list of sources, {1} the output error.</comment>
   </data>
   <data name="TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources" xml:space="preserve">
     <value>No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</value>

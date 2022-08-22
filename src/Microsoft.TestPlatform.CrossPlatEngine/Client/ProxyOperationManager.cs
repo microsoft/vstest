@@ -272,11 +272,11 @@ public class ProxyOperationManager
 
             // Throw a test platform exception along with the error messages from the test if the test host exited unexpectedly
             // before communication was established.
-            ThrowOnTestHostExited(_testHostExited.IsSet);
+            ThrowOnTestHostExited(sources, _testHostExited.IsSet);
 
             // Throw a test platform exception stating the connection to test could not be established even after waiting
             // for the configure timeout period.
-            ThrowExceptionOnConnectionFailure(connTimeout);
+            ThrowExceptionOnConnectionFailure(sources, connTimeout);
         }
 
         // Handling special case for dotnet core projects with older test hosts.
@@ -459,17 +459,17 @@ public class ProxyOperationManager
         RequestSender.OnClientProcessExit(_testHostProcessStdError);
     }
 
-    private void ThrowOnTestHostExited(bool testHostExited)
+    private void ThrowOnTestHostExited(IEnumerable<string> sources, bool testHostExited)
     {
         if (testHostExited)
         {
             // We might consider passing standard output here in case standard error is not
             // available because some errors don't end up in the standard error output.
-            throw new TestPlatformException(string.Format(CrossPlatEngineResources.TestHostExitedWithError, _testHostProcessStdError));
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, string.Join("', '", sources), _testHostProcessStdError));
         }
     }
 
-    private void ThrowExceptionOnConnectionFailure(int connTimeout)
+    private void ThrowExceptionOnConnectionFailure(IEnumerable<string> sources, int connTimeout)
     {
         // Failed to launch testhost process.
         var errorMsg = CrossPlatEngineResources.InitializationFailed;
@@ -489,7 +489,7 @@ public class ProxyOperationManager
         if (!StringUtils.IsNullOrWhiteSpace(_testHostProcessStdError))
         {
             // Testhost failed with error.
-            errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, _testHostProcessStdError);
+            errorMsg = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, string.Join("', '", sources), _testHostProcessStdError);
         }
 
         throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
