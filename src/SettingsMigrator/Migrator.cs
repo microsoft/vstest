@@ -190,7 +190,7 @@ public class Migrator
         // TestSessionTimeout node.
         if (!runTimeout.IsNullOrEmpty())
         {
-            AddRunTimeoutNode(runTimeout, runSettingsXmlDoc!);
+            AddRunTimeoutNode(runTimeout, runSettingsXmlDoc);
         }
 
         // DataCollectors node.
