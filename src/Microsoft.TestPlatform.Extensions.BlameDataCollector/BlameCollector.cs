@@ -119,7 +119,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         DataCollectionLogger logger,
         DataCollectionEnvironmentContext? environmentContext)
     {
-        DebuggerBreakpoint.WaitForDebugger("VSTEST_BLAMEDATACOLLECTOR_DEBUG");
+        DebuggerBreakpoint.WaitForDebugger(WellKnownDebugEnvironmentVariables.VSTEST_BLAMEDATACOLLECTOR_DEBUG);
 
         _events = events;
         _dataCollectionSink = dataSink;

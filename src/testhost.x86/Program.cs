@@ -55,9 +55,9 @@ public class Program
 
     internal static void Run(string[]? args, UiLanguageOverride uiLanguageOverride)
     {
-        DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_HOST_DEBUG_ATTACHVS");
-        DebuggerBreakpoint.WaitForNativeDebugger("VSTEST_HOST_NATIVE_DEBUG");
-        DebuggerBreakpoint.WaitForDebugger("VSTEST_HOST_DEBUG");
+        DebuggerBreakpoint.AttachVisualStudioDebugger(WellKnownDebugEnvironmentVariables.VSTEST_HOST_DEBUG_ATTACHVS);
+        DebuggerBreakpoint.WaitForNativeDebugger(WellKnownDebugEnvironmentVariables.VSTEST_HOST_NATIVE_DEBUG);
+        DebuggerBreakpoint.WaitForDebugger(WellKnownDebugEnvironmentVariables.VSTEST_HOST_DEBUG);
         uiLanguageOverride.SetCultureSpecifiedByUser();
         var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
 
