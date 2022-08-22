@@ -179,7 +179,7 @@ public class Migrator
         }
 
         // WebTestRunConfiguration node.
-        if (testSettingsNodes?.WebSettings != null)
+        if (testSettingsNodes.WebSettings != null)
         {
             runSettingsXmlDoc?.DocumentElement?.AppendChild(runSettingsXmlDoc.ImportNode(testSettingsNodes.WebSettings, deep: true));
         }
