@@ -861,7 +861,7 @@ public class ConsoleLoggerTests
         // On Linux and MAC we don't support backslash for path so source name will contain backslashes.
         VerifyCall(OSUtils.IsWindows ? "MyApp3.Tests.dll" : "MyApp3.Tests\\MyApp3.Tests.dll");
         // On Linux and MAC we don't support backslash for path so source name will contain backslashes.
-        VerifyCall(OSUtils.IsWindows ? "MyApp4.Tests.dll" : @"C:\MyApp4\Tests\MyApp4.Tests\MyApp4.Tests.dll");
+        VerifyCall(OSUtils.IsWindows ? "MyApp4.Tests.dll" : @"C:\\MyApp4\\Tests\\MyApp4.Tests\\MyApp4.Tests.dll");
         VerifyCall("MyApp5.Tests.dll");
         VerifyCall(OSUtils.IsWindows ? "MyApp6.Tests.dll" : @"\\MyApp6\Tests\MyApp6.Tests\MyApp6.Tests.dll");
 
