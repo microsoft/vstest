@@ -856,14 +856,22 @@ public class ConsoleLoggerTests
         loggerEvents.CompleteTestRun(null, false, false, null, null, null, new TimeSpan(1, 0, 0, 0));
 
         // Assert
-        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp1.Tests.dll", ""), OutputLevel.Information), Times.Once());
-        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp2.Tests.dll", ""), OutputLevel.Information), Times.Once());
+        VerifyCall("MyApp1.Tests.dll");
+        VerifyCall("MyApp2.Tests.dll");
         // On Linux and MAC we don't support backslash for path so source name will contain backslashes.
-        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, OSUtils.IsWindows ? "MyApp3.Tests.dll" : "MyApp3.Tests\\MyApp3.Tests.dll", ""), OutputLevel.Information), Times.Once());
+        VerifyCall(OSUtils.IsWindows ? "MyApp3.Tests.dll" : "MyApp3.Tests\\MyApp3.Tests.dll");
         // On Linux and MAC we don't support backslash for path so source name will contain backslashes.
-        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, OSUtils.IsWindows ? "MyApp4.Tests.dll" : "C:\\MyApp4\\Tests\\MyApp4.Tests\\MyApp4.Tests.dll", ""), OutputLevel.Information), Times.Once());
-        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp5.Tests.dll", ""), OutputLevel.Information), Times.Once());
-        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp6.Tests.dll", ""), OutputLevel.Information), Times.Once());
+        VerifyCall(OSUtils.IsWindows ? "MyApp4.Tests.dll" : @"C:\MyApp4\Tests\MyApp4.Tests\MyApp4.Tests.dll");
+        VerifyCall("MyApp5.Tests.dll");
+        VerifyCall(OSUtils.IsWindows ? "MyApp6.Tests.dll" : @"\\MyApp6\Tests\MyApp6.Tests\MyApp6.Tests.dll");
+
+        // Local functions
+        void VerifyCall(string testName)
+            => _mockOutput.Verify(
+                o => o.WriteLine(
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, testName, ""),
+                    OutputLevel.Information),
+                Times.Once());
     }
 
     [TestMethod]
