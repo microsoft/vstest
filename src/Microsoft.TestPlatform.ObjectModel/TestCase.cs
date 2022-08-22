@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+#if NET7_0_OR_GREATER
 using System.Globalization;
+#endif
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;

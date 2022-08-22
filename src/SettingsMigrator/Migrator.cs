@@ -155,37 +155,43 @@ public class Migrator
         TestSettingsNodes testSettingsNodes = ReadTestSettingsNodes(testSettingsPath);
 
         string? testTimeout = null;
-        if (testSettingsNodes.Timeout?.Attributes?[TestTimeoutAttributeName] != null)
-        {
-            testTimeout = testSettingsNodes?.Timeout?.Attributes?[TestTimeoutAttributeName]?.Value;
-        }
-
         string? runTimeout = null;
-        if (testSettingsNodes?.Timeout?.Attributes?[RunTimeoutAttributeName] != null)
+        if (testSettingsNodes.Timeout is not null)
         {
-            runTimeout = testSettingsNodes?.Timeout?.Attributes?[RunTimeoutAttributeName]?.Value;
+            if (testSettingsNodes.Timeout.Attributes?[TestTimeoutAttributeName] is XmlAttribute testTimeoutAttribute)
+            {
+                testTimeout = testTimeoutAttribute.Value;
+            }
+
+            if (testSettingsNodes.Timeout.Attributes?[RunTimeoutAttributeName] is XmlAttribute runTimeoutAttribute)
+            {
+                runTimeout = runTimeoutAttribute.Value;
+            }
         }
 
         string? parallelTestCount = null;
-        if (testSettingsNodes?.Execution?.Attributes?[ParallelTestCountAttributeName] != null)
-        {
-            parallelTestCount = testSettingsNodes?.Execution?.Attributes?[ParallelTestCountAttributeName]?.Value;
-        }
-
         string? hostProcessPlatform = null;
-        if (testSettingsNodes?.Execution?.Attributes?[HostProcessPlatformAttributeName] != null)
+        if (testSettingsNodes.Execution is not null)
         {
-            hostProcessPlatform = testSettingsNodes?.Execution?.Attributes?[HostProcessPlatformAttributeName]?.Value;
+            if (testSettingsNodes.Execution.Attributes?[ParallelTestCountAttributeName] is XmlAttribute parallelTestCountAttribute)
+            {
+                parallelTestCount = parallelTestCountAttribute.Value;
+            }
+
+            if (testSettingsNodes.Execution.Attributes?[HostProcessPlatformAttributeName] is XmlAttribute hostProcessPlatformAttribute)
+            {
+                hostProcessPlatform = hostProcessPlatformAttribute.Value;
+            }
         }
 
         // WebTestRunConfiguration node.
-        if (testSettingsNodes?.WebSettings != null)
+        if (testSettingsNodes.WebSettings != null)
         {
-            runSettingsXmlDoc?.DocumentElement?.AppendChild(runSettingsXmlDoc.ImportNode(testSettingsNodes.WebSettings, deep: true));
+            runSettingsXmlDoc.DocumentElement?.AppendChild(runSettingsXmlDoc.ImportNode(testSettingsNodes.WebSettings, deep: true));
         }
 
         // LegacySettings node.
-        AddLegacyNodes(testSettingsNodes!, testTimeout, parallelTestCount, hostProcessPlatform, runSettingsXmlDoc!);
+        AddLegacyNodes(testSettingsNodes, testTimeout, parallelTestCount, hostProcessPlatform, runSettingsXmlDoc);
 
         // TestSessionTimeout node.
         if (!runTimeout.IsNullOrEmpty())
@@ -196,7 +202,7 @@ public class Migrator
         // DataCollectors node.
         if (testSettingsNodes?.Datacollectors != null && testSettingsNodes.Datacollectors.Count > 0)
         {
-            AddDataCollectorNodes(testSettingsNodes.Datacollectors, runSettingsXmlDoc!);
+            AddDataCollectorNodes(testSettingsNodes.Datacollectors, runSettingsXmlDoc);
         }
     }
 
@@ -222,8 +228,10 @@ public class Migrator
             testSettingsNodes.Hosts = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution/Hosts");
             testSettingsNodes.Execution = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution");
 
-            if (testSettingsNodes.Timeout != null && (testSettingsNodes?.Timeout?.Attributes?[AgentNotRespondingTimeoutAttribute] != null ||
-                                                      testSettingsNodes?.Timeout?.Attributes?[DeploymentTimeoutAttribute] != null || testSettingsNodes?.Timeout?.Attributes?[ScriptTimeoutAttribute] != null))
+            if (testSettingsNodes.Timeout != null
+                && (testSettingsNodes.Timeout.Attributes?[AgentNotRespondingTimeoutAttribute] != null
+                    || testSettingsNodes.Timeout.Attributes?[DeploymentTimeoutAttribute] != null
+                    || testSettingsNodes.Timeout.Attributes?[ScriptTimeoutAttribute] != null))
             {
                 Console.WriteLine(CommandLineResources.UnsupportedAttributes);
             }
@@ -238,10 +246,10 @@ public class Migrator
     /// <param name="newXmlDoc">Xml doc to process</param>
     private static void RemoveEmbeddedTestSettings(XmlDocument newXmlDoc)
     {
-        var testSettingsNode = newXmlDoc?.DocumentElement?.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
+        var testSettingsNode = newXmlDoc.DocumentElement?.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
         if (testSettingsNode != null)
         {
-            testSettingsNode?.ParentNode?.RemoveChild(testSettingsNode);
+            testSettingsNode.ParentNode?.RemoveChild(testSettingsNode);
         }
     }
 
@@ -266,14 +274,13 @@ public class Migrator
             return;
         }
 
-        if (newXmlDoc?.DocumentElement == null)
+        if (newXmlDoc.DocumentElement == null)
         {
             return;
         }
 
         // Add ForcedLegacy node.
         var mstestNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest");
-        XmlNode forcedLegacyNode;
         if (mstestNode == null)
         {
             mstestNode = newXmlDoc.CreateNode(XmlNodeType.Element, MSTestNodeName, null);
@@ -286,7 +293,7 @@ public class Migrator
             return;
         }
 
-        forcedLegacyNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/ForcedLegacyMode")!;
+        var forcedLegacyNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/ForcedLegacyMode");
         if (forcedLegacyNode == null)
         {
             forcedLegacyNode = newXmlDoc.CreateNode(XmlNodeType.Element, ForcedLegacyModeName, null);
@@ -319,13 +326,13 @@ public class Migrator
         // Execution node.
         if (testSettingsNodes.UnitTestConfig != null || !parallelTestCount.IsNullOrEmpty() || !testTimeout.IsNullOrEmpty() || testSettingsNodes.Hosts != null)
         {
-            XmlNode newExecutionNode = newXmlDoc.CreateNode(XmlNodeType.Element, ExecutionNodeName, null)!;
+            XmlNode newExecutionNode = newXmlDoc.CreateNode(XmlNodeType.Element, ExecutionNodeName, null);
 
             if (!parallelTestCount.IsNullOrEmpty())
             {
-                var paralellAttribute = newXmlDoc.CreateAttribute(ParallelTestCountAttributeName);
-                paralellAttribute.Value = parallelTestCount;
-                newExecutionNode.Attributes?.Append(paralellAttribute);
+                var parallelAttribute = newXmlDoc.CreateAttribute(ParallelTestCountAttributeName);
+                parallelAttribute.Value = parallelTestCount;
+                newExecutionNode.Attributes?.Append(parallelAttribute);
             }
 
             if (!hostProcessPlatform.IsNullOrEmpty())
@@ -337,10 +344,10 @@ public class Migrator
 
             if (!testTimeout.IsNullOrEmpty())
             {
-                var newTimeoutsNode = newXmlDoc.CreateNode(XmlNodeType.Element, TimeoutsNodeName, null)!;
-                var testtimeoutattribute = newXmlDoc.CreateAttribute(TestTimeoutAttributeName);
-                testtimeoutattribute.Value = testTimeout;
-                newTimeoutsNode.Attributes?.Append(testtimeoutattribute);
+                var newTimeoutsNode = newXmlDoc.CreateNode(XmlNodeType.Element, TimeoutsNodeName, null);
+                var testTimeoutAttribute = newXmlDoc.CreateAttribute(TestTimeoutAttributeName);
+                testTimeoutAttribute.Value = testTimeout;
+                newTimeoutsNode.Attributes?.Append(testTimeoutAttribute);
                 newExecutionNode.AppendChild(newXmlDoc.ImportNode(newTimeoutsNode, deep: true));
             }
 
@@ -363,11 +370,11 @@ public class Migrator
     }
 
     /// <summary>
-    /// Adds the datacollector nodes to the runSettings xml.
+    /// Adds the dataCollector nodes to the runSettings xml.
     /// </summary>
-    /// <param name="oldDatacollectorNodes"> Datacollector Nodes</param>
+    /// <param name="oldDataCollectorNodes"> Datacollector Nodes</param>
     /// <param name="newXmlDoc">Xml doc to process</param>
-    private static void AddDataCollectorNodes(XmlNodeList oldDatacollectorNodes, XmlDocument? newXmlDoc)
+    private static void AddDataCollectorNodes(XmlNodeList oldDataCollectorNodes, XmlDocument? newXmlDoc)
     {
         if (newXmlDoc?.DocumentElement == null)
         {
@@ -386,9 +393,9 @@ public class Migrator
             dataCollectorsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings/DataCollectors")!;
         }
 
-        foreach (XmlNode datacollector in oldDatacollectorNodes)
+        foreach (XmlNode dataCollector in oldDataCollectorNodes)
         {
-            dataCollectorsNode.AppendChild(newXmlDoc.ImportNode(datacollector, deep: true));
+            dataCollectorsNode.AppendChild(newXmlDoc.ImportNode(dataCollector, deep: true));
         }
     }
 
@@ -399,7 +406,7 @@ public class Migrator
     /// <param name="newXmlDoc">Xml doc to process</param>
     private static void AddRunTimeoutNode(string runTimeout, XmlDocument newXmlDoc)
     {
-        if (newXmlDoc?.DocumentElement == null)
+        if (newXmlDoc.DocumentElement == null)
         {
             return;
         }
