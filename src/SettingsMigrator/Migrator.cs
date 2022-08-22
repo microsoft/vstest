@@ -185,7 +185,7 @@ public class Migrator
         }
 
         // LegacySettings node.
-        AddLegacyNodes(testSettingsNodes!, testTimeout, parallelTestCount, hostProcessPlatform, runSettingsXmlDoc!);
+        AddLegacyNodes(testSettingsNodes, testTimeout, parallelTestCount, hostProcessPlatform, runSettingsXmlDoc!);
 
         // TestSessionTimeout node.
         if (!runTimeout.IsNullOrEmpty())
