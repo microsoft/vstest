@@ -59,7 +59,7 @@ public class ProcDumpArgsBuilderTests
     }
 
     [TestMethod]
-    public void BuildTriggerProcDumpArgsWith_VSTEST_DUMP_PROCDUMPARGUMENTS_EnvironmentVariables()
+    public void BuildTriggerProcDumpArgsWith_VSTEST_DUMP_PROCDUMPARGUMENTS_EnvironmentVariable()
     {
         Mock<IEnvironmentVariableHelper> environmentVariableHelper = new();
         environmentVariableHelper.Setup(e => e.GetEnvironmentVariable("VSTEST_DUMP_PROCDUMPARGUMENTS")).Returns("-e 1 -g -t -ma");
