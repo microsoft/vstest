@@ -229,7 +229,7 @@ public class Migrator
             }
         }
 
-        return testSettingsNodes!;
+        return testSettingsNodes;
     }
 
     /// <summary>
