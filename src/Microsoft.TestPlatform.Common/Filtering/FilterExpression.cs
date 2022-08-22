@@ -127,20 +127,9 @@ internal class FilterExpression
             properties = Enumerable.Empty<string>();
         }
 
-        bool valid = false;
-        if (_condition != null)
-        {
-            valid = _condition.ValidForProperties(properties, propertyProvider);
-            if (!valid)
-            {
-                invalidProperties = new string[1] { _condition.Name };
-            }
-            return invalidProperties;
-        }
-
         FilterExpression? current = this;
         Stack<FilterExpression> filterStack = new();
-        Stack<string[]?> result = new(); 
+        Stack<string[]?> result = new();
         do
         {
             //Push root's right child and then root to stack then Set root as root's left child
@@ -155,7 +144,7 @@ internal class FilterExpression
             }
             //If the popped item has a right child and the right child is at top of stack, then remove the right child from stack, push the root back and set root as root's right child.
             current = filterStack.Pop();
-            if (current._right == filterStack.First())
+            if (filterStack.Count > 0 && current._right == filterStack.First())
             {
                 filterStack.Pop();
                 filterStack.Push(current);
@@ -163,22 +152,35 @@ internal class FilterExpression
             }
             else
             {
-                var invalidRight = current._right != null ? result.Pop() : null;
-                invalidProperties = current._left != null ? result.Pop() : null;
-                if (null == invalidProperties)
+                bool valid = false;
+                if (current._condition != null)
                 {
-                    invalidProperties = invalidRight;
+                    valid = current._condition.ValidForProperties(properties, propertyProvider);
+                    if (!valid)
+                    {
+                        invalidProperties = new string[1] { current._condition.Name };
+                    }
+                    result.Push(invalidProperties);
                 }
-                else if (null != invalidRight)
+                else
                 {
-                    invalidProperties = invalidProperties.Concat(invalidRight).ToArray();
+                    var invalidRight = current._right != null ? result.Pop() : null;
+                    invalidProperties = current._left != null ? result.Pop() : null;
+                    if (null == invalidProperties)
+                    {
+                        invalidProperties = invalidRight;
+                    }
+                    else if (null != invalidRight)
+                    {
+                        invalidProperties = invalidProperties.Concat(invalidRight).ToArray();
+                    }
+                    result.Push(invalidProperties);
                 }
-                result.Push(invalidProperties);
                 current = null;
             }
         } while (filterStack.Count() > 0);
 
-        return invalidProperties;
+        return result.First(); // the result stack will have one element at the end
     }
 
     /// <summary>
