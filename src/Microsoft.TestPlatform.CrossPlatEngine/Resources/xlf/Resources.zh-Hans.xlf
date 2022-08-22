@@ -78,9 +78,9 @@
         <note></note>
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
-        <source>Testhost process exited with error: {0}. Please check the diagnostic logs for more information.</source>
-        <target state="translated">Testhost 进程已退出，但出现错误: {0}。请查看诊断日志了解详细信息。</target>
-        <note></note>
+        <source>Testhost process for source(s) '{0}' exited with error: {1}. Please check the diagnostic logs for more information.</source>
+        <target state="new">Testhost 进程已退出，但出现错误: {0}。请查看诊断日志了解详细信息。</target>
+        <note>{0} a source, or very rarely list of sources, {1} the output error.</note>
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
