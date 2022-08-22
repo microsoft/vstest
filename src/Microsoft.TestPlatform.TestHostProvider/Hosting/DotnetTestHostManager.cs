@@ -620,9 +620,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
         var framework = config.TargetFramework;
 
-        // This is expected to be called once every run so returning a new instance every time.
-        return framework!.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-               || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
+        return framework!.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
                || framework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 

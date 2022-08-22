@@ -11,7 +11,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
     using System;
     using System.Reflection;
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -367,7 +368,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Testhost process exited with error: {0}. Please check the diagnostic logs for more information..
+        ///   Looks up a localized string similar to Testhost process for source(s) &apos;{0}&apos; exited with error: {1}. Please check the diagnostic logs for more information..
         /// </summary>
         internal static string TestHostExitedWithError {
             get {
