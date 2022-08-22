@@ -765,7 +765,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     : $"({_targetFramework})";
 
                 var duration = GetFormattedDurationString(sourceSummary.Duration);
-                var sourceName = sd.Key.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Last();
+                var sourceName = Path.GetFileName(sd.Key);
 
                 var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
                     resultString,

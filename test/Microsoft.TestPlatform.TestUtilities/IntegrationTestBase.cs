@@ -624,7 +624,7 @@ public class IntegrationTestBase
         }
         else if (IsNetCoreRunner())
         {
-            var executablePath = TestUtils.IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
+            var executablePath = OSUtils.IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
             consoleRunnerPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
         }
         else
@@ -676,7 +676,7 @@ public class IntegrationTestBase
         var consoleRunnerPath = IsNetCoreRunner()
                 ? GetDotnetRunnerPath()
                 : GetConsoleRunnerPath();
-        var executablePath = TestUtils.IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
+        var executablePath = OSUtils.IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
         var dotnetPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
 
         if (!File.Exists(dotnetPath))
@@ -768,7 +768,7 @@ public class IntegrationTestBase
 
         environmentVariables["DOTNET_MULTILEVEL_LOOKUP"] = "0";
 
-        var executablePath = TestUtils.IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
+        var executablePath = OSUtils.IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
         var patchedDotnetPath = Path.Combine(_testEnvironment.TestArtifactsDirectory, executablePath);
         ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
     }
@@ -952,7 +952,7 @@ public class IntegrationTestBase
             architecture == "X86" ?
             "dotnet_x86" :
             $"dotnet",
-            $"dotnet{(TestUtils.IsWindows ? ".exe" : "")}");
+            $"dotnet{(OSUtils.IsWindows ? ".exe" : "")}");
 
         Assert.IsTrue(File.Exists(path));
 

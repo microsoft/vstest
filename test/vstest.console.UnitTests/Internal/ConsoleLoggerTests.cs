@@ -849,6 +849,8 @@ public class ConsoleLoggerTests
         loggerEvents.RaiseTestResult(new(new(new("FQN4", new Uri("some://uri"), "C:\\\\MyApp4\\\\Tests\\\\MyApp4.Tests\\\\MyApp4.Tests.dll"))));
         // Mix backslashes and forward slashes path
         loggerEvents.RaiseTestResult(new(new(new("FQN5", new Uri("some://uri"), "C:\\MyApp5/Tests\\\\MyApp5.Tests///MyApp5.Tests.dll"))));
+        // UNC path
+        loggerEvents.RaiseTestResult(new(new(new("FQN6", new Uri("some://uri"), @"\\MyApp6\Tests\MyApp6.Tests\MyApp6.Tests.dll"))));
 
         // Act
         loggerEvents.CompleteTestRun(null, false, false, null, null, null, new TimeSpan(1, 0, 0, 0));
@@ -857,10 +859,11 @@ public class ConsoleLoggerTests
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp1.Tests.dll", ""), OutputLevel.Information), Times.Once());
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp2.Tests.dll", ""), OutputLevel.Information), Times.Once());
         // On Linux and MAC we don't support backslash for path so source name will contain backslashes.
-        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, TestUtils.IsWindows ? "MyApp3.Tests.dll" : "MyApp3.Tests\\MyApp3.Tests.dll", ""), OutputLevel.Information), Times.Once());
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, OSUtils.IsWindows ? "MyApp3.Tests.dll" : "MyApp3.Tests\\MyApp3.Tests.dll", ""), OutputLevel.Information), Times.Once());
         // On Linux and MAC we don't support backslash for path so source name will contain backslashes.
-        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, TestUtils.IsWindows ? "MyApp4.Tests.dll" : "C:\\MyApp4\\Tests\\MyApp4.Tests\\MyApp4.Tests.dll", ""), OutputLevel.Information), Times.Once());
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, OSUtils.IsWindows ? "MyApp4.Tests.dll" : "C:\\MyApp4\\Tests\\MyApp4.Tests\\MyApp4.Tests.dll", ""), OutputLevel.Information), Times.Once());
         _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp5.Tests.dll", ""), OutputLevel.Information), Times.Once());
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, "MyApp6.Tests.dll", ""), OutputLevel.Information), Times.Once());
     }
 
     [TestMethod]
