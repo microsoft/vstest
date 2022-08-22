@@ -566,26 +566,21 @@ public class EventLogDataCollector : DataCollector
         }
     }
 
-    [return: NotNull]
     private EventLogSessionContext GetEventLogSessionContext(DataCollectionContext dataCollectionContext)
     {
-        EventLogSessionContext? eventLogSessionContext;
-        bool eventLogContainerFound;
         lock (ContextMap)
         {
-            eventLogContainerFound = ContextMap.TryGetValue(dataCollectionContext, out eventLogSessionContext);
+            if (ContextMap.TryGetValue(dataCollectionContext, out var eventLogSessionContext))
+            {
+                return eventLogSessionContext;
+            }
         }
 
-        if (!eventLogContainerFound)
-        {
-            string msg = string.Format(
+        string msg = string.Format(
                 CultureInfo.CurrentCulture,
                 Resource.ContextNotFoundException,
                 dataCollectionContext.ToString());
-            throw new EventLogCollectorException(msg, null);
-        }
-
-        return eventLogSessionContext!;
+        throw new EventLogCollectorException(msg, null);
     }
 
 }
