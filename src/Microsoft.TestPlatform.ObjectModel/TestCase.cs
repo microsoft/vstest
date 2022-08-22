@@ -262,13 +262,23 @@ public sealed class TestCase : TestObject
                 return;
 
             case "TestCase.Id":
-                Id = value is Guid guid
-                    ? guid
+                if (value is Guid guid)
+                {
+                    Id = guid;
+                }
+                else if (value is string guidString)
+                {
 #if NET7_0_OR_GREATER
-                    : Guid.Parse((value as string)!, CultureInfo.InvariantCulture);
+                    Id = Guid.Parse(guidString, CultureInfo.InvariantCulture);
 #else
-                    : Guid.Parse((value as string)!);
+                    Id = Guid.Parse(guidString);
 #endif
+                }
+                else
+                {
+                    Id = Guid.Empty;
+                }
+
                 return;
 
             case "TestCase.LineNumber":

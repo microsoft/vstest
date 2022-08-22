@@ -576,7 +576,7 @@ public class EventLogDataCollector : DataCollector
             eventLogContainerFound = ContextMap.TryGetValue(dataCollectionContext, out eventLogSessionContext);
         }
 
-        if (eventLogContainerFound == false)
+        if (!eventLogContainerFound)
         {
             string msg = string.Format(
                 CultureInfo.CurrentCulture,

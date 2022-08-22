@@ -161,40 +161,40 @@ public class Migrator
         }
 
         string? runTimeout = null;
-        if (testSettingsNodes.Timeout?.Attributes?[RunTimeoutAttributeName] != null)
+        if (testSettingsNodes?.Timeout?.Attributes?[RunTimeoutAttributeName] != null)
         {
             runTimeout = testSettingsNodes?.Timeout?.Attributes?[RunTimeoutAttributeName]?.Value;
         }
 
         string? parallelTestCount = null;
-        if (testSettingsNodes.Execution?.Attributes?[ParallelTestCountAttributeName] != null)
+        if (testSettingsNodes?.Execution?.Attributes?[ParallelTestCountAttributeName] != null)
         {
             parallelTestCount = testSettingsNodes?.Execution?.Attributes?[ParallelTestCountAttributeName]?.Value;
         }
 
         string? hostProcessPlatform = null;
-        if (testSettingsNodes.Execution?.Attributes?[HostProcessPlatformAttributeName] != null)
+        if (testSettingsNodes?.Execution?.Attributes?[HostProcessPlatformAttributeName] != null)
         {
             hostProcessPlatform = testSettingsNodes?.Execution?.Attributes?[HostProcessPlatformAttributeName]?.Value;
         }
 
         // WebTestRunConfiguration node.
-        if (testSettingsNodes.WebSettings != null)
+        if (testSettingsNodes?.WebSettings != null)
         {
             runSettingsXmlDoc?.DocumentElement?.AppendChild(runSettingsXmlDoc.ImportNode(testSettingsNodes.WebSettings, deep: true));
         }
 
         // LegacySettings node.
-        AddLegacyNodes(testSettingsNodes, testTimeout, parallelTestCount, hostProcessPlatform, runSettingsXmlDoc!);
+        AddLegacyNodes(testSettingsNodes!, testTimeout, parallelTestCount, hostProcessPlatform, runSettingsXmlDoc!);
 
         // TestSessionTimeout node.
         if (!runTimeout.IsNullOrEmpty())
         {
-            AddRunTimeoutNode(runTimeout, runSettingsXmlDoc);
+            AddRunTimeoutNode(runTimeout, runSettingsXmlDoc!);
         }
 
         // DataCollectors node.
-        if (testSettingsNodes.Datacollectors != null && testSettingsNodes.Datacollectors.Count > 0)
+        if (testSettingsNodes?.Datacollectors != null && testSettingsNodes.Datacollectors.Count > 0)
         {
             AddDataCollectorNodes(testSettingsNodes.Datacollectors, runSettingsXmlDoc!);
         }
@@ -229,7 +229,7 @@ public class Migrator
             }
         }
 
-        return testSettingsNodes;
+        return testSettingsNodes!;
     }
 
     /// <summary>

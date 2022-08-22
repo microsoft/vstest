@@ -706,7 +706,7 @@ public class InferRunSettingsHelper
     private static bool IsPlatformIncompatible(Architecture sourcePlatform, Architecture targetPlatform)
     {
         return sourcePlatform is not Architecture.Default and not Architecture.AnyCPU
-&& (targetPlatform == Architecture.X64 && !Is64BitOperatingSystem() || sourcePlatform != targetPlatform);
+            && (targetPlatform == Architecture.X64 && !Is64BitOperatingSystem() || sourcePlatform != targetPlatform);
 
         static bool Is64BitOperatingSystem()
         {

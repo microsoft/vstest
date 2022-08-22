@@ -54,11 +54,9 @@ public static class ClientUtilities
 
     private static void AddRunSettingsDirectoryNode(XmlDocument doc, string path)
     {
-        ValidateArg.NotNull(doc.DocumentElement, nameof(doc.DocumentElement));
-
         var node = doc.CreateNode(XmlNodeType.Element, RunsettingsDirectory, string.Empty);
         node.InnerXml = path;
-        doc.DocumentElement.AppendChild(node);
+        doc.DocumentElement!.AppendChild(node);
     }
 
     private static void FixNodeFilePath(XmlNode node, string root)
