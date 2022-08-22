@@ -155,7 +155,7 @@ public class Migrator
         TestSettingsNodes testSettingsNodes = ReadTestSettingsNodes(testSettingsPath);
 
         string? testTimeout = null;
-        if (testSettingsNodes?.Timeout?.Attributes?[TestTimeoutAttributeName] != null)
+        if (testSettingsNodes.Timeout?.Attributes?[TestTimeoutAttributeName] != null)
         {
             testTimeout = testSettingsNodes?.Timeout?.Attributes?[TestTimeoutAttributeName]?.Value;
         }
