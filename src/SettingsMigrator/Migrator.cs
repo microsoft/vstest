@@ -161,7 +161,7 @@ public class Migrator
         }
 
         string? runTimeout = null;
-        if (testSettingsNodes?.Timeout?.Attributes?[RunTimeoutAttributeName] != null)
+        if (testSettingsNodes.Timeout?.Attributes?[RunTimeoutAttributeName] != null)
         {
             runTimeout = testSettingsNodes?.Timeout?.Attributes?[RunTimeoutAttributeName]?.Value;
         }
