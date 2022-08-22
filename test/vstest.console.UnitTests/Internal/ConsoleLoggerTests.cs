@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.TestPlatform.TestUtilities;
 
 using Moq;
 
@@ -824,6 +825,53 @@ public class ConsoleLoggerTests
 
         _mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once());
         _mockOutput.Verify(o => o.WriteLine("TestName [< 1 ms]", OutputLevel.Information), Times.Once());
+    }
+
+    [TestMethod]
+    public void TestRunCompleteHandlerCorrectlySplitPathsForSourceName()
+    {
+        // Arrange
+        var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+        loggerEvents.EnableEvents();
+        var parameters = new Dictionary<string, string?>
+        {
+            { "verbosity", "minimal" }
+        };
+        _consoleLogger.Initialize(loggerEvents, parameters);
+
+        // Linux-like path
+        loggerEvents.RaiseTestResult(new(new(new("FQN1", new Uri("some://uri"), "/home/MyApp1/Tests/MyApp1.Tests/MyApp1.Tests.dll"))));
+        // Double forward slashes path
+        loggerEvents.RaiseTestResult(new(new(new("FQN2", new Uri("some://uri"), "/home//MyApp2//Tests//MyApp2.Tests//MyApp2.Tests.dll"))));
+        // Backslashes path
+        loggerEvents.RaiseTestResult(new(new(new("FQN3", new Uri("some://uri"), @"C:\MyApp3/Tests/MyApp3.Tests\MyApp3.Tests.dll"))));
+        // Multiple Backslashes path
+        loggerEvents.RaiseTestResult(new(new(new("FQN4", new Uri("some://uri"), "C:\\\\MyApp4\\\\Tests\\\\MyApp4.Tests\\\\MyApp4.Tests.dll"))));
+        // Mix backslashes and forward slashes path
+        loggerEvents.RaiseTestResult(new(new(new("FQN5", new Uri("some://uri"), "C:\\MyApp5/Tests\\\\MyApp5.Tests///MyApp5.Tests.dll"))));
+        // UNC path
+        loggerEvents.RaiseTestResult(new(new(new("FQN6", new Uri("some://uri"), @"\\MyApp6\Tests\MyApp6.Tests\MyApp6.Tests.dll"))));
+
+        // Act
+        loggerEvents.CompleteTestRun(null, false, false, null, null, null, new TimeSpan(1, 0, 0, 0));
+
+        // Assert
+        VerifyCall("MyApp1.Tests.dll");
+        VerifyCall("MyApp2.Tests.dll");
+        // On Linux and MAC we don't support backslash for path so source name will contain backslashes.
+        VerifyCall(OSUtils.IsWindows ? "MyApp3.Tests.dll" : "MyApp3.Tests\\MyApp3.Tests.dll");
+        // On Linux and MAC we don't support backslash for path so source name will contain backslashes.
+        VerifyCall(OSUtils.IsWindows ? "MyApp4.Tests.dll" : @"C:\\MyApp4\\Tests\\MyApp4.Tests\\MyApp4.Tests.dll");
+        VerifyCall("MyApp5.Tests.dll");
+        VerifyCall(OSUtils.IsWindows ? "MyApp6.Tests.dll" : @"\\MyApp6\Tests\MyApp6.Tests\MyApp6.Tests.dll");
+
+        // Local functions
+        void VerifyCall(string testName)
+            => _mockOutput.Verify(
+                o => o.WriteLine(
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, testName, ""),
+                    OutputLevel.Information),
+                Times.Once());
     }
 
     [TestMethod]
