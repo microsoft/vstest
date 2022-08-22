@@ -167,7 +167,7 @@ public class Migrator
         }
 
         string? parallelTestCount = null;
-        if (testSettingsNodes?.Execution?.Attributes?[ParallelTestCountAttributeName] != null)
+        if (testSettingsNodes.Execution?.Attributes?[ParallelTestCountAttributeName] != null)
         {
             parallelTestCount = testSettingsNodes?.Execution?.Attributes?[ParallelTestCountAttributeName]?.Value;
         }
