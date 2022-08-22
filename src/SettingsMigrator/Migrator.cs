@@ -173,7 +173,7 @@ public class Migrator
         }
 
         string? hostProcessPlatform = null;
-        if (testSettingsNodes?.Execution?.Attributes?[HostProcessPlatformAttributeName] != null)
+        if (testSettingsNodes.Execution?.Attributes?[HostProcessPlatformAttributeName] != null)
         {
             hostProcessPlatform = testSettingsNodes?.Execution?.Attributes?[HostProcessPlatformAttributeName]?.Value;
         }
