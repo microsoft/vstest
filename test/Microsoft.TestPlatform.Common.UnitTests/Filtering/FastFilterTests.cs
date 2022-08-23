@@ -94,10 +94,11 @@ public class FastFilterTests
     public void AvoidingStackOverFlow()
     {
         var testCaseFilter = "Test1";
-        for (int i = 0; i < 1e5; i++)
+        for (int i = 0; i < 1e5; i++)  // creating a 100k filter cases string
         {
             testCaseFilter += "|Test2";
         }
+
         var filterExpressionWrapper = new FilterExpressionWrapper(testCaseFilter);
 
         filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null);

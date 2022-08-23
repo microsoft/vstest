@@ -129,19 +129,21 @@ internal class FilterExpression
 
         return IterateFilterExpression<string[]?>((current, result) =>
         {
-            if (current._condition != null)
+            if (current._condition != null) // only the leaves have a condition value
             {
                 bool valid = false;
                 valid = current._condition.ValidForProperties(properties, propertyProvider);
-                if (!valid)
+                if (!valid) //if it's not valid will add it to the function's return array
                 {
                     invalidProperties = new string[1] { current._condition.Name };
                 }
             }
             else
             {
+                // concatenate the children node's result to get their parent result 
                 var invalidRight = current._right != null ? result.Pop() : null;
                 invalidProperties = current._left != null ? result.Pop() : null;
+
                 if (null == invalidProperties)
                 {
                     invalidProperties = invalidRight;
@@ -271,8 +273,12 @@ internal class FilterExpression
     private T IterateFilterExpression<T>(Func<FilterExpression, Stack<T>, T> getNodeValue)
     {
         FilterExpression? current = this;
+        //will have the nodes
         Stack<FilterExpression> filterStack = new();
+        // will contain the nodes results to use them in thier parent result's calculation
+        // and at the end will have the root result.
         Stack<T> result = new();
+
         do
         {
             // Push root's right child and then root to stack then Set root as root's left child.
@@ -316,7 +322,7 @@ internal class FilterExpression
         return IterateFilterExpression<bool>((current, result) =>
         {
             bool filterResult = false;
-            if (null != current._condition)
+            if (null != current._condition) // only the leaves have a condition value
             {
                 filterResult = current._condition.Evaluate(propertyValueProvider);
             }
@@ -325,6 +331,7 @@ internal class FilterExpression
                 // & or | operator
                 bool rightResult = current._right != null ? result.Pop() : false;
                 bool leftResult = current._left != null ? result.Pop() : false;
+                // concatenate the children node's result to get their parent result 
                 filterResult = current._areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
             }
             return filterResult;
