@@ -105,8 +105,8 @@ public class FastFilterTests
         string[]? invalidProperties = filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null);
 
         Assert.IsNotNull(invalidProperties);
-        Assert.AreEqual(invalidProperties?.Count(), 1);
-        Assert.AreEqual(invalidProperties![0], "Category");
+        Assert.AreEqual(invalidProperties.Length, 1);
+        Assert.AreEqual(invalidProperties[0], "Category");
     }
 
     [TestMethod]
