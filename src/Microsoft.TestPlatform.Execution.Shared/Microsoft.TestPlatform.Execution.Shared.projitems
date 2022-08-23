@@ -11,5 +11,6 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DebuggerBreakpoint.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UILanguageOverride.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WellKnownDebugEnvironmentVariables.cs" />
   </ItemGroup>
 </Project>

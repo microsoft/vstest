@@ -3,7 +3,10 @@
 
 using System.Collections.Generic;
 
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests;
 
@@ -53,5 +56,16 @@ public class ProcDumpArgsBuilderTests
 
         // adds -t for collect on every process exit
         Assert.AreEqual("-accepteula -e 1 -g -t -ma -f a -f b 1234 dump.dmp", argString);
+    }
+
+    [TestMethod]
+    public void BuildTriggerProcDumpArgsWith_VSTEST_DUMP_PROCDUMPARGUMENTS_EnvironmentVariable()
+    {
+        Mock<IEnvironmentVariableHelper> environmentVariableHelper = new();
+        environmentVariableHelper.Setup(e => e.GetEnvironmentVariable("VSTEST_DUMP_PROCDUMPARGUMENTS")).Returns("-e 1 -g -t -ma");
+
+        var procDumpArgsBuilder = new ProcDumpArgsBuilder(environmentVariableHelper.Object);
+        var argString = procDumpArgsBuilder.BuildTriggerBasedProcDumpArgs(_defaultProcId, _defaultDumpFileName, new List<string> { "a", "b" }, true);
+        Assert.AreEqual("-accepteula -e 1 -g -t -ma 1234 dump.dmp", argString);
     }
 }
