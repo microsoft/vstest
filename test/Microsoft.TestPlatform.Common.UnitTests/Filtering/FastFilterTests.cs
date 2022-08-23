@@ -94,14 +94,19 @@ public class FastFilterTests
     [TestMethod]
     public void ValidForPropertiesHandlesBigFilteringExpressions()
     {
-        StringBuilder testCaseFilter = new("Test1");
+        StringBuilder testCaseFilter = new("Category=Test1");
+
         for (int i = 0; i < 1e5; i++)  // creating a 100k filter cases string
         {
             testCaseFilter.Append("|Test2");
         }
 
         var filterExpressionWrapper = new FilterExpressionWrapper(testCaseFilter.ToString());
-        Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null));
+        string[]? invalidProperties = filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null);
+
+        Assert.IsNotNull(invalidProperties);
+        Assert.AreEqual(invalidProperties?.Count(), 1);
+        Assert.AreEqual(invalidProperties![0], "Category");
     }
 
     [TestMethod]

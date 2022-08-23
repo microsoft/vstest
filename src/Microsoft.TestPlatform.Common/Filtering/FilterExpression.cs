@@ -119,8 +119,6 @@ internal class FilterExpression
     /// </summary>
     internal string[]? ValidForProperties(IEnumerable<string>? properties, Func<string, TestProperty?>? propertyProvider)
     {
-        string[]? invalidProperties = null;
-
         if (null == properties)
         {
             // if null, initialize to empty list so that invalid properties can be found.
@@ -133,26 +131,23 @@ internal class FilterExpression
             {
                 bool valid = false;
                 valid = current._condition.ValidForProperties(properties, propertyProvider);
-                if (!valid) //if it's not valid will add it to the function's return array
-                {
-                    invalidProperties = new string[1] { current._condition.Name };
-                }
+                // if it's not valid will add it to the function's return array
+                return !valid ? new string[1] { current._condition.Name } : null;
             }
-            else
-            {
-                // concatenate the children node's result to get their parent result 
-                var invalidRight = current._right != null ? result.Pop() : null;
-                invalidProperties = current._left != null ? result.Pop() : null;
 
-                if (null == invalidProperties)
-                {
-                    invalidProperties = invalidRight;
-                }
-                else if (null != invalidRight)
-                {
-                    invalidProperties = invalidProperties.Concat(invalidRight).ToArray();
-                }
+            // concatenate the children node's result to get their parent result 
+            var invalidRight = current._right != null ? result.Pop() : null;
+            var invalidProperties = current._left != null ? result.Pop() : null;
+
+            if (null == invalidProperties)
+            {
+                invalidProperties = invalidRight;
             }
+            else if (null != invalidRight)
+            {
+                invalidProperties = invalidProperties.Concat(invalidRight).ToArray();
+            }
+
             return invalidProperties;
         });
 
