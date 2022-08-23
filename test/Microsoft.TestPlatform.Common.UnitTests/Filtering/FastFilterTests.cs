@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -91,17 +92,28 @@ public class FastFilterTests
     }
 
     [TestMethod]
-    public void AvoidingStackOverFlow()
+    public void ValidForPropertiesHandlesBigFilteringExpressions()
     {
-        var testCaseFilter = "Test1";
+        StringBuilder testCaseFilter = new("Test1");
         for (int i = 0; i < 1e5; i++)  // creating a 100k filter cases string
         {
-            testCaseFilter += "|Test2";
+            testCaseFilter.Append("|Test2");
         }
 
-        var filterExpressionWrapper = new FilterExpressionWrapper(testCaseFilter);
+        var filterExpressionWrapper = new FilterExpressionWrapper(testCaseFilter.ToString());
+        Assert.IsNull(filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null));
+    }
 
-        filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null);
+    [TestMethod]
+    public void EvaluateHandlesBigFilteringExpressions()
+    {
+        StringBuilder testCaseFilter = new("Test1");
+        for (int i = 0; i < 1e5; i++)  // creating a 100k filter cases string
+        {
+            testCaseFilter.Append("|Test2");
+        }
+
+        var filterExpressionWrapper = new FilterExpressionWrapper(testCaseFilter.ToString());
         Assert.IsTrue(filterExpressionWrapper.Evaluate(s => "Test1"));
     }
 
