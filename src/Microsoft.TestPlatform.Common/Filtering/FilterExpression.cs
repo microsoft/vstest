@@ -127,31 +127,8 @@ internal class FilterExpression
             properties = Enumerable.Empty<string>();
         }
 
-        FilterExpression? current = this;
-        Stack<FilterExpression> filterStack = new();
-        Stack<string[]?> result = new();
-        do
+        return IterateFilterExpression<string[]?>((current, result) =>
         {
-            // Push root's right child and then root to stack then Set root as root's left child.
-            while (current != null)
-            {
-                if (current._right != null)
-                {
-                    filterStack.Push(current._right);
-                }
-                filterStack.Push(current);
-                current = current._left;
-            }
-            // If the popped item has a right child and the right child is at top of stack,
-            // then remove the right child from stack, push the root back and set root as root's right child.
-            current = filterStack.Pop();
-            if (filterStack.Count > 0 && current._right == filterStack.Peek())
-            {
-                filterStack.Pop();
-                filterStack.Push(current);
-                current = current._right;
-                continue;
-            }
             if (current._condition != null)
             {
                 bool valid = false;
@@ -174,11 +151,9 @@ internal class FilterExpression
                     invalidProperties = invalidProperties.Concat(invalidRight).ToArray();
                 }
             }
-            result.Push(invalidProperties);
-            current = null;
-        } while (filterStack.Count > 0);
-        TPDebug.Assert(result.Count == 1, "Result stack should have one element at the end.");
-        return result.Peek(); // the result stack will have one element at the end
+            return invalidProperties;
+        });
+
     }
 
     /// <summary>
@@ -293,19 +268,11 @@ internal class FilterExpression
 
         return filterStack.Pop();
     }
-
-    /// <summary>
-    /// Evaluate filterExpression with given propertyValueProvider.
-    /// </summary>
-    /// <param name="propertyValueProvider"> The property Value Provider.</param>
-    /// <returns> True if evaluation is successful. </returns>
-    internal bool Evaluate(Func<string, object?> propertyValueProvider)
+    private T IterateFilterExpression<T>(Func<FilterExpression, Stack<T>, T> getNodeValue)
     {
-        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
-
         FilterExpression? current = this;
         Stack<FilterExpression> filterStack = new();
-        Stack<bool> result = new();
+        Stack<T> result = new();
         do
         {
             // Push root's right child and then root to stack then Set root as root's left child.
@@ -318,6 +285,7 @@ internal class FilterExpression
                 filterStack.Push(current);
                 current = current._left;
             }
+
             // If the popped item has a right child and the right child is at top of stack,
             // then remove the right child from stack, push the root back and set root as root's right child.
             current = filterStack.Pop();
@@ -328,23 +296,40 @@ internal class FilterExpression
                 current = current._right;
                 continue;
             }
-            bool filterResult = false;
-            if (null != current._condition)
-            {
-                filterResult = current._condition.Evaluate(propertyValueProvider);
-            }
-            else
-            {
-                // & or | operator
-                bool rightResult = current._right != null ? result.Pop() : false;
-                bool leftResult = current._left != null ? result.Pop() : false;
-                filterResult = current._areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
-            }
-            result.Push(filterResult);
+
+            result.Push(getNodeValue(current, result));
             current = null;
         } while (filterStack.Count > 0);
+
         TPDebug.Assert(result.Count == 1, "Result stack should have one element at the end.");
         return result.Peek();
+    }
+    /// <summary>
+    /// Evaluate filterExpression with given propertyValueProvider.
+    /// </summary>
+    /// <param name="propertyValueProvider"> The property Value Provider.</param>
+    /// <returns> True if evaluation is successful. </returns>
+    internal bool Evaluate(Func<string, object?> propertyValueProvider)
+    {
+        ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
+
+        return IterateFilterExpression<bool>((current, result) =>
+         {
+             bool filterResult = false;
+             if (null != current._condition)
+             {
+                 filterResult = current._condition.Evaluate(propertyValueProvider);
+             }
+             else
+             {
+                 // & or | operator
+                 bool rightResult = current._right != null ? result.Pop() : false;
+                 bool leftResult = current._left != null ? result.Pop() : false;
+                 filterResult = current._areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
+             }
+             return filterResult;
+         });
+
     }
 
     internal static IEnumerable<string> TokenizeFilterExpressionString(string str)
