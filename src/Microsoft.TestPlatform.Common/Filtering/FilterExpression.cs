@@ -314,22 +314,21 @@ internal class FilterExpression
         ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
 
         return IterateFilterExpression<bool>((current, result) =>
-         {
-             bool filterResult = false;
-             if (null != current._condition)
-             {
-                 filterResult = current._condition.Evaluate(propertyValueProvider);
-             }
-             else
-             {
-                 // & or | operator
-                 bool rightResult = current._right != null ? result.Pop() : false;
-                 bool leftResult = current._left != null ? result.Pop() : false;
-                 filterResult = current._areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
-             }
-             return filterResult;
-         });
-
+        {
+            bool filterResult = false;
+            if (null != current._condition)
+            {
+                filterResult = current._condition.Evaluate(propertyValueProvider);
+            }
+            else
+            {
+                // & or | operator
+                bool rightResult = current._right != null ? result.Pop() : false;
+                bool leftResult = current._left != null ? result.Pop() : false;
+                filterResult = current._areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
+            }
+            return filterResult;
+        });
     }
 
     internal static IEnumerable<string> TokenizeFilterExpressionString(string str)
