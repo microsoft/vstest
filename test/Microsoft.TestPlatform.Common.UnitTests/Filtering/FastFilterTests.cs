@@ -91,6 +91,20 @@ public class FastFilterTests
     }
 
     [TestMethod]
+    public void AvoidingStackOverFlow()
+    {
+        var testCaseFilter = "Test1";
+        for (int i = 0; i < 1e5; i++)
+        {
+            testCaseFilter += "|Test2";
+        }
+        var filterExpressionWrapper = new FilterExpressionWrapper(testCaseFilter);
+
+        filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null);
+        Assert.IsTrue(filterExpressionWrapper.Evaluate(s => "Test1"));
+    }
+
+    [TestMethod]
     public void FastFilterWithMultipleEqualsClause()
     {
         var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName=Test1|FullyQualifiedName=Test2|FullyQualifiedName=Test3");
