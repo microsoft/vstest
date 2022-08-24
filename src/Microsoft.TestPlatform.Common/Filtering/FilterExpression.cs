@@ -127,15 +127,16 @@ internal class FilterExpression
 
         return IterateFilterExpression<string[]?>((current, result) =>
         {
-            if (current._condition != null) // only the leaves have a condition value
+            // Only the leaves have a condition value.
+            if (current._condition != null)
             {
                 bool valid = false;
                 valid = current._condition.ValidForProperties(properties, propertyProvider);
-                // if it's not valid will add it to the function's return array
+                // If it's not valid will add it to the function's return array.
                 return !valid ? new string[1] { current._condition.Name } : null;
             }
 
-            // concatenate the children node's result to get their parent result 
+            // Concatenate the children node's result to get their parent result.
             var invalidRight = current._right != null ? result.Pop() : null;
             var invalidProperties = current._left != null ? result.Pop() : null;
 
@@ -268,9 +269,9 @@ internal class FilterExpression
     private T IterateFilterExpression<T>(Func<FilterExpression, Stack<T>, T> getNodeValue)
     {
         FilterExpression? current = this;
-        //will have the nodes
+        // Will have the nodes.
         Stack<FilterExpression> filterStack = new();
-        // will contain the nodes results to use them in thier parent result's calculation
+        // Will contain the nodes results to use them in thier parent result's calculation
         // and at the end will have the root result.
         Stack<T> result = new();
 
@@ -317,7 +318,8 @@ internal class FilterExpression
         return IterateFilterExpression<bool>((current, result) =>
         {
             bool filterResult = false;
-            if (null != current._condition) // only the leaves have a condition value
+            // Only the leaves have a condition value.
+            if (null != current._condition)
             {
                 filterResult = current._condition.Evaluate(propertyValueProvider);
             }
@@ -326,7 +328,7 @@ internal class FilterExpression
                 // & or | operator
                 bool rightResult = current._right != null ? result.Pop() : false;
                 bool leftResult = current._left != null ? result.Pop() : false;
-                // concatenate the children node's result to get their parent result 
+                // Concatenate the children node's result to get their parent result.
                 filterResult = current._areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
             }
             return filterResult;
