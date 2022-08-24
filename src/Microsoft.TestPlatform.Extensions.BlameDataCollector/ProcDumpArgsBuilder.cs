@@ -5,10 +5,22 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
 {
+    private readonly IEnvironmentVariableHelper _environmentVariableHelper;
+
+    public ProcDumpArgsBuilder() : this(new EnvironmentVariableHelper()) { }
+
+    internal ProcDumpArgsBuilder(IEnvironmentVariableHelper environmentVariableHelper)
+    {
+        _environmentVariableHelper = environmentVariableHelper ?? throw new ArgumentNullException(nameof(environmentVariableHelper));
+    }
+
     /// <inheritdoc />
     public string BuildTriggerBasedProcDumpArgs(int processId, string filename, IEnumerable<string> procDumpExceptionsList, bool isFullDump)
     {
@@ -26,10 +38,10 @@ public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
         // Filter the first chance exceptions only to those that are most likely to kill the whole process.
 
         // Fully override parameters to procdump
-        var procdumpArgumentsFromEnv = Environment.GetEnvironmentVariable("VSTEST_DUMP_PROCDUMPARGUMENTS")?.Trim();
+        var procdumpArgumentsFromEnv = _environmentVariableHelper.GetEnvironmentVariable("VSTEST_DUMP_PROCDUMPARGUMENTS")?.Trim();
 
         // Useful additional arguments are -n 100, to collect all dumps that you can, or -o to overwrite dump, or -f EXCEPTION_NAME to add exception to filter list
-        var procdumpAdditonalArgumentsFromEnv = Environment.GetEnvironmentVariable("VSTEST_DUMP_PROCDUMPADDITIONALARGUMENTS")?.Trim();
+        var procdumpAdditonalArgumentsFromEnv = _environmentVariableHelper.GetEnvironmentVariable("VSTEST_DUMP_PROCDUMPADDITIONALARGUMENTS")?.Trim();
         StringBuilder procDumpArgument = new($"-accepteula -e 1 -g -t {procdumpAdditonalArgumentsFromEnv}");
         if (isFullDump)
         {
@@ -42,7 +54,10 @@ public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
         }
 
         procDumpArgument.Append($"{processId} {filename}.dmp");
-        var argument = procdumpArgumentsFromEnv.IsNullOrWhiteSpace() ? procDumpArgument.ToString() : procdumpArgumentsFromEnv;
+        var argument = procdumpArgumentsFromEnv.IsNullOrWhiteSpace()
+            ? procDumpArgument.ToString()
+            : $"-accepteula {procdumpArgumentsFromEnv} {processId} {filename}.dmp";
+
         if (!argument.ToUpperInvariant().Contains("-accepteula".ToUpperInvariant()))
         {
             argument = $"-accepteula {argument}";
