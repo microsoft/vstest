@@ -701,13 +701,13 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             }
         }
 
+        var sourceSummary = new SourceSummary();
         var leafTestResultsPerSource = LeafTestResults?.Select(p => p.Value).GroupBy(r => r.TestCase.Source);
         if (leafTestResultsPerSource != null)
         {
             foreach (var sd in leafTestResultsPerSource)
             {
                 var source = sd.Key;
-                var sourceSummary = new SourceSummary();
 
                 var results = sd.ToArray();
                 // duration of the whole source is the difference between the test that ended last and the one that started first
@@ -842,7 +842,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                 var skipped = sourceSummary.SkippedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
                 var total = sourceSummary.TotalTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
 
-
                 var frameworkString = _targetFramework.IsNullOrEmpty()
                     ? string.Empty
                     : $"({_targetFramework})";
@@ -859,7 +858,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     duration,
                     sourceName,
                     frameworkString);
-
 
                 ConsoleColor? color = null;
                 if (sourceOutcome == TestOutcome.Failed)
