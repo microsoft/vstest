@@ -3,16 +3,11 @@
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
-#if !NETSTANDARD1_0
-
-#if !NETCOREAPP1_0 && !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
 using System.Globalization;
-#endif
 
 using NuGet.Frameworks;
 
 using static NuGet.Frameworks.FrameworkConstants;
-#endif
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -32,10 +27,8 @@ public class Framework
     /// </summary>
 #if NETFRAMEWORK
     public static Framework DefaultFramework { get; } = Framework.FromString(".NETFramework,Version=v4.0")!;
-#elif !NETSTANDARD1_0
-    public static Framework DefaultFramework { get; } = Framework.FromString(".NETCoreApp,Version=v1.0")!;
 #else
-    public static Framework? DefaultFramework { get; }
+    public static Framework DefaultFramework { get; } = Framework.FromString(".NETCoreApp,Version=v1.0")!;
 #endif
 
     /// <summary>
@@ -55,19 +48,6 @@ public class Framework
     /// <returns>A framework object</returns>
     public static Framework? FromString(string? frameworkString)
     {
-#if NETSTANDARD1_0
-#pragma warning disable IDE1006 // Naming Styles
-        var CommonFrameworks = new
-#pragma warning restore IDE1006 // Naming Styles
-        {
-            Net35 = new { DotNetFrameworkName = Constants.DotNetFramework35, Version = "3.5.0.0" },
-            Net4 = new { DotNetFrameworkName = Constants.DotNetFramework40, Version = "4.0.0.0" },
-            Net45 = new { DotNetFrameworkName = Constants.DotNetFramework45, Version = "4.5.0.0" },
-            NetCoreApp10 = new { DotNetFrameworkName = Constants.DotNetFrameworkCore10, Version = "1.0.0.0" },
-            UAP10 = new { DotNetFrameworkName = Constants.DotNetFrameworkUap10, Version = "10.0.0.0" },
-        };
-#endif
-
         if (frameworkString.IsNullOrWhiteSpace())
         {
             return null;
@@ -78,12 +58,7 @@ public class Framework
         {
             // IDE always sends framework in form of ENUM, which always throws exception
             // This throws up in first chance exception, refer Bug https://devdiv.visualstudio.com/DefaultCollection/DevDiv/_workitems/edit/591142
-            var formattedFrameworkString = frameworkString.Trim()
-                .ToLower(
-#if !NETCOREAPP1_0 && !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
-                    CultureInfo.InvariantCulture
-#endif
-                );
+            var formattedFrameworkString = frameworkString.Trim().ToLower(CultureInfo.InvariantCulture);
             switch (formattedFrameworkString)
             {
                 case "framework35":
@@ -112,9 +87,6 @@ public class Framework
                     break;
 
                 default:
-#if NETSTANDARD1_0
-                    return null;
-#else
                     var nugetFramework = NuGetFramework.Parse(frameworkString);
                     if (nugetFramework.IsUnsupported)
                         return null;
@@ -123,7 +95,6 @@ public class Framework
                     version = nugetFramework.Version.ToString();
 
                     break;
-#endif
             }
         }
         catch

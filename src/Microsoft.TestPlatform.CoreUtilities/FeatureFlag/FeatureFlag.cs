@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD1_0
-
 using System;
 using System.Collections.Concurrent;
 
@@ -64,5 +62,3 @@ internal partial class FeatureFlag : IFeatureFlag
         _cache[key] = value;
     }
 }
-
-#endif

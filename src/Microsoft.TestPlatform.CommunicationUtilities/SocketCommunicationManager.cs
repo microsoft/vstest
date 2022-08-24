@@ -229,13 +229,8 @@ public class SocketCommunicationManager : ICommunicationManager
     /// </summary>
     public void StopClient()
     {
-#if NETFRAMEWORK
         // tcpClient.Close() calls tcpClient.Dispose().
         _tcpClient?.Close();
-#else
-        // tcpClient.Close() not available for netstandard1.5.
-        _tcpClient?.Dispose();
-#endif
         _tcpClient = null;
         _binaryReader?.Dispose();
         _binaryWriter?.Dispose();

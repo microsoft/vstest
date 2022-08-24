@@ -440,7 +440,7 @@ function publish_package()
         done
         #*************************************************************************************************************#
 
-        newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/$TPB_NEWTONSOFT_JSON_VERSION/lib/netstandard1.0/Newtonsoft.Json.dll
+        newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/$TPB_NEWTONSOFT_JSON_VERSION/lib/netstandard2.0/Newtonsoft.Json.dll
         cp $newtonsoft $packageDir
     done
 

@@ -133,13 +133,8 @@ public class SocketServer : ICommunicationEndPoint
         _tcpListener.Stop();
 
         // Close the client and dispose the underlying stream
-#if NETFRAMEWORK
         // tcpClient.Close() calls tcpClient.Dispose().
         _tcpClient?.Close();
-#else
-        // tcpClient.Close() not available for netstandard1.5.
-        _tcpClient?.Dispose();
-#endif
         _channel.Dispose();
         _cancellation.Dispose();
 

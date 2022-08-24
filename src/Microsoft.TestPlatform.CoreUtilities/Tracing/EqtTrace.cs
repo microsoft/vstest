@@ -822,12 +822,6 @@ public static class EqtTrace
 
     private static void FailDebugger(string? message)
     {
-#if DEBUG
-#if NETSTANDARD1_0
-        TPDebug.Assert(false, message);
-#else
         Debug.Fail(message);
-#endif
-#endif
     }
 }

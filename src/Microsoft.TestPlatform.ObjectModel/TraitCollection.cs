@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 /// <summary>
 /// Class that holds collection of traits
 /// </summary>
-#if NETFRAMEWORK
+#if NETFRAMEWORK // REVIEW ME: This could be enabled for netcore and netstandard
 [Serializable]
 #endif
 public class TraitCollection : IEnumerable<Trait>
@@ -19,20 +19,15 @@ public class TraitCollection : IEnumerable<Trait>
     internal const string TraitPropertyId = "TestObject.Traits";
     private static readonly TestProperty TraitsProperty = TestProperty.Register(
         TraitPropertyId,
-#if WINDOWS_UWP
-        // TODO: Fix this with proper resourcing for UWP and Win 8.1 Apps
-        // Trying to access resources will throw "MissingManifestResourceException" percolated as "TypeInitialization" exception
-        "Traits",
-#else
+        // REVIEW ME: We should make some test to see if that's causing any crash on WinUI/UWP
         Resources.Resources.TestCasePropertyTraitsLabel,
-#endif
         typeof(KeyValuePair<string, string>[]),
 #pragma warning disable 618
         TestPropertyAttributes.Hidden | TestPropertyAttributes.Trait,
 #pragma warning restore 618
         typeof(TestObject));
 
-#if NETFRAMEWORK
+#if NETFRAMEWORK // REVIEW ME: This could be enabled for netcore and netstandard
     [NonSerialized]
 #endif
     private readonly TestObject _testObject;

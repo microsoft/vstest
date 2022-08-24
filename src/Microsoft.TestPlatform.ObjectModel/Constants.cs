@@ -197,12 +197,7 @@ public static class Constants
     /// <summary>
     /// Default results directory.
     /// </summary>
-    public static readonly string DefaultResultsDirectory =
-#if NETSTANDARD1_0
-        Path.Combine(".", ResultsDirectoryName);
-#else
-        Path.Combine(Directory.GetCurrentDirectory(), ResultsDirectoryName);
-#endif
+    public static readonly string DefaultResultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), ResultsDirectoryName);
 
     /// <summary>
     /// Default treatment of error from test adapters.
