@@ -79,7 +79,7 @@
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process for source(s) '{0}' exited with error: {1}. Please check the diagnostic logs for more information.</source>
-        <target state="new">Testhost process for source(s) '{0}' exited with error: {1}. Please check the diagnostic logs for more information.</target>
+        <target state="translated">El proceso del host de prueba para fuentes "{0}" finalizó con el siguiente error: {1}. Consulte los registros de diagnóstico para obtener más información.</target>
         <note>{0} a source, or very rarely list of sources, {1} the output error.</note>
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
