@@ -73,8 +73,8 @@ public class DataCollectorMain
 
     public void Run(string[]? args)
     {
-        DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS");
-        DebuggerBreakpoint.WaitForDebugger("VSTEST_DATACOLLECTOR_DEBUG");
+        DebuggerBreakpoint.AttachVisualStudioDebugger(WellKnownDebugEnvironmentVariables.VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS);
+        DebuggerBreakpoint.WaitForDebugger(WellKnownDebugEnvironmentVariables.VSTEST_DATACOLLECTOR_DEBUG);
 
         var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
 
