@@ -11,9 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 /// <summary>
 /// Class that holds collection of traits
 /// </summary>
-#if NETFRAMEWORK // REVIEW ME: This could be enabled for netcore and netstandard
 [Serializable]
-#endif
 public class TraitCollection : IEnumerable<Trait>
 {
     internal const string TraitPropertyId = "TestObject.Traits";
@@ -27,9 +25,7 @@ public class TraitCollection : IEnumerable<Trait>
 #pragma warning restore 618
         typeof(TestObject));
 
-#if NETFRAMEWORK // REVIEW ME: This could be enabled for netcore and netstandard
     [NonSerialized]
-#endif
     private readonly TestObject _testObject;
 
     internal TraitCollection(TestObject testObject)
