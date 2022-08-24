@@ -313,14 +313,14 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";TestHostExitedWithError" ItemType="0" PsrId="308" Leaf="true">
+      <Item ItemId=";TestHostExitedWithError" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Testhost process exited with error: {0}. Please check the diagnostic logs for more information.]]></Val>
+          <Val><![CDATA[Testhost process for source(s) '{0}' exited with error: {1}. Please check the diagnostic logs for more information.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Zakończono proces testhost z powodu błędu: {0}. Sprawdź dzienniki diagnostyczne, aby uzyskać więcej informacji.]]></Val>
+            <Val><![CDATA[Zakończono proces hosta testowego dla źródła „{0}” z powodu błędu: {1}. Sprawdź dzienniki diagnostyczne, aby uzyskać więcej informacji.]]></Val>
           </Tgt>
           <Prev Cat="Text">
-            <Val><![CDATA[Testhost process exited with error: {0}]]></Val>
+            <Val><![CDATA[Testhost process exited with error: {0}. Please check the diagnostic logs for more information.]]></Val>
           </Prev>
         </Str>
         <Disp Icon="Str" />
