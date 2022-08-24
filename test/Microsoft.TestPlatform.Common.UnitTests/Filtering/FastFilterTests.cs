@@ -113,7 +113,8 @@ public class FastFilterTests
     public void EvaluateHandlesBigFilteringExpressions()
     {
         StringBuilder testCaseFilter = new("Test1");
-        for (int i = 0; i < 1e5; i++)  // creating a 100k filter cases string
+        // Create filter with 100k conditions.
+        for (int i = 0; i < 1e5; i++)
         {
             testCaseFilter.Append("|Test2");
         }
