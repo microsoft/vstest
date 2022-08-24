@@ -78,9 +78,9 @@
         <note></note>
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
-        <source>Testhost process exited with error: {0}. Please check the diagnostic logs for more information.</source>
-        <target state="translated">Testhost 프로세스가 종료되었습니다(오류: {0}). 자세한 내용은 진단 로그를 확인하세요.</target>
-        <note></note>
+        <source>Testhost process for source(s) '{0}' exited with error: {1}. Please check the diagnostic logs for more information.</source>
+        <target state="translated">원본 '{0}'에 대한 Testhost 프로세스가 오류 {1}과(와) 함께 종료되었습니다. 자세한 내용은 진단 로그를 확인하세요.</target>
+        <note>{0} a source, or very rarely list of sources, {1} the output error.</note>
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>

@@ -107,9 +107,7 @@ internal class TestObjectConverter7 : JsonConverter
 
     public TestObjectConverter7()
     {
-#if !NETSTANDARD1_3
         TestPropertyCtor = typeof(TestProperty).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[0], null);
-#endif
     }
 
     /// <inheritdoc/>

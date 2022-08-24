@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -160,7 +161,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// tracking counts per source for the minimal and quiet output.
     /// </summary>
     private ConcurrentDictionary<Guid, MinimalTestResult>? LeafTestResults { get; set; }
-
 
     #region ITestLoggerWithParameters
 
@@ -678,8 +678,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         Output.WriteLine(string.Empty, OutputLevel.Information);
 
         // Printing Run-level Attachments
-        var runLevelAttachementCount = e.AttachmentSets == null ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
-        if (runLevelAttachementCount > 0)
+        var runLevelAttachmentsCount = e.AttachmentSets == null ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
+        if (runLevelAttachmentsCount > 0)
         {
             // If ARTIFACTS_POSTPROCESSING is disabled
             if (_featureFlag.IsSet(FeatureFlag.DISABLE_ARTIFACTS_POSTPROCESSING) ||
@@ -689,7 +689,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                 CommandLineOptions.Instance.TestSessionCorrelationId is null)
             {
                 Output.Information(false, CommandLineResources.AttachmentsBanner);
-                TPDebug.Assert(e.AttachmentSets != null, "e.AttachmentSets should not be null when runLevelAttachementCount > 0.");
+                TPDebug.Assert(e.AttachmentSets != null, "e.AttachmentSets should not be null when runLevelAttachmentsCount > 0.");
                 foreach (var attachmentSet in e.AttachmentSets)
                 {
                     foreach (var uriDataAttachment in attachmentSet.Attachments)
@@ -813,6 +813,86 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                 skippedTests += sourceSummary.SkippedTests;
                 totalTests += sourceSummary.TotalTests;
             }
+
+            if (VerbosityLevel is Verbosity.Quiet or Verbosity.Minimal)
+            {
+                TestOutcome sourceOutcome = TestOutcome.None;
+                if (sourceSummary.FailedTests > 0)
+                {
+                    sourceOutcome = TestOutcome.Failed;
+                }
+                else if (sourceSummary.PassedTests > 0)
+                {
+                    sourceOutcome = TestOutcome.Passed;
+                }
+                else if (sourceSummary.SkippedTests > 0)
+                {
+                    sourceOutcome = TestOutcome.Skipped;
+                }
+
+                string resultString = sourceOutcome switch
+                {
+                    TestOutcome.Failed => (CommandLineResources.FailedTestIndicator + "!").PadRight(LongestResultIndicator),
+                    TestOutcome.Passed => (CommandLineResources.PassedTestIndicator + "!").PadRight(LongestResultIndicator),
+                    TestOutcome.Skipped => (CommandLineResources.SkippedTestIndicator + "!").PadRight(LongestResultIndicator),
+                    _ => CommandLineResources.None.PadRight(LongestResultIndicator),
+                };
+                var failed = sourceSummary.FailedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
+                var passed = sourceSummary.PassedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
+                var skipped = sourceSummary.SkippedTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
+                var total = sourceSummary.TotalTests.ToString(CultureInfo.CurrentCulture).PadLeft(5);
+
+
+                var frameworkString = _targetFramework.IsNullOrEmpty()
+                    ? string.Empty
+                    : $"({_targetFramework})";
+
+                var duration = GetFormattedDurationString(sourceSummary.Duration);
+                var sourceName = Path.GetFileName(sd.Key);
+
+                var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
+                    resultString,
+                    failed,
+                    passed,
+                    skipped,
+                    total,
+                    duration,
+                    sourceName,
+                    frameworkString);
+
+
+                ConsoleColor? color = null;
+                if (sourceOutcome == TestOutcome.Failed)
+                {
+                    color = ConsoleColor.Red;
+                }
+                else if (sourceOutcome == TestOutcome.Passed)
+                {
+                    color = ConsoleColor.Green;
+                }
+                else if (sourceOutcome == TestOutcome.Skipped)
+                {
+                    color = ConsoleColor.Yellow;
+                }
+
+                if (color != null)
+                {
+                    Output.Write(outputLine, OutputLevel.Information, color.Value);
+                }
+                else
+                {
+                    Output.Write(outputLine, OutputLevel.Information);
+                }
+
+                Output.Information(false, CommandLineResources.TestRunSummaryAssemblyAndFramework,
+                    sourceName,
+                    frameworkString);
+            }
+
+            passedTests += sourceSummary.PassedTests;
+            failedTests += sourceSummary.FailedTests;
+            skippedTests += sourceSummary.SkippedTests;
+            totalTests += sourceSummary.TotalTests;
         }
 
         if (VerbosityLevel is Verbosity.Quiet or Verbosity.Minimal)

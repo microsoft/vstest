@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -88,6 +89,38 @@ public class FastFilterTests
 
         Assert.IsTrue(fastFilter.Evaluate(s => "Test1"));
         Assert.IsFalse(fastFilter.Evaluate(s => "Test2"));
+    }
+
+    [TestMethod]
+    public void ValidForPropertiesHandlesBigFilteringExpressions()
+    {
+        StringBuilder testCaseFilter = new("Category=Test1");
+
+        for (int i = 0; i < 1e5; i++)  // creating a 100k filter cases string
+        {
+            testCaseFilter.Append("|Test2");
+        }
+
+        var filterExpressionWrapper = new FilterExpressionWrapper(testCaseFilter.ToString());
+        string[]? invalidProperties = filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null);
+
+        Assert.IsNotNull(invalidProperties);
+        Assert.AreEqual(invalidProperties.Length, 1);
+        Assert.AreEqual(invalidProperties[0], "Category");
+    }
+
+    [TestMethod]
+    public void EvaluateHandlesBigFilteringExpressions()
+    {
+        StringBuilder testCaseFilter = new("Test1");
+        // Create filter with 100k conditions.
+        for (int i = 0; i < 1e5; i++)
+        {
+            testCaseFilter.Append("|Test2");
+        }
+
+        var filterExpressionWrapper = new FilterExpressionWrapper(testCaseFilter.ToString());
+        Assert.IsTrue(filterExpressionWrapper.Evaluate(s => "Test1"));
     }
 
     [TestMethod]

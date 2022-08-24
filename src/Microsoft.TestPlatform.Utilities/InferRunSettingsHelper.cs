@@ -710,12 +710,7 @@ public class InferRunSettingsHelper
 
         static bool Is64BitOperatingSystem()
         {
-#if !NETSTANDARD1_3
             return Environment.Is64BitOperatingSystem;
-#else
-            // In the absence of APIs to check, assume the majority case
-            return true;
-#endif
         }
     }
 

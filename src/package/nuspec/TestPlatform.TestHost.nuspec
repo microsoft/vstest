@@ -25,12 +25,6 @@
         <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
       </group>
 
-      <group targetFramework="uap10.0">
-        <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
-        <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
-        <dependency id="System.Xml.ReaderWriter" version="4.0.11" />
-      </group>
-
       <group targetFramework="net462"></group>
     </dependencies>
   </metadata>
@@ -69,102 +63,6 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp3.1\win7-x86\testhost.x86.exe" target="build\netcoreapp3.1\x86\" />
 
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp3.1\Microsoft.TestPlatform.TestHost.props" target="build\netcoreapp3.1\" />
-
-    <!-- UWP -->
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\testhost.dll" target="lib\uap10.0\" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.TestPlatform.*.dll" target="lib\uap10.0\" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.VisualStudio.TestPlatform.*.dll" target="lib\uap10.0\" />
-
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\x86\msdia140.dll" target="build\uap10.0\x86\" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\x64\msdia140.dll" target="build\uap10.0\x64\" />
-
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.TestPlatform.TestHost.props" target="build\uap10.0\" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.TestPlatform.TestHost.targets" target="build\uap10.0\" />
-
-    <!-- Add localized resources UWP -->
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\cs" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\de" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\es\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\es" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\fr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\fr" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\it\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\it" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ja\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\ja" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ko\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\ko" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\pl\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\pl" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\pt-BR\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\pt-BR" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ru\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\ru" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\tr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\tr" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\zh-Hans" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="build\uap10.0\zh-Hant" />
-
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\cs" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\de" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\es" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\fr" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\it" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\ja" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\ko" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\pl" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\pt-BR" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\ru" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\tr" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\zh-Hans" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="build\uap10.0\zh-Hant" />
-
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\cs\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\cs" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\de\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\de" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\es\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\es" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\fr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\fr" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\it\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\it" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ja\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\ja" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ko\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\ko" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\pl\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\pl" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\pt-BR\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\pt-BR" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ru\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\ru" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\tr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\tr" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hans\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\zh-Hans" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="build\uap10.0\zh-Hant" />
-
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\cs\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\cs" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\de\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\de" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\es\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\es" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\fr\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\fr" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\it\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\it" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ja\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\ja" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ko\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\ko" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\pl\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\pl" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\pt-BR\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\pt-BR" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ru\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\ru" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\tr\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\tr" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hans\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\zh-Hans" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hant\Microsoft.TestPlatform.Utilities.resources.dll" target="build\uap10.0\zh-Hant" />
-
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\cs\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\cs" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\de\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\de" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\es" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\fr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\fr" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\it\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\it" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ja\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\ja" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ko\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\ko" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\pl\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\pl" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\pt-BR\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\pt-BR" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ru\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\ru" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\tr" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\zh-Hans" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="build\uap10.0\zh-Hant" />
-
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\cs" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\de" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\es" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\fr" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\it" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\ja" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\ko" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\pl" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\pt-BR" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\ru" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\tr" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\zh-Hans" />
-    <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\zh-Hant" />
 
     <!-- Add localized resources netcoreapp3.1 -->
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp3.1\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp3.1\cs" />

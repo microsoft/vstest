@@ -98,9 +98,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <inheritdoc />
     public bool AttachDebuggerToProcess(int pid)
     {
-#if NETSTANDARD1_3
-        var fmw = Framework.DefaultFramework.ToString();
-#elif NETSTANDARD || NET
+#if NETSTANDARD || NET
         var fmw = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
 #else
         var fmw = Framework.DefaultFramework.ToString();

@@ -15,6 +15,7 @@ Microsoft.TestPlatform.AdapterUtilities.HierarchyConstants.Levels
 Microsoft.TestPlatform.AdapterUtilities.ManagedNameConstants
 Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.InvalidManagedNameException
 Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.InvalidManagedNameException.InvalidManagedNameException(string? message) -> void
+Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.InvalidManagedNameException.InvalidManagedNameException(System.Runtime.Serialization.SerializationInfo! info, System.Runtime.Serialization.StreamingContext context) -> void
 Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.ManagedNameHelper
 Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.ManagedNameParser
 Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.ManagedNameParser.ManagedNameParser() -> void

@@ -1,13 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
 // We don't want this in our shipped code. Build only for debug until I am able to remove it.
 #if DEBUG
 
-#if !NETSTANDARD1_0
 using System;
-#endif
 using System.Collections.Generic;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -33,9 +30,7 @@ public static class TestServiceLocator
             // throw new InvalidOperationException($"Cannot find an instance for name {name}.");
         }
 
-#if !NETSTANDARD1_0
         Resolves.Add(new Resolve(name, typeof(TRegistration).FullName!, Environment.StackTrace));
-#endif
         return (TRegistration)instance;
     }
 

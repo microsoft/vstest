@@ -12,6 +12,7 @@
     <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3270;MSB3276</MSBuildWarningsAsMessages>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
   </PropertyGroup>
+  <Import Project="$(TestPlatformRoot)src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems" Label="Shared" />
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup Label="Configuration">
     <RootNamespace>Microsoft.TestPlatform.Extensions.BlameDataCollector</RootNamespace>
@@ -27,7 +28,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.TestHostProvider\Properties\TestExtensionTypesAttribute.cs" Link="Properties\TestExtensionTypesAttribute.cs" />
-    <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />

@@ -539,6 +539,7 @@ Global
 		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{27dfbd04-64b2-4f1b-82b2-006620cca6f8}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{2c7ce1f8-e73e-4987-8023-b5a0ebac86e8}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{71cb42ff-e750-4a3b-9c3a-ac938853cc89}*SharedItemsImports = 5
+		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{76d4bb7e-d981-42d5-be96-6fad8def9a4a}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{7f26eda3-c8c4-4b7f-a9b6-d278c2f40a13}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

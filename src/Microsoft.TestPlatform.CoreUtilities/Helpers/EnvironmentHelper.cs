@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD1_0
 using System;
-#endif
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -19,12 +17,7 @@ public class EnvironmentHelper
     /// </summary>
     public static int GetConnectionTimeout()
     {
-
-#if NETSTANDARD1_0
-        var envVarValue = string.Empty;
-#else
         var envVarValue = Environment.GetEnvironmentVariable(VstestConnectionTimeout);
-#endif
 
         if (!envVarValue.IsNullOrEmpty() && int.TryParse(envVarValue, out int value) && value >= 0)
         {

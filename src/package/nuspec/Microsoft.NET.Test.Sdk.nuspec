@@ -19,14 +19,6 @@
                 branch="$BranchName$"
                 commit="$CommitId$" />
     <dependencies>
-      <group targetFramework="uap10.0">
-        <dependency id="System.ComponentModel.Primitives" version="[4.1.0, )" />
-        <dependency id="System.ComponentModel.TypeConverter" version="[4.1.0, )" />
-        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.0.0, )" />
-        <dependency id="Newtonsoft.Json" version="[$JsonNetVersion$, )" />
-        <!-- TestHost gets shipped as ExtensionSDKs with name TestPlatform.Universal. -->
-        <!-- Currently code coverage not supported for uap10.0. -->
-      </group>
       <group targetFramework="netcoreapp3.1">
         <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
         <dependency id="Microsoft.CodeCoverage" version="$Version$" />
@@ -46,10 +38,8 @@
     <file src="Microsoft.NET.Test.Sdk.props" target="buildMultiTargeting\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\netcoreapp3.1\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\net462\" />
-    <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\uap10.0\" />
 
     <file src="_._" target="lib/netcoreapp3.1" />
     <file src="_._" target="lib/net462" />
-    <file src="_._" target="lib/uap10.0" />
   </files>
 </package>
