@@ -215,9 +215,7 @@ function install_cli()
             return 1
         fi
         chmod u+x $install_script
-        # Versions are determined by the installed dotnet sdk from "tools\dotnet\sdk\<version from global json>\Microsoft.NETCoreSdk.BundledVersions.props"
-        # from LatestVersion entries, because our projects use <TargetLatestRuntimePatch>True</TargetLatestRuntimePatch>.
-        #
+
         # Runtime versions installed usually need to be kept in sync with the ones installed in common.lib.ps1
         $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "2.1" --version "2.1.30"
         $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "3.1" --version "3.1.27"
