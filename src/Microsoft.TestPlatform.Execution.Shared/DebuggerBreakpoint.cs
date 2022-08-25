@@ -43,7 +43,14 @@ internal static class DebuggerBreakpoint
             }
             else
             {
-                ConsoleOutput.Instance.WriteLine($"Attaching Visual Studio with PID {vsPid} to the process '{Process.GetCurrentProcess().ProcessName}({Process.GetCurrentProcess().Id})'...", OutputLevel.Information);
+                var processId =
+#if NET6_0_OR_GREATER
+                    Environment.ProcessId;
+#else
+                    Process.GetCurrentProcess().Id;
+#endif
+
+                ConsoleOutput.Instance.WriteLine($"Attaching Visual Studio with PID {vsPid} to the process '{Process.GetCurrentProcess().ProcessName}({processId})'...", OutputLevel.Information);
             }
 
             AttachVs(Process.GetCurrentProcess(), vsPid);

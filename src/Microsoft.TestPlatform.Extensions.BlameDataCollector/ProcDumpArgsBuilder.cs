@@ -50,10 +50,19 @@ public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
 
         foreach (var exceptionFilter in procDumpExceptionsList)
         {
-            procDumpArgument.Append($"-f {exceptionFilter} ");
+            procDumpArgument.Append(
+#if NET7_0_OR_GREATER
+                System.Globalization.CultureInfo.InvariantCulture,
+#endif
+                $"-f {exceptionFilter} ");
         }
 
-        procDumpArgument.Append($"{processId} {filename}.dmp");
+        procDumpArgument.Append(
+#if NET7_0_OR_GREATER
+                System.Globalization.CultureInfo.InvariantCulture,
+#endif
+                $"{processId} {filename}.dmp");
+
         var argument = procdumpArgumentsFromEnv.IsNullOrWhiteSpace()
             ? procDumpArgument.ToString()
             : $"-accepteula {procdumpArgumentsFromEnv} {processId} {filename}.dmp";
@@ -78,7 +87,11 @@ public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
             procDumpArgument.Append(" -ma");
         }
 
-        procDumpArgument.Append($" {processId} {filename}.dmp");
+        procDumpArgument.Append(
+#if NET7_0_OR_GREATER
+                System.Globalization.CultureInfo.InvariantCulture,
+#endif
+                $" {processId} {filename}.dmp");
         var argument = procDumpArgument.ToString();
 
         return argument;

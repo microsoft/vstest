@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
 public interface INativeMethodsHelper
@@ -12,5 +10,5 @@ public interface INativeMethodsHelper
     /// </summary>
     /// <param name="processHandle">Process Handle</param>
     /// <returns>Bool for Is64Bit</returns>
-    bool Is64Bit(IntPtr processHandle);
+    bool Is64Bit(nint processHandle);
 }

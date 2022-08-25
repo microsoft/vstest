@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\scripts\build\TestPlatform.Dependencies.props" />
   <PropertyGroup>
-    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion);net7.0;net6.0;</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">$(TargetNetCoreVersion)</TargetFrameworks>
     <OutputType Condition=" '$(TargetFramework)' != '$(TargetNetFxVersion)' ">Exe</OutputType>
     <AssemblyName>UnitTestProject</AssemblyName>

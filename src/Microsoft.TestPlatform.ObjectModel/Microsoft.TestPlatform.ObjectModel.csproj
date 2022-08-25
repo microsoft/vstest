@@ -7,8 +7,8 @@
 
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.ObjectModel</AssemblyName>
-    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion);netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;$(TargetNetFxVersion);$(TargetNetCoreVersion);netstandard2.0;</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0;</TargetFrameworks>
     <PackageId>Microsoft.TestPlatform.ObjectModel</PackageId>
   </PropertyGroup>
 

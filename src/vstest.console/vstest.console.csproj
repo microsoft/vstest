@@ -8,8 +8,8 @@
   <PropertyGroup>
     <AssemblyName>vstest.console</AssemblyName>
     <AssemblyName Condition=" '$(RuntimeIdentifier)' == 'win10-arm64' ">vstest.console.arm64</AssemblyName>
-    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0;</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <RollForward>Major</RollForward>
     <IsTestProject>false</IsTestProject>
@@ -22,6 +22,10 @@
       (e.g. System.Runtime 4.1.2 instead of 4.0.0)
     -->
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+
+    <MSBuildWarningsAsMessages>
+      $(MSBuildWarningsAsMessages);MSB3276;
+    </MSBuildWarningsAsMessages>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == '$(TargetNetFxVersion)'">
     <RuntimeIdentifiers>win7-x64;win10-arm64</RuntimeIdentifiers>

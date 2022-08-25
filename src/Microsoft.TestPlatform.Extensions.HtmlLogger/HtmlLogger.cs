@@ -290,13 +290,13 @@ public class HtmlLogger : ITestLoggerWithParameters
             }
 
             logFilePrefixValue = logFilePrefixValue + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
-            HtmlFilePath = Path.Combine(TestResultsDirPath, logFilePrefixValue);
+            HtmlFilePath = Path.Combine(TestResultsDirPath!, logFilePrefixValue);
         }
         else
         {
             if (_parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string? logFileNameValue) && !logFileNameValue.IsNullOrWhiteSpace())
             {
-                HtmlFilePath = Path.Combine(TestResultsDirPath, logFileNameValue);
+                HtmlFilePath = Path.Combine(TestResultsDirPath!, logFileNameValue);
             }
         }
 
@@ -351,7 +351,7 @@ public class HtmlLogger : ITestLoggerWithParameters
         for (short i = 0; i < short.MaxValue; i++)
         {
             var fileNameWithIter = i == 0 ? fileName : Path.GetFileNameWithoutExtension(fileName) + $"[{i}]";
-            fullFilePath = Path.Combine(TestResultsDirPath, $"TestResult_{fileNameWithIter}.{fileExtension}");
+            fullFilePath = Path.Combine(TestResultsDirPath!, $"TestResult_{fileNameWithIter}.{fileExtension}");
             lock (FileCreateLockObject)
             {
                 if (!File.Exists(fullFilePath))

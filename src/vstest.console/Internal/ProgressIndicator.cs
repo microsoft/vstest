@@ -100,7 +100,7 @@ internal sealed class ProgressIndicator : IProgressIndicator, IDisposable
         }
     }
 
-    private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
         if (IsRunning)
         {

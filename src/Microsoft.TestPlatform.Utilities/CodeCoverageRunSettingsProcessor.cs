@@ -188,11 +188,13 @@ public class CodeCoverageRunSettingsProcessor
             // default settings node and bail out.
             if (tempNode == null)
             {
-                var defaultNode = ExtractNode(
-                    defaultRootNode,
-                    partialPath.ToString());
+                var defaultNode = ExtractNode(defaultRootNode, partialPath.ToString());
+                if (defaultNode == null)
+                {
+                    return null;
+                }
 
-                var importedChild = currentNode.OwnerDocument.ImportNode(defaultNode, true);
+                var importedChild = currentNode.OwnerDocument!.ImportNode(defaultNode, true);
                 currentNode.AppendChild(importedChild);
 
                 return null;
@@ -218,6 +220,11 @@ public class CodeCoverageRunSettingsProcessor
     private static bool ShouldProcessCurrentExclusion(XmlNode node)
     {
         const string attributeName = "mergeDefaults";
+
+        if (node.Attributes == null)
+        {
+            return true;
+        }
 
         foreach (XmlAttribute attribute in node.Attributes)
         {
@@ -298,7 +305,7 @@ public class CodeCoverageRunSettingsProcessor
             }
 
             // Import missing default exclusions.
-            var importedChild = currentNode.OwnerDocument.ImportNode(child, true);
+            var importedChild = currentNode.OwnerDocument!.ImportNode(child, true);
             currentNode.AppendChild(importedChild);
         }
     }

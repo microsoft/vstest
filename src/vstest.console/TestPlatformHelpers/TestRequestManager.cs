@@ -671,7 +671,7 @@ internal class TestRequestManager : ITestRequestManager
             XmlRunSettingsUtilities.ReaderSettings);
         var document = new XmlDocument();
         document.Load(reader);
-        var navigator = document.CreateNavigator();
+        var navigator = document.CreateNavigator()!;
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
         var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml)
                                 ?? new LoggerRunSettings();

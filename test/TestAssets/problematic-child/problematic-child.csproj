@@ -9,7 +9,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;net6.0;net5.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <RootNamespace>problematic_child</RootNamespace>
   </PropertyGroup>

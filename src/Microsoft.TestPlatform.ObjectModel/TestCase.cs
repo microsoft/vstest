@@ -3,6 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+#if NET7_0_OR_GREATER
+using System.Globalization;
+#endif
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -261,7 +264,23 @@ public sealed class TestCase : TestObject
                 return;
 
             case "TestCase.Id":
-                Id = value is Guid guid ? guid : Guid.Parse((value as string)!);
+                if (value is Guid guid)
+                {
+                    Id = guid;
+                }
+                else if (value is string guidString)
+                {
+#if NET7_0_OR_GREATER
+                    Id = Guid.Parse(guidString, CultureInfo.InvariantCulture);
+#else
+                    Id = Guid.Parse(guidString);
+#endif
+                }
+                else
+                {
+                    Id = Guid.Empty;
+                }
+
                 return;
 
             case "TestCase.LineNumber":

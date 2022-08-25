@@ -122,14 +122,16 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
 
     private static async Task<IList<string>?> MergeCodeCoverageFilesAsync(IList<string> files, CancellationToken cancellationToken)
     {
+        TPDebug.Assert(s_mergeOperationEnumValues != null);
+
         cancellationToken.ThrowIfCancellationRequested();
 
         // Invoke methods
         LoadCodeCoverageAssembly();
-        var task = (Task)s_mergeMethodInfo.Invoke(s_classInstance, new object[] { files[0], files, s_mergeOperationEnumValues.GetValue(0), true, cancellationToken });
+        var task = (Task)s_mergeMethodInfo.Invoke(s_classInstance, new object[] { files[0], files, s_mergeOperationEnumValues.GetValue(0)!, true, cancellationToken })!;
         await task.ConfigureAwait(false);
 
-        if (task.GetType().GetProperty("Result").GetValue(task, null) is not IList<string> mergedResults)
+        if (task.GetType().GetProperty("Result")!.GetValue(task, null) is not IList<string> mergedResults)
         {
             EqtTrace.Error("CodeCoverageDataCollectorAttachmentsHandler: Failed to merge code coverage files.");
             return files;
@@ -163,15 +165,16 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
             return;
         }
 
-        var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageIoAssemblyName + ".dll");
+        var dataAttachmentAssemblyLocation = typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()!;
+        var assemblyPath = Path.Combine(Path.GetDirectoryName(dataAttachmentAssemblyLocation)!, CodeCoverageIoAssemblyName + ".dll");
         s_codeCoverageAssembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(assemblyPath);
 
-        var classType = s_codeCoverageAssembly.GetType($"{CodeCoverageIoAssemblyName}.{CoverageFileUtilityTypeName}");
-        s_classInstance = Activator.CreateInstance(classType);
+        var classType = s_codeCoverageAssembly.GetType($"{CodeCoverageIoAssemblyName}.{CoverageFileUtilityTypeName}")!;
+        s_classInstance = Activator.CreateInstance(classType)!;
 
         var types = s_codeCoverageAssembly.GetTypes();
-        var mergeOperationEnum = Array.Find(types, d => d.Name == CoverageMergeOperationName);
+        var mergeOperationEnum = Array.Find(types, d => d.Name == CoverageMergeOperationName)!;
         s_mergeOperationEnumValues = Enum.GetValues(mergeOperationEnum);
-        s_mergeMethodInfo = classType.GetMethod(MergeMethodName, new[] { typeof(string), typeof(IList<string>), mergeOperationEnum, typeof(bool), typeof(CancellationToken) });
+        s_mergeMethodInfo = classType.GetMethod(MergeMethodName, new[] { typeof(string), typeof(IList<string>), mergeOperationEnum, typeof(bool), typeof(CancellationToken) })!;
     }
 }

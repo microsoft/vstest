@@ -42,7 +42,7 @@ internal sealed class EqtAssert
     /// </summary>
     /// <param name="parameter">Parameter to check</param>
     /// <param name="parameterName">String - parameter name</param>
-    public static void ParameterNotNull([ValidatedNotNull] object? parameter, [ValidatedNotNull] string parameterName)
+    public static void ParameterNotNull([NotNull] object? parameter, [NotNull] string parameterName)
     {
         AssertParameterNameNotNullOrEmpty(parameterName);
         TPDebug.Assert(parameter != null, $"'{nameof(parameterName)}' is null");
@@ -57,7 +57,7 @@ internal sealed class EqtAssert
     /// </summary>
     /// <param name="parameter">Parameter to check</param>
     /// <param name="parameterName">String - parameter name</param>
-    public static void StringNotNullOrEmpty([ValidatedNotNull] string? parameter, [ValidatedNotNull] string parameterName)
+    public static void StringNotNullOrEmpty([NotNull] string? parameter, [NotNull] string parameterName)
     {
         AssertParameterNameNotNullOrEmpty(parameterName);
         TPDebug.Assert(!parameter.IsNullOrEmpty(), $"'{nameof(parameterName)}' is null or empty");
@@ -72,7 +72,7 @@ internal sealed class EqtAssert
     /// </summary>
     /// <param name="parameterName">The parameter name to verify</param>
     [Conditional("DEBUG")]
-    private static void AssertParameterNameNotNullOrEmpty([ValidatedNotNull] string? parameterName)
+    private static void AssertParameterNameNotNullOrEmpty([NotNull] string? parameterName)
     {
         TPDebug.Assert(!parameterName.IsNullOrEmpty(), "'parameterName' is null or empty");
     }

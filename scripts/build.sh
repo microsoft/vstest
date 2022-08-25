@@ -156,7 +156,7 @@ TPB_BRANCH="$(git -C "." rev-parse --abbrev-ref HEAD 2>/dev/null)" || TPB_BRANCH
 TPB_COMMIT="$(git -C "." rev-parse HEAD 2>/dev/null)"              || TPB_COMMIT="LOCALBUILD" # detached HEAD
 
 if [[ $TP_USE_REPO_API = 1 ]]; then
-    TPB_TargetFrameworkCore="net6.0"
+    TPB_TargetFrameworkCore="net7.0"
 fi
 
 #
@@ -220,7 +220,7 @@ function install_cli()
         #
         # Runtime versions installed usually need to be kept in sync with the ones installed in common.lib.ps1
         $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "2.1" --version "2.1.30"
-        $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "3.1" --version "3.1.25"
+        $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "3.1" --version "3.1.27"
         $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "5.0" --version "5.0.17"
         $install_script --runtime dotnet --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64 --channel "6.0" --version "6.0.5"
 
@@ -346,8 +346,8 @@ function publish_package()
             cp -r src/testhost/bin/$TPB_Configuration/$TPB_TargetFramework/win7-x64/* $testhost
             cp -r src/testhost.x86/bin/$TPB_Configuration/$TPB_TargetFramework/win7-x86/* $testhost
         else
-            cp -r src/testhost/bin/$TPB_Configuration/net6.0/* $testhost
-            cp -r src/testhost.x86/bin/$TPB_Configuration/net6.0/* $testhost
+            cp -r src/testhost/bin/$TPB_Configuration/net7.0/* $testhost
+            cp -r src/testhost.x86/bin/$TPB_Configuration/net7.0/* $testhost
         fi
 
         # Copy over the logger assemblies to the Extensions folder.
@@ -355,7 +355,7 @@ function publish_package()
 
         if [[ $TP_USE_REPO_API = 1 ]]; then
             log ".. Package: mv (Source Build)"
-            local current_tfn="net6.0"
+            local current_tfn="net7.0"
         else
             log ".. Package: mv"
             local current_tfn="netstandard2.0"
