@@ -46,70 +46,67 @@ function Verify-Assemblies
     $artifactsDirectory = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     foreach ($pattern in $TPB_AssembliesPattern) {
         Write-Debug "Pattern: $pattern"
-        Get-ChildItem -Recurse -Include $pattern $artifactsDirectory `
-            # Excluding net7.0 folder because otherwise we consider that net7.0/*/Microsoft.TestPlatform.Build.dll are not signed
-            | Where-Object { (!$_.PSIsContainer) -and !($($_.FullName).Contains('VSIX\obj')) -and !($($_.FullName).Contains('publishTemp')) -and !($($_.FullName).Contains('sign_temp')) -and !($($_.FullName).Contains('net7.0'))} `
-            | ForEach-Object {
-                $Path = $_.FullName
-                $signature = Get-AuthenticodeSignature -FilePath $Path
+        Get-ChildItem -Recurse -Include $pattern $artifactsDirectory | Where-Object { (!$_.PSIsContainer) -and !($($_.FullName).Contains('VSIX\obj')) -and !($($_.FullName).Contains('publishTemp')) -and !($($_.FullName).Contains('sign_temp'))} | % {
+            $Path = $_.FullName
+            $signature = Get-AuthenticodeSignature -FilePath $Path
 
-                if ($signature.Status -eq "Valid") {
-                    if ($signature.SignerCertificate.Subject -eq "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US") {
-                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path"
-                    }
-                    elseif ($signature.SignerCertificate.Subject -eq "CN=Microsoft 3rd Party Application Component, O=Microsoft Corporation, L=Redmond, S=Washington, C=US") {
-                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [3rd Party]"
-                    }
-                    else {
-                        # For legacy components, sign certificate is always "prod" signature. Skip such binaries.
-                        if ($signature.SignerCertificate.Thumbprint -eq "98ED99A67886D020C564923B7DF25E9AC019DF26") {
-                            Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
-                        }
-                        # For some dlls e.g. "Microsoft.DiaSymReader.dll", sign certificate is different signature. Skip such binaries.
-                        elseif ($signature.SignerCertificate.Thumbprint -eq "5EAD300DC7E4D637948ECB0ED829A072BD152E17") {
-                            Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
-                        }
-                        # For some dlls e.g. "Interop.UIAutomationClient.dll", sign certificate is different signature. Skip such binaries.
-                        elseif ($signature.SignerCertificate.Thumbprint -eq "67B1757863E3EFF760EA9EBB02849AF07D3A8080") {
-                            Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
-                        }
-                        # For some dlls e.g. "Microsoft.VisualStudio.ArchitectureTools.PEReader.dll", sign certificate is different signature. Skip such binaries.
-                        elseif ($signature.SignerCertificate.Thumbprint -eq "9DC17888B5CFAD98B3CB35C1994E96227F061675") {
-                            Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
-                        }
-                        # For some dlls sign certificate is different signature. Skip such binaries.
-                        elseif ($signature.SignerCertificate.Thumbprint -eq "62009AAABDAE749FD47D19150958329BF6FF4B34") {
-                            Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
-                        }
-                        # Microsoft 3rd Party Authenticode Signature
-                        elseif ($signature.SignerCertificate.Thumbprint -eq "899FA016DEE8E665FF2A315A1151C43FB96C430B") {
-                            Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
-                        }
-                        # Microsoft 3rd Party Application Component
-                        elseif ($signature.SignerCertificate.Thumbprint -eq "709133ECC53CBF386F4A5ECB782AEEF499F0F8CA") {
-                            Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [3rd Party Signed]"
-                        }
-                        # Microsoft 3rd Party Application Component
-                        elseif ($signature.SignerCertificate.Thumbprint -eq "912357a68d29b8fe17168ef8c44d6830d1d42801") {
-                            Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
-                        }
-                        # For some dlls sign certificate is different signature, which already come as signed from nuget packages. Skip such binaries.
-                        elseif ($signature.SignerCertificate.Thumbprint -eq "81C25099511180D15B858DC2B7EC4C057B1CE4BF") {
-                            Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
-                        }
-                        # .NET Foundation, Newtonsoft.Json.dll 13.0.1
-                        elseif ($signature.SignerCertificate.Thumbprint -eq "4CFB89FAA49539A58968D81960B3C1258E8F6A34") {
-                            Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [.NET Foundation Signed]"
-                        }
-                        else {
-                            Write-FailLog "Invalid ($($signature.SignerCertificate.Thumbprint)). File: $Path. [$($signature.SignerCertificate.Subject)]"
-                        }
-                    }
+            if ($signature.Status -eq "Valid") {
+                if ($signature.SignerCertificate.Subject -eq "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US") {
+                    Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path"
+                }
+                elseif ($signature.SignerCertificate.Subject -eq "CN=Microsoft 3rd Party Application Component, O=Microsoft Corporation, L=Redmond, S=Washington, C=US") {
+                    Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [3rd Party]"
                 }
                 else {
-                    Write-FailLog "Not signed. File: $Path."
+                    # For legacy components, sign certificate is always "prod" signature. Skip such binaries.
+                    if ($signature.SignerCertificate.Thumbprint -eq "98ED99A67886D020C564923B7DF25E9AC019DF26") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
+                    }
+                    # For some dlls e.g. "Microsoft.DiaSymReader.dll", sign certificate is different signature. Skip such binaries.
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "5EAD300DC7E4D637948ECB0ED829A072BD152E17") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
+                    }
+                    # For some dlls e.g. "Interop.UIAutomationClient.dll", sign certificate is different signature. Skip such binaries.
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "67B1757863E3EFF760EA9EBB02849AF07D3A8080") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
+                    }
+                    # For some dlls e.g. "Microsoft.VisualStudio.ArchitectureTools.PEReader.dll", sign certificate is different signature. Skip such binaries.
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "9DC17888B5CFAD98B3CB35C1994E96227F061675") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
+                    }
+                    # For some dlls sign certificate is different signature. Skip such binaries.
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "62009AAABDAE749FD47D19150958329BF6FF4B34") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
+                    }
+                    # Microsoft 3rd Party Authenticode Signature
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "899FA016DEE8E665FF2A315A1151C43FB96C430B") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
+                    }
+                    # Microsoft 3rd Party Application Component
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "709133ECC53CBF386F4A5ECB782AEEF499F0F8CA") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [3rd Party Signed]"
+                    }
+                    # Microsoft 3rd Party Application Component
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "912357a68d29b8fe17168ef8c44d6830d1d42801") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
+                    }
+                    # For some dlls sign certificate is different signature, which already come as signed from nuget packages. Skip such binaries.
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "81C25099511180D15B858DC2B7EC4C057B1CE4BF") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
+                    }
+                    # .NET Foundation, Newtonsoft.Json.dll 13.0.1
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "4CFB89FAA49539A58968D81960B3C1258E8F6A34") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [.NET Foundation Signed]"
+                    }
+                    else {
+                        Write-FailLog "Invalid ($($signature.SignerCertificate.Thumbprint)). File: $Path. [$($signature.SignerCertificate.Subject)]"
+                    }
                 }
             }
+            else {
+                Write-FailLog "Not signed. File: $Path."
+            }
+        }
     }
 
     Write-Debug "Verify-Assemblies: Complete"
