@@ -313,14 +313,14 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";TestHostExitedWithError" ItemType="0" PsrId="308" Leaf="true">
+      <Item ItemId=";TestHostExitedWithError" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Testhost process exited with error: {0}. Please check the diagnostic logs for more information.]]></Val>
+          <Val><![CDATA[Testhost process for source(s) '{0}' exited with error: {1}. Please check the diagnostic logs for more information.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Testhost 處理序已結束。錯誤: {0}。如需詳細資訊，請查看診斷記錄。]]></Val>
+            <Val><![CDATA[來源 '{0}' 的 Testhost 處理序已結束，發生錯誤: {1}。如需詳細資訊，請查看診斷記錄。]]></Val>
           </Tgt>
           <Prev Cat="Text">
-            <Val><![CDATA[Testhost process exited with error: {0}]]></Val>
+            <Val><![CDATA[Testhost process exited with error: {0}. Please check the diagnostic logs for more information.]]></Val>
           </Prev>
         </Str>
         <Disp Icon="Str" />

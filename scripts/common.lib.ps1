@@ -105,9 +105,6 @@ function Install-DotNetCli
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
 
-    # Versions are determined by the installed dotnet sdk from "tools\dotnet\sdk\<version from global json>\Microsoft.NETCoreSdk.BundledVersions.props"
-    # from LatestVersion entries, because our projects use <TargetLatestRuntimePatch>True</TargetLatestRuntimePatch>.
-    #
     # Runtime versions installed usually need to be kept in sync with the ones installed in build.sh
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '2.1' -Architecture x64 -NoPath # Install the latest patch
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '3.1' -Architecture x64 -NoPath # Install the latest patch
