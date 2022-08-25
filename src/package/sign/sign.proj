@@ -193,6 +193,10 @@
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.AdapterUtilities.dll" />
+      <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.Utilities.dll" />
+      <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.VisualStudio.TestPlatform.Common.dll" />
 
       <!-- NetCoreExtensions -->
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
