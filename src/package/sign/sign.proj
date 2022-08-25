@@ -27,9 +27,6 @@
     <!-- Directory with NetStandard2.0 binaries -->
     <ArtifactsNS20Directory Condition="'$(ArtifactsNS20Directory)' == ''">$(ArtifactsBaseDirectory)netstandard2.0\</ArtifactsNS20Directory>
 
-    <!-- Directory with UAP10.0 binaries -->
-    <ArtifactsUAP100Directory Condition="'$(ArtifactsUAP100Directory)' == ''">$(ArtifactsBaseDirectory)uap10.0\</ArtifactsUAP100Directory>
-
     <IntermediatesDirectory Condition="'$(IntermediatesDirectory)' == ''">$(ArtifactsBaseDirectory)obj\$(BuildConfiguration)\$(TargetFramework)\$(TargetRuntime)\</IntermediatesDirectory>
   </PropertyGroup>
 
