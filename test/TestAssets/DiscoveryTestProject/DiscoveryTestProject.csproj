@@ -5,8 +5,8 @@
 
   <PropertyGroup>
     <AssemblyName>DiscoveryTestProject</AssemblyName>
-    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkMinimum);$(NetCoreAppMinimum)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">$(NetCoreAppMinimum)</TargetFrameworks>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
@@ -15,7 +15,7 @@
     <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestAdapterVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(NETTestSdkVersion)" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' ">
     <Reference Include="System.Runtime" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>

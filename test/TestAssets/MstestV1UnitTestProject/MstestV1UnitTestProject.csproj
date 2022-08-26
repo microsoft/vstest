@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <OutputType>library</OutputType>
-    <TargetFramework>$(TargetNetFxVersion)</TargetFramework>
+    <TargetFramework>$(NetFrameworkMinimum)</TargetFramework>
     <AssemblyName>MstestV1UnitTestProject</AssemblyName>
   </PropertyGroup>
   <ItemGroup>

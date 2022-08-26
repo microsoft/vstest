@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.Common</AssemblyName>
-    <TargetFrameworks>net7.0;net6.0;netstandard2.0;$(TargetNetFxVersion)</TargetFrameworks>
+    <TargetFrameworks>net7.0;net6.0;netstandard2.0;$(NetFrameworkMinimum)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
     <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
@@ -17,7 +17,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' ">
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.IO" />

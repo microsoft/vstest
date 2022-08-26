@@ -3,7 +3,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkMinimum);$(NetCoreAppMinimum)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>

@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.Client</AssemblyName>
-    <TargetFrameworks>net7.0;netstandard2.0;$(TargetNetFxVersion)</TargetFrameworks>
+    <TargetFrameworks>net7.0;netstandard2.0;$(NetFrameworkMinimum)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
@@ -24,7 +24,7 @@
       <FromP2P>true</FromP2P>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' ">
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Runtime.Serialization" />

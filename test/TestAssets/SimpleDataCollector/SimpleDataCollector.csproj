@@ -10,7 +10,7 @@
     <Version>15.0.0.0</Version>
     <FileVersion>15.0.0.0</FileVersion>
     <ProductVersion>15.0.0.0</ProductVersion>
-    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkMinimum);$(NetCoreAppMinimum)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <WarningsAsErrors>true</WarningsAsErrors>

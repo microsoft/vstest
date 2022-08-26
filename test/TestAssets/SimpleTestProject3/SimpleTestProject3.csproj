@@ -4,7 +4,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkMinimum);$(NetCoreAppMinimum)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <OutputType Condition="$(NetCoreAppTargetFrameWork) == 'true' ">Exe</OutputType>
@@ -16,11 +16,11 @@
     <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestAdapterVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(NETTestSdkVersion)" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' ">
     <Reference Include="System.Runtime" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' ">
     <PackageReference Include="System.Memory" Version="4.5.3"/>
   </ItemGroup>
   <ItemGroup>

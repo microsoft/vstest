@@ -10,7 +10,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>testhost.x86</AssemblyName>
-    <TargetFrameworks>net7.0;$(TargetNetCoreVersion);$(TargetNetFxVersion);net47;net471;net472;net48</TargetFrameworks>
+    <TargetFrameworks>net7.0;$(NetCoreAppMinimum);$(NetFrameworkMinimum);net47;net471;net472;net48</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0;</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>true</Prefer32Bit>
@@ -18,10 +18,10 @@
     <IsTestProject>false</IsTestProject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' != '$(TargetNetCoreVersion)' AND '$(TargetFramework)' != 'net6.0' AND '$(TargetFramework)' != 'net7.0' ">
+  <PropertyGroup Condition="'$(TargetFramework)' != '$(NetCoreAppMinimum)' AND '$(TargetFramework)' != 'net6.0' AND '$(TargetFramework)' != 'net7.0' ">
     <RuntimeIdentifier Condition="'$(DotNetBuildFromSource)' != 'true'">win7-x86</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-    <TargetName Condition="'$(TargetFramework)' != '$(TargetNetFxVersion)'">$(AssemblyName.Replace('.x86', '')).$(TargetFramework).x86</TargetName>
+    <TargetName Condition="'$(TargetFramework)' != '$(NetFrameworkMinimum)'">$(AssemblyName.Replace('.x86', '')).$(TargetFramework).x86</TargetName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="app.config" />
