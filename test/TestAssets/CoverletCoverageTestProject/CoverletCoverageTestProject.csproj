@@ -3,7 +3,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
 
   <PropertyGroup>
-    <TargetFramework>$(TargetNetCoreVersion)</TargetFramework>
+    <TargetFramework>$(NetCoreAppMinimum)</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 

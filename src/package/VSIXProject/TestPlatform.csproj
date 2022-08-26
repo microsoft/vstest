@@ -27,7 +27,7 @@
     <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
     <DeployExtension>False</DeployExtension>
     <IsProductComponent>true</IsProductComponent>
-    <VsixInputFileLocation>$(TestPlatformRoot)artifacts\$(Configuration)\$(TargetNetFxVersion)\win7-x64</VsixInputFileLocation>
+    <VsixInputFileLocation>$(TestPlatformRoot)artifacts\$(Configuration)\$(NetFrameworkMinimum)\win7-x64</VsixInputFileLocation>
     <OutputPath>$(TestPlatformRoot)artifacts\$(Configuration)\VSIX</OutputPath>
     <ExtensionInstallationFolder>TestPlatform</ExtensionInstallationFolder>
     <ExtensionInstallationRelativeToVS>[installDir]\Common7\IDE\Extensions\TestPlatform</ExtensionInstallationRelativeToVS>

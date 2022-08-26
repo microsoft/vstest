@@ -5,13 +5,13 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;netstandard2.0;$(TargetNetFxVersion)</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0;netstandard2.0;$(NetFrameworkMinimum)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.AdapterUtilities</AssemblyName>
     <RootNamespace>Microsoft.TestPlatform.AdapterUtilities</RootNamespace>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == '$(TargetNetFxVersion)'">
+  <PropertyGroup Condition="'$(TargetFramework)' == '$(NetFrameworkMinimum)'">
     <RuntimeIdentifier>any</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
