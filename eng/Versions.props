@@ -83,8 +83,8 @@
          where Rolsyn is not installed. -->
     <MicrosoftCodeAnalysisVersion>3.8.0-3.20427.2</MicrosoftCodeAnalysisVersion>
     <MicrosoftInternalCodeCoverageVersion>17.4.4-beta.22426.1</MicrosoftInternalCodeCoverageVersion>
-    <MicrosoftDiagnosticsNETCoreClientVersion>0.2.0-preview.21508.1</MicrosoftDiagnosticsNETCoreClientVersion>
-    <MicrosoftSourceBuildIntermediatediagnosticsVersion>5.0.0-preview.21508.1</MicrosoftSourceBuildIntermediatediagnosticsVersion>
+    <MicrosoftDiagnosticsNETCoreClientVersion>0.2.0-preview.22424.1</MicrosoftDiagnosticsNETCoreClientVersion>
+    <MicrosoftSourceBuildIntermediatediagnosticsVersion>6.0.0-preview.22424.1</MicrosoftSourceBuildIntermediatediagnosticsVersion>
     <MicrosoftVisualStudioTelemetryVersion>16.4.78</MicrosoftVisualStudioTelemetryVersion>
     <MicrosoftVisualStudioRemoteControlVersion>16.3.44</MicrosoftVisualStudioRemoteControlVersion>
     <MicrosoftVisualStudioUtilitiesInternalVersion>16.3.36</MicrosoftVisualStudioUtilitiesInternalVersion>
