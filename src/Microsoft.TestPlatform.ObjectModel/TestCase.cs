@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-#if NET7_0_OR_GREATER
 using System.Globalization;
-#endif
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -270,11 +268,7 @@ public sealed class TestCase : TestObject
                 }
                 else if (value is string guidString)
                 {
-#if NET7_0_OR_GREATER
-                    Id = Guid.Parse(guidString, CultureInfo.InvariantCulture);
-#else
-                    Id = Guid.Parse(guidString);
-#endif
+                    Id = GuidPolyfill.Parse(guidString, CultureInfo.InvariantCulture);
                 }
                 else
                 {
