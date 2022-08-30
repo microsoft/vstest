@@ -69,31 +69,34 @@ internal class Program
             Path.Combine(playground, "MSTest1", "bin", "Debug", "net5.0", "MSTest1.dll"),
         };
 
-        // console mode
-        var settingsFile = Path.GetTempFileName();
-        try
-        {
-            File.WriteAllText(settingsFile, sourceSettings);
-            var processStartInfo = new ProcessStartInfo
-            {
-                FileName = console,
-                Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile} --listtests",
-                UseShellExecute = false,
-            };
-            EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
-            var process = Process.Start(processStartInfo);
-            process.WaitForExit();
-            if (process.ExitCode != 0)
-            {
-                throw new Exception($"Process failed with {process.ExitCode}");
-            }
-        }
-        finally
-        {
-            try { File.Delete(settingsFile); } catch { }
-        }
+        // Uncomment when providing command line parameters is easier for you
+        // than converting them to settings, or when you debug command line scenario specifically.
+        //// console mode
+        //var settingsFile = Path.GetTempFileName();
+        //try
+        //{
+        //    File.WriteAllText(settingsFile, sourceSettings);
+        //    var processStartInfo = new ProcessStartInfo
+        //    {
+        //        FileName = console,
+        //        Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile} --listtests",
+        //        UseShellExecute = false,
+        //    };
+        //    EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
+        //    var process = Process.Start(processStartInfo);
+        //    process.WaitForExit();
+        //    if (process.ExitCode != 0)
+        //    {
+        //        throw new Exception($"Process failed with {process.ExitCode}");
+        //    }
+        //}
+        //finally
+        //{
+        //    try { File.Delete(settingsFile); } catch { }
+        //}
 
         // design mode
+        var detailedOutput = true;
         var consoleOptions = new ConsoleParameters
         {
             EnvironmentVariables = EnvironmentVariables.Variables,
@@ -110,7 +113,7 @@ internal class Program
         //// TestSessions
         // r.StartTestSession(sources, sourceSettings, sessionHandler);
 #pragma warning restore CS0618 // Type or member is obsolete
-        var discoveryHandler = new PlaygroundTestDiscoveryHandler();
+        var discoveryHandler = new PlaygroundTestDiscoveryHandler(detailedOutput);
         var sw = Stopwatch.StartNew();
         // Discovery
         r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
@@ -118,13 +121,13 @@ internal class Program
         Console.WriteLine($"Discovery done in {discoveryDuration} ms");
         sw.Restart();
         // Run with test cases and custom testhost launcher
-        r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput), new DebuggerTestHostLauncher());
         //// Run with test cases and without custom testhost launcher
-        //r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
+        //r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
         //// Run with sources and custom testhost launcher
-        //r.RunTestsWithCustomTestHost(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(), new DebuggerTestHostLauncher());
+        //r.RunTestsWithCustomTestHost(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput), new DebuggerTestHostLauncher());
         //// Run with sources
-        //r.RunTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler());
+        //r.RunTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
         var rd = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery: {discoveryDuration} ms, Run: {rd} ms, Total: {discoveryDuration + rd} ms");
         Console.WriteLine($"Settings:\n{sourceSettings}");
@@ -133,13 +136,22 @@ internal class Program
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
     {
         private int _testCasesCount;
+        private readonly bool _detailedOutput;
+
+        public PlaygroundTestDiscoveryHandler(bool detailedOutput)
+        {
+            _detailedOutput = detailedOutput;
+        }
 
         public List<TestCase> TestCases { get; internal set; } = new List<TestCase>();
 
         public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
         {
-            Console.WriteLine($"[DISCOVERY.PROGRESS]");
-            Console.WriteLine(WriteTests(discoveredTestCases));
+            if (_detailedOutput)
+            {
+                Console.WriteLine($"[DISCOVERY.PROGRESS]");
+                Console.WriteLine(WriteTests(discoveredTestCases));
+            }
             _testCasesCount += discoveredTestCases.Count();
             if (discoveredTestCases != null) { TestCases.AddRange(discoveredTestCases); }
         }
@@ -147,16 +159,22 @@ internal class Program
         public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase>? lastChunk, bool isAborted)
         {
             Console.WriteLine($"[DISCOVERY.COMPLETE] aborted? {isAborted}, tests count: {totalTests}");
-            Console.WriteLine("Last chunk:");
-            Console.WriteLine(WriteTests(lastChunk));
+            if (_detailedOutput)
+            {
+                Console.WriteLine("Last chunk:");
+                Console.WriteLine(WriteTests(lastChunk));
+            }
             if (lastChunk != null) { TestCases.AddRange(lastChunk); }
         }
 
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
         {
             Console.WriteLine($"[DISCOVERY.COMPLETE] aborted? {discoveryCompleteEventArgs.IsAborted}, tests count: {discoveryCompleteEventArgs.TotalCount}, discovered count: {_testCasesCount}");
-            Console.WriteLine("Last chunk:");
-            Console.WriteLine(WriteTests(lastChunk));
+            if (_detailedOutput)
+            {
+                Console.WriteLine("Last chunk:");
+                Console.WriteLine(WriteTests(lastChunk));
+            }
             Console.WriteLine("Fully discovered:");
             Console.WriteLine(WriteSources(discoveryCompleteEventArgs.FullyDiscoveredSources));
             Console.WriteLine("Partially discovered:");
@@ -191,9 +209,11 @@ internal class Program
 
     public class TestRunHandler : ITestRunEventsHandler
     {
+        private readonly bool _detailedOutput;
 
-        public TestRunHandler()
+        public TestRunHandler(bool detailedOutput)
         {
+            _detailedOutput = detailedOutput;
         }
 
         public void HandleLogMessage(TestMessageLevel level, string? message)
@@ -203,19 +223,28 @@ internal class Program
 
         public void HandleRawMessage(string rawMessage)
         {
-            Console.WriteLine($"[RUN.MESSAGE]: {rawMessage}");
+            if (_detailedOutput)
+            {
+                Console.WriteLine($"[RUN.MESSAGE]: {rawMessage}");
+            }
         }
 
         public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris)
         {
             Console.WriteLine($"[RUN.COMPLETE]: err: {testRunCompleteArgs.Error}, lastChunk:");
-            Console.WriteLine(WriteTests(lastChunkArgs?.NewTestResults));
+            if (_detailedOutput)
+            {
+                Console.WriteLine(WriteTests(lastChunkArgs?.NewTestResults));
+            }
         }
 
         public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
         {
-            Console.WriteLine($"[RUN.PROGRESS]");
-            Console.WriteLine(WriteTests(testRunChangedArgs?.NewTestResults));
+            if (_detailedOutput)
+            {
+                Console.WriteLine($"[RUN.PROGRESS]");
+                Console.WriteLine(WriteTests(testRunChangedArgs?.NewTestResults));
+            }
         }
 
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
@@ -260,6 +289,7 @@ internal class Program
 
 internal class TestSessionHandler : ITestSessionEventsHandler
 {
+    public TestSessionHandler() { }
     public TestSessionInfo? TestSessionInfo { get; private set; }
 
     public void HandleLogMessage(TestMessageLevel level, string? message)
