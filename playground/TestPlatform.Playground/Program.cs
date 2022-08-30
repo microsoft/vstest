@@ -60,7 +60,23 @@ internal class Program
                   <Settings />
                 </SolutionSettings>
                 <ProjectSettings />
-              </GoogleTestAdapterSettings>
+                </GoogleTestAdapterSettings>
+
+                <!-- Blame hang -->
+                <!-- <LoggerRunSettings>
+                  <Loggers>
+                    <Logger friendlyName="blame" enabled="True" />
+                  </Loggers>
+                </LoggerRunSettings>
+                <DataCollectionRunSettings>
+                  <DataCollectors>
+                    <DataCollector friendlyName="blame" enabled="True">
+                      <Configuration>
+                        <CollectDumpOnTestSessionHang TestTimeout="10s" HangDumpType="Full" />
+                      </Configuration>
+                    </DataCollector>
+                  </DataCollectors>
+                </DataCollectionRunSettings> -->
             </RunSettings>
             """;
 
