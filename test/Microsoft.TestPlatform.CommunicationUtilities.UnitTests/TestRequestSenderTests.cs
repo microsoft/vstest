@@ -471,6 +471,18 @@ public class TestRequestSenderTests
     }
 
     [TestMethod]
+    public void DiscoverTestShouldNotifyDiscoveryCompleteIfClientDisconnectedBeforeDiscovery()
+    {
+        SetupFakeCommunicationChannel();
+
+        RaiseClientDisconnectedEvent();
+
+        _testRequestSender.DiscoverTests(new DiscoveryCriteria(), _mockDiscoveryEventsHandler.Object);
+
+        _mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(It.Is<DiscoveryCompleteEventArgs>(dc => dc.IsAborted == true && dc.TotalCount == -1), null));
+    }
+
+    [TestMethod]
     public void DiscoverTestShouldNotifyDiscoveryCompleteIfClientDisconnected()
     {
         SetupFakeCommunicationChannel();

@@ -40,6 +40,7 @@ public class TestRequestSender : ITestRequestSender
 
     private ICommunicationChannel? _channel;
     private EventHandler<MessageReceivedEventArgs>? _onMessageReceived;
+    private DisconnectedEventArgs? _disconnectedInfo;
     private Action<DisconnectedEventArgs>? _onDisconnected;
     // Set to 1 if Discovery/Execution is complete, i.e. complete handlers have been invoked
     private int _operationCompleted;
@@ -151,14 +152,29 @@ public class TestRequestSender : ITestRequestSender
         };
 
         _communicationEndpoint.Disconnected += (sender, args) =>
+        {
+            // Store the disconnected info, so that any further DiscoverTests,
+            // RunTests methods can immediately bail.
+            _disconnectedInfo = args;
+
             // If there's an disconnected event handler, call it
-            _onDisconnected?.Invoke(args);
+            InvokeDisconnectedHandler(args);
+        };
 
         // Server start returns the listener port
         // return int.Parse(this.communicationServer.Start());
         var endpoint = _communicationEndpoint.Start(_connectionInfo.Endpoint);
         // TODO: This is forcing us to use IP address and port for communication
         return endpoint.GetIpEndPoint().Port;
+    }
+
+    private void InvokeDisconnectedHandler(DisconnectedEventArgs args)
+    {
+        // Note: If the endpoint is disconnected at the same time as the
+        //       disconnected handler is setup, it's possible for this method
+        //       to be invoked twice. Ensure that the handler ever gets invoked once.
+        var handler = Interlocked.Exchange(ref _onDisconnected, null);
+        handler?.Invoke(args);
     }
 
     /// <inheritdoc />
@@ -273,6 +289,13 @@ public class TestRequestSender : ITestRequestSender
         _onDisconnected = disconnectedEventArgs => OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, getClientError: !_isDiscoveryAborted);
         _onMessageReceived = (sender, args) => OnDiscoveryMessageReceived(discoveryEventsHandler, args);
 
+        // If the testhost was already disconnected, trigger the handler immediately.
+        if (_disconnectedInfo is not null)
+        {
+            InvokeDisconnectedHandler(_disconnectedInfo);
+            return;
+        }
+
         _channel.MessageReceived += _onMessageReceived;
         var message = _dataSerializer.SerializePayload(
             MessageType.StartDiscovery,
@@ -325,6 +348,13 @@ public class TestRequestSender : ITestRequestSender
         _onMessageReceived = (sender, args) => OnExecutionMessageReceived(args, eventHandler);
         _channel.MessageReceived += _onMessageReceived;
 
+        // If the testhost was already disconnected, trigger the handler immediately.
+        if (_disconnectedInfo is not null)
+        {
+            InvokeDisconnectedHandler(_disconnectedInfo);
+            return;
+        }
+
         // This code section is needed because we altered the old testhost launch process for
         // the debugging workflow. Now we don't ask VS to launch and attach to the testhost
         // process for us as we previously did, instead we launch it as a standalone process
@@ -364,6 +394,13 @@ public class TestRequestSender : ITestRequestSender
 
         _onMessageReceived = (sender, args) => OnExecutionMessageReceived(args, eventHandler);
         _channel.MessageReceived += _onMessageReceived;
+
+        // If the testhost was already disconnected, trigger the handler immediately.
+        if (_disconnectedInfo is not null)
+        {
+            InvokeDisconnectedHandler(_disconnectedInfo);
+            return;
+        }
 
         // This code section is needed because we altered the old testhost launch process for
         // the debugging workflow. Now we don't ask VS to launch and attach to the testhost
