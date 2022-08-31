@@ -637,20 +637,20 @@ public class TestRequestSender : ITestRequestSender
         SetOperationComplete();
 
         var reason = GetAbortErrorMessage(exception, getClientError);
-        // If it isn't a genaric reason then, log it dispite if blame enabled or no.
+        // If it isn't a generic reason then, log it dispite if blame enabled or no.
         if (reason != "Test host process crashed")
         {
             EqtTrace.Error("TestRequestSender: Aborting test run because {0}", reason);
             LogErrorMessage(string.Format(CultureInfo.CurrentCulture, CommonResources.AbortedTestRun, reason));
 
         }
-        // If it's a genaric reason if blame not enabled ask the user to enable it for more details. 
+        // If it's a generic reason if blame not enabled ask the user to enable it for more details. 
         else if (!BlameIsEnabled())
         {
             EqtTrace.Error("TestRequestSender: Aborting test run");
             LogErrorMessage(string.Format(CultureInfo.CurrentCulture, "The active test run was aborted. Use blame for more details."));
         }
-        //If blame enabled and it's agenaric reason just add the log without reason.
+        //If blame enabled and it's ageneric reason just add the log without reason.
         else
         {
             EqtTrace.Error("TestRequestSender: Aborting test run");
