@@ -612,10 +612,14 @@ public class TestRequestSender : ITestRequestSender
             OnDiscoveryAbort(discoveryEventsHandler, ex, false);
         }
     }
-    private static bool BlameIsEnabled()
+    private static bool IsBlameEnabled()
     {
-        string? s = RunSettingsManager.Instance.ActiveRunSettings.SettingsXml;
-        DataCollectionRunSettings dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(s)!;
+        string? runSettingsXml = RunSettingsManager.Instance.ActiveRunSettings.SettingsXml;
+        DataCollectionRunSettings? dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(runSettingsXml);
+
+        if (dataCollectionRunSettings is null)
+            return false;
+
         foreach (var item in dataCollectionRunSettings.DataCollectorSettingsList)
         {
             if (item.FriendlyName?.ToLowerInvariant() == "blame" && item.IsEnabled)
@@ -623,6 +627,7 @@ public class TestRequestSender : ITestRequestSender
                 return true;
             }
         }
+
         return false;
     }
     private void OnTestRunAbort(IInternalTestRunEventsHandler testRunEventsHandler, Exception? exception, bool getClientError)
@@ -642,10 +647,9 @@ public class TestRequestSender : ITestRequestSender
         {
             EqtTrace.Error("TestRequestSender: Aborting test run because {0}", reason);
             LogErrorMessage(string.Format(CultureInfo.CurrentCulture, CommonResources.AbortedTestRun, reason));
-
         }
         // If it's a generic reason if blame not enabled ask the user to enable it for more details. 
-        else if (!BlameIsEnabled())
+        else if (!IsBlameEnabled())
         {
             EqtTrace.Error("TestRequestSender: Aborting test run");
             LogErrorMessage(string.Format(CultureInfo.CurrentCulture, "The active test run was aborted. Use blame for more details."));
