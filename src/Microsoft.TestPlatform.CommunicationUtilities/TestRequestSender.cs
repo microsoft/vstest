@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Threading;
 
+using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
@@ -15,6 +17,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
@@ -609,7 +612,19 @@ public class TestRequestSender : ITestRequestSender
             OnDiscoveryAbort(discoveryEventsHandler, ex, false);
         }
     }
-
+    private static bool BlameIsEnabled()
+    {
+        string? s = RunSettingsManager.Instance.ActiveRunSettings.SettingsXml;
+        DataCollectionRunSettings dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(s)!;
+        foreach (var item in dataCollectionRunSettings.DataCollectorSettingsList)
+        {
+            if (item.FriendlyName?.ToLowerInvariant() == "blame" && item.IsEnabled)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     private void OnTestRunAbort(IInternalTestRunEventsHandler testRunEventsHandler, Exception? exception, bool getClientError)
     {
         if (IsOperationComplete())
@@ -622,8 +637,25 @@ public class TestRequestSender : ITestRequestSender
         SetOperationComplete();
 
         var reason = GetAbortErrorMessage(exception, getClientError);
-        EqtTrace.Error("TestRequestSender: Aborting test run because {0}", reason);
-        LogErrorMessage(string.Format(CultureInfo.CurrentCulture, CommonResources.AbortedTestRun, reason));
+        // If it isn't a genaric reason then, log it dispite if blame enabled or no.
+        if (reason != "Test host process crashed")
+        {
+            EqtTrace.Error("TestRequestSender: Aborting test run because {0}", reason);
+            LogErrorMessage(string.Format(CultureInfo.CurrentCulture, CommonResources.AbortedTestRun, reason));
+
+        }
+        // If it's a genaric reason if blame not enabled ask the user to enable it for more details. 
+        else if (!BlameIsEnabled())
+        {
+            EqtTrace.Error("TestRequestSender: Aborting test run");
+            LogErrorMessage(string.Format(CultureInfo.CurrentCulture, "The active test run was aborted. Use blame for more details."));
+        }
+        //If blame enabled and it's agenaric reason just add the log without reason.
+        else
+        {
+            EqtTrace.Error("TestRequestSender: Aborting test run");
+            LogErrorMessage(string.Format(CultureInfo.CurrentCulture, "The active test run was aborted."));
+        }
 
         // notify test run abort to vstest console wrapper.
         var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, null, TimeSpan.Zero);

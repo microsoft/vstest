@@ -215,8 +215,8 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
         var message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.InactivityTimeout, value, unit);
 
-        EqtTrace.Warning(message);
-        _logger.LogWarning(_context.SessionDataCollectionContext, message);
+        EqtTrace.Error(message);
+        _logger.LogError(_context.SessionDataCollectionContext, message);
 
         try
         {
