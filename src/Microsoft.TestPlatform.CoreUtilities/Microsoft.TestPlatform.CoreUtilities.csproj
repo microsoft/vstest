@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.CoreUtilities</AssemblyName>
-    <TargetFrameworks>net7.0;net6.0;netstandard2.0;$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks>net7.0;net6.0;netstandard2.0;$(NetFrameworkMinimum);$(NetCoreAppMinimum)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0;</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
@@ -15,7 +15,7 @@
     <EmbeddedResource Include="Resources\Resources.resx" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' ">
     <Reference Include="System.Configuration" />
     <Reference Include="System" />
     <Reference Include="System.IO" />
@@ -24,7 +24,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' != '$(TargetNetFxVersion)' ">
+  <ItemGroup Condition=" '$(TargetFramework)' != '$(NetFrameworkMinimum)' ">
     <PackageReference Include="System.Diagnostics.FileVersionInfo" Version="4.3.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.0.0" />
   </ItemGroup>

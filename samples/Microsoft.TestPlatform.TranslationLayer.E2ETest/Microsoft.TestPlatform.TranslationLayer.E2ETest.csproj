@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>$(TargetNetFxVersion)</TargetFramework>
+    <TargetFramework>$(NetFrameworkMinimum)</TargetFramework>
     <AssemblyName>Microsoft.TestPlatform.TranslationLayer.E2ETest</AssemblyName>
     <OutputType>Exe</OutputType>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
@@ -14,7 +14,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' ">
     <ProjectReference Include="..\UnitTestProject\UnitTestProject.csproj" />
     <Reference Include="System" />
     <Reference Include="System.Runtime" />

@@ -7,7 +7,7 @@
 
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.ObjectModel</AssemblyName>
-    <TargetFrameworks>net7.0;$(TargetNetFxVersion);$(TargetNetCoreVersion);netstandard2.0;</TargetFrameworks>
+    <TargetFrameworks>net7.0;$(NetFrameworkMinimum);$(NetCoreAppMinimum);netstandard2.0;</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0;</TargetFrameworks>
     <PackageId>Microsoft.TestPlatform.ObjectModel</PackageId>
   </PropertyGroup>
@@ -16,7 +16,7 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' ">
     <Reference Include="System.Xml" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Runtime" />

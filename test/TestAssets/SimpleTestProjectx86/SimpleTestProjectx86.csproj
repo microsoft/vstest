@@ -13,7 +13,7 @@
 
   <PropertyGroup>
     <AssemblyName>SimpleTestProjectx86</AssemblyName>
-    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkMinimum);$(NetCoreAppMinimum)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <OutputType Condition="$(NetCoreAppTargetFrameWork) == 'true' ">Exe</OutputType>

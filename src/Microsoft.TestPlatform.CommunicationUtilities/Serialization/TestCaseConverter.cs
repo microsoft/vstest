@@ -73,12 +73,7 @@ public class TestCaseConverter : JsonConverter
             switch (testProperty.Id)
             {
                 case "TestCase.Id":
-                    testCase.Id =
-#if NET7_0_OR_GREATER
-                        Guid.Parse(propertyData!, CultureInfo.InvariantCulture);
-#else
-                        Guid.Parse(propertyData!);
-#endif
+                    testCase.Id = GuidPolyfill.Parse(propertyData!, CultureInfo.InvariantCulture);
                     break;
                 case "TestCase.ExecutorUri":
                     testCase.ExecutorUri = new Uri(propertyData!); break;

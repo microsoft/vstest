@@ -124,10 +124,10 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\Microsoft.VisualStudio.TestPlatform.Common.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\testhost.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\testhost.exe" />
+      <BinariesToSign Include="$(ArtifactsDirectory)TestHostNet\testhost.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\win10-arm64\Microsoft.TestPlatform.PlatformAbstractions.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHostNet\win10-arm64\testhost.arm64.dll" />
-      <NativeBinariesToSign Include="$(ArtifactsDirectory)TestHostNet\win10-arm64\testhost.arm64.exe" />
+      <BinariesToSign Include="$(ArtifactsDirectory)TestHostNet\win10-arm64\testhost.arm64.exe" />
 
       <!-- Localized resources -->
       <AssembliesToSign Include="$(ArtifactsDirectory)%(ResxLang.Identity)\*.*" />
@@ -157,7 +157,7 @@
       <NativeBinariesToSign Include="$(ArtifactsCore31Directory)Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.arm64.dll" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)testhost.dll" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)vstest.console.dll" />
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)vstest.console.exe" />
+      <BinariesToSign Include="$(ArtifactsCore31Directory)vstest.console.exe" />
 
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\Microsoft.TestPlatform.CommunicationUtilities.dll" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\Microsoft.TestPlatform.CoreUtilities.dll" />
@@ -185,7 +185,7 @@
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net472.arm64.exe" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\testhost.net48.arm64.exe" />
 
-      <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)datacollector.exe" />
+      <BinariesToSign Include="$(ArtifactsCore31Directory)datacollector.exe" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\datacollector.exe" />
       <Core31AssembliesToSign Include="$(ArtifactsCore31Directory)TestHostNetFramework\datacollector.arm64.exe" />
 
@@ -223,19 +223,22 @@
     <ItemGroup>
       <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\netstandard2.0\Microsoft.TestPlatform.Build.dll" />
       <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\netstandard2.0\%(ResxLang.Identity)\*.*" />
+      
+      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\net7.0\Microsoft.TestPlatform.Build.dll" />
+      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\net7.0\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
     <!-- Sign Microsoft.TestPlatform.TestHost -->
     <ItemGroup>
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\testhost.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\testhost.exe" />
-      <NativeBinariesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win7-x64\testhost.exe" />
+      <BinariesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\testhost.exe" />
+      <BinariesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win7-x64\testhost.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win7-x64\testhost.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win7-x64\Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <NativeBinariesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win7-x86\testhost.x86.exe" />
+      <BinariesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win7-x86\testhost.x86.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win7-x86\testhost.x86.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win7-x86\Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <NativeBinariesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win10-arm64\testhost.arm64.exe" />
+      <BinariesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win10-arm64\testhost.arm64.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win10-arm64\testhost.arm64.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\win10-arm64\Microsoft.TestPlatform.PlatformAbstractions.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp3.1\Microsoft.TestPlatform.CommunicationUtilities.dll" />
@@ -316,6 +319,10 @@
         <Authenticode>Microsoft400</Authenticode>
       </NativeBinariesToSign>
 
+      <BinariesToSign>
+        <Authenticode>Microsoft400</Authenticode>
+      </BinariesToSign>
+
       <ThirdPartyAssembliesToSign>
         <Authenticode>3PartySHA2</Authenticode>
       </ThirdPartyAssembliesToSign>
@@ -329,6 +336,12 @@
 
     <Message Text="Signing native libraries using authenticode certificate '%(NativeBinariesToSign.Authenticode)' for @(NativeBinariesToSign)"/>
     <SignFiles Files="@(NativeBinariesToSign)"
+               BinariesDirectory="$(ArtifactsBaseDirectory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing executables without strong name using authenticode certificate '%(BinariesToSign.Authenticode)' for @(BinariesToSign)"/>
+    <SignFiles Files="@(BinariesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />

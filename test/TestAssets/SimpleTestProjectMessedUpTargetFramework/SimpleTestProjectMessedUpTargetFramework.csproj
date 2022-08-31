@@ -4,7 +4,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks>$(NetCoreAppMinimum)</TargetFrameworks>
     <TestProject>true</TestProject>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>

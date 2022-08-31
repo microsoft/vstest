@@ -3,7 +3,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkMinimum);$(NetCoreAppMinimum)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <LangVersion>Preview</LangVersion>
@@ -20,7 +20,7 @@
       <Version>$(NETTestSdkVersion)</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' ">
     <Reference Include="System.Runtime" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
