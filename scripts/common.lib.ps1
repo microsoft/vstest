@@ -361,12 +361,12 @@ function Start-InlineProcess {
     $outputHandler = [ProcessOutputter]::new("White", "Yellow", "Red", $SuppressOutput.IsPresent)
     $errorHandler = [ProcessOutputter]::new("White", "Yellow", "Red", $SuppressOutput.IsPresent)
     $outputDataReceived = $outputHandler.OutputHandler
-    $errorDataReceivedEvent = $errorHandler.OutputHandler
+    $errorDataReceived = $errorHandler.OutputHandler
 
     $process = New-Object System.Diagnostics.Process
     $process.EnableRaisingEvents = $true
     $process.add_OutputDataReceived($outputDataReceived)
-    $process.add_ErrorDataReceived($errorDataReceivedEvent)
+    $process.add_ErrorDataReceived($errorDataReceived)
 
     try {
         $process.StartInfo = $processInfo
