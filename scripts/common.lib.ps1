@@ -105,12 +105,18 @@ function Install-DotNetCli
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
 
+    $x64Architecture = "x64"
+    if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64")
+    {
+        $x64Architecture = "arm64"
+    }
+
     # Runtime versions installed usually need to be kept in sync with the ones installed in build.sh
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '2.1' -Architecture x64 -NoPath # Install the latest patch
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '3.1' -Architecture x64 -NoPath # Install the latest patch
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '5.0' -Architecture x64 -NoPath # Install the latest patch
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '6.0' -Architecture x64 -NoPath # Install the latest patch
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Channel '7.0' -Architecture x64 -NoPath -Version $env:DOTNET_CLI_VERSION
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '2.1' -Architecture $x64Architecture -NoPath # Install the latest patch
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '3.1' -Architecture $x64Architecture -NoPath # Install the latest patch
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '5.0' -Architecture $x64Architecture -NoPath # Install the latest patch
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '6.0' -Architecture $x64Architecture -NoPath # Install the latest patch
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Channel '7.0' -Architecture $x64Architecture -NoPath -Version $env:DOTNET_CLI_VERSION
 
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '2.1' -Architecture x86 -NoPath # Install the latest patch
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '3.1' -Architecture x86 -NoPath # Install the latest patch
@@ -126,7 +132,7 @@ function Install-DotNetCli
     "---- dotnet environment variables"
     Get-ChildItem "Env:\dotnet_*"
 
-    "`n`n---- x64 dotnet"
+    "`n`n---- $x64Architecture dotnet"
     Invoke-Exe "$env:DOTNET_ROOT\dotnet.exe" -Arguments "--info"
 
     "`n`n---- x86 dotnet"
