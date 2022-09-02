@@ -23,7 +23,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.TestHostProvider\Properties\TestExtensionTypesAttribute.cs" Link="Properties\TestExtensionTypesAttribute.cs" />
-    <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
+    <Compile Include="$(TestPlatformRoot)shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
+    <Compile Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.AdapterUtilities\HierarchyConstants.cs" Link="HierarchyConstants.cs" />
+    <Compile Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.AdapterUtilities\ManagedNameConstants.cs" Link="ManagedNameConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />

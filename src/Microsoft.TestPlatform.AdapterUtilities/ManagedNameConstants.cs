@@ -6,7 +6,11 @@ namespace Microsoft.TestPlatform.AdapterUtilities;
 /// <summary>
 /// Contants to help declare ManagedType and ManagedMethod test properties.
 /// </summary>
+#if PUBLIC_CONSTS
 public static class ManagedNameConstants
+#else
+internal static class ManagedNameConstants
+#endif
 {
     /// <summary>
     /// Label to use on ManagedType test property.

@@ -8,8 +8,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
+using Microsoft.TestPlatform.AdapterUtilities;
 using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -192,28 +194,56 @@ public class HtmlLogger : ITestLoggerWithParameters
     {
         ValidateArg.NotNull(e, nameof(e));
         TPDebug.Assert(ResultCollectionDictionary != null && TestRunDetails != null && Results != null && ResultCollectionByClass != null, "Initialize must be called before this method.");
-        int idx = e.Result.TestCase.FullyQualifiedName.IndexOf('.');
-        /*
-         1. will add getting namespace/classname from Hierarchy
-         */
+        var testCase = e.Result.TestCase;
+        int idx = testCase.FullyQualifiedName.IndexOf('.');
+
+        string? namespaceName = null;
         string? className = null;
 
-        var property = TestProperty.Find("TestCase.ManagedType");
-        if (property is not null)
+        // Get namespace and class name from hierarchyProperty.
+        var hierarchyProperty = testCase.Properties.SingleOrDefault(p => p.Id == HierarchyConstants.HierarchyPropertyId);
+        if (hierarchyProperty is not null)
         {
-            className = e.Result.TestCase.GetPropertyValue<string>(property, null)?.ToString();
-        }
-        idx = idx == -1 ? idx : e.Result.TestCase.FullyQualifiedName.IndexOf('.'); // get the second occerance
+            var hierarchy = (string[])testCase.GetPropertyValue(hierarchyProperty)!;
 
-        className = className == null && idx != -1 ? e.Result.TestCase.FullyQualifiedName.Remove(idx) : className;
+            if (hierarchy.Length == HierarchyConstants.Levels.TotalLevelCount)
+            {
+                namespaceName = hierarchy[HierarchyConstants.Levels.NamespaceIndex];
+                className = hierarchy[HierarchyConstants.Levels.ClassIndex];
+            }
+        }
+
+        // If namespace still null will get the names from managedTypeProperty.
+        if (namespaceName is null)
+        {
+            var managedTypeProperty = testCase.Properties.SingleOrDefault(p => p.Id == ManagedNameConstants.ManagedTypePropertyId);
+            if (managedTypeProperty is not null)
+            {
+                var managedType = (string)testCase.GetPropertyValue(managedTypeProperty)!;
+
+                var dotIndex = managedType.LastIndexOf(".");
+                namespaceName = managedType.Substring(0, dotIndex);
+                className = managedType.Substring(dotIndex + 1);
+            }
+        }
+
+        //If namespace still null will get the names from fullyQualifiedName.
+        if (namespaceName is null)
+        {
+            var fqn = testCase.FullyQualifiedName.Substring(0, testCase.FullyQualifiedName.LastIndexOf("."));
+            var dotIndex = fqn.LastIndexOf(".");
+
+            namespaceName = fqn.Substring(0, dotIndex);
+            className = fqn.Substring(dotIndex + 1);
+        }
 
         var testResult = new ObjectModel.TestResult
         {
             DisplayName = e.Result.DisplayName ?? e.Result.TestCase.FullyQualifiedName,
             FullyQualifiedName = e.Result.TestCase.FullyQualifiedName,
-            //get the class and namespace to group results by them
             ErrorStackTrace = e.Result.ErrorStackTrace,
-            NamespaceAndClassName = className == null ? e.Result.TestCase.FullyQualifiedName : className,
+            // Get the class and namespace to group the results by them.
+            NamespaceAndClassName = String.Concat(namespaceName, ".", className),
             ErrorMessage = e.Result.ErrorMessage,
             TestResultId = e.Result.TestCase.Id,
             Duration = GetFormattedDurationString(e.Result.Duration),

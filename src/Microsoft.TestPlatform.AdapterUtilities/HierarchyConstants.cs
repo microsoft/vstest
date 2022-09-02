@@ -6,7 +6,11 @@ namespace Microsoft.TestPlatform.AdapterUtilities;
 /// <summary>
 /// Constants to help declare Hierarchy test property.
 /// </summary>
+#if PUBLIC_CONSTS
 public static class HierarchyConstants
+#else
+internal static class HierarchyConstants
+#endif
 {
     /// <summary>
     /// Label to use on Hierarchy test property.

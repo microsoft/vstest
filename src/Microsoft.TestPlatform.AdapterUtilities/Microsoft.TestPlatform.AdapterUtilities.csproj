@@ -10,6 +10,7 @@
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.AdapterUtilities</AssemblyName>
     <RootNamespace>Microsoft.TestPlatform.AdapterUtilities</RootNamespace>
+    <DefineConstants>$(DefineConstants);PUBLIC_CONSTS</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
