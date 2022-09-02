@@ -150,4 +150,13 @@
   <data name="AbortedTestDiscoveryWithReason" xml:space="preserve">
     <value>The active test discovery was aborted. Reason: {0}</value>
   </data>
+  <data name="AbortedTestRunWithoutReason" xml:space="preserve">
+    <value>The active test run was aborted.</value>
+  </data>
+  <data name="SuggestingLookAtBlameLogs" xml:space="preserve">
+    <value>This is likely caused by a crash or hang, blame was enabled please look at the blame messages below.</value>
+  </data>
+  <data name="SuggestingUsingBlame" xml:space="preserve">
+    <value>This is likely caused by a crash or hang, use the blame argument to get more details.</value>
+  </data>
 </root>

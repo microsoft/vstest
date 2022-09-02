@@ -10,7 +10,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
     using System;
-    using System.Reflection;
     
     
     /// <summary>
@@ -20,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -40,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -89,6 +88,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The active test run was aborted..
+        /// </summary>
+        public static string AbortedTestRunWithoutReason {
+            get {
+                return ResourceManager.GetString("AbortedTestRunWithoutReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot attach the debugger to the default test host..
         /// </summary>
         public static string AttachDebuggerToDefaultTestHostFailure {
@@ -112,6 +120,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         public static string ConnectionTimeoutErrorMessage {
             get {
                 return ResourceManager.GetString("ConnectionTimeoutErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is likely caused by a crash or hang, blame was enabled please look at the blame messages below..
+        /// </summary>
+        public static string SuggestingLookAtBlameLogs {
+            get {
+                return ResourceManager.GetString("SuggestingLookAtBlameLogs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is likely caused by a crash or hang, use the blame argument to get more details..
+        /// </summary>
+        public static string SuggestingUsingBlame {
+            get {
+                return ResourceManager.GetString("SuggestingUsingBlame", resourceCulture);
             }
         }
         

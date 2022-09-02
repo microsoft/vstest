@@ -622,7 +622,7 @@ public class TestRequestSender : ITestRequestSender
 
         foreach (var item in dataCollectionRunSettings.DataCollectorSettingsList)
         {
-            if (item.FriendlyName?.ToLowerInvariant() == "blame" && item.IsEnabled)
+            if (item.IsEnabled && string.Equals(item.FriendlyName, "blame", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
@@ -641,24 +641,21 @@ public class TestRequestSender : ITestRequestSender
         EqtTrace.Verbose("TestRequestSender: OnTestRunAbort: Set operation complete.");
         SetOperationComplete();
 
-        var reason = GetAbortErrorMessage(exception, getClientError);
-        // If it isn't a generic reason then, log it dispite if blame enabled or no.
-        if (reason != "Test host process crashed")
+        var abortError = GetAbortErrorMessage(exception, getClientError);
+        var reason = abortError.Item1;
+        bool isGenericReason = abortError.Item2;
+
+        if (!isGenericReason && reason is not null)
         {
             EqtTrace.Error("TestRequestSender: Aborting test run because {0}", reason);
             LogErrorMessage(string.Format(CultureInfo.CurrentCulture, CommonResources.AbortedTestRun, reason));
         }
-        // If it's a generic reason if blame not enabled ask the user to enable it for more details. 
-        else if (!IsBlameEnabled())
-        {
-            EqtTrace.Error("TestRequestSender: Aborting test run");
-            LogErrorMessage(string.Format(CultureInfo.CurrentCulture, "The active test run was aborted. Use blame for more details."));
-        }
-        //If blame enabled and it's ageneric reason just add the log without reason.
         else
         {
+            var blameMessage = IsBlameEnabled() ? CommonResources.SuggestingLookAtBlameLogs : CommonResources.SuggestingUsingBlame;
+
             EqtTrace.Error("TestRequestSender: Aborting test run");
-            LogErrorMessage(string.Format(CultureInfo.CurrentCulture, "The active test run was aborted."));
+            LogErrorMessage(string.Format(CultureInfo.CurrentCulture, CommonResources.AbortedTestRunWithoutReason, blameMessage));
         }
 
         // notify test run abort to vstest console wrapper.
@@ -682,16 +679,22 @@ public class TestRequestSender : ITestRequestSender
         EqtTrace.Verbose("TestRequestSender.OnDiscoveryAbort: Set operation complete.");
         SetOperationComplete();
 
+        var abortError = GetAbortErrorMessage(exception, getClientError);
+        var reason = abortError.Item1;
+        bool isGenericReason = abortError.Item2;
+
         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
-        if (GetAbortErrorMessage(exception, getClientError) is string reason)
+        if (!isGenericReason && reason is not null)
         {
             EqtTrace.Error("TestRequestSender.OnDiscoveryAbort: Aborting test discovery because {0}.", reason);
             LogErrorMessage(string.Format(CultureInfo.CurrentCulture, CommonResources.AbortedTestDiscoveryWithReason, reason));
         }
         else
         {
+            var blameMessage = IsBlameEnabled() ? CommonResources.SuggestingLookAtBlameLogs : CommonResources.SuggestingUsingBlame;
+
             EqtTrace.Error("TestRequestSender.OnDiscoveryAbort: Aborting test discovery.");
-            LogErrorMessage(CommonResources.AbortedTestDiscovery);
+            LogErrorMessage(string.Format(CultureInfo.CurrentCulture, CommonResources.AbortedTestDiscovery, blameMessage));
         }
 
         // Notify discovery abort to IDE test output
@@ -708,7 +711,8 @@ public class TestRequestSender : ITestRequestSender
         eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
     }
 
-    private string? GetAbortErrorMessage(Exception? exception, bool getClientError)
+    // Will return true if it's a generic reason and false otherwise.
+    private (string?, bool) GetAbortErrorMessage(Exception? exception, bool getClientError)
     {
         EqtTrace.Verbose("TestRequestSender.GetAbortErrorMessage: Exception: " + exception);
 
@@ -719,10 +723,13 @@ public class TestRequestSender : ITestRequestSender
         // error output in the ClientExited callback).
         if (!getClientError)
         {
-            return exception?.Message;
+            return (exception?.Message, false);
         }
 
         EqtTrace.Verbose("TestRequestSender.GetAbortErrorMessage: Client has disconnected. Wait for standard error.");
+
+        // I think I can remove the rest of this function becouse if it's a generic resoun we will not view it for the user and will just suggest using blame
+        // and the log we add to the EqtTrace in the below code won't appear in the log
 
         // Wait for test host to exit for a moment
         // TODO: this timeout is 10 seconds, make it also configurable like the other famous timeout that is 100ms
@@ -737,12 +744,12 @@ public class TestRequestSender : ITestRequestSender
                 reason = $"{reason} : {_clientExitErrorMessage}";
             }
 
-            return reason;
+            return (reason, true);
         }
         else
         {
             EqtTrace.Info("TestRequestSender.GetAbortErrorMessage: Timed out waiting for test host error message.");
-            return CommonResources.UnableToCommunicateToTestHost;
+            return (CommonResources.UnableToCommunicateToTestHost, true);
         }
     }
 
