@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities;
 #if PUBLIC_CONSTS
 public static class ManagedNameConstants
 #else
-internal static class ManagedNameConstants
+internal static class ManagedNameConstants /* To linke it inside htmllogger project. */
 #endif
 {
     /// <summary>

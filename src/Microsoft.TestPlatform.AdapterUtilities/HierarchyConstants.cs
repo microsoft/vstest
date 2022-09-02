@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities;
 #if PUBLIC_CONSTS
 public static class HierarchyConstants
 #else
-internal static class HierarchyConstants
+internal static class HierarchyConstants /* To linke it inside htmllogger project. */
 #endif
 {
     /// <summary>
