@@ -20,7 +20,7 @@ internal class DataCollectionTelemetryManager : IDataCollectionTelemetryManager
     private const string ClrIeInstrumentationMethodConfigurationPrefix32Variable = "MicrosoftInstrumentationEngine_ConfigPath32_";
     private const string ClrIeInstrumentationMethodConfigurationPrefix64Variable = "MicrosoftInstrumentationEngine_ConfigPath64_";
 
-    private static readonly Guid ClrIeProfilerGuid = Guid.Parse("{324f817a-7420-4e6d-b3c1-143fbed6d855}");
+    private static readonly Guid ClrIeProfilerGuid = new("{324f817a-7420-4e6d-b3c1-143fbed6d855}");
     private const string OverwrittenProfilerName = "overwritten";
 
     private readonly IRequestData _requestData;

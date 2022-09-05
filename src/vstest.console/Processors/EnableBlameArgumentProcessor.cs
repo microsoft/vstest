@@ -188,7 +188,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         var settings = _runSettingsManager.ActiveRunSettings?.SettingsXml;
 
         // Get results directory from RunSettingsManager
-        var resultsDirectory = GetResultsDirectory(settings);
+        var resultsDirectory = GetResultsDirectory(settings)!;
 
         // Get data collection run settings. Create if not present.
         var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
@@ -205,8 +205,9 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         if (enableCrashDump)
         {
             var dumpParameters = collectDumpParameters
-                .Where(p => new[] { "CollectAlways", "DumpType" }.Contains(p.Key, StringComparer.OrdinalIgnoreCase))
-                .ToDictionary(p => p.Key, p => p.Value, StringComparer.OrdinalIgnoreCase);
+                ?.Where(p => new[] { "CollectAlways", "DumpType" }.Contains(p.Key, StringComparer.OrdinalIgnoreCase))
+                .ToDictionary(p => p.Key, p => p.Value, StringComparer.OrdinalIgnoreCase)
+                ?? new Dictionary<string, string>();
 
             if (!dumpParameters.ContainsKey("DumpType"))
             {
@@ -220,8 +221,9 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         if (enableHangDump)
         {
             var hangDumpParameters = collectDumpParameters
-                .Where(p => new[] { "TestTimeout", "HangDumpType" }.Contains(p.Key, StringComparer.OrdinalIgnoreCase))
-                .ToDictionary(p => p.Key, p => p.Value, StringComparer.OrdinalIgnoreCase);
+                ?.Where(p => new[] { "TestTimeout", "HangDumpType" }.Contains(p.Key, StringComparer.OrdinalIgnoreCase))
+                .ToDictionary(p => p.Key, p => p.Value, StringComparer.OrdinalIgnoreCase)
+                ?? new Dictionary<string, string>();
 
             if (!hangDumpParameters.ContainsKey("TestTimeout"))
             {
@@ -281,7 +283,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// <param name="parameters">Parameters.</param>
     /// <param name="xmlDocument">Xml document.</param>
     /// <param name="outernode">Outer node.</param>
-    private static void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
+    private static void AddCollectDumpNode(Dictionary<string, string>? parameters, XmlDocument xmlDocument, XmlElement outernode)
     {
         var dumpNode = xmlDocument.CreateElement(Constants.BlameCollectDumpKey);
         if (parameters != null && parameters.Count > 0)

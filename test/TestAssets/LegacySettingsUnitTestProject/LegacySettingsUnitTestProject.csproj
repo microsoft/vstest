@@ -8,7 +8,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <PropertyGroup>
     <OutputType>library</OutputType>
-    <TargetFramework>$(TargetNetFxVersion)</TargetFramework>
+    <TargetFramework>$(NetFrameworkMinimum)</TargetFramework>
     <AssemblyName>LegacySettingsUnitTestProject</AssemblyName>
   </PropertyGroup>
   <ItemGroup>

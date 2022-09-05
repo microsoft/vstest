@@ -25,22 +25,6 @@ internal static class TestPluginDiscoverer
 {
     private static readonly HashSet<string> UnloadableFiles = new();
 
-#if WINDOWS_UAP
-        private static HashSet<string> platformAssemblies = new HashSet<string>(new string[] {
-            "MICROSOFT.VISUALSTUDIO.TESTPLATFORM.UNITTESTFRAMEWORK.DLL",
-            "MICROSOFT.VISUALSTUDIO.TESTPLATFORM.TESTEXECUTOR.CORE.DLL",
-            "MICROSOFT.VISUALSTUDIO.TESTPLATFORM.OBJECTMODEL.DLL",
-            "VSTEST_EXECUTIONENGINE_PLATFORMBRIDGE.DLL",
-            "VSTEST_EXECUTIONENGINE_PLATFORMBRIDGE.WINMD",
-            "VSTEST.EXECUTIONENGINE.WINDOWSPHONE.DLL",
-            "MICROSOFT.CSHARP.DLL",
-            "MICROSOFT.VISUALBASIC.DLL",
-            "CLRCOMPRESSION.DLL",
-        });
-
-        private const string SYSTEM_ASSEMBLY_PREFIX = "system.";
-#endif
-
     /// <summary>
     /// Gets information about each of the test extensions available.
     /// </summary>

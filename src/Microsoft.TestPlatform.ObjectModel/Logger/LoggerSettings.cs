@@ -59,7 +59,6 @@ public class LoggerSettings
         set;
     }
 
-#if !NETSTANDARD1_0
     /// <summary>
     /// Gets or sets the configuration.
     /// </summary>
@@ -119,7 +118,6 @@ public class LoggerSettings
         attribute.Value = attributeValue;
         owner.Attributes.Append(attribute);
     }
-#endif
 
     internal static LoggerSettings FromXml(XmlReader reader)
     {
@@ -146,11 +144,7 @@ public class LoggerSettings
                         {
                             settings.Uri = new Uri(reader.Value);
                         }
-#if NETSTANDARD1_0
-                        catch
-#else
                         catch (UriFormatException)
-#endif
                         {
                             throw new SettingsException(
                                 string.Format(
@@ -210,18 +204,14 @@ public class LoggerSettings
         // Read inner elements.
         while (reader.NodeType == XmlNodeType.Element)
         {
-#pragma warning disable IDE0066 // Convert switch statement to expression
             switch (reader.Name.ToLowerInvariant())
             {
-#pragma warning restore IDE0066 // Convert switch statement to expression
-#if !NETSTANDARD1_0
                 case Constants.LoggerConfigurationNameLower:
                     var document = new XmlDocument();
                     var element = document.CreateElement(reader.Name);
                     element.InnerXml = reader.ReadInnerXml();
                     settings.Configuration = element;
                     break;
-#endif
                 default:
                     throw new SettingsException(
                         string.Format(

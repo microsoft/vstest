@@ -33,12 +33,12 @@ internal class TestHostTraceListener : DefaultTraceListener
         EqtTrace.Verbose("TestPlatformTraceListener.Setup: Added test platform trace listener.");
     }
 
-    public override void Fail(string message)
+    public override void Fail(string? message)
     {
         throw GetException(message);
     }
 
-    public override void Fail(string message, string detailMessage)
+    public override void Fail(string? message, string? detailMessage)
     {
         throw GetException((message + Environment.NewLine + detailMessage));
     }

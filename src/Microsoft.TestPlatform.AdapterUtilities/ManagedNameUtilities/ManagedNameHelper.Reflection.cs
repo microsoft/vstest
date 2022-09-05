@@ -193,7 +193,7 @@ public static partial class ManagedNameHelper
         hierarchyValues[HierarchyConstants.Levels.TestGroupIndex] = managedMethodName.Substring(0, methodNameEndIndex);
         hierarchyValues[HierarchyConstants.Levels.ClassIndex] = managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1);
         hierarchyValues[HierarchyConstants.Levels.NamespaceIndex] = managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]);
-        hierarchyValues[HierarchyConstants.Levels.ContainerIndex] = method.DeclaringType.GetTypeInfo().Assembly.GetName().Name;
+        hierarchyValues[HierarchyConstants.Levels.ContainerIndex] = method.DeclaringType?.GetTypeInfo()?.Assembly?.GetName()?.Name ?? string.Empty;
     }
 
     /// <summary>
@@ -227,19 +227,7 @@ public static partial class ManagedNameHelper
         Type? type;
 
         var parsedManagedTypeName = ReflectionHelpers.ParseEscapedString(managedTypeName);
-
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
         type = assembly.GetType(parsedManagedTypeName, throwOnError: false, ignoreCase: false);
-#else
-        try
-        {
-            type = assembly.GetType(parsedManagedTypeName);
-        }
-        catch
-        {
-            type = null;
-        }
-#endif
 
         if (type == null)
         {
@@ -297,12 +285,8 @@ public static partial class ManagedNameHelper
 
         MemberInfo[] methods;
 
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
         var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
         methods = type.FindMembers(MemberTypes.Method, bindingFlags, Filter, null);
-#else
-        methods = type.GetRuntimeMethods().Where(m => Filter(m, null)).ToArray();
-#endif
 
         return (MethodInfo?)(methods.Length switch
         {
@@ -427,7 +411,11 @@ public static partial class ManagedNameHelper
 
         if (arity > 0 && methodArity == arity)
         {
-            methodBuilder.Append($"`{arity}");
+            methodBuilder.Append(
+#if NET6_0_OR_GREATER
+                System.Globalization.CultureInfo.InvariantCulture,
+#endif
+                $"`{arity}");
         }
     }
 
@@ -500,23 +488,13 @@ public static partial class ManagedNameHelper
 
     private static void AppendGenericMethodParameters(StringBuilder methodBuilder, MethodBase method)
     {
-        Type[] genericArguments;
-
-        genericArguments = method.GetGenericArguments();
-
+        Type[] genericArguments = method.GetGenericArguments();
         AppendGenericArguments(methodBuilder, genericArguments);
     }
 
     private static void AppendGenericTypeParameters(StringBuilder b, Type type)
     {
-        Type[] genericArguments;
-
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
-        genericArguments = type.GetGenericArguments();
-#else
-        genericArguments = type.GetTypeInfo().GenericTypeArguments;
-#endif
-
+        Type[] genericArguments = type.GetGenericArguments();
         AppendGenericArguments(b, genericArguments);
     }
 

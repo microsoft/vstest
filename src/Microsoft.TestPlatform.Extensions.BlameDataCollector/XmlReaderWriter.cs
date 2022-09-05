@@ -120,15 +120,25 @@ public class XmlReaderWriter : IBlameReaderWriter
             }
 
             var root = xmlDocument.LastChild;
+            if (root == null)
+            {
+                return testCaseList;
+            }
+
             foreach (XmlNode node in root)
             {
+                if (node?.Attributes == null)
+                {
+                    continue;
+                }
+
                 var testCase = new BlameTestObject
                 {
                     FullyQualifiedName =
-                        node.Attributes[Constants.TestNameAttribute].Value,
-                    Source = node.Attributes[Constants.TestSourceAttribute].Value,
-                    DisplayName = node.Attributes[Constants.TestDisplayNameAttribute].Value,
-                    IsCompleted = node.Attributes[Constants.TestCompletedAttribute].Value == "True"
+                        node.Attributes[Constants.TestNameAttribute]?.Value,
+                    Source = node.Attributes[Constants.TestSourceAttribute]?.Value,
+                    DisplayName = node.Attributes[Constants.TestDisplayNameAttribute]?.Value,
+                    IsCompleted = node.Attributes[Constants.TestCompletedAttribute]?.Value == "True"
                 };
                 testCaseList.Add(testCase);
             }

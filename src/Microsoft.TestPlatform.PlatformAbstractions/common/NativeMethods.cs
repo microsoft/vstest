@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD1_0
-
 using System;
 using System.Runtime.InteropServices;
 
@@ -24,5 +22,3 @@ internal class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool IsWow64Process([In] IntPtr process, [Out] out bool wow64Process);
 }
-
-#endif

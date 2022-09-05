@@ -25,10 +25,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-#if !NETSTANDARD1_0
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("8a200cda-4813-43a1-aa18-9faedc31d2af")]
-#endif
 
 // Type forwarding utility classes defined earlier in object model to a core utilities assembly.
 [assembly: TypeForwardedTo(typeof(EqtTrace))]

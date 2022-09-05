@@ -105,20 +105,23 @@ function Install-DotNetCli
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
 
-    # Versions are determined by the installed dotnet sdk from "tools\dotnet\sdk\<version from global json>\Microsoft.NETCoreSdk.BundledVersions.props"
-    # from LatestVersion entries, because our projects use <TargetLatestRuntimePatch>True</TargetLatestRuntimePatch>.
-    #
-    # Runtime versions installed usually need to be kept in sync with the ones installed in build.sh
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '2.1' -Architecture x64 -NoPath -Version '2.1.30'
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '3.1' -Architecture x64 -NoPath -Version '3.1.25'
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '5.0' -Architecture x64 -NoPath -Version '5.0.17'
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '6.0' -Architecture x64 -NoPath -Version '6.0.5'
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Channel '7.0' -Architecture x64 -NoPath -Version $env:DOTNET_CLI_VERSION
+    $x64Architecture = "x64"
+    if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64")
+    {
+        $x64Architecture = "arm64"
+    }
 
-    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '2.1' -Architecture x86 -NoPath -Version '2.1.30'
-    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '3.1' -Architecture x86 -NoPath -Version '3.1.25'
-    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '5.0' -Architecture x86 -NoPath -Version '5.0.17'
-    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '6.0' -Architecture x86 -NoPath -Version '6.0.5'
+    # Runtime versions installed usually need to be kept in sync with the ones installed in build.sh
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '2.1' -Architecture $x64Architecture -NoPath # Install the latest patch
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '3.1' -Architecture $x64Architecture -NoPath # Install the latest patch
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '5.0' -Architecture $x64Architecture -NoPath # Install the latest patch
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '6.0' -Architecture $x64Architecture -NoPath # Install the latest patch
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Channel '7.0' -Architecture $x64Architecture -NoPath -Version $env:DOTNET_CLI_VERSION
+
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '2.1' -Architecture x86 -NoPath # Install the latest patch
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '3.1' -Architecture x86 -NoPath # Install the latest patch
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '5.0' -Architecture x86 -NoPath # Install the latest patch
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '6.0' -Architecture x86 -NoPath # Install the latest patch
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Channel '7.0' -Architecture x86 -NoPath -Version $env:DOTNET_CLI_VERSION
 
     $env:DOTNET_ROOT= $dotnetInstallPath
@@ -129,7 +132,7 @@ function Install-DotNetCli
     "---- dotnet environment variables"
     Get-ChildItem "Env:\dotnet_*"
 
-    "`n`n---- x64 dotnet"
+    "`n`n---- $x64Architecture dotnet"
     Invoke-Exe "$env:DOTNET_ROOT\dotnet.exe" -Arguments "--info"
 
     "`n`n---- x86 dotnet"
@@ -364,12 +367,12 @@ function Start-InlineProcess {
     $outputHandler = [ProcessOutputter]::new("White", "Yellow", "Red", $SuppressOutput.IsPresent)
     $errorHandler = [ProcessOutputter]::new("White", "Yellow", "Red", $SuppressOutput.IsPresent)
     $outputDataReceived = $outputHandler.OutputHandler
-    $errorDataReceivedEvent = $errorHandler.OutputHandler
+    $errorDataReceived = $errorHandler.OutputHandler
 
     $process = New-Object System.Diagnostics.Process
     $process.EnableRaisingEvents = $true
     $process.add_OutputDataReceived($outputDataReceived)
-    $process.add_ErrorDataReceived($errorDataReceivedEvent)
+    $process.add_ErrorDataReceived($errorDataReceived)
 
     try {
         $process.StartInfo = $processInfo

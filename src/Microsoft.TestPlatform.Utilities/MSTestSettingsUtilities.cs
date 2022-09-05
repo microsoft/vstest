@@ -35,7 +35,7 @@ public static class MSTestSettingsUtilities
             throw new XmlException(string.Format(CultureInfo.CurrentCulture, UtilitiesResources.UnExpectedSettingsFile));
         }
 
-        var navigator = defaultRunSettings.CreateNavigator();
+        var navigator = defaultRunSettings.CreateNavigator()!;
 
         if (!navigator.MoveToChild(Constants.RunSettingsName, string.Empty))
         {
@@ -44,7 +44,7 @@ public static class MSTestSettingsUtilities
 
         var settingsNode = GenerateMsTestXml(settingsFile);
 
-        defaultRunSettings.DocumentElement.PrependChild(defaultRunSettings.ImportNode(settingsNode, true));
+        defaultRunSettings.DocumentElement!.PrependChild(defaultRunSettings.ImportNode(settingsNode, true));
 
         // Adding RunConfig
         if (!navigator.MoveToChild(Constants.RunConfigurationSettingsName, string.Empty))

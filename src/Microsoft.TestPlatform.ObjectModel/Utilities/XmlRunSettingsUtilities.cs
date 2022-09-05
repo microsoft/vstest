@@ -6,13 +6,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Xml;
+using System.Xml.XPath;
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
-
-#if !NETSTANDARD1_0
-using System.Xml.XPath;
-#endif
-
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 using ObjectModelResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.Resources;
@@ -55,7 +51,6 @@ public static class XmlRunSettingsUtilities
         }
     }
 
-#if !NETSTANDARD1_0
     /// <summary>
     /// Examines the given XPathNavigable representation of a runsettings file and determines if it has a configuration node
     /// for the data collector (used for Fakes and CodeCoverage)
@@ -130,7 +125,6 @@ public static class XmlRunSettingsUtilities
 
         navigator.AppendChild(dataCollectorNode);
     }
-#endif
 
     /// <summary>
     /// Returns RunConfiguration from settingsXml.
@@ -167,7 +161,6 @@ public static class XmlRunSettingsUtilities
         return nodeValue;
     }
 
-#if !NETSTANDARD1_0
     /// <summary>
     /// Create a default run settings
     /// </summary>
@@ -306,8 +299,6 @@ public static class XmlRunSettingsUtilities
         return DataCollectionRunSettings.FromXml(reader, Constants.InProcDataCollectionRunSettingsName, Constants.InProcDataCollectorsSettingName, Constants.InProcDataCollectorSettingName);
     }
 
-#endif
-
     /// <summary>
     /// Get logger run settings from the settings XML.
     /// </summary>
@@ -396,7 +387,6 @@ public static class XmlRunSettingsUtilities
         return default;
     }
 
-#if !NETSTANDARD1_0
     /// <summary>
     /// Moves the given runsettings file navigator to the DataCollectors node in the runsettings xml.
     /// Throws XmlException if it was unable to find the DataCollectors node.
@@ -422,5 +412,4 @@ public static class XmlRunSettingsUtilities
             runSettingsNavigator.MoveToChild("DataCollectors", string.Empty);
         }
     }
-#endif
 }

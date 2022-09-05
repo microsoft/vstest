@@ -3,10 +3,8 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-#if !NETSTANDARD1_0
 using System.Collections.Generic;
 using System.IO;
-#endif
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -15,7 +13,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 /// </summary>
 public interface IFileHelper
 {
-#if !NETSTANDARD1_0
     /// <summary>
     /// Creates a directory.
     /// </summary>
@@ -23,7 +20,6 @@ public interface IFileHelper
     /// <returns><see cref="DirectoryInfo"/> for the created directory.</returns>
     DirectoryInfo CreateDirectory(string path);
 
-#endif
     /// <summary>
     /// Gets the current directory
     /// </summary>
@@ -44,7 +40,6 @@ public interface IFileHelper
     /// <returns>True if directory exists <see cref="bool"/>.</returns>
     bool DirectoryExists([NotNullWhen(true)] string? path);
 
-#if !NETSTANDARD1_0
     /// <summary>
     /// Gets a stream for the file.
     /// </summary>
@@ -79,7 +74,6 @@ public interface IFileHelper
     /// <param name="path">Full path of the file.</param>
     /// <returns>Attributes of the file.</returns>
     FileAttributes GetFileAttributes(string path);
-#endif
 
     /// <summary>
     /// Gets the version information of the file.
@@ -140,7 +134,6 @@ public interface IFileHelper
     /// </param>
     void DeleteDirectory(string directoryPath, bool recursive);
 
-#if !NETSTANDARD1_0
     /// <summary>
     /// Gets all files in directory based on search pattern
     /// </summary>
@@ -149,7 +142,6 @@ public interface IFileHelper
     /// <param name="searchOption">Search option</param>
     /// <returns>string[]</returns>
     string[] GetFiles(string path, string searchPattern, SearchOption searchOption);
-#endif
 
     /// <summary>
     /// Deletes the specified file

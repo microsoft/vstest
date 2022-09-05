@@ -168,8 +168,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         // There can be more dumps in the crash folder from the child processes that were .NET5 or newer and crashed
         // get only the ones that match the path we provide to procdump. And get the last one created.
         var allTargetProcessDumps = allDumps
-            .Where(dump => Path.GetFileNameWithoutExtension(dump)
-                .StartsWith(_outputFilePrefix))
+            .Where(dump => Path.GetFileNameWithoutExtension(dump).StartsWith(_outputFilePrefix ?? string.Empty))
             .Select(dump => new FileInfo(dump))
             .OrderBy(dump => dump.LastWriteTime).ThenBy(dump => dump.Name)
             .ToList();
@@ -285,7 +284,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
 
         if (!searchPath)
         {
-            var candidatePath = Path.Combine(procdumpDirectory, filename);
+            var candidatePath = Path.Combine(procdumpDirectory!, filename);
             if (File.Exists(candidatePath))
             {
                 EqtTrace.Verbose($"ProcDumpDumper.GetProcDumpExecutable: Path to ProcDump '{candidatePath}' exists, using that.");
@@ -311,7 +310,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     private bool TryGetExecutablePath(string executable, out string executablePath)
     {
         executablePath = string.Empty;
-        var pathString = Environment.GetEnvironmentVariable("PATH");
+        var pathString = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
         foreach (string path in pathString.Split(Path.PathSeparator))
         {
             string exeFullPath = Path.Combine(path.Trim(), executable);

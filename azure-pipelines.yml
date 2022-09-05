@@ -1,4 +1,10 @@
-# Pipeline YAML for PR
+trigger:
+- main
+- rel/*
+
+pr:
+- main
+- rel/*
 
 jobs:
 - job: Windows
@@ -165,11 +171,11 @@ jobs:
     clean: all
   strategy:
     matrix:
-      Ubuntu_18_04:
-        vmImage: ubuntu-18.04
+      Ubuntu_22_04:
+        vmImage: ubuntu-22.04
         pwsh: true
-      macOS_10_15_Catalina:
-        vmImage: macOS-10.15
+      macOS_11:
+        vmImage: macOS-11
         pwsh: true
   pool:
     vmImage: $[ variables['vmImage'] ]

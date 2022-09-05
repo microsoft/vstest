@@ -17,7 +17,7 @@ public class InactivityTimer : IInactivityTimer
     /// <param name="timerCallback">Function to callback once the timer times out.</param>
     public InactivityTimer(Action timerCallback)
     {
-        _timer = new Timer((object state) => timerCallback());
+        _timer = new Timer((object? state) => timerCallback());
     }
 
     /// <inheritdoc />

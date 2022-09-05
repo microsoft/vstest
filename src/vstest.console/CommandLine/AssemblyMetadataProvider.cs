@@ -58,7 +58,17 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
         {
             // AssemblyName won't load the assembly into current domain.
             var assemblyName = AssemblyName.GetAssemblyName(assemblyPath);
-            archType = MapToArchitecture(assemblyName.ProcessorArchitecture, assemblyPath);
+
+            var processorArchitecture =
+#if NET7_0_OR_GREATER
+                // AssemblyName doesn't include ProcessorArchitecture in net7.
+                // It will always be ProcessorArchitecture.None.
+                ProcessorArchitecture.None;
+#else
+                assemblyName.ProcessorArchitecture;
+#endif
+
+            archType = MapToArchitecture(processorArchitecture, assemblyPath);
         }
         catch (Exception ex)
         {
@@ -102,15 +112,9 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
                     // to Run image that flag is not "updated" and ignored. So we check if the module is IL only or not.
                     // If it's not IL only it means that is a R2R (Ready to Run) and we're already in the correct architecture x86.
                     // In all other cases the architecture will end inside the correct switch branch.
-                    var corflags = peReader.PEHeaders.CorHeader.Flags;
-                    if ((corflags & CorFlags.Requires32Bit) != 0 || (corflags & CorFlags.ILOnly) == 0)
-                    {
-                        return Architecture.X86;
-                    }
-                    else
-                    {
-                        return Architecture.AnyCPU;
-                    }
+                    var corflags = peReader.PEHeaders.CorHeader?.Flags;
+                    return (corflags & CorFlags.Requires32Bit) != 0 || (corflags & CorFlags.ILOnly) == 0
+                        ? Architecture.X86 : Architecture.AnyCPU;
                 default:
                     {
                         EqtTrace.Error($"AssemblyMetadataProvider.GetArchitecture: Unhandled architecture '{peReader.PEHeaders.CoffHeader.Machine}'.");
@@ -205,7 +209,6 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
         const int imageFileMachineArm = 0x01c0; // ARM Little-Endian
         const int imageFileMachineThumb = 0x01c2; // ARM Thumb/Thumb-2 Little-Endian
         const int imageFileMachineArmnt = 0x01c4; // ARM Thumb-2 Little-Endian
-
 
         try
         {

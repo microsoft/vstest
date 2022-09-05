@@ -272,6 +272,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     private void DiscoveryRequest_OnDiscoveredTests(object? sender, DiscoveredTestsEventArgs args)
     {
         TPDebug.Assert(_selectedTestNames != null, "Initialize should have been called");
+        TPDebug.Assert(args.DiscoveredTestCases != null);
 
         _discoveredTestCount += args.DiscoveredTestCases.Count();
         foreach (var testCase in args.DiscoveredTestCases!)

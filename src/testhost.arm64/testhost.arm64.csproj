@@ -2,7 +2,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
-    <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
     <!-- MSB3270 Suppress warnings about testhost being x64 (AMD64)/x86 when imported into AnyCPU (MSIL) projects. -->
     <!-- MSB3276 Suppress warnings about conflicts between different versions of the same dependent assembly -->
     <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3270;MSB3276</MSBuildWarningsAsMessages>
@@ -11,16 +10,16 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>testhost.arm64</AssemblyName>
-    <TargetFrameworks>$(TargetNetCoreVersion);$(TargetNetFxVersion);net47;net471;net472;net48</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;$(NetCoreAppMinimum);$(NetFrameworkMinimum);net47;net471;net472;net48</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0;</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <IsTestProject>false</IsTestProject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' != '$(TargetNetCoreVersion)' AND '$(TargetFramework)' != 'net6.0' ">
+  <PropertyGroup Condition="'$(TargetFramework)' != '$(NetCoreAppMinimum)' AND '$(TargetFramework)' != 'net6.0' AND '$(TargetFramework)' != 'net7.0' ">
     <RuntimeIdentifier Condition="'$(DotNetBuildFromSource)' != 'true'">win10-arm64</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-    <TargetName Condition="'$(TargetFramework)' != '$(TargetNetFxVersion)'">$(AssemblyName.Replace('.arm64', '')).$(TargetFramework).arm64</TargetName>
+    <TargetName Condition="'$(TargetFramework)' != '$(NetFrameworkMinimum)'">$(AssemblyName.Replace('.arm64', '')).$(TargetFramework).arm64</TargetName>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\testhost.x86\DebugAssertException.cs" Link="DebugAssertException.cs" />

@@ -47,7 +47,7 @@ Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelp
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetCurrentProcessId() -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetCurrentProcessLocation() -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetNativeDllDirectory() -> string!
-Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessHandle(int processId) -> System.IntPtr
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessHandle(int processId) -> nint
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessId(object? process) -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessName(int processId) -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetTestEngineDirectory() -> string?
@@ -102,7 +102,7 @@ Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetCurren
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetCurrentProcessId() -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetCurrentProcessLocation() -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetNativeDllDirectory() -> string!
-Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessHandle(int processId) -> System.IntPtr
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessHandle(int processId) -> nint
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessId(object? process) -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessName(int processId) -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetTestEngineDirectory() -> string?

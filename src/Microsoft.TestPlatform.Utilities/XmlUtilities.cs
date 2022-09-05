@@ -63,7 +63,15 @@ internal class XmlUtilities
         var secureInnerXml = SecurityElement.Escape(innerXml);
 #else
         // fixing manually as we currently target to netcore 1.1 and we don't have default implementation for Escape functionality
-        var secureInnerXml = innerXml.IsNullOrEmpty() ? innerXml : innerXml.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;").Replace("'", "&apos;");
+        string secureInnerXml;
+        if (innerXml.IsNullOrEmpty())
+        {
+            secureInnerXml = string.Empty;
+        }
+        else
+        {
+            secureInnerXml = innerXml.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;").Replace("'", "&apos;");
+        }
 #endif
         if (childNode == null)
         {
