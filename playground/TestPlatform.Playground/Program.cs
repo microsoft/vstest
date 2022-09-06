@@ -39,7 +39,6 @@ internal class Program
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
 
-        var maxCpuCount = Environment.GetEnvironmentVariable("VSTEST_MAX_CPU_COUNT") ?? "0";
         var sourceSettings = $$$"""
             <RunSettings>
                 <RunConfiguration>
