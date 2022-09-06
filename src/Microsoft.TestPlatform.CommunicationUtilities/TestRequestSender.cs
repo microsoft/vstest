@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -168,6 +169,37 @@ public class TestRequestSender : ITestRequestSender
         return endpoint.GetIpEndPoint().Port;
     }
 
+
+    private bool TrySetupMessageReceiver(
+        EventHandler<MessageReceivedEventArgs> onMessageReceived,
+        Action<DisconnectedEventArgs> onDisconnected)
+    {
+        TPDebug.Assert(_channel is not null, "_channel is null");
+
+        // Note: Attempts to setup a message receiver.
+        // It's possible that the testhost was already disconnected and in that case we should
+        // immediately call the disconnected callback.
+
+        // Design: The current method is needed because the request sender sets up
+        //         the disconnect handler late. If the first thing that is done by the class
+        //         is to setup the disconnect handler, then we'd only need to fire the handler
+        //         when the disconnect event fires.
+
+        _onDisconnected = onDisconnected;
+
+        // If the testhost was already disconnected, trigger the handler immediately.
+        if (_disconnectedInfo is DisconnectedEventArgs args)
+        {
+            InvokeDisconnectedHandler(args);
+            return false;
+        }
+
+        _onMessageReceived = onMessageReceived;
+        _channel.MessageReceived += _onMessageReceived;
+
+        return true;
+    }
+
     private void InvokeDisconnectedHandler(DisconnectedEventArgs args)
     {
         // Note: If the endpoint is disconnected at the same time as the
@@ -205,7 +237,7 @@ public class TestRequestSender : ITestRequestSender
         // Test host sends back the lower number of the two. So the highest protocol version, that both sides support is used.
         // Error case: test host can send a protocol error if it cannot find a supported version
         var protocolNegotiated = new ManualResetEvent(false);
-        _onMessageReceived = (sender, args) =>
+        EventHandler<MessageReceivedEventArgs> onMessageReceived = (sender, args) =>
         {
             var message = _dataSerializer.DeserializeMessage(args.Data!);
 
@@ -237,7 +269,7 @@ public class TestRequestSender : ITestRequestSender
 
             protocolNegotiated.Set();
         };
-        _channel.MessageReceived += _onMessageReceived;
+        _channel.MessageReceived += onMessageReceived;
 
         try
         {
@@ -258,8 +290,7 @@ public class TestRequestSender : ITestRequestSender
         }
         finally
         {
-            _channel.MessageReceived -= _onMessageReceived;
-            _onMessageReceived = null;
+            _channel.MessageReceived -= onMessageReceived;
         }
     }
 
@@ -286,17 +317,13 @@ public class TestRequestSender : ITestRequestSender
         _messageEventHandler = discoveryEventsHandler;
         // When testhost disconnects, it normally means there was an error in the testhost and it exited unexpectedly.
         // But when it was us who aborted the run and killed the testhost, we don't want to wait for it to report error, because there won't be any.
-        _onDisconnected = disconnectedEventArgs => OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, getClientError: !_isDiscoveryAborted);
-        _onMessageReceived = (sender, args) => OnDiscoveryMessageReceived(discoveryEventsHandler, args);
-
-        // If the testhost was already disconnected, trigger the handler immediately.
-        if (_disconnectedInfo is not null)
+        if (!TrySetupMessageReceiver(
+            onMessageReceived: (sender, args) => OnDiscoveryMessageReceived(discoveryEventsHandler, args),
+            disconnectedEventArgs => OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, getClientError: !_isDiscoveryAborted)))
         {
-            InvokeDisconnectedHandler(_disconnectedInfo);
             return;
         }
 
-        _channel.MessageReceived += _onMessageReceived;
         var message = _dataSerializer.SerializePayload(
             MessageType.StartDiscovery,
             discoveryCriteria,
@@ -343,15 +370,11 @@ public class TestRequestSender : ITestRequestSender
     {
         TPDebug.Assert(_channel is not null, "_channel is null");
         _messageEventHandler = eventHandler;
-        _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
-        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(args, eventHandler);
-        _channel.MessageReceived += _onMessageReceived;
-
-        // If the testhost was already disconnected, trigger the handler immediately.
-        if (_disconnectedInfo is not null)
+        if (!TrySetupMessageReceiver(
+            onMessageReceived: (sender, args) => OnExecutionMessageReceived(args, eventHandler),
+            onDisconnected: (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true)))
         {
-            InvokeDisconnectedHandler(_disconnectedInfo);
             return;
         }
 
@@ -390,15 +413,11 @@ public class TestRequestSender : ITestRequestSender
     {
         TPDebug.Assert(_channel is not null, "_channel is null");
         _messageEventHandler = eventHandler;
-        _onDisconnected = (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
 
-        _onMessageReceived = (sender, args) => OnExecutionMessageReceived(args, eventHandler);
-        _channel.MessageReceived += _onMessageReceived;
-
-        // If the testhost was already disconnected, trigger the handler immediately.
-        if (_disconnectedInfo is not null)
+        if (!TrySetupMessageReceiver(
+            onMessageReceived: (sender, args) => OnExecutionMessageReceived(args, eventHandler),
+            onDisconnected: (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true)))
         {
-            InvokeDisconnectedHandler(_disconnectedInfo);
             return;
         }
 
