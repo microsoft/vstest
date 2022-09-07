@@ -237,7 +237,8 @@ public class TestRequestSender : ITestRequestSender
         // Test host sends back the lower number of the two. So the highest protocol version, that both sides support is used.
         // Error case: test host can send a protocol error if it cannot find a supported version
         var protocolNegotiated = new ManualResetEvent(false);
-        EventHandler<MessageReceivedEventArgs> onMessageReceived = (sender, args) =>
+
+EventHandler<MessageReceivedEventArgs> onMessageReceived = (sender, args) =>
         {
             var message = _dataSerializer.DeserializeMessage(args.Data!);
 
@@ -318,8 +319,8 @@ public class TestRequestSender : ITestRequestSender
         // When testhost disconnects, it normally means there was an error in the testhost and it exited unexpectedly.
         // But when it was us who aborted the run and killed the testhost, we don't want to wait for it to report error, because there won't be any.
         if (!TrySetupMessageReceiver(
-            onMessageReceived: (sender, args) => OnDiscoveryMessageReceived(discoveryEventsHandler, args),
-            disconnectedEventArgs => OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, getClientError: !_isDiscoveryAborted)))
+            onMessageReceived: (_, args) => OnDiscoveryMessageReceived(discoveryEventsHandler, args),
+            onDisconnected: disconnectedEventArgs => OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, getClientError: !_isDiscoveryAborted)))
         {
             return;
         }
@@ -372,8 +373,8 @@ public class TestRequestSender : ITestRequestSender
         _messageEventHandler = eventHandler;
 
         if (!TrySetupMessageReceiver(
-            onMessageReceived: (sender, args) => OnExecutionMessageReceived(args, eventHandler),
-            onDisconnected: (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true)))
+            onMessageReceived: (_, args) => OnExecutionMessageReceived(args, eventHandler),
+            onDisconnected: disconnectedEventArgs => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true)))
         {
             return;
         }
@@ -415,8 +416,8 @@ public class TestRequestSender : ITestRequestSender
         _messageEventHandler = eventHandler;
 
         if (!TrySetupMessageReceiver(
-            onMessageReceived: (sender, args) => OnExecutionMessageReceived(args, eventHandler),
-            onDisconnected: (disconnectedEventArgs) => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true)))
+            onMessageReceived: (_, args) => OnExecutionMessageReceived(args, eventHandler),
+            onDisconnected: disconnectedEventArgs => OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true)))
         {
             return;
         }
