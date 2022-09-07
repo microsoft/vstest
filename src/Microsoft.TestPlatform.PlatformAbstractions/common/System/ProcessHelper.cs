@@ -143,9 +143,18 @@ public partial class ProcessHelper : IProcessHelper
                             {
                                 cts.Token.Register(() =>
                                 {
-                                    if (!p.HasExited)
+                                    try
                                     {
-                                        p.Kill();
+                                        if (!p.HasExited)
+                                        {
+                                            p.Kill();
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        // Ignore all exceptions thrown when trying to kill a process that may be
+                                        // left hanging. This is a best effort to kill it, but should we fail for
+                                        // any reason we'd probably block on 'WaitForExit()' anyway.
                                     }
                                 });
                                 await Task.Run(() => p.WaitForExit(), cts.Token).ConfigureAwait(false);
