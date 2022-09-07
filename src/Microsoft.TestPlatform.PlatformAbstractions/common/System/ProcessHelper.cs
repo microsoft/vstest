@@ -141,7 +141,13 @@ public partial class ProcessHelper : IProcessHelper
                             }
                             else
                             {
-                                cts.Token.Register(() => p.Kill());
+                                cts.Token.Register(() =>
+                                {
+                                    if (!p.HasExited)
+                                    {
+                                        p.Kill();
+                                    }
+                                });
                                 await Task.Run(() => p.WaitForExit(), cts.Token).ConfigureAwait(false);
                             }
 #endif
