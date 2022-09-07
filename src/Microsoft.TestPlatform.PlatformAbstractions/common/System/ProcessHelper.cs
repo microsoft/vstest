@@ -84,6 +84,8 @@ public partial class ProcessHelper : IProcessHelper
 
             if (exitCallBack != null)
             {
+                const int timeout = 500;
+
                 process.Exited += async (sender, args) =>
                 {
                     if (sender is Process p)
@@ -102,11 +104,20 @@ public partial class ProcessHelper : IProcessHelper
                             //
                             // For older frameworks, the solution is more tricky but it seems we can get the expected
                             // behavior using the parameterless 'WaitForExit()' combined with an awaited Task.Run call.
-                            var cts = new CancellationTokenSource(500);
+                            var cts = new CancellationTokenSource(timeout);
 #if NET5_0_OR_GREATER
                             await p.WaitForExitAsync(cts.Token);
 #else
-                            await Task.Run(() => p.WaitForExit(), cts.Token);
+                            var os = new PlatformEnvironment().OperatingSystem;
+                            if (os is PlatformOperatingSystem.Windows)
+                            {
+                                p.WaitForExit(timeout);
+                            }
+                            else
+                            {
+                                cts.Token.Register(() => p.Kill());
+                                await Task.Run(() => p.WaitForExit(), cts.Token).ConfigureAwait(false);
+                            }
 #endif
                         }
                         catch
