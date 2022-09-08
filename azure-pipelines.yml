@@ -1,4 +1,10 @@
-# Pipeline YAML for PR
+trigger:
+- main
+- rel/*
+
+pr:
+- main
+- rel/*
 
 jobs:
 - job: Windows
