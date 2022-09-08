@@ -1,7 +1,5 @@
 ## Description
-> **IMPORTANT**: Kindly refrain from reporting issues that are only reproduced as part of a Visual Studio workflow - please report them using Visual Studio's "Send Feedback" option instead. This option can be accessed either from the Help menu OR by directly using [this link](https://developercommunity.visualstudio.com).
->
-> For a defect reproducible from the vstest command line, describe the issue you have observed here.
+> Please describe the issue in as much detail as possible here.
 
 ## Steps to reproduce
 > What steps can reproduce the defect?
