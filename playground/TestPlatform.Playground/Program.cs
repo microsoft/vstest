@@ -84,9 +84,9 @@ internal class Program
             Path.Combine(playground, "MSTest1", "bin", "Debug", "net5.0", "MSTest1.dll"),
         };
 
-        // Uncomment if providing command line parameters is easier for you
-        // than converting them to settings, or when you debug command line scenario specifically.
-        //// console mode
+        //// Console mode
+        //// Uncomment if providing command line parameters is easier for you
+        //// than converting them to settings, or when you debug command line scenario specifically.
         //var settingsFile = Path.GetTempFileName();
         //try
         //{
