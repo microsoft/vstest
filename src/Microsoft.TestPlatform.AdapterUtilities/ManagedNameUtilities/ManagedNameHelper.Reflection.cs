@@ -78,7 +78,7 @@ public static partial class ManagedNameHelper
     /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in
     /// <see href="https://github.com/microsoft/vstest-docs/blob/main/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
     /// </remarks>
-    public static void GetManagedName(MethodBase method, out string managedTypeName, out string managedMethodName, out string[] hierarchyValues)
+    public static void GetManagedName(MethodBase method, out string managedTypeName, out string managedMethodName, out string?[] hierarchyValues)
     {
         GetManagedName(method, out managedTypeName, out managedMethodName);
         GetManagedNameAndHierarchy(method, true, out _, out _, out hierarchyValues);
@@ -102,14 +102,14 @@ public static partial class ManagedNameHelper
     /// <returns>
     /// The hierarchy values.
     /// </returns>
-    public static string[] GetManagedHierarchy(MethodBase method)
+    public static string?[] GetManagedHierarchy(MethodBase method)
     {
         GetManagedNameAndHierarchy(method, true, out _, out _, out var hierarchyValues);
 
         return hierarchyValues;
     }
 
-    private static void GetManagedNameAndHierarchy(MethodBase method, bool useClosedTypes, out string managedTypeName, out string managedMethodName, out string[] hierarchyValues)
+    private static void GetManagedNameAndHierarchy(MethodBase method, bool useClosedTypes, out string managedTypeName, out string managedMethodName, out string?[] hierarchyValues)
     {
         _ = method ?? throw new ArgumentNullException(nameof(method));
 
@@ -191,8 +191,16 @@ public static partial class ManagedNameHelper
 
         hierarchyValues = new string[HierarchyConstants.Levels.TotalLevelCount];
         hierarchyValues[HierarchyConstants.Levels.TestGroupIndex] = managedMethodName.Substring(0, methodNameEndIndex);
-        hierarchyValues[HierarchyConstants.Levels.ClassIndex] = managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1);
-        hierarchyValues[HierarchyConstants.Levels.NamespaceIndex] = managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]);
+        if (hierarchyPos[1] == hierarchyPos[0]) // No namespace
+        {
+            hierarchyValues[HierarchyConstants.Levels.ClassIndex] = managedTypeName.Substring(0, hierarchyPos[2]);
+            hierarchyValues[HierarchyConstants.Levels.NamespaceIndex] = null;
+        }
+        else
+        {
+            hierarchyValues[HierarchyConstants.Levels.ClassIndex] = managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1);
+            hierarchyValues[HierarchyConstants.Levels.NamespaceIndex] = managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]);
+        }
         hierarchyValues[HierarchyConstants.Levels.ContainerIndex] = method.DeclaringType?.GetTypeInfo()?.Assembly?.GetName()?.Name ?? string.Empty;
     }
 
@@ -328,10 +336,17 @@ public static partial class ManagedNameHelper
             hierarchies = new int[3];
             hierarchies[0] = b.Length;
 
-            AppendNamespace(b, type.Namespace);
-            hierarchies[1] = b.Length;
+            if (type.Namespace != null)
+            {
+                AppendNamespace(b, type.Namespace);
+                hierarchies[1] = b.Length;
 
-            b.Append('.');
+                b.Append('.');
+            }
+            else
+            {
+                hierarchies[1] = hierarchies[0];
+            }
 
             AppendNestedTypeName(b, type, closedType);
             if (closedType)
