@@ -29,6 +29,7 @@
     <!-- Add a third party notice file -->
     <file src="ThirdPartyNotices.txt" target="" />
     
-    <file src="$TargetFramework$\**\*.*" exclude="**\*.pdb" target="contentFiles\any\$TargetFramework$" />
+    <!-- excluding dbghelp and cpp as they cannot be re-distributed with sdk, but need to be distributed with VS -->
+    <file src="$TargetFramework$\**\*.*" exclude="**\*.pdb;**\dbghelp.dll;**\*TestTools.CppUnitTestFramework*" target="contentFiles\any\$TargetFramework$" />
   </files>
 </package>
