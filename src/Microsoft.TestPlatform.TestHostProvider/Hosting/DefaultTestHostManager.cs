@@ -274,6 +274,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             PlatformArchitecture.ARM => Architecture.ARM,
             PlatformArchitecture.ARM64 => Architecture.ARM64,
             PlatformArchitecture.S390x => Architecture.S390x,
+            PlatformArchitecture.PPC64le => Architecture.PPC64le,
             _ => throw new NotSupportedException(),
         };
 
