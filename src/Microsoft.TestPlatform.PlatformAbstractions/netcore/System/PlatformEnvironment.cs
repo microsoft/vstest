@@ -28,7 +28,7 @@ public class PlatformEnvironment : IEnvironment
                 // preview 6 or later, so use the numerical value for now.
                 // case System.Runtime.InteropServices.Architecture.S390x:
                 (Architecture)5 => PlatformArchitecture.S390x,
-                (Architecture)6 => PlatformArchitecture.PPC64le,
+                (Architecture)8 => PlatformArchitecture.Ppc64le,
                 _ => throw new NotSupportedException(),
             };
         }
