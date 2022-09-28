@@ -85,7 +85,7 @@ public class PlatformArgumentProcessorTests
     {
         ExceptionUtilities.ThrowsException<CommandLineException>(
             () => _executor.Initialize("foo"),
-            "Invalid platform type: {0}. Valid platform types are X86, X64, ARM, ARM64, S390x, ppc64le.",
+            "Invalid platform type: {0}. Valid platform types are X86, X64, ARM, ARM64, S390x, Ppc64le.",
             "foo");
     }
 
@@ -94,7 +94,7 @@ public class PlatformArgumentProcessorTests
     {
         ExceptionUtilities.ThrowsException<CommandLineException>(
             () => _executor.Initialize("AnyCPU"),
-            "Invalid platform type: {0}. Valid platform types are X86, X64, ARM, ARM64, S390x, ppc64le.",
+            "Invalid platform type: {0}. Valid platform types are X86, X64, ARM, ARM64, S390x, Ppc64le.",
             "AnyCPU");
     }
 
