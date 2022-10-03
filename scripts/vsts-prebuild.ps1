@@ -8,7 +8,7 @@ param (
   [Parameter(Mandatory)]
   $Branch,
   [Parameter(Mandatory)]
-  $ForcePreviewOnRelBranch
+  [string] $ForcePreviewOnRelBranch
 )
 
 $TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.FullName
