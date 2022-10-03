@@ -23,7 +23,7 @@ $repoUrl = $(if ((git -C $Path remote -v) -match "upstream") {
 
 # list all tags on this branch ordered by creator date to get the latest, stable or pre-release tag.
 # For stable release we choose only tags without any dash, for pre-release we choose all tags.
-$tags = git -C $Path tag -l --sort=creatordate | Where-Object { $_ -match "v\d+\.\d+\.\d+.*" -and (-not $Stable -or $_ -notlike '*-*') }
+$tags = git -C $Path tag -l --sort=refname | Where-Object { $_ -match "v\d+\.\d+\.\d+.*" -and (-not $Stable -or $_ -notlike '*-*') }
 
 if ($EndWithLatestCommit) {
     # in CI we don't have the tag yet, so we show changes between the most recent tag, and this commit
@@ -35,6 +35,7 @@ if ($EndWithLatestCommit) {
 else {
     # normally we show changes between the latest two tags
     $start, $end = $tags | Select-Object -Last 2
+    Write-Host "$start -- $end"
     $tag = $end
 }
 
@@ -95,6 +96,8 @@ $issues = $log | ForEach-Object {
     }
 }
 
+$vsixDropBranch = $sourceBranch -replace "rel/", ""
+
 $output = @"
 
 See the release notes [here](https://github.com/microsoft/vstest-docs/blob/main/docs/releases.md#$($v -replace '\.')).
@@ -110,7 +113,7 @@ See full log [here]($repoUrl/compare/$start...$tag)
 
 ### Drops
 
-* TestPlatform vsix: [$v](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/$sourceBranch/$b;/TestPlatform.vsix)
+* TestPlatform vsix: [$v](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/$vsixDropBranch/$b;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel : [$v](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/$v)
 "@
 

@@ -24,6 +24,10 @@ while [ $# -gt 0 ]; do
             IS_RTM=$2
             shift
             ;;
+        -relpreview)
+            IS_PREVIEW_REL_BRANCH=$2
+            shift
+            ;;
         *)
             break
             ;;
@@ -40,7 +44,7 @@ if [ $IS_RTM == true ]; then
     PACKAGE_VERSION="$TP_BUILD_PREFIX"
     TP_BUILD_SUFFIX=
 else
-    if [ ! -z "$BRANCH" ] && [[ $BRANCH =~ ^refs\/heads\/rel\/.*$ ]]; then
+    if [ ! -z "$BRANCH" ] && [[ $BRANCH =~ ^refs\/heads\/rel\/.*$ ]] && [ $IS_PREVIEW_REL_BRANCH == false ]; then
         TP_BUILD_SUFFIX="${TP_BUILD_SUFFIX/preview/release}"
     fi
 
