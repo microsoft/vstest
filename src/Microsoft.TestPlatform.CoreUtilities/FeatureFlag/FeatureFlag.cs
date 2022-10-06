@@ -50,6 +50,10 @@ internal partial class FeatureFlag : IFeatureFlag
     // multiple different tfms and architectures to run at the same time.
     public const string DISABLE_MULTI_TFM_RUN = VSTEST_ + nameof(DISABLE_MULTI_TFM_RUN);
 
+    // Disables setting a higher value for SetMinThreads. Setting SetMinThreads value to higher allows testhost to connect back faster
+    // even though we are blocking additional threads becuase we don't have to wait for ThreadPool to start more threads.
+    public const string DISABLE_THREADPOOL_SIZE_INCREASE = VSTEST_ + nameof(DISABLE_THREADPOOL_SIZE_INCREASE);
+
     [Obsolete("Only use this in tests.")]
     internal static void Reset()
     {
