@@ -1210,7 +1210,7 @@ Comportements actuellement pris en charge :
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidProcDumpToolDirectoryPath">
-        <source>The directory specified for the procdump executable is not valid: '{0}' and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)</source>
+        <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)</source>
         <target state="new">The directory specified is not valid: '{0}'</target>
         <note></note>
       </trans-unit>

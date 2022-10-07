@@ -45,7 +45,15 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     {
     }
 
-    public ProcDumpDumper(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, IEnvironmentVariableHelper environmentVariableHelper)
+    public ProcDumpDumper(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment) :
+        this(processHelper, fileHelper, environment, new EnvironmentVariableHelper())
+    {
+        _processHelper = processHelper;
+        _fileHelper = fileHelper;
+        _environment = environment;
+    }
+
+    internal ProcDumpDumper(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, IEnvironmentVariableHelper environmentVariableHelper)
     {
         _processHelper = processHelper;
         _fileHelper = fileHelper;
