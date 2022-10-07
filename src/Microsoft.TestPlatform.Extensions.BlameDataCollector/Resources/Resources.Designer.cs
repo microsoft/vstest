@@ -136,6 +136,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid &apos;DumpDirectoryPath&apos; for postmortem debugger monitor.
+        /// </summary>
+        internal static string MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter {
+            get {
+                return ResourceManager.GetString("MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All tests finished running, Sequence file will not be generated.
         /// </summary>
         internal static string NotGeneratingSequenceFile {

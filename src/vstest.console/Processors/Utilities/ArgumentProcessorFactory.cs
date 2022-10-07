@@ -218,6 +218,7 @@ internal class ArgumentProcessorFactory
         new DisableAutoFakesArgumentProcessor(),
         new ResponseFileArgumentProcessor(),
         new EnableBlameArgumentProcessor(),
+        new AeDebuggerArgumentProcessor(),
         new UseVsixExtensionsArgumentProcessor(),
         new ListDiscoverersArgumentProcessor(),
         new ListExecutorsArgumentProcessor(),

@@ -18,7 +18,7 @@ internal class ArgumentProcessorUtilities
     /// <param name="argumentSeparator">Argument separator.</param>
     /// <param name="exceptionMessage">Exception Message.</param>
     /// <returns>Argument list.</returns>
-    public static string[] GetArgumentList(string rawArgument, char[] argumentSeparator, string exceptionMessage)
+    public static string[] GetArgumentList(string? rawArgument, char[] argumentSeparator, string exceptionMessage)
     {
         var argumentList = rawArgument?.Split(argumentSeparator, StringSplitOptions.RemoveEmptyEntries);
 

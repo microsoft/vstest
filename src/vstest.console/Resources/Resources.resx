@@ -748,6 +748,27 @@
   <data name="InvalidBlameArgument" xml:space="preserve">
     <value>Blame argument '{0}' is not valid.</value>
   </data>
+  <data name="InvalidAeDebuggerArgument" xml:space="preserve">
+    <value>AeDebugger argument '{0}' is not valid.</value>
+  </data>
+  <data name="ProcDumpToolDirectoryPathArgumenNotFound" xml:space="preserve">
+    <value>ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</value>
+  </data>
+  <data name="ProcDumpDirectoryPathArgumenNotFound" xml:space="preserve">
+    <value>DumpDirectoryPath should be specified to install the post mortem debugger.</value>
+  </data>
+  <data name="PostmortemDebuggerNotSupportedForCurrentOS" xml:space="preserve">
+    <value>Postmortem debugger is not supported in the current OS.</value>
+  </data>
+  <data name="InvalidProcDumpToolDirectoryPath" xml:space="preserve">
+    <value>The directory specified is not valid: '{0}'</value>
+  </data>
+  <data name="InvalidProcDumpDirectoryPath" xml:space="preserve">
+    <value>The directory specified is not valid: '{0}'</value>
+  </data>
+  <data name="ProcDumpFileNameNotFound" xml:space="preserve">
+    <value>Procdump file name not found: '{0}'</value>
+  </data>
   <data name="InvalidDiagArgument" xml:space="preserve">
     <value>Diag argument '{0}' is not valid.</value>
   </data>

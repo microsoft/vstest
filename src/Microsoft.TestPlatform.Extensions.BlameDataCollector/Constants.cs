@@ -84,6 +84,11 @@ internal static class Constants
     public const string CollectDumpOnTestSessionHang = "CollectDumpOnTestSessionHang";
 
     /// <summary>
+    /// Configuration key name for monitoring a folder for postmortem dumps
+    /// </summary>
+    public const string MonitorPostmortemDebugger = "MonitorPostmortemDebugger";
+
+    /// <summary>
     /// Configuration key name for specifying what the expected execution time for the longest running test is.
     /// If no events come from the test host for this period a dump will be collected and the test host process will
     /// be killed.

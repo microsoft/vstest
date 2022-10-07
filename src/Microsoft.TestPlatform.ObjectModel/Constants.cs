@@ -37,6 +37,12 @@ public static class Constants
 
     /// <summary>
     /// Name of collect dump option for blame.
+    /// The internal visibility is because the new feature is not publicly exposed yet and so we can retire it.
+    /// </summary>
+    internal const string BlameCollectMonitorPostMortemDebuggerKey = "MonitorPostmortemDebugger";
+
+    /// <summary>
+    /// Name of collect dump option for blame.
     /// </summary>
     public const string BlameCollectHangDumpKey = "CollectHangDump";
 

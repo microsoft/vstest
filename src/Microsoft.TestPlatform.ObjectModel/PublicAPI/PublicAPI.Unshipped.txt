@@ -1,3 +1,1 @@
 ﻿#nullable enable
-Microsoft.VisualStudio.TestPlatform.ObjectModel.DirectoryBasedTestDiscovererAttribute
-Microsoft.VisualStudio.TestPlatform.ObjectModel.DirectoryBasedTestDiscovererAttribute.DirectoryBasedTestDiscovererAttribute() -> void
