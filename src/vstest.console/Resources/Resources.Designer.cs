@@ -859,7 +859,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The directory specified is not valid: &apos;{0}&apos;.
+        ///   Looks up a localized string similar to The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH).
         /// </summary>
         internal static string InvalidProcDumpToolDirectoryPath {
             get {

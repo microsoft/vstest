@@ -71,7 +71,7 @@ Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.Dump(int pro
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.GetDumpFiles(bool processCrashed) -> System.Collections.Generic.IEnumerable<string!>!
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.OutputReceivedCallback.get -> System.Action<object?, string?>!
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.ProcDumpDumper() -> void
-Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.ProcDumpDumper(Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper! processHelper, Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper! fileHelper, Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment! environment) -> void
+Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.ProcDumpDumper(Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper! processHelper, Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper! fileHelper, Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment! environment, Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IEnvironmentVariableHelper! environmentVariableHelper) -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.ProcDumpDumper.WaitForDumpToFinish() -> void
 Microsoft.TestPlatform.Extensions.BlameDataCollector.Win32NamedEvent
 Microsoft.TestPlatform.Extensions.BlameDataCollector.Win32NamedEvent.Set() -> void

@@ -25,11 +25,12 @@ public class AeDebuggerArgumentProcessorTest
     private readonly Mock<IFileHelper> _fileHelper = new();
     private readonly Mock<IProcessHelper> _processHelper = new();
     private readonly Mock<IOutput> _output = new();
+    private readonly Mock<IEnvironmentVariableHelper> _environmentVariableHelper = new();
     private readonly AeDebuggerArgumentExecutor _executor;
 
     public AeDebuggerArgumentProcessorTest()
     {
-        _executor = new AeDebuggerArgumentExecutor(_environment.Object, _fileHelper.Object, _processHelper.Object, _output.Object);
+        _executor = new AeDebuggerArgumentExecutor(_environment.Object, _fileHelper.Object, _processHelper.Object, _output.Object, _environmentVariableHelper.Object);
     }
 
     [TestMethod]
@@ -58,10 +59,11 @@ public class AeDebuggerArgumentProcessorTest
     [TestMethod]
     public void AeDebuggerArgumentExecutor_InvalidCtor()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => new AeDebuggerArgumentExecutor(_environment.Object, _fileHelper.Object, _processHelper.Object, null!));
-        Assert.ThrowsException<ArgumentNullException>(() => new AeDebuggerArgumentExecutor(_environment.Object, _fileHelper.Object, null!, _output.Object));
-        Assert.ThrowsException<ArgumentNullException>(() => new AeDebuggerArgumentExecutor(_environment.Object, null!, _processHelper.Object, _output.Object));
-        Assert.ThrowsException<ArgumentNullException>(() => new AeDebuggerArgumentExecutor(null!, _fileHelper.Object, _processHelper.Object, _output.Object));
+        Assert.ThrowsException<ArgumentNullException>(() => new AeDebuggerArgumentExecutor(_environment.Object, _fileHelper.Object, _processHelper.Object, _output.Object, null!));
+        Assert.ThrowsException<ArgumentNullException>(() => new AeDebuggerArgumentExecutor(_environment.Object, _fileHelper.Object, _processHelper.Object, null!, _environmentVariableHelper.Object));
+        Assert.ThrowsException<ArgumentNullException>(() => new AeDebuggerArgumentExecutor(_environment.Object, _fileHelper.Object, null!, _output.Object, _environmentVariableHelper.Object));
+        Assert.ThrowsException<ArgumentNullException>(() => new AeDebuggerArgumentExecutor(_environment.Object, null!, _processHelper.Object, _output.Object, _environmentVariableHelper.Object));
+        Assert.ThrowsException<ArgumentNullException>(() => new AeDebuggerArgumentExecutor(null!, _fileHelper.Object, _processHelper.Object, _output.Object, _environmentVariableHelper.Object));
     }
 
     [TestMethod]
@@ -100,9 +102,23 @@ public class AeDebuggerArgumentProcessorTest
         _fileHelper.Setup(x => x.DirectoryExists(It.IsAny<string>()))
             .Returns((string path) => directoryPath is null || !directoryPath.EndsWith(path));
         _fileHelper.Setup(x => x.Exists(It.IsAny<string>()))
-            .Returns((string path) => path.EndsWith("procdump.exe"));
+            .Returns((string path) => path.EndsWith("procdump.exe") && path != "procdump.exe");
         _executor.Initialize(string.Format(CultureInfo.InvariantCulture, command, directoryPath));
         Assert.AreEqual(ArgumentProcessorResult.Fail, _executor.Execute());
+    }
+
+    [TestMethod]
+    [DataRow("Install;DumpDirectoryPath=c:\\DumpDirectoryPath", "PROCDUMP_PATH", "c:\\procDump")]
+    [DataRow("Install;DumpDirectoryPath=c:\\DumpDirectoryPath", "PATH", "c:\\procDump;")]
+
+    public void AeDebuggerArgumentExecutor_ShouldUseEnvironmentVariables(string command, string environmentVariablesKey, string environmentVariableValue)
+    {
+        _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(environmentVariablesKey)).Returns(environmentVariableValue);
+        _fileHelper.Setup(x => x.DirectoryExists("c:\\procDump")).Returns(true);
+        _fileHelper.Setup(x => x.DirectoryExists("c:\\DumpDirectoryPath")).Returns(true);
+        _fileHelper.Setup(x => x.Exists(It.IsAny<string>())).Returns((string fileName) => fileName == "c:\\procDump\\procdump.exe");
+        _executor.Initialize(command);
+        Assert.AreEqual(ArgumentProcessorResult.Success, _executor.Execute());
     }
 
     [TestMethod]
