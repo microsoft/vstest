@@ -72,7 +72,7 @@ internal class AeDebuggerArgumentExecutor : IArgumentExecutor
     private readonly IEnvironmentVariableHelper _environmentVariableHelper;
     private string? _argument;
     private Dictionary<string, string>? _collectDumpParameters;
-
+    private readonly ProcDumpExecutableHelper _procDumpExecutableHelper;
     public AeDebuggerArgumentExecutor(IEnvironment environment, IFileHelper fileHelper, IProcessHelper processHelper, IOutput output, IEnvironmentVariableHelper environmentVariableHelper)
     {
         _environment = environment ?? throw new ArgumentNullException(nameof(environment));
@@ -80,6 +80,7 @@ internal class AeDebuggerArgumentExecutor : IArgumentExecutor
         _processHelper = processHelper ?? throw new ArgumentNullException(nameof(processHelper));
         _output = output ?? throw new ArgumentNullException(nameof(output));
         _environmentVariableHelper = environmentVariableHelper ?? throw new ArgumentNullException(nameof(environmentVariableHelper));
+        _procDumpExecutableHelper = new ProcDumpExecutableHelper(processHelper, fileHelper, environment, environmentVariableHelper);
     }
 
     public void Initialize(string? argument) => _argument = argument;
@@ -130,7 +131,7 @@ internal class AeDebuggerArgumentExecutor : IArgumentExecutor
         // Look for procdump
         string? procDumpPath = null;
         if (!TryGetDirectoryInfo(_collectDumpParameters, "ProcDumpToolDirectoryPath", out DirectoryInfo? procDumpToolDirectoryPath) &&
-            !new ProcDumpExecutableHelper(_processHelper, _fileHelper, _environment, _environmentVariableHelper).TryGetProcDumpExecutable(out procDumpPath)
+            !_procDumpExecutableHelper.TryGetProcDumpExecutable(out procDumpPath)
             )
         {
             _output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidProcDumpToolDirectoryPath));

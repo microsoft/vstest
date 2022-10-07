@@ -39,6 +39,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     private string? _outputDirectory;
     private Process? _process;
     private string? _outputFilePrefix;
+    private readonly ProcDumpExecutableHelper _procDumpExecutableHelper;
 
     public ProcDumpDumper()
         : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), new EnvironmentVariableHelper())
@@ -59,6 +60,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         _fileHelper = fileHelper;
         _environment = environment;
         _environmentVariableHelper = environmentVariableHelper;
+        _procDumpExecutableHelper = new ProcDumpExecutableHelper(processHelper, fileHelper, environment, environmentVariableHelper);
     }
 
     [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
@@ -98,7 +100,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
             throw new InvalidOperationException("Procdump crash dump file must end with .dmp extension.");
         }
 
-        if (!new ProcDumpExecutableHelper(_processHelper, _fileHelper, _environment, _environmentVariableHelper).TryGetProcDumpExecutable(processId, out var procDumpPath))
+        if (!_procDumpExecutableHelper.TryGetProcDumpExecutable(processId, out var procDumpPath))
         {
             var procdumpNotFound = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ProcDumpNotFound, procDumpPath);
             logWarning(procdumpNotFound);
@@ -217,7 +219,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
             throw new InvalidOperationException("Procdump crash dump file must end with .dmp extension.");
         }
 
-        if (!new ProcDumpExecutableHelper(_processHelper, _fileHelper, _environment, _environmentVariableHelper).TryGetProcDumpExecutable(processId, out var procDumpPath))
+        if (!_procDumpExecutableHelper.TryGetProcDumpExecutable(processId, out var procDumpPath))
         {
             var err = $"{procDumpPath} could not be found, please set PROCDUMP_PATH environment variable to a directory that contains {procDumpPath} executable, or make sure that the executable is available on PATH.";
             ConsoleOutput.Instance.Warning(false, err);
