@@ -40,7 +40,7 @@ internal class ProcDumpExecutableHelper
 
     public bool TryGetProcDumpExecutable(out string path)
     {
-        // Use machien architecture
+        // Use machine architecture
         var targetProcessArchitecture = _environment.Architecture;
         return TryGetProcDumpExecutable(targetProcessArchitecture, out path);
     }
