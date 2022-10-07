@@ -761,7 +761,7 @@
     <value>Postmortem debugger is not supported in the current OS.</value>
   </data>
   <data name="InvalidProcDumpToolDirectoryPath" xml:space="preserve">
-    <value>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)</value>
+    <value>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)</value>
   </data>
   <data name="InvalidProcDumpDirectoryPath" xml:space="preserve">
     <value>The directory specified is not valid: '{0}'</value>
