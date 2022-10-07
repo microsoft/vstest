@@ -1221,7 +1221,7 @@ Comportements actuellement pris en charge :
       </trans-unit>
       <trans-unit id="ProcDumpDirectoryPathArgumenNotFound">
         <source>DumpDirectoryPath should be specified to install the post mortem debugger.</source>
-        <target state="new">ProcDumpDirectoryPath should be specified to install the post mortem debugger.</target>
+        <target state="new">DumpDirectoryPath should be specified to install the post mortem debugger.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidProcDumpDirectoryPath">
@@ -1231,7 +1231,7 @@ Comportements actuellement pris en charge :
       </trans-unit>
       <trans-unit id="InvalidAeDebuggerArgument">
         <source>AeDebugger argument '{0}' is not valid.</source>
-        <target state="new">Blame argument '{0}' is not valid.</target>
+        <target state="new">AeDebugger argument '{0}' is not valid.</target>
         <note></note>
       </trans-unit>
     </body>
