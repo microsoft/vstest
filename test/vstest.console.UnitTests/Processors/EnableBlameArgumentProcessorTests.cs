@@ -418,6 +418,88 @@ public class EnableBlameArgumentProcessorTests
             _settingsProvider.ActiveRunSettings.SettingsXml);
     }
 
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    public void InitializeMonitorPostmortemDebuggerShouldGenerateCorrectConfiguration()
+    {
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
+        var runsettings = new RunSettings();
+        runsettings.LoadSettingsXml(_defaultRunSettings);
+        _settingsProvider.SetActiveRunSettings(runsettings);
+
+        _mockEnvronment.Setup(x => x.OperatingSystem)
+            .Returns(PlatformOperatingSystem.Windows);
+        _mockEnvronment.Setup(x => x.Architecture)
+            .Returns(PlatformArchitecture.X64);
+
+        _executor.Initialize("MonitorPostmortemDebugger;DumpDirectoryPath=c:\\DumpDirectoryPath");
+        Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
+        Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "          <MonitorPostmortemDebugger DumpDirectoryPath=\"c:\\DumpDirectoryPath\" />",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "  <RunConfiguration>",
+                "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "  </RunConfiguration>",
+                "  <LoggerRunSettings>",
+                "    <Loggers>",
+                "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
+                "    </Loggers>",
+                "  </LoggerRunSettings>",
+                "</RunSettings>"),
+            _settingsProvider.ActiveRunSettings.SettingsXml);
+    }
+
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    public void InitializeMonitorPostmortemDebuggerShouldGenerateCorrectConfigurationAlsoIfIncomplete()
+    {
+        var runsettingsString = string.Format(CultureInfo.CurrentCulture, _defaultRunSettings, "");
+        var runsettings = new RunSettings();
+        runsettings.LoadSettingsXml(_defaultRunSettings);
+        _settingsProvider.SetActiveRunSettings(runsettings);
+
+        _mockEnvronment.Setup(x => x.OperatingSystem)
+            .Returns(PlatformOperatingSystem.Windows);
+        _mockEnvronment.Setup(x => x.Architecture)
+            .Returns(PlatformArchitecture.X64);
+
+        _executor.Initialize("MonitorPostmortemDebugger;");
+        Assert.IsNotNull(_settingsProvider.ActiveRunSettings);
+        Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "          <MonitorPostmortemDebugger DumpDirectoryPath=\"\" />",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "  <RunConfiguration>",
+                "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "  </RunConfiguration>",
+                "  <LoggerRunSettings>",
+                "    <Loggers>",
+                "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
+                "    </Loggers>",
+                "  </LoggerRunSettings>",
+                "</RunSettings>"),
+            _settingsProvider.ActiveRunSettings.SettingsXml);
+    }
+
     internal class TestableEnableBlameArgumentExecutor : EnableBlameArgumentExecutor
     {
         internal TestableEnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IEnvironment environment, IOutput output)

@@ -11,6 +11,7 @@ using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -33,6 +34,7 @@ public class BlameCollectorTests
     private readonly Mock<DataCollectionSink> _mockDataCollectionSink;
     private readonly Mock<IBlameReaderWriter> _mockBlameReaderWriter;
     private readonly Mock<IProcessDumpUtility> _mockProcessDumpUtility;
+    private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly Mock<IInactivityTimer> _mockInactivityTimer;
     private readonly Mock<IFileHelper> _mockFileHelper;
     private readonly XmlElement? _configurationElement;
@@ -51,11 +53,13 @@ public class BlameCollectorTests
         _mockProcessDumpUtility = new Mock<IProcessDumpUtility>();
         _mockInactivityTimer = new Mock<IInactivityTimer>();
         _mockFileHelper = new Mock<IFileHelper>();
+        _mockProcessHelper = new Mock<IProcessHelper>();
         _blameDataCollector = new TestableBlameCollector(
             _mockBlameReaderWriter.Object,
             _mockProcessDumpUtility.Object,
             _mockInactivityTimer.Object,
-            _mockFileHelper.Object);
+            _mockFileHelper.Object,
+            _mockProcessHelper.Object);
 
         // Initializing members
         TestCase testcase = new() { Id = Guid.NewGuid() };
@@ -162,7 +166,8 @@ public class BlameCollectorTests
             _mockBlameReaderWriter.Object,
             _mockProcessDumpUtility.Object,
             null,
-            _mockFileHelper.Object);
+            _mockFileHelper.Object,
+            _mockProcessHelper.Object);
 
         var dumpFile = "abc_hang.dmp";
         var hangBasedDumpcollected = new ManualResetEventSlim();
@@ -197,7 +202,8 @@ public class BlameCollectorTests
             _mockBlameReaderWriter.Object,
             _mockProcessDumpUtility.Object,
             null,
-            _mockFileHelper.Object);
+            _mockFileHelper.Object,
+            _mockProcessHelper.Object);
 
         var hangBasedDumpcollected = new ManualResetEventSlim();
 
@@ -229,7 +235,8 @@ public class BlameCollectorTests
             _mockBlameReaderWriter.Object,
             _mockProcessDumpUtility.Object,
             null,
-            _mockFileHelper.Object);
+            _mockFileHelper.Object,
+            _mockProcessHelper.Object);
 
         var dumpFile = "abc_hang.dmp";
         var hangBasedDumpcollected = new ManualResetEventSlim();
@@ -755,8 +762,8 @@ public class BlameCollectorTests
         /// MockFileHelper instance.
         /// </param>
         internal TestableBlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility, IInactivityTimer? inactivityTimer,
-            IFileHelper mockFileHelper)
-            : base(blameReaderWriter, processDumpUtility, inactivityTimer, mockFileHelper)
+            IFileHelper mockFileHelper, IProcessHelper mockProcessHelper)
+            : base(blameReaderWriter, processDumpUtility, inactivityTimer, mockFileHelper, mockProcessHelper)
         {
         }
     }

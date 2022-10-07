@@ -47,7 +47,7 @@
 
     <ItemGroup>
       <FileToCopy Include="$(SourcePath)vstest.console\bin\$(Configuration)\$(NetFrameworkMinimum)\**\*.*" SubFolder="" />
-      <FileToCopy Include="$(SourcePath)Microsoft.TestPlatform.TestHostProvider\bin\$(Configuration)\$(NetFrameworkMinimum)\**\*.*" SubFolder="vstest.console\Extensions\" />
+      <FileToCopy Include="$(SourcePath)Microsoft.TestPlatform.TestHostProvider\bin\$(Configuration)\$(NetFrameworkMinimum)\**\*.*" SubFolder="Extensions\" />
 
       <!-- copy net462, net47, net471, net472 and net48 testhosts" -->
       <FileToCopy Include="$(SourcePath)testhost.x86\bin\$(Configuration)\$(NetFrameworkMinimum)\win7-x86\**\*.*" SubFolder="TestHostNetFramework\" />

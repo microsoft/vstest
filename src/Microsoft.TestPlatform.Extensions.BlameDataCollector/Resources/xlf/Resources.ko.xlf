@@ -83,6 +83,11 @@ This test may, or may not be the source of the crash.</source>
         <target state="translated">{0}을(를) 찾을 수 없습니다. 실행 파일을 PATH에서 사용할 수 있는지 확인합니다. 또는 PROCDUMP_PATH 환경 변수를 {0} 실행 파일이 포함된 디렉터리로 설정하세요.</target>
         <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
       </trans-unit>
+      <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
+        <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
+        <target state="new">Invalid 'DumpDirectoryPath' for postmortem debugger monitor</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

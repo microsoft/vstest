@@ -83,6 +83,11 @@ Esse teste pode ser a origem da falha ou não.</target>
         <target state="translated">{0} não pôde ser encontrado, verifique se o executável está disponível no CAMINHO. Alternativamente, defina a variável de ambiente PROCDUMP_PATH para um diretório que contenha o executável {0}</target>
         <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
       </trans-unit>
+      <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
+        <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
+        <target state="new">Invalid 'DumpDirectoryPath' for postmortem debugger monitor</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

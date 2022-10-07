@@ -171,4 +171,7 @@ This test may, or may not be the source of the crash.</value>
   <data name="UnexpectedValueForInactivityTimespanValue" xml:space="preserve">
     <value>Unexpected value '{0}' provided as timeout. Please provide a value in this format: 1.5h / 90m / 5400s / 5400000ms / 5400000</value>
   </data>
+  <data name="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter" xml:space="preserve">
+    <value>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</value>
+  </data>
 </root>

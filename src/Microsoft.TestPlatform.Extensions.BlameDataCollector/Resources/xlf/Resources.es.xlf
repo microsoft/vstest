@@ -83,6 +83,11 @@ Esta prueba puede ser el origen del bloqueo o no serlo.</target>
         <target state="translated">no se encontró {0}. Cerciórese de que el ejecutable está disponible en PATH o establezca variable de entorno PROCDUMP_PATH en un directorio que contenga {0} ejecutable</target>
         <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
       </trans-unit>
+      <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
+        <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
+        <target state="new">Invalid 'DumpDirectoryPath' for postmortem debugger monitor</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

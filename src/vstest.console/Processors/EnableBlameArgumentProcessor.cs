@@ -120,19 +120,21 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     {
         var enableDump = false;
         var enableHangDump = false;
+        var monitorPostMortemDebugger = false;
         var exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidBlameArgument, argument);
         Dictionary<string, string>? collectDumpParameters = null;
-
         if (!argument.IsNullOrWhiteSpace())
         {
             // Get blame argument list.
-            var blameArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
+            string[] blameArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
             Func<string, bool> isDumpCollect = a => Constants.BlameCollectDumpKey.Equals(a, StringComparison.OrdinalIgnoreCase);
             Func<string, bool> isHangDumpCollect = a => Constants.BlameCollectHangDumpKey.Equals(a, StringComparison.OrdinalIgnoreCase);
+            Func<string, bool> isMonitorPostmortemDebugger = a => Constants.BlameCollectMonitorPostMortemDebuggerKey.Equals(a, StringComparison.OrdinalIgnoreCase);
 
             // Get collect dump key.
             var hasCollectDumpKey = blameArgumentList.Any(isDumpCollect);
             var hasCollectHangDumpKey = blameArgumentList.Any(isHangDumpCollect);
+            var hasMonitorPostmortemDebugger = blameArgumentList.Any(isMonitorPostmortemDebugger);
 
             // Check if dump should be enabled or not.
             enableDump = hasCollectDumpKey;
@@ -140,38 +142,41 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
             // Check if dump should be enabled or not.
             enableHangDump = hasCollectHangDumpKey;
 
-            if (!enableDump && !enableHangDump)
+            // Check if we need to monitor the postmortem debugger folder
+            monitorPostMortemDebugger = hasMonitorPostmortemDebugger;
+
+            if (!enableDump && !enableHangDump && !monitorPostMortemDebugger)
             {
                 Output.Warning(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.BlameIncorrectOption, argument));
             }
             else
             {
                 // Get collect dump parameters.
-                var collectDumpParameterArgs = blameArgumentList.Where(a => !isDumpCollect(a) && !isHangDumpCollect(a));
+                IEnumerable<string> collectDumpParameterArgs = blameArgumentList
+                    .Where(a => !isDumpCollect(a) &&
+                    !isHangDumpCollect(a) &&
+                    !isMonitorPostmortemDebugger(a));
+
                 collectDumpParameters = ArgumentProcessorUtilities.GetArgumentParameters(collectDumpParameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
             }
         }
 
         // Initialize blame.
-        InitializeBlame(enableDump, enableHangDump, collectDumpParameters);
+        InitializeBlame(enableDump, enableHangDump, monitorPostMortemDebugger, collectDumpParameters);
     }
 
     /// <summary>
     /// Executes the argument processor.
     /// </summary>
     /// <returns>The <see cref="ArgumentProcessorResult"/>.</returns>
-    public ArgumentProcessorResult Execute()
-    {
-        // Nothing to do since we updated the logger and data collector list in initialize
-        return ArgumentProcessorResult.Success;
-    }
+    public ArgumentProcessorResult Execute() => ArgumentProcessorResult.Success;
 
     /// <summary>
     /// Initialize blame.
     /// </summary>
     /// <param name="enableCrashDump">Enable dump.</param>
     /// <param name="blameParameters">Blame parameters.</param>
-    private void InitializeBlame(bool enableCrashDump, bool enableHangDump, Dictionary<string, string>? collectDumpParameters)
+    private void InitializeBlame(bool enableCrashDump, bool enableHangDump, bool monitorPostMortemDebugger, Dictionary<string, string>? collectDumpParameters)
     {
         // Add Blame Logger
         LoggerUtilities.AddLoggerToRunSettings(BlameFriendlyName, null, _runSettingsManager);
@@ -193,8 +198,6 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         // Get data collection run settings. Create if not present.
         var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
         dataCollectionRunSettings ??= new DataCollectionRunSettings();
-
-        // Create blame configuration element.
         var xmlDocument = new XmlDocument();
         var outernode = xmlDocument.CreateElement("Configuration");
         var node = xmlDocument.CreateElement("ResultsDirectory");
@@ -236,6 +239,21 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
             }
 
             AddCollectHangDumpNode(hangDumpParameters, xmlDocument, outernode);
+        }
+
+        // Check if have to monitor the post mortem debugger
+        if (monitorPostMortemDebugger)
+        {
+            if (collectDumpParameters is not null)
+            {
+                // We don't need to check if present or not if null we'll set empty dump directory path
+                collectDumpParameters.TryGetValue("DumpDirectoryPath", out string? directoryPath);
+                Dictionary<string, string> monitorPostMortemDebuggerParameters = new()
+                {
+                    { "DumpDirectoryPath", directoryPath ?? "" }
+                };
+                AddMonitorPostMortemDebuggerNode(monitorPostMortemDebuggerParameters, xmlDocument, outernode);
+            }
         }
 
         // Add blame configuration element to blame collector.
@@ -285,17 +303,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// <param name="outernode">Outer node.</param>
     private static void AddCollectDumpNode(Dictionary<string, string>? parameters, XmlDocument xmlDocument, XmlElement outernode)
     {
-        var dumpNode = xmlDocument.CreateElement(Constants.BlameCollectDumpKey);
-        if (parameters != null && parameters.Count > 0)
-        {
-            foreach (KeyValuePair<string, string> entry in parameters)
-            {
-                var attribute = xmlDocument.CreateAttribute(entry.Key);
-                attribute.Value = entry.Value;
-                dumpNode.Attributes.Append(attribute);
-            }
-        }
-        outernode.AppendChild(dumpNode);
+        AddNode(parameters, xmlDocument, outernode, Constants.BlameCollectDumpKey);
     }
 
     /// <summary>
@@ -306,7 +314,29 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
     /// <param name="outernode">Outer node.</param>
     private static void AddCollectHangDumpNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
     {
-        var dumpNode = xmlDocument.CreateElement(Constants.CollectDumpOnTestSessionHang);
+        AddNode(parameters, xmlDocument, outernode, Constants.CollectDumpOnTestSessionHang);
+    }
+
+    /// <summary>
+    /// Adds monitor postmortem debuggerNode de dump node in outer node.
+    /// </summary>
+    /// <param name="parameters">Parameters.</param>
+    /// <param name="xmlDocument">Xml document.</param>
+    /// <param name="outernode">Outer node.</param>
+    private static void AddMonitorPostMortemDebuggerNode(Dictionary<string, string> parameters, XmlDocument xmlDocument, XmlElement outernode)
+    {
+        AddNode(parameters, xmlDocument, outernode, Constants.BlameCollectMonitorPostMortemDebuggerKey);
+    }
+
+    /// <summary>
+    /// Adds node in outer node.
+    /// </summary>
+    /// <param name="parameters">Parameters.</param>
+    /// <param name="xmlDocument">Xml document.</param>
+    /// <param name="outernode">Outer node.</param>
+    private static void AddNode(Dictionary<string, string>? parameters, XmlDocument xmlDocument, XmlElement outernode, string nodeName)
+    {
+        var dumpNode = xmlDocument.CreateElement(nodeName);
         if (parameters != null && parameters.Count > 0)
         {
             foreach (KeyValuePair<string, string> entry in parameters)

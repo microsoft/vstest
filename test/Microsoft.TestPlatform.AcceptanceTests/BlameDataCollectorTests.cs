@@ -251,6 +251,44 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         ValidateDump(2);
     }
 
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void BlameDataCollectorAeDebuggerShouldCollectDump(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        // Install AeDebugger
+        string dumpPath = Path.Combine(TempDirectory.Path, "Dumps");
+        Directory.CreateDirectory(dumpPath);
+
+        ExecuteVsTestConsole($"/AeDebugger:Install;ProcDumpToolDirectoryPath={_procDumpPath};DumpDirectoryPath={dumpPath}",
+            out string standardTestOutput,
+            out string standardErrorTestOutput,
+            out int _);
+        Assert.IsTrue(standardErrorTestOutput.Trim().Length == 0);
+
+        // Run test under postmortem monitoring
+        var assemblyPaths = GetAssetFullPath("BlameUnitTestProject.dll");
+        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
+        arguments = string.Concat(arguments, $" /Blame:MonitorPostmortemDebugger;DumpDirectoryPath={dumpPath}");
+        arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
+        InvokeVsTest(arguments);
+
+        // Uninstall AeDebugger
+        ExecuteVsTestConsole($"/AeDebugger:Uninstall;ProcDumpToolDirectoryPath={_procDumpPath}",
+            out standardTestOutput,
+            out standardErrorTestOutput,
+            out int _);
+        Assert.IsTrue(standardErrorTestOutput.Trim().Length == 0);
+
+        // We cannot be precise here procdump is at machine level so we can have more than one dump and not only the one for our test
+        // We look for "at least" one dump file, is the best we can do without locking all tests.
+        Assert.IsTrue(Directory.GetFiles(TempDirectory.Path, "*.dmp", SearchOption.AllDirectories)
+            .Where(x => Path.GetFileNameWithoutExtension(x).StartsWith("testhost")).Count() > 0);
+    }
+
     private void ValidateDump(int expectedDumpCount = 1)
     {
         var attachments = StdOutWithWhiteSpace.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)

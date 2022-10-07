@@ -534,6 +534,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error hosting communication channel..
+        /// </summary>
+        internal static string ErrorHostingCommunicationChannel {
+            get {
+                return ResourceManager.GetString("ErrorHostingCommunicationChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error Message:.
         /// </summary>
         internal static string ErrorMessageBanner {
@@ -706,6 +715,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AeDebugger argument &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string InvalidAeDebuggerArgument {
+            get {
+                return ResourceManager.GetString("InvalidAeDebuggerArgument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The argument {0} is invalid. Please use the /help option to check the list of valid arguments..
         /// </summary>
         internal static string InvalidArgument {
@@ -828,6 +846,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         internal static string InvalidPortArgument {
             get {
                 return ResourceManager.GetString("InvalidPortArgument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The directory specified is not valid: &apos;{0}&apos;.
+        /// </summary>
+        internal static string InvalidProcDumpDirectoryPath {
+            get {
+                return ResourceManager.GetString("InvalidProcDumpDirectoryPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The directory specified is not valid: &apos;{0}&apos;.
+        /// </summary>
+        internal static string InvalidProcDumpToolDirectoryPath {
+            get {
+                return ResourceManager.GetString("InvalidProcDumpToolDirectoryPath", resourceCulture);
             }
         }
         
@@ -1211,6 +1247,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         internal static string PortArgumentHelp {
             get {
                 return ResourceManager.GetString("PortArgumentHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Postmortem debugger is not supported in the current OS..
+        /// </summary>
+        internal static string PostmortemDebuggerNotSupportedForCurrentOS {
+            get {
+                return ResourceManager.GetString("PostmortemDebuggerNotSupportedForCurrentOS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DumpDirectoryPath should be specified to install the post mortem debugger..
+        /// </summary>
+        internal static string ProcDumpDirectoryPathArgumenNotFound {
+            get {
+                return ResourceManager.GetString("ProcDumpDirectoryPathArgumenNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Procdump file name not found: &apos;{0}&apos;.
+        /// </summary>
+        internal static string ProcDumpFileNameNotFound {
+            get {
+                return ResourceManager.GetString("ProcDumpFileNameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger..
+        /// </summary>
+        internal static string ProcDumpToolDirectoryPathArgumenNotFound {
+            get {
+                return ResourceManager.GetString("ProcDumpToolDirectoryPathArgumenNotFound", resourceCulture);
             }
         }
         
@@ -1841,15 +1913,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         internal static string WarningEmulatedOnArm64 {
             get {
                 return ResourceManager.GetString("WarningEmulatedOnArm64", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Error hosting the communication channel. For better performance, please consider using the native runner vstest.console.arm64.exe..
-        /// </summary>
-        internal static string ErrorHostingCommunicationChannel {
-            get {
-                return ResourceManager.GetString("ErrorHostingCommunicationChannel", resourceCulture);
             }
         }
     }
