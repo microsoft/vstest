@@ -598,7 +598,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                                 }
                                 catch (IOException ex)
                                 {
-                                    // In case of race explained in the comment above we simply log a warning.
+                                    // In case of race condition explained in the comment above we simply log a warning.
                                     EqtTrace.Warning(ex.ToString());
                                     _logger.LogWarning(args.Context, ex.ToString());
                                 }
