@@ -85,7 +85,7 @@ This test may, or may not be the source of the crash.</source>
       </trans-unit>
       <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
         <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
-        <target state="new">Invalid 'DumpDirectoryPath' for postmortem debugger monitor</target>
+        <target state="translated">事後剖析偵錯工具監視的 'DumpDirectoryPath' 無效</target>
         <note></note>
       </trans-unit>
     </body>

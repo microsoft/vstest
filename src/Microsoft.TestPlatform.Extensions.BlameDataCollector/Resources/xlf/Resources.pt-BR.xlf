@@ -85,7 +85,7 @@ Esse teste pode ser a origem da falha ou não.</target>
       </trans-unit>
       <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
         <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
-        <target state="new">Invalid 'DumpDirectoryPath' for postmortem debugger monitor</target>
+        <target state="translated">'DumpDirectoryPath' inválido para o monitor do depurador postmortem</target>
         <note></note>
       </trans-unit>
     </body>

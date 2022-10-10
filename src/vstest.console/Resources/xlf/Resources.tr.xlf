@@ -1201,37 +1201,37 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       </trans-unit>
       <trans-unit id="ProcDumpToolDirectoryPathArgumenNotFound">
         <source>ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</source>
-        <target state="new">ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</target>
+        <target state="translated">İşlem sonrası hata ayıklayıcısını yüklemek veya kaldırmak için ProcDumpToolDirectoryPath belirtilmelidir.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="PostmortemDebuggerNotSupportedForCurrentOS">
         <source>Postmortem debugger is not supported in the current OS.</source>
-        <target state="new">Postmortem debugger is not supported in the current OS.</target>
+        <target state="translated">Postmortem hata ayıklayıcısı mevcut işletim sisteminde desteklenmiyor.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidProcDumpToolDirectoryPath">
         <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)</source>
-        <target state="new">The directory specified is not valid: '{0}'</target>
+        <target state="new">The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpFileNameNotFound">
         <source>Procdump file name not found: '{0}'</source>
-        <target state="new">Procdump file name not found: '{0}'</target>
+        <target state="translated">Procdump dosya adı bulunamadı: '{0}'</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpDirectoryPathArgumenNotFound">
         <source>DumpDirectoryPath should be specified to install the post mortem debugger.</source>
-        <target state="new">DumpDirectoryPath should be specified to install the post mortem debugger.</target>
+        <target state="translated">Son mortem hata ayıklayıcısını yüklemek için DumpDirectoryPath belirtilmelidir.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidProcDumpDirectoryPath">
         <source>The directory specified is not valid: '{0}'</source>
-        <target state="new">The directory specified is not valid: '{0}'</target>
+        <target state="translated">Belirtilen dizin geçerli değil: '{0}'</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidAeDebuggerArgument">
         <source>AeDebugger argument '{0}' is not valid.</source>
-        <target state="new">AeDebugger argument '{0}' is not valid.</target>
+        <target state="translated">'{0}' AeDebugger bağımsız değişkeni geçerli değil.</target>
         <note></note>
       </trans-unit>
     </body>

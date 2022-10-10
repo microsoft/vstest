@@ -85,7 +85,7 @@ Tento test může a nemusí být příčinou chybového ukončení.</target>
       </trans-unit>
       <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
         <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
-        <target state="new">Invalid 'DumpDirectoryPath' for postmortem debugger monitor</target>
+        <target state="translated">Neplatná vlastnost DumpDirectoryPath pro monitorování ladicího programu postmortem</target>
         <note></note>
       </trans-unit>
     </body>

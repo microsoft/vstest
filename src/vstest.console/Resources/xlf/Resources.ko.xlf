@@ -1201,37 +1201,37 @@
       </trans-unit>
       <trans-unit id="ProcDumpToolDirectoryPathArgumenNotFound">
         <source>ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</source>
-        <target state="new">ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</target>
+        <target state="translated">사후 디버거를 설치하거나 제거하려면 ProcDumpToolDirectoryPath를 지정해야 합니다.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="PostmortemDebuggerNotSupportedForCurrentOS">
         <source>Postmortem debugger is not supported in the current OS.</source>
-        <target state="new">Postmortem debugger is not supported in the current OS.</target>
+        <target state="translated">포스트모템 디버거는 현재 OS에서 지원되지 않습니다.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidProcDumpToolDirectoryPath">
         <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)</source>
-        <target state="new">The directory specified is not valid: '{0}'</target>
+        <target state="new">The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpFileNameNotFound">
         <source>Procdump file name not found: '{0}'</source>
-        <target state="new">Procdump file name not found: '{0}'</target>
+        <target state="translated">Procdump 파일 이름을 찾을 수 없음: '{0}'</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpDirectoryPathArgumenNotFound">
         <source>DumpDirectoryPath should be specified to install the post mortem debugger.</source>
-        <target state="new">DumpDirectoryPath should be specified to install the post mortem debugger.</target>
+        <target state="translated">사후 디버거를 설치하려면 DumpDirectoryPath를 지정해야 합니다.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidProcDumpDirectoryPath">
         <source>The directory specified is not valid: '{0}'</source>
-        <target state="new">The directory specified is not valid: '{0}'</target>
+        <target state="translated">지정된 디렉터리가 유효하지 않습니다: '{0}'</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidAeDebuggerArgument">
         <source>AeDebugger argument '{0}' is not valid.</source>
-        <target state="new">AeDebugger argument '{0}' is not valid.</target>
+        <target state="translated">AeDebugger 인수 '{0}'이(가) 유효하지 않습니다.</target>
         <note></note>
       </trans-unit>
     </body>
