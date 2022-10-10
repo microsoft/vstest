@@ -10,6 +10,8 @@ using System.IO;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -31,7 +33,7 @@ internal class AeDebuggerArgumentProcessor : IArgumentProcessor
     public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
-            new AeDebuggerArgumentExecutor(new PlatformEnvironment(), new FileHelper(), new ProcessHelper(), ConsoleOutput.Instance));
+            new AeDebuggerArgumentExecutor(new PlatformEnvironment(), new FileHelper(), new ProcessHelper(), ConsoleOutput.Instance, new EnvironmentVariableHelper()));
 
         set => _executor = value;
     }
@@ -67,15 +69,18 @@ internal class AeDebuggerArgumentExecutor : IArgumentExecutor
     private readonly IFileHelper _fileHelper;
     private readonly IProcessHelper _processHelper;
     private readonly IOutput _output;
+    private readonly IEnvironmentVariableHelper _environmentVariableHelper;
     private string? _argument;
     private Dictionary<string, string>? _collectDumpParameters;
-
-    public AeDebuggerArgumentExecutor(IEnvironment environment, IFileHelper fileHelper, IProcessHelper processHelper, IOutput output)
+    private readonly ProcDumpExecutableHelper _procDumpExecutableHelper;
+    public AeDebuggerArgumentExecutor(IEnvironment environment, IFileHelper fileHelper, IProcessHelper processHelper, IOutput output, IEnvironmentVariableHelper environmentVariableHelper)
     {
         _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         _fileHelper = fileHelper ?? throw new ArgumentNullException(nameof(fileHelper));
         _processHelper = processHelper ?? throw new ArgumentNullException(nameof(processHelper));
         _output = output ?? throw new ArgumentNullException(nameof(output));
+        _environmentVariableHelper = environmentVariableHelper ?? throw new ArgumentNullException(nameof(environmentVariableHelper));
+        _procDumpExecutableHelper = new ProcDumpExecutableHelper(processHelper, fileHelper, environment, environmentVariableHelper);
     }
 
     public void Initialize(string? argument) => _argument = argument;
@@ -123,21 +128,31 @@ internal class AeDebuggerArgumentExecutor : IArgumentExecutor
             return ArgumentProcessorResult.Fail;
         }
 
-        // Validate ProcDumpToolDirectoryPath
-        if (!TryGetDirectoryInfo(_collectDumpParameters,
-            "ProcDumpToolDirectoryPath",
-            CommandLineResources.ProcDumpToolDirectoryPathArgumenNotFound,
-            CommandLineResources.InvalidProcDumpToolDirectoryPath,
-            out DirectoryInfo? procDumpToolDirectoryPath))
+        // Look for procdump
+        string? procDumpPath = null;
+        if (!TryGetDirectoryInfo(_collectDumpParameters, "ProcDumpToolDirectoryPath", out DirectoryInfo? procDumpToolDirectoryPath) &&
+            !_procDumpExecutableHelper.TryGetProcDumpExecutable(out procDumpPath)
+            )
         {
+            _output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidProcDumpToolDirectoryPath));
+            return ArgumentProcessorResult.Fail;
+        }
+
+        if (procDumpPath is null && procDumpToolDirectoryPath is not null)
+        {
+            procDumpPath = Path.Combine(procDumpToolDirectoryPath.FullName, ProcDumpExecutableHelper.ProcDumpFileName(_environment.Architecture));
+        }
+
+        if (procDumpPath is null)
+        {
+            _output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.ProcDumpFileNameNotFound, procDumpPath));
             return ArgumentProcessorResult.Fail;
         }
 
         // Looking for procdump*.exe
-        FileInfo procDumpFileName = new(Path.Combine(procDumpToolDirectoryPath.FullName, ProcDumpFileName()));
-        if (!_fileHelper.Exists(procDumpFileName.FullName))
+        if (!_fileHelper.Exists(procDumpPath))
         {
-            _output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.ProcDumpFileNameNotFound, procDumpFileName.FullName));
+            _output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.ProcDumpFileNameNotFound, procDumpPath));
             return ArgumentProcessorResult.Fail;
         }
 
@@ -145,7 +160,7 @@ internal class AeDebuggerArgumentExecutor : IArgumentExecutor
         if (install)
         {
             // Validate ProcDumpDirectoryPath
-            if (!TryGetDirectoryInfo(_collectDumpParameters,
+            if (!TryGetDirectoryInfoAndReportToOutput(_collectDumpParameters,
                 "DumpDirectoryPath",
                 CommandLineResources.ProcDumpDirectoryPathArgumenNotFound,
                 CommandLineResources.InvalidProcDumpDirectoryPath,
@@ -157,7 +172,7 @@ internal class AeDebuggerArgumentExecutor : IArgumentExecutor
             procDumpInstallUnistallArgument = dumpDirectoryPath.FullName;
         }
 
-        if (_processHelper.LaunchProcess(procDumpFileName.FullName, install ? "-ma -i" : "-u", procDumpInstallUnistallArgument, null,
+        if (_processHelper.LaunchProcess(procDumpPath, install ? "-ma -i" : "-u", procDumpInstallUnistallArgument, null,
             (_, data) =>
             {
                 if (data is not null && !StringUtilities.IsNullOrWhiteSpace(data))
@@ -183,15 +198,7 @@ internal class AeDebuggerArgumentExecutor : IArgumentExecutor
         // We suppose a success if the object returned by the LaunchProcess is not a Process object.
         return ArgumentProcessorResult.Success;
 
-        string ProcDumpFileName() =>
-            _processHelper.GetCurrentProcessArchitecture() switch
-            {
-                PlatformArchitecture.X86 => "procdump.exe",
-                PlatformArchitecture.ARM64 => "procdump64a.exe",
-                _ => "procdump64.exe",
-            };
-
-        bool TryGetDirectoryInfo(Dictionary<string, string> collectDumpParameters,
+        bool TryGetDirectoryInfoAndReportToOutput(Dictionary<string, string> collectDumpParameters,
             string directoryArgumentName,
             string invalidArgumentErrorMessage,
             string invalidDirectoryErrorMessage,
@@ -215,6 +222,30 @@ internal class AeDebuggerArgumentExecutor : IArgumentExecutor
             if (!_fileHelper.DirectoryExists(directoryInfo.FullName))
             {
                 _output.Error(false, string.Format(CultureInfo.CurrentCulture, invalidDirectoryErrorMessage, directoryInfo.FullName));
+                directoryInfo = null;
+                return false;
+            }
+
+            return true;
+        }
+
+        bool TryGetDirectoryInfo(Dictionary<string, string> collectDumpParameters, string directoryArgumentName, [NotNullWhen(true)] out DirectoryInfo? directoryInfo)
+        {
+            directoryInfo = null;
+
+            if (!collectDumpParameters.TryGetValue(directoryArgumentName, out string? directoryPath))
+            {
+                return false;
+            }
+
+            if (directoryPath is null)
+            {
+                return false;
+            }
+
+            directoryInfo = new(directoryPath);
+            if (!_fileHelper.DirectoryExists(directoryInfo.FullName))
+            {
                 directoryInfo = null;
                 return false;
             }
