@@ -85,7 +85,7 @@ Ce test est éventuellement à l'origine du plantage.</target>
       </trans-unit>
       <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
         <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
-        <target state="new">Invalid 'DumpDirectoryPath' for postmortem debugger monitor</target>
+        <target state="translated">'DumpDirectoryPath' non valide pour l’analyse du débogueur post-mortem</target>
         <note></note>
       </trans-unit>
     </body>
