@@ -1211,7 +1211,7 @@
       </trans-unit>
       <trans-unit id="InvalidProcDumpToolDirectoryPath">
         <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)</source>
-        <target state="new">The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)</target>
+        <target state="translated">procdump 실행 파일에 대해 지정된 디렉터리가 유효하지 않으며 도구가 환경 변수(PROCDUMP_PATH, PATH) 내에서 발견되지 않았습니다.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpFileNameNotFound">
