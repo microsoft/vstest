@@ -1210,8 +1210,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidProcDumpToolDirectoryPath">
-        <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)</source>
-        <target state="translated">Das für die ausführbare „Procdump“-Datei angegebene Verzeichnis ist ungültig, und das Tool wurde nicht in den Umgebungsvariablen (PROCDUMP_PATH, PATH) gefunden.</target>
+        <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)</source>
+        <target state="new">Das für die ausführbare „Procdump“-Datei angegebene Verzeichnis ist ungültig, und das Tool wurde nicht in den Umgebungsvariablen (PROCDUMP_PATH, PATH) gefunden.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpFileNameNotFound">
