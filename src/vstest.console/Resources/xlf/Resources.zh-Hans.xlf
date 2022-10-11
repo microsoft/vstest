@@ -1201,12 +1201,12 @@
       </trans-unit>
       <trans-unit id="ProcDumpToolDirectoryPathArgumenNotFound">
         <source>ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</source>
-        <target state="new">ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</target>
+        <target state="translated">应指定 ProcDumpToolDirectoryPath 以安装或卸载事后分析调试程序。</target>
         <note></note>
       </trans-unit>
       <trans-unit id="PostmortemDebuggerNotSupportedForCurrentOS">
         <source>Postmortem debugger is not supported in the current OS.</source>
-        <target state="new">Postmortem debugger is not supported in the current OS.</target>
+        <target state="translated">当前操作系统不支持事后分析调试程序。</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidProcDumpToolDirectoryPath">
@@ -1216,22 +1216,22 @@
       </trans-unit>
       <trans-unit id="ProcDumpFileNameNotFound">
         <source>Procdump file name not found: '{0}'</source>
-        <target state="new">Procdump file name not found: '{0}'</target>
+        <target state="translated">找不到 Procdump 文件名:“{0}”</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpDirectoryPathArgumenNotFound">
         <source>DumpDirectoryPath should be specified to install the post mortem debugger.</source>
-        <target state="new">DumpDirectoryPath should be specified to install the post mortem debugger.</target>
+        <target state="translated">应指定 DumpDirectoryPath 以安装事后分析调试程序。</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidProcDumpDirectoryPath">
         <source>The directory specified is not valid: '{0}'</source>
-        <target state="new">The directory specified is not valid: '{0}'</target>
+        <target state="translated">指定的目录无效:“{0}”</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidAeDebuggerArgument">
         <source>AeDebugger argument '{0}' is not valid.</source>
-        <target state="new">AeDebugger argument '{0}' is not valid.</target>
+        <target state="translated">AeDebugger 参数“{0}”无效。</target>
         <note></note>
       </trans-unit>
     </body>

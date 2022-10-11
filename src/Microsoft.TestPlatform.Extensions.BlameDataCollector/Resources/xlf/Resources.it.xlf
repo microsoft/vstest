@@ -85,7 +85,7 @@ Il test potrebbe essere l'origine dell'arresto anomalo.</target>
       </trans-unit>
       <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
         <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
-        <target state="new">Invalid 'DumpDirectoryPath' for postmortem debugger monitor</target>
+        <target state="translated">Il valore di 'DumpDirectoryPath' non è valido per il monitoraggio del debugger effettuato dopo che l'applicazione è terminata.</target>
         <note></note>
       </trans-unit>
     </body>
