@@ -765,10 +765,13 @@
       </Item>
       <Item ItemId=";InvalidProcDumpToolDirectoryPath" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[The directory specified is not valid: '{0}']]></Val>
+          <Val><![CDATA[The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[指定的目录无效:“{0}”]]></Val>
+            <Val><![CDATA[为 procdump 可执行文件指定的目录无效，在环境变量(PROCDUMP_PATH、PATH)中找不到该工具]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[The directory specified is not valid: '{0}']]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
