@@ -238,13 +238,17 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
             return;
         }
 
-        // When no test session is being used we don't share the testhost
+        // When no test session is being used, we don't share the testhost
         // between test discovery and test run. The testhost is closed upon
         // successfully completing the operation it was spawned for.
         //
         // In contrast, the new workflow (using test sessions) means we should keep
-        // the testhost alive until explicitly closed by the test session owner.
-        if (_testSessionInfo == null)
+        // the testhost alive until explicitly closed by the test session owner, but
+        // only if the testhost is part of a test session (i.e. the proxy operation manager
+        // id is valid), since there is the distinct possibility of test session criteria
+        // changing between spawn and discovery/run, causing a new proxy operation manager
+        // to be spawned on demand instead of dequing an incompatible proxy from the pool.
+        if (_testSessionInfo == null || _proxyOperationManager.Id < 0)
         {
             _proxyOperationManager.Close();
             return;

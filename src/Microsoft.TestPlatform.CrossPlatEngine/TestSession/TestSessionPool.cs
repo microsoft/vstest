@@ -198,7 +198,7 @@ public class TestSessionPool
             // Try re-enqueueing the specified proxy.
             return sessionManager.EnqueueProxy(proxyId);
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex)
         {
             // If we are unable to re-enqueue the proxy we just eat up the exception here as
             // it is safe to proceed.
