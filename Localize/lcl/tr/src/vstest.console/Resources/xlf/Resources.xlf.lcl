@@ -765,12 +765,12 @@
       </Item>
       <Item ItemId=";InvalidProcDumpToolDirectoryPath" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)]]></Val>
+          <Val><![CDATA[The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Procdump yürütülebilir dosyası için belirtilen dizin geçerli değil ve araç ortam değişkenleri içinde bulunamadı (PROCDUMP_PATH, PATH)]]></Val>
           </Tgt>
           <Prev Cat="Text">
-            <Val><![CDATA[The directory specified is not valid: '{0}']]></Val>
+            <Val><![CDATA[The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)]]></Val>
           </Prev>
         </Str>
         <Disp Icon="Str" />
