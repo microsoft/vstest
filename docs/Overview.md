@@ -273,6 +273,7 @@ null
 
 
 ```mermaid
+sequenceDiagram
 participant c as Client<br>(Visual Studio)
 participant r as Runner<br>(vstest.console.exe)
 c->>r:   Run vstest.console -port X
