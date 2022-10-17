@@ -176,13 +176,13 @@ Versions:
 - 4: Added because version 3 did not update the serialization to use, and it will use v1 serialization (bag) rather than explicit properties. Right side should avoid negotiating 3 and downgrade to 2.
 - 5: Unknown. (TODO)
 - 6: Added Abort and Cancel with handlers that report the status.
-- 7: Latest version. (TODO)
+- 7: Added SkippedDiscoveredSources.
 
 *Request:*
 
 ```csharp
 // Version from 0 to 7.
-int
+int version
 ```
 
 ```json
@@ -196,7 +196,7 @@ int
 
 ```csharp
 // Version from 0 to 7.
-int
+int version
 ```
 
 ```json
@@ -252,7 +252,18 @@ Session starts the runner process, and connects to it. This is used in two ways.
 
 > ⚠️ Do not confuse this with TestSession workflow that pre-starts testhosts.
 
-### Runner start request
+### Start Runner process request
+
+Runner process starts and sends response to the port that it connected to.
+
+```mermaid
+sequenceDiagram
+participant c as Client<br>(Visual Studio)
+participant r as Runner<br>(vstest.console.exe)
+c->>r:   Run vstest.console -port X
+r->>r:   Connect to port Y
+r->>c:   TestSession.Connected
+```
 
 *Request:* 
 
@@ -271,15 +282,71 @@ null
 }
 ```
 
+### Terminate runner request
+
+Runner process is asked to terminate.
 
 ```mermaid
 sequenceDiagram
 participant c as Client<br>(Visual Studio)
 participant r as Runner<br>(vstest.console.exe)
-c->>r:   Run vstest.console -port X
-r->>r:   Connect to port Y
-r->>c:   TestSession.Connected
+c->>r:   TestSession.Terminate
+r-->>c:  Process exited 
 ```
+
+*Request:*
+
+```csharp
+null
+```
+
+```json
+{
+    "MessageType": "TestSession.Terminate",
+    "Payload": null
+}
+```
+
+*Response:*
+
+The runner process terminates. Termination is detected by observing the process. ([Exited](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.exited?view=net-7.0) event in .NET.)
+
+### Start Testhost process request
+
+Testhost process starts, and runner detects that it connected. There is no additional request response exchange. 
+
+Same applies to datacollector.
+
+### Terminate testhost request
+
+Testhost process is asked to terminate.
+
+```mermaid
+sequenceDiagram
+participant r as Runner<br>(vstest.console.exe)
+participant t as Testhost<br>(testhost.exe)
+r->>t:   TestSession.Terminate
+t-->>r:  Process exited 
+```
+
+*Request:*
+
+```csharp
+null
+```
+
+```json
+{
+    "MessageType": "TestSession.Terminate",
+    "Payload": null
+}
+```
+
+*Response:*
+
+The testhost process terminates. Termination is detected by observing the process. ([Exited](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.exited?view=net-7.0) event in .NET.)
+
+Same applies to datacollector.
 
 ## Discovery
 
@@ -288,18 +355,13 @@ Discovery workflow is used to find tests in the provided test sources. Discovery
 > ℹ️ The real work is often offloaded to a test framework such as NUnit, which runs inside of the testhost process. This is not shown in the workflow below.
 
 
-
 ```mermaid
 %% https://github.com/microsoft/vstest-docs/blob/main/RFCs/0001-Test-Platform-Architecture.md#discovery
 sequenceDiagram
 participant c as Client<br>(Visual Studio)
 participant r as Runner<br>(vstest.console.exe)
 participant t as Testhost<br>(testhost.exe)
-c->>r:   Run vstest.console -port X
-r->>r:   Connect to port Y
-r->>c:   TestSession.Connected
-c->>r:   ProtocolVersion
-r->>c:   ProtocolVersion
+Note over c,r: Start session and negotiate version
 c->>r:   (optional) Extensions.Initialize
 c->>+r:  TestDiscovery.Start
 r->>t:   Run testhost -port Y
@@ -312,13 +374,191 @@ r->>+t:  TestDiscovery.Start
 t-->>r:  TestDiscovery.TestFound
 r-->>c:  TestDiscovery.TestFound
 t-->>r:  TestDiscovery.TestFound
-t->>r:   TestDiscovery.Completed
+t->>-r:   TestDiscovery.Completed
 r->>t:   TestSession.Terminate
 t-->>r:  Process exited
-r->>c:   TestDiscovery.Completed
+r->>-c:   TestDiscovery.Completed
 ```
 
+### Extensions.Initialize request
 
+List of extensions to initialize in runner. Runner should forward appropriate extensions to testhost or datacollector if they are appropriate. For example when then list contains test adapters. This request is optional.
+
+*Request:*
+
+```cs
+// Full path to zero or more extensions to initialize.
+// Most often those are .NET .dll files, but can also be VSIX extensions.
+IEnumerable<string> extensions
+```
+
+```json
+{
+    "Version": 7,
+    "MessageType": "Extensions.Initialize",
+    "Payload": [
+        "C:\\PROGRAM FILES\\MICROSOFT VISUAL STUDIO\\2022\\INTPREVIEW\\COMMON7\\IDE\\COMMONEXTENSIONS\\MICROSOFT\\EBF\\TESTEXPLORER\\Microsoft.VisualStudio.Workspace.ExternalBuildFramework.TestProvider.dll",
+        "C:\\Users\\me\\.nuget\\packages\\mstest.testadapter\\2.2.8\\build\\_common\\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll"
+    ]
+}
+```
+
+*Response:*
+
+None.
+
+### TestDiscovery.Start request
+
+Contains full paths to one or more test sources, and settings to use for the discovery. Runner can split the request into multiple additional pieces. For example when the sources are incompatible and each need a different type of testhost. Or when it is asked to discover the sources in parallel.
+
+*Request:*
+
+```csharp
+public class DiscoveryCriteria
+{
+    // Gets the test Containers (e.g. .appx, .appxrecipie) TODO what???
+    public string? Package { get; set; }
+
+    
+    // Test adapter and array of sources map:
+    // { 
+    //   C:\temp\testAdapter1.dll : [ source1.dll, source2.dll ], 
+    //   C:\temp\testadapter2.dll : [ source3.dll, source2.dll ]
+    // }
+    public Dictionary<string, IEnumerable<string>> AdapterSourceMap { get; private set; }
+
+    
+    // Discovered test event will be raised after discovering at minimum this number of tests, 
+    // or when DiscoveredTestEventTimeout is passed.
+    public long FrequencyOfDiscoveredTestsEvent { get; private set; }
+
+    // Discovered test event will be raised after this much time since last test
+    // when FrequencyOfDiscoveredTestsEvent is passed.
+    public TimeSpan DiscoveredTestEventTimeout { get; private set; }
+
+    // Run settings for the discovery.
+    public string? RunSettings { get; private set; }
+
+    // Filters out tests that don't meet this filter. Filter is test framework
+    // dependent.
+    public string? TestCaseFilter { get; set; }
+
+    // TestSession (pre-started testhosts) on which this discovery should happen.
+    public TestSessionInfo? TestSessionInfo { get; set; }
+}
+```
+
+```json
+{
+    "Version": 7,
+    "MessageType": "TestDiscovery.Start",
+    "Payload": {
+        "Package": null,
+        "AdapterSourceMap": {
+            "_none_": [
+                "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll"
+            ]
+        },
+        "FrequencyOfDiscoveredTestsEvent": 10,
+        "DiscoveredTestEventTimeout": "00:00:01.5000000",
+        "RunSettings": "<RunSettings>\r\n  
+            <RunConfiguration>\r\n    
+            <BatchSize>10</BatchSize>\r\n    
+            <CollectSourceInformation>False</CollectSourceInformation>\r\n    
+            <DesignMode>True</DesignMode>\r\n    
+            <TargetFrameworkVersion>.NETFramework,Version=v4.7.2</TargetFrameworkVersion>\r\n    
+            <TargetPlatform>X64</TargetPlatform>\r\n  
+            </RunConfiguration>\r\n  
+            <BoostTestInternalSettings 
+                xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"
+                xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n    
+            <VSProcessId>999999</VSProcessId>\r\n  
+            </BoostTestInternalSettings>\r\n  
+            <GoogleTestAdapterSettings 
+                xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" 
+                xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n    
+            <SolutionSettings>\r\n      
+            <Settings />\r\n    
+            </SolutionSettings>\r\n    
+            <ProjectSettings />\r\n  
+            </GoogleTestAdapterSettings>\r\n</RunSettings>",
+        "TestCaseFilter": null,
+        "TestSessionInfo": null
+    }
+}
+```
+
+*Response:*
+
+```cs
+public class DiscoveryCompleteEventArgs : EventArgs
+{
+    //  Total number of tests discovered in this request.
+    public long TotalCount { get; set; }
+
+    // Specifies if discovery has been aborted (meaning that testhost crashed or was killed). 
+    // If true TotalCount is also set to -1.
+    public bool IsAborted { get; set; }
+
+    // Metrics
+    public IDictionary<string, object>? Metrics { get; set; }
+
+    // Sources which were fully discovered.
+    public IList<string>? FullyDiscoveredSources { get; set; } = new List<string>();
+
+    // Sources which were partially discovered (e.g. started discovering tests, but then discovery aborted).
+    // Since protocol 6.
+    public IList<string>? PartiallyDiscoveredSources { get; set; } = new List<string>();
+
+    // Sources that were skipped during discovery.
+    // Since protocol 7.
+    public IList<string>? SkippedDiscoveredSources { get; set; } = new List<string>();
+
+    // Sources which were not discovered at all.
+    // Since protocol 6.
+    public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
+
+    // Gets or sets the collection of discovered extensions.
+    // TODO: since?
+    public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
+}
+```
+
+```json
+{
+    "Version": 7,
+    "MessageType": "TestDiscovery.Completed",
+    "Payload": {
+        "TotalTests": 2,
+        "LastDiscoveredTests": [],
+        "IsAborted": false,
+        "Metrics": {
+            "VS.TestDiscovery.TimeTakenToLoadAdaptersInSec": 0.0045024999999999996,
+            "VS.TestDiscovery.AdaptersDiscoveredCount": 1,
+            "VS.TestDiscovery.TotalTestsDiscovered.executor://mstestadapter/v2": 2,
+            "VS.TestDiscovery.TimeTakenAdapter.executor://mstestadapter/v2": 0.2842144,
+            "VS.TestDiscovery.TimeTakenInSecByAllAdapters": 0.2842144,
+            "VS.TestDiscovery.AdaptersUsedCount": 1.0,
+            "VS.TestDiscovery.DiscoveryState": "Completed",
+            "VS.TestDiscovery.TotalTests": 2
+        },
+        "FullyDiscoveredSources": [
+            "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll"
+        ],
+        "PartiallyDiscoveredSources": [],
+        "NotDiscoveredSources": [],
+        "SkippedDiscoverySources": [],
+        "DiscoveredExtensions": {
+            "TestDiscoverers": [
+                "Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.MSTestDiscoverer, Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+            ],
+            "TestSettingsProviders": []
+        }
+    }
+}
+```
+
+### Testupdate
 
 
 ## Run
