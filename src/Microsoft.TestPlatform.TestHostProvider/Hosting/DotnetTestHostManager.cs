@@ -536,6 +536,10 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                     return PlatformArchitecture.ARM;
                 case Architecture.ARM64:
                     return PlatformArchitecture.ARM64;
+                case Architecture.S390x:
+                    return PlatformArchitecture.S390x;
+                case Architecture.Ppc64le:
+                    return PlatformArchitecture.Ppc64le;
                 case Architecture.AnyCPU:
                 case Architecture.Default:
                 default:
@@ -552,6 +556,8 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 Architecture.X64 => platformAchitecture == PlatformArchitecture.X64,
                 Architecture.ARM => platformAchitecture == PlatformArchitecture.ARM,
                 Architecture.ARM64 => platformAchitecture == PlatformArchitecture.ARM64,
+                Architecture.S390x => platformAchitecture == PlatformArchitecture.S390x,
+                Architecture.Ppc64le => platformAchitecture == PlatformArchitecture.Ppc64le,
                 _ => throw new TestPlatformException($"Invalid target architecture '{targetArchitecture}'"),
             };
 
