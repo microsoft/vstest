@@ -380,7 +380,7 @@ t-->>r:  Process exited
 r->>-c:   TestDiscovery.Completed
 ```
 
-### Extensions.Initialize request
+### Extensions.Initialize request (Runner)
 
 List of extensions to initialize in runner. Runner should forward appropriate extensions to testhost or datacollector if they are appropriate. For example when then list contains test adapters. This request is optional.
 
@@ -407,7 +407,154 @@ IEnumerable<string> extensions
 
 None.
 
-### TestDiscovery.Start request
+### TestDiscovery.Start request (Runner)
+
+Contains full paths to one or more test sources, and settings to use for the discovery. Runner can split the request into multiple additional pieces. For example when the sources are incompatible and each need a different type of testhost. Or when it is asked to discover the sources in parallel.
+
+*Request:*
+
+```csharp
+public class DiscoveryRequestPayload
+{
+    // Full paths to sources to be discovered.
+    public IEnumerable<string>? Sources { get; set; }
+
+    // Settings used for this discovery request.
+    [DataMember]
+    public string? RunSettings { get; set; }
+
+    // TestPlatformOptions to use for this request.
+    public TestPlatformOptions? TestPlatformOptions
+    {
+        get;
+        set;
+    }
+
+    // A set of pre-started testhosts that this request should use.
+    public TestSessionInfo? TestSessionInfo { get; set; }
+}
+```
+
+```json
+{
+    "Version": 7,
+    "MessageType": "TestDiscovery.Start",
+    "Payload": {
+        "Sources": [
+            "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll"
+        ],
+        "RunSettings": "<RunSettings></RunSettings>",
+        "TestPlatformOptions": {
+            "TestCaseFilter": null,
+            "FilterOptions": null,
+            "CollectMetrics": true,
+            "SkipDefaultAdapters": false
+        },
+        "TestSessionInfo": null
+    }
+}
+```
+
+*Response:*
+
+```cs
+public class DiscoveryCompletePayload
+{
+    //  Total number of tests discovered in this request. Set to -1 when aborted.
+    public long TotalTests { get; set; }
+
+    // The last set of tests that were not reported yet by TestFound message.
+    public IEnumerable<TestCase>? LastDiscoveredTests { get; set; }
+
+    // Specifies if discovery has been aborted (meaning that testhost crashed or was killed). 
+    // If true TotalCount is also set to -1.
+    public bool IsAborted { get; set; }
+
+    // Metrics.
+    public IDictionary<string, object>? Metrics { get; set; }
+
+    // Sources which were fully discovered.
+    public IList<string>? FullyDiscoveredSources { get; set; } = new List<string>();
+
+    // Sources which were partially discovered (e.g. started discovering tests, but then discovery aborted).
+    // Since protocol 6.
+    public IList<string>? PartiallyDiscoveredSources { get; set; } = new List<string>();
+
+    // Sources that were skipped during discovery.
+    // Since protocol 7.
+    public IList<string>? SkippedDiscoverySources { get; set; } = new List<string>();
+
+    // Sources which were not discovered at all.
+    // Since protocol 6.
+    public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
+
+    // Gets or sets the collection of discovered extensions.
+    // TODO: since?
+    public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
+}
+```
+
+```json
+{
+    "Version": 7,
+    "MessageType": "TestDiscovery.Completed",
+    "Payload": {
+        "TotalTests": 2,
+        "LastDiscoveredTests": [],
+        "IsAborted": false,
+        "Metrics": {
+            "VS.TestDiscovery.TimeTakenToLoadAdaptersInSec": 0.0045024999999999996,
+            "VS.TestDiscovery.AdaptersDiscoveredCount": 1,
+            "VS.TestDiscovery.TotalTestsDiscovered.executor://mstestadapter/v2": 2,
+            "VS.TestDiscovery.TimeTakenAdapter.executor://mstestadapter/v2": 0.2842144,
+            "VS.TestDiscovery.TimeTakenInSecByAllAdapters": 0.2842144,
+            "VS.TestDiscovery.AdaptersUsedCount": 1.0,
+            "VS.TestDiscovery.DiscoveryState": "Completed",
+            "VS.TestDiscovery.TotalTests": 2
+        },
+        "FullyDiscoveredSources": [
+            "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll"
+        ],
+        "PartiallyDiscoveredSources": [],
+        "NotDiscoveredSources": [],
+        "SkippedDiscoverySources": [],
+        "DiscoveredExtensions": {
+            "TestDiscoverers": [
+                "Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.MSTestDiscoverer, Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+            ],
+            "TestSettingsProviders": []
+        }
+    }
+}
+```
+
+### TestDiscovery.Initialize request (Testhost)
+
+List of extensions to initialize in the testhost. This request is optional.
+
+*Request:*
+
+```cs
+// Full path to zero or more extensions to initialize.
+// Most often those are .NET .dll files, but can also be VSIX extensions.
+IEnumerable<string> extensions
+```
+
+```json
+{
+    "Version": 7,
+    "MessageType": "TestDiscovery.Initialize",
+    "Payload": [
+        "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll"
+    ]
+}
+```
+
+*Response:*
+
+None.
+
+### TestDiscovery.Start request (Testhost)
 
 Contains full paths to one or more test sources, and settings to use for the discovery. Runner can split the request into multiple additional pieces. For example when the sources are incompatible and each need a different type of testhost. Or when it is asked to discover the sources in parallel.
 
@@ -420,11 +567,7 @@ public class DiscoveryCriteria
     public string? Package { get; set; }
 
     
-    // Test adapter and array of sources map:
-    // { 
-    //   C:\temp\testAdapter1.dll : [ source1.dll, source2.dll ], 
-    //   C:\temp\testadapter2.dll : [ source3.dll, source2.dll ]
-    // }
+    // Test adapter mapped to the sources it should process.
     public Dictionary<string, IEnumerable<string>> AdapterSourceMap { get; private set; }
 
     
@@ -461,27 +604,7 @@ public class DiscoveryCriteria
         },
         "FrequencyOfDiscoveredTestsEvent": 10,
         "DiscoveredTestEventTimeout": "00:00:01.5000000",
-        "RunSettings": "<RunSettings>\r\n  
-            <RunConfiguration>\r\n    
-            <BatchSize>10</BatchSize>\r\n    
-            <CollectSourceInformation>False</CollectSourceInformation>\r\n    
-            <DesignMode>True</DesignMode>\r\n    
-            <TargetFrameworkVersion>.NETFramework,Version=v4.7.2</TargetFrameworkVersion>\r\n    
-            <TargetPlatform>X64</TargetPlatform>\r\n  
-            </RunConfiguration>\r\n  
-            <BoostTestInternalSettings 
-                xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"
-                xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n    
-            <VSProcessId>999999</VSProcessId>\r\n  
-            </BoostTestInternalSettings>\r\n  
-            <GoogleTestAdapterSettings 
-                xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" 
-                xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n    
-            <SolutionSettings>\r\n      
-            <Settings />\r\n    
-            </SolutionSettings>\r\n    
-            <ProjectSettings />\r\n  
-            </GoogleTestAdapterSettings>\r\n</RunSettings>",
+        "RunSettings": "<RunSettings></RunSettings>",
         "TestCaseFilter": null,
         "TestSessionInfo": null
     }
@@ -491,16 +614,19 @@ public class DiscoveryCriteria
 *Response:*
 
 ```cs
-public class DiscoveryCompleteEventArgs : EventArgs
+public class DiscoveryCompletePayload
 {
-    //  Total number of tests discovered in this request.
-    public long TotalCount { get; set; }
+    //  Total number of tests discovered in this request. Set to -1 when aborted.
+    public long TotalTests { get; set; }
+
+    // The last set of tests that were not reported yet by TestFound message.
+    public IEnumerable<TestCase>? LastDiscoveredTests { get; set; }
 
     // Specifies if discovery has been aborted (meaning that testhost crashed or was killed). 
     // If true TotalCount is also set to -1.
     public bool IsAborted { get; set; }
 
-    // Metrics
+    // Metrics.
     public IDictionary<string, object>? Metrics { get; set; }
 
     // Sources which were fully discovered.
@@ -512,7 +638,7 @@ public class DiscoveryCompleteEventArgs : EventArgs
 
     // Sources that were skipped during discovery.
     // Since protocol 7.
-    public IList<string>? SkippedDiscoveredSources { get; set; } = new List<string>();
+    public IList<string>? SkippedDiscoverySources { get; set; } = new List<string>();
 
     // Sources which were not discovered at all.
     // Since protocol 6.
