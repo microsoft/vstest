@@ -206,7 +206,7 @@ int version
 }
 ```
 
-### TestSession.Message notification
+### TestSession.Message notification (Runner) (Testhost)
 
 Downstream components can send messages to upstream components, with a given severity. This is mostly used to send additional information from extensions. Upstream component can decide what to do with the information, if it will process it and forward it, or batch it and then send it as one unified message. 
 
@@ -252,7 +252,7 @@ Session starts the runner process, and connects to it. This is used in two ways.
 
 > ⚠️ Do not confuse this with TestSession workflow that pre-starts testhosts.
 
-### Start Runner process request
+### Start Runner process request (Runner)
 
 Runner process starts and sends response to the port that it connected to.
 
@@ -282,7 +282,7 @@ null
 }
 ```
 
-### Terminate runner request
+### TestSession.Terminate request (Runner)
 
 Runner process is asked to terminate.
 
@@ -311,13 +311,13 @@ null
 
 The runner process terminates. Termination is detected by observing the process. ([Exited](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.exited?view=net-7.0) event in .NET.)
 
-### Start Testhost process request
+### Start Testhost process request (Runner)
 
 Testhost process starts, and runner detects that it connected. There is no additional request response exchange. 
 
 Same applies to datacollector.
 
-### Terminate testhost request
+### Terminate testhost request (Testhost)
 
 Testhost process is asked to terminate.
 
