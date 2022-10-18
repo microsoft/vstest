@@ -499,18 +499,32 @@ public class DiscoveryCompletePayload
     "Version": 7,
     "MessageType": "TestDiscovery.Completed",
     "Payload": {
-        "TotalTests": 2,
-        "LastDiscoveredTests": [],
+        "TotalTests": 3,
+        "LastDiscoveredTests": null,
         "IsAborted": false,
         "Metrics": {
-            "VS.TestDiscovery.TimeTakenToLoadAdaptersInSec": 0.0045024999999999996,
+            "VS.TestDiscovery.TimeTakenAdapter.executor://mstestadapter/v2": 0.38184969999999996,
+            "VS.TestDiscovery.TimeTakenInSecByAllAdapters": 0.38184969999999996,
+            "VS.TestDiscovery.TotalTestsDiscovered.executor://mstestadapter/v2": 3.0,
+            "VS.TestDiscovery.TotalTests": 3.0,
+            "VS.TestDiscovery.TimeTakenToLoadAdaptersInSec": 0.0030006,
             "VS.TestDiscovery.AdaptersDiscoveredCount": 1,
-            "VS.TestDiscovery.TotalTestsDiscovered.executor://mstestadapter/v2": 2,
-            "VS.TestDiscovery.TimeTakenAdapter.executor://mstestadapter/v2": 0.2842144,
-            "VS.TestDiscovery.TimeTakenInSecByAllAdapters": 0.2842144,
-            "VS.TestDiscovery.AdaptersUsedCount": 1.0,
+            "VS.TestDiscovery.AdaptersUsedCount": 1,
+            "VS.TestRun.TargetFramework": ".NETFramework,Version=v4.7.2",
+            "VS.TestRun.TargetPlatform": "X64",
+            "VS.TestRun.MaxCPUcount": 1,
+            "VS.TestRun.TargetDevice": "Local Machine",
+            "VS.TestRun.TestPlatformVersion": "17.5.0-dev",
+            "VS.TestRun.TargetOS": "Microsoft Windows NT 10.0.22623.0",
+            "VS.TestRun.DisableAppDomain": false,
+            "VS.TestRun.CommandLineSwitches": "",
+            "VS.TestRun.LoggersUsed": "",
+            "VS.TestDiscovery.ParallelEnabled": "False",
+            "VS.TestSession.Id": "",
+            "VS.TestDiscovery.NumberOfSources": 1,
             "VS.TestDiscovery.DiscoveryState": "Completed",
-            "VS.TestDiscovery.TotalTests": 2
+            "VS.TestDiscovery.TotalTimeTakenInSec": 4.4026146,
+            "VS.TestPlatform.DiscoveredExtensions": "{\"TestDiscoverers\":[\"Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.MSTestDiscoverer, Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\"],\"TestHosts\":[\"HostProvider://DefaultTestHost\",\"HostProvider://DotnetTestHost\"]}"
         },
         "FullyDiscoveredSources": [
             "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll"
@@ -522,7 +536,10 @@ public class DiscoveryCompletePayload
             "TestDiscoverers": [
                 "Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.MSTestDiscoverer, Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
             ],
-            "TestSettingsProviders": []
+            "TestHosts": [
+                "HostProvider://DefaultTestHost",
+                "HostProvider://DotnetTestHost"
+            ]
         }
     }
 }
@@ -567,7 +584,8 @@ public class DiscoveryCriteria
     public string? Package { get; set; }
 
     
-    // Test adapter mapped to the sources it should process.
+    // Test adapter mapped to the sources it should process. "_none_" is used when there 
+    // is no adapter determined.
     public Dictionary<string, IEnumerable<string>> AdapterSourceMap { get; private set; }
 
     
@@ -684,8 +702,107 @@ public class DiscoveryCompletePayload
 }
 ```
 
-### Testupdate
+### TestDiscovery.TestFound notification (Testhost)
 
+Contains a batch of tests that were found. Runner should aggregate the results, and hold onto them if it needs. The final response does not contain all the partial updates.
+
+
+```cs
+IEnumerable<TestCase> testCases
+```
+
+```json
+{
+    "Version": 7,
+    "MessageType": "TestDiscovery.TestFound",
+    "Payload": [
+        {
+            "Id": "cfa76bee-59fb-2133-3c23-9693a1078027",
+            "FullyQualifiedName": "MSTest1.UnitTest1.TestMethod1",
+            "DisplayName": "TestMethod1",
+            "ExecutorUri": "executor://MSTestAdapter/v2",
+            "Source": "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll",
+            "CodeFilePath": null,
+            "LineNumber": -1,
+            "Properties": [
+                {
+                    "Key": {
+                        "Id": "MSTestDiscoverer.TestClassName",
+                        "Label": "ClassName",
+                        "Category": "",
+                        "Description": "",
+                        "Attributes": 1,
+                        "ValueType": "System.String"
+                    },
+                    "Value": "MSTest1.UnitTest1"
+                },
+                {
+                    "Key": {
+                        "Id": "TestObject.Traits",
+                        "Label": "Traits",
+                        "Category": "",
+                        "Description": "",
+                        "Attributes": 5,
+                        "ValueType": "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]"
+                    },
+                    "Value": []
+                }
+            ]
+        }
+    ]
+}
+```
+
+### TestDiscovery.TestFound notification (Runner)
+
+Contains a batch of tests that were found. Client should aggregate the results, and hold onto them if it needs. The final response does not contain all the partial updates.
+
+
+```cs
+IEnumerable<TestCase> testCases
+```
+
+```json
+{
+    "Version": 7,
+    "MessageType": "TestDiscovery.TestFound",
+    "Payload": [
+        {
+            "Id": "cfa76bee-59fb-2133-3c23-9693a1078027",
+            "FullyQualifiedName": "MSTest1.UnitTest1.TestMethod1",
+            "DisplayName": "TestMethod1",
+            "ExecutorUri": "executor://MSTestAdapter/v2",
+            "Source": "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll",
+            "CodeFilePath": null,
+            "LineNumber": -1,
+            "Properties": [
+                {
+                    "Key": {
+                        "Id": "MSTestDiscoverer.TestClassName",
+                        "Label": "ClassName",
+                        "Category": "",
+                        "Description": "",
+                        "Attributes": 1,
+                        "ValueType": "System.String"
+                    },
+                    "Value": "MSTest1.UnitTest1"
+                },
+                {
+                    "Key": {
+                        "Id": "TestObject.Traits",
+                        "Label": "Traits",
+                        "Category": "",
+                        "Description": "",
+                        "Attributes": 5,
+                        "ValueType": "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]"
+                    },
+                    "Value": []
+                }
+            ]
+        }
+    ]
+}
+```
 
 ## Run
 
