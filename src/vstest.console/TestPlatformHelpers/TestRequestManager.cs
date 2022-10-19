@@ -849,7 +849,7 @@ internal class TestRequestManager : ITestRequestManager
 
     private string AddFakesConfigurationToRunsettings(IList<string>? sources, string runsettings)
     {
-        if (string.Equals(Environment.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))
+        if (string.Equals(_environment.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))
         {
             return runsettings;
         }
@@ -864,17 +864,17 @@ internal class TestRequestManager : ITestRequestManager
         // and so we fall back to using sources instead.
         if (_commandLineOptions.Sources.Any())
         {
-            GenerateFakesUtilities.GenerateFakesSettings(
+            runsettings = GenerateFakesUtilities.GenerateFakesSettings(
                 _commandLineOptions,
-                _commandLineOptions.Sources.ToList(),
-                ref runsettings);
+                _commandLineOptions.Sources,
+                runsettings);
         }
-        else if (sources.Any())
+        else if (sources.Count > 0)
         {
-            GenerateFakesUtilities.GenerateFakesSettings(
+            runsettings = GenerateFakesUtilities.GenerateFakesSettings(
                 _commandLineOptions,
                 sources,
-                ref runsettings);
+                runsettings);
         }
 
         return runsettings;

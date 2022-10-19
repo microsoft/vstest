@@ -331,7 +331,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
         // only if the testhost is part of a test session (i.e. the proxy operation manager
         // id is valid), since there is the distinct possibility of test session criteria
         // changing between spawn and discovery/run, causing a new proxy operation manager
-        // to be spawned on demand instead of dequing an incompatible proxy from the pool.
+        // to be spawned on demand instead of dequeuing an incompatible proxy from the pool.
         if (_testSessionInfo == null || _proxyOperationManager.Id < 0)
         {
             _proxyOperationManager.Close();
