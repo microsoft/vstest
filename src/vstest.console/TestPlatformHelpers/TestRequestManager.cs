@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
@@ -37,6 +38,7 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 
@@ -62,6 +64,7 @@ internal class TestRequestManager : ITestRequestManager
     private readonly IProcessHelper _processHelper;
     private readonly ITestRunAttachmentsProcessingManager _attachmentsProcessingManager;
     private readonly IEnvironment _environment;
+    private readonly IEnvironmentVariableHelper _environmentVariableHelper;
 
     /// <summary>
     /// Maintains the current active execution request.
@@ -96,7 +99,8 @@ internal class TestRequestManager : ITestRequestManager
                 CommandLineOptions.Instance.IsDesignMode),
             new ProcessHelper(),
             new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()),
-            new PlatformEnvironment())
+            new PlatformEnvironment(),
+            new EnvironmentVariableHelper())
     {
     }
 
@@ -109,7 +113,8 @@ internal class TestRequestManager : ITestRequestManager
         Task<IMetricsPublisher> metricsPublisher,
         IProcessHelper processHelper,
         ITestRunAttachmentsProcessingManager attachmentsProcessingManager,
-        IEnvironment environment)
+        IEnvironment environment,
+        IEnvironmentVariableHelper environmentVariableHelper)
     {
         _testPlatform = testPlatform;
         _commandLineOptions = commandLineOptions;
@@ -120,6 +125,7 @@ internal class TestRequestManager : ITestRequestManager
         _processHelper = processHelper;
         _attachmentsProcessingManager = attachmentsProcessingManager;
         _environment = environment;
+        _environmentVariableHelper = environmentVariableHelper;
     }
 
     /// <summary>
@@ -849,7 +855,7 @@ internal class TestRequestManager : ITestRequestManager
 
     private string AddFakesConfigurationToRunsettings(IList<string>? sources, string runsettings)
     {
-        if (string.Equals(_environment.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))
+        if (string.Equals(_environmentVariableHelper.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))
         {
             return runsettings;
         }
