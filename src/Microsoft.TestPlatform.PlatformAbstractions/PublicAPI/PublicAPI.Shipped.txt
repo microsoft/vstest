@@ -67,6 +67,7 @@ Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture.ARM = 2 -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture.ARM64 = 3 -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture.S390x = 4 -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture.Ppc64le = 5 -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture.X64 = 1 -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture.X86 = 0 -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyExtensions
