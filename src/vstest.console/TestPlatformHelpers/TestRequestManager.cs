@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
@@ -37,6 +38,7 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 
@@ -62,6 +64,7 @@ internal class TestRequestManager : ITestRequestManager
     private readonly IProcessHelper _processHelper;
     private readonly ITestRunAttachmentsProcessingManager _attachmentsProcessingManager;
     private readonly IEnvironment _environment;
+    private readonly IEnvironmentVariableHelper _environmentVariableHelper;
 
     /// <summary>
     /// Maintains the current active execution request.
@@ -96,7 +99,8 @@ internal class TestRequestManager : ITestRequestManager
                 CommandLineOptions.Instance.IsDesignMode),
             new ProcessHelper(),
             new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()),
-            new PlatformEnvironment())
+            new PlatformEnvironment(),
+            new EnvironmentVariableHelper())
     {
     }
 
@@ -109,7 +113,8 @@ internal class TestRequestManager : ITestRequestManager
         Task<IMetricsPublisher> metricsPublisher,
         IProcessHelper processHelper,
         ITestRunAttachmentsProcessingManager attachmentsProcessingManager,
-        IEnvironment environment)
+        IEnvironment environment,
+        IEnvironmentVariableHelper environmentVariableHelper)
     {
         _testPlatform = testPlatform;
         _commandLineOptions = commandLineOptions;
@@ -120,6 +125,7 @@ internal class TestRequestManager : ITestRequestManager
         _processHelper = processHelper;
         _attachmentsProcessingManager = attachmentsProcessingManager;
         _environment = environment;
+        _environmentVariableHelper = environmentVariableHelper;
     }
 
     /// <summary>
@@ -324,29 +330,7 @@ internal class TestRequestManager : ITestRequestManager
         }
 
         // Get Fakes data collector settings.
-        if (!string.Equals(Environment.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))
-        {
-            // TODO: Are the sources in _commandLineOptions any different from the ones we get on the request?
-            // because why would they be? We never pass that forward to the executor, so this probably should
-            // just look at sources anyway.
-
-            // The commandline options do not have sources in design time mode,
-            // and so we fall back to using sources instead.
-            if (_commandLineOptions.Sources.Any())
-            {
-                GenerateFakesUtilities.GenerateFakesSettings(
-                    _commandLineOptions,
-                    _commandLineOptions.Sources.ToList(),
-                    ref runsettings);
-            }
-            else if (sources.Any())
-            {
-                GenerateFakesUtilities.GenerateFakesSettings(
-                    _commandLineOptions,
-                    sources,
-                    ref runsettings);
-            }
-        }
+        runsettings = AddFakesConfigurationToRunsettings(sources, runsettings);
 
         // We can have either a run that contains string as test container (usually a DLL), which is later resolved to the actual path
         // and all tests that match filter are run from that container.
@@ -502,6 +486,21 @@ internal class TestRequestManager : ITestRequestManager
         // Collect metrics & commands.
         CollectMetrics(requestData, runConfiguration);
         LogCommandsTelemetryPoints(requestData);
+
+        // Get Fakes data collector settings.
+        payload.RunSettings = AddFakesConfigurationToRunsettings(payload.Sources, payload.RunSettings);
+
+        // Data collection is not supported yet, so no test session is spawned.
+        if (XmlRunSettingsUtilities.IsDataCollectionEnabled(payload.RunSettings))
+        {
+            eventsHandler.HandleStartTestSessionComplete(new()
+            {
+                TestSessionInfo = null,
+                Metrics = null,
+            });
+
+            return;
+        }
 
         lock (_syncObject)
         {
@@ -852,6 +851,39 @@ internal class TestRequestManager : ITestRequestManager
             // it should be handled in a correct way by the callers.
             return Architecture.Default;
         }
+    }
+
+    private string AddFakesConfigurationToRunsettings(IList<string>? sources, string runsettings)
+    {
+        if (string.Equals(_environmentVariableHelper.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))
+        {
+            return runsettings;
+        }
+
+        TPDebug.Assert(sources is not null, "AddFakesConfigurationToRunsettings: Sources list is null.");
+
+        // TODO: Are the sources in _commandLineOptions any different from the ones we get on the request?
+        // because why would they be? We never pass that forward to the executor, so this probably should
+        // just look at sources anyway.
+        //
+        // The commandline options do not have sources in design time mode,
+        // and so we fall back to using sources instead.
+        if (_commandLineOptions.Sources.Any())
+        {
+            runsettings = GenerateFakesUtilities.GenerateFakesSettings(
+                _commandLineOptions,
+                _commandLineOptions.Sources,
+                runsettings);
+        }
+        else if (sources.Count > 0)
+        {
+            runsettings = GenerateFakesUtilities.GenerateFakesSettings(
+                _commandLineOptions,
+                sources,
+                runsettings);
+        }
+
+        return runsettings;
     }
 
     private bool AddOrUpdateConsoleLogger(

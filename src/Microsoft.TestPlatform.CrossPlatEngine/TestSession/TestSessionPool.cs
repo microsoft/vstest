@@ -198,13 +198,22 @@ public class TestSessionPool
             // Try re-enqueueing the specified proxy.
             return sessionManager.EnqueueProxy(proxyId);
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex)
         {
-            // If we are unable to re-enqueue the proxy we just eat up the exception here as
-            // it is safe to proceed.
-            //
-            // WARNING: This should not normally happen and it raises questions regarding the
-            // test session pool operation and consistency.
+            // If we are unable to re-enqueue the proxy, we just eat up the exception here as
+            // it is safe to proceed. Returning a proxy is a fire-and-forget kind of operation,
+            // and failing to return it for whatever reason should no longer be considered a
+            // breaking scenario. In fact, this happens on a regular basis when two calls to
+            // ReturnProxy are issued, one when handling a raw message signaling a discovery/run
+            // complete, and one when actually processing this kind of message. As such, only the
+            // first call will ever succeed, with the second one always failing. Another failing
+            // scenario was attempting to return a "non-managed" testhost (one that can be obtained,
+            // for example, by failing to match discovery/run criteria to session criteria, and as
+            // such an on-demand testhost is spawned) to a test session. A "non-managed" testhost
+            // has -1 for the Id, and the call to EnqueueProxy will fail and an exception will be
+            // thrown. We have to make sure we catch that exception instead of relying on the caller
+            // to perform sanity checks, hence why we expanded the type of exception that we handle
+            // to generic exceptions too.
             EqtTrace.Warning("TestSessionPool.ReturnProxy failed: {0}", ex.ToString());
         }
 

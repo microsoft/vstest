@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -140,7 +141,8 @@ internal class Fixture : IDisposable
             fakeMetricsPublisherTask,
             ProcessHelper,
             TestRunAttachmentsProcessingManager,
-            Environment);
+            Environment,
+            new EnvironmentVariableHelper());
 
         TestRequestManager = testRequestManager;
 

@@ -31,6 +31,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
@@ -59,6 +60,7 @@ public class TestRequestManagerTests
     private readonly Mock<IProcessHelper> _mockProcessHelper;
     private readonly Mock<ITestRunAttachmentsProcessingManager> _mockAttachmentsProcessingManager;
     private readonly Mock<IEnvironment> _mockEnvironment;
+    private readonly Mock<IEnvironmentVariableHelper> _mockEnvironmentVariableHelper;
 
     private const string DefaultRunsettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
@@ -80,6 +82,7 @@ public class TestRequestManagerTests
         var testRunResultAggregator = new DummyTestRunResultAggregator();
         _mockProcessHelper = new Mock<IProcessHelper>();
         _mockEnvironment = new Mock<IEnvironment>();
+        _mockEnvironmentVariableHelper = new Mock<IEnvironmentVariableHelper>();
 
         _mockMetricsPublisher = new Mock<IMetricsPublisher>();
         _mockMetricsPublisherTask = Task.FromResult(_mockMetricsPublisher.Object);
@@ -93,7 +96,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
         _mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Returns(_mockDiscoveryRequest.Object);
         _mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
@@ -128,7 +132,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
         Assert.IsFalse(_mockLoggerEvents.EventsSubscribed());
     }
@@ -209,7 +214,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
         _testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, _protocolConfig);
 
@@ -260,7 +266,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
         // Act
         _testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
@@ -309,7 +316,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
 
         // Act
@@ -359,7 +367,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
 
         // Act
@@ -403,7 +412,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
 
         // Act
@@ -447,7 +457,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
 
         // Act
@@ -491,7 +502,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
         CommandLineOptions.Instance.Parallel = true;
         CommandLineOptions.Instance.EnableCodeCoverage = true;
@@ -547,7 +559,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
         CommandLineOptions.Instance.SettingsFile = @"c://temp/.testsettings";
 
@@ -594,7 +607,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
         CommandLineOptions.Instance.SettingsFile = @"c://temp/.vsmdi";
 
@@ -641,7 +655,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
         CommandLineOptions.Instance.SettingsFile = @"c://temp/.testrunConfig";
 
@@ -944,7 +959,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
         CommandLineOptions.Instance.Parallel = true;
         CommandLineOptions.Instance.EnableCodeCoverage = true;
@@ -1009,7 +1025,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
         // Act.
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1057,7 +1074,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
         // Act.
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1103,7 +1121,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
         // Act.
         _testRequestManager.RunTests(payload, new Mock<ITestHostLauncher3>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1151,7 +1170,8 @@ public class TestRequestManagerTests
             _mockMetricsPublisherTask,
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
-            _mockEnvironment.Object);
+            _mockEnvironment.Object,
+            _mockEnvironmentVariableHelper.Object);
 
         _testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, _protocolConfig);
 
