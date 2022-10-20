@@ -806,11 +806,102 @@ IEnumerable<TestCase> testCases
 
 ## Run
 
+TestExecution.RunAllWithDefaultHost
+TestExecution.GetTestRunnerProcessStartInfoForRunSelected
+
+TestExecution.StartWithTests
+
+```mermaid
+%% https://github.com/microsoft/vstest-docs/blob/main/RFCs/0001-Test-Platform-Architecture.md#discovery
+sequenceDiagram
+participant c as Client<br>(Visual Studio)
+participant r as Runner<br>(vstest.console.exe)
+participant t as Testhost<br>(testhost.exe)
+Note over c,r: Start session and negotiate version
+c->>r:   (optional) Extensions.Initialize
+c->>+r:  TestExecution.GetTestRunnerProcessStartInfoForRunSelected
+r->>t:   Run testhost -port Y
+t->>t:   Connect to port Y
+t-->r:   Runner detects connection
+r->>t:   ProtocolVersion
+t->>r:   ProtocolVersion
+r->>t:   (optional) TestExecution.Initialize
+r->>+t:  TestExecution.StartWithTests
+t->>r:   TestExecution.AttachDebugger
+r->>c:   TestExecution.AttachDebugger
+r->>c:   TestExecution.EditorAttachDebugger2
+c->>r:   TestExecution.EditorAttachDebuggerCallback
+r->>t:   TestExecution.AttachDebuggerCallback
+t-->>r:  TestExecution.StatsChange
+r-->>c:  TestExecution.StatsChange
+t-->>r:  TestExecution.StatsChange
+t->>-r:  TestExecution.Completed
+r->>t:   TestSession.Terminate
+t-->>r:  Process exited
+r-->>c:  TestExecution.StatsChange
+r->>-c:  TestExecution.Completed
+
+```
 
 
 
 
 
+run 
 
+```json
+public class TestRunRequestPayload
+{
+    /// <summary>
+    /// Gets or sets the sources for the test run request.
+    /// </summary>
+    /// <remarks>
+    /// Making this a list instead of an IEnumerable because the json serializer fails to deserialize
+    /// if a linq query outputs the IEnumerable.
+    /// </remarks>
+    [DataMember]
+    public List<string>? Sources { get; set; }
+
+    /// <summary>
+    /// Gets or sets the test cases for the test run request.
+    /// </summary>
+    /// <remarks>
+    /// Making this a list instead of an IEnumerable because the json serializer fails to deserialize
+    /// if a linq query outputs the IEnumerable.
+    /// </remarks>
+    [DataMember]
+    public List<TestCase>? TestCases { get; set; }
+
+    /// <summary>
+    /// Gets or sets the settings used for the test run request.
+    /// </summary>
+    [DataMember]
+    public string? RunSettings { get; set; }
+
+    /// <summary>
+    /// Settings used for the Run request.
+    /// </summary>
+    [DataMember]
+    public bool KeepAlive { get; set; }
+
+    /// <summary>
+    /// Is Debugging enabled
+    /// </summary>
+    [DataMember]
+    public bool DebuggingEnabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets the testplatform options
+    /// </summary>
+    [DataMember]
+    public TestPlatformOptions? TestPlatformOptions { get; set; }
+
+    /// <summary>
+    /// Gets or sets the test session info.
+    /// </summary>
+    [DataMember]
+    public TestSessionInfo? TestSessionInfo { get; set; }
+}
+```
 
 
