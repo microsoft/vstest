@@ -806,10 +806,17 @@ IEnumerable<TestCase> testCases
 
 ## Run
 
-TestExecution.RunAllWithDefaultHost
-TestExecution.GetTestRunnerProcessStartInfoForRunSelected
+The Run workflow runs the provided tests. It has has four modes, determined by combination of two properties. Running with sources, or set of discovered tests. And running with a default testhost launcher, or with a custom testhost launcher. Running with custom testhost launcher is most commonly used when debugging, and it adds the debugger related messages into the workflow.
 
-TestExecution.StartWithTests
+There are four distinct messages, one for each mode, which all use the same payload:
+
+- TestExecution.RunAllWithDefaultHost (sources, default testhost)
+- TestExecution.RunSelectedWithDefaultHost (tests, default testhost)
+- TestExecution.GetTestRunnerProcessStartInfoForRunAll (sources, custom testhost)
+- TestExecution.GetTestRunnerProcessStartInfoForRunSelected (tests, custom testhost)
+
+Below, only the most complex workflow is shown:
+
 
 ```mermaid
 %% https://github.com/microsoft/vstest-docs/blob/main/RFCs/0001-Test-Platform-Architecture.md#discovery
@@ -844,64 +851,753 @@ r->>-c:  TestExecution.Completed
 ```
 
 
+### TestExecution.GetTestRunnerProcessStartInfoForRunSelected request (Client)
 
+This applies to all these four requests:
 
+- TestExecution.RunAllWithDefaultHost (sources, default testhost)
+- TestExecution.RunSelectedWithDefaultHost (tests, default testhost)
+- TestExecution.GetTestRunnerProcessStartInfoForRunAll (sources, custom testhost)
+- TestExecution.GetTestRunnerProcessStartInfoForRunSelected (tests, custom testhost)
 
-run 
+*Request:*
 
-```json
+```cs
 public class TestRunRequestPayload
 {
-    /// <summary>
-    /// Gets or sets the sources for the test run request.
-    /// </summary>
-    /// <remarks>
-    /// Making this a list instead of an IEnumerable because the json serializer fails to deserialize
-    /// if a linq query outputs the IEnumerable.
-    /// </remarks>
-    [DataMember]
+    // Full paths of to the test sources containing the tests to run.
+    // It should not be used together with TestCases.
     public List<string>? Sources { get; set; }
 
-    /// <summary>
-    /// Gets or sets the test cases for the test run request.
-    /// </summary>
-    /// <remarks>
-    /// Making this a list instead of an IEnumerable because the json serializer fails to deserialize
-    /// if a linq query outputs the IEnumerable.
-    /// </remarks>
-    [DataMember]
+    // List of TestCases that were previously discovered.
+    // It should not be used together with Sources.
     public List<TestCase>? TestCases { get; set; }
 
-    /// <summary>
-    /// Gets or sets the settings used for the test run request.
-    /// </summary>
-    [DataMember]
+    // RunSettings for the current run.
     public string? RunSettings { get; set; }
 
-    /// <summary>
-    /// Settings used for the Run request.
-    /// </summary>
-    [DataMember]
+    // True if the runner should stay alive after the run is completed.
     public bool KeepAlive { get; set; }
 
-    /// <summary>
-    /// Is Debugging enabled
-    /// </summary>
-    [DataMember]
+    // True when requests to attach debugger to testhost should be send back to client.
     public bool DebuggingEnabled { get; set; }
 
-    /// <summary>
-    /// Gets or sets the testplatform options
-    /// </summary>
-    [DataMember]
+    // Test platform options.
     public TestPlatformOptions? TestPlatformOptions { get; set; }
 
-    /// <summary>
-    /// Gets or sets the test session info.
-    /// </summary>
-    [DataMember]
+    // The set of pre-started testhosts on which this run should try to run.
     public TestSessionInfo? TestSessionInfo { get; set; }
 }
 ```
 
+```json
+{
+   "Version": 7,
+   "MessageType": "TestExecution.GetTestRunnerProcessStartInfoForRunSelected",
+   "Payload": {
+      "Sources": null,
+      "TestCases": [
+         {
+            "Id": "cfa76bee-59fb-2133-3c23-9693a1078027",
+            "FullyQualifiedName": "MSTest1.UnitTest1.TestMethod1",
+            "DisplayName": "TestMethod1",
+            "ExecutorUri": "executor://MSTestAdapter/v2",
+            "Source": "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll",
+            "CodeFilePath": null,
+            "LineNumber": -1,
+            "Properties": [
+               {
+                  "Key": {
+                     "Id": "MSTestDiscoverer.TestClassName",
+                     "Label": "ClassName",
+                     "Category": "",
+                     "Description": "",
+                     "Attributes": 1,
+                     "ValueType": "System.String"
+                  },
+                  "Value": "MSTest1.UnitTest1"
+               },
+               {
+                  "Key": {
+                     "Id": "TestObject.Traits",
+                     "Label": "Traits",
+                     "Category": "",
+                     "Description": "",
+                     "Attributes": 5,
+                     "ValueType": "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]"
+                  },
+                  "Value": []
+               }
+            ]
+         }
+      ],
+      "RunSettings": "<RunSettings></RunSettings>",
+      "KeepAlive": false,
+      "DebuggingEnabled": true,
+      "TestPlatformOptions": {
+         "TestCaseFilter": null,
+         "FilterOptions": null,
+         "CollectMetrics": true,
+         "SkipDefaultAdapters": false
+      },
+      "TestSessionInfo": null
+   }
+}
+```
 
+*Response:*
+
+```cs
+public class TestRunCompletePayload
+{
+    // The completion information defined below.
+    public TestRunCompleteEventArgs? TestRunCompleteArgs { get; set; }
+
+    // The last batch of tests that were executed, empty when they were sent 
+    // via stats update message.
+    public TestRunChangedEventArgs? LastRunTests { get; set; }
+
+    // Gets or sets the run attachments, such as TRX reports or other files.
+    public ICollection<AttachmentSet>? RunAttachments { get; set; }
+
+    // Gets or sets the executor uris that were used to run the tests.
+    public ICollection<string>? ExecutorUris { get; set; }
+}
+
+public class TestRunCompleteEventArgs
+{
+    // Gets the statistics on the state of the test run. Including how many tests 
+    // were there for each outcome.
+    public ITestRunStatistics? TestRunStatistics { get; private set; }
+
+    // True when the run was cancelled. E.g. by user clicking cancel in a client
+    // or starting a new RunTests operation.
+    public bool IsCanceled { get; private set; }
+
+    // Gets a value indicating whether the test run is aborted. Meaning that the testhost
+    // crashed and runner sends this result on its behalf.
+    public bool IsAborted { get; private set; }
+
+    // Error encountered in the run that is not linked to any test.
+    public Exception? Error { get; private set; }
+
+    // Gets the attachment sets associated with the test run.
+    // TODO: HOW is this different from RunAttachments above?
+    public Collection<AttachmentSet> AttachmentSets { get; private set; }
+
+    // Gets the invoked data collectors for the test session.
+    public Collection<InvokedDataCollector> InvokedDataCollectors { get; private set; }
+
+    // Gets the time elapsed in just running the tests.
+    // Value is set to TimeSpan.Zero in case of any error.
+    public TimeSpan ElapsedTimeInRunningTests { get; private set; }
+
+    // Metrics.
+    public IDictionary<string, object>? Metrics { get; set; }
+
+    // Extensions that were discovered in this run.
+    public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; }
+}
+```
+
+```json
+{
+   "Version": 7,
+   "MessageType": "TestExecution.Completed",
+   "Payload": {
+      "TestRunCompleteArgs": {
+         "TestRunStatistics": {
+            "ExecutedTests": 3,
+            "Stats": {
+               "Passed": 3
+            }
+         },
+         "IsCanceled": false,
+         "IsAborted": false,
+         "Error": null,
+         "AttachmentSets": [],
+         "InvokedDataCollectors": [],
+         "ElapsedTimeInRunningTests": "00:00:00.5860000",
+         "Metrics": {
+            "VS.TestRun.TotalTestsRun.executor://mstestadapter/v2": 3.0,
+            "VS.TestRun.AdaptersUsedCount": 1,
+            "VS.TestRun.TimeTakenByAllAdapters": 0.5498061,
+            "VS.TestRun.AdaptersDiscoveredCount": 1,
+            "VS.TestRun.TotalTests": 3.0,
+            "VS.TestRun.TimeTakenToRun.executor://mstestadapter/v2": 0.5498061,
+            "VS.TestRun.TargetFramework": ".NETFramework,Version=v4.7.2",
+            "VS.TestRun.TargetPlatform": "X64",
+            "VS.TestRun.MaxCPUcount": 1,
+            "VS.TestRun.TargetDevice": "Local Machine",
+            "VS.TestRun.TestPlatformVersion": "17.5.0-dev",
+            "VS.TestRun.TargetOS": "Microsoft Windows NT 10.0.22623.0",
+            "VS.TestRun.DisableAppDomain": false,
+            "VS.TestRun.CommandLineSwitches": "",
+            "VS.TestRun.IsTestSettingsUsed": false,
+            "VS.TestRun.LoggersUsed": "",
+            "VS.TestRun.ParallelEnabled": "False",
+            "VS.TestSession.Id": "",
+            "VS.TestRun.NumberOfSources": 0,
+            "VS.TestRun.RunState": "Completed",
+            "VS.TestRun.TimeTakenInSec": 2.8273251,
+            "VS.TestPlatform.DiscoveredExtensions": "{\"TestExecutors\":[\"executor://MSTestAdapter/v2\"],\"TestHosts\":[\"HostProvider://DefaultTestHost\",\"HostProvider://DotnetTestHost\"]}"
+         },
+         "DiscoveredExtensions": {
+            "TestExecutors": [
+               "executor://MSTestAdapter/v2"
+            ],
+            "TestHosts": [
+               "HostProvider://DefaultTestHost",
+               "HostProvider://DotnetTestHost"
+            ]
+         }
+      },
+      "LastRunTests": null,
+      "RunAttachments": [],
+      "ExecutorUris": [
+         "executor://mstestadapter/v2"
+      ]
+   }
+}
+```
+
+### TestExecution.Initialize request (Runner)
+
+Optional list of additional extensions to initialize in the testhost.
+
+*Request:*
+```cs
+IEnumerable<string> extensions
+```
+
+```json
+{
+   "Version": 7,
+   "MessageType": "TestExecution.Initialize",
+   "Payload": [
+      "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll"
+   ]
+}
+```
+
+*Response:*
+
+None.
+
+### TestExecution.StartWithTests (Runner)
+
+The runner starts the testhost and sends it a request to run tests. It comes in two flavors, depending on whether we run with sources, or with given set of testcases (see below).
+
+*Request:*
+
+```cs
+public class TestRunCriteriaWithTests
+{
+    // The tests that were previously discovered and that should run.
+    public IEnumerable<TestCase> Tests { get; private set; }
+
+    // Settings for the current run.
+    public string? RunSettings { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the test execution context.
+    /// </summary>
+    public TestExecutionContext TestExecutionContext { get; set; }
+
+    /// <summary>
+    /// Gets the test Containers (e.g. .appx, .appxrecipie)
+    /// </summary>
+    public string? Package { get; private set; }
+}
+
+public class TestExecutionContext
+{
+    // Gets or sets the frequency of run stats event.
+    public long FrequencyOfRunStatsChangeEvent { get; set; }
+
+    // Gets or sets the timeout that triggers sending results regardless of cache size.
+    public TimeSpan RunStatsChangeEventTimeout { get; set; }
+
+    // Gets or sets a value indicating whether execution is out of process.
+    public bool InIsolation { get; set; }
+
+    // Gets or sets a value indicating whether testhost process should be kept running after test run completion.
+    public bool KeepAlive { get; set; }
+
+    // Gets or sets a value indicating whether test case level events need to be sent or not.
+    public bool AreTestCaseLevelEventsRequired { get; set; }
+
+    // Gets or sets a value indicating whether execution is in debug mode.
+    public bool IsDebug { get; set; }
+
+    // Gets or sets the filter criteria for run with sources to filter test cases.
+    public string? TestCaseFilter { get; set; }
+
+    // Gets or sets additional options for filtering.
+    public FilterOptions? FilterOptions { get; set; }
+}
+```
+
+```json
+{
+   "Version": 7,
+   "MessageType": "TestExecution.StartWithTests",
+   "Payload": {
+      "Tests": [
+         {
+            "Id": "cfa76bee-59fb-2133-3c23-9693a1078027",
+            "FullyQualifiedName": "MSTest1.UnitTest1.TestMethod1",
+            "DisplayName": "TestMethod1",
+            "ExecutorUri": "executor://MSTestAdapter/v2",
+            "Source": "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll",
+            "CodeFilePath": null,
+            "LineNumber": -1,
+            "Properties": [
+               {
+                  "Key": {
+                     "Id": "MSTestDiscoverer.TestClassName",
+                     "Label": "ClassName",
+                     "Category": "",
+                     "Description": "",
+                     "Attributes": 1,
+                     "ValueType": "System.String"
+                  },
+                  "Value": "MSTest1.UnitTest1"
+               },
+               {
+                  "Key": {
+                     "Id": "TestObject.Traits",
+                     "Label": "Traits",
+                     "Category": "",
+                     "Description": "",
+                     "Attributes": 5,
+                     "ValueType": "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]"
+                  },
+                  "Value": []
+               }
+            ]
+         }
+      ],
+      "RunSettings": "<RunSettings></RunSettings>",
+      "TestExecutionContext": {
+         "FrequencyOfRunStatsChangeEvent": 2,
+         "RunStatsChangeEventTimeout": "00:00:01.5000000",
+         "InIsolation": false,
+         "KeepAlive": false,
+         "AreTestCaseLevelEventsRequired": false,
+         "IsDebug": true,
+         "TestCaseFilter": null,
+         "FilterOptions": null
+      },
+      "Package": null
+   }
+}
+```
+
+*Response:*
+
+```cs
+public class TestRunCompletePayload
+{
+    // The completion information defined below.
+    public TestRunCompleteEventArgs? TestRunCompleteArgs { get; set; }
+
+    // The last batch of tests that were executed, empty when they were sent 
+    // via stats update message.
+    public TestRunChangedEventArgs? LastRunTests { get; set; }
+
+    // Gets or sets the run attachments, such as TRX reports or other files.
+    public ICollection<AttachmentSet>? RunAttachments { get; set; }
+
+    // Gets or sets the executor uris that were used to run the tests.
+    public ICollection<string>? ExecutorUris { get; set; }
+}
+
+public class TestRunCompleteEventArgs
+{
+    // Gets the statistics on the state of the test run. Including how many tests 
+    // were there for each outcome.
+    public ITestRunStatistics? TestRunStatistics { get; private set; }
+
+    // True when the run was cancelled. E.g. by user clicking cancel in a client
+    // or starting a new RunTests operation.
+    public bool IsCanceled { get; private set; }
+
+    // Gets a value indicating whether the test run is aborted. Meaning that the testhost
+    // crashed and runner sends this result on its behalf.
+    public bool IsAborted { get; private set; }
+
+    // Error encountered in the run that is not linked to any test.
+    public Exception? Error { get; private set; }
+
+    // Gets the attachment sets associated with the test run.
+    // TODO: HOW is this different from RunAttachments above?
+    public Collection<AttachmentSet> AttachmentSets { get; private set; }
+
+    // Gets the invoked data collectors for the test session.
+    public Collection<InvokedDataCollector> InvokedDataCollectors { get; private set; }
+
+    // Gets the time elapsed in just running the tests.
+    // Value is set to TimeSpan.Zero in case of any error.
+    public TimeSpan ElapsedTimeInRunningTests { get; private set; }
+
+    // Metrics.
+    public IDictionary<string, object>? Metrics { get; set; }
+
+    // Extensions that were discovered in this run.
+    public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; }
+}
+```
+
+```json
+{
+    "Version": 7,
+    "MessageType": "TestExecution.Completed",
+    "Payload": {
+        "TestRunCompleteArgs": {
+            "TestRunStatistics": {
+                "ExecutedTests": 3,
+                "Stats": {
+                    "Passed": 3
+                }
+            },
+            "IsCanceled": false,
+            "IsAborted": false,
+            "Error": null,
+            "AttachmentSets": [],
+            "InvokedDataCollectors": [],
+            "ElapsedTimeInRunningTests": "00:00:00.6764685",
+            "Metrics": {
+                "VS.TestRun.AdaptersDiscoveredCount": 1,
+                "VS.TestRun.TotalTestsRun.executor://mstestadapter/v2": 3,
+                "VS.TestRun.TimeTakenToRun.executor://mstestadapter/v2": 0.6460834,
+                "VS.TestRun.TimeTakenByAllAdapters": 0.6460834,
+                "VS.TestRun.TotalTests": 3,
+                "VS.TestRun.RunState": "Completed",
+                "VS.TestRun.AdaptersUsedCount": 1
+            },
+            "DiscoveredExtensions": {
+                "TestDiscoverers": [
+                    "Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.MSTestDiscoverer, Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+                ],
+                "TestExecutors": [
+                    "executor://MSTestAdapter/v2"
+                ],
+                "TestExecutors2": [],
+                "TestSettingsProviders": []
+            }
+        },
+        "LastRunTests": {
+            "NewTestResults": [
+                {
+                    "TestCase": {
+                        "Id": "ef7f4646-afa1-4482-25a2-1aabbbdbb9bc",
+                        "FullyQualifiedName": "MSTest1.UnitTest1.TestMethod3",
+                        "DisplayName": "TestMethod3",
+                        "ExecutorUri": "executor://MSTestAdapter/v2",
+                        "Source": "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll",
+                        "CodeFilePath": null,
+                        "LineNumber": -1,
+                        "Properties": [
+                            {
+                                "Key": {
+                                    "Id": "MSTestDiscoverer.TestClassName",
+                                    "Label": "ClassName",
+                                    "Category": "",
+                                    "Description": "",
+                                    "Attributes": 1,
+                                    "ValueType": "System.String"
+                                },
+                                "Value": "MSTest1.UnitTest1"
+                            },
+                            {
+                                "Key": {
+                                    "Id": "TestObject.Traits",
+                                    "Label": "Traits",
+                                    "Category": "",
+                                    "Description": "",
+                                    "Attributes": 5,
+                                    "ValueType": "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]"
+                                },
+                                "Value": []
+                            }
+                        ]
+                    },
+                    "Attachments": [],
+                    "Outcome": 1,
+                    "ErrorMessage": null,
+                    "ErrorStackTrace": null,
+                    "DisplayName": null,
+                    "Messages": [],
+                    "ComputerName": null,
+                    "Duration": "00:00:00.0101784",
+                    "StartTime": "2022-10-20T07:22:58.0889799+02:00",
+                    "EndTime": "2022-10-20T07:22:58.099497+02:00",
+                    "Properties": [
+                        {
+                            "Key": {
+                                "Id": "ExecutionId",
+                                "Label": "ExecutionId",
+                                "Category": "",
+                                "Description": "",
+                                "Attributes": 1,
+                                "ValueType": "System.Guid"
+                            },
+                            "Value": "00000000-0000-0000-0000-000000000000"
+                        },
+                        {
+                            "Key": {
+                                "Id": "ParentExecId",
+                                "Label": "ParentExecId",
+                                "Category": "",
+                                "Description": "",
+                                "Attributes": 1,
+                                "ValueType": "System.Guid"
+                            },
+                            "Value": "00000000-0000-0000-0000-000000000000"
+                        },
+                        {
+                            "Key": {
+                                "Id": "InnerResultsCount",
+                                "Label": "InnerResultsCount",
+                                "Category": "",
+                                "Description": "",
+                                "Attributes": 1,
+                                "ValueType": "System.Int32"
+                            },
+                            "Value": 0
+                        }
+                    ]
+                }
+            ],
+            "TestRunStatistics": {
+                "ExecutedTests": 3,
+                "Stats": {
+                    "Passed": 3
+                }
+            },
+            "ActiveTests": []
+        },
+        "RunAttachments": [],
+        "ExecutorUris": [
+            "executor://mstestadapter/v2"
+        ]
+    }
+}
+```
+
+
+
+### TestExecution.StartWithSources
+
+The runner starts the testhost and sends it a request to run tests. It comes in two flavors, depending on whether we run with sources (see above), or with given set of testcases.
+
+```cs
+public class TestRunCriteriaWithSources
+{
+    /// <summary>
+    /// Gets the adapter source map.
+    /// </summary>
+    public Dictionary<string, IEnumerable<string>> AdapterSourceMap { get; private set; }
+
+    /// <summary>
+    /// Gets the run settings.
+    /// </summary>
+    public string? RunSettings { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the test execution context.
+    /// </summary>
+    public TestExecutionContext TestExecutionContext { get; set; }
+
+    /// <summary>
+    /// Gets the test Containers (e.g. .appx, .appxrecipie)
+    /// </summary>
+    public string? Package { get; private set; }
+}
+```
+
+```json
+{
+    "Version": 7,
+    "MessageType": "TestExecution.StartWithSources",
+    "Payload": {
+        "AdapterSourceMap": {
+            "_none_": [
+                "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll"
+            ]
+        },
+        "RunSettings": "<RunSettings>\r\n  <RunConfiguration>\r\n    <BatchSize>2</BatchSize>\r\n    <CollectSourceInformation>False</CollectSourceInformation>\r\n    <DesignMode>True</DesignMode>\r\n    <TargetFrameworkVersion>.NETFramework,Version=v4.7.2</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n  <BoostTestInternalSettings xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n    <VSProcessId>999999</VSProcessId>\r\n  </BoostTestInternalSettings>\r\n  <GoogleTestAdapterSettings xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n    <SolutionSettings>\r\n      <Settings />\r\n    </SolutionSettings>\r\n    <ProjectSettings />\r\n  </GoogleTestAdapterSettings>\r\n</RunSettings>",
+        "TestExecutionContext": {
+            "FrequencyOfRunStatsChangeEvent": 2,
+            "RunStatsChangeEventTimeout": "00:00:01.5000000",
+            "InIsolation": false,
+            "KeepAlive": false,
+            "AreTestCaseLevelEventsRequired": false,
+            "IsDebug": true,
+            "TestCaseFilter": null,
+            "FilterOptions": null
+        },
+        "Package": null
+    }
+}
+```
+
+*Response:*
+
+See [TestExecution.StartWithTests (Runner)](#testexecutionstartwithtests-runner).
+
+### TestExecution.StatsChange notification (Runner)
+
+```cs
+public class TestRunChangedEventArgs : EventArgs
+{
+    // New test results.
+    public IEnumerable<TestResult>? NewTestResults { get; private set; }
+
+    // Test run statistics, e.g. how many tests passed or failed so far.
+    public ITestRunStatistics? TestRunStatistics { get; private set; }
+
+    // Currently running tests.
+    public IEnumerable<TestCase>? ActiveTests { get; private set; }
+}
+
+```
+
+```json
+{
+    "Version": 7,
+    "MessageType": "TestExecution.StatsChange",
+    "Payload": {
+        "NewTestResults": [
+            {
+                "TestCase": {
+                    "Id": "66367201-6976-c7c2-37ef-ac9e96858025",
+                    "FullyQualifiedName": "MSTest1.UnitTest1.TestMethod2",
+                    "DisplayName": "TestMethod2",
+                    "ExecutorUri": "executor://MSTestAdapter/v2",
+                    "Source": "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll",
+                    "CodeFilePath": null,
+                    "LineNumber": -1,
+                    "Properties": [
+                        {
+                            "Key": {
+                                "Id": "MSTestDiscoverer.TestClassName",
+                                "Label": "ClassName",
+                                "Category": "",
+                                "Description": "",
+                                "Attributes": 1,
+                                "ValueType": "System.String"
+                            },
+                            "Value": "MSTest1.UnitTest1"
+                        },
+                        {
+                            "Key": {
+                                "Id": "TestObject.Traits",
+                                "Label": "Traits",
+                                "Category": "",
+                                "Description": "",
+                                "Attributes": 5,
+                                "ValueType": "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]"
+                            },
+                            "Value": []
+                        }
+                    ]
+                },
+                "Attachments": [],
+                "Outcome": 1,
+                "ErrorMessage": null,
+                "ErrorStackTrace": null,
+                "DisplayName": null,
+                "Messages": [],
+                "ComputerName": null,
+                "Duration": "00:00:00.0000401",
+                "StartTime": "2022-10-20T07:22:58.0857669+02:00",
+                "EndTime": "2022-10-20T07:22:58.0857669+02:00",
+                "Properties": [
+                    {
+                        "Key": {
+                            "Id": "ExecutionId",
+                            "Label": "ExecutionId",
+                            "Category": "",
+                            "Description": "",
+                            "Attributes": 1,
+                            "ValueType": "System.Guid"
+                        },
+                        "Value": "00000000-0000-0000-0000-000000000000"
+                    },
+                    {
+                        "Key": {
+                            "Id": "ParentExecId",
+                            "Label": "ParentExecId",
+                            "Category": "",
+                            "Description": "",
+                            "Attributes": 1,
+                            "ValueType": "System.Guid"
+                        },
+                        "Value": "00000000-0000-0000-0000-000000000000"
+                    },
+                    {
+                        "Key": {
+                            "Id": "InnerResultsCount",
+                            "Label": "InnerResultsCount",
+                            "Category": "",
+                            "Description": "",
+                            "Attributes": 1,
+                            "ValueType": "System.Int32"
+                        },
+                        "Value": 0
+                    }
+                ]
+            }
+        ],
+        "TestRunStatistics": {
+            "ExecutedTests": 2,
+            "Stats": {
+                "Passed": 2
+            }
+        },
+        "ActiveTests": [
+            {
+                "Id": "ef7f4646-afa1-4482-25a2-1aabbbdbb9bc",
+                "FullyQualifiedName": "MSTest1.UnitTest1.TestMethod3",
+                "DisplayName": "TestMethod3",
+                "ExecutorUri": "executor://MSTestAdapter/v2",
+                "Source": "S:\\p\\vstest\\playground\\MSTest1\\bin\\Debug\\net472\\MSTest1.dll",
+                "CodeFilePath": null,
+                "LineNumber": -1,
+                "Properties": [
+                    {
+                        "Key": {
+                            "Id": "MSTestDiscoverer.TestClassName",
+                            "Label": "ClassName",
+                            "Category": "",
+                            "Description": "",
+                            "Attributes": 1,
+                            "ValueType": "System.String"
+                        },
+                        "Value": "MSTest1.UnitTest1"
+                    },
+                    {
+                        "Key": {
+                            "Id": "TestObject.Traits",
+                            "Label": "Traits",
+                            "Category": "",
+                            "Description": "",
+                            "Attributes": 5,
+                            "ValueType": "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]"
+                        },
+                        "Value": []
+                    }
+                ]
+            }
+        ]
+    }
+}
+```
+
+
+### TestExecution.StatsChange (Client)
+
+
+### TestExecution.Completed (Client)
