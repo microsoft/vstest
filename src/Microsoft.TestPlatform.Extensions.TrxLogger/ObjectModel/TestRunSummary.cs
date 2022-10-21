@@ -91,6 +91,7 @@ internal class TestRunSummary : IXmlTestStore
         int executed,
         int pass,
         int fail,
+        int abort,
         TestOutcome outcome,
         List<RunInfo> runMessages,
         string stdOut,
@@ -102,7 +103,7 @@ internal class TestRunSummary : IXmlTestStore
         _passedTests = pass;
         _failedTests = fail;
         int countForNonExistingResults = 0; // if below values are assigned constants 0, compiler gives warning CS0414
-        _abortedTests = countForNonExistingResults;
+        _abortedTests = abort;
         _errorTests = countForNonExistingResults;
         _timeoutTests = countForNonExistingResults;
         _inconclusiveTests = countForNonExistingResults;

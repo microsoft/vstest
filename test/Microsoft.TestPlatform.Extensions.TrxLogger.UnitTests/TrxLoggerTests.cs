@@ -191,6 +191,21 @@ public class TrxLoggerTests
     }
 
     [TestMethod]
+    public void TestResultHandlerKeepingTheTrackOfAbortedTests()
+    {
+        TestCase abortTestCase1 = CreateTestCase("Abort");
+
+        VisualStudio.TestPlatform.ObjectModel.TestResult passResult1 = new(abortTestCase1);
+        passResult1.Outcome = TestOutcome.Aborted;
+
+        Mock<TestResultEventArgs> pass1 = new(passResult1);
+
+        _testableTrxLogger.TestResultHandler(new object(), pass1.Object);
+
+        Assert.AreEqual(1, _testableTrxLogger.AbortedTestCount, "Aborted Tests");
+    }
+
+    [TestMethod]
     public void TestResultHandlerKeepingTheTrackOfTotalTests()
     {
         TestCase passTestCase1 = CreateTestCase("Pass1");

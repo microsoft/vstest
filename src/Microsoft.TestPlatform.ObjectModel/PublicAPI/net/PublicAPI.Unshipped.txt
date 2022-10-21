@@ -1,1 +1,2 @@
 ﻿#nullable enable
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Aborted = 5 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome

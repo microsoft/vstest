@@ -175,6 +175,8 @@ public class TrxLogger : ITestLoggerWithParameters
 
     internal int FailedTestCount { get; private set; }
 
+    internal int AbortedTestCount { get; private set; }
+
     internal int TestResultCount
     {
         get
@@ -293,14 +295,18 @@ public class TrxLogger : ITestLoggerWithParameters
 
         // Set various counts (passed tests, failed tests, total tests)
         TotalTestCount++;
-        if (testResult.Outcome == TrxLoggerObjectModel.TestOutcome.Failed)
+        switch (testResult.Outcome)
         {
-            TestResultOutcome = TrxLoggerObjectModel.TestOutcome.Failed;
-            FailedTestCount++;
-        }
-        else if (testResult.Outcome == TrxLoggerObjectModel.TestOutcome.Passed)
-        {
-            PassedTestCount++;
+            case TrxLoggerObjectModel.TestOutcome.Failed:
+                TestResultOutcome = TrxLoggerObjectModel.TestOutcome.Failed;
+                FailedTestCount++;
+                break;
+            case TrxLoggerObjectModel.TestOutcome.Passed:
+                PassedTestCount++;
+                break;
+            case TrxLoggerObjectModel.TestOutcome.Aborted:
+                AbortedTestCount++;
+                break;
         }
     }
 
@@ -379,6 +385,7 @@ public class TrxLogger : ITestLoggerWithParameters
             PassedTestCount + FailedTestCount,
             PassedTestCount,
             FailedTestCount,
+            AbortedTestCount,
             TestResultOutcome,
             _runLevelErrorsAndWarnings,
             _runLevelStdOut.ToString(),

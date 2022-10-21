@@ -32,4 +32,9 @@ public enum TestOutcome
     /// Test Case Not found
     /// </summary>
     NotFound = 4,
+
+    /// <summary>
+    /// Test Case Aborted
+    /// </summary>
+    Aborted,
 }

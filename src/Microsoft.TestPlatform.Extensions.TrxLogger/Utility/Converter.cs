@@ -159,6 +159,9 @@ internal class Converter
             case Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.NotFound:
                 outcome = TrxObjectModel.TestOutcome.NotExecuted;
                 break;
+            case Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Aborted:
+                outcome = TrxObjectModel.TestOutcome.Aborted;
+                break;
             default:
                 Debug.Fail("Unexpected Outcome.");
                 break;

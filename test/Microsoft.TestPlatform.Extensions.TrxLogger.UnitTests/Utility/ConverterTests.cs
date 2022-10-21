@@ -68,6 +68,12 @@ public class ConverterTests
     }
 
     [TestMethod]
+    public void ToOutcomeShouldMapAbortedToAborted()
+    {
+        Assert.AreEqual(TrxLoggerOutcome.Aborted, Converter.ToOutcome(TestOutcome.Aborted));
+    }
+
+    [TestMethod]
     public void ToCollectionEntriesShouldRenameAttachmentUriIfTheAttachmentNameIsSame()
     {
         SetupForToCollectionEntries(out var tempDir, out var attachmentSets, out var testRun, out var testResultsDirectory);
