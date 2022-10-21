@@ -13,6 +13,7 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Client;
 using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
@@ -830,7 +831,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public Task ProcessTestRunAttachmentsAsync(
+    public async Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
         IEnumerable<InvokedDataCollector>? invokedDataCollectors,
         string? processingSettings,
@@ -839,7 +840,47 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         ITestRunAttachmentsProcessingEventsHandler eventsHandler,
         CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        _testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStart();
+
+        try
+        {
+            var attachmentProcessingPayload = new TestRunAttachmentsProcessingPayload
+            {
+                Attachments = attachments,
+                InvokedDataCollectors = invokedDataCollectors,
+                RunSettings = processingSettings,
+                CollectMetrics = collectMetrics
+            };
+
+            using (cancellationToken.Register(() =>
+                TestRequestManager?.CancelTestRunAttachmentsProcessing()))
+            {
+                // Awaiting the attachment processing task here. The implementation of the
+                // underlying operation guarantees the event handler is called when processing
+                // is complete, so when awaiting ends, the results have already been passed to
+                // the caller via the event handler. No need for further synchronization.
+                await Task.Run(() =>
+                        TestRequestManager?.ProcessTestRunAttachments(
+                            attachmentProcessingPayload,
+                            new InProcessTestRunAttachmentsProcessingEventsHandler(eventsHandler),
+                            new ProtocolConfig { Version = _highestSupportedVersion }),
+                        CancellationToken.None)
+                    .ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.ProcessTestRunAttachmentsAsync: Exception occurred: " + ex ?? "payload is null");
+
+            var attachmentsProcessingArgs = new TestRunAttachmentsProcessingCompleteEventArgs(
+                isCanceled: cancellationToken.IsCancellationRequested,
+                ex);
+
+            eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex?.ToString());
+            eventsHandler.HandleTestRunAttachmentsProcessingComplete(attachmentsProcessingArgs, lastChunk: null);
+        }
+
+        _testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStop();
     }
 
     /// <inheritdoc/>
