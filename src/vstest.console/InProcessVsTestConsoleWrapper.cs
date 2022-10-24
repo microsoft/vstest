@@ -13,7 +13,6 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Client;
 using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
@@ -862,7 +861,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
                 await Task.Run(() =>
                         TestRequestManager?.ProcessTestRunAttachments(
                             attachmentProcessingPayload,
-                            new InProcessTestRunAttachmentsProcessingEventsHandler(eventsHandler),
+                            eventsHandler,
                             new ProtocolConfig { Version = _highestSupportedVersion }),
                         CancellationToken.None)
                     .ConfigureAwait(false);
@@ -870,13 +869,13 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("InProcessVsTestConsoleWrapper.ProcessTestRunAttachmentsAsync: Exception occurred: " + ex ?? "payload is null");
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.ProcessTestRunAttachmentsAsync: Exception occurred: " + ex);
 
             var attachmentsProcessingArgs = new TestRunAttachmentsProcessingCompleteEventArgs(
                 isCanceled: cancellationToken.IsCancellationRequested,
                 ex);
 
-            eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex?.ToString());
+            eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
             eventsHandler.HandleTestRunAttachmentsProcessingComplete(attachmentsProcessingArgs, lastChunk: null);
         }
 
