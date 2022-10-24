@@ -418,12 +418,12 @@ public class IntegrationTestBase
 
     public void StdOutputContains(string substring)
     {
-        Assert.IsTrue(_standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.IsTrue(_standardTestOutput.Contains(substring), $"StdOutput:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void StdOutputDoesNotContains(string substring)
     {
-        Assert.IsFalse(_standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.IsFalse(_standardTestOutput.Contains(substring), $"StdOutput:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void ExitCodeEquals(int exitCode)
@@ -918,7 +918,7 @@ public class IntegrationTestBase
 
     protected string BuildMultipleAssemblyPath(params string[] assetNames)
     {
-        // Double quoted sources sepearated by space.
+        // Double quoted sources separated by space.
         return string.Join(" ", GetTestDlls(assetNames).Select(a => a.AddDoubleQuote()));
     }
 
