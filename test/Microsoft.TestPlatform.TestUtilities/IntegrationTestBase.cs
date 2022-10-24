@@ -200,7 +200,7 @@ public class IntegrationTestBase
 
         if (arguments.Contains(".csproj"))
         {
-            arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" " + arguments;
+            arguments += $@" -p:VsTestConsolePath=""{vstestConsolePath}""";
         }
 
         // This is used in dotnet/sdk to determine path to vstest.console:
