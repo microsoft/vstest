@@ -1306,11 +1306,7 @@ if ($Force -or $Steps -contains "Pack") {
 }
 
 if ($Force -or $Steps -contains "Manifest") {
-    Generate-Manifest -PackageFolder $TPB_PackageOutDir
-    if (Test-Path $TPB_SourceBuildPackageOutDir)
-    {
-        Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
-    }
+
     Copy-PackageIntoStaticDirectory
 }
 
