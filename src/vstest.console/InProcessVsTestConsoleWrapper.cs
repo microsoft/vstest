@@ -858,6 +858,14 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
                 // underlying operation guarantees the event handler is called when processing
                 // is complete, so when awaiting ends, the results have already been passed to
                 // the caller via the event handler. No need for further synchronization.
+                //
+                // NOTE: We're passing in CancellationToken.None and that is by design, *DO NOT*
+                // attempt to optimize this code by passing in the cancellation token registered
+                // above. Passing in the said token would result in potentially leaving the caller
+                // hanging when the token is signaled before even starting the test run attachment
+                // processing. In this scenario, the Task.Run should not even run in the first
+                // place, and as such the event handler that signals processing is complete will
+                // not be triggered anymore.
                 await Task.Run(() =>
                         TestRequestManager?.ProcessTestRunAttachments(
                             attachmentProcessingPayload,
