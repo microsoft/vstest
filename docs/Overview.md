@@ -1,3 +1,49 @@
+- [Specification](#specification)
+  - [Base Protocol](#base-protocol)
+    - [Header Part](#header-part)
+    - [Content Part](#content-part)
+    - [Base Types](#base-types)
+    - [Request Message](#request-message)
+    - [Response Message](#response-message)
+    - [Notification Message](#notification-message)
+    - [Cancellation Support](#cancellation-support)
+    - [Progress Support](#progress-support)
+  - [Test Platform Protocol](#test-platform-protocol)
+    - [Capabilities](#capabilities)
+    - [Request, Notification and Response Ordering](#request-notification-and-response-ordering)
+    - [Message documentation](#message-documentation)
+  - [Basic structures](#basic-structures)
+    - [URI](#uri)
+    - [String type aliases](#string-type-aliases)
+    - [Regular expressions](#regular-expressions)
+    - [Enumerations](#enumerations)
+    - [TestCase](#testcase)
+    - [TestResult](#testresult)
+    - [Message](#message)
+  - [Lifecycle Messages](#lifecycle-messages)
+    - [ProtocolVersion request](#protocolversion-request)
+    - [TestSession.Message notification (Runner) (Testhost)](#testsessionmessage-notification-runner-testhost)
+  - [Session](#session)
+    - [Start Runner process request (Runner)](#start-runner-process-request-runner)
+    - [TestSession.Terminate request (Runner)](#testsessionterminate-request-runner)
+    - [Start Testhost process request (Runner)](#start-testhost-process-request-runner)
+    - [Terminate testhost request (Testhost)](#terminate-testhost-request-testhost)
+  - [Discovery](#discovery)
+    - [Extensions.Initialize request (Runner)](#extensionsinitialize-request-runner)
+    - [TestDiscovery.Start request (Runner)](#testdiscoverystart-request-runner)
+    - [TestDiscovery.Initialize request (Testhost)](#testdiscoveryinitialize-request-testhost)
+    - [TestDiscovery.Start request (Testhost)](#testdiscoverystart-request-testhost)
+    - [TestDiscovery.TestFound notification (Testhost)](#testdiscoverytestfound-notification-testhost)
+    - [TestDiscovery.TestFound notification (Runner)](#testdiscoverytestfound-notification-runner)
+  - [Run](#run)
+    - [TestExecution.GetTestRunnerProcessStartInfoForRunSelected request (Client)](#testexecutiongettestrunnerprocessstartinfoforrunselected-request-client)
+    - [TestExecution.Initialize request (Runner)](#testexecutioninitialize-request-runner)
+    - [TestExecution.StartWithTests (Runner)](#testexecutionstartwithtests-runner)
+    - [TestExecution.StartWithSources](#testexecutionstartwithsources)
+    - [TestExecution.StatsChange notification (Runner)](#testexecutionstatschange-notification-runner)
+    - [TestExecution.StatsChange notification (Client)](#testexecutionstatschange-notification-client)
+  - [Datacollection](#datacollection)
+
 ## What is TestPlatform? 
 
 TestPlatform is a collection of libraries and tools that provide test running for Visual Studio Test Explorer, `dotnet test`, Azure DevOps, Omnisharp, Stryker and other tools.
@@ -79,6 +125,74 @@ The Run workflow described above is very common in command line tools, and proba
 # Specification
 
 ## Base Protocol
+
+TODO: fill in more details. 
+
+Data are passed as JSON serialized strings over TCP. The messages are serialized using binary format that delimits messages by a length prefix. The size prefix is written as 7 bit encoded int. (The basics of encoding that number are summarized here: https://stackoverflow.com/a/49780224/3065397).
+
+In .NET the data are written using BinaryWriter and BinaryReader which do all the needed conversions automatically when writing and reading the string (https://learn.microsoft.com/en-us/dotnet/api/system.io.binarywriter.write?view=net-6.0#system-io-binarywriter-write(system-string)).
+
+The message on the wire is prefixed by the header, and read until the size of the message is reached. The 10 first bytes of a 1024 letter message looks like this: 
+
+```
+128
+08
+72 - H
+101 - e
+108 - l
+108 - l
+111 - o
+32
+102 - f
+114 - r
+```
+
+You can play with it using this code:
+```cs
+namespace ConsoleApp45
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            var mem = new MemoryStream();
+            var w = new BinaryWriter(mem);
+            var message = "Hello from TestPlatform!" + new string('*', 1000);
+
+            Console.WriteLine($"Written length: {message.Length}");
+            w.Write(message);
+            w.Flush();
+
+            var r = new BinaryReader(mem);
+            mem.Position = 0;
+            var length = r.Read7BitEncodedInt();
+            Console.WriteLine($"Read length: {message.Length}");
+            
+            mem.Position = 0;
+            var size = 10;
+            var bytes = r.ReadBytes(size);
+            Console.WriteLine($"Data (first {size} bytes):");
+            Console.WriteLine(string.Join("\n", bytes.Select(ToText).ToArray()));
+        }
+
+        public static string ToText(byte b)
+        {
+            if (char.IsLetterOrDigit((char)b))
+            {
+                return $"{b:d2} - {(char)b}";
+            }
+
+            return $"{b:d2}";
+        }
+    }
+}
+```
+
+The messages are then transported over TCP. In .NET the standard TCP client and TCP server is used. A single *dynamic* port is used for a single pair of client and server. (Unlike in a more typical web scenario where server has a determined port, and a client connects to that port.)
+
+The role of client and server are not fully set, and based on parameters either the runner, or the testhost can serve the role of a server. Typically the runner is the server (setups a dynamic port, and starts testhost, passing the port to connect to). But in remote scenarios it is beneficial to make the remote side (testhost), the server, and open the port on the remote device which is more likely to be for-testing-only, and deprovisioned after the test run. In this case the server (testhost) needs to use a predetermined port which it sets up, and the client (runner) will connect to it. 
+
+
 
 ### Header Part
 
@@ -1597,7 +1711,10 @@ public class TestRunChangedEventArgs : EventArgs
 ```
 
 
-### TestExecution.StatsChange (Client)
+### TestExecution.StatsChange notification (Client)
+
+Same as above [TestExecution.StatsChange notification (Runner)](#testexecutionstatschange-notification-runner).
 
 
-### TestExecution.Completed (Client)
+## Datacollection
+
