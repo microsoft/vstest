@@ -1,60 +1,65 @@
-- [Specification](#specification)
-  - [Base Protocol](#base-protocol)
-    - [Header Part](#header-part)
-    - [Content Part](#content-part)
-    - [Base Types](#base-types)
-    - [Request Message](#request-message)
-    - [Response Message](#response-message)
-    - [Notification Message](#notification-message)
-    - [Cancellation Support](#cancellation-support)
-    - [Progress Support](#progress-support)
-  - [Test Platform Protocol](#test-platform-protocol)
-    - [Capabilities](#capabilities)
-    - [Request, Notification and Response Ordering](#request-notification-and-response-ordering)
-    - [Message documentation](#message-documentation)
-  - [Basic structures](#basic-structures)
-    - [URI](#uri)
-    - [String type aliases](#string-type-aliases)
-    - [Regular expressions](#regular-expressions)
-    - [Enumerations](#enumerations)
-    - [TestCase](#testcase)
-    - [TestResult](#testresult)
-    - [Message](#message)
-  - [Lifecycle Messages](#lifecycle-messages)
-    - [ProtocolVersion request](#protocolversion-request)
-    - [TestSession.Message notification (Runner) (Testhost)](#testsessionmessage-notification-runner-testhost)
-  - [Session](#session)
-    - [Start Runner process request (Runner)](#start-runner-process-request-runner)
-    - [TestSession.Terminate request (Runner)](#testsessionterminate-request-runner)
-    - [Start Testhost process request (Runner)](#start-testhost-process-request-runner)
-    - [Terminate testhost request (Testhost)](#terminate-testhost-request-testhost)
-  - [Discovery](#discovery)
-    - [Extensions.Initialize request (Runner)](#extensionsinitialize-request-runner)
-    - [TestDiscovery.Start request (Runner)](#testdiscoverystart-request-runner)
-    - [TestDiscovery.Initialize request (Testhost)](#testdiscoveryinitialize-request-testhost)
-    - [TestDiscovery.Start request (Testhost)](#testdiscoverystart-request-testhost)
-    - [TestDiscovery.TestFound notification (Testhost)](#testdiscoverytestfound-notification-testhost)
-    - [TestDiscovery.TestFound notification (Runner)](#testdiscoverytestfound-notification-runner)
-  - [Run](#run)
-    - [TestExecution.GetTestRunnerProcessStartInfoForRunSelected request (Client)](#testexecutiongettestrunnerprocessstartinfoforrunselected-request-client)
-    - [TestExecution.Initialize request (Runner)](#testexecutioninitialize-request-runner)
-    - [TestExecution.StartWithTests (Runner)](#testexecutionstartwithtests-runner)
-    - [TestExecution.StartWithSources](#testexecutionstartwithsources)
-    - [TestExecution.StatsChange notification (Runner)](#testexecutionstatschange-notification-runner)
-    - [TestExecution.StatsChange notification (Client)](#testexecutionstatschange-notification-client)
-  - [Datacollection](#datacollection)
-  - [.NET Implementation](#net-implementation)
-    - [Architecture](#architecture)
-    - [Extension points](#extension-points)
+# Test Platform messaging
 
-## What is TestPlatform? 
+- [Test Platform messaging](#test-platform-messaging)
+  - [What is TestPlatform?](#what-is-testplatform)
+  - [How it works?](#how-it-works)
+  - [Workflows](#workflows)
+  - [Specification](#specification)
+    - [Base Protocol](#base-protocol)
+      - [Header Part](#header-part)
+      - [Content Part](#content-part)
+      - [Base Types](#base-types)
+      - [Request Message](#request-message)
+      - [Response Message](#response-message)
+      - [Notification Message](#notification-message)
+      - [Cancellation Support](#cancellation-support)
+      - [Progress Support](#progress-support)
+    - [Test Platform Protocol](#test-platform-protocol)
+      - [Capabilities](#capabilities)
+      - [Request, Notification and Response Ordering](#request-notification-and-response-ordering)
+      - [Message documentation](#message-documentation)
+    - [Basic structures](#basic-structures)
+      - [URI](#uri)
+      - [String type aliases](#string-type-aliases)
+      - [Regular expressions](#regular-expressions)
+      - [Enumerations](#enumerations)
+      - [TestCase](#testcase)
+      - [TestResult](#testresult)
+      - [Message](#message)
+    - [Lifecycle Messages](#lifecycle-messages)
+      - [ProtocolVersion request](#protocolversion-request)
+      - [TestSession.Message notification (Runner) (Testhost)](#testsessionmessage-notification-runner-testhost)
+    - [Session](#session)
+      - [Start Runner process request (Runner)](#start-runner-process-request-runner)
+      - [TestSession.Terminate request (Runner)](#testsessionterminate-request-runner)
+      - [Start Testhost process request (Runner)](#start-testhost-process-request-runner)
+      - [Terminate testhost request (Testhost)](#terminate-testhost-request-testhost)
+    - [Discovery](#discovery)
+      - [Extensions.Initialize request (Runner)](#extensionsinitialize-request-runner)
+      - [TestDiscovery.Start request (Runner)](#testdiscoverystart-request-runner)
+      - [TestDiscovery.Initialize request (Testhost)](#testdiscoveryinitialize-request-testhost)
+      - [TestDiscovery.Start request (Testhost)](#testdiscoverystart-request-testhost)
+      - [TestDiscovery.TestFound notification (Testhost)](#testdiscoverytestfound-notification-testhost)
+      - [TestDiscovery.TestFound notification (Runner)](#testdiscoverytestfound-notification-runner)
+    - [Run](#run)
+      - [TestExecution.GetTestRunnerProcessStartInfoForRunSelected request (Client)](#testexecutiongettestrunnerprocessstartinfoforrunselected-request-client)
+      - [TestExecution.Initialize request (Runner)](#testexecutioninitialize-request-runner)
+      - [TestExecution.StartWithTests (Runner)](#testexecutionstartwithtests-runner)
+      - [TestExecution.StartWithSources](#testexecutionstartwithsources)
+      - [TestExecution.StatsChange notification (Runner)](#testexecutionstatschange-notification-runner)
+      - [TestExecution.StatsChange notification (Client)](#testexecutionstatschange-notification-client)
+    - [Datacollection](#datacollection)
+    - [.NET Implementation](#net-implementation)
+      - [Architecture](#architecture)
+      - [Extension points](#extension-points)
+
+## What is TestPlatform?
 
 TestPlatform is a collection of libraries and tools that provide test running for Visual Studio Test Explorer, `dotnet test`, Azure DevOps, Omnisharp, Stryker and other tools.
 
 TestPlatform is mainly focused on running C# tests, but it is an extensible platform, that allows additional providers and extensions to be used.
 
 TestPlatform is also known as vstest, or by the names of the tools that use it: Test Explorer, and `dotnet test`.
-
 
 ## How it works?
 
@@ -75,11 +80,11 @@ Datacollector observes the testhost to collect additional information about the 
 
 While the tests execute, the results are reported back to the runner, aggregated, and forwarded to the client.
 
-The client processes the results and shows them in their UI, for example as TestExplorer does it here: 
+The client processes the results and shows them in their UI, for example as TestExplorer does it here:
 
 <TODO gif>
 
-A simplified flow describing the whole process is as follows: 
+A simplified flow describing the whole process is as follows:
 
 ```mermaid
 sequenceDiagram
@@ -113,31 +118,29 @@ This example represents the basic workflow of a test run. With each component ha
 
 - *Datacollector* runs in additional process, and can host user extensions that observe testhost and manage its lifetime.
 
-
 ## Workflows
 
 The Run workflow described above is very common in command line tools, and probably the first thing everyone thinks about when it comes to tests. There are additional workflows that TestPlatform provides:
 
 - *Discovery* - discovers tests in given test sources, most commonly .NET dlls.
-- *Run* - runs tests from given libraries (test sources) or from a given list of pre-discovered tests. 
+- *Run* - runs tests from given libraries (test sources) or from a given list of pre-discovered tests.
 - *Session* - starts the runner and waits for requests.
 - *TestSession* - starts a set of testhosts for given test sources, to make the ready to run.
 - *AttachmentProcessing* - processes a given set of attachments that were produced during a previous test run, e.g. merges code coverage files.
 
+## Specification
 
-# Specification
+### Base Protocol
 
-## Base Protocol
+TODO: fill in more details.
 
-TODO: fill in more details. 
+Data are passed as JSON serialized strings over TCP. The messages are serialized using binary format that delimits messages by a length prefix. The size prefix is written as 7 bit encoded int. (The basics of encoding that number are summarized here: <https://stackoverflow.com/a/49780224/3065397>).
 
-Data are passed as JSON serialized strings over TCP. The messages are serialized using binary format that delimits messages by a length prefix. The size prefix is written as 7 bit encoded int. (The basics of encoding that number are summarized here: https://stackoverflow.com/a/49780224/3065397).
+In .NET the data are written using BinaryWriter and BinaryReader which do all the needed conversions automatically when writing and reading the string (<https://learn.microsoft.com/en-us/dotnet/api/system.io.binarywriter.write?view=net-6.0#system-io-binarywriter-write(system-string>)).
 
-In .NET the data are written using BinaryWriter and BinaryReader which do all the needed conversions automatically when writing and reading the string (https://learn.microsoft.com/en-us/dotnet/api/system.io.binarywriter.write?view=net-6.0#system-io-binarywriter-write(system-string)).
+The message on the wire is prefixed by the header, and read until the size of the message is reached. The 10 first bytes of a 1024 letter message looks like this:
 
-The message on the wire is prefixed by the header, and read until the size of the message is reached. The 10 first bytes of a 1024 letter message looks like this: 
-
-```
+```bash
 128
 08
 72 - H
@@ -151,6 +154,7 @@ The message on the wire is prefixed by the header, and read until the size of th
 ```
 
 You can play with it using this code:
+
 ```cs
 namespace ConsoleApp45
 {
@@ -193,30 +197,27 @@ namespace ConsoleApp45
 
 The messages are then transported over TCP. In .NET the standard TCP client and TCP server is used. A single *dynamic* port is used for a single pair of client and server. (Unlike in a more typical web scenario where server has a determined port, and a client connects to that port.)
 
-The role of client and server are not fully set, and based on parameters either the runner, or the testhost can serve the role of a server. Typically the runner is the server (setups a dynamic port, and starts testhost, passing the port to connect to). But in remote scenarios it is beneficial to make the remote side (testhost), the server, and open the port on the remote device which is more likely to be for-testing-only, and deprovisioned after the test run. In this case the server (testhost) needs to use a predetermined port which it sets up, and the client (runner) will connect to it. 
+The role of client and server are not fully set, and based on parameters either the runner, or the testhost can serve the role of a server. Typically the runner is the server (setups a dynamic port, and starts testhost, passing the port to connect to). But in remote scenarios it is beneficial to make the remote side (testhost), the server, and open the port on the remote device which is more likely to be for-testing-only, and deprovisioned after the test run. In this case the server (testhost) needs to use a predetermined port which it sets up, and the client (runner) will connect to it.
 
-
-### Header Part
+#### Header Part
 
 There is no header in the message itself. There is header only in the binary message.
 
-### Content Part
+#### Content Part
 
+#### Base Types
 
+#### Request Message
 
-### Base Types
+#### Response Message
 
-### Request Message
+#### Notification Message
 
-### Response Message
+#### Cancellation Support
 
-### Notification Message
+#### Progress Support
 
-### Cancellation Support
-
-### Progress Support
-
-## Test Platform Protocol
+### Test Platform Protocol
 
 TestPlatform protocol defines a set of JSON request, response and notification messages, that are exchanged using the above base protocol. This section starts by describing the basic JSON structures used in the protocol. The description uses C# classes, and types, with nullability enabled. Meaning that every type is non-nullable by default, and nullability is denoted by `?` following the type name.
 
@@ -224,7 +225,7 @@ TestPlatform protocol defines a set of JSON request, response and notification m
 
 The protocol assumes that one server serves one tool. There is no support in the protocol to share one server between different tools.
 
-### Capabilities
+#### Capabilities
 
 The client, runner + datacollector, and testhost are shipped separately. Each of those components can have a different version and hence a different set of functionality they support. A single number (protocol version) is used to represent the whole set of capabilities that a given component supports. Each newer version includes complete functionality of the previous version. There are no granular capabilities.
 
@@ -232,54 +233,54 @@ Components are expected to handshake a version of the protocol to use, and use t
 
 > For example client announces that is supports version 7, runner supports 9, version 7 is used.
 
-Once a version is agreed upon, a higher version should not be used by the lower level components. 
+Once a version is agreed upon, a higher version should not be used by the lower level components.
 
-> The above runner should announce 7 to testhost, rather than 9. If testhost announces 10, 7 is used. 
+> The above runner should announce 7 to testhost, rather than 9. If testhost announces 10, 7 is used.
 
 The version is negotiated between the components at the beginning of every workflow using [ProtocolVersion](#protocolversion-request) request.
 
-### Request, Notification and Response Ordering
+#### Request, Notification and Response Ordering
 
 The server supports processing only a single request at a time. Unless the request is [Cancel](#cancel) or [Abort](#abort) request.
 
 All notifications are sent before as response is sent.
 
-### Message documentation
+#### Message documentation
 
 TestPlatformProtocol is defined by a set of requests, responses and notifications. Each of those are described using the following format:
 
 - a header describing the request
-- a request section describing the format of the 
+- a request section describing the format of the
 
 <TODO>
 
-## Basic structures
+### Basic structures
 
-### URI
+#### URI
 
-### String type aliases
+#### String type aliases
 
-### Regular expressions
+#### Regular expressions
 
-### Enumerations
+#### Enumerations
 
-### TestCase
+#### TestCase
 
-### TestResult
+#### TestResult
 
-### Message
+#### Message
 
-## Lifecycle Messages
+### Lifecycle Messages
 
 The current protocol specification defines that the lifecycle of a server is managed by the client (e.g. VisualStudio). It is up to the client to decide when to start (process-wise) and when to shutdown a server.
 
-### ProtocolVersion request
+#### ProtocolVersion request
 
 Version request is sent as the first request from the client to runner, and from runner to testhost. This request is used to negotiate the version of protocol to be used.
 
-Each protocol version is allowed to only add new features and never remove old features. Each component is also required to support all versions of protocol from version 0 up to the latest version. 
+Each protocol version is allowed to only add new features and never remove old features. Each component is also required to support all versions of protocol from version 0 up to the latest version.
 
-The handshake is one sided. The left side sends the request, and the right side (client-**runner**, or runner-**testhost**) responds with the determined version. 
+The handshake is one sided. The left side sends the request, and the right side (client-**runner**, or runner-**testhost**) responds with the determined version.
 
 The version is determined by choosing the highest common supported version. When client sends 6, and runner supports maximum version 7, then 6 will be used.
 
@@ -287,7 +288,7 @@ The receiving side should remember the agreed value, and use it as the highest s
 
 The request was introduced in TestPlatform version `16.0.0`. Runners before this version are not allowed. Testhosts before this version are allowed, the version of testhost if figured out by scanning the assembly, and the request is not sent to them. Version 0 is used for communication.
 
-Versions: 
+Versions:
 
 - 0: The original base protocol with no explicit versioning in the message. It is used during negotiation.
 - 1: Added Version field to the base protocol.
@@ -326,9 +327,9 @@ int version
 }
 ```
 
-### TestSession.Message notification (Runner) (Testhost)
+#### TestSession.Message notification (Runner) (Testhost)
 
-Downstream components can send messages to upstream components, with a given severity. This is mostly used to send additional information from extensions. Upstream component can decide what to do with the information, if it will process it and forward it, or batch it and then send it as one unified message. 
+Downstream components can send messages to upstream components, with a given severity. This is mostly used to send additional information from extensions. Upstream component can decide what to do with the information, if it will process it and forward it, or batch it and then send it as one unified message.
 
 The upstream component should not parse the message content, or use it for flow control.
 
@@ -366,13 +367,13 @@ public enum TestMessageLevel
 }
 ```
 
-## Session
+### Session
 
 Session starts the runner process, and connects to it. This is used in two ways. First as a way to pre-start Runner before there is any work for it, this is done for example by Visual Studio to have the runner ready to receive work. Or the flow is run just before other requests (e.g. Discovery).
 
 > ⚠️ Do not confuse this with TestSession workflow that pre-starts testhosts.
 
-### Start Runner process request (Runner)
+#### Start Runner process request (Runner)
 
 Runner process starts and sends response to the port that it connected to.
 
@@ -385,7 +386,7 @@ r->>r:   Connect to port Y
 r->>c:   TestSession.Connected
 ```
 
-*Request:* 
+*Request:*
 
 The runner process starts.
 
@@ -402,7 +403,7 @@ null
 }
 ```
 
-### TestSession.Terminate request (Runner)
+#### TestSession.Terminate request (Runner)
 
 Runner process is asked to terminate.
 
@@ -429,15 +430,15 @@ null
 
 *Response:*
 
-The runner process terminates. Termination is detected by observing the process. ([Exited](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.exited?view=net-7.0) event in .NET.)
+The runner process terminates. Termination is detected by observing the process. ([Exited](https://learn.microsoft.com/dotnet/api/system.diagnostics.process.exited) event in .NET.)
 
-### Start Testhost process request (Runner)
+#### Start Testhost process request (Runner)
 
-Testhost process starts, and runner detects that it connected. There is no additional request response exchange. 
+Testhost process starts, and runner detects that it connected. There is no additional request response exchange.
 
 Same applies to datacollector.
 
-### Terminate testhost request (Testhost)
+#### Terminate testhost request (Testhost)
 
 Testhost process is asked to terminate.
 
@@ -464,16 +465,15 @@ null
 
 *Response:*
 
-The testhost process terminates. Termination is detected by observing the process. ([Exited](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.exited?view=net-7.0) event in .NET.)
+The testhost process terminates. Termination is detected by observing the process. ([Exited](https://learn.microsoft.com/dotnet/api/system.diagnostics.process.exited) event in .NET.)
 
 Same applies to datacollector.
 
-## Discovery
+### Discovery
 
 Discovery workflow is used to find tests in the provided test sources. Discovery happens in testhost and can run in parallel. Datacollectors are not used during discovery.
 
 > ℹ️ The real work is often offloaded to a test framework such as NUnit, which runs inside of the testhost process. This is not shown in the workflow below.
-
 
 ```mermaid
 %% https://github.com/microsoft/vstest-docs/blob/main/RFCs/0001-Test-Platform-Architecture.md#discovery
@@ -500,7 +500,7 @@ t-->>r:  Process exited
 r->>-c:   TestDiscovery.Completed
 ```
 
-### Extensions.Initialize request (Runner)
+#### Extensions.Initialize request (Runner)
 
 List of extensions to initialize in runner. Runner should forward appropriate extensions to testhost or datacollector if they are appropriate. For example when then list contains test adapters. This request is optional.
 
@@ -527,7 +527,7 @@ IEnumerable<string> extensions
 
 None.
 
-### TestDiscovery.Start request (Runner)
+#### TestDiscovery.Start request (Runner)
 
 Contains full paths to one or more test sources, and settings to use for the discovery. Runner can split the request into multiple additional pieces. For example when the sources are incompatible and each need a different type of testhost. Or when it is asked to discover the sources in parallel.
 
@@ -665,7 +665,7 @@ public class DiscoveryCompletePayload
 }
 ```
 
-### TestDiscovery.Initialize request (Testhost)
+#### TestDiscovery.Initialize request (Testhost)
 
 List of extensions to initialize in the testhost. This request is optional.
 
@@ -691,7 +691,7 @@ IEnumerable<string> extensions
 
 None.
 
-### TestDiscovery.Start request (Testhost)
+#### TestDiscovery.Start request (Testhost)
 
 Contains full paths to one or more test sources, and settings to use for the discovery. Runner can split the request into multiple additional pieces. For example when the sources are incompatible and each need a different type of testhost. Or when it is asked to discover the sources in parallel.
 
@@ -822,11 +822,10 @@ public class DiscoveryCompletePayload
 }
 ```
 
-### TestDiscovery.TestFound notification (Testhost)
+#### TestDiscovery.TestFound notification (Testhost)
 
 Contains a batch of tests that were found. Runner should aggregate the results, and hold onto them if it needs. The final response does not contain all the partial updates.
 
-
 ```cs
 IEnumerable<TestCase> testCases
 ```
@@ -873,11 +872,10 @@ IEnumerable<TestCase> testCases
 }
 ```
 
-### TestDiscovery.TestFound notification (Runner)
+#### TestDiscovery.TestFound notification (Runner)
 
 Contains a batch of tests that were found. Client should aggregate the results, and hold onto them if it needs. The final response does not contain all the partial updates.
 
-
 ```cs
 IEnumerable<TestCase> testCases
 ```
@@ -924,7 +922,7 @@ IEnumerable<TestCase> testCases
 }
 ```
 
-## Run
+### Run
 
 The Run workflow runs the provided tests. It has has four modes, determined by combination of two properties. Running with sources, or set of discovered tests. And running with a default testhost launcher, or with a custom testhost launcher. Running with custom testhost launcher is most commonly used when debugging, and it adds the debugger related messages into the workflow.
 
@@ -936,7 +934,6 @@ There are four distinct messages, one for each mode, which all use the same payl
 - TestExecution.GetTestRunnerProcessStartInfoForRunSelected (tests, custom testhost)
 
 Below, only the most complex workflow is shown:
-
 
 ```mermaid
 %% https://github.com/microsoft/vstest-docs/blob/main/RFCs/0001-Test-Platform-Architecture.md#discovery
@@ -970,8 +967,7 @@ r->>-c:  TestExecution.Completed
 
 ```
 
-
-### TestExecution.GetTestRunnerProcessStartInfoForRunSelected request (Client)
+#### TestExecution.GetTestRunnerProcessStartInfoForRunSelected request (Client)
 
 This applies to all these four requests:
 
@@ -1181,11 +1177,12 @@ public class TestRunCompleteEventArgs
 }
 ```
 
-### TestExecution.Initialize request (Runner)
+#### TestExecution.Initialize request (Runner)
 
 Optional list of additional extensions to initialize in the testhost.
 
 *Request:*
+
 ```cs
 IEnumerable<string> extensions
 ```
@@ -1204,7 +1201,7 @@ IEnumerable<string> extensions
 
 None.
 
-### TestExecution.StartWithTests (Runner)
+#### TestExecution.StartWithTests (Runner)
 
 The runner starts the testhost and sends it a request to run tests. It comes in two flavors, depending on whether we run with sources, or with given set of testcases (see below).
 
@@ -1506,9 +1503,7 @@ public class TestRunCompleteEventArgs
 }
 ```
 
-
-
-### TestExecution.StartWithSources
+#### TestExecution.StartWithSources
 
 The runner starts the testhost and sends it a request to run tests. It comes in two flavors, depending on whether we run with sources (see above), or with given set of testcases.
 
@@ -1567,7 +1562,7 @@ public class TestRunCriteriaWithSources
 
 See [TestExecution.StartWithTests (Runner)](#testexecutionstartwithtests-runner).
 
-### TestExecution.StatsChange notification (Runner)
+#### TestExecution.StatsChange notification (Runner)
 
 ```cs
 public class TestRunChangedEventArgs : EventArgs
@@ -1716,20 +1711,16 @@ public class TestRunChangedEventArgs : EventArgs
 }
 ```
 
-
-### TestExecution.StatsChange notification (Client)
+#### TestExecution.StatsChange notification (Client)
 
 Same as above [TestExecution.StatsChange notification (Runner)](#testexecutionstatschange-notification-runner).
 
-
-## Datacollection
+### Datacollection
 
 TODO
 
+### .NET Implementation
 
+#### Architecture
 
-## .NET Implementation
-
-### Architecture 
-
-### Extension points
+#### Extension points
