@@ -765,10 +765,13 @@
       </Item>
       <Item ItemId=";InvalidProcDumpToolDirectoryPath" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[The directory specified is not valid: '{0}']]></Val>
+          <Val><![CDATA[The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[지정된 디렉터리가 유효하지 않습니다: '{0}']]></Val>
+            <Val><![CDATA[procdump 실행 파일에 대해 지정된 디렉터리가 유효하지 않으며 도구가 환경 변수(PROCDUMP_PATH, PATH) 내에서 발견되지 않았습니다.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>

@@ -39,7 +39,7 @@ public class RunsettingsTests : AcceptanceTestBase
         var runConfigurationDictionary = new Dictionary<string, string>
         {
             { "MaxCpuCount", "0" },
-            { "TargetFrameworkVersion", GetTargetFramworkForRunsettings() },
+            { "TargetFrameworkVersion", GetTargetFrameworkForRunsettings() },
             { "TestAdaptersPaths", GetTestAdapterPath() }
         };
         // passing different platform
@@ -51,7 +51,7 @@ public class RunsettingsTests : AcceptanceTestBase
             {
                 "RunConfiguration.MaxCpuCount=1",
                 string.Concat("RunConfiguration.TargetPlatform=",targetPlatform),
-                string.Concat("RunConfiguration.TargetFrameworkVersion=" , GetTargetFramworkForRunsettings()),
+                string.Concat("RunConfiguration.TargetFrameworkVersion=" , GetTargetFrameworkForRunsettings()),
                 string.Concat("RunConfiguration.TestAdaptersPaths=" , GetTestAdapterPath())
             });
 
@@ -86,7 +86,7 @@ public class RunsettingsTests : AcceptanceTestBase
             {
                 "RunConfiguration.MaxCpuCount=1",
                 string.Concat("RunConfiguration.TargetPlatform=",targetPlatform),
-                string.Concat("RunConfiguration.TargetFrameworkVersion=" , GetTargetFramworkForRunsettings()),
+                string.Concat("RunConfiguration.TargetFrameworkVersion=" , GetTargetFrameworkForRunsettings()),
                 string.Concat("RunConfiguration.TestAdaptersPaths=" , GetTestAdapterPath())
             });
 
@@ -118,7 +118,7 @@ public class RunsettingsTests : AcceptanceTestBase
         {
             { "MaxCpuCount", "1" },
             { "TargetPlatform", "x64" },
-            { "TargetFrameworkVersion", GetTargetFramworkForRunsettings() },
+            { "TargetFrameworkVersion", GetTargetFrameworkForRunsettings() },
             { "TestAdaptersPaths", GetTestAdapterPath() }
         };
         var additionalArgs = "/Platform:x86";
@@ -147,7 +147,7 @@ public class RunsettingsTests : AcceptanceTestBase
         {
             { "MaxCpuCount", "1" },
             { "TargetPlatform", targetPlatform },
-            { "TargetFrameworkVersion", GetTargetFramworkForRunsettings() },
+            { "TargetFrameworkVersion", GetTargetFrameworkForRunsettings() },
             { "TestAdaptersPaths", GetTestAdapterPath() }
         };
         RunTestWithRunSettings(runConfigurationDictionary, null, null, testhostProcessNames, expectedNumOfProcessCreated);
@@ -174,7 +174,7 @@ public class RunsettingsTests : AcceptanceTestBase
             {
                 "RunConfiguration.MaxCpuCount=1",
                 string.Concat("RunConfiguration.TargetPlatform=",targetPlatform),
-                string.Concat("RunConfiguration.TargetFrameworkVersion=" , GetTargetFramworkForRunsettings()),
+                string.Concat("RunConfiguration.TargetFrameworkVersion=" , GetTargetFrameworkForRunsettings()),
                 string.Concat("RunConfiguration.TestAdaptersPaths=" , GetTestAdapterPath())
             });
 
@@ -200,7 +200,7 @@ public class RunsettingsTests : AcceptanceTestBase
         {
             { "MaxCpuCount", "2" },
             { "TargetPlatform", targetPlatform },
-            { "TargetFrameworkVersion", GetTargetFramworkForRunsettings() },
+            { "TargetFrameworkVersion", GetTargetFrameworkForRunsettings() },
             { "TestAdaptersPaths", GetTestAdapterPath() }
         };
 
@@ -210,7 +210,7 @@ public class RunsettingsTests : AcceptanceTestBase
             {
                 "RunConfiguration.MaxCpuCount=1",
                 string.Concat("RunConfiguration.TargetPlatform=",targetPlatform),
-                string.Concat("RunConfiguration.TargetFrameworkVersion=" , GetTargetFramworkForRunsettings()),
+                string.Concat("RunConfiguration.TargetFrameworkVersion=" , GetTargetFrameworkForRunsettings()),
                 string.Concat("RunConfiguration.TestAdaptersPaths=" , GetTestAdapterPath())
             });
 
@@ -232,7 +232,7 @@ public class RunsettingsTests : AcceptanceTestBase
         {
             { "MaxCpuCount", "2" },
             { "TargetPlatform", targetPlatform },
-            { "TargetFrameworkVersion", GetTargetFramworkForRunsettings()},
+            { "TargetFrameworkVersion", GetTargetFrameworkForRunsettings()},
             { "TestAdaptersPaths", GetTestAdapterPath() }
         };
         RunTestWithRunSettings(runConfigurationDictionary, null, null, testhostProcessName, expectedProcessCreated);

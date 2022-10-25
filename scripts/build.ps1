@@ -1057,6 +1057,7 @@ function Copy-CodeCoverage-Package-Artifacts {
     Copy-Item $codeCoverageInstrumentationPackagesDir\Microsoft.CodeCoverage.Instrumentation.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $codeCoverageInstrumentationPackagesDir\Mono.Cecil.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $codeCoverageInstrumentationPackagesDir\Mono.Cecil.Pdb.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $codeCoverageInstrumentationPackagesDir\Mono.Cecil.Rocks.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $codeCoverageTelemetryPackagesDir\Microsoft.CodeCoverage.Telemetry.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $internalCodeCoveragePackagesDir\CodeCoverage $microsoftCodeCoveragePackageDir -Force -Recurse
     Copy-Item $internalCodeCoveragePackagesDir\InstrumentationEngine $microsoftCodeCoveragePackageDir -Force -Recurse

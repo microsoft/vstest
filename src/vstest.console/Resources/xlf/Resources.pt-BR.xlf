@@ -1210,8 +1210,8 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidProcDumpToolDirectoryPath">
-        <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)</source>
-        <target state="new">The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)</target>
+        <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)</source>
+        <target state="translated">O diretório especificado para o executável procdump não é válido e a ferramenta não foi encontrada dentro das variáveis de ambiente (PROCDUMP_PATH, PATH)</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpFileNameNotFound">

@@ -121,7 +121,7 @@ public class TestSessionPoolTests
         Assert.IsTrue(TestSessionPool.Instance.AddSession(testSessionInfo, mockProxyTestSessionManager.Object));
 
         // Simulates proxy id not found (see setup sequence).
-        Assert.ThrowsException<ArgumentException>(() => TestSessionPool.Instance.ReturnProxy(testSessionInfo, 0));
+        Assert.IsFalse(TestSessionPool.Instance.ReturnProxy(testSessionInfo, 0));
         mockProxyTestSessionManager.Verify(tsm => tsm.EnqueueProxy(It.IsAny<int>()), Times.Once);
 
         // Simulates proxy already available (see setup sequence).
