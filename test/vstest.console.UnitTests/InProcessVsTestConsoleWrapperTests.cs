@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
@@ -15,13 +17,14 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using FluentAssertions;
 using Moq;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 
@@ -38,6 +41,17 @@ public class InProcessVsTestConsoleWrapperTests
 
     private readonly IList<string> _testSources = new List<String>() { "test1", "test2" };
     private readonly IList<TestCase> _testCases = new List<TestCase>() { new TestCase(), new TestCase() };
+    private readonly IList<AttachmentSet> _attachmentSets = new List<AttachmentSet>()
+    {
+        new AttachmentSet(new Uri("datacollector://AttachmentSetDataCollector1"), "AttachmentSet1"),
+        new AttachmentSet(new Uri("datacollector://AttachmentSetDataCollector2"), "AttachmentSet2"),
+    };
+    private readonly IList<InvokedDataCollector> _invokedDataCollectors = new List<InvokedDataCollector>()
+    {
+        new InvokedDataCollector(new Uri("datacollector://InvokedDataCollector1"), "InvokedDataCollector1", "DummyAssemblyName1", "DummyFilePath1", true),
+        new InvokedDataCollector(new Uri("datacollector://InvokedDataCollector2"), "InvokedDataCollector2", "DummyAssemblyName2", "DummyFilePath2", false),
+    };
+
     private readonly string _runSettings = "dummy runsettings";
 
     public InProcessVsTestConsoleWrapperTests()
@@ -848,5 +862,181 @@ public class InProcessVsTestConsoleWrapperTests
 
         mockTestSessionEventsHandler.Verify(eh => eh.HandleStartTestSessionComplete(startTestSessionCompleteArgs), Times.Once);
         mockTestSessionEventsHandler.Verify(eh => eh.HandleStopTestSessionComplete(stopTestSessionCompleteArgs), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task InProcessWrapperProcessTestRunAttachmentsAsyncWithSevenParamsIsSuccessfullyInvoked()
+    {
+        var attachmentsEventHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
+
+        TestRunAttachmentsProcessingPayload? payload = null;
+        _mockTestRequestManager
+            .Setup(trm => trm.ProcessTestRunAttachments(
+                It.IsAny<TestRunAttachmentsProcessingPayload>(),
+                It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(),
+                It.IsAny<ProtocolConfig>()))
+            .Callback((
+                TestRunAttachmentsProcessingPayload p,
+                ITestRunAttachmentsProcessingEventsHandler _,
+                ProtocolConfig _) => payload = p);
+
+        await _consoleWrapper.ProcessTestRunAttachmentsAsync(
+            _attachmentSets,
+            _invokedDataCollectors,
+            _runSettings,
+            true,
+            false,
+            attachmentsEventHandler.Object,
+            CancellationToken.None).ConfigureAwait(false);
+
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_attachmentSets.SequenceEqual(payload.Attachments!));
+        Assert.IsTrue(_invokedDataCollectors.SequenceEqual(payload.InvokedDataCollectors!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.IsFalse(payload.CollectMetrics);
+
+        _mockEventSource.Verify(es => es.TranslationLayerTestRunAttachmentsProcessingStart(), Times.Once);
+        _mockEventSource.Verify(es => es.TranslationLayerTestRunAttachmentsProcessingStop(), Times.Once);
+        _mockTestRequestManager.Verify(trm => trm.ResetOptions(), Times.Never);
+        _mockTestRequestManager.Verify(trm => trm.ProcessTestRunAttachments(
+                It.IsAny<TestRunAttachmentsProcessingPayload>(),
+                It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(),
+                It.IsAny<ProtocolConfig>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task InProcessWrapperProcessTestRunAttachmentsAsyncWithSevenParamsSuccessfullyHandlesCancellation()
+    {
+        var attachmentsEventHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
+
+        TestRunAttachmentsProcessingPayload? payload = null;
+        _mockTestRequestManager
+            .Setup(trm => trm.ProcessTestRunAttachments(
+                It.IsAny<TestRunAttachmentsProcessingPayload>(),
+                It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(),
+                It.IsAny<ProtocolConfig>()))
+            .Callback((
+                TestRunAttachmentsProcessingPayload p,
+                ITestRunAttachmentsProcessingEventsHandler _,
+                ProtocolConfig _) => payload = p);
+        _mockTestRequestManager.Setup(trm => trm.CancelTestRunAttachmentsProcessing())
+            .Callback(() => { });
+
+        var cancellationTokenSource = new CancellationTokenSource();
+
+        cancellationTokenSource.Cancel();
+        await _consoleWrapper.ProcessTestRunAttachmentsAsync(
+            _attachmentSets,
+            _invokedDataCollectors,
+            _runSettings,
+            true,
+            false,
+            attachmentsEventHandler.Object,
+            cancellationTokenSource.Token).ConfigureAwait(false);
+
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_attachmentSets.SequenceEqual(payload.Attachments!));
+        Assert.IsTrue(_invokedDataCollectors.SequenceEqual(payload.InvokedDataCollectors!));
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.IsFalse(payload.CollectMetrics);
+
+        _mockEventSource.Verify(es => es.TranslationLayerTestRunAttachmentsProcessingStart(), Times.Once);
+        _mockEventSource.Verify(es => es.TranslationLayerTestRunAttachmentsProcessingStop(), Times.Once);
+        _mockTestRequestManager.Verify(trm => trm.ResetOptions(), Times.Never);
+        _mockTestRequestManager.Verify(trm => trm.ProcessTestRunAttachments(
+                It.IsAny<TestRunAttachmentsProcessingPayload>(),
+                It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(),
+                It.IsAny<ProtocolConfig>()), Times.Once);
+        _mockTestRequestManager.Verify(trm => trm.CancelTestRunAttachmentsProcessing(), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task InProcessWrapperProcessTestRunAttachmentsAsyncWithSevenParamsSuccessfullyHandlesExceptions()
+    {
+        var attachmentsEventHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
+
+        _mockTestRequestManager
+            .Setup(trm => trm.ProcessTestRunAttachments(
+                It.IsAny<TestRunAttachmentsProcessingPayload>(),
+                It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(),
+                It.IsAny<ProtocolConfig>()))
+            .Throws(new Exception("Dummy exception"));
+
+        await _consoleWrapper.ProcessTestRunAttachmentsAsync(
+            _attachmentSets,
+            _invokedDataCollectors,
+            _runSettings,
+            true,
+            false,
+            attachmentsEventHandler.Object,
+            CancellationToken.None).ConfigureAwait(false);
+
+        _mockEventSource.Verify(es => es.TranslationLayerTestRunAttachmentsProcessingStart(), Times.Once);
+        _mockEventSource.Verify(es => es.TranslationLayerTestRunAttachmentsProcessingStop(), Times.Once);
+        _mockTestRequestManager.Verify(trm => trm.ResetOptions(), Times.Never);
+        _mockTestRequestManager.Verify(trm => trm.ProcessTestRunAttachments(
+                It.IsAny<TestRunAttachmentsProcessingPayload>(),
+                It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(),
+                It.IsAny<ProtocolConfig>()), Times.Once);
+        attachmentsEventHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()));
+    }
+
+    [TestMethod]
+    public async Task InProcessWrapperProcessTestRunAttachmentsAsyncWithSevenParamsSuccessfullyHandlesNullTestRequestManager()
+    {
+        var attachmentsEventHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
+
+        _consoleWrapper.TestRequestManager = null;
+
+        await _consoleWrapper.ProcessTestRunAttachmentsAsync(
+            _attachmentSets,
+            _invokedDataCollectors,
+            _runSettings,
+            true,
+            false,
+            attachmentsEventHandler.Object,
+            CancellationToken.None).ConfigureAwait(false);
+
+        _mockEventSource.Verify(es => es.TranslationLayerTestRunAttachmentsProcessingStart(), Times.Once);
+        _mockEventSource.Verify(es => es.TranslationLayerTestRunAttachmentsProcessingStop(), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task InProcessWrapperProcessTestRunAttachmentsAsyncWithSixParamsIsSuccessfullyInvoked()
+    {
+        var attachmentsEventHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
+
+        TestRunAttachmentsProcessingPayload? payload = null;
+        _mockTestRequestManager
+            .Setup(trm => trm.ProcessTestRunAttachments(
+                It.IsAny<TestRunAttachmentsProcessingPayload>(),
+                It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(),
+                It.IsAny<ProtocolConfig>()))
+            .Callback((
+                TestRunAttachmentsProcessingPayload p,
+                ITestRunAttachmentsProcessingEventsHandler _,
+                ProtocolConfig _) => payload = p);
+
+        await _consoleWrapper.ProcessTestRunAttachmentsAsync(
+            _attachmentSets,
+            _runSettings,
+            true,
+            false,
+            attachmentsEventHandler.Object,
+            CancellationToken.None);
+
+        Assert.IsNotNull(payload);
+        Assert.IsTrue(_attachmentSets.SequenceEqual(payload.Attachments!));
+        Assert.IsNull(payload.InvokedDataCollectors);
+        Assert.AreEqual(_runSettings, payload.RunSettings);
+        Assert.IsFalse(payload.CollectMetrics);
+
+        _mockEventSource.Verify(es => es.TranslationLayerTestRunAttachmentsProcessingStart(), Times.Once);
+        _mockEventSource.Verify(es => es.TranslationLayerTestRunAttachmentsProcessingStop(), Times.Once);
+        _mockTestRequestManager.Verify(trm => trm.ResetOptions(), Times.Never);
+        _mockTestRequestManager.Verify(trm => trm.ProcessTestRunAttachments(
+                It.IsAny<TestRunAttachmentsProcessingPayload>(),
+                It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(),
+                It.IsAny<ProtocolConfig>()), Times.Once);
     }
 }

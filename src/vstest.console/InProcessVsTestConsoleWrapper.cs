@@ -830,7 +830,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    public Task ProcessTestRunAttachmentsAsync(
+    public async Task ProcessTestRunAttachmentsAsync(
         IEnumerable<AttachmentSet> attachments,
         IEnumerable<InvokedDataCollector>? invokedDataCollectors,
         string? processingSettings,
@@ -839,7 +839,55 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         ITestRunAttachmentsProcessingEventsHandler eventsHandler,
         CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        _testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStart();
+
+        try
+        {
+            var attachmentProcessingPayload = new TestRunAttachmentsProcessingPayload
+            {
+                Attachments = attachments,
+                InvokedDataCollectors = invokedDataCollectors,
+                RunSettings = processingSettings,
+                CollectMetrics = collectMetrics
+            };
+
+            using (cancellationToken.Register(() =>
+                TestRequestManager?.CancelTestRunAttachmentsProcessing()))
+            {
+                // Awaiting the attachment processing task here. The implementation of the
+                // underlying operation guarantees the event handler is called when processing
+                // is complete, so when awaiting ends, the results have already been passed to
+                // the caller via the event handler. No need for further synchronization.
+                //
+                // NOTE: We're passing in CancellationToken.None and that is by design, *DO NOT*
+                // attempt to optimize this code by passing in the cancellation token registered
+                // above. Passing in the said token would result in potentially leaving the caller
+                // hanging when the token is signaled before even starting the test run attachment
+                // processing. In this scenario, the Task.Run should not even run in the first
+                // place, and as such the event handler that signals processing is complete will
+                // not be triggered anymore.
+                await Task.Run(() =>
+                        TestRequestManager?.ProcessTestRunAttachments(
+                            attachmentProcessingPayload,
+                            eventsHandler,
+                            new ProtocolConfig { Version = _highestSupportedVersion }),
+                        CancellationToken.None)
+                    .ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error("InProcessVsTestConsoleWrapper.ProcessTestRunAttachmentsAsync: Exception occurred: " + ex);
+
+            var attachmentsProcessingArgs = new TestRunAttachmentsProcessingCompleteEventArgs(
+                isCanceled: cancellationToken.IsCancellationRequested,
+                ex);
+
+            eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
+            eventsHandler.HandleTestRunAttachmentsProcessingComplete(attachmentsProcessingArgs, lastChunk: null);
+        }
+
+        _testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStop();
     }
 
     /// <inheritdoc/>
