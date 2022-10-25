@@ -43,6 +43,9 @@
     - [TestExecution.StatsChange notification (Runner)](#testexecutionstatschange-notification-runner)
     - [TestExecution.StatsChange notification (Client)](#testexecutionstatschange-notification-client)
   - [Datacollection](#datacollection)
+  - [.NET Implementation](#net-implementation)
+    - [Architecture](#architecture)
+    - [Extension points](#extension-points)
 
 ## What is TestPlatform? 
 
@@ -193,10 +196,13 @@ The messages are then transported over TCP. In .NET the standard TCP client and 
 The role of client and server are not fully set, and based on parameters either the runner, or the testhost can serve the role of a server. Typically the runner is the server (setups a dynamic port, and starts testhost, passing the port to connect to). But in remote scenarios it is beneficial to make the remote side (testhost), the server, and open the port on the remote device which is more likely to be for-testing-only, and deprovisioned after the test run. In this case the server (testhost) needs to use a predetermined port which it sets up, and the client (runner) will connect to it. 
 
 
-
 ### Header Part
 
+There is no header in the message itself. There is header only in the binary message.
+
 ### Content Part
+
+
 
 ### Base Types
 
@@ -1718,3 +1724,12 @@ Same as above [TestExecution.StatsChange notification (Runner)](#testexecutionst
 
 ## Datacollection
 
+TODO
+
+
+
+## .NET Implementation
+
+### Architecture 
+
+### Extension points
