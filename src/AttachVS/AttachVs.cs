@@ -90,7 +90,7 @@ internal class DebuggerUtility
     private static bool AttachVs(Process vs, int pid)
     {
         IBindCtx? bindCtx = null;
-        IRunningObjectTable? runninObjectTable = null;
+        IRunningObjectTable? runningObjectTable = null;
         IEnumMoniker? enumMoniker = null;
         try
         {
@@ -101,14 +101,14 @@ internal class DebuggerUtility
                 Trace($"BindCtx is null. Cannot attach VS.");
                 return false;
             }
-            bindCtx.GetRunningObjectTable(out runninObjectTable);
-            if (runninObjectTable == null)
+            bindCtx.GetRunningObjectTable(out runningObjectTable);
+            if (runningObjectTable == null)
             {
                 Trace($"RunningObjectTable is null. Cannot attach VS.");
                 return false;
             }
 
-            runninObjectTable.EnumRunning(out enumMoniker);
+            runningObjectTable.EnumRunning(out enumMoniker);
             if (enumMoniker == null)
             {
                 Trace($"EnumMoniker is null. Cannot attach VS.");
@@ -126,7 +126,7 @@ internal class DebuggerUtility
                 if (dn.StartsWith("!VisualStudio.DTE.") && dn.EndsWith(dteSuffix))
                 {
                     object dbg, lps;
-                    runninObjectTable.GetObject(moniker[0], out object dte);
+                    runningObjectTable.GetObject(moniker[0], out object dte);
 
                     // The COM object can be busy, we retry few times, hoping that it won't be busy next time.
                     for (var i = 0; i < 10; i++)
@@ -174,11 +174,11 @@ internal class DebuggerUtility
                 }
                 catch { }
             }
-            if (runninObjectTable != null)
+            if (runningObjectTable != null)
             {
                 try
                 {
-                    Marshal.ReleaseComObject(runninObjectTable);
+                    Marshal.ReleaseComObject(runningObjectTable);
                 }
                 catch { }
             }

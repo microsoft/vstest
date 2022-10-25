@@ -742,7 +742,7 @@ internal class TestRequestManager : ITestRequestManager
 
         EqtTrace.Verbose($"TestRequestManager.UpdateRunSettingsIfRequired: Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}, Current process architecture: {_processHelper.GetCurrentProcessArchitecture()} OperatingSystem: {_environment.OperatingSystem}.");
 
-        // True when runsettings don't set platformk. False when runsettings force platform
+        // True when runsettings don't set platforml. False when runsettings force platform
         // in both cases the sourceToArchitectureMap is populated with the real architecture as we inferred it
         // from dlls. For sources like .js, we return the default architecture.
         var platformWasAutodetected = UpdatePlatform(

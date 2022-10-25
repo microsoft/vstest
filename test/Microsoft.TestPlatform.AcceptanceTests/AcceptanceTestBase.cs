@@ -91,7 +91,7 @@ public class AcceptanceTestBase : IntegrationTestBase
     protected bool IsDesktopTargetFramework()
         => _testEnvironment.TargetFramework == DesktopTargetFramework;
 
-    protected string GetTargetFramworkForRunsettings()
+    protected string GetTargetFrameworkForRunsettings()
     {
         string targetFramework = _testEnvironment.TargetFramework == DesktopTargetFramework ? "Framework45" : "FrameworkCore10";
 
