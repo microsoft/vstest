@@ -152,6 +152,7 @@ internal class AssemblyResolver : IDisposable
                                 if (_currentlyResolvingResources != null && _currentlyResolvingResources.Count > 0 && _currentlyResolvingResources.Contains(assemblyPath))
                                 {
                                     EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Assembly is searching for itself recursively: '{1}', returning as not found.", args.Name, assemblyPath);
+                                    _resolvedAssemblies[args.Name] = null;
                                     return null;
                                 }
 
