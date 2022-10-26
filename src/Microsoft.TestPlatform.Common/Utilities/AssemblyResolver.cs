@@ -136,7 +136,6 @@ internal class AssemblyResolver : IDisposable
                     var assemblyPath = Path.Combine(dir, requestedName.Name + extension);
                     try
                     {
-                        EqtTrace.Verbose("-Resolving:  " + assemblyPath);
                         var isResource = requestedName.Name.EndsWith(".resources");
                         bool pushed = false;
                         try
