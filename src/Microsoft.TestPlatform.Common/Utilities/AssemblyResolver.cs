@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -31,6 +32,7 @@ internal class AssemblyResolver : IDisposable
     /// Specifies whether the resolver is disposed or not
     /// </summary>
     private bool _isDisposed;
+    private Stack<string>? _currentlyResolvingResources;
 
     /// <summary>
     /// Assembly resolver for platform
@@ -134,29 +136,62 @@ internal class AssemblyResolver : IDisposable
                     var assemblyPath = Path.Combine(dir, requestedName.Name + extension);
                     try
                     {
-                        if (!File.Exists(assemblyPath))
+                        var isResource = requestedName.Name.EndsWith(".resources");
+                        bool pushed = false;
+                        try
                         {
-                            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Assembly path does not exist: '{1}', returning.", args.Name, assemblyPath);
+                            if (isResource)
+                            {
+                                // Check for recursive resource lookup.
+                                // This can happen when we are on non-english locale, and we try to load mscorlib.resources
+                                // (or potentially some other resources). This will trigger a new Resolve and call the method
+                                // we are currently in. If then some code in this Resolve method (like File.Exists) will again
+                                // try to access mscorlib.resources it will end up recursing forever.
 
-                            continue;
+                                if (_currentlyResolvingResources != null && _currentlyResolvingResources.Count > 0 && _currentlyResolvingResources.Contains(assemblyPath))
+                                {
+                                    EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Assembly is searching for itself recursively: '{1}', returning as not found.", args.Name, assemblyPath);
+                                    _resolvedAssemblies[args.Name] = null;
+                                    return null;
+                                }
+
+                                _currentlyResolvingResources ??= new Stack<string>(4);
+                                _currentlyResolvingResources.Push(assemblyPath);
+                                pushed = true;
+                            }
+
+                            if (!File.Exists(assemblyPath))
+                            {
+                                EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Assembly path does not exist: '{1}', returning.", args.Name, assemblyPath);
+
+                                continue;
+                            }
+
+                            AssemblyName foundName = _platformAssemblyLoadContext.GetAssemblyNameFromPath(assemblyPath);
+
+                            if (!RequestedAssemblyNameMatchesFound(requestedName, foundName))
+                            {
+                                EqtTrace.Info("AssemblyResolver.OnResolve: {0}: File exists but version/public key is wrong. Try next extension.", args.Name);
+                                continue;   // File exists but version/public key is wrong. Try next extension.
+                            }
+
+                            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Loading assembly '{1}'.", args.Name, assemblyPath);
+
+                            assembly = _platformAssemblyLoadContext.LoadAssemblyFromPath(assemblyPath);
+                            _resolvedAssemblies[args.Name] = assembly;
+
+                            EqtTrace.Info("AssemblyResolver.OnResolve: Resolved assembly: {0}, from path: {1}", args.Name, assemblyPath);
+
+                            return assembly;
                         }
-
-                        AssemblyName foundName = _platformAssemblyLoadContext.GetAssemblyNameFromPath(assemblyPath);
-
-                        if (!RequestedAssemblyNameMatchesFound(requestedName, foundName))
+                        finally
                         {
-                            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: File exists but version/public key is wrong. Try next extension.", args.Name);
-                            continue;   // File exists but version/public key is wrong. Try next extension.
+                            if (isResource && pushed)
+                            {
+                                _currentlyResolvingResources?.Pop();
+                            }
+
                         }
-
-                        EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Loading assembly '{1}'.", args.Name, assemblyPath);
-
-                        assembly = _platformAssemblyLoadContext.LoadAssemblyFromPath(assemblyPath);
-                        _resolvedAssemblies[args.Name] = assembly;
-
-                        EqtTrace.Info("AssemblyResolver.OnResolve: Resolved assembly: {0}, from path: {1}", args.Name, assemblyPath);
-
-                        return assembly;
                     }
                     catch (FileLoadException ex)
                     {
