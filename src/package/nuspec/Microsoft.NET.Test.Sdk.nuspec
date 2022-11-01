@@ -32,12 +32,12 @@
   <files>
     <file src="Icon.png" target="" />
     <file src="licenses\LICENSE_NET.txt" target="" />
-    <file src="netcoreapp\*" target="buildTransitive\netcoreapp3.1\" />
-    <file src="netfx\*" target="buildTransitive\net462\" />
+    <file src="netcoreapp\*" target="build\netcoreapp3.1\" />
+    <file src="netfx\*" target="build\net462\" />
 
     <file src="Microsoft.NET.Test.Sdk.props" target="buildMultiTargeting\" />
-    <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\netcoreapp3.1\" />
-    <file src="Microsoft.NET.Test.Sdk.props" target="buildTransitive\net462\" />
+    <file src="Microsoft.NET.Test.Sdk.props" target="build\netcoreapp3.1\" />
+    <file src="Microsoft.NET.Test.Sdk.props" target="build\net462\" />
 
     <file src="_._" target="lib/netcoreapp3.1" />
     <file src="_._" target="lib/net462" />
