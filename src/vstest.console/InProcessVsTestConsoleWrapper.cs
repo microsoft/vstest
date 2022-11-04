@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -88,6 +89,8 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
 #endif
         consoleParameters.PortNumber = port;
 
+        UpdateDotnetLookupPath();
+
         // Start vstest.console.
         // TODO: under VS we use consoleParameters.InheritEnvironmentVariables, we take that
         // into account when starting a testhost, or clean up in the service host, and use the
@@ -132,6 +135,30 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     internal ITestRequestManager? TestRequestManager { get; set; }
+
+    private void UpdateDotnetLookupPath()
+    {
+        const string dotnetRootOverrideEnvVarName = "VSTEST_WINAPPHOST_DOTNET_ROOT";
+        const string programFilesPathEnvVarName = "ProgramFiles";
+        const string dotnetGlobalInstallationDir = "dotnet";
+
+        // Allow users to specify a dotnet private installation path before attempting to use the
+        // global installation path.
+        if (_environmentVariableHelper.GetEnvironmentVariable(dotnetRootOverrideEnvVarName) is not null)
+        {
+            return;
+        }
+
+        var dotnetPathPrefix = _environmentVariableHelper.GetEnvironmentVariable(programFilesPathEnvVarName);
+        if (dotnetPathPrefix is null)
+        {
+            return;
+        }
+
+        _environmentVariableHelper.SetEnvironmentVariable(
+            dotnetRootOverrideEnvVarName,
+            Path.Combine(dotnetPathPrefix, dotnetGlobalInstallationDir));
+    }
 
     /// <inheritdoc/>
     public void AbortTestRun()
@@ -869,7 +896,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
                 await Task.Run(() =>
                         TestRequestManager?.ProcessTestRunAttachments(
                             attachmentProcessingPayload,
-                            eventsHandler,
+                            new InProcessTestRunAttachmentsProcessingEventsHandler(eventsHandler),
                             new ProtocolConfig { Version = _highestSupportedVersion }),
                         CancellationToken.None)
                     .ConfigureAwait(false);
