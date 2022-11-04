@@ -115,6 +115,59 @@ public class InProcessVsTestConsoleWrapperTests
     }
 
     [TestMethod]
+    public void InProcessWrapperConstructorShouldNotOverwriteVstestWinapphostEnvironmentVariable()
+    {
+        const string environmentVariableName = "VSTEST_WINAPPHOST_DOTNET_ROOT";
+
+        _mockEnvironmentVariableHelper.Invocations.Clear();
+        _mockEnvironmentVariableHelper.Setup(evh => evh.GetEnvironmentVariable(environmentVariableName))
+            .Returns(() => "dummy");
+
+        var consoleParams = new ConsoleParameters();
+        var _ = new InProcessVsTestConsoleWrapper(
+            consoleParams,
+            _mockEnvironmentVariableHelper.Object,
+            _mockRequestSender.Object,
+            _mockTestRequestManager.Object,
+            new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),
+            new Mock<ITestPlatformEventSource>().Object);
+
+        _mockEnvironmentVariableHelper.Verify(evh =>
+            evh.GetEnvironmentVariable(environmentVariableName), Times.Once);
+        _mockEnvironmentVariableHelper.Verify(evh =>
+            evh.SetEnvironmentVariable(environmentVariableName, It.IsAny<string>()), Times.Never);
+    }
+
+    [TestMethod]
+    public void InProcessWrapperConstructorShouldSetVstestWinapphostEnvironmentVariableWhenUnset()
+    {
+        const string dotnetRootOverrideEnvVarName = "VSTEST_WINAPPHOST_DOTNET_ROOT";
+        const string programFilesPathEnvVarName = "ProgramFiles";
+
+        _mockEnvironmentVariableHelper.Invocations.Clear();
+        _mockEnvironmentVariableHelper.Setup(evh => evh.GetEnvironmentVariable(dotnetRootOverrideEnvVarName))
+            .Returns(() => null);
+        _mockEnvironmentVariableHelper.Setup(evh => evh.GetEnvironmentVariable(programFilesPathEnvVarName))
+            .Returns(() => @"C:\Program Files");
+
+        var consoleParams = new ConsoleParameters();
+        var _ = new InProcessVsTestConsoleWrapper(
+            consoleParams,
+            _mockEnvironmentVariableHelper.Object,
+            _mockRequestSender.Object,
+            _mockTestRequestManager.Object,
+            new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),
+            new Mock<ITestPlatformEventSource>().Object);
+
+        _mockEnvironmentVariableHelper.Verify(evh =>
+            evh.GetEnvironmentVariable(dotnetRootOverrideEnvVarName), Times.Once);
+        _mockEnvironmentVariableHelper.Verify(evh =>
+            evh.GetEnvironmentVariable(programFilesPathEnvVarName), Times.Once);
+        _mockEnvironmentVariableHelper.Verify(evh =>
+            evh.SetEnvironmentVariable(dotnetRootOverrideEnvVarName, @"C:\Program Files\dotnet"), Times.Once);
+    }
+
+    [TestMethod]
     public void InProcessWrapperDiscoverTestsWithThreeParamsIsSuccessfullyInvoked()
     {
         var discoveryEventHandler = new Mock<ITestDiscoveryEventsHandler>();
