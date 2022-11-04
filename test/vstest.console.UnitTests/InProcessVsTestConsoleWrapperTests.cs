@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -148,7 +149,7 @@ public class InProcessVsTestConsoleWrapperTests
         _mockEnvironmentVariableHelper.Setup(evh => evh.GetEnvironmentVariable(dotnetRootOverrideEnvVarName))
             .Returns(() => null);
         _mockEnvironmentVariableHelper.Setup(evh => evh.GetEnvironmentVariable(programFilesPathEnvVarName))
-            .Returns(() => @"C:\Program Files");
+            .Returns(() => Path.Combine("C:", "Program Files"));
 
         var consoleParams = new ConsoleParameters();
         var _ = new InProcessVsTestConsoleWrapper(
@@ -164,7 +165,7 @@ public class InProcessVsTestConsoleWrapperTests
         _mockEnvironmentVariableHelper.Verify(evh =>
             evh.GetEnvironmentVariable(programFilesPathEnvVarName), Times.Once);
         _mockEnvironmentVariableHelper.Verify(evh =>
-            evh.SetEnvironmentVariable(dotnetRootOverrideEnvVarName, @"C:\Program Files\dotnet"), Times.Once);
+            evh.SetEnvironmentVariable(dotnetRootOverrideEnvVarName, Path.Combine("C:", "Program Files", "dotnet")), Times.Once);
     }
 
     [TestMethod]
