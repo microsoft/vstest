@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,11 +16,13 @@ using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
@@ -53,7 +54,8 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
               requestSender: new VsTestConsoleRequestSender(),
               testRequestManager: null,
               executor: new Executor(ConsoleOutput.Instance),
-              testPlatformEventSource: TestPlatformEventSource.Instance)
+              testPlatformEventSource: TestPlatformEventSource.Instance,
+              new())
     { }
 
     internal InProcessVsTestConsoleWrapper(
@@ -63,7 +65,29 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         ITestRequestManager? testRequestManager,
         Executor executor,
         ITestPlatformEventSource testPlatformEventSource)
+        : this(
+              consoleParameters,
+              environmentVariableHelper,
+              requestSender,
+              testRequestManager,
+              executor,
+              testPlatformEventSource,
+              new())
+    { }
+
+    internal InProcessVsTestConsoleWrapper(
+        ConsoleParameters consoleParameters,
+        IEnvironmentVariableHelper environmentVariableHelper,
+        ITranslationLayerRequestSender requestSender,
+        ITestRequestManager? testRequestManager,
+        Executor executor,
+        ITestPlatformEventSource testPlatformEventSource,
+        UiLanguageOverride languageOverride)
     {
+        // Setting the culture specified by user here since there's no more vstest.console process
+        // to set it for us. See vstest.console Main method for more info.
+        languageOverride.SetCultureSpecifiedByUser();
+
         EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
 
         _environmentVariableHelper = environmentVariableHelper;
@@ -89,12 +113,14 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
 #endif
         consoleParameters.PortNumber = port;
 
-        UpdateDotnetLookupPath();
-
         // Start vstest.console.
-        // TODO: under VS we use consoleParameters.InheritEnvironmentVariables, we take that
-        // into account when starting a testhost, or clean up in the service host, and use the
-        // desired set, so all children can inherit it.
+        // Running vstest.console in process means we inherit all environment variables from the
+        // process we load the wrapper into. We do not want to alter this environment since that
+        // would mean we may interfer with the way the host process works. However, certain
+        // alterations are desired. The solution is to pass the environment variables we get via
+        // the console parameters directly to the testhost process and make sure that at least the
+        // testhost environment is predictable.
+        ProcessHelper.ExternalEnvironmentVariables = consoleParameters.EnvironmentVariables;
         foreach (var pair in consoleParameters.EnvironmentVariables)
         {
             if (pair.Value is null)
@@ -135,30 +161,6 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     internal ITestRequestManager? TestRequestManager { get; set; }
-
-    private void UpdateDotnetLookupPath()
-    {
-        const string dotnetRootOverrideEnvVarName = "VSTEST_WINAPPHOST_DOTNET_ROOT";
-        const string programFilesPathEnvVarName = "ProgramFiles";
-        const string dotnetGlobalInstallationDir = "dotnet";
-
-        // Allow users to specify a dotnet private installation path before attempting to use the
-        // global installation path.
-        if (_environmentVariableHelper.GetEnvironmentVariable(dotnetRootOverrideEnvVarName) is not null)
-        {
-            return;
-        }
-
-        var dotnetPathPrefix = _environmentVariableHelper.GetEnvironmentVariable(programFilesPathEnvVarName);
-        if (dotnetPathPrefix is null)
-        {
-            return;
-        }
-
-        _environmentVariableHelper.SetEnvironmentVariable(
-            dotnetRootOverrideEnvVarName,
-            Path.Combine(dotnetPathPrefix, dotnetGlobalInstallationDir));
-    }
 
     /// <inheritdoc/>
     public void AbortTestRun()

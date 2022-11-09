@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.TestPlatform.Client;
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -116,15 +117,13 @@ public class InProcessVsTestConsoleWrapperTests
     }
 
     [TestMethod]
-    public void InProcessWrapperConstructorShouldNotOverwriteVstestWinapphostEnvironmentVariable()
+    public void InProcessWrapperConstructorShouldSetEnvironmentVariablesReceivedAsConsoleParametersForProcessHelper()
     {
-        const string environmentVariableName = "VSTEST_WINAPPHOST_DOTNET_ROOT";
-
-        _mockEnvironmentVariableHelper.Invocations.Clear();
-        _mockEnvironmentVariableHelper.Setup(evh => evh.GetEnvironmentVariable(environmentVariableName))
-            .Returns(() => "dummy");
+        const string environmentVariableName = "AAAAA";
 
         var consoleParams = new ConsoleParameters();
+        consoleParams.EnvironmentVariables.Add(environmentVariableName, "1");
+
         var _ = new InProcessVsTestConsoleWrapper(
             consoleParams,
             _mockEnvironmentVariableHelper.Object,
@@ -133,24 +132,20 @@ public class InProcessVsTestConsoleWrapperTests
             new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),
             new Mock<ITestPlatformEventSource>().Object);
 
-        _mockEnvironmentVariableHelper.Verify(evh =>
-            evh.GetEnvironmentVariable(environmentVariableName), Times.Once);
-        _mockEnvironmentVariableHelper.Verify(evh =>
-            evh.SetEnvironmentVariable(environmentVariableName, It.IsAny<string>()), Times.Never);
+        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?.ContainsKey(environmentVariableName));
+        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?[environmentVariableName] == "1");
     }
 
     [TestMethod]
-    public void InProcessWrapperConstructorShouldSetVstestWinapphostEnvironmentVariableWhenUnset()
+    public void InProcessWrapperConstructorShouldSetTheCultureSpecifiedByTheUser()
     {
-        const string dotnetRootOverrideEnvVarName = "VSTEST_WINAPPHOST_DOTNET_ROOT";
-        const string programFilesPathEnvVarName = "ProgramFiles";
+        // Arrange
+        var culture = new CultureInfo("fr-fr");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE")).Returns(culture.Name);
 
-        _mockEnvironmentVariableHelper.Invocations.Clear();
-        _mockEnvironmentVariableHelper.Setup(evh => evh.GetEnvironmentVariable(dotnetRootOverrideEnvVarName))
-            .Returns(() => null);
-        _mockEnvironmentVariableHelper.Setup(evh => evh.GetEnvironmentVariable(programFilesPathEnvVarName))
-            .Returns(() => Path.Combine("C:", "Program Files"));
+        bool threadCultureWasSet = false;
 
+        // Act - We have an exception because we are not passing the right args but that's ok for our test
         var consoleParams = new ConsoleParameters();
         var _ = new InProcessVsTestConsoleWrapper(
             consoleParams,
@@ -158,14 +153,16 @@ public class InProcessVsTestConsoleWrapperTests
             _mockRequestSender.Object,
             _mockTestRequestManager.Object,
             new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),
-            new Mock<ITestPlatformEventSource>().Object);
+            new Mock<ITestPlatformEventSource>().Object,
+            new UiLanguageOverride(_mockEnvironmentVariableHelper.Object, lang => threadCultureWasSet = lang.Equals(culture)));
 
-        _mockEnvironmentVariableHelper.Verify(evh =>
-            evh.GetEnvironmentVariable(dotnetRootOverrideEnvVarName), Times.Once);
-        _mockEnvironmentVariableHelper.Verify(evh =>
-            evh.GetEnvironmentVariable(programFilesPathEnvVarName), Times.Once);
-        _mockEnvironmentVariableHelper.Verify(evh =>
-            evh.SetEnvironmentVariable(dotnetRootOverrideEnvVarName, Path.Combine("C:", "Program Files", "dotnet")), Times.Once);
+        // Assert
+        Assert.IsTrue(threadCultureWasSet, "DefaultThreadCurrentUICulture was not set");
+        _mockEnvironmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE"), Times.Exactly(2));
+        _mockEnvironmentVariableHelper.Verify(x => x.GetEnvironmentVariable("VSLANG"), Times.Once);
+        _mockEnvironmentVariableHelper.Verify(x => x.SetEnvironmentVariable("VSLANG", culture.LCID.ToString(CultureInfo.InvariantCulture)), Times.Once);
+        _mockEnvironmentVariableHelper.Verify(x => x.GetEnvironmentVariable("PreferredUILang"), Times.Once);
+        _mockEnvironmentVariableHelper.Verify(x => x.SetEnvironmentVariable("PreferredUILang", culture.Name), Times.Once);
     }
 
     [TestMethod]

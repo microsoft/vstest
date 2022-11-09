@@ -40,6 +40,13 @@ public partial class ProcessHelper : IProcessHelper
         _environment = environment;
     }
 
+    /// <summary>
+    /// Gets or sets the set of environment variables to be used when spawning a new process.
+    /// Should this set of environment variables be null, the environment variables inherited from
+    /// the parent process will be used.
+    /// </summary>
+    public static IDictionary<string, string?>? ExternalEnvironmentVariables { get; set; }
+
     /// <inheritdoc/>
     public object LaunchProcess(string processPath, string? arguments, string? workingDirectory, IDictionary<string, string?>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack)
     {
@@ -77,6 +84,23 @@ public partial class ProcessHelper : IProcessHelper
 
             process.EnableRaisingEvents = true;
 
+            // Resetting the baseline environment variables inherited from the parent process and
+            // replacing them with the desired set of environment variables.
+            if (ExternalEnvironmentVariables is not null)
+            {
+                process.StartInfo.EnvironmentVariables.Clear();
+                foreach (var kvp in ExternalEnvironmentVariables)
+                {
+                    if (kvp.Value is null)
+                    {
+                        continue;
+                    }
+
+                    process.StartInfo.AddEnvironmentVariable(kvp.Key, kvp.Value);
+                }
+            }
+
+            // Set additional environment variables.
             if (envVariables != null)
             {
                 foreach (var kvp in envVariables)
