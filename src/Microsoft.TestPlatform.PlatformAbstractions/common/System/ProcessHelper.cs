@@ -90,8 +90,16 @@ public partial class ProcessHelper : IProcessHelper
 
             process.EnableRaisingEvents = true;
 
-            // Resetting the baseline environment variables inherited from the parent process and
-            // replacing them with the desired set of environment variables.
+            // When vstest.console is started in its own process in VisualStudio it is TestWindowStoreHost that starts it.
+            // TestWindowStoreHost inherits environment variables from ServiceHost and DevEnv. Those env variables,
+            // contain multiple "internal" environment variables, and they also contain DOTNET_ROOT pointing to the 
+            // .NET that is shipped with VisualStudio. So to work around this, vstest.console is given a set of environment
+            // variables that has only variables that DevEnv was started with. So it gets a "clean" set of env variables.
+            //
+            // When we run vstest.console in process, we cannot start ourselves with the same clean set of env variables,
+            // and the best we can do is to start our child processes (testhost / datacollector) with this environment.
+            // To do that we pass that set of "clean" env variables down to the ProcessHelper, and use those instead
+            // of all the variables that are set in the current process.
             if (ExternalEnvironmentVariables is not null)
             {
                 if (!InheritEnvironmentVariables)
