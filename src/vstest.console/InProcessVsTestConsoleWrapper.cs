@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+extern alias Abstraction;
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -22,7 +24,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Abstraction::Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
@@ -55,23 +57,6 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
               testRequestManager: null,
               executor: new Executor(ConsoleOutput.Instance),
               testPlatformEventSource: TestPlatformEventSource.Instance,
-              new())
-    { }
-
-    internal InProcessVsTestConsoleWrapper(
-        ConsoleParameters consoleParameters,
-        IEnvironmentVariableHelper environmentVariableHelper,
-        ITranslationLayerRequestSender requestSender,
-        ITestRequestManager? testRequestManager,
-        Executor executor,
-        ITestPlatformEventSource testPlatformEventSource)
-        : this(
-              consoleParameters,
-              environmentVariableHelper,
-              requestSender,
-              testRequestManager,
-              executor,
-              testPlatformEventSource,
               new())
     { }
 
@@ -121,6 +106,8 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         // the console parameters directly to the testhost process and make sure that at least the
         // testhost environment is predictable.
         ProcessHelper.ExternalEnvironmentVariables = consoleParameters.EnvironmentVariables;
+        ProcessHelper.InheritEnvironmentVariables = consoleParameters.InheritEnvironmentVariables;
+
         foreach (var pair in consoleParameters.EnvironmentVariables)
         {
             if (pair.Value is null)

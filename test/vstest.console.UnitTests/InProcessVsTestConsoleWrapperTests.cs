@@ -77,7 +77,8 @@ public class InProcessVsTestConsoleWrapperTests
             _mockRequestSender.Object,
             _mockTestRequestManager.Object,
             _executor,
-            _mockEventSource.Object);
+            _mockEventSource.Object,
+            new());
     }
 
     [TestMethod]
@@ -92,7 +93,8 @@ public class InProcessVsTestConsoleWrapperTests
                 _mockRequestSender.Object,
                 _mockTestRequestManager.Object,
                 new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),
-                new Mock<ITestPlatformEventSource>().Object));
+                new Mock<ITestPlatformEventSource>().Object,
+                new()));
     }
 
     [TestMethod]
@@ -111,7 +113,8 @@ public class InProcessVsTestConsoleWrapperTests
             _mockRequestSender.Object,
             _mockTestRequestManager.Object,
             new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),
-            new Mock<ITestPlatformEventSource>().Object);
+            new Mock<ITestPlatformEventSource>().Object,
+            new());
 
         _mockEnvironmentVariableHelper.Verify(evh => evh.SetEnvironmentVariable(environmentVariableName, "1"));
     }
@@ -130,7 +133,8 @@ public class InProcessVsTestConsoleWrapperTests
             _mockRequestSender.Object,
             _mockTestRequestManager.Object,
             new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),
-            new Mock<ITestPlatformEventSource>().Object);
+            new Mock<ITestPlatformEventSource>().Object,
+            new());
 
         Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?.ContainsKey(environmentVariableName));
         Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?[environmentVariableName] == "1");
@@ -891,7 +895,8 @@ public class InProcessVsTestConsoleWrapperTests
             _mockRequestSender.Object,
             _mockTestRequestManager.Object,
             new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),
-            new Mock<ITestPlatformEventSource>().Object);
+            new Mock<ITestPlatformEventSource>().Object,
+            new());
 
         using (var testSession = consoleWrapper?.StartTestSession(_testSources, _runSettings, mockTestSessionEventsHandler.Object))
         {

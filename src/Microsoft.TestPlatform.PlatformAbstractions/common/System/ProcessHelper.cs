@@ -26,7 +26,9 @@ public partial class ProcessHelper : IProcessHelper
     private static readonly string Arm = "arm";
     private readonly Process _currentProcess = Process.GetCurrentProcess();
 
+#if !NET5_0_OR_GREATER
     private IEnvironment _environment;
+#endif
 
     /// <summary>
     /// Default constructor.
@@ -37,7 +39,9 @@ public partial class ProcessHelper : IProcessHelper
 
     internal ProcessHelper(IEnvironment environment)
     {
+#if !NET5_0_OR_GREATER
         _environment = environment;
+#endif
     }
 
     /// <summary>
@@ -45,7 +49,9 @@ public partial class ProcessHelper : IProcessHelper
     /// Should this set of environment variables be null, the environment variables inherited from
     /// the parent process will be used.
     /// </summary>
-    public static IDictionary<string, string?>? ExternalEnvironmentVariables { get; set; }
+    internal static IDictionary<string, string?>? ExternalEnvironmentVariables { get; set; }
+
+    internal static bool InheritEnvironmentVariables { get; set; } = true;
 
     /// <inheritdoc/>
     public object LaunchProcess(string processPath, string? arguments, string? workingDirectory, IDictionary<string, string?>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack)
@@ -88,7 +94,11 @@ public partial class ProcessHelper : IProcessHelper
             // replacing them with the desired set of environment variables.
             if (ExternalEnvironmentVariables is not null)
             {
-                process.StartInfo.EnvironmentVariables.Clear();
+                if (!InheritEnvironmentVariables)
+                {
+                    process.StartInfo.EnvironmentVariables.Clear();
+                }
+
                 foreach (var kvp in ExternalEnvironmentVariables)
                 {
                     if (kvp.Value is null)

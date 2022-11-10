@@ -12,17 +12,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client;
 
 internal class InProcessTestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProcessingEventsHandler
 {
-    private readonly ITestRunAttachmentsProcessingEventsHandler _oldEventsHandler;
+    private readonly ITestRunAttachmentsProcessingEventsHandler _eventsHandler;
 
     public InProcessTestRunAttachmentsProcessingEventsHandler(
-        ITestRunAttachmentsProcessingEventsHandler oldEventsHandler)
+        ITestRunAttachmentsProcessingEventsHandler eventsHandler)
     {
-        _oldEventsHandler = oldEventsHandler;
+        _eventsHandler = eventsHandler;
     }
 
     public void HandleLogMessage(TestMessageLevel level, string? message)
     {
-        _oldEventsHandler.HandleLogMessage(level, message);
+        _eventsHandler.HandleLogMessage(level, message);
     }
 
     public void HandleProcessedAttachmentsChunk(IEnumerable<AttachmentSet> attachments)
@@ -50,7 +50,7 @@ internal class InProcessTestRunAttachmentsProcessingEventsHandler : ITestRunAtta
         TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs,
         IEnumerable<AttachmentSet>? lastChunk)
     {
-        _oldEventsHandler.HandleTestRunAttachmentsProcessingComplete(
+        _eventsHandler.HandleTestRunAttachmentsProcessingComplete(
             attachmentsProcessingCompleteEventArgs,
             lastChunk);
     }
@@ -58,7 +58,7 @@ internal class InProcessTestRunAttachmentsProcessingEventsHandler : ITestRunAtta
     public void HandleTestRunAttachmentsProcessingProgress(
         TestRunAttachmentsProcessingProgressEventArgs attachmentsProcessingProgressEventArgs)
     {
-        _oldEventsHandler.HandleTestRunAttachmentsProcessingProgress(
+        _eventsHandler.HandleTestRunAttachmentsProcessingProgress(
             attachmentsProcessingProgressEventArgs);
     }
 }
