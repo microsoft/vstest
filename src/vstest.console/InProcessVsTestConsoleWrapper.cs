@@ -111,9 +111,9 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         {
             // This is needed because GetEnvironmentVariables() returns a non-generic dictionary
             // and we need to convert it to a generic dictionary for our use-case.
-            foreach (DictionaryEntry entry in Environment.GetEnvironmentVariables())
+            foreach (DictionaryEntry? entry in _environmentVariableHelper.GetEnvironmentVariables())
             {
-                environmentVariableBaseline[entry.Key.ToString()!] = entry.Value?.ToString();
+                environmentVariableBaseline[entry?.Key.ToString()!] = entry?.Value?.ToString();
             }
         }
 

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -25,7 +26,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using FluentAssertions;
 using Moq;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
@@ -59,6 +59,7 @@ public class InProcessVsTestConsoleWrapperTests
     public InProcessVsTestConsoleWrapperTests()
     {
         _mockEnvironmentVariableHelper = new Mock<IEnvironmentVariableHelper>();
+        _mockEnvironmentVariableHelper.Setup(evh => evh.GetEnvironmentVariables()).Returns(new Hashtable());
 
         _mockRequestSender = new Mock<ITranslationLayerRequestSender>();
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(1234);
@@ -98,14 +99,13 @@ public class InProcessVsTestConsoleWrapperTests
     }
 
     [TestMethod]
-    public void InProcessWrapperConstructorShouldSetEnvironmentVariablesReceivedAsConsoleParameters()
+    public void InProcessWrapperConstructorShouldSetEnvironmentVariablesReceivedAsConsoleParametersForProcessHelperNoInherit()
     {
         const string environmentVariableName = "AAAAA";
 
-        Environment.GetEnvironmentVariable(environmentVariableName).Should().BeNull();
-
         var consoleParams = new ConsoleParameters();
         consoleParams.EnvironmentVariables.Add(environmentVariableName, "1");
+        consoleParams.InheritEnvironmentVariables = false;
 
         var _ = new InProcessVsTestConsoleWrapper(
             consoleParams,
@@ -116,16 +116,27 @@ public class InProcessVsTestConsoleWrapperTests
             new Mock<ITestPlatformEventSource>().Object,
             new());
 
-        _mockEnvironmentVariableHelper.Verify(evh => evh.SetEnvironmentVariable(environmentVariableName, "1"));
+        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?.Count == 1);
+        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?.ContainsKey(environmentVariableName));
+        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?[environmentVariableName] == "1");
     }
 
     [TestMethod]
     public void InProcessWrapperConstructorShouldSetEnvironmentVariablesReceivedAsConsoleParametersForProcessHelper()
     {
-        const string environmentVariableName = "AAAAA";
+        const string environmentVariableName1 = "AAAAA";
+        const string environmentVariableName2 = "BBBBB";
+        const string environmentVariableName3 = "CCCCC";
 
         var consoleParams = new ConsoleParameters();
-        consoleParams.EnvironmentVariables.Add(environmentVariableName, "1");
+        consoleParams.EnvironmentVariables.Add(environmentVariableName1, "1");
+        consoleParams.InheritEnvironmentVariables = true;
+
+        IDictionary defaultEnvironmentVariables = new Hashtable();
+        defaultEnvironmentVariables.Add(environmentVariableName2, "1");
+        defaultEnvironmentVariables.Add(environmentVariableName3, "1");
+
+        _mockEnvironmentVariableHelper.Setup(evh => evh.GetEnvironmentVariables()).Returns(defaultEnvironmentVariables);
 
         var _ = new InProcessVsTestConsoleWrapper(
             consoleParams,
@@ -136,8 +147,13 @@ public class InProcessVsTestConsoleWrapperTests
             new Mock<ITestPlatformEventSource>().Object,
             new());
 
-        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?.ContainsKey(environmentVariableName));
-        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?[environmentVariableName] == "1");
+        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?.Count == 3);
+        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?.ContainsKey(environmentVariableName1));
+        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?[environmentVariableName1] == "1");
+        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?.ContainsKey(environmentVariableName2));
+        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?[environmentVariableName2] == "1");
+        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?.ContainsKey(environmentVariableName3));
+        Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?[environmentVariableName3] == "1");
     }
 
     [TestMethod]
