@@ -4,6 +4,7 @@
 extern alias Abstraction;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -105,18 +106,23 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         // alterations are desired. The solution is to pass the environment variables we get via
         // the console parameters directly to the testhost process and make sure that at least the
         // testhost environment is predictable.
-        ProcessHelper.ExternalEnvironmentVariables = consoleParameters.EnvironmentVariables;
-        ProcessHelper.InheritEnvironmentVariables = consoleParameters.InheritEnvironmentVariables;
+        IDictionary<string, string?> environmentVariableBaseline = new Dictionary<string, string?>();
+        if (consoleParameters.InheritEnvironmentVariables)
+        {
+            // This is needed because GetEnvironmentVariables() returns a non-generic dictionary
+            // and we need to convert it to a generic dictionary for our use-case.
+            foreach (DictionaryEntry entry in Environment.GetEnvironmentVariables())
+            {
+                environmentVariableBaseline[entry.Key.ToString()!] = entry.Value?.ToString();
+            }
+        }
 
         foreach (var pair in consoleParameters.EnvironmentVariables)
         {
-            if (pair.Value is null)
-            {
-                continue;
-            }
-
-            _environmentVariableHelper.SetEnvironmentVariable(pair.Key, pair.Value);
+            environmentVariableBaseline[pair.Key] = pair.Value;
         }
+
+        ProcessHelper.ExternalEnvironmentVariables = environmentVariableBaseline;
 
         string someExistingFile = typeof(InProcessVsTestConsoleWrapper).Assembly.Location;
         var args = new VsTestConsoleProcessManager(someExistingFile).BuildArguments(consoleParameters);

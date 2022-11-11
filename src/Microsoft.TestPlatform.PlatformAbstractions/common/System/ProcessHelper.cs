@@ -51,8 +51,6 @@ public partial class ProcessHelper : IProcessHelper
     /// </summary>
     internal static IDictionary<string, string?>? ExternalEnvironmentVariables { get; set; }
 
-    internal static bool InheritEnvironmentVariables { get; set; } = true;
-
     /// <inheritdoc/>
     public object LaunchProcess(string processPath, string? arguments, string? workingDirectory, IDictionary<string, string?>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack)
     {
@@ -102,11 +100,7 @@ public partial class ProcessHelper : IProcessHelper
             // of all the variables that are set in the current process.
             if (ExternalEnvironmentVariables is not null)
             {
-                if (!InheritEnvironmentVariables)
-                {
-                    process.StartInfo.EnvironmentVariables.Clear();
-                }
-
+                process.StartInfo.EnvironmentVariables.Clear();
                 foreach (var kvp in ExternalEnvironmentVariables)
                 {
                     if (kvp.Value is null)
