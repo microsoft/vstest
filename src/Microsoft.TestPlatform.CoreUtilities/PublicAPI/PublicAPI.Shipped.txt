@@ -63,7 +63,13 @@ Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces.ITestPlatfo
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.GetDotnetPath() -> string!
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.GetMonoPath() -> string!
-Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.TryGetDotnetPathByArchitecture(Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture targetArchitecture, out string? muxerPath) -> bool
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.TryGetDotnetPathByArchitecture(Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture targetArchitecture, Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution dotnetMuxerResolution, out string? muxerPath) -> bool
+Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution
+Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution.All = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution.DotnetRootArchitecture | Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution.DotnetRootArchitectureLess | Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution.GlobalInstallation | Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution.DefaultInstallation -> Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution
+Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution.DefaultInstallation = 8 -> Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution
+Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution.DotnetRootArchitecture = 1 -> Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution
+Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution.DotnetRootArchitectureLess = 2 -> Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution
+Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution.GlobalInstallation = 4 -> Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.DotnetMuxerResolution
 Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ValidateArg
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ValidateArgProperty
