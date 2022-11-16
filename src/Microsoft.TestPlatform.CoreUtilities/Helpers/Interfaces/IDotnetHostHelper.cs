@@ -28,11 +28,11 @@ public interface IDotnetHostHelper
     /// Try to locate muxer of specific architecture
     /// </summary>
     /// <param name="targetArchitecture">Specific architecture</param>
-    /// <param name="dotnetMuxerResolution">The dotnet muxer resolution.</param>
+    /// <param name="dotnetMuxerResolutionStrategy">The dotnet muxer resolution strategy.</param>
     /// <param name="muxerPath">Path to the muxer</param>
     /// <returns>True if native muxer is found</returns>
     bool TryGetDotnetPathByArchitecture(
         PlatformArchitecture targetArchitecture,
-        DotnetMuxerResolution dotnetMuxerResolution,
+        DotnetMuxerResolutionStrategy dotnetMuxerResolutionStrategy,
         out string? muxerPath);
 }

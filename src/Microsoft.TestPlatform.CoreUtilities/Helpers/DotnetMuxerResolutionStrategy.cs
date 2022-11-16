@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 /// An enum representing the dotnet muxer resolution.
 /// </summary>
 [Flags]
-public enum DotnetMuxerResolution
+public enum DotnetMuxerResolutionStrategy
 {
     /// <summary>
     /// Indicates if the muxer resolution process should take dotnet root into account.
@@ -24,15 +24,15 @@ public enum DotnetMuxerResolution
     /// <summary>
     /// Indicates if the muxer resolution process should look in the global installation location.
     /// </summary>
-    GlobalInstallation = 4,
+    GlobalInstallationLocation = 4,
 
     /// <summary>
     /// Indicates if the muxer resolution process should look in the default installation location.
     /// </summary>
-    DefaultInstallation = 8,
+    DefaultInstallationLocation = 8,
 
     /// <summary>
-    /// All muxer resolution options should be taken into account.
+    /// Default muxer resolution strategy.
     /// </summary>
-    All = DotnetRootArchitecture | DotnetRootArchitectureLess | GlobalInstallation | DefaultInstallation,
+    Default = DotnetRootArchitecture | DotnetRootArchitectureLess | GlobalInstallationLocation | DefaultInstallationLocation,
 }

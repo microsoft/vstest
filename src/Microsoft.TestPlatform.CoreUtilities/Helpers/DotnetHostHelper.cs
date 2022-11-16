@@ -120,11 +120,11 @@ public class DotnetHostHelper : IDotnetHostHelper
 
     public bool TryGetDotnetPathByArchitecture(
         PlatformArchitecture targetArchitecture,
-        DotnetMuxerResolution dotnetMuxerResolution,
+        DotnetMuxerResolutionStrategy dotnetMuxerResolutionStrategy,
         [NotNullWhen(true)] out string? muxerPath)
     {
         muxerPath = null;
-        EqtTrace.Verbose($"Using dotnet muxer resolution: {dotnetMuxerResolution}");
+        EqtTrace.Verbose($"DotnetHostHelper.TryGetDotnetPathByArchitecture: Using dotnet muxer resolution strategy: {dotnetMuxerResolutionStrategy}");
 
         // If current process is the same as the target architecture we return the current process filename.
         if (_processHelper.GetCurrentProcessArchitecture() == targetArchitecture)
@@ -148,7 +148,7 @@ public class DotnetHostHelper : IDotnetHostHelper
 
         string? envKey = null;
         string? envVar = null;
-        if (dotnetMuxerResolution.HasFlag(DotnetMuxerResolution.DotnetRootArchitecture))
+        if (dotnetMuxerResolutionStrategy.HasFlag(DotnetMuxerResolutionStrategy.DotnetRootArchitecture))
         {
             // Try to search using env vars in the order
             // DOTNET_ROOT_{arch}
@@ -161,7 +161,7 @@ public class DotnetHostHelper : IDotnetHostHelper
             envVar = _environmentVariableHelper.GetEnvironmentVariable(envKey);
         }
 
-        if (dotnetMuxerResolution.HasFlag(DotnetMuxerResolution.DotnetRootArchitectureLess))
+        if (dotnetMuxerResolutionStrategy.HasFlag(DotnetMuxerResolutionStrategy.DotnetRootArchitectureLess))
         {
             // Try on non virtualized x86 var(should happen only on non-x86 architecture)
             if ((envVar == null || !_fileHelper.DirectoryExists(envVar)) &&
@@ -210,13 +210,13 @@ public class DotnetHostHelper : IDotnetHostHelper
             }
         }
 
-        if (dotnetMuxerResolution.HasFlag(DotnetMuxerResolution.DotnetRootArchitecture)
-            || dotnetMuxerResolution.HasFlag(DotnetMuxerResolution.DotnetRootArchitectureLess))
+        if (dotnetMuxerResolutionStrategy.HasFlag(DotnetMuxerResolutionStrategy.DotnetRootArchitecture)
+            || dotnetMuxerResolutionStrategy.HasFlag(DotnetMuxerResolutionStrategy.DotnetRootArchitectureLess))
         {
             EqtTrace.Verbose($"DotnetHostHelper.TryGetDotnetPathByArchitecture: Muxer was not found using DOTNET_ROOT* env variables.");
         }
 
-        if (dotnetMuxerResolution.HasFlag(DotnetMuxerResolution.GlobalInstallation))
+        if (dotnetMuxerResolutionStrategy.HasFlag(DotnetMuxerResolutionStrategy.GlobalInstallationLocation))
         {
             // Try to search for global registration
             muxerPath = isWinOs ? GetMuxerFromGlobalRegistrationWin(targetArchitecture) : GetMuxerFromGlobalRegistrationOnUnix(targetArchitecture);
@@ -246,7 +246,7 @@ public class DotnetHostHelper : IDotnetHostHelper
             EqtTrace.Verbose($"DotnetHostHelper.TryGetDotnetPathByArchitecture: Muxer not found using global registrations");
         }
 
-        if (dotnetMuxerResolution.HasFlag(DotnetMuxerResolution.DefaultInstallation))
+        if (dotnetMuxerResolutionStrategy.HasFlag(DotnetMuxerResolutionStrategy.DefaultInstallationLocation))
         {
             // Try searching in default installation location if it exists
             if (isWinOs)

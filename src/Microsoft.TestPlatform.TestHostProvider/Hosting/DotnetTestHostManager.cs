@@ -432,14 +432,13 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 }
 
                 // Check if DOTNET_ROOT resolution should be bypassed.
-                var shouldIgnoreDotnetRoot = _environmentVariableHelper.GetEnvironmentVariable("VSTEST_IGNORE_DOTNET_ROOT");
-                var muxerResolution = (!StringUtils.IsNullOrEmpty(shouldIgnoreDotnetRoot)
-                    && shouldIgnoreDotnetRoot.Equals("1", StringComparison.Ordinal))
-                        ? (DotnetMuxerResolution.GlobalInstallation | DotnetMuxerResolution.DefaultInstallation)
-                        : DotnetMuxerResolution.All;
+                var shouldIgnoreDotnetRoot = (_environmentVariableHelper.GetEnvironmentVariable("VSTEST_IGNORE_DOTNET_ROOT")?.Trim() ?? "0") != "0";
+                var muxerResolutionStrategy = shouldIgnoreDotnetRoot
+                        ? (DotnetMuxerResolutionStrategy.GlobalInstallationLocation | DotnetMuxerResolutionStrategy.DefaultInstallationLocation)
+                        : DotnetMuxerResolutionStrategy.Default;
 
                 PlatformArchitecture finalTargetArchitecture = forceToX64 ? PlatformArchitecture.X64 : targetArchitecture;
-                if (!_dotnetHostHelper.TryGetDotnetPathByArchitecture(finalTargetArchitecture, muxerResolution, out string? muxerPath))
+                if (!_dotnetHostHelper.TryGetDotnetPathByArchitecture(finalTargetArchitecture, muxerResolutionStrategy, out string? muxerPath))
                 {
                     string message = string.Format(CultureInfo.CurrentCulture, Resources.NoDotnetMuxerFoundForArchitecture, $"dotnet{(_platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : string.Empty)}", finalTargetArchitecture.ToString());
                     EqtTrace.Error(message);
