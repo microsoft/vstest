@@ -185,7 +185,7 @@ internal class AssemblyResolver : IDisposable
                 }
             }
 
-            foreach (var dir in _searchDirectories)
+            foreach (var dir in (satelliteLocation is not null) ? _searchDirectories.Union(satelliteLocation) : _searchDirectories)
             {
                 if (dir.IsNullOrEmpty())
                 {
