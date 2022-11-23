@@ -136,6 +136,8 @@ internal class AssemblyResolver : IDisposable
             // Looks like a loading timing issue but we're not in control of the assembly loader order.
             var isResource = requestedName.Name.EndsWith(".resources");
             string[]? satelliteLocation = null;
+
+            // We help to resolve only test platform resources to be less invasive as possible with the default/expected behavior
             if (isResource && requestedName.Name.StartsWith("Microsoft.VisualStudio.TestPlatform"))
             {
                 try
