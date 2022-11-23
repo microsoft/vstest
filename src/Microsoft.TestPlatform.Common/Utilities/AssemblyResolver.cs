@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -31,6 +32,7 @@ internal class AssemblyResolver : IDisposable
     /// Specifies whether the resolver is disposed or not
     /// </summary>
     private bool _isDisposed;
+    private Stack<string>? _currentlyResolvingResources;
 
     /// <summary>
     /// Assembly resolver for platform
@@ -120,7 +122,71 @@ internal class AssemblyResolver : IDisposable
 
             TPDebug.Assert(requestedName != null && !requestedName.Name.IsNullOrEmpty(), "AssemblyResolver.OnResolve: requested is null or name is empty!");
 
-            foreach (var dir in _searchDirectories)
+            // Workaround: adding expected folder for the satellite assembly related to the current CurrentThread.CurrentUICulture relative to the current assembly location.
+            // After the move to the net461 the runtime doesn't resolve anymore the satellite assembly correctly.
+            // The expected workflow should be https://learn.microsoft.com/en-us/dotnet/core/extensions/package-and-deploy-resources#net-framework-resource-fallback-process
+            // But the resolution never fallback to the CultureInfo.Parent folder and fusion log return a failure like:
+            // ...
+            // LOG: The same bind was seen before, and was failed with hr = 0x80070002.
+            // ERR: Unrecoverable error occurred during pre - download check(hr = 0x80070002).
+            // ...
+            // The bizarre thing is that as a result we're failing caller task like discovery and when for reporting reason
+            // we're accessing again to the resource it works.
+            // Looks like a loading timing issue but we're not in control of the assembly loader order.
+            var isResource = requestedName.Name.EndsWith(".resources");
+            string[]? satelliteLocation = null;
+
+            // We help to resolve only test platform resources to be less invasive as possible with the default/expected behavior
+            if (isResource && requestedName.Name.StartsWith("Microsoft.VisualStudio.TestPlatform"))
+            {
+                try
+                {
+                    string? currentAssemblyLocation = null;
+                    try
+                    {
+                        currentAssemblyLocation = Assembly.GetExecutingAssembly().Location;
+                        // In .NET 5 and later versions, for bundled assemblies, the value returned is an empty string.
+                        currentAssemblyLocation = currentAssemblyLocation == string.Empty ? null : Path.GetDirectoryName(currentAssemblyLocation);
+                    }
+                    catch (NotSupportedException)
+                    {
+                        // https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location
+                    }
+
+                    if (currentAssemblyLocation is not null)
+                    {
+                        List<string> satelliteLocations = new();
+
+                        // We mimic the satellite workflow and we add CurrentUICulture and CurrentUICulture.Parent folder in order
+                        string? currentUICulture = Thread.CurrentThread.CurrentUICulture?.Name;
+                        if (currentUICulture is not null)
+                        {
+                            satelliteLocations.Add(Path.Combine(currentAssemblyLocation, currentUICulture));
+                        }
+
+                        // CurrentUICulture.Parent
+                        string? parentCultureInfo = Thread.CurrentThread.CurrentUICulture?.Parent?.Name;
+                        if (parentCultureInfo is not null)
+                        {
+                            satelliteLocations.Add(Path.Combine(currentAssemblyLocation, parentCultureInfo));
+                        }
+
+                        if (satelliteLocations.Count > 0)
+                        {
+                            satelliteLocation = satelliteLocations.ToArray();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // We catch here because this is a workaround, we're trying to substitute the expected workflow of the runtime
+                    // and this shouldn't be needed, but if we fail we want to log what's happened and give a chance to the in place
+                    // resolution workflow
+                    EqtTrace.Error($"AssemblyResolver.OnResolve: Exception during the custom satellite resolution\n{ex}");
+                }
+            }
+
+            foreach (var dir in (satelliteLocation is not null) ? _searchDirectories.Union(satelliteLocation) : _searchDirectories)
             {
                 if (dir.IsNullOrEmpty())
                 {
@@ -134,29 +200,61 @@ internal class AssemblyResolver : IDisposable
                     var assemblyPath = Path.Combine(dir, requestedName.Name + extension);
                     try
                     {
-                        if (!File.Exists(assemblyPath))
+                        bool pushed = false;
+                        try
                         {
-                            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Assembly path does not exist: '{1}', returning.", args.Name, assemblyPath);
+                            if (isResource)
+                            {
+                                // Check for recursive resource lookup.
+                                // This can happen when we are on non-english locale, and we try to load mscorlib.resources
+                                // (or potentially some other resources). This will trigger a new Resolve and call the method
+                                // we are currently in. If then some code in this Resolve method (like File.Exists) will again
+                                // try to access mscorlib.resources it will end up recursing forever.
 
-                            continue;
+                                if (_currentlyResolvingResources != null && _currentlyResolvingResources.Count > 0 && _currentlyResolvingResources.Contains(assemblyPath))
+                                {
+                                    EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Assembly is searching for itself recursively: '{1}', returning as not found.", args.Name, assemblyPath);
+                                    _resolvedAssemblies[args.Name] = null;
+                                    return null;
+                                }
+
+                                _currentlyResolvingResources ??= new Stack<string>(4);
+                                _currentlyResolvingResources.Push(assemblyPath);
+                                pushed = true;
+                            }
+
+                            if (!File.Exists(assemblyPath))
+                            {
+                                EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Assembly path does not exist: '{1}', returning.", args.Name, assemblyPath);
+
+                                continue;
+                            }
+
+                            AssemblyName foundName = _platformAssemblyLoadContext.GetAssemblyNameFromPath(assemblyPath);
+
+                            if (!RequestedAssemblyNameMatchesFound(requestedName, foundName))
+                            {
+                                EqtTrace.Info("AssemblyResolver.OnResolve: {0}: File exists but version/public key is wrong. Try next extension.", args.Name);
+                                continue;   // File exists but version/public key is wrong. Try next extension.
+                            }
+
+                            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Loading assembly '{1}'.", args.Name, assemblyPath);
+
+                            assembly = _platformAssemblyLoadContext.LoadAssemblyFromPath(assemblyPath);
+                            _resolvedAssemblies[args.Name] = assembly;
+
+                            EqtTrace.Info("AssemblyResolver.OnResolve: Resolved assembly: {0}, from path: {1}", args.Name, assemblyPath);
+
+                            return assembly;
                         }
-
-                        AssemblyName foundName = _platformAssemblyLoadContext.GetAssemblyNameFromPath(assemblyPath);
-
-                        if (!RequestedAssemblyNameMatchesFound(requestedName, foundName))
+                        finally
                         {
-                            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: File exists but version/public key is wrong. Try next extension.", args.Name);
-                            continue;   // File exists but version/public key is wrong. Try next extension.
+                            if (isResource && pushed)
+                            {
+                                _currentlyResolvingResources?.Pop();
+                            }
+
                         }
-
-                        EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Loading assembly '{1}'.", args.Name, assemblyPath);
-
-                        assembly = _platformAssemblyLoadContext.LoadAssemblyFromPath(assemblyPath);
-                        _resolvedAssemblies[args.Name] = assembly;
-
-                        EqtTrace.Info("AssemblyResolver.OnResolve: Resolved assembly: {0}, from path: {1}", args.Name, assemblyPath);
-
-                        return assembly;
                     }
                     catch (FileLoadException ex)
                     {
