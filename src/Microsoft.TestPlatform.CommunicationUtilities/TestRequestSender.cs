@@ -238,7 +238,7 @@ public class TestRequestSender : ITestRequestSender
         // Error case: test host can send a protocol error if it cannot find a supported version
         var protocolNegotiated = new ManualResetEvent(false);
 
-EventHandler<MessageReceivedEventArgs> onMessageReceived = (sender, args) =>
+        EventHandler<MessageReceivedEventArgs> onMessageReceived = (sender, args) =>
         {
             var message = _dataSerializer.DeserializeMessage(args.Data!);
 
