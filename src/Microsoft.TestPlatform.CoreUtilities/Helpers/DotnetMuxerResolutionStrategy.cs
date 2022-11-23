@@ -34,5 +34,5 @@ public enum DotnetMuxerResolutionStrategy
     /// <summary>
     /// Default muxer resolution strategy.
     /// </summary>
-    Default = DotnetRootArchitecture | DotnetRootArchitectureLess | GlobalInstallationLocation | DefaultInstallationLocation,
+    Default = DotnetRootArchitecture | DotnetRootArchitectureLess | GlobalInstallationLocation | DefaultInstallationLocation
 }
