@@ -49,7 +49,7 @@ internal class SerialTestRunDecorator : ITestExecutor, ITestExecutor2, IDisposab
     {
         if (IsSerialTestRunEnabled(runContext))
         {
-            EqtTrace.Error(Resources.Resources.SerialTestRunInvalidScenario);
+            EqtTrace.Error("<ForceOneTestAtTimePerTestHost>true</ForceOneTestAtTimePerTestHost> is not supported for sources test run.");
             frameworkHandle?.SendMessage(TestMessageLevel.Error, Resources.Resources.SerialTestRunInvalidScenario);
         }
         else

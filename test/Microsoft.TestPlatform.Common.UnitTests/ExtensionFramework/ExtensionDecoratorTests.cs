@@ -76,7 +76,7 @@ public class ExtensionDecoratorTests
         });
 
         // Run test
-        SerializeTestRunDecorator serializeTestRunDecorator = new(_testExecutorMock.Object);
+        SerialTestRunDecorator serializeTestRunDecorator = new(_testExecutorMock.Object);
         serializeTestRunDecorator.RunTests(testCases, _contextMock.Object, _frameworkWorkHandleMock.Object);
 
         // Assert
@@ -91,7 +91,7 @@ public class ExtensionDecoratorTests
         _contextMock.Setup(x => x.RunSettings).Returns(_settingsMock.Object);
 
         // Run test
-        SerializeTestRunDecorator serializeTestRunDecorator = new(_testExecutorMock.Object);
+        SerialTestRunDecorator serializeTestRunDecorator = new(_testExecutorMock.Object);
         serializeTestRunDecorator.RunTests(new List<string>() { "samplesource.dll" }, _contextMock.Object, _frameworkWorkHandleMock.Object);
 
         // Assert
@@ -131,7 +131,7 @@ public class ExtensionDecoratorTests
         .Callback((IEnumerable<string>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle) => Assert.AreEqual(sourcesName, tests));
 
         // Run test
-        SerializeTestRunDecorator serializeTestRunDecorator = new(_testExecutorMock.Object);
+        SerialTestRunDecorator serializeTestRunDecorator = new(_testExecutorMock.Object);
         serializeTestRunDecorator.RunTests(testCases, _contextMock.Object, _frameworkWorkHandleMock.Object);
         serializeTestRunDecorator.RunTests(sourcesName, _contextMock.Object, _frameworkWorkHandleMock.Object);
 

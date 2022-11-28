@@ -192,9 +192,9 @@
         <target state="translated">Analisi dello stack:</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="SerializeTestRunInvalidScenario">
-        <source>&lt;ForceOneTestAtTimePerTestHost&gt;true&lt;/ForceOneTestAtTimePerTestHost&gt; is not supported for sources test run</source>
-        <target state="new">&lt;SerializeTestRun&gt;true&lt;/SerializeTestRun&gt; is not supported for sources test run</target>
+      <trans-unit id="SerialTestRunInvalidScenario">
+        <source>&lt;ForceOneTestAtTimePerTestHost&gt;true&lt;/ForceOneTestAtTimePerTestHost&gt; is not supported for sources test run.</source>
+        <target state="new">&lt;ForceOneTestAtTimePerTestHost&gt;true&lt;/ForceOneTestAtTimePerTestHost&gt; is not supported for sources test run.</target>
         <note></note>
       </trans-unit>
     </body>
