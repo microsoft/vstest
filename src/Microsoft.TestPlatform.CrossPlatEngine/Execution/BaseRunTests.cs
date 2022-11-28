@@ -495,8 +495,8 @@ internal abstract class BaseRunTests
                     {
                         // If real executor is wrapped by a decorator we get the real decorated type
                         TypeInfo executorTypeInfo =
-                            (executor.Value is SerialTestRunDecorator serializeTestRunDecorator)
-                                ? serializeTestRunDecorator.OriginalTestExecutor.GetType().GetTypeInfo()
+                            (executor.Value is SerialTestRunDecorator serialTestRunDecorator)
+                                ? serialTestRunDecorator.OriginalTestExecutor.GetType().GetTypeInfo()
                                 : executor.Value.GetType().GetTypeInfo();
 
                         var executorLocation = executorTypeInfo.Assembly.GetAssemblyLocation();
