@@ -73,7 +73,7 @@ public class SerialTestRunDecorator : AcceptanceTestBase
     {
         // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Dictionary<string, string?>? environmentVariables = new() { { "VSTEST_DISABLE_SERIALIZETESTRUN_DECORATOR", "1" } };
+        Dictionary<string, string?>? environmentVariables = new() { { "VSTEST_DISABLE_SERIALTESTRUN_DECORATOR", "1" } };
         Setup(environmentVariables);
 
         // Act

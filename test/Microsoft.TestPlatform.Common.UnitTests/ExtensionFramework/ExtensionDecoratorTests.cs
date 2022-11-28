@@ -38,7 +38,7 @@ public class ExtensionDecoratorTests
     public void ExtensionDecoratorFactory_DisabledByFlag()
     {
         // Arrange
-        _featureFlagMock.Setup(x => x.IsSet(FeatureFlag.DISABLE_SERIALIZETESTRUN_DECORATOR)).Returns(true);
+        _featureFlagMock.Setup(x => x.IsSet(FeatureFlag.DISABLE_SERIALTESTRUN_DECORATOR)).Returns(true);
 
         // Run test and assert
         ExtensionDecoratorFactory extensionDecoratorFactory = new(_featureFlagMock.Object);
@@ -47,7 +47,7 @@ public class ExtensionDecoratorTests
     }
 
     [TestMethod]
-    public void SerializeTestRunDecorator_ShouldSerializeTests()
+    public void SerialTestRunDecorator_ShouldSerializeTests()
     {
         // Arrange
         List<TestCase> testCases = new();
@@ -76,23 +76,23 @@ public class ExtensionDecoratorTests
         });
 
         // Run test
-        SerialTestRunDecorator serializeTestRunDecorator = new(_testExecutorMock.Object);
-        serializeTestRunDecorator.RunTests(testCases, _contextMock.Object, _frameworkWorkHandleMock.Object);
+        SerialTestRunDecorator serialTestRunDecorator = new(_testExecutorMock.Object);
+        serialTestRunDecorator.RunTests(testCases, _contextMock.Object, _frameworkWorkHandleMock.Object);
 
         // Assert
         Assert.AreEqual(0, testCases.Except(testCasesRan).Count());
     }
 
     [TestMethod]
-    public void SerializeTestRunDecorator_DoesNotSupportSources()
+    public void SerialTestRunDecorator_DoesNotSupportSources()
     {
         // Arrange
         _settingsMock.Setup(x => x.SettingsXml).Returns(_runsettings);
         _contextMock.Setup(x => x.RunSettings).Returns(_settingsMock.Object);
 
         // Run test
-        SerialTestRunDecorator serializeTestRunDecorator = new(_testExecutorMock.Object);
-        serializeTestRunDecorator.RunTests(new List<string>() { "samplesource.dll" }, _contextMock.Object, _frameworkWorkHandleMock.Object);
+        SerialTestRunDecorator serialTestRunDecorator = new(_testExecutorMock.Object);
+        serialTestRunDecorator.RunTests(new List<string>() { "samplesource.dll" }, _contextMock.Object, _frameworkWorkHandleMock.Object);
 
         // Assert
         _testExecutorMock.Verify(x => x.RunTests(It.IsAny<IEnumerable<string>?>(), It.IsAny<IRunContext?>(), It.IsAny<IFrameworkHandle?>()), Times.Never());
@@ -105,7 +105,7 @@ public class ExtensionDecoratorTests
     [DataRow("false", false)]
     [DataRow("FALSE", false)]
     [DataRow(null, true)]
-    public void SerializeTestRunDecorator_Disabled(string falseValue, bool nullRunSettings)
+    public void SerialTestRunDecorator_Disabled(string falseValue, bool nullRunSettings)
     {
         // Arrange
         string runsettings = $@"
@@ -131,9 +131,9 @@ public class ExtensionDecoratorTests
         .Callback((IEnumerable<string>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle) => Assert.AreEqual(sourcesName, tests));
 
         // Run test
-        SerialTestRunDecorator serializeTestRunDecorator = new(_testExecutorMock.Object);
-        serializeTestRunDecorator.RunTests(testCases, _contextMock.Object, _frameworkWorkHandleMock.Object);
-        serializeTestRunDecorator.RunTests(sourcesName, _contextMock.Object, _frameworkWorkHandleMock.Object);
+        SerialTestRunDecorator serialTestRunDecorator = new(_testExecutorMock.Object);
+        serialTestRunDecorator.RunTests(testCases, _contextMock.Object, _frameworkWorkHandleMock.Object);
+        serialTestRunDecorator.RunTests(sourcesName, _contextMock.Object, _frameworkWorkHandleMock.Object);
 
         // Assert
         _testExecutorMock.Verify(x => x.RunTests(It.IsAny<IEnumerable<TestCase>?>(), It.IsAny<IRunContext?>(), It.IsAny<IFrameworkHandle?>()), Times.Once());
