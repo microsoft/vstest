@@ -16,7 +16,7 @@ internal class SerializeTestRunDecorator : ITestExecutor, ITestExecutor2, IDispo
 {
     private readonly SemaphoreSlim _runSequentialEvent = new(1);
 
-    public ITestExecutor OriginalTestExecutor { get; private set; }
+    public ITestExecutor OriginalTestExecutor { get; }
 
     public SerializeTestRunDecorator(ITestExecutor originalTestExecutor)
     {
