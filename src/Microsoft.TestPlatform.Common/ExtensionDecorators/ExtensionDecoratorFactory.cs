@@ -18,6 +18,6 @@ internal class ExtensionDecoratorFactory
     {
         return _featureFlag.IsSet(FeatureFlag.DISABLE_SERIALIZETESTRUN_DECORATOR)
             ? originalTestExecutor
-            : new SerializeTestRunDecorator(originalTestExecutor);
+            : new SerialTestRunDecorator(originalTestExecutor);
     }
 }

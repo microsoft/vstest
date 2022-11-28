@@ -50,7 +50,7 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
             return new Collection<AttachmentSet>();
 
         // Merging per test code coverage is not supported
-        if (PerTestCoverageEnabled(configurationElement))
+        if (IsPerTestCoverageEnabled(configurationElement))
         {
             return attachments;
         }
@@ -97,7 +97,7 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
 
         return attachments;
 
-        static bool PerTestCoverageEnabled(XmlElement? configurationElement)
+        static bool IsPerTestCoverageEnabled(XmlElement? configurationElement)
         {
             XmlNodeList? xmlNodeList = configurationElement?.GetElementsByTagName("PerTestCodeCoverage");
             if (xmlNodeList?.Count == 1)

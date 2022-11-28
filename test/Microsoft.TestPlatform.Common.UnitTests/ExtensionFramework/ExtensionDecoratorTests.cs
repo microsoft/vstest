@@ -96,7 +96,7 @@ public class ExtensionDecoratorTests
 
         // Assert
         _testExecutorMock.Verify(x => x.RunTests(It.IsAny<IEnumerable<string>?>(), It.IsAny<IRunContext?>(), It.IsAny<IFrameworkHandle?>()), Times.Never());
-        _frameworkWorkHandleMock.Verify(x => x.SendMessage(TestMessageLevel.Error, Resources.SerializeTestRunInvalidScenario), Times.Once());
+        _frameworkWorkHandleMock.Verify(x => x.SendMessage(TestMessageLevel.Error, Resources.SerialTestRunInvalidScenario), Times.Once());
     }
 
 

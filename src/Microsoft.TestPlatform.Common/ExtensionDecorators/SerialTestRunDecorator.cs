@@ -12,20 +12,20 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionDecorators;
 
-internal class SerializeTestRunDecorator : ITestExecutor, ITestExecutor2, IDisposable
+internal class SerialTestRunDecorator : ITestExecutor, ITestExecutor2, IDisposable
 {
     private readonly SemaphoreSlim _runSequentialEvent = new(1);
 
     public ITestExecutor OriginalTestExecutor { get; }
 
-    public SerializeTestRunDecorator(ITestExecutor originalTestExecutor)
+    public SerialTestRunDecorator(ITestExecutor originalTestExecutor)
     {
         OriginalTestExecutor = originalTestExecutor;
     }
 
     public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
     {
-        if (IsSerializeTestRunEnabled(runContext))
+        if (IsSerialTestRunEnabled(runContext))
         {
             EqtTrace.Info("SerializeTestRunDecorator.RunTests: Test cases will run sequentially");
             if (tests is null)
@@ -47,10 +47,10 @@ internal class SerializeTestRunDecorator : ITestExecutor, ITestExecutor2, IDispo
 
     public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
     {
-        if (IsSerializeTestRunEnabled(runContext))
+        if (IsSerialTestRunEnabled(runContext))
         {
-            EqtTrace.Error(Resources.Resources.SerializeTestRunInvalidScenario);
-            frameworkHandle?.SendMessage(TestMessageLevel.Error, Resources.Resources.SerializeTestRunInvalidScenario);
+            EqtTrace.Error(Resources.Resources.SerialTestRunInvalidScenario);
+            frameworkHandle?.SendMessage(TestMessageLevel.Error, Resources.Resources.SerialTestRunInvalidScenario);
         }
         else
         {
@@ -85,7 +85,7 @@ internal class SerializeTestRunDecorator : ITestExecutor, ITestExecutor2, IDispo
     public void Cancel()
         => OriginalTestExecutor.Cancel();
 
-    private static bool IsSerializeTestRunEnabled(IRunContext? runContext)
+    private static bool IsSerialTestRunEnabled(IRunContext? runContext)
     {
         if (runContext is null || runContext.RunSettings is null || runContext.RunSettings.SettingsXml is null)
         {

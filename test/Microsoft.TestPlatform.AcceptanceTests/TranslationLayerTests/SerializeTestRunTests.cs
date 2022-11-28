@@ -16,19 +16,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 [TestClass]
 // We need to dogfood the package built in this repo *-dev and we pack tha tp only on windows
 [TestCategory("Windows-Review")]
-public class SerializeTestRunTests : AcceptanceTestBase
+public class SerialTestRunDecorator : AcceptanceTestBase
 {
     private IVsTestConsoleWrapper? _vstestConsoleWrapper;
     private RunEventHandler? _runEventHandler;
     private DiscoveryEventHandler? _discoveryEventHandler;
     private DiscoveryEventHandler2? _discoveryEventHandler2;
-    private readonly string _runsettings = @"
+    private readonly string _runsettings = $$"""
 <RunSettings>
     <RunConfiguration>
         <ForceOneTestAtTimePerTestHost>true</ForceOneTestAtTimePerTestHost>
     </RunConfiguration>
 </RunSettings>
-";
+""";
 
     [MemberNotNull(nameof(_vstestConsoleWrapper), nameof(_runEventHandler), nameof(_discoveryEventHandler), nameof(_discoveryEventHandler2))]
     private void Setup(Dictionary<string, string?>? environmentVariables = null)
@@ -109,6 +109,6 @@ public class SerializeTestRunTests : AcceptanceTestBase
         }
 
         Assert.IsTrue(_runEventHandler.Errors.Count > 0);
-        Assert.IsTrue(_runEventHandler.Errors.Contains(VisualStudio.TestPlatform.Common.Resources.Resources.SerializeTestRunInvalidScenario), $"Error messages\n:{builder}");
+        Assert.IsTrue(_runEventHandler.Errors.Contains(VisualStudio.TestPlatform.Common.Resources.Resources.SerialTestRunInvalidScenario), $"Error messages\n:{builder}");
     }
 }

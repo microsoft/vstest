@@ -331,11 +331,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;ForceOneTestAtTimePerTestHost&gt;true&lt;/ForceOneTestAtTimePerTestHost&gt; is not supported for sources test run.
+        ///   Looks up a localized string similar to &lt;ForceOneTestAtTimePerTestHost&gt;true&lt;/ForceOneTestAtTimePerTestHost&gt; is not supported for sources test run..
         /// </summary>
-        internal static string SerializeTestRunInvalidScenario {
+        internal static string SerialTestRunInvalidScenario {
             get {
-                return ResourceManager.GetString("SerializeTestRunInvalidScenario", resourceCulture);
+                return ResourceManager.GetString("SerialTestRunInvalidScenario", resourceCulture);
             }
         }
         
