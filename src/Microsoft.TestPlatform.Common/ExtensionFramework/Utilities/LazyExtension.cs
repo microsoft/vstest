@@ -102,8 +102,8 @@ public class LazyExtension<TExtension, TMetadata>
                             var pluginType = TestPluginManager.GetTestExtensionType(TestPluginInfo.AssemblyQualifiedName);
                             TPDebug.Assert(pluginType is not null, "pluginType is null");
 
+                            // If the extension is a test executor we decorate the adapter to augment the test platform capabilities.
                             var extension = TestPluginManager.CreateTestExtension<TExtension>(pluginType);
-
                             if (typeof(ITestExecutor).IsAssignableFrom(typeof(TExtension)))
                             {
                                 extension = (TExtension)_extensionDecoratorFactory.Decorate((ITestExecutor)extension!);
