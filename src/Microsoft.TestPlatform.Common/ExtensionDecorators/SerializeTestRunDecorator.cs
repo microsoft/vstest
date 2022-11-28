@@ -27,7 +27,7 @@ internal class SerializeTestRunDecorator : ITestExecutor, ITestExecutor2, IDispo
     {
         if (IsSerializeTestRunEnabled(runContext))
         {
-            EqtTrace.Info($"SerializeTestRunDecorator: Test cases will run sequentially");
+            EqtTrace.Info("SerializeTestRunDecorator.RunTests: Test cases will run sequentially");
             if (tests is null)
             {
                 return;
