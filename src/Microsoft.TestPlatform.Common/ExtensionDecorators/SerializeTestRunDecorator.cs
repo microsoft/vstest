@@ -93,7 +93,7 @@ internal class SerializeTestRunDecorator : ITestExecutor, ITestExecutor2, IDispo
         }
 
         XElement runSettings = XElement.Parse(runContext.RunSettings.SettingsXml);
-        XElement? serializeTestRun = runSettings.Element("RunConfiguration")?.Element("SerializeTestRun");
+        XElement? serializeTestRun = runSettings.Element("RunConfiguration")?.Element("ForceOneTestAtTimePerTestHost");
         return serializeTestRun is not null && bool.TryParse(serializeTestRun.Value, out bool enabled) && enabled;
     }
 

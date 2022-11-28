@@ -208,7 +208,7 @@
     <value>An error occurred while loading the run settings.  Error: {0}</value>
   </data>
   <data name="SerializeTestRunInvalidScenario" xml:space="preserve">
-    <value>&lt;SerializeTestRun&gt;true&lt;/SerializeTestRun&gt; is not supported for sources test run</value>
+    <value>&lt;ForceOneTestAtTimePerTestHost&gt;true&lt;/ForceOneTestAtTimePerTestHost&gt; is not supported for sources test run</value>
   </data>
   <data name="SettingsNodeInvalidName" xml:space="preserve">
     <value>Invalid settings node specified. The name property of the settings node must be non-empty.</value>

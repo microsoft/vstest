@@ -30,7 +30,7 @@ public class ExtensionDecoratorTests
     private readonly string _runsettings = @"
     <RunSettings>
         <RunConfiguration>
-            <SerializeTestRun>true</SerializeTestRun>
+            <ForceOneTestAtTimePerTestHost>true</ForceOneTestAtTimePerTestHost>
         </RunConfiguration>
     </RunSettings>";
 
@@ -111,7 +111,7 @@ public class ExtensionDecoratorTests
         string runsettings = $@"
         <RunSettings>
             <RunConfiguration>
-                <SerializeTestRun>{falseValue}</SerializeTestRun>
+                <ForceOneTestAtTimePerTestHost>{falseValue}</ForceOneTestAtTimePerTestHost>
             </RunConfiguration>
         </RunSettings>";
 
