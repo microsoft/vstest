@@ -192,6 +192,11 @@
         <target state="translated">Stapelüberwachung:</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="SerializeTestRunInvalidScenario">
+        <source>&lt;SerializeTestRun&gt;true&lt;/SerializeTestRun&gt; is not supported for sources test run</source>
+        <target state="new">&lt;SerializeTestRun&gt;true&lt;/SerializeTestRun&gt; is not supported for sources test run</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

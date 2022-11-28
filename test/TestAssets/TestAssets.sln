@@ -124,7 +124,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "Tools\Tools.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perfy.TestAdapter", "performance\Perfy.TestAdapter\Perfy.TestAdapter.csproj", "{71BF7EC9-7BEE-4038-8F4E-87032FA4E995}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecursiveResourceLookupCrash", "RecursiveResourceLookupCrash\RecursiveResourceLookupCrash.csproj", "{9B5BDF7D-5816-47C6-8CFD-E45B152CA35F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecursiveResourceLookupCrash", "RecursiveResourceLookupCrash\RecursiveResourceLookupCrash.csproj", "{9B5BDF7D-5816-47C6-8CFD-E45B152CA35F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerializeTestRunTestProject", "SerializeTestRunTestProject\SerializeTestRunTestProject.csproj", "{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -820,6 +822,18 @@ Global
 		{9B5BDF7D-5816-47C6-8CFD-E45B152CA35F}.Release|x64.Build.0 = Release|Any CPU
 		{9B5BDF7D-5816-47C6-8CFD-E45B152CA35F}.Release|x86.ActiveCfg = Release|Any CPU
 		{9B5BDF7D-5816-47C6-8CFD-E45B152CA35F}.Release|x86.Build.0 = Release|Any CPU
+		{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}.Debug|x64.Build.0 = Debug|Any CPU
+		{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}.Debug|x86.Build.0 = Debug|Any CPU
+		{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}.Release|x64.ActiveCfg = Release|Any CPU
+		{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}.Release|x64.Build.0 = Release|Any CPU
+		{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}.Release|x86.ActiveCfg = Release|Any CPU
+		{64C4C4CD-2319-4033-9F33-53AAA8FECEFA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
