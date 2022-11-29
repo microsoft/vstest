@@ -55,9 +55,12 @@ public class FileHelper : IFileHelper
 
         var files = Directory.EnumerateFiles(directory, "*", searchOption);
 
-        return files.Where(
-            file => endsWithSearchPatterns.Any(
-                pattern => file.EndsWith(pattern, StringComparison.OrdinalIgnoreCase)));
+        return files
+            .Where(
+                file => endsWithSearchPatterns.Any(
+                    pattern => file.EndsWith(pattern, StringComparison.OrdinalIgnoreCase)))
+            .OrderBy(
+                file => file, StringComparer.Ordinal);
     }
 
     /// <inheritdoc/>
