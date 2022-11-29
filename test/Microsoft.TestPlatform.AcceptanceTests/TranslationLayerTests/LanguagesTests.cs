@@ -44,7 +44,7 @@ public class LanguagesTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         _testEnvironment.DebugInfo!.DebugStopAtEntrypoint = true;
 
-        // Some languages it doesn't have to be complete supported list
+        // Some languages it doesn't have to be the complete supported list
         foreach (var langId in new string[] { "zh-CHS", "zh-CN", "fr", "it", "pl", "tr", "pt-BR", "zh-Hans" })
         {
             Dictionary<string, string?>? environmentVariables = new()
