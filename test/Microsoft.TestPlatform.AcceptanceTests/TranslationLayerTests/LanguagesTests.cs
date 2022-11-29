@@ -50,6 +50,7 @@ public class LanguagesTests : AcceptanceTestBase
             Dictionary<string, string?>? environmentVariables = new()
         {
             { "DOTNET_CLI_UI_LANGUAGE", langId },
+            // User for attach to debug
             // { "VSTEST_HOST_DEBUG","1" }
         };
             Setup(environmentVariables);
