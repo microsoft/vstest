@@ -48,11 +48,11 @@ public class LanguagesTests : AcceptanceTestBase
         foreach (var langId in new string[] { "zh-CHS", "zh-CN", "fr", "it", "pl", "tr", "pt-BR", "zh-Hans" })
         {
             Dictionary<string, string?>? environmentVariables = new()
-        {
-            { "DOTNET_CLI_UI_LANGUAGE", langId },
-            // Used for attach to debug
-            // { "VSTEST_HOST_DEBUG","1" }
-        };
+            {
+                { "DOTNET_CLI_UI_LANGUAGE", langId },
+                // Used for attach to debug
+                // { "VSTEST_HOST_DEBUG","1" }
+            };
             Setup(environmentVariables);
 
             // Act
