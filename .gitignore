@@ -144,3 +144,6 @@ logs/
 
 .fake/
 .ionide/
+
+# Test assets specific
+/test/TestAssets/packages
