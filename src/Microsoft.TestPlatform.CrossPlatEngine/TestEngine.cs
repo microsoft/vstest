@@ -704,7 +704,7 @@ public class TestEngine : ITestEngine
     /// </summary>
     internal static int? GetMultiHostTestExecutionHostCount(string? runsettings)
     {
-        if (runsettings is null)
+        if (string.IsNullOrEmpty(runsettings))
         {
             return null;
         }
