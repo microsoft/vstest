@@ -95,7 +95,6 @@ public class MultiHostTestExecutionTests : AcceptanceTestBase
         }
 
         Assert.AreEqual(10, tests.Count);
-        tests.Sort();
         for (int i = 1; i <= 10; i++)
         {
             tests.Remove($"TestMethod{i}");
