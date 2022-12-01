@@ -93,8 +93,8 @@ internal class SerialTestRunDecorator : ITestExecutor, ITestExecutor2, IDisposab
         }
 
         XElement runSettings = XElement.Parse(runContext.RunSettings.SettingsXml);
-        XElement? serializeTestRun = runSettings.Element("RunConfiguration")?.Element("ForceOneTestAtTimePerTestHost");
-        return serializeTestRun is not null && bool.TryParse(serializeTestRun.Value, out bool enabled) && enabled;
+        XElement? forceOneTestAtTimePerTestHost = runSettings.Element("RunConfiguration")?.Element("ForceOneTestAtTimePerTestHost");
+        return forceOneTestAtTimePerTestHost is not null && bool.TryParse(forceOneTestAtTimePerTestHost.Value, out bool enabled) && enabled;
     }
 
     public void Dispose()

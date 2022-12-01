@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 [TestClass]
 // We need to dogfood the package built in this repo *-dev and we pack tha tp only on windows
 [TestCategory("Windows-Review")]
-public class SerialTestRunDecorator : AcceptanceTestBase
+public class SerialTestRunDecoratorTests : AcceptanceTestBase
 {
     private IVsTestConsoleWrapper? _vstestConsoleWrapper;
     private RunEventHandler? _runEventHandler;
