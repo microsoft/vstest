@@ -58,7 +58,7 @@ public class MultiHostTestExecutionTests : AcceptanceTestBase
         string runsettings = $"""
 <RunSettings>
     <RunConfiguration>
-        <MaxCpuCount>0</MaxCpuCount>
+        <MaxCpuCount>{expectedHost}</MaxCpuCount>
         <MultiHostTestExecution strategy="Fixed">
             <Value>{expectedHost}</Value>
         </MultiHostTestExecution>
