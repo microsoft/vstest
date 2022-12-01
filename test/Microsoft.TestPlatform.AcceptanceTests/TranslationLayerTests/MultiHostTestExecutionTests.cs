@@ -6,8 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
-using FluentAssertions.Collections;
-
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -46,6 +44,12 @@ public class MultiHostTestExecutionTests : AcceptanceTestBase
     [TestMethod]
     [NetCoreTargetFrameworkDataSource]
     [NetFullTargetFrameworkDataSource]
+    public void ExecuteContainerInMultiHost_MoreHostsThanTests(RunnerInfo runnerInfo)
+        => ExecuteContainerInMultiHost(runnerInfo, 20);
+
+    [TestMethod]
+    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSource]
     public void ExecuteSingleContainerInDefaultSingleHost(RunnerInfo runnerInfo)
         => ExecuteContainerInMultiHost(runnerInfo, -1);
 
@@ -78,7 +82,7 @@ public class MultiHostTestExecutionTests : AcceptanceTestBase
         Assert.IsFalse(failedTests > 0, $"Number of failed tests {failedTests}");
 
         string[] hosts = Directory.GetFiles(TempDirectory.Path, "TestHost*");
-        Assert.AreEqual(expectedHost == -1 ? 1 : expectedHost, hosts.Length);
+        Assert.AreEqual(expectedHost == -1 ? 1 : expectedHost > 10 ? 10 : expectedHost, hosts.Length);
 
         List<string> tests = new();
         foreach (var file in hosts)
