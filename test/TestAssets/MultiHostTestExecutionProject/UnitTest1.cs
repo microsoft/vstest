@@ -17,7 +17,7 @@ namespace SerializeTestRunTestProject
     {
         private static readonly object Lock = new object();
 
-        private void LogFile(string testName)
+        private void LogToFile(string testName)
         {
             lock (Lock)
             {
@@ -27,33 +27,33 @@ namespace SerializeTestRunTestProject
         }
 
         [TestMethod]
-        public void TestMethod1() => LogFile(nameof(TestMethod1));
+        public void TestMethod1() => LogToFile(nameof(TestMethod1));
 
         [TestMethod]
-        public void TestMethod2() => LogFile(nameof(TestMethod2));
+        public void TestMethod2() => LogToFile(nameof(TestMethod2));
 
         [TestMethod]
-        public void TestMethod3() => LogFile(nameof(TestMethod3));
+        public void TestMethod3() => LogToFile(nameof(TestMethod3));
 
         [TestMethod]
-        public void TestMethod4() => LogFile(nameof(TestMethod4));
+        public void TestMethod4() => LogToFile(nameof(TestMethod4));
 
         [TestMethod]
-        public void TestMethod5() => LogFile(nameof(TestMethod5));
+        public void TestMethod5() => LogToFile(nameof(TestMethod5));
 
         [TestMethod]
-        public void TestMethod6() => LogFile(nameof(TestMethod6));
+        public void TestMethod6() => LogToFile(nameof(TestMethod6));
 
         [TestMethod]
-        public void TestMethod7() => LogFile(nameof(TestMethod7));
+        public void TestMethod7() => LogToFile(nameof(TestMethod7));
 
         [TestMethod]
-        public void TestMethod8() => LogFile(nameof(TestMethod8));
+        public void TestMethod8() => LogToFile(nameof(TestMethod8));
 
         [TestMethod]
-        public void TestMethod9() => LogFile(nameof(TestMethod9));
+        public void TestMethod9() => LogToFile(nameof(TestMethod9));
 
         [TestMethod]
-        public void TestMethod10() => LogFile(nameof(TestMethod10));
+        public void TestMethod10() => LogToFile(nameof(TestMethod10));
     }
 }

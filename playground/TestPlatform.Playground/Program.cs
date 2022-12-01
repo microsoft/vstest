@@ -48,16 +48,19 @@ internal class Program
                     <!-- <TargetPlatform>x86</TargetPlatform> -->
                     <!-- <TargetFrameworkVersion>net472</TargetFrameworkVersion> -->
 
-                    <!-- The settings below are what VS sends by default. -->
-                    <CollectSourceInformation>False</CollectSourceInformation>
-                    <DesignMode>True</DesignMode>
-                   
+                    <!-- Per test coverage support -->
+                    <!--
                     <MaxCpuCount>0</MaxCpuCount>
                     <ForceOneTestAtTimePerTestHost>True</ForceOneTestAtTimePerTestHost>
                     <MultiHostTestExecution strategy="Fixed">
                         <Value>16</Value>
                     </MultiHostTestExecution>
+                    -->
+                    
 
+                    <!-- The settings below are what VS sends by default. -->
+                    <CollectSourceInformation>False</CollectSourceInformation>
+                    <DesignMode>True</DesignMode>
                 </RunConfiguration>
                 <BoostTestInternalSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                     <VSProcessId>999999</VSProcessId>
