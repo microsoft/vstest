@@ -194,7 +194,7 @@
       </trans-unit>
       <trans-unit id="SerialTestRunInvalidScenario">
         <source>&lt;ForceOneTestAtTimePerTestHost&gt;true&lt;/ForceOneTestAtTimePerTestHost&gt; is not supported for sources test run.</source>
-        <target state="new">&lt;ForceOneTestAtTimePerTestHost&gt;true&lt;/ForceOneTestAtTimePerTestHost&gt; is not supported for sources test run.</target>
+        <target state="translated">&lt;ForceOneTestAtTimePerTestHost&gt;true&lt;/ForceOneTestAtTimePerTestHost&gt;는 원본 테스트 실행에 대해 지원되지 않습니다.</target>
         <note></note>
       </trans-unit>
     </body>
