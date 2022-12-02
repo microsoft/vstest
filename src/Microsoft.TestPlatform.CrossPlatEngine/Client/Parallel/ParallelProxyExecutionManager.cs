@@ -236,7 +236,7 @@ internal sealed class ParallelProxyExecutionManager : IParallelProxyExecutionMan
         if (testRunCriteria.HasSpecificTests)
         {
             // We get the expected number of hosts to use to run tests
-            int? numberOfTestHostToUse = TestEngine.GetMultiHostTestExecutionHostCount(testRunCriteria.TestRunSettings);
+            int? numberOfTestHostToUse = TestEngine.GetTargetFrameworkTestHostDemultiplexer(testRunCriteria.TestRunSettings);
 
             // We split test cases to their respective sources, and associate them with additional info about on
             // which type of provider they can run so we can later select the correct workload for the provider

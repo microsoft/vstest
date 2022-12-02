@@ -52,7 +52,7 @@ internal class Program
                     <!--
                     <MaxCpuCount>0</MaxCpuCount>
                     <ForceOneTestAtTimePerTestHost>True</ForceOneTestAtTimePerTestHost>
-                    <TargetFrameworkTestHostLoadBalancingStrategy>4</TargetFrameworkTestHostLoadBalancingStrategy>
+                    <TargetFrameworkTestHostDemultiplexer>4</TargetFrameworkTestHostDemultiplexer>
                     -->
 
                     <!-- The settings below are what VS sends by default. -->

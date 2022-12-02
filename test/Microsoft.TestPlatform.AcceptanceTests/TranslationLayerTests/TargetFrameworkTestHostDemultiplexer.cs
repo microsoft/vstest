@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 [TestClass]
 // We need to dogfood the package built in this repo *-dev and we pack tha tp only on windows
 [TestCategory("Windows-Review")]
-public class TargetFrameworkTestHostLoadBalancingStrategyTests : AcceptanceTestBase
+public class TargetFrameworkTestHostDemultiplexer : AcceptanceTestBase
 {
     private IVsTestConsoleWrapper? _vstestConsoleWrapper;
     private RunEventHandler? _runEventHandler;
@@ -63,7 +63,7 @@ public class TargetFrameworkTestHostLoadBalancingStrategyTests : AcceptanceTestB
 <RunSettings>
     <RunConfiguration>
         <MaxCpuCount>{expectedHost}</MaxCpuCount>
-        <TargetFrameworkTestHostLoadBalancingStrategy>{expectedHost}</TargetFrameworkTestHostLoadBalancingStrategy>
+        <TargetFrameworkTestHostDemultiplexer>{expectedHost}</TargetFrameworkTestHostDemultiplexer>
     </RunConfiguration>
 </RunSettings>
 """;

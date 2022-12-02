@@ -555,7 +555,7 @@ public class TestEngine : ITestEngine
 
                 // If we're using the multi host execution we don't want to
                 // limit the number of hosts also if we're running less sources than the parallel level chosen.
-                int? numberOfTestHostToUse = GetMultiHostTestExecutionHostCount(runSettings);
+                int? numberOfTestHostToUse = GetTargetFrameworkTestHostDemultiplexer(runSettings);
                 if (numberOfTestHostToUse is null)
                 {
                     parallelLevelToUse = Math.Min(sourceCount, parallelLevelToUse);
@@ -702,7 +702,7 @@ public class TestEngine : ITestEngine
     /// <summary>
     /// We don't add this helper to the XmlRunSettingsUtilities because the feature is in preview and not exposed yet
     /// </summary>
-    internal static int? GetMultiHostTestExecutionHostCount(string? runsettings)
+    internal static int? GetTargetFrameworkTestHostDemultiplexer(string? runsettings)
     {
         if (string.IsNullOrEmpty(runsettings))
         {
@@ -710,20 +710,20 @@ public class TestEngine : ITestEngine
         }
 
         XDocument document = XDocument.Parse(runsettings);
-        XElement? targetFrameworkTestHostLoadBalancingStrategy = document?.Element("RunSettings")?.Element("RunConfiguration")?.Element("TargetFrameworkTestHostLoadBalancingStrategy");
+        XElement? targetFrameworkTestHostDemultiplexer = document?.Element("RunSettings")?.Element("RunConfiguration")?.Element("TargetFrameworkTestHostDemultiplexer");
 
-        if (targetFrameworkTestHostLoadBalancingStrategy is null)
+        if (targetFrameworkTestHostDemultiplexer is null)
         {
             return null;
         }
 
-        if (int.TryParse(targetFrameworkTestHostLoadBalancingStrategy.Value, out int numberOfTestHost) && numberOfTestHost > 0)
+        if (int.TryParse(targetFrameworkTestHostDemultiplexer.Value, out int numberOfTestHost) && numberOfTestHost > 0)
         {
             return numberOfTestHost;
         }
         else
         {
-            EqtTrace.Error($"ProxyParallelExecutionManager: Invalid value for TargetFrameworkTestHostLoadBalancingStrategy, '{targetFrameworkTestHostLoadBalancingStrategy.Value}'");
+            EqtTrace.Error($"ProxyParallelExecutionManager: Invalid value for TargetFrameworkTestHostDemultiplexer, '{targetFrameworkTestHostDemultiplexer.Value}'");
         }
 
         return null;
