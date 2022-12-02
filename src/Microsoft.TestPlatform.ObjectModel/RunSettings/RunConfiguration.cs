@@ -902,8 +902,9 @@ public class RunConfiguration : TestRunSettings
                         runConfiguration.TreatNoTestsAsError = treatNoTestsAsError;
                         break;
                     // Configuration used but not exposed to the public to avoid the Warning inside the log
-                    case "SerializeTestRun":
+                    case "ForceOneTestAtTimePerTestHost":
                     case "EnvironmentVariables":
+                    case "TargetFrameworkTestHostLoadBalancingStrategy":
                         reader.Skip();
                         break;
                     default:
