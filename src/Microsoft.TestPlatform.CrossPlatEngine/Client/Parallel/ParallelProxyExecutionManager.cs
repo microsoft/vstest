@@ -266,7 +266,7 @@ internal sealed class ParallelProxyExecutionManager : IParallelProxyExecutionMan
                     {
                         if (numberOfTestHostToUse > _parallelLevel)
                         {
-                            EqtTrace.Info($"ParallelProxyExecutionManager: adjust the numberOfTestHostToUse to the max parallel level, from {numberOfTestHostToUse} to {_parallelLevel}");
+                            EqtTrace.Warning($"ParallelProxyExecutionManager: adjust the numberOfTestHostToUse to the max parallel level, from {numberOfTestHostToUse} to {_parallelLevel}");
                             // Adjust to the maximum parallel level
                             numberOfTestHostToUse = _parallelLevel;
                         }

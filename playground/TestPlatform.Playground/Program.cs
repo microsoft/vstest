@@ -52,11 +52,8 @@ internal class Program
                     <!--
                     <MaxCpuCount>0</MaxCpuCount>
                     <ForceOneTestAtTimePerTestHost>True</ForceOneTestAtTimePerTestHost>
-                    <MultiHostTestExecution strategy="Fixed">
-                        <Value>16</Value>
-                    </MultiHostTestExecution>
+                    <TargetFrameworkTestHostLoadBalancingStrategy>4</TargetFrameworkTestHostLoadBalancingStrategy>
                     -->
-                    
 
                     <!-- The settings below are what VS sends by default. -->
                     <CollectSourceInformation>False</CollectSourceInformation>

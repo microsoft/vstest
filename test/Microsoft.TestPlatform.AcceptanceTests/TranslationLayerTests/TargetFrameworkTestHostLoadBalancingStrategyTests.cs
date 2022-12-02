@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
 [TestClass]
 // We need to dogfood the package built in this repo *-dev and we pack tha tp only on windows
 [TestCategory("Windows-Review")]
-public class MultiHostTestExecutionTests : AcceptanceTestBase
+public class TargetFrameworkTestHostLoadBalancingStrategyTests : AcceptanceTestBase
 {
     private IVsTestConsoleWrapper? _vstestConsoleWrapper;
     private RunEventHandler? _runEventHandler;
@@ -63,9 +63,7 @@ public class MultiHostTestExecutionTests : AcceptanceTestBase
 <RunSettings>
     <RunConfiguration>
         <MaxCpuCount>{expectedHost}</MaxCpuCount>
-        <MultiHostTestExecution strategy="Fixed">
-            <Value>{expectedHost}</Value>
-        </MultiHostTestExecution>
+        <TargetFrameworkTestHostLoadBalancingStrategy>{expectedHost}</TargetFrameworkTestHostLoadBalancingStrategy>
     </RunConfiguration>
 </RunSettings>
 """;
@@ -85,12 +83,26 @@ public class MultiHostTestExecutionTests : AcceptanceTestBase
         Assert.AreEqual(expectedHost == -1 ? 1 : expectedHost > 10 ? 10 : expectedHost, hosts.Length);
 
         List<string> tests = new();
+        int testsRunInsideHost = 0;
         foreach (var file in hosts)
         {
+            testsRunInsideHost = 0;
+
             using StreamReader streamReader = new(file);
             while (!streamReader.EndOfStream)
             {
-                tests.Add(streamReader.ReadLine()!);
+                string? line = streamReader.ReadLine();
+                if (!string.IsNullOrEmpty(line))
+                {
+                    tests.Add(line);
+                }
+                testsRunInsideHost++;
+            }
+
+
+            if (expectedHost == 3)
+            {
+                Assert.IsTrue(testsRunInsideHost >= 3);
             }
         }
 

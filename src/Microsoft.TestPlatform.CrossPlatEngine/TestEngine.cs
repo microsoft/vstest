@@ -710,29 +710,20 @@ public class TestEngine : ITestEngine
         }
 
         XDocument document = XDocument.Parse(runsettings);
-        XElement? multiHostTestExecution = document?.Element("RunSettings")?.Element("RunConfiguration")?.Element("MultiHostTestExecution");
+        XElement? targetFrameworkTestHostLoadBalancingStrategy = document?.Element("RunSettings")?.Element("RunConfiguration")?.Element("TargetFrameworkTestHostLoadBalancingStrategy");
 
-        if (multiHostTestExecution is not null)
+        if (targetFrameworkTestHostLoadBalancingStrategy is null)
         {
-            string? strategy = multiHostTestExecution.Attribute("strategy")?.Value;
-            if (strategy is not null)
-            {
-                if (strategy.Equals("Fixed", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (int.TryParse(multiHostTestExecution.Element("Value")?.Value, out int numberOfTestHost) && numberOfTestHost > 0)
-                    {
-                        return numberOfTestHost;
-                    }
-                    else
-                    {
-                        EqtTrace.Error($"ProxyParallelExecutionManager: Invalid value for MultiHostTestExecution 'Fixed' strategy, '{multiHostTestExecution.Value}'");
-                    }
-                }
-                else
-                {
-                    EqtTrace.Info($"ProxyParallelExecutionManager: MultiHostTestExecution disabled, strategy: {strategy}");
-                }
-            }
+            return null;
+        }
+
+        if (int.TryParse(targetFrameworkTestHostLoadBalancingStrategy.Value, out int numberOfTestHost) && numberOfTestHost > 0)
+        {
+            return numberOfTestHost;
+        }
+        else
+        {
+            EqtTrace.Error($"ProxyParallelExecutionManager: Invalid value for TargetFrameworkTestHostLoadBalancingStrategy, '{targetFrameworkTestHostLoadBalancingStrategy.Value}'");
         }
 
         return null;
