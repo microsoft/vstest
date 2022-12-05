@@ -3,6 +3,7 @@
 ## 17.4.0
 
 ### Issues Fixed
+
 * Revert "Run tests with Server GC enabled & concurrent GC disabled. (#3661)" (#4108) [#4109](https://github.com/microsoft/vstest/pull/4109)
 * Revert making Microsoft.NET.Test.Sdk package transitive [#4105](https://github.com/microsoft/vstest/pull/4105)
 * [rel/17.4] Fix Invalid target architecture 'S390x' error [#4079](https://github.com/microsoft/vstest/pull/4079)
@@ -114,6 +115,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.3.2...v17.4.
 ## 17.5.0-preview-20221003-04
 
 ### Issues Fixed
+
 * Fix release note and prebuild scripts [#4039](https://github.com/microsoft/vstest/pull/4039)
 * Update Fakes binaries [#4033](https://github.com/microsoft/vstest/pull/4033)
 * Add support for ppc64le processor architecture [#4028](https://github.com/microsoft/vstest/pull/4028)
@@ -128,6 +130,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.4.0-preview-
 ## 17.4.0-preview-20221003-03
 
 ### Issues Fixed
+
 * Fix release note and prebuild scripts
 * [rel/17.4] Remove portable CPP adapter and dbghelp [#4020](https://github.com/microsoft/vstest/pull/4020)
 * Fix ManagedNameHelper to support namespaceless methods. [#4003](https://github.com/microsoft/vstest/pull/4003)
@@ -194,6 +197,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.4.0-preview-
 ## 17.3.2
 
 ### Issue Fixed
+
 * Fixed Selenium test run hang after stopping the debugger [#4013](https://github.com/microsoft/vstest/pull/4013)
 
 See full log [here](https://github.com/microsoft/vstest/compare/v17.3.1...v17.3.2)
@@ -206,6 +210,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.3.1...v17.3.
 ## 17.3.1
 
 ### Issues Fixed
+
 * Do not match .NET Standard to Dotnet testhost runner [#3958](https://github.com/microsoft/vstest/pull/3958)
 
 See full log [here](https://github.com/microsoft/vstest/compare/v17.3.0...v17.3.1)
@@ -218,6 +223,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.3.0...v17.3.
 ## 17.3.0
 
 ### Issue Fixed
+
 * Reverts change that breaks DOTNET_ROOT [#3844](https://github.com/microsoft/vstest/pull/3844)
 * Add runtime location to host log [#3806](https://github.com/microsoft/vstest/pull/3806)
 * Fix reading/setting culture env variables [#3802](https://github.com/microsoft/vstest/pull/3802)
@@ -263,11 +269,12 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.3.0-preview-
 ### Drops
 
 * TestPlatform vsix: [17.3.0](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/17.3/20220809-01;/TestPlatform.vsix)
-* Microsoft.TestPlatform.ObjectModel : [17.3.0](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/17.3.0)   
+* Microsoft.TestPlatform.ObjectModel : [17.3.0](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/17.3.0)
 
 ## 17.4.0-preview-20220726-02
 
 ### Issue Fixed
+
 * Use runtime 3.1.27 [#3900](https://github.com/microsoft/vstest/pull/3900)
 * Remove un-needed entries from sln [#3887](https://github.com/microsoft/vstest/pull/3887)
 * Build compatibility matrix tests faster [#3884](https://github.com/microsoft/vstest/pull/3884)
@@ -291,6 +298,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.4.0-preview-
 ## 17.4.0-preview-20220707-01
 
 ### Issue Fixed
+
 * Revert #3715 [#3843](https://github.com/microsoft/vstest/pull/3843)
 * Enable more rules on test projects [#3832](https://github.com/microsoft/vstest/pull/3832)
 * Ignore CancelTestDiscovery test as it is flaky [#3839](https://github.com/microsoft/vstest/pull/3839)
@@ -353,6 +361,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/f6b89cfcace13f8a
 ## 17.3.0-preview-20220612-01
 
 ### Issue Fixed
+
 * Fix logging setup when running in remote [#3643](https://github.com/microsoft/vstest/pull/3643)
 * Fix get process architecture [#3726](https://github.com/microsoft/vstest/pull/3726)
 * Enable nullables on Abstraction project [#3723](https://github.com/microsoft/vstest/pull/3723)
@@ -376,6 +385,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.3.0-preview-
 ## 17.3.0-preview-20220530-08
 
 ### Issue Fixed
+
 * Fix CppUnitTestFramework package layout [#3695](https://github.com/microsoft/vstest/pull/3695)
 * Share files instead of duplicating them [#3692](https://github.com/microsoft/vstest/pull/3692)
 * Enable nullable on adapter utilities [#3688](https://github.com/microsoft/vstest/pull/3688)
@@ -406,6 +416,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.3.0-preview-
 ## 17.3.0-preview-20220426-02
 
 ### Issue Fixed
+
 * Collect artifacts in case of test abort/cancelled [#3606](https://github.com/microsoft/vstest/pull/3606)
 * Use most recent stable version of Microsoft.CodeCoverage for unit tests [#3601](https://github.com/microsoft/vstest/pull/3601)
 * Patched CVE-2017-11770 and CVE-2019-0981 [#3578](https://github.com/microsoft/vstest/pull/3578)
@@ -434,6 +445,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.2.0-preview-
 ## 17.2.0-preview-20220401-08
 
 ### Issue Fixed
+
 * Add packing to PR build [#3540](https://github.com/microsoft/vstest/pull/3540)
 
 See full log [here](https://github.com/microsoft/vstest/compare/v17.2.0-preview-20220401-08...v17.2.0-preview-20220401-07)
@@ -446,6 +458,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.2.0-preview-
 ## v17.2.0-preview-20220401-07
 
 ### Issue Fixed
+
 * Added telemetry data point for extensions loaded during test discovery/run [#3511](https://github.com/microsoft/vstest/pull/3511)
 * Catch all exceptions when exiting process [#3530](https://github.com/microsoft/vstest/pull/3530)
 * Test matrix [#3459](https://github.com/microsoft/vstest/pull/3459)
@@ -477,6 +490,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.2.0-preview-
 ## 17.2.0-preview-20220301-01
 
 ### Issue Fixed
+
 * Handle correctly waiting for process exit on Unix systems [#3410](https://github.com/microsoft/vstest/pull/3410)
 * Move usings outside namespace [#3398](https://github.com/microsoft/vstest/pull/3398)
 * Prefer string alias over String type [#3408](https://github.com/microsoft/vstest/pull/3408)
@@ -532,6 +546,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.2.0-preview-
 ## 17.1.0
 
 ### Issues Fixed
+
 * Added support for TestAdapterLoadingStrategy. [#3374](https://github.com/microsoft/vstest/pull/3374)
 * Fix architecture retrival [#3251](https://github.com/microsoft/vstest/pull/3251)
 * External dependencies updated [#3204](https://github.com/microsoft/vstest/pull/3204)
@@ -562,6 +577,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.0.0...v17.1.
 ## 17.2.0-preview-20220131-20
 
 ### Issues Fixed
+
 * Removed system-wide PDB purge to make build faster [#3310](https://github.com/microsoft/vstest/pull/3310)
 * Test stabilization, increase waiting time for report events [#3309](https://github.com/microsoft/vstest/pull/3309)
 * Use longer timeout for playground project [#3301](https://github.com/microsoft/vstest/pull/3301)
@@ -615,6 +631,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.1.0-preview-
 ## 17.1.0-release-20220113-05
 
 ### Issue Fixed
+
 * Fix architecture retrival [#3251](https://github.com/microsoft/vstest/pull/3251)
 
 See full log [here](https://github.com/microsoft/vstest/compare/v17.1.0-preview-20211130-02...v17.1.0-release-20220113-05)
@@ -627,6 +644,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.1.0-preview-
 ## 17.1.0-preview-20211130-02
 
 ### Issue Fixed
+
 * AttachVS PR comments fixed [#3201](https://github.com/microsoft/vstest/pull/3201)
 * Attach to VS automatically [#3197](https://github.com/microsoft/vstest/pull/3197)
 * Fixing .net frmw parallel issue [#3192](https://github.com/microsoft/vstest/pull/3192)
@@ -649,6 +667,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v17.1.0-preview-
 ## 17.1.0-preview-20211109-03
 
 ### Issues Fixed
+
 * Honor `--arch` switch for arm64 on Windows and Mac [#3100](https://github.com/microsoft/vstest/pull/3100)
 * CPP runner under .NET (Core) [#3003](https://github.com/microsoft/vstest/pull/3003)
 * Log messages from RequestSender [#3057](https://github.com/microsoft/vstest/pull/3057)
@@ -676,6 +695,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.11.0...v17.0
 ## 16.11.0
 
 ### Issues Fixed
+
 * 16.11 External Packages Insertion [#2996](https://github.com/microsoft/vstest/pull/2996)
 * Update externals to 16.11 [#2932](https://github.com/microsoft/vstest/pull/2932)
 
@@ -689,6 +709,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.10.0...v16.1
 ## 16.10.0-release-20210429-01
 
 ### Issues Fixed
+
 * Adding mono.cecil libs to packages, (#2878) [#2878](https://github.com/microsoft/vstest/pull/2878)
 * Upgrade CC components to 16.10.0-beta.21227.2 (#2877) [#2877](https://github.com/microsoft/vstest/pull/2877)
 
@@ -702,6 +723,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.10.0-release
 ## 16.10.0-release-20210422-02
 
 ### Issues Fixed
+
 * Mark early testhost startup APIs as internal for TP 16.10 (#2768) [#2864](https://github.com/microsoft/vstest/pull/2864)
 * Added some capabilities to package utilities (#2854) [#2862](https://github.com/microsoft/vstest/pull/2862)
 * Fixed #2814 and #2853.
@@ -717,7 +739,8 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.10.0-release
 ## 16.9.4
 
 ### Issue Fixed
-* Loadind corelib.net dynamically (https://github.com/microsoft/vstest/pull/2762)
+
+* Loadind corelib.net dynamically (<https://github.com/microsoft/vstest/pull/2762>)
 
 See full log [here](https://github.com/microsoft/vstest/compare/v16.9.1...v16.9.4)
 
@@ -729,6 +752,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.9.1...v16.9.
 ## 16.10.0-release-20210330-02
 
 ### Issue Fixed
+
 * Updating code coverage version [#2836](https://github.com/microsoft/vstest/pull/2836)
 
 See full log [here](https://github.com/microsoft/vstest/compare/v16.10.0-release-20210329-03...v16.10.0-release-20210330-02)
@@ -741,6 +765,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.10.0-release
 ## 16.10.0-release-20210329-03
 
 ### Issues Fixed
+
 * Add basic mstestv1 telemetry [#2781](https://github.com/microsoft/vstest/pull/2781)
 * Update TP externals [#2809](https://github.com/microsoft/vstest/pull/2809)
 
@@ -754,6 +779,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.10.0-preview
 ## 16.10.0-preview-20210219-03
 
 ### Issues Fixed
+
 * Dynamic corelib.net loading [#2762](https://github.com/microsoft/vstest/pull/2762)
 * Add failed logic for trx logger when TreatNoTestAsError is set to true [#2758](https://github.com/microsoft/vstest/pull/2758)
 * Adding resources for corelib.net in portable package, [#2759](https://github.com/microsoft/vstest/pull/2759)
@@ -777,6 +803,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.9.0-preview-
 ## 16.9.1
 
 ### Issues Fixed
+
 * Implemented Workitem support in TRX logger (#2666)
 * Stopped merging code coverage logs (#2671)
 * Early testhost startup performance improved (#2584)
@@ -788,12 +815,14 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.9.0-preview-
 See full log [here](https://github.com/microsoft/vstest/compare/v16.9.0-preview-20210127-04...v16.9.1)
 
 ### Drops
+
 * TestPlatform vsix: [16.9.1](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/rel/16.9/20210223-02;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [16.9.1](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/16.9.1)
 
 ## 16.9.0-preview-20210127-04
 
 ### Issue Fixed
+
 * Move FQN related code into a separate NuGet package [#2714](https://github.com/microsoft/vstest/pull/2714)
 * vstest.console: CommandLineOptions: preserve stacktrace on re-throw (CA2200) [#2606](https://github.com/microsoft/vstest/pull/2606)
 * Add metrics for datacollector.exe - provides information about profilers [#2705](https://github.com/microsoft/vstest/pull/2705)
@@ -809,11 +838,12 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.9.0-preview-
 ## 16.9.0-preview-20210106-01
 
 ### Issues Fixed
+
 * Upgrade CC to 16.9.0-beta.20630.1 [#2684](https://github.com/microsoft/vstest/pull/2684)
 * Upgrade fakes version [#2683](https://github.com/microsoft/vstest/pull/2683)
 * Fixed assembly names of TestHost executables [#2682](https://github.com/microsoft/vstest/pull/2682)
 * Upgrade CC and CLR IE versions [#2681](https://github.com/microsoft/vstest/pull/2681)
-* Update dependencies from https://github.com/dotnet/arcade build 20201221.2 [#2680](https://github.com/microsoft/vstest/pull/2680)
+* Update dependencies from <https://github.com/dotnet/arcade> build 20201221.2 [#2680](https://github.com/microsoft/vstest/pull/2680)
 * Adding environment variable used during build process, [#2679](https://github.com/microsoft/vstest/pull/2679)
 * Getting TraceDataCollector from nuget [#2678](https://github.com/microsoft/vstest/pull/2678)
 * Attribute refactoring [#2676](https://github.com/microsoft/vstest/pull/2676)
@@ -824,7 +854,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.9.0-preview-
 * Bumping Fakes TestRunnerHarness version [#2661](https://github.com/microsoft/vstest/pull/2661)
 * Fixed "issue" pluralization in write-release-notes.ps1 [#2665](https://github.com/microsoft/vstest/pull/2665)
 * Updating Microsoft.VisualStudio.TraceDataCollector source [#2663](https://github.com/microsoft/vstest/pull/2663)
-* Update dependencies from https://github.com/dotnet/arcade build 20201130.3 [#2659](https://github.com/microsoft/vstest/pull/2659)
+* Update dependencies from <https://github.com/dotnet/arcade> build 20201130.3 [#2659](https://github.com/microsoft/vstest/pull/2659)
 * Cross platform acceptance tests [#2653](https://github.com/microsoft/vstest/pull/2653)
 * Upgrade externals - remove interop [#2650](https://github.com/microsoft/vstest/pull/2650)
 
@@ -838,6 +868,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.9.0-preview-
 ## 16.9.0-preview-20201123-03
 
 ### Issues Fixed
+
 * Added support for new CC merging library for netstandard2.0 [#2598](https://github.com/microsoft/vstest/pull/2598)
 * [master] Fix collect dump always  [#2645](https://github.com/microsoft/vstest/pull/2645)
 * Managed TestCase Properties implemented [#2611](https://github.com/microsoft/vstest/pull/2611)
@@ -862,6 +893,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.9.0-preview-
 ## 16.8.3
 
 ### Issues Fixed
+
 * Fixed PackageReferences on ObjectModel nupkg [#2660](https://github.com/microsoft/vstest/pull/2660)
 * [16.8] Fix collect dump always [#2641](https://github.com/microsoft/vstest/pull/2641)
 * Assembly load fixes [#2644](https://github.com/microsoft/vstest/pull/2644)
@@ -876,21 +908,22 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.8.0...v16.8.
 ## 16.8.0
 
 ### Issues Fixed
+
 * Cherry-picked signing fixes from `master` [#2619](https://github.com/microsoft/vstest/pull/2619)
 * Signing instructions for Newtonsoft.Json.dll added (#2601) [#2603](https://github.com/microsoft/vstest/pull/2603)
 * Fix the initial assets location of VSTest assets [#2589](https://github.com/microsoft/vstest/pull/2589)
 * Generate release notes in pipeline
 * Forward merge fixes from master to rc2 [#2581](https://github.com/microsoft/vstest/pull/2581)
 * Fix blame parameter, warning, and add all testhosts to be ngend [#2579](https://github.com/microsoft/vstest/pull/2579)
-* Merge branch 'master' of https://github.com/microsoft/vstest into rel/16.8
+* Merge branch 'master' of <https://github.com/microsoft/vstest> into rel/16.8
 * Blame upload on crash even if hang dump started [#2553](https://github.com/microsoft/vstest/pull/2553)
 * Fix errors reported by StyleCop Analyzers [#2555](https://github.com/microsoft/vstest/pull/2555)
 * Improve blame [#2552](https://github.com/microsoft/vstest/pull/2552)
 * Remove sleeps and extra process dumps from blame
 * Changes to allow special characters in parameter names [#2481](https://github.com/microsoft/vstest/pull/2481)
-* Update dependencies from https://github.com/dotnet/arcade build 20200827.6 [#2547](https://github.com/microsoft/vstest/pull/2547)
-* Update dependencies from https://github.com/dotnet/arcade build 20200827.2 [#2546](https://github.com/microsoft/vstest/pull/2546)
-* Merge branch 'rel/16.8' of https://github.com/microsoft/vstest into rel/16.8
+* Update dependencies from <https://github.com/dotnet/arcade> build 20200827.6 [#2547](https://github.com/microsoft/vstest/pull/2547)
+* Update dependencies from <https://github.com/dotnet/arcade> build 20200827.2 [#2546](https://github.com/microsoft/vstest/pull/2546)
+* Merge branch 'rel/16.8' of <https://github.com/microsoft/vstest> into rel/16.8
 * Remove env variables
 * Add binaries to enable running Fakes in Net Core [#2529](https://github.com/microsoft/vstest/pull/2529)
 * Trigger dumps asynchronously [#2542](https://github.com/microsoft/vstest/pull/2542)
@@ -930,7 +963,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.8.0...v16.8.
 * Update License
 * Linux build [#2477](https://github.com/microsoft/vstest/pull/2477)
 * Windows 32 bit issue [#2482](https://github.com/microsoft/vstest/pull/2482)
-* Update dependencies from https://github.com/dotnet/arcade build 20200715.6 [#2485](https://github.com/microsoft/vstest/pull/2485)
+* Update dependencies from <https://github.com/dotnet/arcade> build 20200715.6 [#2485](https://github.com/microsoft/vstest/pull/2485)
 * Create test results directory [#2483](https://github.com/microsoft/vstest/pull/2483)
 * Use testhost.exe only on Windows x86 and x64, and enable hang dumps on ARM and ARM64 [#2479](https://github.com/microsoft/vstest/pull/2479)
 * Localization HB. [#2478](https://github.com/microsoft/vstest/pull/2478)
@@ -939,7 +972,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.8.0...v16.8.
 * Adding test run attachments processing [#2463](https://github.com/microsoft/vstest/pull/2463)
 * Adding test run attachments processing [#2463](https://github.com/microsoft/vstest/pull/2463)
 * Localization check-in 07-01-2020 [#2471](https://github.com/microsoft/vstest/pull/2471)
-* Update dependencies from https://github.com/dotnet/arcade build 20200626.2 [#2470](https://github.com/microsoft/vstest/pull/2470)
+* Update dependencies from <https://github.com/dotnet/arcade> build 20200626.2 [#2470](https://github.com/microsoft/vstest/pull/2470)
 * Added new exception handling [#2461](https://github.com/microsoft/vstest/pull/2461)
 * Update branding to 16.8.0 [#2460](https://github.com/microsoft/vstest/pull/2460)
 
@@ -953,6 +986,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.7.0...v16.8.
 ## 16.9.0-preview-20201020-06
 
 ### Issues Fixed
+
 * Enable Fakes Datacollector settings to be added in design mode [#2586](https://github.com/microsoft/vstest/pull/2586)
 * Fix blame parameter, warning, and add all testhosts to be ngend [#2579](https://github.com/microsoft/vstest/pull/2579)
 * Add netcoreapp1.0 support to `Microsoft.TestPlatform.TestHost` NuGet [#2569](https://github.com/microsoft/vstest/pull/2569)
@@ -977,6 +1011,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.8.0-release-
 ## 16.8.0-preview-20200921-01
 
 ### Issues Fixed
+
 * Fix blame parameter, warning, and add all testhosts to be ngend [#2579](https://github.com/microsoft/vstest/pull/2579)
 * Trigger dumps asynchronously [#2533](https://github.com/microsoft/vstest/pull/2533)
 * Print version of the product in log [#2535](https://github.com/microsoft/vstest/pull/2535)
@@ -991,6 +1026,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.8.0-preview-
 ## 16.7.1
 
 ### Issues Fixed
+
 * Fixed code coverage compatibility issue [#2527](https://github.com/microsoft/vstest/pull/2527)
 * Adding test run attachments processing [#2463](https://github.com/microsoft/vstest/pull/2463)
 
@@ -1004,6 +1040,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.7.0...v16.7.
 ## 16.8.0-preview-20200812-03
 
 ### Issues Fixed
+
 * Replace NET451 compiler directives with NETFRAMEWORK [#2516](https://github.com/Microsoft/vstest/pull/2516)
 * [master] Update dependencies from dotnet/arcade [#2509](https://github.com/Microsoft/vstest/pull/2509)
 * Updated TP external dependencies [#2515](https://github.com/Microsoft/vstest/pull/2515)
@@ -1020,6 +1057,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.8.0-preview-
 ## 16.8.0-preview-20200806-02
 
 ### Issues Fixed
+
 * Use OS bitness to figure out .NETCore runner architecture [#2507](https://github.com/microsoft/vstest/pull/2507)
 * Updated TP external dependencies [#2503](https://github.com/microsoft/vstest/pull/2503)
 * Add missing space before parens in message [#2504](https://github.com/microsoft/vstest/pull/2504)
@@ -1034,7 +1072,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.8.0-preview-
 * Update License
 * Linux build [#2477](https://github.com/microsoft/vstest/pull/2477)
 * Windows 32 bit issue [#2482](https://github.com/microsoft/vstest/pull/2482)
-* Update dependencies from https://github.com/dotnet/arcade build 20200715.6 [#2485](https://github.com/microsoft/vstest/pull/2485)
+* Update dependencies from <https://github.com/dotnet/arcade> build 20200715.6 [#2485](https://github.com/microsoft/vstest/pull/2485)
 * Create test results directory [#2483](https://github.com/microsoft/vstest/pull/2483)
 * Use testhost.exe only on Windows x86 and x64, and enable hang dumps on ARM and ARM64 [#2479](https://github.com/microsoft/vstest/pull/2479)
 * Localization HB. [#2478](https://github.com/microsoft/vstest/pull/2478)
@@ -1042,10 +1080,10 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.8.0-preview-
 * Change indicators to words [#2475](https://github.com/microsoft/vstest/pull/2475)
 * Adding test run attachments processing [#2463](https://github.com/microsoft/vstest/pull/2463)
 * Localization check-in 07-01-2020 [#2471](https://github.com/microsoft/vstest/pull/2471)
-* Update dependencies from https://github.com/dotnet/arcade build 20200626.2 [#2470](https://github.com/microsoft/vstest/pull/2470)
+* Update dependencies from <https://github.com/dotnet/arcade> build 20200626.2 [#2470](https://github.com/microsoft/vstest/pull/2470)
 * Added new exception handling [#2461](https://github.com/microsoft/vstest/pull/2461)
 * Update branding to 16.8.0 [#2460](https://github.com/microsoft/vstest/pull/2460)
-* Update dependencies from https://github.com/dotnet/arcade build 20200602.3 [#2455](https://github.com/microsoft/vstest/pull/2455)
+* Update dependencies from <https://github.com/dotnet/arcade> build 20200602.3 [#2455](https://github.com/microsoft/vstest/pull/2455)
 * Added exception handling while creating "TestResults" folder [#2450](https://github.com/microsoft/vstest/pull/2450)
 * Added support for default exclusion merging for code coverage [#2431](https://github.com/microsoft/vstest/pull/2431)
 * LOC CHECKIN | microsoft/vstest master | 20200526 [#2445](https://github.com/microsoft/vstest/pull/2445)
@@ -1061,6 +1099,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.7.0-preview-
 ## 16.7.0
 
 ### Issues Fixed
+
 * Added new exception handling [#2461](https://github.com/microsoft/vstest/pull/2461)
 * Added exception handling while creating "TestResults" folder [#2450](https://github.com/microsoft/vstest/pull/2450)
 * Added support for default exclusion merging for code coverage [#2431](https://github.com/microsoft/vstest/pull/2431)
@@ -1092,6 +1131,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.6.0...v16.7.
 ## 16.7.0-preview-20200519-01
 
 ### Issues Fixed
+
 * Upgrade TestPlatform external dependencies [#2440](https://github.com/microsoft/vstest/pull/2440)
 * Added support for debugging external test processes [#2325](https://github.com/microsoft/vstest/pull/2325)
 * Add the parameters to VSTestTask to allow dotnet test to work [#2438](https://github.com/microsoft/vstest/pull/2438)
@@ -1111,6 +1151,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.7.0-preview-
 ## 16.7.0-preview-20200428-01
 
 ### Issues Fixed
+
 * Update telemetry to latest [#2421](https://github.com/microsoft/vstest/pull/2421)
 * Merge test run parameters that have spaces [#2409](https://github.com/microsoft/vstest/pull/2409)
 * updated package version [#2412](https://github.com/microsoft/vstest/pull/2412)
@@ -1143,6 +1184,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.6.0...v16.6.
 ## 16.6.0
 
 ### Issues Fixed
+
 * Fix null reference in Fakes [#2400](https://github.com/microsoft/vstest/pull/2400)
 * Changed new configurator method name [#2397](https://github.com/microsoft/vstest/pull/2397)
 * Fixes Test Platform. [#2393](https://github.com/microsoft/vstest/pull/2393)
@@ -1180,6 +1222,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.5.0...v16.6.
 ## 16.6.0-preview-20200318-01
 
 ### Issues Fixed
+
 * Fix writing to trx when error has no message [#2364](https://github.com/microsoft/vstest/pull/2364)
 * Fix symbols [#2363](https://github.com/microsoft/vstest/pull/2363)
 * Report informational messages when platform logs are enabled [#2361](https://github.com/microsoft/vstest/pull/2361)
@@ -1189,12 +1232,13 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.6.0-preview-
 
 ### Drops
 
-* TestPlatform vsix: [16.6.0-preview-20200318-01](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/master/20200318-01;/TestPlatform.vsix)        
+* TestPlatform vsix: [16.6.0-preview-20200318-01](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/master/20200318-01;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [16.6.0-preview-20200318-01](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/16.6.0-preview-20200318-01)
 
 ## 16.6.0-preview-20200310-03
 
 ### Issues Fixed
+
 * Fix running self-contained apps on Windows [#2358](https://github.com/microsoft/vstest/pull/2358)
 * Remove unused usings. [#2350](https://github.com/microsoft/vstest/pull/2350)
 * Better error when discoverer defaultExecutorUri is not set. [#2354](https://github.com/microsoft/vstest/pull/2354)
@@ -1209,6 +1253,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.6.0-preview-
 ## 16.6.0-preview-20200309-01
 
 ### Issues Fixed
+
 * Add coverlet smoke test [#2348](https://github.com/microsoft/vstest/pull/2348)
 * Fix splitting of test name from fully qualified name [#2355](https://github.com/microsoft/vstest/pull/2355)
 
@@ -1222,6 +1267,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.6.0-preview-
 ## 16.6.0-preview-20200226-03
 
 ### Issues Fixed
+
 * Spelling / conventions and grammar fixes [#2338](https://github.com/microsoft/vstest/pull/2338)
 * Small build fixes [#2345](https://github.com/microsoft/vstest/pull/2345)
 * Fix race condition on testhost exit before we connect [#2344](https://github.com/microsoft/vstest/pull/2344)
@@ -1277,6 +1323,7 @@ See changes since the last preview [here](https://github.com/microsoft/vstest/co
 ## 16.5.0-preview-20200203-01
 
 ### Issues Fixed
+
 * Use version of external package with fixes [#2315](https://github.com/microsoft/vstest/pull/2315)
 * Use latest version of VS that is available [#2314](https://github.com/microsoft/vstest/pull/2314)
 * Pass coverlet codebase in runsettings for inproc data collector initialization [#2288](https://github.com/microsoft/vstest/pull/2288)
@@ -1291,7 +1338,8 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.5.0-preview-
 
 ## 16.5.0-preview-20200116-01
 
-### Issues Fixed 
+### Issues Fixed
+
 * Revert "Use patched version of TestPlatform.Extensions (#2283)" [#2307](https://github.com/microsoft/vstest/pull/2307)
 * Update arcade [#2302](https://github.com/microsoft/vstest/pull/2302)
 * Fix SocketCommunicationManager [#2290](https://github.com/microsoft/vstest/pull/2290)
@@ -1305,8 +1353,9 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 
 ## 16.5.0-preview-20200110-02
 
-### Issues Fixed 
-* Remove duplicate counting of test results in Consolelogger [#2267](https://github.com/microsoft/vstest/pull/2267) 
+### Issues Fixed
+
+* Remove duplicate counting of test results in Consolelogger [#2267](https://github.com/microsoft/vstest/pull/2267)
 * Cap version of VS to <16.0 [#2285](https://github.com/microsoft/vstest/pull/2285)
 * Use patched version of TestPlatform.Extensions [#2283](https://github.com/microsoft/vstest/pull/2283)
 
@@ -1320,6 +1369,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 16.5.0-preview-20200102-01
 
 ### Issues Fixed
+
 * Test run parameter added as part of CLI runsettings args [#2251](https://github.com/microsoft/vstest/pull/2251)
 
 ### Drops
@@ -1330,6 +1380,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 16.5.0-preview-20191216-02
 
 ### Issues Fixed
+
 * Trx changes for fqdn mapping in test method name [#2259](https://github.com/microsoft/vstest/pull/2259)
 * Fix for test discovery not working on mac machines [#2266](https://github.com/microsoft/vstest/pull/2266)
 * Use RunSettingsFilePath from project file when using dotnet test [#2272](https://github.com/microsoft/vstest/pull/2272)
@@ -1342,6 +1393,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 16.5.0-preview-20191115-01
 
 ### Issues Fixed
+
 * Fixed Coverlet in-process collector not loaded for version > 1.0.0 [#2204](https://github.com/microsoft/vstest/pull/2221)
 
 ### Drops
@@ -1352,6 +1404,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 16.4.0
 
 ### Issues Fixed
+
 * Adding log prefixkey to html logger [#2204](https://github.com/microsoft/vstest/pull/2204)
 * AnyCPU tests to choose default architecture based on process [#2206](https://github.com/microsoft/vstest/pull/2206)
 * Only send Coverlet in proc datacollector dll to testhost [#2226](https://github.com/microsoft/vstest/pull/2226)
@@ -1362,7 +1415,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * TestPlatform vsix: [16.4.0](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/master/20191025-01;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [16.4.0](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/16.4.0)
 
-##  16.4.0-preview-20191007-01
+## 16.4.0-preview-20191007-01
 
 ### Issues Fixed / Features Added
 
@@ -1376,6 +1429,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 16.3.0
 
 ### Issues Fixed
+
 * Html logger [#2103](https://github.com/microsoft/vstest/pull/2103)
 * Add LogFilePrefix Parameter for supporting trx for multi-targetted projects [#2140](https://github.com/microsoft/vstest/pull/2140)
 * Support x86 platform targeting for .NET core tests [#2161](https://github.com/microsoft/vstest/pull/2161)
@@ -1386,10 +1440,10 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * TestPlatform vsix: [16.3.0](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/master/20190919-02;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [16.3.0](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/16.3.0)
 
-
 ## 16.3.0-preview-20190828-03
 
 ### Issues Fixed
+
 * Add noprogress parameter to disable progress indicator [#2117](https://github.com/microsoft/vstest/pull/2117)
 * Accept short names for framewwork [#2116](https://github.com/microsoft/vstest/pull/2116)
 * Specifying environment variables in RunSettings file [#2128](https://github.com/microsoft/vstest/pull/2128)
@@ -1400,10 +1454,10 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * TestPlatform vsix: [16.3.0-preview-20190828-03](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/master/20190828-03;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [16.3.0-preview-20190828-03](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/16.3.0-preview-20190828-03)
 
-
 ## 16.3.0-preview-20190715-02
 
 ### Issues Fixed
+
 * TestPlatform targeting netstandard2.0. [#2076](https://github.com/microsoft/vstest/pull/2076)
 * Implemented the cancellation of discovery request [#2076](https://github.com/microsoft/vstest/pull/2076)
 * Generating manifest for publishing to BAR. [#2069](https://github.com/microsoft/vstest/pull/2069)
@@ -1416,6 +1470,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 16.2.0
 
 ### Issues Fixed
+
 * Updated TestPlatform.ObjectModel.nuspec. [#2055](https://github.com/microsoft/vstest/pull/2055)
 * Fixed incorrect timeout message when test host crashes [#2056](https://github.com/microsoft/vstest/pull/2056)
 * Incompatible framework message fix. [#2044](https://github.com/microsoft/vstest/pull/2044)
@@ -1429,6 +1484,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 16.2.0-preview-20190606-02
 
 ### Issues Fixed
+
 * Spurious vstest.console process spin up fixed. [#2035](https://github.com/microsoft/vstest/pull/2035)
 * Test host locking pdb fixed [#2029](https://github.com/microsoft/vstest/pull/2029)
 * Encoding change from UCS-2 to UTF-8. [#2044](https://github.com/microsoft/vstest/pull/2044)
@@ -1442,6 +1498,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 16.1.1
 
 ### Issues Fixed
+
 * Prevent unnecessary progress indicator refresh to improve test run time. [#2024](https://github.com/microsoft/vstest/pull/2024)
 * Changes to allow clients to provide environment variable while initializing VsTestConsoleWrapper [#2023](https://github.com/microsoft/vstest/pull/2023)
 * Fix for the trx classname being wrongly stamped when testname and fullyqualifiedname are same. [#2014](https://github.com/microsoft/vstest/pull/2014)
@@ -1456,6 +1513,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 16.0.2-Preview-20190502-01
 
 ### Issues Fixed
+
 * Improve the cli experience for dotnet test. [#1964](https://github.com/Microsoft/vstest/pull/1964)
 * Improve readability of dotnet test [#1960](https://github.com/Microsoft/vstest/pull/1960)
 * Make testhost.x86 large address aware [#1986](https://github.com/Microsoft/vstest/pull/1986)
@@ -1471,6 +1529,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 16.0.1
 
 ### Issues Fixed
+
 * Reverted aborting test run when source and target frameworks/architectures are incompatible. [#1935](https://github.com/Microsoft/vstest/pull/1935)
 
 ### Drops
@@ -1481,6 +1540,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 16.0.0
 
 ### Issues Fixed
+
 * Added missing Utilities dependency to netstandard1.5 [#1913](https://github.com/Microsoft/vstest/pull/1913)
 * Add support for xplat vstest console in translationlayer [#1893](https://github.com/Microsoft/vstest/pull/1893)
 * Aborting test run when source and target frameworks/architectures are incompatible. [#1789](https://github.com/Microsoft/vstest/pull/1789)
@@ -1493,6 +1553,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 16.0.0-preview-20190201-03
 
 ### Issues Fixed
+
 * Running NETFramework 3.5 tests in compat mode [#1906](https://github.com/Microsoft/vstest/pull/1906)
 * Make timeouts for translation layer timeout configurable. [#1909](https://github.com/Microsoft/vstest/pull/1909)
 
@@ -1501,10 +1562,10 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * TestPlatform vsix: [16.0.0-preview-20190201-03](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/master/20190201-03;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [16.0.0-preview-20190201-03](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/16.0.0-preview-20190201-03)
 
-
 ## 16.0.0-preview-20190124-02
 
 ### Issues Fixed
+
 * Downgrade Test.Sdk to net40 [#1860](https://github.com/Microsoft/vstest/pull/1860)
 * Fix xml exception when we are dealing with special chars [#1872](https://github.com/Microsoft/vstest/pull/1872)
 * Fix - dotnet test on a multi-target projects logs only the last target [#1877](https://github.com/Microsoft/vstest/pull/1877)
@@ -1516,10 +1577,10 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * TestPlatform vsix: [16.0.0-preview-20190124-02](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/master/20190124-02;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [16.0.0-preview-20190124-02](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/16.0.0-preview-20190124-02)
 
-
 ## 16.0.0-preview-20181205-02
 
 ### Issues Fixed
+
 * Stop trying to connect if the test host exits unexpectedly [#1853](https://github.com/Microsoft/vstest/pull/1853)
 * Move warning into a target to fix msbuild error [#1856](https://github.com/Microsoft/vstest/pull/1856)
 * Adding the missing assemblyInfo files and updating the copyrights [#1859](https://github.com/Microsoft/vstest/pull/1859)
@@ -1529,10 +1590,10 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * TestPlatform vsix: [16.0.0-preview-20181205-02](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/master/20181205-02;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [16.0.0-preview-20181205-02](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/16.0.0-preview-20181205-02)
 
-
 ## 16.0.0-preview-20181128-01
 
 ### Issues Fixed
+
 * Allow external use of the TRX Logger [#1792](https://github.com/Microsoft/vstest/pull/1792)
 * Add "!~" operator to test filter [#1803](https://github.com/Microsoft/vstest/pull/1803)
 * Simplify SDK languages support [#1804](https://github.com/Microsoft/vstest/pull/1804)
@@ -1544,10 +1605,10 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * TestPlatform vsix: [16.0.0-preview-20181128-01](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/master/20181128-01;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [16.0.0-preview-20181128-01](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/16.0.0-preview-20181128-01)
 
-
 ## 15.9.0
 
 ### Issues Fixed
+
 * Unstable testId for nunit tests [#1785](https://github.com/Microsoft/vstest/pull/1785)
 * Run tests only for test projects [#1745](https://github.com/Microsoft/vstest/pull/1745)
 * Add info log if try to run tests with no IsTestProject prop [#1778](https://github.com/Microsoft/vstest/pull/1778)
@@ -1557,47 +1618,49 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * TestPlatform vsix: [15.9.0](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/15.9/20181008-02;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [15.9.0](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.9.0)
 
-
 ## 15.9.0-preview-20180924-03
 
 ### Issues Fixed
+
 * Fix Video Datacollector errors [#1719](https://github.com/Microsoft/vstest/pull/1719)
 * Show error message on Framework35 [#1723](https://github.com/Microsoft/vstest/pull/1723)
 * Suggest publish for running on an isolated machine[#1726](https://github.com/Microsoft/vstest/pull/1726)
 * Fix UWP tests app socket exception [#1728](https://github.com/Microsoft/vstest/pull/1728)
 * Run tests only for test projects in "dotnet test my.sln" scenario [#1745](https://github.com/Microsoft/vstest/pull/1745)
 
-
 ### Drops
 
 * TestPlatform vsix: [15.9.0-preview-20180924-03](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/master/20180924-03;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [15.9.0-preview-20180924-03](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.9.0-preview-20180924-03)
 
-
 ## 15.9.0-preview-20180807-05
-	
+ 
 ### Issues Fixed
+
 * Fix for VSTest to honor /nologo user input from dotnet cli [#1717](https://github.com/Microsoft/vstest/pull/1717)
 * Fixed ISettingsProvider in TestAdapter assembly [#1704](https://github.com/Microsoft/vstest/pull/1704)
 * Added `.NETCoreApp,Version=v2.0` example in error message [#1714](https://github.com/Microsoft/vstest/pull/1714)
 * Print start of testhost standard error stacktrace [#1708](https://github.com/Microsoft/vstest/pull/1708)
 * Use of culture specified by user in case it differs with that of OS [#1712](https://github.com/Microsoft/vstest/pull/1712)
 * Added attributes for sequence file generated by blame [#1716](https://github.com/Microsoft/vstest/pull/1716)
-* Trx Logger class name fix for Nunit Data Driven tests [#1677](https://github.com/Microsoft/vstest/pull/1677) 
+* Trx Logger class name fix for Nunit Data Driven tests [#1677](https://github.com/Microsoft/vstest/pull/1677)
 * Trx Logger Fixed to generate trx file when test run aborts [#1710](https://github.com/Microsoft/vstest/pull/1710)
 * Added trace level for diag argument [#1681](https://github.com/Microsoft/vstest/pull/1681)
-	
+ 
 ### New Features introduced
+
 * Enhancing Blame data collector options to include DumpType and AlwaysCollectDump [#1682](https://github.com/Microsoft/vstest/pull/1682)
 * Procdump arguments enhanced to handle crash scenarios [#1700](https://github.com/Microsoft/vstest/pull/1700)
-	
+ 
 ### Drops
+
 * TestPlatform vsix: [15.9.0-preview-20180807-05](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/master/20180807-05;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [15.9.0-preview-20180807-05](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.9.0-preview-20180807-05)
 
 ## 15.8.0
 
 ### Issues Fixed
+
 * Fix vstest.console.exe grabs exclusive read access to its test container [#1660](https://github.com/Microsoft/vstest/pull/1660)
 * Registring correct property attributes during deserialization [#1644](https://github.com/Microsoft/vstest/pull/1644)
 * Fixed test platform messages on cancellation request [#1667](https://github.com/Microsoft/vstest/pull/1667)
@@ -1606,6 +1669,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * Handling null value deserialization in TestCategory [#1640](https://github.com/Microsoft/vstest/pull/1640)
 
 ### New Features introduced
+
 * Auto-generate F# program file. [#1664](https://github.com/Microsoft/vstest/pull/1664)
 * Added support for dotnet test --collect:"Code Coverage" (windows only) [#981](https://github.com/Microsoft/vstest/issues/981)
 
@@ -1617,6 +1681,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.8.0-preview-20180610-02
 
 ### New Features introduced
+
 * Collect Code coverage with dotnet core sdk on windows. [#981](https://github.com/Microsoft/vstest/issues/981)
 
 ### Drops
@@ -1627,6 +1692,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.8.0-preview-20180605-02
 
 ### Issues Fixed
+
 * Fix Exception thrown while creating framework based on default enums. [#1598](https://github.com/Microsoft/vstest/pull/1598)
 * Deprecate Testplatform\Extensions path for Adapters [#1602](https://github.com/Microsoft/vstest/pull/1602)
 * Update Test Source with Package for Inprogress Tests [#1605](https://github.com/Microsoft/vstest/pull/1605)
@@ -1636,6 +1702,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * Add support to escape/unescape testcase filter strings [#1627](https://github.com/Microsoft/vstest/pull/1627)
 
 ### New Features introduced
+
 * Add a tool to migrate testsettings to runsettings [#1600](https://github.com/Microsoft/vstest/pull/1600)
 
 ### Drops
@@ -1646,6 +1713,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.8.0-preview-20180510-03
 
 ### Issues Fixed
+
 * Extend FastFilter to support multiple properties. [#1523](https://github.com/Microsoft/vstest/pull/1523)
 * Make all communication timeouts configurable. [#1538](https://github.com/Microsoft/vstest/pull/1538)
 * Honoring cancel and abort request in test platform. [#1543](https://github.com/Microsoft/vstest/pull/1543)
@@ -1656,6 +1724,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * Filtering non existent adapter paths. [#1578](https://github.com/Microsoft/vstest/pull/1578)
 
 ### New Features introduced
+
 * Introduced category attribtue for adapter to specify supported assembly type.[#1528](https://github.com/Microsoft/vstest/pull/1528), [#1529](https://github.com/Microsoft/vstest/pull/1529), [#1537](https://github.com/Microsoft/vstest/pull/1537)
 
 ### Drops
@@ -1666,6 +1735,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.7.2
 
 ### Issues Fixed
+
 * Code coverage fix for async functions. [242314](https://developercommunity.visualstudio.com/content/problem/242314/code-coverage-doesnt-show-async-methods.html)
 
 ### Drops
@@ -1676,6 +1746,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.7.0
 
 ### Issues Fixed
+
 * Code coverage fix for runsettings. [#1510](https://github.com/Microsoft/vstest/pull/1510)
 * Logging fix for UWP.[#1508](https://github.com/Microsoft/vstest/pull/1508)
 * Perf improvements for LUT [#1517](https://github.com/Microsoft/vstest/pull/1517)
@@ -1683,6 +1754,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * Fix socket exception on datacollection in parallel. [#1514](https://github.com/Microsoft/vstest/pull/1514)
 
 ### New Features introduced
+
 * Introduced running UWP test using ".appx" file as input, for CLI.
 
 ### Drops
@@ -1693,6 +1765,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.7.0-preview-20180320-02
 
 ### Issues Fixed
+
 * Fixing the tests for string comparison issue. [#1462](https://github.com/Microsoft/vstest/pull/1462)
 * Sync for binarywriter writes.[#1470](https://github.com/Microsoft/vstest/pull/1470)
 * Usability Fixes [#1478](https://github.com/Microsoft/vstest/pull/1478)
@@ -1707,6 +1780,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.7.0-preview-20180307-01
 
 ### Issues Fixed
+
 * Fix CUIT tests fail to run on no VS installed machine.  [#1450](https://github.com/Microsoft/vstest/pull/1450)
 
 ### Drops
@@ -1714,10 +1788,10 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * TestPlatform vsix: [15.7.0-preview-20180307-01](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/master/20180307-01;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [15.7.0-preview-20180307-01](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.7.0-preview-20180307-01)
 
-
 ## 15.7.0-preview-20180221-13
 
 ### Issues Fixed
+
 * Adding Category to Test Category mapping for ListFullyQualifiedTests. [#1369](https://github.com/Microsoft/vstest/pull/1369)
 * Support escaping "," in Test filter. [#1374](https://github.com/Microsoft/vstest/pull/1374)
 * Generate proper default settings for EnableCodeCoverage. [#1390](https://github.com/Microsoft/vstest/pull/1390)
@@ -1731,6 +1805,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * Exceptions flow to Translation layer [#1434](https://github.com/Microsoft/vstest/pull/1434)
 
 ### New Features introduced
+
 * Logger support in run settings.[#1382](https://github.com/Microsoft/vstest/pull/1382)
 * Added CUIT package in vstest xcopy package. [#1394](https://github.com/Microsoft/vstest/pull/1394)
 * Making Trx Logger Hierarchical for ordered test and data driven tests. [#1330](https://github.com/Microsoft/vstest/pull/1330)
@@ -1743,9 +1818,9 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.6.2
 
 ### Issues Fixed
+
 * Fix socket exception on datacollection in parallel  [#1505](https://github.com/Microsoft/vstest/pull/1505)
 * Fix datacollectors temporary files cleanup [#1506](https://github.com/Microsoft/vstest/pull/1506)
-
 
 ### Drops
 
@@ -1755,8 +1830,8 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.6.1
 
 ### Issues Fixed
-* Synchronize concurrent writes to communication channel  [#1457](https://github.com/Microsoft/vstest/pull/1457)
 
+* Synchronize concurrent writes to communication channel  [#1457](https://github.com/Microsoft/vstest/pull/1457)
 
 ### Drops
 
@@ -1766,7 +1841,8 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.6.0
 
 ### Issues Fixed
-* Fix for Communication b/w testhost, & datacollector fails causing tests processes to hang. [#1406](https://github.com/Microsoft/vstest/pull/1406) 
+
+* Fix for Communication b/w testhost, & datacollector fails causing tests processes to hang. [#1406](https://github.com/Microsoft/vstest/pull/1406)
 * Fix for Cancellation hanging TestExplorer with the unclickable cancelling. [#1398](https://github.com/Microsoft/vstest/pull/1398)
 
 ### Drops
@@ -1777,7 +1853,8 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.6.0-preview-20180207-05
 
 ### Issues Fixed
-* Enabling diagnostics for UWP causes app to hang. [#1387](https://github.com/Microsoft/vstest/pull/1387) 
+
+* Enabling diagnostics for UWP causes app to hang. [#1387](https://github.com/Microsoft/vstest/pull/1387)
 
 ### Drops
 
@@ -1786,7 +1863,8 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.6.0-preview-20180109-01
 
 ### Issues Fixed
-* Make latest ObjectModel API compatible with ObjectModel 11.0.0. [#1251](https://github.com/Microsoft/vstest/pull/1251/) 
+
+* Make latest ObjectModel API compatible with ObjectModel 11.0.0. [#1251](https://github.com/Microsoft/vstest/pull/1251/)
 * Fix no error message in case of invalid runsettings. [#1344](https://github.com/Microsoft/vstest/pull/1344)
 * Fix CodedUI debug broken. [#1352](https://github.com/Microsoft/vstest/pull/1352)
 * Fix debug stop causing 10s or indefinite wait in test explorer.  [#1358](https://github.com/Microsoft/vstest/pull/1358)
@@ -1795,6 +1873,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * Fix running fakes and code coverage with embedded testsettings in runsettings. [#1364](https://github.com/Microsoft/vstest/pull/1364)
 
 ### New Features introduced
+
 * Support reflection based discovery for UWP C++ Unit tests projects.[#1336](https://github.com/Microsoft/vstest/pull/1336)
 * Add testhost external dependencies for UWP to Microsoft.NET.Test.Sdk. [#1351](https://github.com/Microsoft/vstest/pull/1351)
 
@@ -1806,6 +1885,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.6.0-preview-20171211-02
 
 ### Issues Fixed
+
 * Removed warning for AnyCPU assemblies
 * Fix updating runsettings in dotnet core.
 * Fix exception in Event Log DataCollector. [#1288](https://github.com/Microsoft/vstest/pull/1288)
@@ -1817,10 +1897,10 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * TestPlatform vsix: [15.6.0-preview-20171211-02](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/master/20171211-02;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [15.6.0-preview-20171211-02](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.6.0-preview-20171211-02)
 
-
 ## 15.5.0
 
 ### Issues Fixed
+
 * Removed compile time dependency on castle.core.dll. [#1246](https://github.com/Microsoft/vstest/pull/1246)
 * Fix test run for x64 c++ tests. [#1269](https://github.com/Microsoft/vstest/pull/1269)
 * Localization fixes for error scenarios. [#1266](https://github.com/Microsoft/vstest/pull/1266)
@@ -1835,11 +1915,12 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.5.0-preview-20171031-01
 
 ### Issues Fixed
+
 * Add LocalExtensionData property to TestCase Class.
 * Do not crash data collector if extension fails to initialize or set environment variables.
 * Use TPv2 as default for .NET 3.5 test projects.
 * Loading native dll's correctly for UWP release mode.
-* Insertion PR: https://github.com/Microsoft/vstest/pull/1250
+* Insertion PR: <https://github.com/Microsoft/vstest/pull/1250>
 
 ### Drops
 
@@ -1850,6 +1931,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 ## 15.5.0-preview-20171012-09
 
 ### Issues Fixed
+
 * Fixed Data Collector Attachment issues for legacy TMI test execution workflow.
 * Added error message and help when vstest.console is invoked without arguments.
 * Fixed failure in loading extensions without Identifier Data.
@@ -1858,6 +1940,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 * Fixed issues with Static Cover Coverage, Ordered tests through TMI.
 
 ### New Features introduced
+
 * Added Telemetry Infra for Design Mode.
 * Supported running .Net Framework v35 in compat mode.
 * Localization changes.
@@ -1872,20 +1955,21 @@ A list of all changes since last release are available [here](https://github.com
 
 * Microsoft.TestPlatform.ObjectModel: [15.5.0-preview-20171012-09](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.5.0-preview-20171012-09)
 
-
 ## 15.5.0-preview-20170923-02
 
 ### Issues Fixed
+
 * Feature flag for executing net35 tests through TPv2 in compat mode.
 * Removed unnecessary binding redirects from app.configs. [More info here](https://github.com/Microsoft/vstest/pull/1117)
 * Put quotes around TestHost path so in case of spaces in name it starts correctly. [More info here](https://github.com/Microsoft/vstest/pull/1108)
 * Performance Automation Infra.
 
 ### New Features introduced
+
 * Added filter support on test case discovery.
 * Added Telemetry Collection Infrastructure.
 * Added support for listing fully qualified test cases.
-* Exposed discovery events to loggers. 
+* Exposed discovery events to loggers.
 
 A list of all changes since last release are available [here](https://github.com/Microsoft/vstest/compare/f8020e56e418f3a14637d401928fd154a061c9c4...v15.5.0-preview-20170923-02).
 
@@ -1895,22 +1979,22 @@ A list of all changes since last release are available [here](https://github.com
 
 * Microsoft.TestPlatform.ObjectModel: [15.5.0-preview-20170923-02](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.5.0-preview-20170923-02)
 
-
 ## 15.5.0-preview-20170914-09
 
 ### Issues Fixed
-* https://github.com/Microsoft/vstest/issues/979
-* https://github.com/Microsoft/vstest/pull/992
+
+* <https://github.com/Microsoft/vstest/issues/979>
+* <https://github.com/Microsoft/vstest/pull/992>
 * Made TestPlatform.ObjectModel CLS-compliant
 * Made Microsoft.CodeCoverage as nuget package dependency for Microsoft.NET.Test.Sdk nuget package. [More info here](https://github.com/Microsoft/vstest/issues/852)
 * Perf improvements. [More info here](https://github.com/Microsoft/vstest/pull/1041)
 * Fixed issue related to /EnableCodeCoverage. [More info here](https://github.com/Microsoft/vstest/pull/1072)
-* https://github.com/Microsoft/vstest/issues/902
+* <https://github.com/Microsoft/vstest/issues/902>
 * Highest version filtering for extensions. [More info here](https://github.com/Microsoft/vstest/pull/1051)
-* https://github.com/Microsoft/vstest/pull/1060
-
+* <https://github.com/Microsoft/vstest/pull/1060>
 
 ### New Features introduced
+
 * InProc execution of tests inside vstest.console process. [More info here](https://github.com/Microsoft/vstest/pull/1009)
 * Added Verbosity Level as prefix for loggers. [More info here](https://github.com/Microsoft/vstest/pull/967)
 * Event Log Data Collector. [More info here](https://github.com/Microsoft/vstest/blob/master/docs/analyze.md#event-log-data-collector)
@@ -1924,16 +2008,17 @@ A list of all changes since last release are available [here](https://github.com
 
 * Microsoft.TestPlatform.ObjectModel: [15.5.0-preview-20170914-09](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.5.0-preview-20170914-09)
 
-
 ## 15.5.0-preview-20170810-02
 
 ### Issues Fixed
-* https://github.com/Microsoft/vstest/issues/861
-* https://github.com/Microsoft/vstest/issues/916
+
+* <https://github.com/Microsoft/vstest/issues/861>
+* <https://github.com/Microsoft/vstest/issues/916>
 * Made latest testhost compat with older vstest.console and vice versa.
 * Some performance improvement
 
 ### New Features introduced
+
 * Added blame data collector support in `dotnet test`.
 * Add ExecutionThreadApartmentState property in runsettings. [More info here](https://github.com/Microsoft/vstest/blob/master/docs/configure.md#execution-thread-apartment-state)
 * Added async APIs support in translationLayer.
@@ -1946,10 +2031,10 @@ A list of all changes since last release are available [here](https://github.com
 
 * Microsoft.TestPlatform.ObjectModel: [15.5.0-preview-20170810-02](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.5.0-preview-20170810-02)
 
-
 ## 15.5.0-preview-20170727-01
 
 ### Issues Fixed
+
 * Support for devices: build up the TestHostRuntime APIs
 * Console test runs will not collect File/LineNumber information
 * Several performance improvements
@@ -1957,6 +2042,7 @@ A list of all changes since last release are available [here](https://github.com
 * Engineering fixes to build/test
 
 ### New Features introduced
+
 * Blame for vstest. Reports the test which crashes a run
 * Response file support for vstest
 * `TestSessionTimeout` cancels a test run if it exceeds a timeout
@@ -1974,9 +2060,9 @@ A list of all changes since last release are available [here](https://github.com
 ## 15.3.0
 
 ### Issues Fixed
-* Clean testhost before sending discoveryComplete/ExecutionCompltete. 
-* Closing VS should also close vstest.console process.
 
+* Clean testhost before sending discoveryComplete/ExecutionCompltete.
+* Closing VS should also close vstest.console process.
 
 A list of all changes since last release are available [here](https://github.com/Microsoft/vstest/compare/v15.3.0-preview-20170618-03...rel/15.3-rtm).
 
@@ -1985,16 +2071,15 @@ A list of all changes since last release are available [here](https://github.com
 * TestPlatform vsix: [15.3.0](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/15.3-rtm/20170807-05;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [15.3.0](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.3.0)
 
-
 ## 15.3.0-preview-20170618-03
 
 ### Issues Fixed
-* https://github.com/Microsoft/vstest/issues/632 
-* https://github.com/Microsoft/vstest/issues/844 
-* https://github.com/Microsoft/vstest/issues/847 
-* https://github.com/Microsoft/vstest/issues/840 
-* https://github.com/Microsoft/vstest/issues/843
 
+* <https://github.com/Microsoft/vstest/issues/632>
+* <https://github.com/Microsoft/vstest/issues/844>
+* <https://github.com/Microsoft/vstest/issues/847>
+* <https://github.com/Microsoft/vstest/issues/840>
+* <https://github.com/Microsoft/vstest/issues/843>
 
 A list of all changes since last release are available [here](https://github.com/Microsoft/vstest/compare/v15.3.0-preview-20170601-03...v15.3.0-preview-20170618-03).
 
@@ -2002,7 +2087,6 @@ A list of all changes since last release are available [here](https://github.com
 
 * TestPlatform vsix: [15.3.0-preview-20170618-03](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/15.3-rtm/20170618-03;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [15.3.0-preview-20170618-03](http://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.3.0-preview-20170618-03)
-
 
 ## 15.3.0-preview-20170601-03
 
@@ -2013,8 +2097,8 @@ A list of all changes since last release are available [here](https://github.com
 * In case of parallel if test host is aborted, add a new one in place of that
 
 ### Issues Fixed
-* https://github.com/Microsoft/vstest/issues/823
 
+* <https://github.com/Microsoft/vstest/issues/823>
 
 A list of all changes since last release are available [here](https://github.com/Microsoft/vstest/compare/v15.3.0-preview-20170517-02...v15.3.0-preview-20170601-03).
 
@@ -2022,7 +2106,6 @@ A list of all changes since last release are available [here](https://github.com
 
 * TestPlatform vsix: [15.3.0-preview-20170601-03](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/master/20170601-03;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [15.3.0-preview-20170601-03](http://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.3.0-preview-20170601-03)
-
 
 ## 15.3.0-preview-20170517-02
 
@@ -2033,14 +2116,13 @@ A list of all changes since last release are available [here](https://github.com
 * Localized new added string.
 * Code cleanup
 
-
 ### Issues Fixed
-* https://github.com/Microsoft/vstest/issues/646
-* https://github.com/Microsoft/vstest/issues/706
-* https://github.com/Microsoft/vstest/issues/618
-* https://github.com/Microsoft/vstest/issues/801
-* https://github.com/Microsoft/vstest/issues/799
 
+* <https://github.com/Microsoft/vstest/issues/646>
+* <https://github.com/Microsoft/vstest/issues/706>
+* <https://github.com/Microsoft/vstest/issues/618>
+* <https://github.com/Microsoft/vstest/issues/801>
+* <https://github.com/Microsoft/vstest/issues/799>
 
 A list of all changes since last release are available [here](https://github.com/Microsoft/vstest/compare/v15.3.0-preview-20170427-09...v15.3.0-preview-20170517-02).
 
@@ -2049,7 +2131,6 @@ A list of all changes since last release are available [here](https://github.com
 * TestPlatform vsix: [15.3.0-preview-20170517-02](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/master/20170517-02;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [15.3.0-preview-20170517-02](http://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.3.0-preview-20170517-02)
 
-
 ## 15.3.0-preview-20170425-07
 
 * Data collector support enabled
@@ -2057,7 +2138,7 @@ A list of all changes since last release are available [here](https://github.com
 * ResultsDirectory argument and Runsettings priority order [#322](https://github.com/Microsoft/vstest/pull/322)
 * Supporting Multiple TestProperty with the same key value [#328](https://github.com/Microsoft/vstest/pull/328)
 * Allow VSTestConsole path to be specified [#325](https://github.com/Microsoft/vstest/pull/325)
-* Adding /InIsolation flag for backward compatibility [#414](https://github.com/Microsoft/vstest/pull/414) 
+* Adding /InIsolation flag for backward compatibility [#414](https://github.com/Microsoft/vstest/pull/414)
 * Fixed reading test adapter paths from runsettings [#455](https://github.com/Microsoft/vstest/pull/455)
 * Honor cache timeout for discovery. [#470](https://github.com/Microsoft/vstest/pull/470)
 * Read asynchronously from test host process [#529](https://github.com/Microsoft/vstest/pull/529)
@@ -2088,6 +2169,7 @@ A list of all changes since last release are available [here](https://github.com
 ## 15.0.0-preview-20170125-04
 
 * Localization for following nuget packages:
+
  1) Microsoft.TestPlatform.CLI
  2) Microsoft.TestPlatform
  3) Microsoft.TestPlatform.ObjectModel
@@ -2099,7 +2181,6 @@ A list of all changes since last release are available [here](https://github.com
 
 * Microsoft.TestPlatform.ObjectModel: [15.0.0-preview-20170125-04](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.ObjectModel/15.0.0-preview-20170125-04)
 * Microsoft.TestPlatform.TranslationLayer: [15.0.0-preview-20170125-04](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.TranslationLayer/15.0.0-preview-20170125-04)
-
 
 ## 15.0.0-preview-20170123.02
 
@@ -2116,7 +2197,6 @@ A list of all changes since last release are available [here](https://github.com
 * TestPlatform vsix: [TestPlatform.CI.Real-20170123-02](https://devdiv.visualstudio.com/DevDiv/_build/index?buildId=533598&_a=summary)
 * Microsoft.TestPlatform.ObjectModel: [15.0.0-preview-20170123-02](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.ObjectModel/15.0.0-preview-20170123-02)
 * Microsoft.TestPlatform.TranslationLayer: [15.0.0-preview-20170123-02](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.TranslationLayer/15.0.0-preview-20170123-02)
-
 
 ## 15.0.0-preview-20170106.08
 
@@ -2135,7 +2215,6 @@ A list of all changes since last release are available [here](https://github.com
 * Microsoft.TestPlatform.ObjectModel: [15.0.0-preview-20170106-08](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.ObjectModel/15.0.0-preview-20170106-08)
 * Microsoft.TestPlatform.TranslationLayer: [15.0.0-preview-20170106-08](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.TranslationLayer/15.0.0-preview-20170106-08)
 
-
 ## 15.0.0-preview-20161227.02
 
 * Add enhancement: trx logger can take logfile parameter [#282](https://github.com/Microsoft/vstest/pull/282).
@@ -2152,7 +2231,6 @@ A list of all changes since last release are available [here](https://github.com
 * TestPlatform vsix: [TestPlatform.CI.Real-20161227-02](https://devdiv.visualstudio.com/DevDiv/VS.in%20Agile%20Testing%20IDE/_build/index?buildId=490545&_a=summary&tab=artifacts)
 * Microsoft.TestPlatform.ObjectModel: [15.0.0-preview-20161227-02](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.ObjectModel/15.0.0-preview-20161227-02)
 * Microsoft.TestPlatform.TranslationLayer: [15.0.0-preview-20161227-02](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.TranslationLayer/15.0.0-preview-20161227-02)
-
 
 ## 15.0.0-preview-20161216.01
 
@@ -2182,7 +2260,6 @@ A list of all changes since last release are available [here](https://github.com
 * Microsoft.TestPlatform.ObjectModel: [15.0.0-preview-20161216-01](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.ObjectModel/15.0.0-preview-20161216-01)
 * Microsoft.TestPlatform.TranslationLayer: [15.0.0-preview-20161216-01](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.TranslationLayer/15.0.0-preview-20161216-01)
 
-
 ## 15.0.0-preview-20161123.03
 
 * Support for debugging .net core project.
@@ -2208,7 +2285,6 @@ A list of all changes since last release are available [here](https://github.com
 * Microsoft.TestPlatform.ObjectModel: [15.0.0-preview-20161123-03](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.ObjectModel/15.0.0-preview-20161123-03)
 * Microsoft.TestPlatform.TranslationLayer: [15.0.0-preview-20161123-03](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.TranslationLayer/15.0.0-preview-20161123-03)
 
-
 ## 15.0.0-preview-20160923-03
 
 * New configuration `DisableParallelization` in runsettings. This setting may be used by adapters to disable parallel run in certain scenarios, e.g. test profiling or instrumented runs.
@@ -2226,7 +2302,6 @@ A list of all changes since last release are available [here](https://github.com
 * TestPlatform vsix: [TestPlatform.CI.Real-20160923-03](https://devdiv.visualstudio.com/DevDiv/VS.in%20Agile%20Testing%20IDE/_build/index?buildId=343725&_a=summary)
 * Microsoft.TestPlatform.ObjectModel: [15.0.0-preview-20160923-03](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.ObjectModel/15.0.0-preview-20160923-03)
 * Microsoft.TestPlatform.TranslationLayer: [15.0.0-preview-20160923-03](https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.TranslationLayer/15.0.0-preview-20160923-03)
-
 
 ## 15.0.0-preview-20160914-02
 

@@ -25,7 +25,7 @@ A DataCollector is a test platform extension to monitor test run. It can be exte
 
 You can author a DataCollector to collect code coverage data for a test run, to collect logs when a test case or test run fails, etc. These additional files are called Attachments and they can be attached to test result report(trx).
 
-Please refer [here](./docs/extensions/datacollector.md) for instructions on creating a DataCollector and [here](./RFCs/0006-DataCollection-Protocol.md)
+Please refer [here](./extensions/datacollector.md) for instructions on creating a DataCollector and [here](./RFCs/0006-DataCollection-Protocol.md)
 if you're interested in the architecture of data collection.
 
 ## Configure DataCollectors

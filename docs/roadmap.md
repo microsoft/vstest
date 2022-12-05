@@ -1,8 +1,10 @@
+# Test Platform Roadmap
+
 This repo is the modern, OSS, cross-plat testing engine that has been powering testing on .NET Core via the "test" verb in dotnet test, and Live Unit Testing scenario (LUT) in Visual Studio. Internally we call this repo "TPV2" (Test Platform V2)
 
 We aim to continuously deliver improvements that will ship with Visual Studio and with the .NET Tools SDK. These improvements are directly informed by your feedback filed as [issues](https://github.com/Microsoft/vstest/issues). If you do not see your issue addressed already, we will get to it soon! If you would like to help out, let us know!
 
-Over the past several quarters, we have made many enhancements - from introducing support for Mono, to refactoring the platform to make it ready to support device testing, to performance improvements, to enabling robust C++ support, to improved documentation, and more. For a complete list see here: [Release Notes](./docs/releases.md)
+Over the past several quarters, we have made many enhancements - from introducing support for Mono, to refactoring the platform to make it ready to support device testing, to performance improvements, to enabling robust C++ support, to improved documentation, and more. For a complete list see here: [Release Notes](./releases.md)
 
 ## Roadmap
 

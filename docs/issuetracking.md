@@ -1,6 +1,6 @@
 # Issue tracking
 
-The vstest project tracks issues and feature requests using the [issue template](./.github/ISSUE_TEMPLATE.md) for the vstest repository.
+The vstest project tracks issues and feature requests using the [issue template](../.github/ISSUE_TEMPLATE.md) for the vstest repository.
 
 ## Submitting an Issue
 
@@ -10,7 +10,7 @@ If you find your issue already exists, make relevant comments and add your [reac
 - 👍 - upvote
 - 👎 - downvote
 
-If you cannot find an existing issue that describes your issue, submit it using the [issue template](./.github/ISSUE_TEMPLATE.md). Remember to follow the instruction mentioned therein carefully.
+If you cannot find an existing issue that describes your issue, submit it using the [issue template](../.github/ISSUE_TEMPLATE.md). Remember to follow the instruction mentioned therein carefully.
 
 ## Issue triage
 
