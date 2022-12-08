@@ -33,7 +33,7 @@ You'll find 3 files for logs(runner, datacollector, host), datacollector one can
 ```
 ## vstest.console.exe  
 
-### Collect logs   
+### Collect logs with `/Diag:`
 
 ```shell
 vstest.console.exe ...\TestProject1.dll /Collect:"Code Coverage" /Diag:log.txt
