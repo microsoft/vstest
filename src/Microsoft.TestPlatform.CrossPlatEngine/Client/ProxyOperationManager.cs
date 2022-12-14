@@ -114,7 +114,13 @@ public class ProxyOperationManager
     /// <summary>
     /// Gets the proxy operation manager id for proxy test session manager internal organization.
     /// </summary>
-    public int Id { get; set; } = -1;
+    internal int Id { get; set; } = -1;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the current proxy operation manager is part of a
+    /// test session.
+    /// </summary>
+    internal bool IsTestSessionEnabled { get; set; }
 
     /// <summary>
     /// Gets or sets the cancellation token source.
@@ -175,6 +181,13 @@ public class ProxyOperationManager
         if (_initialized)
         {
             return true;
+        }
+
+        // Check whether test sessions are supported if the current proxy operation manager is to
+        // be part of one.
+        if (IsTestSessionEnabled && !IsTesthostCompatibleWithTestSessions())
+        {
+            return false;
         }
 
         var connTimeout = EnvironmentHelper.GetConnectionTimeout();
@@ -401,6 +414,32 @@ public class ProxyOperationManager
         updatedRunSettingsXml = InferRunSettingsHelper.RemoveTargetPlatformElement(updatedRunSettingsXml);
 
         return updatedRunSettingsXml;
+    }
+
+    private bool IsTesthostCompatibleWithTestSessions()
+    {
+        // These constants should be kept in line with the friendly names found in
+        // DotnetTestHostManager.cs, respectively DefaultTestHostManager.cs.
+        //
+        // We agreed on checking the test session compatibility this way (i.e. by reading the
+        // friendly name and making sure it's one of the testhosts we control) instead of a more
+        // generic alternative that was initially proposed (i.e. by decorating each testhost
+        // manager with a capability attribute that could tell us if the test session scenario
+        // is supported for the testhost in discussion) because of the breaking risks associated
+        // with the latter approach. Also, there is no formal specification for now of what it
+        // means to support test sessions. Should extending session functionality to 3rd party
+        // testhosts be something we want to address in the future, we should come up with such
+        // a specification first.
+        const string dotnetTesthostFriendlyName = "DotnetTestHost";
+        const string defaultTesthostFriendlyName = "DefaultTestHost";
+
+        var friendlyNameAttribute = TestHostManager.GetType().GetCustomAttributes(typeof(FriendlyNameAttribute), true).FirstOrDefault();
+        if (friendlyNameAttribute is not null and FriendlyNameAttribute friendlyName)
+        {
+            return friendlyName.FriendlyName is (dotnetTesthostFriendlyName or defaultTesthostFriendlyName);
+        }
+
+        return false;
     }
 
     [return: NotNullIfNotNull("logFile")]
