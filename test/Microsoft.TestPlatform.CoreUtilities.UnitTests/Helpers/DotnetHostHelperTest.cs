@@ -343,89 +343,87 @@ public sealed class DotnetHostHelperTest : IDisposable
         Assert.AreEqual(found ? expectedMuxerPath : null, muxerPath);
     }
 
-    [DataTestMethod]
-    [DataRow(DotnetMuxerResolutionStrategy.DotnetRootArchitecture)]
-    [DataRow(DotnetMuxerResolutionStrategy.DotnetRootArchitectureLess)]
-    [DataRow(DotnetMuxerResolutionStrategy.GlobalInstallationLocation)]
-    [DataRow(DotnetMuxerResolutionStrategy.DefaultInstallationLocation)]
-    [DataRow(DotnetMuxerResolutionStrategy.Default)]
-    public void GetDotnetPathByArchitecture_Strategies(DotnetMuxerResolutionStrategy strategy)
+    [TestMethod]
+    public void GetDotnetPathByArchitecture_Strategies()
     {
-        // Arrange
-        _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable("ProgramFiles")).Returns("notfound");
-        var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
-        dotnetHostHelper.TryGetDotnetPathByArchitecture(PlatformArchitecture.X64, strategy, out string? _);
-
-        // Assert
-        switch (strategy)
+        foreach (DotnetMuxerResolutionStrategy strategy in Enum.GetValues(typeof(DotnetMuxerResolutionStrategy)))
         {
-            case DotnetMuxerResolutionStrategy.DotnetRootArchitecture:
-                // Assert env vars
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64"), Times.Once);
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT"), Times.Never);
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable(It.IsAny<string>()), Times.Once);
+            // Arrange
+            _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable("ProgramFiles")).Returns("notfound");
+            var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
+            dotnetHostHelper.TryGetDotnetPathByArchitecture(PlatformArchitecture.X64, strategy, out string? _);
 
-                // Assert local installation
-                _windowsRegistrytHelper.Verify(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32), Times.Never);
+            // Assert
+            switch (strategy)
+            {
+                case DotnetMuxerResolutionStrategy.DotnetRootArchitecture:
+                    // Assert env vars
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64"), Times.Once);
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT"), Times.Never);
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable(It.IsAny<string>()), Times.Once);
 
-                // Assert default installation folder
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("ProgramFiles"), Times.Never);
+                    // Assert local installation
+                    _windowsRegistrytHelper.Verify(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32), Times.Never);
 
-                break;
-            case DotnetMuxerResolutionStrategy.DotnetRootArchitectureLess:
-                // Assert env vars
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64"), Times.Never);
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT"), Times.Once);
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable(It.IsAny<string>()), Times.Once);
+                    // Assert default installation folder
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("ProgramFiles"), Times.Never);
 
-                // Assert local installation
-                _windowsRegistrytHelper.Verify(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32), Times.Never);
+                    break;
+                case DotnetMuxerResolutionStrategy.DotnetRootArchitectureLess:
+                    // Assert env vars
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64"), Times.Never);
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT"), Times.Once);
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable(It.IsAny<string>()), Times.Once);
 
-                // Assert default installation folder
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("ProgramFiles"), Times.Never);
+                    // Assert local installation
+                    _windowsRegistrytHelper.Verify(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32), Times.Never);
 
-                break;
-            case DotnetMuxerResolutionStrategy.GlobalInstallationLocation:
-                // Assert env vars
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64"), Times.Never);
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT"), Times.Never);
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable(It.IsAny<string>()), Times.Never);
+                    // Assert default installation folder
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("ProgramFiles"), Times.Never);
 
-                // Assert local installation
-                _windowsRegistrytHelper.Verify(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32), Times.Once);
+                    break;
+                case DotnetMuxerResolutionStrategy.GlobalInstallationLocation:
+                    // Assert env vars
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64"), Times.Never);
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT"), Times.Never);
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable(It.IsAny<string>()), Times.Never);
 
-                // Assert default installation folder
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("ProgramFiles"), Times.Never);
+                    // Assert local installation
+                    _windowsRegistrytHelper.Verify(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32), Times.Once);
 
-                break;
-            case DotnetMuxerResolutionStrategy.DefaultInstallationLocation:
-                // Assert env vars
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64"), Times.Never);
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT"), Times.Never);
+                    // Assert default installation folder
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("ProgramFiles"), Times.Never);
 
-                // Assert local installation
-                _windowsRegistrytHelper.Verify(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32), Times.Never);
+                    break;
+                case DotnetMuxerResolutionStrategy.DefaultInstallationLocation:
+                    // Assert env vars
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64"), Times.Never);
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT"), Times.Never);
 
-                // Assert default installation folder
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("ProgramFiles"), Times.Once);
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable(It.IsAny<string>()), Times.Once);
+                    // Assert local installation
+                    _windowsRegistrytHelper.Verify(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32), Times.Never);
 
-                break;
-            case DotnetMuxerResolutionStrategy.Default:
+                    // Assert default installation folder
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("ProgramFiles"), Times.Once);
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable(It.IsAny<string>()), Times.Once);
 
-                // Assert env vars
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64"), Times.Once);
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT"), Times.Once);
+                    break;
+                case DotnetMuxerResolutionStrategy.Default:
 
-                // Assert local installation
-                _windowsRegistrytHelper.Verify(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32), Times.Once);
+                    // Assert env vars
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64"), Times.Once);
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("DOTNET_ROOT"), Times.Once);
 
-                // Assert default installation folder
-                _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("ProgramFiles"), Times.Once);
+                    // Assert local installation
+                    _windowsRegistrytHelper.Verify(x => x.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32), Times.Once);
 
-                break;
-            default:
-                throw new NotImplementedException();
+                    // Assert default installation folder
+                    _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("ProgramFiles"), Times.Once);
+
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 
