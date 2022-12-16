@@ -349,6 +349,12 @@ public sealed class DotnetHostHelperTest : IDisposable
         foreach (DotnetMuxerResolutionStrategy strategy in Enum.GetValues(typeof(DotnetMuxerResolutionStrategy)))
         {
             // Arrange
+            _environmentHelper.Reset();
+            _fileHelper.Reset();
+            _windowsRegistrytHelper.Reset();
+            _environmentVariableHelper.Reset();
+            _processHelper.Reset();
+
             _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable("ProgramFiles")).Returns("notfound");
             var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
             dotnetHostHelper.TryGetDotnetPathByArchitecture(PlatformArchitecture.X64, strategy, out string? _);
