@@ -1,5 +1,18 @@
 # Release Notes
 
+## 17.4.1
+
+### Issues Fixed
+
+* Fix satellite resolution for Microsoft.TestPlatform.Common [#4147](https://github.com/microsoft/vstest/pull/4147)
+
+See full log [here](https://github.com/microsoft/vstest/compare/v17.4.0...v17.4.1)
+
+### Drops
+
+* TestPlatform vsix: [17.4.1](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/17.4/20221215-01;/TestPlatform.vsix)
+* Microsoft.TestPlatform.ObjectModel : [17.4.1](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/17.4.1)
+
 ## 17.4.0
 
 ### Issues Fixed
