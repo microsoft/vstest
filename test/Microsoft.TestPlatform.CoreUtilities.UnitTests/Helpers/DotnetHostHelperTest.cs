@@ -345,10 +345,10 @@ public sealed class DotnetHostHelperTest : IDisposable
     }
 
     [DataTestMethod]
-    //[DataRow(DotnetMuxerResolutionStrategy.DotnetRootArchitecture)]
-    //[DataRow(DotnetMuxerResolutionStrategy.DotnetRootArchitectureLess)]
-    //[DataRow(DotnetMuxerResolutionStrategy.GlobalInstallationLocation)]
-    //[DataRow(DotnetMuxerResolutionStrategy.DefaultInstallationLocation)]
+    [DataRow(DotnetMuxerResolutionStrategy.DotnetRootArchitecture)]
+    [DataRow(DotnetMuxerResolutionStrategy.DotnetRootArchitectureLess)]
+    [DataRow(DotnetMuxerResolutionStrategy.GlobalInstallationLocation)]
+    [DataRow(DotnetMuxerResolutionStrategy.DefaultInstallationLocation)]
     [DataRow(DotnetMuxerResolutionStrategy.Default)]
     public void GetDotnetPathByArchitecture_Strategies(DotnetMuxerResolutionStrategy strategy)
     {
