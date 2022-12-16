@@ -90,7 +90,7 @@ public class DataCollectorAttachmentProcessorAppDomainTests
 
         // assert
         // We return same instance but we're marshaling so we expected different pointers
-        Assert.AreNotSame(attachmentSet, attachmentsResult);
+        Assert.AreNotSame(attachments, attachmentsResult);
 
         Assert.AreEqual(attachmentSet.DisplayName, attachmentsResult.First().DisplayName);
         Assert.AreEqual(attachmentSet.Uri, attachmentsResult.First().Uri);
