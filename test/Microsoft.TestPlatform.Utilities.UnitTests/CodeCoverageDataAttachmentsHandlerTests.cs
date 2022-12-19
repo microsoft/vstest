@@ -50,7 +50,6 @@ public class CodeCoverageDataAttachmentsHandlerTests
 #endif
     }
 
-#if NETFRAMEWORK
     [ClassInitialize]
     public static void ClassInitialize(TestContext context)
     {
@@ -62,7 +61,6 @@ public class CodeCoverageDataAttachmentsHandlerTests
         foreach (var file in files)
             File.Copy(file, Path.Combine(testFilesDirectory, Path.GetFileName(file)));
     }
-#endif
 
     [TestMethod]
     public async Task HandleDataCollectionAttachmentSetsShouldReturnEmptySetWhenNoAttachmentsOrAttachmentsAreNull()
@@ -104,6 +102,9 @@ public class CodeCoverageDataAttachmentsHandlerTests
     {
         var file1Path = Path.Combine(TestFilesDirectory, "fullcovered.cobertura.xml");
         var file2Path = Path.Combine(Path.Combine(TestFilesDirectory, "fullcovered.coverage"));
+        Assert.IsTrue(File.Exists(file1Path));
+        Assert.IsTrue(File.Exists(file2Path));
+
         var attachmentSet = new AttachmentSet(new Uri("datacollector://microsoft/CodeCoverage/2.0"), string.Empty);
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(file1Path), "coverage"));
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(file2Path), "coverage"));
@@ -125,6 +126,8 @@ public class CodeCoverageDataAttachmentsHandlerTests
     public async Task HandleDataCollectionAttachmentSetsShouldReturnInputIf2SameFormatAttachments()
     {
         var file1Path = Path.Combine(TestFilesDirectory, "fullcovered.cobertura.xml");
+        Assert.IsTrue(File.Exists(file1Path));
+
         var attachmentSet = new AttachmentSet(new Uri("datacollector://microsoft/CodeCoverage/2.0"), string.Empty);
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(file1Path), "coverage"));
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(file1Path), "coverage"));
@@ -202,6 +205,8 @@ public class CodeCoverageDataAttachmentsHandlerTests
     public async Task MergingPerTestCodeCoverageReturnsOneCoverageFile()
     {
         string file1Path = Path.Combine(TestFilesDirectory, "fullcovered.cobertura.xml");
+        Assert.IsTrue(File.Exists(file1Path));
+
         var attachmentSet = new AttachmentSet(new Uri("datacollector://microsoft/CodeCoverage/2.0"), string.Empty);
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(file1Path), "coverage"));
         attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(file1Path), "coverage"));
