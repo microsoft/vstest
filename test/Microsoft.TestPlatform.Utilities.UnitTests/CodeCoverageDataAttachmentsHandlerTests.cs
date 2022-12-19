@@ -55,7 +55,7 @@ public class CodeCoverageDataAttachmentsHandlerTests
     {
         // Copying test files to correct place,
         var assemblyPath = AppDomain.CurrentDomain.BaseDirectory;
-        var testFilesDirectory = Path.Combine(context.DeploymentDirectory, "TestFiles");
+        var testFilesDirectory = Path.Combine(context.DeploymentDirectory!, "TestFiles");
         Directory.CreateDirectory(testFilesDirectory);
         var files = Directory.GetFiles(Path.Combine(assemblyPath, "TestFiles"));
         foreach (var file in files)
