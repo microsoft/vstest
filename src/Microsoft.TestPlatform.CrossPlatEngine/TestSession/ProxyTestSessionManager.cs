@@ -165,7 +165,8 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         // to create proxies for.
         if (_proxySetupFailed)
         {
-            if (DisposalPolicy == ProxyDisposalOnCreationFailPolicy.DisposeAllOnFailure)
+            if (DisposalPolicy == ProxyDisposalOnCreationFailPolicy.DisposeAllOnFailure
+                || _proxyContainerList.Count == 0)
             {
                 requestData?.MetricsCollection.Add(
                     TelemetryDataConstants.TestSessionState,

@@ -34,6 +34,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 [SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class ProxyOperationManager
 {
+    internal const string DotnetTesthostFriendlyName = "DotnetTestHost";
+    internal const string DefaultTesthostFriendlyName = "DefaultTestHost";
+
     private readonly string _versionCheckPropertyName = "IsVersionCheckRequired";
     private readonly string _makeRunsettingsCompatiblePropertyName = "MakeRunsettingsCompatible";
     private readonly ManualResetEventSlim _testHostExited = new(false);
@@ -416,7 +419,17 @@ public class ProxyOperationManager
         return updatedRunSettingsXml;
     }
 
-    private bool IsTesthostCompatibleWithTestSessions()
+    internal virtual string ReadTesthostFriendlyName()
+    {
+        var friendlyNameAttribute = TestHostManager.GetType().GetCustomAttributes(
+                typeof(FriendlyNameAttribute), true)
+            .FirstOrDefault();
+
+        return (friendlyNameAttribute is not null and FriendlyNameAttribute friendlyName)
+            ? friendlyName.FriendlyName : string.Empty;
+    }
+
+    internal bool IsTesthostCompatibleWithTestSessions()
     {
         // These constants should be kept in line with the friendly names found in
         // DotnetTestHostManager.cs, respectively DefaultTestHostManager.cs.
@@ -430,13 +443,13 @@ public class ProxyOperationManager
         // means to support test sessions. Should extending session functionality to 3rd party
         // testhosts be something we want to address in the future, we should come up with such
         // a specification first.
-        const string dotnetTesthostFriendlyName = "DotnetTestHost";
-        const string defaultTesthostFriendlyName = "DefaultTestHost";
-
-        var friendlyNameAttribute = TestHostManager.GetType().GetCustomAttributes(typeof(FriendlyNameAttribute), true).FirstOrDefault();
-        if (friendlyNameAttribute is not null and FriendlyNameAttribute friendlyName)
+        var friendlyName = ReadTesthostFriendlyName();
+        if (!friendlyName.IsNullOrEmpty())
         {
-            return friendlyName.FriendlyName is (dotnetTesthostFriendlyName or defaultTesthostFriendlyName);
+            var isSessionSupported = friendlyName is (DotnetTesthostFriendlyName or DefaultTesthostFriendlyName);
+            EqtTrace.Verbose($"ProxyOperationManager.IsTesthostCompatibleWithTestSessions: Testhost friendly name: {friendlyName}; Sessions support: {isSessionSupported};");
+
+            return isSessionSupported;
         }
 
         return false;
