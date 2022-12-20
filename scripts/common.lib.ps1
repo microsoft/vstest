@@ -116,14 +116,12 @@ function Install-DotNetCli
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '3.1' -Architecture $x64Architecture -NoPath # Install the latest patch
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '5.0' -Architecture $x64Architecture -NoPath # Install the latest patch
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '6.0' -Architecture $x64Architecture -NoPath # Install the latest patch
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Channel '7.0' -Architecture $x64Architecture -NoPath # Install the latest patch
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Channel '7.0' -Architecture $x64Architecture -NoPath -Version $env:DOTNET_CLI_VERSION
 
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '2.1' -Architecture x86 -NoPath # Install the latest patch
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '3.1' -Architecture x86 -NoPath # Install the latest patch
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '5.0' -Architecture x86 -NoPath # Install the latest patch
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '6.0' -Architecture x86 -NoPath # Install the latest patch
-    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Channel '7.0' -Architecture x86 -NoPath # Install the latest patch
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Channel '7.0' -Architecture x86 -NoPath -Version $env:DOTNET_CLI_VERSION
 
     $env:DOTNET_ROOT= $dotnetInstallPath
