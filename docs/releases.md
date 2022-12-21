@@ -1,5 +1,9 @@
 # Release Notes
 
+## 17.5.0-preview-20221221-03
+
+### Issues Fixed
+
 * Add test run serialization feature [#4126](https://github.com/microsoft/vstest/pull/4126)
 * Ensure that the OnAbort message is sent if the testhost aborts early [#3993](https://github.com/microsoft/vstest/pull/3993)
 * Add custom satellite assemblies resolution [#4133](https://github.com/microsoft/vstest/pull/4133)
