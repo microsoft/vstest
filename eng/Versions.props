@@ -87,6 +87,6 @@
     <MicrosoftSourceBuildIntermediatediagnosticsVersion>6.0.0-preview.22424.1</MicrosoftSourceBuildIntermediatediagnosticsVersion>
     <MicrosoftVisualStudioTelemetryVersion>16.6.11</MicrosoftVisualStudioTelemetryVersion>
     <MicrosoftVisualStudioRemoteControlVersion>16.3.44</MicrosoftVisualStudioRemoteControlVersion>
-    <MicrosoftVisualStudioUtilitiesInternalVersion>16.3.36</MicrosoftVisualStudioUtilitiesInternalVersion>
+    <MicrosoftVisualStudioUtilitiesInternalVersion>16.3.38</MicrosoftVisualStudioUtilitiesInternalVersion>
   </PropertyGroup>
 </Project>
