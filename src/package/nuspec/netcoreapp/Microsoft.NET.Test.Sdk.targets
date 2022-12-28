@@ -16,7 +16,7 @@
     Output type for .NET Core test projects should be exe.
     https://devdiv.visualstudio.com/DevDiv/_workitems?id=375688&_a=edit
   -->
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(OutputType)' != 'WinExe' And '$(OutputType)' != 'Exe'" >
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
