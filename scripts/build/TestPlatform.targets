@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TestPlatformRoot>$(MSBuildThisFileDirectory)..\..\</TestPlatformRoot>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
-    <NoWarn>$(NoWarn);CA1416;RS0037</NoWarn>
+    <NoWarn>$(NoWarn);CA1416;RS0037;CS1570;CS1572;CS1573;CS1574;CS1584;CS1591;CS1658;CS1712;CS1734</NoWarn>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Localization.targets" />
