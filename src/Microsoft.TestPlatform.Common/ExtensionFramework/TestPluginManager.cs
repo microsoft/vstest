@@ -88,11 +88,16 @@ internal class TestPluginManager
     /// <summary>
     /// Retrieves the test extension collections of given extension type.
     /// </summary>
+    /// <typeparam name="TPluginInfo">
+    /// </typeparam>
     /// <typeparam name="TExtension">
     /// Type of the required extensions
     /// </typeparam>
-    /// <typeparam name="TMetadata">
+    /// <typeparam name="IMetadata">
     /// Type of metadata of required extensions
+    /// </typeparam>
+    /// <typeparam name="TMetadata">
+    /// Concrete type of metadata
     /// </typeparam>
     /// <param name="endsWithPattern">
     /// Pattern used to select files using String.EndsWith
@@ -124,8 +129,11 @@ internal class TestPluginManager
     /// <typeparam name="TExtension">
     /// Type of the required extensions
     /// </typeparam>
-    /// <typeparam name="TMetadata">
+    /// <typeparam name="IMetadata">
     /// Type of metadata of required extensions
+    /// </typeparam>
+    /// <typeparam name="TMetadata">
+    /// Concrete type of metadata
     /// </typeparam>
     /// <param name="unfiltered">
     /// Receives unfiltered list of test extensions
@@ -173,8 +181,11 @@ internal class TestPluginManager
     /// <typeparam name="TExtension">
     /// Type of the required extensions
     /// </typeparam>
-    /// <typeparam name="TMetadata">
+    /// <typeparam name="IMetadata">
     /// Type of metadata of required extensions
+    /// </typeparam>
+    /// <typeparam name="TMetadata">
+    /// Concrete type of metadata
     /// </typeparam>
     /// <param name="testPluginInfo">
     /// The test extension dictionary.
