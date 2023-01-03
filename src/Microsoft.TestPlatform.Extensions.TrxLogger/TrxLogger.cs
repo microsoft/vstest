@@ -747,12 +747,11 @@ public class TrxLogger : ITestLoggerWithParameters
     private TrxLoggerObjectModel.TestOutcome ChangeTestOutcomeIfNecessary(TrxLoggerObjectModel.TestOutcome outcome)
     {
         TPDebug.Assert(IsInitialized, "Logger is not initialized");
-        TPDebug.Assert(_parametersDictionary is not null, "_parametersDictionary is null");
 
         // If no tests discovered/executed and TreatNoTestsAsError was set to True
         // We will return ResultSummary as Failed
         // Note : we only send the value of TreatNoTestsAsError if it is "True"
-        if (TotalTestCount == 0 && _parametersDictionary.ContainsKey(ObjectModelConstants.TreatNoTestsAsError))
+        if (TotalTestCount == 0 && _parametersDictionary?.ContainsKey(ObjectModelConstants.TreatNoTestsAsError) == true)
         {
             outcome = TrxLoggerObjectModel.TestOutcome.Failed;
         }
