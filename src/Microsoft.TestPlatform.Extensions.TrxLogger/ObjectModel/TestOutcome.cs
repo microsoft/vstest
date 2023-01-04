@@ -88,7 +88,7 @@ internal enum TestOutcome
     /// </summary>
     Pending,
 
-    // NOTE: OLD CODE WAS  Min = Error and Max = Pending
+    // NOTE: OLD CODE WAS Min = Error and Max = Pending
     // This doesn't work well with the coversion to string for the reason explained here:
     // https://learn.microsoft.com/en-us/dotnet/api/system.enum.tostring?view=net-7.0
     // Notes to Callers: If multiple enumeration members have the same underlying value and you attempt to retrieve the
