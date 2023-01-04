@@ -88,13 +88,6 @@ internal enum TestOutcome
     /// </summary>
     Pending,
 
-    // NOTE: OLD CODE WAS Min = Error and Max = Pending
-    // This doesn't work well with the conversion to string for the reason explained here:
-    // https://learn.microsoft.com/dotnet/api/system.enum.tostring?view=net-7.0
-    // Notes to Callers: If multiple enumeration members have the same underlying value and you attempt to retrieve the
-    // string representation of an enumeration member's name based on its underlying value
-    // We fixed removing the equality above to break less as possible. But the returned value won't be the expected Min/Max
-
     /// <summary>
     /// The min value of this enum
     /// </summary>
