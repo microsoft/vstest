@@ -89,7 +89,7 @@ internal enum TestOutcome
     Pending,
 
     // NOTE: OLD CODE WAS Min = Error and Max = Pending
-    // This doesn't work well with the coversion to string for the reason explained here:
+    // This doesn't work well with the conversion to string for the reason explained here:
     // https://learn.microsoft.com/en-us/dotnet/api/system.enum.tostring?view=net-7.0
     // Notes to Callers: If multiple enumeration members have the same underlying value and you attempt to retrieve the
     // string representation of an enumeration member's name based on its underlying value
