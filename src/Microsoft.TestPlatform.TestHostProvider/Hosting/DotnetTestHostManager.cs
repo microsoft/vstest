@@ -50,6 +50,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 public class DotnetTestHostManager : ITestRuntimeProvider2
 {
     private const string DotnetTestHostUri = "HostProvider://DotnetTestHost";
+    // Should the friendly name ever change, please make sure to change the corresponding constant
+    // inside ProxyOperationManager::IsTesthostCompatibleWithTestSessions().
     private const string DotnetTestHostFriendlyName = "DotnetTestHost";
     private const string TestAdapterRegexPattern = @"TestAdapter.dll";
     private const string PROCESSOR_ARCHITECTURE = nameof(PROCESSOR_ARCHITECTURE);
@@ -431,8 +433,14 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                     EqtTrace.Verbose($"DotnetTestHostmanager: Forcing the search to x64 architecure, IsDefaultTargetArchitecture '{_runsettingHelper.IsDefaultTargetArchitecture}' OS '{_platformEnvironment.OperatingSystem}' framework '{_targetFramework}'");
                 }
 
+                // Check if DOTNET_ROOT resolution should be bypassed.
+                var shouldIgnoreDotnetRoot = (_environmentVariableHelper.GetEnvironmentVariable("VSTEST_IGNORE_DOTNET_ROOT")?.Trim() ?? "0") != "0";
+                var muxerResolutionStrategy = shouldIgnoreDotnetRoot
+                        ? (DotnetMuxerResolutionStrategy.GlobalInstallationLocation | DotnetMuxerResolutionStrategy.DefaultInstallationLocation)
+                        : DotnetMuxerResolutionStrategy.Default;
+
                 PlatformArchitecture finalTargetArchitecture = forceToX64 ? PlatformArchitecture.X64 : targetArchitecture;
-                if (!_dotnetHostHelper.TryGetDotnetPathByArchitecture(finalTargetArchitecture, out string? muxerPath))
+                if (!_dotnetHostHelper.TryGetDotnetPathByArchitecture(finalTargetArchitecture, muxerResolutionStrategy, out string? muxerPath))
                 {
                     string message = string.Format(CultureInfo.CurrentCulture, Resources.NoDotnetMuxerFoundForArchitecture, $"dotnet{(_platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : string.Empty)}", finalTargetArchitecture.ToString());
                     EqtTrace.Error(message);
@@ -536,6 +544,10 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                     return PlatformArchitecture.ARM;
                 case Architecture.ARM64:
                     return PlatformArchitecture.ARM64;
+                case Architecture.S390x:
+                    return PlatformArchitecture.S390x;
+                case Architecture.Ppc64le:
+                    return PlatformArchitecture.Ppc64le;
                 case Architecture.AnyCPU:
                 case Architecture.Default:
                 default:
@@ -552,6 +564,8 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 Architecture.X64 => platformAchitecture == PlatformArchitecture.X64,
                 Architecture.ARM => platformAchitecture == PlatformArchitecture.ARM,
                 Architecture.ARM64 => platformAchitecture == PlatformArchitecture.ARM64,
+                Architecture.S390x => platformAchitecture == PlatformArchitecture.S390x,
+                Architecture.Ppc64le => platformAchitecture == PlatformArchitecture.Ppc64le,
                 _ => throw new TestPlatformException($"Invalid target architecture '{targetArchitecture}'"),
             };
 
@@ -620,9 +634,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
         var framework = config.TargetFramework;
 
-        // This is expected to be called once every run so returning a new instance every time.
-        return framework!.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-               || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
+        return framework!.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
                || framework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 

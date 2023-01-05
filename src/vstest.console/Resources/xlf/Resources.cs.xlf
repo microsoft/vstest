@@ -1199,6 +1199,41 @@
         <target state="translated">Při hostování komunikačního kanálu došlo k chybě.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProcDumpToolDirectoryPathArgumenNotFound">
+        <source>ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</source>
+        <target state="translated">Pro instalaci nebo odinstalaci ladicího programu postmortem by se měla zadat cesta ProcDumpToolDirectoryPath.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PostmortemDebuggerNotSupportedForCurrentOS">
+        <source>Postmortem debugger is not supported in the current OS.</source>
+        <target state="translated">Ladicí program postmortem se v aktuálním operačním systému nepodporuje.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpToolDirectoryPath">
+        <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)</source>
+        <target state="translated">Adresář zadaný pro spustitelný soubor procdump není platný a nástroj nebyl nalezen v proměnných prostředí (PROCDUMP_PATH, PATH).</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpFileNameNotFound">
+        <source>Procdump file name not found: '{0}'</source>
+        <target state="translated">Název souboru Procdump se nenašel: {0}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpDirectoryPathArgumenNotFound">
+        <source>DumpDirectoryPath should be specified to install the post mortem debugger.</source>
+        <target state="translated">Pro instalaci ladicího programu postmortem by se měla zadat cesta DumpDirectoryPath.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpDirectoryPath">
+        <source>The directory specified is not valid: '{0}'</source>
+        <target state="translated">Zadaný adresář není platný: {0}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidAeDebuggerArgument">
+        <source>AeDebugger argument '{0}' is not valid.</source>
+        <target state="translated">Argument AeDebugger {0} není platný.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

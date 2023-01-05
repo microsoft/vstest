@@ -477,28 +477,29 @@ public class TrxLogger : ITestLoggerWithParameters
     private string AcquireTrxFileNamePath(out bool shouldOverwrite)
     {
         TPDebug.Assert(IsInitialized, "Logger is not initialized");
-        TPDebug.Assert(_parametersDictionary is not null, "_parametersDictionary is null");
 
         shouldOverwrite = false;
-        var isLogFileNameParameterExists = _parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string? logFileNameValue) && !logFileNameValue.IsNullOrWhiteSpace();
-        var isLogFilePrefixParameterExists = _parametersDictionary.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string? logFilePrefixValue) && !logFilePrefixValue.IsNullOrWhiteSpace();
-
         string? filePath = null;
 
-        if (isLogFilePrefixParameterExists)
+        if (_parametersDictionary is not null)
         {
-            if (_parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var framework) && framework != null)
+            var isLogFileNameParameterExists = _parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string? logFileNameValue) && !logFileNameValue.IsNullOrWhiteSpace();
+            var isLogFilePrefixParameterExists = _parametersDictionary.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string? logFilePrefixValue) && !logFilePrefixValue.IsNullOrWhiteSpace();
+            if (isLogFilePrefixParameterExists)
             {
-                framework = NuGetFramework.Parse(framework).GetShortFolderName();
-                logFilePrefixValue = logFilePrefixValue + "_" + framework;
-            }
+                if (_parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var framework) && framework != null)
+                {
+                    framework = NuGetFramework.Parse(framework).GetShortFolderName();
+                    logFilePrefixValue = logFilePrefixValue + "_" + framework;
+                }
 
-            filePath = _trxFileHelper.GetNextTimestampFileName(_testResultsDirPath, logFilePrefixValue + _trxFileExtension, "_yyyyMMddHHmmss");
-        }
-        else if (isLogFileNameParameterExists)
-        {
-            filePath = Path.Combine(_testResultsDirPath, logFileNameValue!);
-            shouldOverwrite = true;
+                filePath = _trxFileHelper.GetNextTimestampFileName(_testResultsDirPath, logFilePrefixValue + _trxFileExtension, "_yyyyMMddHHmmss");
+            }
+            else if (isLogFileNameParameterExists)
+            {
+                filePath = Path.Combine(_testResultsDirPath, logFileNameValue!);
+                shouldOverwrite = true;
+            }
         }
 
         filePath ??= SetDefaultTrxFilePath();
@@ -608,27 +609,13 @@ public class TrxLogger : ITestLoggerWithParameters
         TestCase testCase = rockSteadyTestResult.TestCase;
         Guid testId = Converter.GetTestId(testCase);
 
-        // Scenario for inner test case when parent test element is not present.
-        string? testName = testCase.DisplayName;
-        var adapter = testCase.ExecutorUri.ToString();
-        if (adapter.Contains(TrxLoggerConstants.MstestAdapterString) &&
-            parentTestElement == null &&
-            !string.IsNullOrEmpty(rockSteadyTestResult.DisplayName))
-        {
-            // Note: For old mstest adapters hierarchical support was not present. Thus inner result of data driven was identified using test result display name.
-            // Non null test result display name means its a inner result of data driven/ordered test.
-            // Changing GUID to keep supporting old mstest adapters.
-            testId = Guid.NewGuid();
-            testName = rockSteadyTestResult.DisplayName;
-        }
-
         // Get test element
         testElement = GetTestElement(testId);
 
         // Create test element
         if (testElement == null)
         {
-            testElement = Converter.ToTestElement(testId, executionId, parentExecutionId, testName!, testType, testCase);
+            testElement = Converter.ToTestElement(testId, executionId, parentExecutionId, testCase.DisplayName, testType, testCase);
             _testElements.TryAdd(testId, testElement);
         }
 
@@ -760,12 +747,11 @@ public class TrxLogger : ITestLoggerWithParameters
     private TrxLoggerObjectModel.TestOutcome ChangeTestOutcomeIfNecessary(TrxLoggerObjectModel.TestOutcome outcome)
     {
         TPDebug.Assert(IsInitialized, "Logger is not initialized");
-        TPDebug.Assert(_parametersDictionary is not null, "_parametersDictionary is null");
 
         // If no tests discovered/executed and TreatNoTestsAsError was set to True
         // We will return ResultSummary as Failed
         // Note : we only send the value of TreatNoTestsAsError if it is "True"
-        if (TotalTestCount == 0 && _parametersDictionary.ContainsKey(ObjectModelConstants.TreatNoTestsAsError))
+        if (TotalTestCount == 0 && _parametersDictionary?.ContainsKey(ObjectModelConstants.TreatNoTestsAsError) == true)
         {
             outcome = TrxLoggerObjectModel.TestOutcome.Failed;
         }

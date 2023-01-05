@@ -95,7 +95,7 @@ public class InferRunSettingsHelper
         var document = new XmlDocument();
         document.Load(reader);
 
-        var runSettingsNavigator = document.CreateNavigator();
+        var runSettingsNavigator = document.CreateNavigator()!;
 
         // Move navigator to RunConfiguration node
         if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
@@ -155,7 +155,7 @@ public class InferRunSettingsHelper
     /// <param name="resultsDirectory"> The results directory. </param>
     public static void UpdateRunSettingsWithUserProvidedSwitches(XmlDocument runSettingsDocument, Architecture architecture, Framework framework, string? resultsDirectory)
     {
-        var runSettingsNavigator = runSettingsDocument.CreateNavigator();
+        var runSettingsNavigator = runSettingsDocument.CreateNavigator()!;
 
         ValidateRunConfiguration(runSettingsNavigator);
 
@@ -325,7 +325,7 @@ public class InferRunSettingsHelper
             using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
             var document = new XmlDocument();
             document.Load(reader);
-            var runSettingsNavigator = document.CreateNavigator();
+            var runSettingsNavigator = document.CreateNavigator()!;
 
             var node = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings");
             if (node == null)
@@ -338,7 +338,7 @@ public class InferRunSettingsHelper
             var legacySettingElements = new List<string>();
             while (childNodes.MoveNext())
             {
-                legacySettingElements.Add(childNodes.Current.Name);
+                legacySettingElements.Add(childNodes.Current!.Name);
             }
 
             foreach (var executionNodePath in ExecutionNodesPaths)
@@ -414,7 +414,7 @@ public class InferRunSettingsHelper
             using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
             var document = new XmlDocument();
             document.Load(reader);
-            var runSettingsNavigator = document.CreateNavigator();
+            var runSettingsNavigator = document.CreateNavigator()!;
 
             var node = runSettingsNavigator.SelectSingleNode(EnvironmentVariablesNodePath);
             if (node == null)
@@ -456,7 +456,7 @@ public class InferRunSettingsHelper
         ValidateArg.NotNull(runSettingsNavigator, nameof(runSettingsNavigator));
 
         deviceXml = null;
-        XPathNavigator targetDeviceNode = runSettingsNavigator.SelectSingleNode(MsTestTargetDeviceNodePath);
+        var targetDeviceNode = runSettingsNavigator.SelectSingleNode(MsTestTargetDeviceNodePath);
         if (targetDeviceNode != null)
         {
             deviceXml = targetDeviceNode.InnerXml;
@@ -483,7 +483,7 @@ public class InferRunSettingsHelper
             var document = new XmlDocument();
             document.Load(reader);
 
-            var runSettingsNavigator = document.CreateNavigator();
+            var runSettingsNavigator = document.CreateNavigator()!;
 
             // Move navigator to MSTest node
             if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
@@ -512,9 +512,9 @@ public class InferRunSettingsHelper
         // Navigator should be at Root of runsettings xml, attempt to move to /RunSettings/RunConfiguration
         var root = xmlDocument.DocumentElement;
 
-        if (root.SelectSingleNode(RunConfigurationNodePath) == null)
+        if (root?.SelectSingleNode(RunConfigurationNodePath) == null)
         {
-            if (root.Name == RunSettingsNodeName)
+            if (root?.Name == RunSettingsNodeName)
             {
                 // When just <RunSettings></RunSettings> is provided in the runsettings string, then this will add the common RunConfiguration inner node.
                 XmlUtilities.AppendOrModifyChild(xmlDocument, RunConfigurationNodePath, RunConfigurationNodeName, innerXml: null);
@@ -705,21 +705,12 @@ public class InferRunSettingsHelper
     /// </summary>
     private static bool IsPlatformIncompatible(Architecture sourcePlatform, Architecture targetPlatform)
     {
-        if (sourcePlatform is Architecture.Default or Architecture.AnyCPU)
-        {
-            return false;
-        }
-
-        return targetPlatform == Architecture.X64 && !Is64BitOperatingSystem() || sourcePlatform != targetPlatform;
+        return sourcePlatform is not Architecture.Default and not Architecture.AnyCPU
+            && (targetPlatform == Architecture.X64 && !Is64BitOperatingSystem() || sourcePlatform != targetPlatform);
 
         static bool Is64BitOperatingSystem()
         {
-#if !NETSTANDARD1_3
             return Environment.Is64BitOperatingSystem;
-#else
-            // In the absence of APIs to check, assume the majority case
-            return true;
-#endif
         }
     }
 

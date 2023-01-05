@@ -1199,6 +1199,41 @@
         <target state="translated">Ошибка при размещении коммуникационного канала.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProcDumpToolDirectoryPathArgumenNotFound">
+        <source>ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</source>
+        <target state="translated">Для установки или удаления отладчика с разбором итогов необходимо указать ProcDumpToolDirectoryPath.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PostmortemDebuggerNotSupportedForCurrentOS">
+        <source>Postmortem debugger is not supported in the current OS.</source>
+        <target state="translated">Отладчик с разбором итогов не поддерживается в текущей ОС.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpToolDirectoryPath">
+        <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)</source>
+        <target state="translated">Каталог, указанный для исполняемого файла procdump, недействителен, а инструмент не найден в переменных среды (PROCDUMP_PATH, PATH).</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpFileNameNotFound">
+        <source>Procdump file name not found: '{0}'</source>
+        <target state="translated">Не найдено имя файла procdump: "{0}"</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpDirectoryPathArgumenNotFound">
+        <source>DumpDirectoryPath should be specified to install the post mortem debugger.</source>
+        <target state="translated">Для установки отладчика с разбором итогов необходимо указать DumpDirectoryPath.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpDirectoryPath">
+        <source>The directory specified is not valid: '{0}'</source>
+        <target state="translated">Указан недопустимый каталог: "{0}"</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidAeDebuggerArgument">
+        <source>AeDebugger argument '{0}' is not valid.</source>
+        <target state="translated">Аргумент AeDebugger "{0}" недопустим.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

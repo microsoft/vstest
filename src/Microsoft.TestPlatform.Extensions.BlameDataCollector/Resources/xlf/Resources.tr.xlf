@@ -83,6 +83,11 @@ Bu test, kilitlenmenin kaynağı olmayabilir veya olmayabilir.</target>
         <target state="translated">{0} bulunamadı, lütfen yürütülebilir dosyanın PATH üzerinde kullanılabilir olduğundan emin olun veya PROCDUMP_PATH ortam değişkenini {0} yürütülebilir dosyasını içeren bir dizine ayarlayın.</target>
         <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
       </trans-unit>
+      <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
+        <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
+        <target state="translated">Postmortem hata ayıklayıcısı izleyicisi için geçersiz 'DumpDirectoryPath'</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

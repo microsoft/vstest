@@ -1199,6 +1199,41 @@
         <target state="translated">裝載通訊通道時發生錯誤。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProcDumpToolDirectoryPathArgumenNotFound">
+        <source>ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</source>
+        <target state="translated">應指定 ProcDumpToolDirectoryPath 以安裝或解除安裝事後剖析偵錯工具。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PostmortemDebuggerNotSupportedForCurrentOS">
+        <source>Postmortem debugger is not supported in the current OS.</source>
+        <target state="translated">目前的作業系統不支援 Postmortem 偵錯工具。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpToolDirectoryPath">
+        <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)</source>
+        <target state="translated">指定給 procdump 可執行檔的目錄無效，而且在環境變數 (PROCDUMP_PATH, PATH) 中找不到工具</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpFileNameNotFound">
+        <source>Procdump file name not found: '{0}'</source>
+        <target state="translated">找不到 procdump 檔案名稱: '{0}'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpDirectoryPathArgumenNotFound">
+        <source>DumpDirectoryPath should be specified to install the post mortem debugger.</source>
+        <target state="translated">應指定 DumpDirectoryPath 以安裝事後剖析偵錯工具。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpDirectoryPath">
+        <source>The directory specified is not valid: '{0}'</source>
+        <target state="translated">指定的目錄無效: '{0}'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidAeDebuggerArgument">
+        <source>AeDebugger argument '{0}' is not valid.</source>
+        <target state="translated">AeDebugger 引數 '{0}' 無效。</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

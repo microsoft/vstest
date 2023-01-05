@@ -16,6 +16,7 @@ public static class ClientUtilities
 {
     private const string TestSettingsFileXPath = "RunSettings/MSTest/SettingsFile";
     private const string ResultsDirectoryXPath = "RunSettings/RunConfiguration/ResultsDirectory";
+    private const string DotnetHostPathXPath = "RunSettings/RunConfiguration/DotNetHostPath";
     private const string RunsettingsDirectory = "RunSettingsDirectory";
 
     /// <summary>
@@ -28,7 +29,7 @@ public static class ClientUtilities
         ValidateArg.NotNull(xmlDocument, nameof(xmlDocument));
         ValidateArg.NotNullOrEmpty(path, nameof(path));
 
-        string root = Path.GetDirectoryName(path);
+        var root = Path.GetDirectoryName(path)!;
 
         AddRunSettingsDirectoryNode(xmlDocument, root);
 
@@ -43,13 +44,19 @@ public static class ClientUtilities
         {
             FixNodeFilePath(resultsDirectoryNode, root);
         }
+
+        var dotnetHostPathNode = xmlDocument.SelectSingleNode(DotnetHostPathXPath);
+        if (dotnetHostPathNode != null)
+        {
+            FixNodeFilePath(dotnetHostPathNode, root);
+        }
     }
 
     private static void AddRunSettingsDirectoryNode(XmlDocument doc, string path)
     {
         var node = doc.CreateNode(XmlNodeType.Element, RunsettingsDirectory, string.Empty);
         node.InnerXml = path;
-        doc.DocumentElement.AppendChild(node);
+        doc.DocumentElement!.AppendChild(node);
     }
 
     private static void FixNodeFilePath(XmlNode node, string root)

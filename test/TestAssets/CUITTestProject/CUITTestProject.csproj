@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <AssemblyName>CUITTestProject</AssemblyName>
-    <TargetFrameworks>$(TargetNetFxVersion)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkMinimum)</TargetFrameworks>
     <OutputType Condition="$(NetCoreAppTargetFramework) == 'true' ">Exe</OutputType>
   </PropertyGroup>
 

@@ -34,6 +34,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 [SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Would cause a breaking change if users are inheriting this class and implement IDisposable")]
 public class ProxyOperationManager
 {
+    internal const string DotnetTesthostFriendlyName = "DotnetTestHost";
+    internal const string DefaultTesthostFriendlyName = "DefaultTestHost";
+
     private readonly string _versionCheckPropertyName = "IsVersionCheckRequired";
     private readonly string _makeRunsettingsCompatiblePropertyName = "MakeRunsettingsCompatible";
     private readonly ManualResetEventSlim _testHostExited = new(false);
@@ -114,7 +117,13 @@ public class ProxyOperationManager
     /// <summary>
     /// Gets the proxy operation manager id for proxy test session manager internal organization.
     /// </summary>
-    public int Id { get; set; } = -1;
+    internal int Id { get; set; } = -1;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the current proxy operation manager is part of a
+    /// test session.
+    /// </summary>
+    internal bool IsTestSessionEnabled { get; set; }
 
     /// <summary>
     /// Gets or sets the cancellation token source.
@@ -175,6 +184,13 @@ public class ProxyOperationManager
         if (_initialized)
         {
             return true;
+        }
+
+        // Check whether test sessions are supported if the current proxy operation manager is to
+        // be part of one.
+        if (IsTestSessionEnabled && !IsTesthostCompatibleWithTestSessions())
+        {
+            return false;
         }
 
         var connTimeout = EnvironmentHelper.GetConnectionTimeout();
@@ -271,11 +287,11 @@ public class ProxyOperationManager
 
             // Throw a test platform exception along with the error messages from the test if the test host exited unexpectedly
             // before communication was established.
-            ThrowOnTestHostExited(_testHostExited.IsSet);
+            ThrowOnTestHostExited(sources, _testHostExited.IsSet);
 
             // Throw a test platform exception stating the connection to test could not be established even after waiting
             // for the configure timeout period.
-            ThrowExceptionOnConnectionFailure(connTimeout);
+            ThrowExceptionOnConnectionFailure(sources, connTimeout);
         }
 
         // Handling special case for dotnet core projects with older test hosts.
@@ -403,6 +419,42 @@ public class ProxyOperationManager
         return updatedRunSettingsXml;
     }
 
+    internal virtual string ReadTesthostFriendlyName()
+    {
+        var friendlyNameAttribute = TestHostManager.GetType().GetCustomAttributes(
+                typeof(FriendlyNameAttribute), true)
+            .FirstOrDefault();
+
+        return (friendlyNameAttribute is not null and FriendlyNameAttribute friendlyName)
+            ? friendlyName.FriendlyName : string.Empty;
+    }
+
+    internal bool IsTesthostCompatibleWithTestSessions()
+    {
+        // These constants should be kept in line with the friendly names found in
+        // DotnetTestHostManager.cs, respectively DefaultTestHostManager.cs.
+        //
+        // We agreed on checking the test session compatibility this way (i.e. by reading the
+        // friendly name and making sure it's one of the testhosts we control) instead of a more
+        // generic alternative that was initially proposed (i.e. by decorating each testhost
+        // manager with a capability attribute that could tell us if the test session scenario
+        // is supported for the testhost in discussion) because of the breaking risks associated
+        // with the latter approach. Also, there is no formal specification for now of what it
+        // means to support test sessions. Should extending session functionality to 3rd party
+        // testhosts be something we want to address in the future, we should come up with such
+        // a specification first.
+        var friendlyName = ReadTesthostFriendlyName();
+        if (!friendlyName.IsNullOrEmpty())
+        {
+            var isSessionSupported = friendlyName is (DotnetTesthostFriendlyName or DefaultTesthostFriendlyName);
+            EqtTrace.Verbose($"ProxyOperationManager.IsTesthostCompatibleWithTestSessions: Testhost friendly name: {friendlyName}; Sessions support: {isSessionSupported};");
+
+            return isSessionSupported;
+        }
+
+        return false;
+    }
+
     [return: NotNullIfNotNull("logFile")]
     private static string? GetTimestampedLogFile(string? logFile)
     {
@@ -459,17 +511,17 @@ public class ProxyOperationManager
         RequestSender.OnClientProcessExit(_testHostProcessStdError);
     }
 
-    private void ThrowOnTestHostExited(bool testHostExited)
+    private void ThrowOnTestHostExited(IEnumerable<string> sources, bool testHostExited)
     {
         if (testHostExited)
         {
             // We might consider passing standard output here in case standard error is not
             // available because some errors don't end up in the standard error output.
-            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, _testHostProcessStdError));
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, string.Join("', '", sources), _testHostProcessStdError));
         }
     }
 
-    private void ThrowExceptionOnConnectionFailure(int connTimeout)
+    private void ThrowExceptionOnConnectionFailure(IEnumerable<string> sources, int connTimeout)
     {
         // Failed to launch testhost process.
         var errorMsg = CrossPlatEngineResources.InitializationFailed;
@@ -490,7 +542,7 @@ public class ProxyOperationManager
         if (!StringUtils.IsNullOrWhiteSpace(_testHostProcessStdError))
         {
             // Testhost failed with error.
-            errorMsg = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, _testHostProcessStdError);
+            errorMsg = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, string.Join("', '", sources), _testHostProcessStdError);
         }
 
         throw new TestPlatformException(errorMsg);

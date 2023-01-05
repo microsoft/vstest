@@ -6,9 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-#if !NETCOREAPP1_0
 using System.Globalization;
-#endif
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -27,6 +25,31 @@ public partial class ProcessHelper : IProcessHelper
 {
     private static readonly string Arm = "arm";
     private readonly Process _currentProcess = Process.GetCurrentProcess();
+
+#if !NET5_0_OR_GREATER
+    private IEnvironment _environment;
+#endif
+
+    /// <summary>
+    /// Default constructor.
+    /// </summary>
+    public ProcessHelper() : this(new PlatformEnvironment())
+    {
+    }
+
+    internal ProcessHelper(IEnvironment environment)
+    {
+#if !NET5_0_OR_GREATER
+        _environment = environment;
+#endif
+    }
+
+    /// <summary>
+    /// Gets or sets the set of environment variables to be used when spawning a new process.
+    /// Should this set of environment variables be null, the environment variables inherited from
+    /// the parent process will be used.
+    /// </summary>
+    internal static IDictionary<string, string?>? ExternalEnvironmentVariables { get; set; }
 
     /// <inheritdoc/>
     public object LaunchProcess(string processPath, string? arguments, string? workingDirectory, IDictionary<string, string?>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack)
@@ -65,6 +88,31 @@ public partial class ProcessHelper : IProcessHelper
 
             process.EnableRaisingEvents = true;
 
+            // When vstest.console is started in its own process in VisualStudio it is TestWindowStoreHost that starts it.
+            // TestWindowStoreHost inherits environment variables from ServiceHost and DevEnv. Those env variables,
+            // contain multiple "internal" environment variables, and they also contain DOTNET_ROOT pointing to the 
+            // .NET that is shipped with VisualStudio. So to work around this, vstest.console is given a set of environment
+            // variables that has only variables that DevEnv was started with. So it gets a "clean" set of env variables.
+            //
+            // When we run vstest.console in process, we cannot start ourselves with the same clean set of env variables,
+            // and the best we can do is to start our child processes (testhost / datacollector) with this environment.
+            // To do that we pass that set of "clean" env variables down to the ProcessHelper, and use those instead
+            // of all the variables that are set in the current process.
+            if (ExternalEnvironmentVariables is not null)
+            {
+                process.StartInfo.EnvironmentVariables.Clear();
+                foreach (var kvp in ExternalEnvironmentVariables)
+                {
+                    if (kvp.Value is null)
+                    {
+                        continue;
+                    }
+
+                    process.StartInfo.AddEnvironmentVariable(kvp.Key, kvp.Value);
+                }
+            }
+
+            // Set additional environment variables.
             if (envVariables != null)
             {
                 foreach (var kvp in envVariables)
@@ -88,6 +136,8 @@ public partial class ProcessHelper : IProcessHelper
             {
                 process.Exited += async (sender, args) =>
                 {
+                    const int timeout = 500;
+
                     if (sender is Process p)
                     {
                         try
@@ -104,11 +154,47 @@ public partial class ProcessHelper : IProcessHelper
                             //
                             // For older frameworks, the solution is more tricky but it seems we can get the expected
                             // behavior using the parameterless 'WaitForExit()' combined with an awaited Task.Run call.
-                            var cts = new CancellationTokenSource(500);
+                            var cts = new CancellationTokenSource(timeout);
 #if NET5_0_OR_GREATER
                             await p.WaitForExitAsync(cts.Token);
 #else
-                            await Task.Run(() => p.WaitForExit(), cts.Token);
+                            // NOTE: In case we run on Windows we must call 'WaitForExit(timeout)' instead of calling
+                            // the parameterless overload. The reason for this requirement stems from the behavior of
+                            // the Selenium WebDriver when debugging a test. If the debugger is detached, the default
+                            // action is to kill the testhost process that it was attached to, but for some reason we
+                            // end up with a zombie process that would make us wait indefinitely with a simple
+                            // 'WaitForExit()' call. This in turn causes the vstest.console to block waiting for the
+                            // test request to finish and this behavior will be visible to the user since TW will
+                            // show the Selenium test as still running. Only killing the Edge Driver process would help
+                            // unblock vstest.console, but this is not a reasonable ask to our users.
+                            //
+                            // TODO: This fix is not ideal, it's only a workaround to make Selenium tests usable again.
+                            // Ideally, we should spend some more time here in order to better understand what causes
+                            // the testhost to become a zombie process in the first place.
+                            if (_environment.OperatingSystem is PlatformOperatingSystem.Windows)
+                            {
+                                p.WaitForExit(timeout);
+                            }
+                            else
+                            {
+                                cts.Token.Register(() =>
+                                {
+                                    try
+                                    {
+                                        if (!p.HasExited)
+                                        {
+                                            p.Kill();
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        // Ignore all exceptions thrown when trying to kill a process that may be
+                                        // left hanging. This is a best effort to kill it, but should we fail for
+                                        // any reason we'd probably block on 'WaitForExit()' anyway.
+                                    }
+                                });
+                                await Task.Run(() => p.WaitForExit(), cts.Token).ConfigureAwait(false);
+                            }
 #endif
                         }
                         catch

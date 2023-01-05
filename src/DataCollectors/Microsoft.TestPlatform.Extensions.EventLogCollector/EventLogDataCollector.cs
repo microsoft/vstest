@@ -335,7 +335,7 @@ public class EventLogDataCollector : DataCollector
         return strings;
     }
 
-    private void OnSessionStart(object sender, SessionStartEventArgs e)
+    private void OnSessionStart(object? sender, SessionStartEventArgs e)
     {
         ValidateArg.NotNull(e, nameof(e));
         ValidateArg.NotNull(e.Context, "SessionStartEventArgs.Context");
@@ -345,7 +345,7 @@ public class EventLogDataCollector : DataCollector
         StartCollectionForContext(e.Context);
     }
 
-    private void OnSessionEnd(object sender, SessionEndEventArgs e)
+    private void OnSessionEnd(object? sender, SessionEndEventArgs e)
     {
         ValidateArg.NotNull(e, nameof(e));
         ValidateArg.NotNull(e.Context, "SessionEndEventArgs.Context");
@@ -355,7 +355,7 @@ public class EventLogDataCollector : DataCollector
         WriteCollectedEventLogEntries(e.Context, true, TimeSpan.MaxValue, DateTime.UtcNow);
     }
 
-    private void OnTestCaseStart(object sender, TestCaseStartEventArgs e)
+    private void OnTestCaseStart(object? sender, TestCaseStartEventArgs e)
     {
         ValidateArg.NotNull(e, nameof(e));
         ValidateArg.NotNull(e.Context, "TestCaseStartEventArgs.Context");
@@ -371,7 +371,7 @@ public class EventLogDataCollector : DataCollector
         StartCollectionForContext(e.Context);
     }
 
-    private void OnTestCaseEnd(object sender, TestCaseEndEventArgs e)
+    private void OnTestCaseEnd(object? sender, TestCaseEndEventArgs e)
     {
         ValidateArg.NotNull(e, nameof(e));
         TPDebug.Assert(e.Context != null, "Context is null");
@@ -446,7 +446,7 @@ public class EventLogDataCollector : DataCollector
         var fileName = WriteEventLogs(eventLogEntries, isSessionEnd ? int.MaxValue : MaxEntries, dataCollectionContext, requestedDuration, timeRequestReceived);
 
         // Add the directory to the list
-        _eventLogDirectories.Add(Path.GetDirectoryName(fileName));
+        _eventLogDirectories.Add(Path.GetDirectoryName(fileName)!);
 
         lock (ContextMap)
         {
@@ -568,23 +568,19 @@ public class EventLogDataCollector : DataCollector
 
     private EventLogSessionContext GetEventLogSessionContext(DataCollectionContext dataCollectionContext)
     {
-        EventLogSessionContext eventLogSessionContext;
-        bool eventLogContainerFound;
         lock (ContextMap)
         {
-            eventLogContainerFound = ContextMap.TryGetValue(dataCollectionContext, out eventLogSessionContext);
+            if (ContextMap.TryGetValue(dataCollectionContext, out var eventLogSessionContext))
+            {
+                return eventLogSessionContext;
+            }
         }
 
-        if (!eventLogContainerFound)
-        {
-            string msg = string.Format(
+        string msg = string.Format(
                 CultureInfo.CurrentCulture,
                 Resource.ContextNotFoundException,
                 dataCollectionContext.ToString());
-            throw new EventLogCollectorException(msg, null);
-        }
-
-        return eventLogSessionContext;
+        throw new EventLogCollectorException(msg, null);
     }
 
 }

@@ -119,27 +119,27 @@ internal class FilterExpression
     /// </summary>
     internal string[]? ValidForProperties(IEnumerable<string>? properties, Func<string, TestProperty?>? propertyProvider)
     {
-        string[]? invalidProperties = null;
-
         if (null == properties)
         {
             // if null, initialize to empty list so that invalid properties can be found.
             properties = Enumerable.Empty<string>();
         }
 
-        bool valid = false;
-        if (_condition != null)
+        return IterateFilterExpression<string[]?>((current, result) =>
         {
-            valid = _condition.ValidForProperties(properties, propertyProvider);
-            if (!valid)
+            // Only the leaves have a condition value.
+            if (current._condition != null)
             {
-                invalidProperties = new string[1] { _condition.Name };
+                bool valid = false;
+                valid = current._condition.ValidForProperties(properties, propertyProvider);
+                // If it's not valid will add it to the function's return array.
+                return !valid ? new string[1] { current._condition.Name } : null;
             }
-        }
-        else
-        {
-            invalidProperties = _left!.ValidForProperties(properties, propertyProvider);
-            var invalidRight = _right!.ValidForProperties(properties, propertyProvider);
+
+            // Concatenate the children node's result to get their parent result.
+            var invalidRight = current._right != null ? result.Pop() : null;
+            var invalidProperties = current._left != null ? result.Pop() : null;
+
             if (null == invalidProperties)
             {
                 invalidProperties = invalidRight;
@@ -148,9 +148,10 @@ internal class FilterExpression
             {
                 invalidProperties = invalidProperties.Concat(invalidRight).ToArray();
             }
-        }
 
-        return invalidProperties;
+            return invalidProperties;
+        });
+
     }
 
     /// <summary>
@@ -265,7 +266,46 @@ internal class FilterExpression
 
         return filterStack.Pop();
     }
+    private T IterateFilterExpression<T>(Func<FilterExpression, Stack<T>, T> getNodeValue)
+    {
+        FilterExpression? current = this;
+        // Will have the nodes.
+        Stack<FilterExpression> filterStack = new();
+        // Will contain the nodes results to use them in thier parent result's calculation
+        // and at the end will have the root result.
+        Stack<T> result = new();
 
+        do
+        {
+            // Push root's right child and then root to stack then Set root as root's left child.
+            while (current != null)
+            {
+                if (current._right != null)
+                {
+                    filterStack.Push(current._right);
+                }
+                filterStack.Push(current);
+                current = current._left;
+            }
+
+            // If the popped item has a right child and the right child is at top of stack,
+            // then remove the right child from stack, push the root back and set root as root's right child.
+            current = filterStack.Pop();
+            if (filterStack.Count > 0 && current._right == filterStack.Peek())
+            {
+                filterStack.Pop();
+                filterStack.Push(current);
+                current = current._right;
+                continue;
+            }
+
+            result.Push(getNodeValue(current, result));
+            current = null;
+        } while (filterStack.Count > 0);
+
+        TPDebug.Assert(result.Count == 1, "Result stack should have one element at the end.");
+        return result.Peek();
+    }
     /// <summary>
     /// Evaluate filterExpression with given propertyValueProvider.
     /// </summary>
@@ -274,19 +314,25 @@ internal class FilterExpression
     internal bool Evaluate(Func<string, object?> propertyValueProvider)
     {
         ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
-        bool filterResult = false;
-        if (null != _condition)
+
+        return IterateFilterExpression<bool>((current, result) =>
         {
-            filterResult = _condition.Evaluate(propertyValueProvider);
-        }
-        else
-        {
-            // & or | operator
-            bool leftResult = _left!.Evaluate(propertyValueProvider);
-            bool rightResult = _right!.Evaluate(propertyValueProvider);
-            filterResult = _areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
-        }
-        return filterResult;
+            bool filterResult = false;
+            // Only the leaves have a condition value.
+            if (null != current._condition)
+            {
+                filterResult = current._condition.Evaluate(propertyValueProvider);
+            }
+            else
+            {
+                // & or | operator
+                bool rightResult = current._right != null ? result.Pop() : false;
+                bool leftResult = current._left != null ? result.Pop() : false;
+                // Concatenate the children node's result to get their parent result.
+                filterResult = current._areJoinedByAnd ? leftResult && rightResult : leftResult || rightResult;
+            }
+            return filterResult;
+        });
     }
 
     internal static IEnumerable<string> TokenizeFilterExpressionString(string str)

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD1_0
-
 using System;
 using System.Collections.Concurrent;
 
@@ -52,6 +50,13 @@ internal partial class FeatureFlag : IFeatureFlag
     // multiple different tfms and architectures to run at the same time.
     public const string DISABLE_MULTI_TFM_RUN = VSTEST_ + nameof(DISABLE_MULTI_TFM_RUN);
 
+    // Disables setting a higher value for SetMinThreads. Setting SetMinThreads value to higher allows testhost to connect back faster
+    // even though we are blocking additional threads becuase we don't have to wait for ThreadPool to start more threads.
+    public const string DISABLE_THREADPOOL_SIZE_INCREASE = VSTEST_ + nameof(DISABLE_THREADPOOL_SIZE_INCREASE);
+
+    // Disable the SerialTestRunDecorator
+    public const string DISABLE_SERIALTESTRUN_DECORATOR = VSTEST_ + nameof(DISABLE_SERIALTESTRUN_DECORATOR);
+
     [Obsolete("Only use this in tests.")]
     internal static void Reset()
     {
@@ -64,5 +69,3 @@ internal partial class FeatureFlag : IFeatureFlag
         _cache[key] = value;
     }
 }
-
-#endif

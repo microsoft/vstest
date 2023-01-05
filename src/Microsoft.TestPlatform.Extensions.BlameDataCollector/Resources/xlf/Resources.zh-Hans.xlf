@@ -83,6 +83,11 @@ This test may, or may not be the source of the crash.</source>
         <target state="translated">找不到 {0}，请确保可执行文件在路径上可用，或者将 PROCDUMP_PATH 环境变量设置为包含 {0} 可执行文件的目录。</target>
         <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
       </trans-unit>
+      <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
+        <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
+        <target state="translated">事后分析调试程序监视器的 “DumpDirectoryPath” 无效</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

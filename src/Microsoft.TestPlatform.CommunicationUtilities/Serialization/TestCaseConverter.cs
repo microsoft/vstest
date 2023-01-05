@@ -73,7 +73,8 @@ public class TestCaseConverter : JsonConverter
             switch (testProperty.Id)
             {
                 case "TestCase.Id":
-                    testCase.Id = Guid.Parse(propertyData!); break;
+                    testCase.Id = GuidPolyfill.Parse(propertyData!, CultureInfo.InvariantCulture);
+                    break;
                 case "TestCase.ExecutorUri":
                     testCase.ExecutorUri = new Uri(propertyData!); break;
                 case "TestCase.FullyQualifiedName":

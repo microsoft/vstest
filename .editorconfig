@@ -312,8 +312,8 @@ csharp_prefer_simple_default_expression = true:suggestion
 csharp_style_deconstructed_variable_declaration = true:suggestion
 csharp_style_inlined_variable_declaration = true:suggestion
 csharp_style_prefer_local_over_anonymous_function = false:suggestion # not default, default is true, avoided because we use anonymous functions in multiple places and it does not make the code clearer
-csharp_style_prefer_index_operator = true:suggestion
-csharp_style_prefer_range_operator = true:suggestion
+csharp_style_prefer_index_operator = false:warning # not default, default is true, disabled because Index operator is not supported in all the TFMs we support. (supported on .Net Core 3.0+)
+csharp_style_prefer_range_operator = false:warning # not default, default is true, disabled because Range operator is not supported in all the TFMs we support. (supported on .Net Core 3.0+)
 csharp_style_throw_expression = true:suggestion
 csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
@@ -330,6 +330,9 @@ csharp_style_prefer_parameter_null_checking = false # not default, disabled as n
 
 # IDE0055: Fix formatting - Set the severity of all .NET and C# formatting rules (https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/formatting-rules)
 dotnet_diagnostic.IDE0055.severity = warning # ensure all formatting rules are enforced on build
+
+# IDE0057: Use range operator
+dotnet_diagnostic.IDE0057.severity = none # Range operator is not supported in some TFMs.
 
 #### C# Formatting Rules ####
 

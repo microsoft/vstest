@@ -45,6 +45,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 public class DefaultTestHostManager : ITestRuntimeProvider2
 {
     private const string DefaultTestHostUri = "HostProvider://DefaultTestHost";
+    // Should the friendly name ever change, please make sure to change the corresponding constant
+    // inside ProxyOperationManager::IsTesthostCompatibleWithTestSessions().
     private const string DefaultTestHostFriendlyName = "DefaultTestHost";
     private const string TestAdapterEndsWithPattern = @"TestAdapter.dll";
 
@@ -274,6 +276,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             PlatformArchitecture.ARM => Architecture.ARM,
             PlatformArchitecture.ARM64 => Architecture.ARM64,
             PlatformArchitecture.S390x => Architecture.S390x,
+            PlatformArchitecture.Ppc64le => Architecture.Ppc64le,
             _ => throw new NotSupportedException(),
         };
 

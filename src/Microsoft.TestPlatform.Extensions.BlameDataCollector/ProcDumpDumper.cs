@@ -9,6 +9,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -29,6 +31,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     private readonly IProcessHelper _processHelper;
     private readonly IFileHelper _fileHelper;
     private readonly IEnvironment _environment;
+    private readonly IEnvironmentVariableHelper _environmentVariableHelper;
     private Process? _procDumpProcess;
     private string? _tempDirectory;
     private string? _dumpFileName;
@@ -36,17 +39,28 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     private string? _outputDirectory;
     private Process? _process;
     private string? _outputFilePrefix;
+    private readonly ProcDumpExecutableHelper _procDumpExecutableHelper;
 
     public ProcDumpDumper()
-        : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment())
+        : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), new EnvironmentVariableHelper())
     {
     }
 
-    public ProcDumpDumper(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment)
+    public ProcDumpDumper(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment) :
+        this(processHelper, fileHelper, environment, new EnvironmentVariableHelper())
     {
         _processHelper = processHelper;
         _fileHelper = fileHelper;
         _environment = environment;
+    }
+
+    internal ProcDumpDumper(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, IEnvironmentVariableHelper environmentVariableHelper)
+    {
+        _processHelper = processHelper;
+        _fileHelper = fileHelper;
+        _environment = environment;
+        _environmentVariableHelper = environmentVariableHelper;
+        _procDumpExecutableHelper = new ProcDumpExecutableHelper(processHelper, fileHelper, environment, environmentVariableHelper);
     }
 
     [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
@@ -86,7 +100,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
             throw new InvalidOperationException("Procdump crash dump file must end with .dmp extension.");
         }
 
-        if (!TryGetProcDumpExecutable(processId, out var procDumpPath))
+        if (!_procDumpExecutableHelper.TryGetProcDumpExecutable(processId, out var procDumpPath))
         {
             var procdumpNotFound = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ProcDumpNotFound, procDumpPath);
             logWarning(procdumpNotFound);
@@ -168,8 +182,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         // There can be more dumps in the crash folder from the child processes that were .NET5 or newer and crashed
         // get only the ones that match the path we provide to procdump. And get the last one created.
         var allTargetProcessDumps = allDumps
-            .Where(dump => Path.GetFileNameWithoutExtension(dump)
-                .StartsWith(_outputFilePrefix))
+            .Where(dump => Path.GetFileNameWithoutExtension(dump).StartsWith(_outputFilePrefix ?? string.Empty))
             .Select(dump => new FileInfo(dump))
             .OrderBy(dump => dump.LastWriteTime).ThenBy(dump => dump.Name)
             .ToList();
@@ -206,7 +219,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
             throw new InvalidOperationException("Procdump crash dump file must end with .dmp extension.");
         }
 
-        if (!TryGetProcDumpExecutable(processId, out var procDumpPath))
+        if (!_procDumpExecutableHelper.TryGetProcDumpExecutable(processId, out var procDumpPath))
         {
             var err = $"{procDumpPath} could not be found, please set PROCDUMP_PATH environment variable to a directory that contains {procDumpPath} executable, or make sure that the executable is available on PATH.";
             ConsoleOutput.Instance.Warning(false, err);
@@ -237,91 +250,5 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         _processHelper?.WaitForProcessExit(procDumpProcess);
 
         EqtTrace.Info($"ProcDumpDumper.Dump: ProcDump finished hang dumping process with id '{processId}'.");
-    }
-
-    /// <summary>
-    /// Try get proc dump executable path from env variable or PATH, if it does not success the result is false, and the name of the exe we tried to find.
-    /// </summary>
-    /// <param name="processId">
-    /// Process Id to determine the bittness
-    /// </param>
-    /// <param name="path">
-    /// Path to procdump or the name of the executable we tried to resolve when we don't find it
-    /// </param>
-    /// <returns>proc dump executable path</returns>
-    private bool TryGetProcDumpExecutable(int processId, out string path)
-    {
-        var procdumpDirectory = Environment.GetEnvironmentVariable("PROCDUMP_PATH");
-        var searchPath = false;
-        if (procdumpDirectory.IsNullOrWhiteSpace())
-        {
-            EqtTrace.Verbose("ProcDumpDumper.GetProcDumpExecutable: PROCDUMP_PATH env variable is empty will try to run ProcDump from PATH.");
-            searchPath = true;
-        }
-        else if (!Directory.Exists(procdumpDirectory))
-        {
-            EqtTrace.Verbose($"ProcDumpDumper.GetProcDumpExecutable: PROCDUMP_PATH env variable '{procdumpDirectory}' is not a directory, or the directory does not exist. Will try to run ProcDump from PATH.");
-            searchPath = true;
-        }
-
-        string filename;
-        if (_environment.OperatingSystem == PlatformOperatingSystem.Windows)
-        {
-            // Launch proc dump according to process architecture
-            var targetProcessArchitecture = _processHelper.GetProcessArchitecture(processId);
-            filename = targetProcessArchitecture switch
-            {
-                PlatformArchitecture.X86 => "procdump.exe",
-                PlatformArchitecture.ARM64 => "procdump64a.exe",
-                _ => "procdump64.exe",
-            };
-        }
-        else
-        {
-            filename = _environment.OperatingSystem is PlatformOperatingSystem.Unix or PlatformOperatingSystem.OSX
-                ? Constants.ProcdumpUnixProcess
-                : throw new NotSupportedException($"Not supported platform {_environment.OperatingSystem}");
-        }
-
-        if (!searchPath)
-        {
-            var candidatePath = Path.Combine(procdumpDirectory, filename);
-            if (File.Exists(candidatePath))
-            {
-                EqtTrace.Verbose($"ProcDumpDumper.GetProcDumpExecutable: Path to ProcDump '{candidatePath}' exists, using that.");
-                path = candidatePath;
-                return true;
-            }
-
-            EqtTrace.Verbose($"ProcDumpDumper.GetProcDumpExecutable: Path '{candidatePath}' does not exist will try to run {filename} from PATH.");
-        }
-
-        if (TryGetExecutablePath(filename, out var p))
-        {
-            EqtTrace.Verbose($"ProcDumpDumper.GetProcDumpExecutable: Resolved {filename} to {p} from PATH.");
-            path = p;
-            return true;
-        }
-
-        EqtTrace.Verbose($"ProcDumpDumper.GetProcDumpExecutable: Could not find {filename} on PATH.");
-        path = filename;
-        return false;
-    }
-
-    private bool TryGetExecutablePath(string executable, out string executablePath)
-    {
-        executablePath = string.Empty;
-        var pathString = Environment.GetEnvironmentVariable("PATH");
-        foreach (string path in pathString.Split(Path.PathSeparator))
-        {
-            string exeFullPath = Path.Combine(path.Trim(), executable);
-            if (_fileHelper.Exists(exeFullPath))
-            {
-                executablePath = exeFullPath;
-                return true;
-            }
-        }
-
-        return false;
     }
 }

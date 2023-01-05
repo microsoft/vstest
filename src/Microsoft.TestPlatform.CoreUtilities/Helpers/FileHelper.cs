@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD1_0
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -122,5 +120,3 @@ public class FileHelper : IFileHelper
     public long GetFileLength(string path)
         => new FileInfo(path).Length;
 }
-
-#endif

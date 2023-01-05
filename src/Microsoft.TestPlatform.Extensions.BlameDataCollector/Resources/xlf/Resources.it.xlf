@@ -83,6 +83,11 @@ Il test potrebbe essere l'origine dell'arresto anomalo.</target>
         <target state="translated">{0} non è stato trovato, verificare che il file eseguibile sia disponibile in PATH. In alternativa, impostare la variabile di ambiente PROCDUMP_PATH su una directory che contiene {0} eseguibile</target>
         <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
       </trans-unit>
+      <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
+        <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
+        <target state="translated">Il valore di 'DumpDirectoryPath' non è valido per il monitoraggio del debugger effettuato dopo che l'applicazione è terminata.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

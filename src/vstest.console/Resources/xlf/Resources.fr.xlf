@@ -1199,6 +1199,41 @@ Comportements actuellement pris en charge :
         <target state="translated">Erreur lors de l’hébergement du canal de communication</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProcDumpToolDirectoryPathArgumenNotFound">
+        <source>ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</source>
+        <target state="translated">ProcDumpToolDirectoryPath doit être spécifié pour installer ou annuler l’installation du débogueur post-mortem.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PostmortemDebuggerNotSupportedForCurrentOS">
+        <source>Postmortem debugger is not supported in the current OS.</source>
+        <target state="translated">Le débogueur post-mortem n’est pas pris en charge dans le système d’exploitation actuel.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpToolDirectoryPath">
+        <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)</source>
+        <target state="translated">Le répertoire spécifié pour l’exécutable procdump n’est pas valide et l’outil est introuvable dans les variables d’environnement (PROCDUMP_PATH, PATH)</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpFileNameNotFound">
+        <source>Procdump file name not found: '{0}'</source>
+        <target state="translated">Nom de fichier procdump introuvable : '{0}'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpDirectoryPathArgumenNotFound">
+        <source>DumpDirectoryPath should be specified to install the post mortem debugger.</source>
+        <target state="translated">DumpDirectoryPath doit être spécifié pour installer le débogueur post-mortem.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpDirectoryPath">
+        <source>The directory specified is not valid: '{0}'</source>
+        <target state="translated">Le répertoire spécifié n’est pas valide : «{0}»</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidAeDebuggerArgument">
+        <source>AeDebugger argument '{0}' is not valid.</source>
+        <target state="translated">L’argument AeDebugger '{0}' n’est pas valide.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -616,6 +616,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";InvalidAeDebuggerArgument" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[AeDebugger argument '{0}' is not valid.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA['{0}' AeDebugger bağımsız değişkeni geçerli değil.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";InvalidArgument" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[The argument {0} is invalid. Please use the /help option to check the list of valid arguments.]]></Val>
@@ -742,6 +751,27 @@
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[--Port|/Port bağımsız değişkeni tamsayı olan bir bağlantı noktası numarası gerektirir. Yuva bağlantısına ve olay iletilerini almaya yönelik bağlantı noktasını belirtin.]]></Val>
           </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";InvalidProcDumpDirectoryPath" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The directory specified is not valid: '{0}']]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Belirtilen dizin geçerli değil: '{0}']]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";InvalidProcDumpToolDirectoryPath" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Procdump yürütülebilir dosyası için belirtilen dizin geçerli değil ve araç ortam değişkenleri içinde bulunamadı (PROCDUMP_PATH, PATH)]]></Val>
+          </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[The directory specified for the procdump executable is not valid and the tool was not found inside environment variables(PROCDUMP_PATH, PATH)]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1116,6 +1146,42 @@
           <Val><![CDATA[--Port|/Port:<Port>]D;]A;      The Port for socket connection and receiving the event messages.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[--Port|/Port:<Bağlantı Noktası>]D;]A;      Yuva bağlantısı ve olay iletilerini almaya yönelik Bağlantı Noktası.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";PostmortemDebuggerNotSupportedForCurrentOS" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Postmortem debugger is not supported in the current OS.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Postmortem hata ayıklayıcısı mevcut işletim sisteminde desteklenmiyor.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ProcDumpDirectoryPathArgumenNotFound" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[DumpDirectoryPath should be specified to install the post mortem debugger.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Son mortem hata ayıklayıcısını yüklemek için DumpDirectoryPath belirtilmelidir.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ProcDumpFileNameNotFound" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Procdump file name not found: '{0}']]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Procdump dosya adı bulunamadı: '{0}']]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ProcDumpToolDirectoryPathArgumenNotFound" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[İşlem sonrası hata ayıklayıcısını yüklemek veya kaldırmak için ProcDumpToolDirectoryPath belirtilmelidir.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

@@ -50,8 +50,6 @@ public class IntegrationTestBase
     private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _chutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools".Replace('\\', Path.DirectorySeparatorChar);
 
-    protected static readonly bool IsWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
-
     public enum UnitTestFramework
     {
         NUnit, XUnit, MSTest, CPP, Chutzpah
@@ -202,7 +200,7 @@ public class IntegrationTestBase
 
         if (arguments.Contains(".csproj"))
         {
-            arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" " + arguments;
+            arguments += $@" -p:VsTestConsolePath=""{vstestConsolePath}""";
         }
 
         // This is used in dotnet/sdk to determine path to vstest.console:
@@ -420,12 +418,12 @@ public class IntegrationTestBase
 
     public void StdOutputContains(string substring)
     {
-        Assert.IsTrue(_standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.IsTrue(_standardTestOutput.Contains(substring), $"StdOutput:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void StdOutputDoesNotContains(string substring)
     {
-        Assert.IsFalse(_standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.IsFalse(_standardTestOutput.Contains(substring), $"StdOutput:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void ExitCodeEquals(int exitCode)
@@ -626,7 +624,7 @@ public class IntegrationTestBase
         }
         else if (IsNetCoreRunner())
         {
-            var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
+            var executablePath = OSUtils.IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
             consoleRunnerPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
         }
         else
@@ -678,7 +676,7 @@ public class IntegrationTestBase
         var consoleRunnerPath = IsNetCoreRunner()
                 ? GetDotnetRunnerPath()
                 : GetConsoleRunnerPath();
-        var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
+        var executablePath = OSUtils.IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
         var dotnetPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
 
         if (!File.Exists(dotnetPath))
@@ -770,7 +768,7 @@ public class IntegrationTestBase
 
         environmentVariables["DOTNET_MULTILEVEL_LOOKUP"] = "0";
 
-        var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
+        var executablePath = OSUtils.IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
         var patchedDotnetPath = Path.Combine(_testEnvironment.TestArtifactsDirectory, executablePath);
         ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
     }
@@ -920,7 +918,7 @@ public class IntegrationTestBase
 
     protected string BuildMultipleAssemblyPath(params string[] assetNames)
     {
-        // Double quoted sources sepearated by space.
+        // Double quoted sources separated by space.
         return string.Join(" ", GetTestDlls(assetNames).Select(a => a.AddDoubleQuote()));
     }
 
@@ -954,7 +952,7 @@ public class IntegrationTestBase
             architecture == "X86" ?
             "dotnet_x86" :
             $"dotnet",
-            $"dotnet{(IsWindows ? ".exe" : "")}");
+            $"dotnet{(OSUtils.IsWindows ? ".exe" : "")}");
 
         Assert.IsTrue(File.Exists(path));
 

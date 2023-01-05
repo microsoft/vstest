@@ -3,8 +3,8 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkMinimum);$(NetCoreAppMinimum)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">$(NetCoreAppMinimum)</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
@@ -18,10 +18,10 @@
   <PropertyGroup Condition="$(NetCoreAppTargetFramework) == 'true' and $(Configuration) == 'Release'">
     <DebugType>portable</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' and $(Configuration) == 'Debug'">
+  <PropertyGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' and $(Configuration) == 'Debug'">
     <DebugType>full</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)' and $(Configuration) == 'Release'">
+  <PropertyGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' and $(Configuration) == 'Release'">
     <DebugType>portable</DebugType>
   </PropertyGroup>
 </Project>

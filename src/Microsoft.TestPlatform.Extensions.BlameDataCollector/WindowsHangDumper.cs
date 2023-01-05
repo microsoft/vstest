@@ -131,17 +131,17 @@ internal class WindowsHangDumper : IHangDumper
                 PlatformArchitecture.X86 => "DumpMinitool.x86.exe",
                 PlatformArchitecture.X64 => "DumpMinitool.exe",
                 PlatformArchitecture.ARM64 => "DumpMinitool.arm64.exe",
-                _ => null
+                _ => string.Empty
             };
 
-            if (dumpMinitoolName == null)
+            if (dumpMinitoolName == string.Empty)
             {
                 EqtTrace.Verbose($"WindowsHangDumper.CollectDump: The target process architecture is {targetProcessArchitecture}, we don't have a DumpMinitool for that, falling back to using PInvoke directly.");
                 MiniDumpWriteDump.CollectDumpUsingMiniDumpWriteDump(process, outputFile, FromDumpType(type));
             }
 
             var args = $"--file \"{outputFile}\" --processId {process.Id} --dumpType {type}";
-            var dumpMinitoolPath = Path.Combine(Path.GetDirectoryName(Assembly.GetCallingAssembly().Location), "dump", dumpMinitoolName);
+            var dumpMinitoolPath = Path.Combine(Path.GetDirectoryName(Assembly.GetCallingAssembly().Location)!, "dump", dumpMinitoolName);
             EqtTrace.Verbose($"WindowsHangDumper.CollectDump: The target process architecture is {targetProcessArchitecture}, dumping it via {dumpMinitoolName}.");
 
             if (!File.Exists(dumpMinitoolPath))

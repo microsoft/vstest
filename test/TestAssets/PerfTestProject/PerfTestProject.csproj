@@ -7,16 +7,16 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.Settings.targets" />
   <PropertyGroup>
-    <TargetFrameworks>$(TargetNetFxVersion);$(TargetNetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkMinimum);$(NetCoreAppMinimum)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <OutputType Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">Exe</OutputType>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <AssemblyName>PerfTestProject</AssemblyName>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == '$(TargetNetCoreVersion)' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == '$(NetCoreAppMinimum)' ">
     <DebugType>portable</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == '$(TargetNetFxVersion)'">
+  <PropertyGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)'">
     <DebugType>full</DebugType>
   </PropertyGroup>
   <ItemGroup>

@@ -1199,6 +1199,41 @@
         <target state="translated">Błąd podczas hostowania kanału komunikacji.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProcDumpToolDirectoryPathArgumenNotFound">
+        <source>ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</source>
+        <target state="translated">Właściwość ProcDumpToolDirectoryPath powinna być określona w celu zainstalowania lub usunięcia debugera post mortem.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PostmortemDebuggerNotSupportedForCurrentOS">
+        <source>Postmortem debugger is not supported in the current OS.</source>
+        <target state="translated">Debuger postmortem nie jest obsługiwany w bieżącym systemie operacyjnym.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpToolDirectoryPath">
+        <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)</source>
+        <target state="translated">Katalog określony dla pliku wykonywalnego procdump jest nieprawidłowy i nie znaleziono narzędzia wewnątrz zmiennych środowiskowych (PROCDUMP_PATH, PATH)</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpFileNameNotFound">
+        <source>Procdump file name not found: '{0}'</source>
+        <target state="translated">Nie znaleziono nazwy pliku procdump: „{0}”</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpDirectoryPathArgumenNotFound">
+        <source>DumpDirectoryPath should be specified to install the post mortem debugger.</source>
+        <target state="translated">Należy określić element DumpDirectoryPath, aby zainstalować debuger post mortem.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpDirectoryPath">
+        <source>The directory specified is not valid: '{0}'</source>
+        <target state="translated">Określony katalog jest nieprawidłowy: „{0}”</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidAeDebuggerArgument">
+        <source>AeDebugger argument '{0}' is not valid.</source>
+        <target state="translated">Argument AeDebugger „{0}” jest nieprawidłowy.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

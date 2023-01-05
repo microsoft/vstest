@@ -5,47 +5,16 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard2.0;$(TargetNetFxVersion)</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0;netstandard2.0;$(NetFrameworkMinimum)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net7.0</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.AdapterUtilities</AssemblyName>
     <RootNamespace>Microsoft.TestPlatform.AdapterUtilities</RootNamespace>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
-    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
-    <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
-
-    <!-- On non windows environment, make UAP behave like desktop .NET framework -->
-    <TargetFrameworkIdentifier Condition="'$(OS)' != 'Windows_NT'">.NETFramework</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion Condition="'$(OS)' != 'Windows_NT'">v4.6.2</TargetFrameworkVersion>
-    <IsTestProject>false</IsTestProject>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == '$(TargetNetFxVersion)'">
+  <PropertyGroup Condition="'$(TargetFramework)' == '$(NetFrameworkMinimum)'">
     <RuntimeIdentifier>any</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="5.1.0" />
-    <PackageReference Include="System.Net.Http" Version="$(SystemNetHttpVersion)" />
-
-    <!-- CVE-2018-8356 mitigation -->
-    <PackageReference Include="System.ServiceModel.Duplex" Version="$(SystemServiceModelVersion)" />
-    <PackageReference Include="System.ServiceModel.NetTcp" Version="$(SystemServiceModelVersion)" />
-    <PackageReference Include="System.ServiceModel.Primitives" Version="$(SystemServiceModelVersion)" />
-    <PackageReference Include="System.ServiceModel.Security" Version="$(SystemServiceModelVersion)" />
-    <PackageReference Include="System.Private.ServiceModel" Version="$(SystemServiceModelVersion)" />
-    <PackageReference Include="System.ServiceModel.Http" Version="$(SystemServiceModelVersion)" />
-    <!-- / CVE-2018-8356 mitigation -->
-  </ItemGroup>
 
   <ItemGroup Condition="'$(DotNetBuildFromSource)' != 'true'">
     <!-- CVE-2019-0657 mitigation -->
@@ -71,9 +40,6 @@
     <!-- API that is common to all frameworks that we build for. -->
     <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
-    <!-- API that is common to all frameworks except for .NET Standard 1.0 and UAP10. -->
-    <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' AND '$(TargetFramework)' != 'uap10.0' " Include="PublicAPI\net\PublicAPI.Shipped.txt" />
-    <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' AND '$(TargetFramework)' != 'uap10.0' " Include="PublicAPI\net\PublicAPI.Unshipped.txt" />
   </ItemGroup>
 
   <ItemGroup>

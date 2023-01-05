@@ -47,7 +47,7 @@ Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelp
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetCurrentProcessId() -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetCurrentProcessLocation() -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetNativeDllDirectory() -> string!
-Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessHandle(int processId) -> System.IntPtr
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessHandle(int processId) -> nint
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessId(object? process) -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessName(int processId) -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetTestEngineDirectory() -> string?
@@ -67,6 +67,7 @@ Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture.ARM = 2 -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture.ARM64 = 3 -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture.S390x = 4 -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture.Ppc64le = 5 -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture.X64 = 1 -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture.X86 = 0 -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyExtensions
@@ -102,7 +103,7 @@ Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetCurren
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetCurrentProcessId() -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetCurrentProcessLocation() -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetNativeDllDirectory() -> string!
-Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessHandle(int processId) -> System.IntPtr
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessHandle(int processId) -> nint
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessId(object? process) -> int
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessName(int processId) -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetTestEngineDirectory() -> string?
@@ -119,4 +120,3 @@ static Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.ErrorOnI
 static Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformAssemblyExtensions.GetAssemblyLocation(this System.Reflection.Assembly! assembly) -> string!
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IProcessHelper.GetProcessArchitecture(int processId) -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
 Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessHelper.GetProcessArchitecture(int processId) -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
-

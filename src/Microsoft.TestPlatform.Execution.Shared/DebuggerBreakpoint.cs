@@ -1,6 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if USE_EXTERN_ALIAS
+extern alias Abstraction;
+#endif
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -8,7 +12,11 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
+#if USE_EXTERN_ALIAS
+using Abstraction::Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+#else
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+#endif
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.Execution;
@@ -43,7 +51,14 @@ internal static class DebuggerBreakpoint
             }
             else
             {
-                ConsoleOutput.Instance.WriteLine($"Attaching Visual Studio with PID {vsPid} to the process '{Process.GetCurrentProcess().ProcessName}({Process.GetCurrentProcess().Id})'...", OutputLevel.Information);
+                var processId =
+#if NET6_0_OR_GREATER
+                    Environment.ProcessId;
+#else
+                    Process.GetCurrentProcess().Id;
+#endif
+
+                ConsoleOutput.Instance.WriteLine($"Attaching Visual Studio with PID {vsPid} to the process '{Process.GetCurrentProcess().ProcessName}({processId})'...", OutputLevel.Information);
             }
 
             AttachVs(Process.GetCurrentProcess(), vsPid);

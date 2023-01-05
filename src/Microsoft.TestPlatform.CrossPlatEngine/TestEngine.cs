@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
@@ -419,14 +420,22 @@ public class TestEngine : ITestEngine
                     requestSender,
                     hostManager,
                     // There is always at least one, and all of them have the same framework and architecture.
-                    testRuntimeProviderInfo.SourceDetails[0].Framework!);
+                    testRuntimeProviderInfo.SourceDetails[0].Framework!)
+                {
+                    IsTestSessionEnabled = true
+                };
         };
 
         // TODO: This condition should be returning the maxParallel level to avoid pre-starting way too many testhosts, because maxParallel level,
         // can be smaller than the number of sources to run.
         var maxTesthostCount = isParallelRun ? testSessionCriteria.Sources.Count : 1;
 
-        return new ProxyTestSessionManager(testSessionCriteria, maxTesthostCount, proxyCreator, testRuntimeProviders);
+        return new ProxyTestSessionManager(testSessionCriteria, maxTesthostCount, proxyCreator, testRuntimeProviders)
+        {
+            // Individual proxy setup failures are tolerated since SetupChannel may fail if the
+            // testhost it tries to start is not compatible with the test session feature.
+            DisposalPolicy = ProxyDisposalOnCreationFailPolicy.AllowProxySetupFailures
+        };
     }
 
     private List<TestRuntimeProviderInfo> GetTestRuntimeProvidersForUniqueConfigurations(
@@ -552,8 +561,13 @@ public class TestEngine : ITestEngine
 
                 EqtTrace.Verbose("TestEngine.VerifyParallelSettingAndCalculateParallelLevel: Parallel execution is enabled (cpu count: {0}, max cpu count is {1}, calculated cpu count is {2}, background mode is {3}, number of sources is {4})", _environment.ProcessorCount, maxCpuCount, parallelLevelToUse, isBackgroundDiscoveryEnabled == "1" ? "enabled" : "disabled", sourceCount);
 
-
-                parallelLevelToUse = Math.Min(sourceCount, parallelLevelToUse);
+                // If we're using the multi host execution we don't want to
+                // limit the number of hosts also if we're running less sources than the parallel level chosen.
+                int? numberOfTestHostToUse = GetTargetFrameworkTestHostDemultiplexer(runSettings);
+                if (numberOfTestHostToUse is null)
+                {
+                    parallelLevelToUse = Math.Min(sourceCount, parallelLevelToUse);
+                }
 
                 // If only one source, no need to use parallel service client.
                 enableParallel = parallelLevelToUse > 1;
@@ -691,5 +705,35 @@ public class TestEngine : ITestEngine
                 warningLogger.LogWarning(stringBuilder.ToString());
             }
         }
+    }
+
+    /// <summary>
+    /// We don't add this helper to the XmlRunSettingsUtilities because the feature is in preview and not exposed yet
+    /// </summary>
+    internal static int? GetTargetFrameworkTestHostDemultiplexer(string? runsettings)
+    {
+        if (string.IsNullOrEmpty(runsettings))
+        {
+            return null;
+        }
+
+        XDocument document = XDocument.Parse(runsettings);
+        XElement? targetFrameworkTestHostDemultiplexer = document?.Element("RunSettings")?.Element("RunConfiguration")?.Element("TargetFrameworkTestHostDemultiplexer");
+
+        if (targetFrameworkTestHostDemultiplexer is null)
+        {
+            return null;
+        }
+
+        if (int.TryParse(targetFrameworkTestHostDemultiplexer.Value, out int numberOfTestHost) && numberOfTestHost > 0)
+        {
+            return numberOfTestHost;
+        }
+        else
+        {
+            EqtTrace.Error($"ProxyParallelExecutionManager: Invalid value for TargetFrameworkTestHostDemultiplexer, '{targetFrameworkTestHostDemultiplexer.Value}'");
+        }
+
+        return null;
     }
 }

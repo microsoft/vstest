@@ -3,12 +3,9 @@
 
 // This was copied from https://github.com/dotnet/coreclr/blob/60f1e6265bd1039f023a82e0643b524d6aaf7845/src/System.Private.CoreLib/shared/System/Diagnostics/CodeAnalysis/NullableAttributes.cs
 // and updated to have the scope of the attributes be internal.
-
-#pragma warning disable CA1019 // Define accessors for attribute arguments
-
 namespace System.Diagnostics.CodeAnalysis;
 
-#if NETFRAMEWORK || WINDOWS_UWP || NETSTANDARD && !NETSTANDARD2_1 || NETCOREAPP && !NETCOREAPP3_0_OR_GREATER
+#if NETFRAMEWORK || NETSTANDARD && !NETSTANDARD2_1 || NETCOREAPP && !NETCOREAPP3_0_OR_GREATER
 
 /// <summary>Specifies that null is allowed as an input even if the corresponding type disallows it.</summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
@@ -89,7 +86,7 @@ internal sealed class DoesNotReturnIfAttribute : Attribute
 
 #endif
 
-#if NETFRAMEWORK || WINDOWS_UWP || NETSTANDARD && !NETSTANDARD2_1 || NETCOREAPP && !NET5_0_OR_GREATER
+#if NETFRAMEWORK || NETSTANDARD && !NETSTANDARD2_1 || NETCOREAPP && !NET5_0_OR_GREATER
 
 /// <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values.</summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
@@ -149,11 +146,3 @@ internal sealed class MemberNotNullWhenAttribute : Attribute
 }
 
 #endif
-
-/// <summary>
-/// Secret attribute that tells the CA1062 validate arguments rule that this method validates the argument is not null.
-/// </summary>
-[AttributeUsage(AttributeTargets.Parameter)]
-internal sealed class ValidatedNotNullAttribute : Attribute
-{
-}

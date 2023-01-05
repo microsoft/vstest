@@ -22,7 +22,7 @@ public partial class ProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc/>
-    public IntPtr GetProcessHandle(int processId)
+    public nint GetProcessHandle(int processId)
     {
         // An IntPtr representing the value of the handle field.
         // If the handle has been marked invalid with SetHandleAsInvalid, this method still returns the original handle value, which can be a stale value.
@@ -41,6 +41,7 @@ public partial class ProcessHelper : IProcessHelper
             // preview 6 or later, so use the numerical value for now.
             // case System.Runtime.InteropServices.Architecture.S390x:
             (Architecture)5 => PlatformArchitecture.S390x,
+            (Architecture)8 => PlatformArchitecture.Ppc64le,
             _ => throw new NotSupportedException(),
         };
     }

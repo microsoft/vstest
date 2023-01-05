@@ -113,6 +113,7 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture.ARM = 3 -> Microsof
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture.ARM64 = 5 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture.Default = 0 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture.S390x = 6 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture.Ppc64le = 7 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture.X64 = 2 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture.X86 = 1 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
 Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet
@@ -965,3 +966,5 @@ virtual Microsoft.VisualStudio.TestPlatform.ObjectModel.TestObject.ProtectedSetP
 ~static Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources.MalformedRunSettingsFile.get -> string
 ~static Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources.NoMatchingSourcesFound.get -> string
 ~static Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources.SourceIncompatible.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.DirectoryBasedTestDiscovererAttribute
+Microsoft.VisualStudio.TestPlatform.ObjectModel.DirectoryBasedTestDiscovererAttribute.DirectoryBasedTestDiscovererAttribute() -> void

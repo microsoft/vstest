@@ -83,6 +83,11 @@ Tento test může a nemusí být příčinou chybového ukončení.</target>
         <target state="translated">{0} nelze najít. Zkontrolujte, zda je spustitelný soubor k dispozici v cestě PATH, případně nastavte proměnnou prostředí PROCDUMP_PATH na adresář, který obsahuje spustitelný soubor {0}.</target>
         <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
       </trans-unit>
+      <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
+        <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
+        <target state="translated">Neplatná vlastnost DumpDirectoryPath pro monitorování ladicího programu postmortem</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

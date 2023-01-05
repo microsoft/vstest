@@ -40,7 +40,6 @@ public class LoggerRunSettings : TestRunSettings
         private set;
     }
 
-#if !NETSTANDARD1_0
     public override XmlElement ToXml()
     {
         var doc = new XmlDocument();
@@ -56,7 +55,6 @@ public class LoggerRunSettings : TestRunSettings
 
         return root;
     }
-#endif
 
     /// <summary>
     /// The from xml.

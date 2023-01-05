@@ -9,7 +9,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>$(TargetNetFxVersion);net472;net48;$(TargetNetCoreVersion);net5.0</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkMinimum);net472;net48;$(NetCoreAppMinimum);net7.0;net6.0;net5.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
 

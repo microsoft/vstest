@@ -1199,6 +1199,41 @@
         <target state="translated">Errore nell'hosting del canale di comunicazione.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProcDumpToolDirectoryPathArgumenNotFound">
+        <source>ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</source>
+        <target state="translated">È necessario specificare ProcDumpToolDirectoryPath per installare o annullare l'installazione del debugger effettuato dopo che l'applicazione è terminata.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PostmortemDebuggerNotSupportedForCurrentOS">
+        <source>Postmortem debugger is not supported in the current OS.</source>
+        <target state="translated">Il debugger effettuato dopo che l'applicazione è terminata non è supportato nel sistema operativo corrente.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpToolDirectoryPath">
+        <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)</source>
+        <target state="translated">La directory specificata per l'eseguibile procdump non è valida e lo strumento non è stato trovato nelle variabili di ambiente (PROCDUMP_PATH, PATH)</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpFileNameNotFound">
+        <source>Procdump file name not found: '{0}'</source>
+        <target state="translated">Il nome del file Procdump non è stato trovato: '{0}'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpDirectoryPathArgumenNotFound">
+        <source>DumpDirectoryPath should be specified to install the post mortem debugger.</source>
+        <target state="translated">È necessario specificare DumpDirectoryPath per installare il debugger effettuato dopo che l'applicazione è terminata.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpDirectoryPath">
+        <source>The directory specified is not valid: '{0}'</source>
+        <target state="translated">La directory specificata non è valida: '{0}'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidAeDebuggerArgument">
+        <source>AeDebugger argument '{0}' is not valid.</source>
+        <target state="translated">L'argomento '{0}' di AeDebugger non è valido.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

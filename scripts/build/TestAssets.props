@@ -4,8 +4,8 @@
         <!-- Not able to add TargetFrameworks here due to: https://github.com/dotnet/sdk/issues/1110 -->
         <NetCoreAppTargetFramework Condition="'$(TargetFramework)' != '' AND $(TargetFramework.StartsWith('netcoreapp'))">true</NetCoreAppTargetFramework>
         <CheckEolTargetFramework>false</CheckEolTargetFramework>
-        <TargetNetFxVersion Condition=" '$(TargetNetFxVersion)' == '' ">net462</TargetNetFxVersion>
-        <TargetNetCoreVersion Condition=" '$(TargetNetCoreVersion)' == '' ">netcoreapp3.1</TargetNetCoreVersion>
+        <NetFrameworkMinimum Condition=" '$(NetFrameworkMinimum)' == '' ">net462</NetFrameworkMinimum>
+        <NetCoreAppMinimum Condition=" '$(NetCoreAppMinimum)' == '' ">netcoreapp3.1</NetCoreAppMinimum>
     </PropertyGroup>
 
     <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Dependencies.props" Condition=" '$(DependencyVersionsImported)' != 'true' "/>

@@ -54,12 +54,12 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
     internal class ArgumentExecutor : IArgumentExecutor
     {
         /// <summary>
-        /// Used when warning about overriden environment variables.
+        /// Used when warning about overridden environment variables.
         /// </summary>
         private readonly IOutput _output;
 
         /// <summary>
-        /// Used when setting Environemnt variables.
+        /// Used when setting Environment variables.
         /// </summary>
         private readonly IRunSettingsProvider _runSettingsProvider;
 

@@ -1,9 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !NETSTANDARD1_0
 using System.Xml;
-#endif
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -31,12 +29,10 @@ public abstract class TestRunSettings
     /// </summary>
     public string Name { get; }
 
-#if !NETSTANDARD1_0
     /// <summary>
     /// Converter the setting to be an XmlElement.
     /// </summary>
     /// <returns>The Xml element for the run settings provided.</returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes", Justification = "XmlElement is required in the data collector.")]
     public abstract XmlElement ToXml();
-#endif
 }

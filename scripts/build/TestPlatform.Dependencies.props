@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <VSSdkBuildToolsVersion>17.1.4054</VSSdkBuildToolsVersion>
+    <VSSdkBuildToolsVersion>17.4.2116</VSSdkBuildToolsVersion>
 
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
 
@@ -11,7 +11,8 @@
     <!-- this version also needs to be "statically" readable because the test fixture will inspect this file for the version
     and because during the test `dotnet test` will run and re-build some of the test projects and at that time the version
     from a build parameter would not be available, so I am writing this version from the build.ps1 script to keep it in sync -->
-    <NETTestSdkVersion>17.4.0-dev</NETTestSdkVersion>
+		<!-- Note that before bumping this version, you need to have one NuGet package available -->
+    <NETTestSdkVersion>17.6.0-dev</NETTestSdkVersion>
 
     <!-- These versions are used for running unit tests, and running acceptance tests. They are also used as the default version for projects
     in TestAssets.sln to allow running and debugging tests in that solution directly in VS without having to run them via AcceptanceTests. -->
@@ -65,7 +66,7 @@
     <TestPlatformRemoteExternalsVersion>17.3.32621.448</TestPlatformRemoteExternalsVersion>
     <TestPlatformMSDiaVersion>17.3.32621.448</TestPlatformMSDiaVersion>
     <InteropExternalsVersion>17.3.32621.448</InteropExternalsVersion>
-    <MicrosoftFakesVersion>17.4.0-beta.22378.9</MicrosoftFakesVersion>
+    <MicrosoftFakesVersion>17.4.0-beta.22478.3</MicrosoftFakesVersion>
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
     <MicrosoftBuildFrameworkPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>

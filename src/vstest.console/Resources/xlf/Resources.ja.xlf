@@ -1199,6 +1199,41 @@
         <target state="translated">通信チャネルをホスト中にエラーが発生しました。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProcDumpToolDirectoryPathArgumenNotFound">
+        <source>ProcDumpToolDirectoryPath should be specified to install or unistall the post mortem debugger.</source>
+        <target state="translated">事後検証デバッガーをインストールまたはアンインストールするには、ProcDumpToolDirectoryPath を指定する必要があります。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PostmortemDebuggerNotSupportedForCurrentOS">
+        <source>Postmortem debugger is not supported in the current OS.</source>
+        <target state="translated">現在の OS では、事後検証デバッガーはサポートされていません。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpToolDirectoryPath">
+        <source>The directory specified for the procdump executable is not valid and the tool was not found inside environment variables (PROCDUMP_PATH, PATH)</source>
+        <target state="translated">procdump 実行可能ファイルに指定されたディレクトリが無効であり、ツールが環境変数 (PROCDUMP_PATH、PATH) 内に見つかりませんでした</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpFileNameNotFound">
+        <source>Procdump file name not found: '{0}'</source>
+        <target state="translated">Procdump ファイル名が見つかりません: '{0}'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpDirectoryPathArgumenNotFound">
+        <source>DumpDirectoryPath should be specified to install the post mortem debugger.</source>
+        <target state="translated">事後検証デバッガーをインストールするには、DumpDirectoryPath を指定する必要があります。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidProcDumpDirectoryPath">
+        <source>The directory specified is not valid: '{0}'</source>
+        <target state="translated">指定されたディレクトリは無効です: '{0}'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidAeDebuggerArgument">
+        <source>AeDebugger argument '{0}' is not valid.</source>
+        <target state="translated">AeDebugger 引数 '{0}' は無効です。</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

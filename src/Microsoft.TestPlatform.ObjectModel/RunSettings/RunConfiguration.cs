@@ -435,7 +435,6 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public string? DotnetHostPath { get; private set; }
 
-#if !NETSTANDARD1_0
     /// <inheritdoc/>
     public override XmlElement ToXml()
     {
@@ -553,7 +552,6 @@ public class RunConfiguration : TestRunSettings
 
         return root;
     }
-#endif
 
     /// <summary>
     /// Loads RunConfiguration from XmlReader.
@@ -600,7 +598,7 @@ public class RunConfiguration : TestRunSettings
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         string collectSourceInformationStr = reader.ReadElementContentAsString();
 
-                        bool bCollectSourceInformation = true;
+                        bool bCollectSourceInformation;
                         if (!bool.TryParse(collectSourceInformationStr, out bCollectSourceInformation))
                         {
                             throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
@@ -813,7 +811,7 @@ public class RunConfiguration : TestRunSettings
 
                     case "TreatTestAdapterErrorsAsWarnings":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                        bool treatTestAdapterErrorsAsWarnings = false;
+                        bool treatTestAdapterErrorsAsWarnings;
 
                         value = reader.ReadElementContentAsString();
 
@@ -838,16 +836,10 @@ public class RunConfiguration : TestRunSettings
                     case "SolutionDirectory":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         string? solutionDirectory = reader.ReadElementContentAsString();
-
-#if !NETSTANDARD1_0
                         solutionDirectory = Environment.ExpandEnvironmentVariables(solutionDirectory);
-#endif
 
-                        if (StringUtils.IsNullOrEmpty(solutionDirectory)
-#if !NETSTANDARD1_0
-                            || !System.IO.Directory.Exists(solutionDirectory)
-#endif
-                           )
+                        if (solutionDirectory.IsNullOrEmpty()
+                            || !System.IO.Directory.Exists(solutionDirectory))
                         {
                             EqtTrace.Error(string.Format(CultureInfo.CurrentCulture, Resources.Resources.SolutionDirectoryNotExists, solutionDirectory));
                             solutionDirectory = null;
@@ -891,7 +883,13 @@ public class RunConfiguration : TestRunSettings
 
                     case "DotNetHostPath":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                        runConfiguration.DotnetHostPath = reader.ReadElementContentAsString();
+                        string? dotnetHostPath = reader.ReadElementContentAsString();
+
+#if !NETSTANDARD1_0
+                        dotnetHostPath = Environment.ExpandEnvironmentVariables(dotnetHostPath);
+#endif
+
+                        runConfiguration.DotnetHostPath = dotnetHostPath;
                         break;
                     case "TreatNoTestsAsError":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
@@ -903,7 +901,12 @@ public class RunConfiguration : TestRunSettings
                         }
                         runConfiguration.TreatNoTestsAsError = treatNoTestsAsError;
                         break;
-
+                    // Configuration used but not exposed to the public to avoid the Warning inside the log
+                    case "ForceOneTestAtTimePerTestHost":
+                    case "EnvironmentVariables":
+                    case "TargetFrameworkTestHostDemultiplexer":
+                        reader.Skip();
+                        break;
                     default:
                         // Ignore a runsettings element that we don't understand. It could occur in the case
                         // the test runner is of a newer version, but the test host is of an earlier version.

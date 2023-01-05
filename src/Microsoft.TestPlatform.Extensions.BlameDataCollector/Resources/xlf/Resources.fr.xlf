@@ -83,6 +83,11 @@ Ce test est éventuellement à l'origine du plantage.</target>
         <target state="translated">{0} est introuvable, vérifiez que l’exécutable est disponible sur PATH. Vous pouvez également définir PROCDUMP_PATH variable d’environnement sur un répertoire qui contient l’exécutable {0}</target>
         <note>0 is procDumpPath, a name of procdump executable such as procdump64.exe, 0 is used twice on purpose. PROCDUMP_PATH and PATH are literal and should not be localized.</note>
       </trans-unit>
+      <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
+        <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
+        <target state="translated">'DumpDirectoryPath' non valide pour l’analyse du débogueur post-mortem</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

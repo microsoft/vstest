@@ -8,10 +8,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
 using System.Xml;
 
+using Microsoft.VisualStudio.TestPlatform.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -36,11 +42,13 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     private Dictionary<Guid, BlameTestObject>? _testObjectDictionary;
     private readonly IBlameReaderWriter _blameReaderWriter;
     private readonly IFileHelper _fileHelper;
+    private readonly IProcessHelper _processHelper;
     private XmlElement? _configurationElement;
     private int _testStartCount;
     private int _testEndCount;
     private bool _collectProcessDumpOnCrash;
     private bool _collectProcessDumpOnHang;
+    private bool _monitorPostmortemDumpFolder;
     private bool _collectDumpAlways;
     private string? _attachmentGuid;
 
@@ -52,17 +60,19 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     private TimeSpan _inactivityTimespan = TimeSpan.FromMinutes(DefaultInactivityTimeInMinutes);
 
     private int _testHostProcessId;
+    private string? _testHostProcessName;
     private string? _targetFramework;
     private readonly List<KeyValuePair<string, string>> _environmentVariables = new();
     private bool _uploadDumpFiles;
     private string? _tempDirectory;
+    private string? _monitorPostmortemDumpFolderPath;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BlameCollector"/> class.
     /// Using XmlReaderWriter by default
     /// </summary>
     public BlameCollector()
-        : this(new XmlReaderWriter(), new ProcessDumpUtility(), null, new FileHelper())
+        : this(new XmlReaderWriter(), new ProcessDumpUtility(), null, new FileHelper(), new ProcessHelper())
     {
     }
 
@@ -85,12 +95,14 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         IBlameReaderWriter blameReaderWriter,
         IProcessDumpUtility processDumpUtility,
         IInactivityTimer? inactivityTimer,
-        IFileHelper fileHelper)
+        IFileHelper fileHelper,
+        IProcessHelper processHelper)
     {
         _blameReaderWriter = blameReaderWriter;
         _processDumpUtility = processDumpUtility;
         _inactivityTimer = inactivityTimer;
         _fileHelper = fileHelper;
+        _processHelper = processHelper;
     }
 
     /// <summary>
@@ -118,6 +130,8 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         DataCollectionLogger logger,
         DataCollectionEnvironmentContext? environmentContext)
     {
+        DebuggerBreakpoint.WaitForDebugger(WellKnownDebugEnvironmentVariables.VSTEST_BLAMEDATACOLLECTOR_DEBUG);
+
         _events = events;
         _dataCollectionSink = dataSink;
         _context = environmentContext;
@@ -168,6 +182,10 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             {
                 _collectProcessDumpOnHang = false;
             }
+
+            _monitorPostmortemDumpFolder = _configurationElement[Constants.MonitorPostmortemDebugger] is XmlElement monitorPostmortemNode &&
+                ValidateMonitorPostmortemDebuggerParameters(monitorPostmortemNode);
+            EqtTrace.Info($"[MonitorPostmortemDump]Monitor enabled: '{_monitorPostmortemDumpFolder}'");
 
             var tfm = _configurationElement[Constants.TargetFramework]?.InnerText;
             if (!tfm.IsNullOrWhiteSpace())
@@ -305,6 +323,24 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         {
             EqtTrace.Error(ex);
         }
+    }
+
+    private bool ValidateMonitorPostmortemDebuggerParameters(XmlElement collectDumpNode)
+    {
+        TPDebug.Assert(_logger != null && _context != null, "Initialize must be called before calling this method");
+        if (StringUtils.IsNullOrEmpty(_monitorPostmortemDumpFolderPath = collectDumpNode.GetAttribute("DumpDirectoryPath")))
+        {
+            _logger.LogWarning(_context.SessionDataCollectionContext, Resources.Resources.MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter);
+            return false;
+        }
+
+        if (!_fileHelper.DirectoryExists(_monitorPostmortemDumpFolderPath))
+        {
+            _logger.LogWarning(_context.SessionDataCollectionContext, Resources.Resources.MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter);
+            return false;
+        }
+
+        return true;
     }
 
     private void ValidateAndAddCrashProcessDumpParameters(XmlElement collectDumpNode)
@@ -463,7 +499,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// <param name="args">SessionEndEventArgs</param>
     private void SessionEndedHandler(object? sender, SessionEndEventArgs args)
     {
-        TPDebug.Assert(_testSequence != null && _testObjectDictionary != null && _context != null && _dataCollectionSink != null && _logger != null, "Initialize must be called before calling this method");
+        TPDebug.Assert(_testHostProcessName != null && _testSequence != null && _testObjectDictionary != null && _context != null && _dataCollectionSink != null && _logger != null, "Initialize must be called before calling this method");
         ResetInactivityTimer();
 
         EqtTrace.Info("Blame Collector: Session End");
@@ -522,6 +558,55 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             {
                 EqtTrace.Info("BlameCollector.CollectDumpAndAbortTesthost: Custom path to dump directory was provided via VSTEST_DUMP_PATH. Skipping attachment upload, the caller is responsible for collecting and uploading the dumps themselves.");
             }
+
+            if (_monitorPostmortemDumpFolder)
+            {
+                if (!_fileHelper.DirectoryExists(_monitorPostmortemDumpFolderPath))
+                {
+                    _logger.LogWarning(_context.SessionDataCollectionContext, Resources.Resources.MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter);
+                }
+                else
+                {
+                    // We do ToArray() because we're moving files and we cannot move file and enumerate at the same time
+                    foreach (var dumpFileNameFullPath in _fileHelper.GetFiles(_monitorPostmortemDumpFolderPath, "*.dmp", SearchOption.TopDirectoryOnly).ToArray())
+                    {
+                        EqtTrace.Info($"[MonitorPostmortemDump]'{dumpFileNameFullPath}' dump file found during postmortem monitoring");
+                        // Ensure exclusive access to the dump file, it can happen if we run more test module in parallel.
+                        // We cannot ensure that we'll move only "our" dump because procdump -i produce a name that doesn't have the pid in it(because PID is reusable).
+                        // The name of the file starts with the process name, that's the only filtering we can do.
+                        // So there's one possible benign race condition when another test is dumping an host and we take lock on the name but the dump is not finished.
+                        // In that case we'll fail for file locking but it's fine. The correct or subsequent "SessionEndedHandler" will move that one.
+                        using MD5 md5LockName = MD5.Create();
+                        // BitConverter converts into something like EC-1B-B6-22-81-00-41-C8-31-1D-B6-61-27-6A-65-8A valid muxer name
+                        // LPCSTR An LPCSTR is a 32-bit pointer to a constant null-terminated string of 8-bit Windows (ANSI) characters.
+                        string muxerName = @$"Global\{BitConverter.ToString(md5LockName.ComputeHash(Encoding.UTF8.GetBytes(dumpFileNameFullPath)))}";
+                        using Mutex lockFile = new(true, muxerName, out bool createdNew);
+                        EqtTrace.Info($"[MonitorPostmortemDump]Acquired global muxer '{muxerName}' for {dumpFileNameFullPath}");
+                        if (createdNew)
+                        {
+                            string dumpFileName = Path.GetFileNameWithoutExtension(dumpFileNameFullPath);
+
+                            // Expected format testhost.exe_221004_123127.dmp processName.exe_yyMMdd_HHmmss.dmp
+                            if (dumpFileName.StartsWith(_testHostProcessName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                EqtTrace.Info($"[MonitorPostmortemDump]Valid pattern start with '{_testHostProcessName}' found for {dumpFileNameFullPath}");
+                                try
+                                {
+                                    var fileTranferInformation = new FileTransferInformation(_context.SessionDataCollectionContext, dumpFileNameFullPath, true);
+                                    EqtTrace.Info($"[MonitorPostmortemDump]Transferring {dumpFileNameFullPath}");
+                                    _dataCollectionSink.SendFileAsync(fileTranferInformation);
+                                }
+                                catch (IOException ex)
+                                {
+                                    // In case of race condition explained in the comment above we simply log a warning.
+                                    EqtTrace.Warning(ex.ToString());
+                                    _logger.LogWarning(args.Context, ex.ToString());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         finally
         {
@@ -540,10 +625,11 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// </summary>
     /// <param name="sender">Sender</param>
     /// <param name="args">TestHostLaunchedEventArgs</param>
-    private void TestHostLaunchedHandler(object sender, TestHostLaunchedEventArgs args)
+    private void TestHostLaunchedHandler(object? sender, TestHostLaunchedEventArgs args)
     {
         ResetInactivityTimer();
         _testHostProcessId = args.TestHostProcessId;
+        _testHostProcessName = _processHelper.GetProcessName(args.TestHostProcessId);
 
         if (!_collectProcessDumpOnCrash)
         {
@@ -634,7 +720,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         var dumpDirectoryOverrideHasValue = !dumpDirectoryOverride.IsNullOrWhiteSpace();
         _uploadDumpFiles = !dumpDirectoryOverrideHasValue;
 
-        var dumpDirectory = dumpDirectoryOverrideHasValue ? dumpDirectoryOverride : GetTempDirectory();
+        var dumpDirectory = dumpDirectoryOverrideHasValue ? dumpDirectoryOverride! : GetTempDirectory();
         Directory.CreateDirectory(dumpDirectory);
         var dumpPath = Path.Combine(Path.GetFullPath(dumpDirectory));
 
