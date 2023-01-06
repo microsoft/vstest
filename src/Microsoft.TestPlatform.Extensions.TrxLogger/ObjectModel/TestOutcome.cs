@@ -86,5 +86,15 @@ internal enum TestOutcome
     /// <summary>
     /// Test is in the execution queue, was not started yet.
     /// </summary>
-    Pending
+    Pending,
+
+    /// <summary>
+    /// The min value of this enum
+    /// </summary>
+    Min = Error,
+
+    /// <summary>
+    /// The max value of this enum
+    /// </summary>
+    Max = Pending
 }
