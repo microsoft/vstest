@@ -129,7 +129,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         // https://github.com/mmanela/chutzpah/issues/812
         var jsInTemp = TempDirectory.CopyFile(jsSource);
 
-        var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(UnitTestFramework.Chutzpah), "*.TestAdapter.dll").ToList();
+        var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(UnitTestFramework.NonDll), "*.TestAdapter.dll").ToList();
         _vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.First() });
 
         _vstestConsoleWrapper.RunTests(
