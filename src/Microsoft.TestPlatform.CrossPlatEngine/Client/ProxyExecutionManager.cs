@@ -212,6 +212,12 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
                 InitializeTestRun(testRunCriteria, eventHandler);
             }
 
+            // TODO: Quick & dirty fix to confirm tests are fixed. Refactor before merging.
+            if (eventHandler != _baseTestRunEventsHandler)
+            {
+                _baseTestRunEventsHandler = eventHandler;
+            }
+
             TPDebug.Assert(_proxyOperationManager is not null, "ProxyOperationManager is null.");
 
             if (_isCommunicationEstablished)
