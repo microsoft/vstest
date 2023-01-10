@@ -212,8 +212,23 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
                 InitializeTestRun(testRunCriteria, eventHandler);
             }
 
-            // TODO: Quick & dirty fix to confirm tests are fixed. Refactor before merging.
-            if (eventHandler != _baseTestRunEventsHandler)
+            // In certain scenarios (like the one for non-parallel dotnet runs) we may end up
+            // using the incorrect events handler which can have nasty side effects, like failing to
+            // properly terminate the communication with any data collector. The reason for this is
+            // that the initialization and the actual test run have been decoupled and are now two
+            // separate operations. In the initialization phase we already provide an events handler
+            // to be invoked when data flows back from the testhost, but the "correct" handler is
+            // only provided in the run phase which may occur later on. This was not a problem when
+            // initialization was part of the normal test run workflow. However, now that the two
+            // operations are separate and because initialization could've already taken place, the
+            // communication channel could be properly set up, which means that we don't get to
+            // overwrite the old events handler anymore.
+            // The solution to this is to make sure that we always use the most "up-to-date"
+            // handler, and that would be the handler we got as an argument when this method was
+            // called. When initialization and test run are part of the same operation the behavior
+            // is still correct, since the two events handler will be equal and there'll be no need
+            // for an overwrite.
+            if (_baseTestRunEventsHandler != eventHandler)
             {
                 _baseTestRunEventsHandler = eventHandler;
             }
