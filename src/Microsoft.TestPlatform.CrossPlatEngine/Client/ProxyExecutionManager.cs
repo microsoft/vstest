@@ -195,7 +195,6 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
 
                 InitializeExtensions(_testSources);
             }
-
         }
         catch (Exception ex)
         {
