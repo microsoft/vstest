@@ -268,7 +268,7 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
         }
         finally
         {
-            EqtTrace.Verbose("ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: No sources available for discovery.");
+            EqtTrace.Verbose("ProxyParallelDiscoveryManager.InitializeDiscoverTestsOnConcurrentManager: No sources available for discovery.");
         }
     }
 
