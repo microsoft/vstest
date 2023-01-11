@@ -405,7 +405,6 @@ internal sealed class ParallelProxyExecutionManager : IParallelProxyExecutionMan
             //
             // Interlocked.Increment(ref _runStartedClients);
             proxyExecutionManager.InitializeTestRun(testRunCriteria, eventHandler);
-
         });
     }
 
