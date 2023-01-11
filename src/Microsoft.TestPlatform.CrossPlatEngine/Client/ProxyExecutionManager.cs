@@ -239,9 +239,9 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
             {
                 var testSources = new List<string>(
                     testRunCriteria.HasSpecificSources
-                    ? testRunCriteria.Sources
-                    // If the test execution is with a test filter, group them by sources.
-                    : testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
+                        ? testRunCriteria.Sources
+                        // If the test execution is with a test filter, group them by sources.
+                        : testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
 
                 // This code should be in sync with InProcessProxyExecutionManager.StartTestRun
                 // execution context.
