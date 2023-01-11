@@ -314,9 +314,10 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
         EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
 
         var handler = eventHandler;
-        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception?.ToString() };
+        var exceptionString = t.Exception?.ToString();
+        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exceptionString };
         handler.HandleRawMessage(_dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
-        handler.HandleLogMessage(TestMessageLevel.Error, t.Exception?.ToString());
+        handler.HandleLogMessage(TestMessageLevel.Error, exceptionString);
 
         // Send discovery complete. Similar logic is also used in ProxyDiscoveryManager.DiscoverTests.
         // Differences:
