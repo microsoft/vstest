@@ -228,7 +228,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
             // called. When initialization and test run are part of the same operation the behavior
             // is still correct, since the two events handler will be equal and there'll be no need
             // for an overwrite.
-            if (_baseTestRunEventsHandler != eventHandler)
+            if (eventHandler != _baseTestRunEventsHandler)
             {
                 _baseTestRunEventsHandler = eventHandler;
             }
