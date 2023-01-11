@@ -208,7 +208,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
         // and the test host is lost as well.
         HandleLogMessage(TestMessageLevel.Error, exception.ToString());
 
-        var discoveryCompletePayload = new DiscoveryCompletePayload()
+        var discoveryCompletePayload = new DiscoveryCompletePayload
         {
             IsAborted = true,
             LastDiscoveredTests = null,
