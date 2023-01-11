@@ -141,8 +141,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                 var slot = availableSlots[i];
                 slot.HasWork = true;
                 var workload = workloadsToAdd[i];
-                var initializeOnly = occupiedSlots + i + 1 > MaxParallelLevel;
-                slot.ShouldPreStart = initializeOnly;
+                slot.ShouldPreStart = occupiedSlots + i + 1 > MaxParallelLevel;
 
                 var manager = _createNewManager(workload.Provider);
                 var eventHandler = _getEventHandler(_eventHandler, manager);
