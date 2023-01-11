@@ -303,7 +303,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
         // TestPlatformException is expected exception, log only the message.
         // For other exceptions, log the stacktrace as well.
         var errorMessage = exception is TestPlatformException ? exception.Message : exception.ToString();
-        var testMessagePayload = new TestMessagePayload()
+        var testMessagePayload = new TestMessagePayload
         {
             MessageLevel = TestMessageLevel.Error,
             Message = errorMessage
