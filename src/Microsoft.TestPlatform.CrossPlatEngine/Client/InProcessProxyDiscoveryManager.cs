@@ -116,6 +116,9 @@ internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
 
     public void InitializeDiscovery(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler, bool skipDefaultAdapters)
     {
-        throw new NotImplementedException();
+        // Leaving this empty as it is not really relevant to the in-process proxy managers since
+        // there's no external testhost to be started. The idea of pre-initializing the test run
+        // makes sense only for out-of-process proxies like ProxyExecutionManager or
+        // ProxyDiscoveryManager.
     }
 }

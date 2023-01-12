@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -114,7 +115,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             throw new InvalidOperationException($"{nameof(_runWorkload)} was not provided.");
 
         // Reserve slots and assign them work under the lock so we keep the slots consistent.
-        List<Slot> slots;
+        Slot[] slots;
         lock (_lock)
         {
             // When HandlePartialDiscovery or HandlePartialRun are in progress, and we call StopAllManagers,
@@ -125,14 +126,14 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                 return false;
 
             // We grab all empty slots.
-            var availableSlots = _managerSlots.Where(slot => !slot.HasWork).ToList();
-            var occupiedSlots = MaxParallelLevel - (availableSlots.Count - PreStartCount);
+            var availableSlots = _managerSlots.Where(slot => !slot.HasWork).ToImmutableArray();
+            var occupiedSlots = MaxParallelLevel - (availableSlots.Length - PreStartCount);
             // We grab all available workloads.
-            var availableWorkloads = _workloads.Where(workload => workload != null).ToList();
+            var availableWorkloads = _workloads.Where(workload => workload != null).ToImmutableArray();
             // We take the amount of workloads to fill all the slots, or just as many workloads
             // as there are if there are less workloads than slots.
-            var amount = Math.Min(availableSlots.Count, availableWorkloads.Count);
-            var workloadsToAdd = availableWorkloads.Take(amount).ToList();
+            var amount = Math.Min(availableSlots.Length, availableWorkloads.Length);
+            var workloadsToAdd = availableWorkloads.Take(amount).ToImmutableArray();
 
             // We associate each workload to a slot, if we reached the max parallel
             // level, then we will run only initalize step of the given workload.
@@ -153,7 +154,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                 _workloads.Remove(workload);
             }
 
-            slots = _managerSlots.ToList();
+            slots = _managerSlots.ToArray();
             SetOccupiedSlotCount();
         }
 
@@ -231,12 +232,12 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
     {
         lock (_lock)
         {
-            var completedSlot = _managerSlots.Where(s => ReferenceEquals(completedManager, s.Manager)).ToList();
+            var completedSlot = _managerSlots.Where(s => ReferenceEquals(completedManager, s.Manager)).ToImmutableArray();
             // When HandlePartialDiscovery or HandlePartialRun are in progress, and we call StopAllManagers,
             // it is possible that we will clear all slots, while ClearCompletedSlot is waiting on the lock,
             // so when it is allowed to enter it will fail to find the respective slot and fail. In this case it is
             // okay that the slot is not found, and we do nothing, because we already stopped all work and cleared the slots.
-            if (completedSlot.Count == 0)
+            if (completedSlot.Length == 0)
             {
                 if (_acceptMoreWork)
                 {
@@ -248,7 +249,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                 }
             }
 
-            if (completedSlot.Count > 1)
+            if (completedSlot.Length > 1)
             {
                 throw new InvalidOperationException("The provided manager was found in multiple slots.");
             }
@@ -272,9 +273,9 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
     {
         // We don't need to lock here, we just grab the current list of
         // slots that are occupied (have managers) and run action on each one of them.
-        var managers = _managerSlots.Where(slot => slot.HasWork).Select(slot => slot.Manager).ToList();
+        var managers = _managerSlots.Where(slot => slot.HasWork).Select(slot => slot.Manager).ToImmutableArray();
         int i = 0;
-        var actionTasks = new Task[managers.Count];
+        var actionTasks = new Task[managers.Length];
         foreach (var manager in managers)
         {
             if (manager == null)

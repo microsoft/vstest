@@ -4,12 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 using FluentAssertions;
-using System.Threading.Tasks;
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 

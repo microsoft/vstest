@@ -331,7 +331,9 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
 
     public void InitializeDiscovery(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler, bool skipDefaultAdapters)
     {
-        throw new NotImplementedException();
+        // Leaving this empty as it is not really relevant to the parallel proxy managers.
+        // The idea of pre-initializing the test run makes sense only for single proxies like
+        // ProxyExecutionManager or ProxyDiscoveryManager.
     }
 
     public void Dispose()

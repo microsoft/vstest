@@ -22,11 +22,11 @@ public interface IProxyExecutionManager
     void Initialize(bool skipDefaultAdapters);
 
     /// <summary>
-    /// 
+    /// Initializes test execution. Create the test host, setup channel and initialize extensions.
     /// </summary>
     /// 
-    /// <param name="testRunCriteria"></param>
-    /// <param name="eventHandler"></param>
+    /// <param name="testRunCriteria">The settings/options for the test run.</param>
+    /// <param name="eventHandler">EventHandler for handling execution events from Engine.</param>
     void InitializeTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler);
 
     /// <summary>
