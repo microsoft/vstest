@@ -577,7 +577,7 @@ public class IntegrationTestBase
         if (testFramework == UnitTestFramework.NonDll)
         {
             var dllPath = _testEnvironment.GetTestAsset("NonDll.TestAdapter.dll", "netstandard2.0");
-            return Path.GetDirectoryName(dllPath);
+            return Path.GetDirectoryName(dllPath)!;
         }
 
         string adapterRelativePath = string.Empty;
