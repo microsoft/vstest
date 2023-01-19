@@ -263,7 +263,7 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
                 proxyDiscoveryManager.Initialize(_skipDefaultAdapters);
                 proxyDiscoveryManager.InitializeDiscovery(discoveryCriteria, eventHandler, _skipDefaultAdapters);
 
-                System.Diagnostics.Debug.WriteLine($"Init only: {discoveryCriteria.Sources.Single()}");
+                EqtTrace.Verbose($"ProxyParallelDiscoveryManager.InitializeDiscoverTestsOnConcurrentManager: Init only: {discoveryCriteria.Sources.Single()}");
             });
         }
         finally
@@ -290,7 +290,7 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
                 EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery started.");
                 if (!initialized)
                 {
-                    System.Diagnostics.Debug.WriteLine($"initialize right before run: {discoveryCriteria.Sources.Single()}");
+                    EqtTrace.Verbose($"ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: Initialize right before run: {discoveryCriteria.Sources.Single()}");
                     proxyDiscoveryManager.Initialize(_skipDefaultAdapters);
                     proxyDiscoveryManager.InitializeDiscovery(discoveryCriteria, eventHandler, _skipDefaultAdapters);
                 }
@@ -299,7 +299,7 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
                     task?.Wait();
                 }
 
-                System.Diagnostics.Debug.WriteLine($"Run: {discoveryCriteria.Sources.Single().ToString()}");
+                EqtTrace.Verbose($"ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: Run: {discoveryCriteria.Sources.Single().ToString()}");
                 proxyDiscoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
             }).ContinueWith(t => HandleError(eventHandler, t), TaskContinuationOptions.OnlyOnFaulted);
 

@@ -330,7 +330,6 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
         switch (message?.MessageType)
         {
             case MessageType.VersionCheck:
-                Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>> Received handshake in testhost.");
                 try
                 {
                     var version = _dataSerializer.DeserializePayload<int>(message);
@@ -452,7 +451,6 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
                             EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
                             TPDebug.Assert(_testHostManagerFactory is not null, "_testHostManagerFactory is null");
                             _testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions, testInitializeEventsHandler);
-                            Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>> execution init done in testhost.");
                         };
                         _jobQueue.QueueJob(job, 0);
                     }
