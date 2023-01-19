@@ -168,7 +168,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         {
             startedWork++;
             slot.IsRunning = true;
-            System.Diagnostics.Debug.Write($">>>>>>>>> run on pre-started host: {(DateTime.Now.TimeOfDay - slot.PreStartTime).TotalMilliseconds}ms {slot.InitTask?.Status}");
+            EqtTrace.Verbose($"ParallelOperationManager.RunWorkInParallel(): Running on pre-started host: {(DateTime.Now.TimeOfDay - slot.PreStartTime).TotalMilliseconds}ms {slot.InitTask?.Status}");
             _runWorkload(slot.Manager!, slot.EventHandler!, slot.Work!, slot.IsPreStarted, slot.InitTask);
 
             // We already started as many as we were allowed, jump out;
@@ -190,7 +190,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                     {
                         startedWork++;
                         slot.IsRunning = true;
-                        System.Diagnostics.Debug.Write($">>>>>>>>> started work on host");
+                        EqtTrace.Verbose($"ParallelOperationManager.RunWorkInParallel(): Started work on a host.");
                         _runWorkload(slot.Manager!, slot.EventHandler!, slot.Work!, slot.IsPreStarted, slot.InitTask);
                     }
                 }
@@ -211,7 +211,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                 preStartedWork++;
                 slot.PreStartTime = DateTime.Now.TimeOfDay;
                 slot.IsPreStarted = true;
-                System.Diagnostics.Debug.Write($">>>>>>>>> pre-start a host");
+                EqtTrace.Verbose($"ParallelOperationManager.RunWorkInParallel(): Pre-starting a host.");
                 slot.InitTask = _initializeWorkload!(slot.Manager!, slot.EventHandler!, slot.Work!);
             }
         }
