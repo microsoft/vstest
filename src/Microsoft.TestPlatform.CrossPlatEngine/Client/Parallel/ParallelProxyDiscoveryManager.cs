@@ -253,23 +253,16 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
     /// <param name="ProxyDiscoveryManager">Proxy discovery manager instance.</param>
     private Task InitializeDiscoverTestsOnConcurrentManager(IProxyDiscoveryManager proxyDiscoveryManager, ITestDiscoveryEventsHandler2 eventHandler, DiscoveryCriteria discoveryCriteria)
     {
-        try
+        // Kick off another discovery task for the next source
+        return Task.Run(() =>
         {
-            // Kick off another discovery task for the next source
-            return Task.Run(() =>
-            {
-                EqtTrace.Verbose("ProxyParallelDiscoveryManager.InitializeDiscoverTestsOnConcurrentManager: Discovery preparation started.");
+            EqtTrace.Verbose("ProxyParallelDiscoveryManager.InitializeDiscoverTestsOnConcurrentManager: Discovery preparation started.");
 
-                proxyDiscoveryManager.Initialize(_skipDefaultAdapters);
-                proxyDiscoveryManager.InitializeDiscovery(discoveryCriteria, eventHandler, _skipDefaultAdapters);
+            proxyDiscoveryManager.Initialize(_skipDefaultAdapters);
+            proxyDiscoveryManager.InitializeDiscovery(discoveryCriteria, eventHandler, _skipDefaultAdapters);
 
-                EqtTrace.Verbose($"ProxyParallelDiscoveryManager.InitializeDiscoverTestsOnConcurrentManager: Init only: {discoveryCriteria.Sources.Single()}");
-            });
-        }
-        finally
-        {
-            EqtTrace.Verbose("ProxyParallelDiscoveryManager.InitializeDiscoverTestsOnConcurrentManager: No sources available for discovery.");
-        }
+            EqtTrace.Verbose($"ProxyParallelDiscoveryManager.InitializeDiscoverTestsOnConcurrentManager: Init only: {discoveryCriteria.Sources.Single()}");
+        });
     }
 
     /// <summary>
