@@ -211,7 +211,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                 preStartedWork++;
                 slot.PreStartTime = DateTime.Now.TimeOfDay;
                 slot.IsPreStarted = true;
-                EqtTrace.Verbose($"ParallelOperationManager.RunWorkInParallel(): Pre-starting a host.");
+                EqtTrace.Verbose($"ParallelOperationManager.RunWorkInParallel: Pre-starting a host.");
                 slot.InitTask = _initializeWorkload!(slot.Manager!, slot.EventHandler!, slot.Work!);
             }
         }
