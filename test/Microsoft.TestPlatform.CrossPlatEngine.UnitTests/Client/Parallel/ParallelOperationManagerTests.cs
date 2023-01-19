@@ -59,7 +59,7 @@ public class ParallelOperationManagerTests
             parallelOperationManager.RunNextWork(manager);
         };
         Func<SampleManager, SampleHandler, SampleWorkload, Task> initializeWorkload = (_, _, _) =>
-            Task.Run(() => System.Threading.Thread.Sleep(100));
+            Task.Run(async () => await Task.Delay(100));
 
         // Act
         parallelOperationManager.StartWork(workloads, eventHandler, getEventHandler, initializeWorkload, runWorkload);
