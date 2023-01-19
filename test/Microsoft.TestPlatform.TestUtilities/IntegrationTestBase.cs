@@ -48,7 +48,6 @@ public class IntegrationTestBase
     private readonly string _testAdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _nUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
-    private readonly string _chutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools".Replace('\\', Path.DirectorySeparatorChar);
 
     public enum UnitTestFramework
     {
