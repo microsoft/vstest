@@ -168,7 +168,7 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         {
             startedWork++;
             slot.IsRunning = true;
-            EqtTrace.Verbose($"ParallelOperationManager.RunWorkInParallel(): Running on pre-started host: {(DateTime.Now.TimeOfDay - slot.PreStartTime).TotalMilliseconds}ms {slot.InitTask?.Status}");
+            EqtTrace.Verbose($"ParallelOperationManager.RunWorkInParallel: Running on pre-started host: {(DateTime.Now.TimeOfDay - slot.PreStartTime).TotalMilliseconds}ms {slot.InitTask?.Status}");
             _runWorkload(slot.Manager!, slot.EventHandler!, slot.Work!, slot.IsPreStarted, slot.InitTask);
 
             // We already started as many as we were allowed, jump out;
