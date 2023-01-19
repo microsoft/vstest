@@ -94,7 +94,7 @@ public class ParallelOperationManagerTests
             parallelOperationManager.RunNextWork(manager);
         };
         Func<SampleManager, SampleHandler, SampleWorkload, Task> initializeWorkload = (_, _, _) =>
-            Task.Run(() => System.Threading.Thread.Sleep(100));
+            Task.Run(async () => await Task.Delay(100));
 
         // Act
         parallelOperationManager.StartWork(workloads, eventHandler, getEventHandler, initializeWorkload, runWorkload);
@@ -132,7 +132,7 @@ public class ParallelOperationManagerTests
             parallelOperationManager.RunNextWork(manager);
         };
         Func<SampleManager, SampleHandler, SampleWorkload, Task> initializeWorkload = (_, _, _) =>
-            Task.Run(() => System.Threading.Thread.Sleep(100));
+            Task.Run(async () => await Task.Delay(100));
 
         // Act
         parallelOperationManager.StartWork(workloads, eventHandler, getEventHandler, initializeWorkload, runWorkload);
@@ -175,7 +175,7 @@ public class ParallelOperationManagerTests
             }
         };
         Func<SampleManager, SampleHandler, SampleWorkload, Task> initializeWorkload = (_, _, _) =>
-            Task.Run(() => System.Threading.Thread.Sleep(100));
+            Task.Run(async () => await Task.Delay(100));
 
         // Act
         parallelOperationManager.StartWork(workloads, eventHandler, getEventHandler, initializeWorkload, runWorkload);
@@ -230,7 +230,7 @@ public class ParallelOperationManagerTests
             }
         };
         Func<SampleManager, SampleHandler, SampleWorkload, Task> initializeWorkload = (_, _, _) =>
-            Task.Run(() => System.Threading.Thread.Sleep(100));
+            Task.Run(async () => await Task.Delay(100));
 
         // Start the work, so we process workload 1 and then move to 2.
         parallelOperationManager.StartWork(workloads, eventHandler, getEventHandler, initializeWorkload, runWorkload);
