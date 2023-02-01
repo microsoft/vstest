@@ -28,7 +28,6 @@
     <NUnit3AdapterVersion>3.11.0</NUnit3AdapterVersion>
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
 
-    <ChutzpahAdapterVersion>4.4.13</ChutzpahAdapterVersion>
     <FluentAssertionsVersion>6.7.0</FluentAssertionsVersion>
 
     <!-- Versions that are used when building projects from TestAssets.sln for compatibility tests. See Invoke-TestAssetsBuild in scripts/build.ps1.
@@ -65,7 +64,7 @@
     <!-- Portable CPP test runner -->
     <TestPlatformRemoteExternalsVersion>17.3.32621.448</TestPlatformRemoteExternalsVersion>
     <TestPlatformMSDiaVersion>17.3.32621.448</TestPlatformMSDiaVersion>
-    <InteropExternalsVersion>17.3.32621.448</InteropExternalsVersion>
+    <InteropExternalsVersion>17.3.32622.426</InteropExternalsVersion>
     <MicrosoftFakesVersion>17.4.0-beta.22478.3</MicrosoftFakesVersion>
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
     <MicrosoftBuildFrameworkPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildFrameworkPackageVersion>
