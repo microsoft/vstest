@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting;
 
 internal class TestHostManagerCallbacks
 {
-    const int E_HANDLE = unchecked((int)0x80070006);
+    private const int E_HANDLE = unchecked((int)0x80070006);
 
     public static void ErrorReceivedCallback(StringBuilder testHostProcessStdError, string? data)
     {
