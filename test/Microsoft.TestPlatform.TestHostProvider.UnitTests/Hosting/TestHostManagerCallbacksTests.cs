@@ -115,7 +115,7 @@ public class TestHostManagerCallbacksTests
         Assert.IsTrue(onHostExitedCalled, "onHostExited was not called");
     }
 
-    class InvalidHandleProcessHelper : IProcessHelper
+    private class InvalidHandleProcessHelper : IProcessHelper
     {
         public bool TryGetExitCodeCalled { get; private set; }
 
