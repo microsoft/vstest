@@ -105,11 +105,11 @@ public class TestHostManagerCallbacksTests
         var handleProcessHelper = new InvalidHandleProcessHelper();
         bool onHostExitedCalled = false;
         TestHostManagerCallbacks.ExitCallBack(handleProcessHelper, null, new StringBuilder(),
-        hostProviderEventArgs =>
-        {
-            onHostExitedCalled = true;
-            Assert.AreEqual(-1, hostProviderEventArgs.ErrroCode);
-        });
+            hostProviderEventArgs =>
+            {
+                onHostExitedCalled = true;
+                Assert.AreEqual(-1, hostProviderEventArgs.ErrroCode);
+            });
 
         Assert.IsTrue(handleProcessHelper.TryGetExitCodeCalled, "TryGetExitCodeCalled was not called");
         Assert.IsTrue(onHostExitedCalled, "onHostExited was not called");
