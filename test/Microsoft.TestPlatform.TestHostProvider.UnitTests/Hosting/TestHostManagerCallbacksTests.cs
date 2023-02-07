@@ -187,7 +187,7 @@ public class TestHostManagerCallbacksTests
         public bool TryGetExitCode(object? process, out int exitCode)
         {
             var err = new COMException("Invalid handle", unchecked((int)0x80070006));
-            typeof(COMException).GetProperty("HResult").SetValue(err, unchecked((int)0x80070006));
+            typeof(COMException).GetProperty("HResult")!.SetValue(err, unchecked((int)0x80070006));
             TryGetExitCodeCalled = true;
             throw err;
         }
