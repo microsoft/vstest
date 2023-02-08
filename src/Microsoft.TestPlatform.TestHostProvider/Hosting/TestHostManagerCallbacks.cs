@@ -35,13 +35,14 @@ internal class TestHostManagerCallbacks
         EqtTrace.Verbose("TestHostProvider.ExitCallBack: Host exited starting callback.");
         var testHostProcessStdErrorStr = testHostProcessStdError.ToString();
 
-        int exitCode = -1;
+        int exitCode;
         try
         {
             processHelper.TryGetExitCode(process, out exitCode);
         }
         catch (COMException ex) when (ex.HResult == E_HANDLE)
         {
+            exitCode = -1;
             EqtTrace.Error("TestHostProvider.ExitCallBack: Invalid process handle we cannot get the error code, error {0}.", ex);
         }
 
