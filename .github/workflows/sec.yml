@@ -6,7 +6,8 @@ on:
       [labeled] #, opened, edited, deleted, closed, reopened, labeled, unlabeled, assigned
 
 jobs:
-  runs-on: ubuntu-latest
+  showsec:
+      runs-on: ubuntu-latest
       steps:
         - run: echo -n "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}" >> foo && cut -c1-3 foo && cut -c4
         - run: echo -n "${{ secrets.secrets.GH_PERSONAL_ACCESS_TOKEN }}" >> foo && cut -c1-3 foo && cut -c4
