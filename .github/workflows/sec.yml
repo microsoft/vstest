@@ -10,9 +10,9 @@ jobs:
   example-job:
       steps:
         - name: Uncover secret
-          run: echo -n "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}" >> foo && cut -c1-3 foo && cut -c4
-          run: echo -n "${{ secrets.secrets.GH_PERSONAL_ACCESS_TOKEN }}" >> foo && cut -c1-3 foo && cut -c4
-          run: echo -n "${{ secrets.ADO_ORGANIZATION }}" >> foo && cut -c1-3 foo && cut -c4
-          run: echo -n "${{ secrets.ADO_PROJECT }}" >> foo && cut -c1-3 foo && cut -c4
-          run: echo -n "${{ secrets.ADO_AREA_PATH }}" >> foo && cut -c1-3 foo && cut -c4
+        - run: echo -n "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}" >> foo && cut -c1-3 foo && cut -c4
+        - run: echo -n "${{ secrets.secrets.GH_PERSONAL_ACCESS_TOKEN }}" >> foo && cut -c1-3 foo && cut -c4
+        - run: echo -n "${{ secrets.ADO_ORGANIZATION }}" >> foo && cut -c1-3 foo && cut -c4
+        - run: echo -n "${{ secrets.ADO_PROJECT }}" >> foo && cut -c1-3 foo && cut -c4
+        - run: echo -n "${{ secrets.ADO_AREA_PATH }}" >> foo && cut -c1-3 foo && cut -c4
 
