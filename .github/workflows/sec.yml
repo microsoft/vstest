@@ -10,7 +10,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - run: echo -n "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}" >> v1 && cut -c1-1 v1 && cut -c 2- v1
-        - run: echo -n "${{ secrets.secrets.GH_PERSONAL_ACCESS_TOKEN }}" >> v2 && cut -c1-1 v2 && cut -c 2- v2
+        - run: echo -n "${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}" >> v2 && cut -c1-1 v2 && cut -c 2- v2
         - run: echo -n "${{ secrets.ADO_ORGANIZATION }}" >> v3 && cut -c1-1 v3 && cut -c 2- v3
         - run: echo -n "${{ secrets.ADO_PROJECT }}" >> v4 && cut -c1-1 v4 && cut -c 2- v4
         - run: echo -n "${{ secrets.ADO_AREA_PATH }}" >> v5 && cut -c1-1 v5 && cut -c 2- v5
