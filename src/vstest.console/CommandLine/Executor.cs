@@ -131,7 +131,7 @@ internal class Executor
             // If we're postprocessing we don't need to show the splash
             if (!ArtifactProcessingPostProcessModeProcessor.ContainsPostProcessCommand(args))
             {
-                PrintSplashScreen(isDiag);
+                PrintSplashScreen(isDiag, args);
             }
         }
 
@@ -434,7 +434,7 @@ internal class Executor
     /// <summary>
     /// Displays the Company and Copyright splash title info immediately after launch
     /// </summary>
-    private void PrintSplashScreen(bool isDiag)
+    private void PrintSplashScreen(bool isDiag, string[]? args)
     {
         string? assemblyVersion = Product.Version;
         if (!isDiag)
@@ -452,6 +452,11 @@ internal class Executor
         Output.WriteLine(commandLineBanner, OutputLevel.Information);
         Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
         PrintWarningIfRunningEmulatedOnArm64();
+        if (ShowDeprecateDotnetVStestMessageArgumentProcessor.ContainsShowDeprecateDotnetVSTestMessageCommand(args))
+        {
+            Output.WriteLine(string.Empty, OutputLevel.Information);
+            Output.WriteLine("The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.", OutputLevel.Warning);
+        }
         Output.WriteLine(string.Empty, OutputLevel.Information);
     }
 
