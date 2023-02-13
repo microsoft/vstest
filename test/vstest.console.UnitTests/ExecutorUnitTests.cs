@@ -338,6 +338,23 @@ public class ExecutorUnitTests
         Assert.IsFalse(mockOutput.Messages.Any(message => message.Message!.Contains("vstest.console.exe is running in emulated mode")));
     }
 
+    [TestMethod]
+    public void ExecutorShouldPrintDotnetVSTestDeprecationMessage()
+    {
+        var mockOutput = new MockOutput();
+        Mock<IProcessHelper> processHelper = new();
+        processHelper.Setup(x => x.GetCurrentProcessArchitecture()).Returns(PlatformArchitecture.X64);
+        processHelper.Setup(x => x.GetCurrentProcessId()).Returns(0);
+        Mock<IEnvironment> environment = new();
+        environment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X64);
+
+        new Executor(mockOutput, _mockTestPlatformEventSource.Object, processHelper.Object, environment.Object).Execute("--ShowDeprecateDotnetVSTestMessage");
+
+        Assert.AreEqual(6, mockOutput.Messages.Count);
+        Assert.AreEqual(OutputLevel.Warning, mockOutput.Messages[3].Level);
+        Assert.AreEqual("The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.", mockOutput.Messages[3].Message);
+    }
+
     private class MockOutput : IOutput
     {
         public List<OutputMessage> Messages { get; set; } = new List<OutputMessage>();

@@ -455,7 +455,7 @@ internal class Executor
         if (ShowDeprecateDotnetVStestMessageArgumentProcessor.ContainsShowDeprecateDotnetVSTestMessageCommand(args))
         {
             Output.WriteLine(string.Empty, OutputLevel.Information);
-            Output.WriteLine("The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.", OutputLevel.Warning);
+            Output.WriteLine(CommandLineResources.VSTestDeprecationMessage, OutputLevel.Warning);
         }
         Output.WriteLine(string.Empty, OutputLevel.Information);
     }

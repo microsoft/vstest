@@ -32,13 +32,10 @@ internal class ShowDeprecateDotnetVStestMessageProcessorCapabilities : BaseArgum
 
     public override bool AllowMultiple => false;
 
-    // We put priority at the same level of the argument processor for runsettings passed as argument through cli.
-    // We'll be sure to run before test run arg processor.
     public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.CliRunSettings;
 
     public override HelpContentPriority HelpPriority => HelpContentPriority.None;
 
-    // We want to be sure that this command won't show in user help
     public override string? HelpContentResourceName => null;
 }
 
