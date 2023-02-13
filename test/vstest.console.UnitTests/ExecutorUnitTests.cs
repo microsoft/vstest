@@ -339,7 +339,9 @@ public class ExecutorUnitTests
     }
 
     [TestMethod]
-    public void ExecutorShouldPrintDotnetVSTestDeprecationMessage()
+    [DataRow("--ShowDeprecateDotnetVSTestMessage")]
+    [DataRow("--showdeprecateDotnetvTestMessage")]
+    public void ExecutorShouldPrintDotnetVSTestDeprecationMessage(string commandLine)
     {
         var mockOutput = new MockOutput();
         Mock<IProcessHelper> processHelper = new();
@@ -348,7 +350,7 @@ public class ExecutorUnitTests
         Mock<IEnvironment> environment = new();
         environment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X64);
 
-        new Executor(mockOutput, _mockTestPlatformEventSource.Object, processHelper.Object, environment.Object).Execute("--ShowDeprecateDotnetVSTestMessage");
+        new Executor(mockOutput, _mockTestPlatformEventSource.Object, processHelper.Object, environment.Object).Execute(commandLine);
 
         Assert.AreEqual(6, mockOutput.Messages.Count);
         Assert.AreEqual(OutputLevel.Warning, mockOutput.Messages[3].Level);
