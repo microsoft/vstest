@@ -452,12 +452,19 @@ internal class Executor
         Output.WriteLine(commandLineBanner, OutputLevel.Information);
         Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
         PrintWarningIfRunningEmulatedOnArm64();
+        PrintWarningIfInvokedThroughDotnetVSTest(args);
+        Output.WriteLine(string.Empty, OutputLevel.Information);
+    }
+
+    /// <summary>
+    /// Display a warning if we're executed through `dotnet vstest`
+    /// </summary>
+    private void PrintWarningIfInvokedThroughDotnetVSTest(string[]? args)
+    {
         if (ShowDeprecateDotnetVStestMessageArgumentProcessor.ContainsShowDeprecateDotnetVSTestMessageCommand(args))
         {
-            Output.WriteLine(string.Empty, OutputLevel.Information);
-            Output.WriteLine(CommandLineResources.VSTestDeprecationMessage, OutputLevel.Warning);
+            Output.Warning(false, CommandLineResources.VSTestDeprecationMessage);
         }
-        Output.WriteLine(string.Empty, OutputLevel.Information);
     }
 
     /// <summary>
