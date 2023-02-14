@@ -11,10 +11,26 @@
     <RootNamespace>Microsoft.TestPlatform.AdapterUtilities</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <NuspecFile>Microsoft.TestPlatform.AdapterUtilities.nuspec</NuspecFile>
+    <NuspecBasePath>$(OutputPath)</NuspecBasePath>
+    <PackageId>Microsoft.TestPlatform.AdapterUtilities</PackageId>
+    <PackageTags>vstest visual-studio unittest testplatform mstest microsoft test testing</PackageTags>
+    <PackageDescription>
+      Includes helpers for the Test Platform's modern functionality such as standardized fully qualified names and hierarchical test case names.
+    </PackageDescription>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' == '$(NetFrameworkMinimum)'">
-    <RuntimeIdentifier>any</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
+
+  <ItemGroup Label="NuGet">
+    <NuspecProperty Include="Runtime=$(RuntimeIdentifier)" />
+  </ItemGroup>
 
   <ItemGroup Condition="'$(DotNetBuildFromSource)' != 'true'">
     <!-- CVE-2019-0657 mitigation -->

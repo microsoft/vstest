@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+    <PropertyGroup> <!-- TODO: Cleanup some of these properties when arcade migration is complete. -->
+        <PackagesFolder>$(MSBuildThisFileDirectory)src\package</PackagesFolder>
+        <ProjectUrl>https://github.com/microsoft/vstest/</ProjectUrl>
+
+        <CommonMetadataElements>
+            <id>$(PackageId)</id>
+            <version>$(Version)</version>
+            <title>$(PackageId)</title>
+            <authors>Microsoft</authors>
+            <owners>Microsoft</owners>
+            <requireLicenseAcceptance>true</requireLicenseAcceptance>
+            <description>$(PackageDescription)</description>
+            <license type="file">LICENSE_NET.txt</license>
+            <icon>Icon.png</icon>
+            <projectUrl>$(ProjectUrl)</projectUrl>
+            <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+            <tags>$(PackageTags)</tags>
+            <repository type="git"
+                        url="$(ProjectUrl)"
+                        branch="$(BranchName)"
+                        commit="$(CommitId)" />
+        </CommonMetadataElements>
+
+        <CommonFileElements>
+            <file src="$(PackagesFolder)\Icon.png" target="" />
+            <file src="$(PackagesFolder)\licenses\LICENSE_NET.txt" target="" />
+        </CommonFileElements>
+
+        <NuspecProperties>$(NuspecProperties);version=$(Version)</NuspecProperties>
+        <NuspecProperties>$(NuspecProperties);JsonNetVersion=$(NewtonsoftJsonVersion)</NuspecProperties>
+        <NuspecProperties>$(NuspecProperties);OutputPath=$(OutputPath)</NuspecProperties>
+        <NuspecProperties>$(NuspecProperties);PackagesFolder=$(PackagesFolder)</NuspecProperties>
+        <NuspecProperties>$(NuspecProperties);Runtime=$(RuntimeIdentifier)</NuspecProperties>
+        <NuspecProperties>$(NuspecProperties);TargetFramework=$(TargetFramework)</NuspecProperties>
+        <NuspecProperties>$(NuspecProperties);CommonMetadataElements=$(CommonMetadataElements)</NuspecProperties>
+        <NuspecProperties>$(NuspecProperties);CommonFileElements=$(CommonFileElements)</NuspecProperties>
+    </PropertyGroup>
+</Project>
