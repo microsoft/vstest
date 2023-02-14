@@ -1,35 +1,34 @@
 ﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>Microsoft.TestPlatform.Build</id>
-    <version>15.0.0</version>
-    <title>Microsoft.TestPlatform.Build</title>
-    <authors>Microsoft</authors>
-    <owners>Microsoft</owners>
-    <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>Build tasks and targets for running tests with Test Platform</description>
-    <license type="file">LICENSE_NET.txt</license>
-    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
-    <icon>Icon.png</icon>
-    <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
-    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
-    <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
-    <repository type="git" 
-                url="https://github.com/microsoft/vstest" 
-                branch="$BranchName$" 
-                commit="$CommitId$" />
-                
+    $CommonMetadataElements$
+
     <dependencies>
-      <group targetFramework="$TargetFramework$"></group>
+      <group targetFramework="netstandard2.0" />
     </dependencies>
   </metadata>
+
   <files>
-    <file src="Icon.png" target="" />
-    <file src="licenses\LICENSE_NET.txt" target="" />
-    <file src="Microsoft.TestPlatform.Build\$TargetFramework$\Microsoft.TestPlatform.targets" target="runtimes\any\native" />
+    $CommonFileElements$
+
+    <file src="netstandard2.0\Microsoft.TestPlatform.targets" target="runtimes\any\native" />
+
+    <file src="netstandard2.0\Microsoft.TestPlatform.Build.dll" target="lib\netstandard2.0" />
+    <file src="netstandard2.0\Microsoft.TestPlatform.Build.pdb" target="lib\netstandard2.0" />
 
     <!-- Add localized resources -->
-    <file src="Microsoft.TestPlatform.Build\$TargetFramework$\**\*.dll" target="lib\$TargetFramework$" />
-
+    <file src="netstandard2.0\cs\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\cs" />
+    <file src="netstandard2.0\de\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\de" />
+    <file src="netstandard2.0\es\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\es" />
+    <file src="netstandard2.0\fr\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\fr" />
+    <file src="netstandard2.0\it\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\it" />
+    <file src="netstandard2.0\ja\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\ja" />
+    <file src="netstandard2.0\ko\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\ko" />
+    <file src="netstandard2.0\pl\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\pl" />
+    <file src="netstandard2.0\pt-BR\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\pt-BR" />
+    <file src="netstandard2.0\ru\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\ru" />
+    <file src="netstandard2.0\tr\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\tr" />
+    <file src="netstandard2.0\zh-Hans\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\zh-Hans" />
+    <file src="netstandard2.0\zh-Hant\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard2.0\zh-Hant" />
   </files>
 </package>
