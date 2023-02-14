@@ -11,7 +11,7 @@
     <OutputType>Exe</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <IsTestProject>false</IsTestProject>
-    <Prefer32Bit>true</Prefer32Bit>
+    <Prefer32Bit Condition="'$(TargetFramework)' == '$(NetFrameworkMinimum)'">true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == '$(NetFrameworkMinimum)'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
