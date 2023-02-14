@@ -261,7 +261,7 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
             proxyDiscoveryManager.Initialize(_skipDefaultAdapters);
             proxyDiscoveryManager.InitializeDiscovery(discoveryCriteria, eventHandler, _skipDefaultAdapters);
 
-            EqtTrace.Verbose($"ProxyParallelDiscoveryManager.InitializeDiscoverTestsOnConcurrentManager: Init only: {discoveryCriteria.Sources.Single()}");
+            EqtTrace.Verbose($"ProxyParallelDiscoveryManager.InitializeDiscoverTestsOnConcurrentManager: Init only: {string.Join(", ", discoveryCriteria.Sources)}");
         });
     }
 
@@ -283,7 +283,7 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
                 EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery started.");
                 if (!initialized)
                 {
-                    EqtTrace.Verbose($"ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: Initialize right before run: {discoveryCriteria.Sources.Single()}");
+                    EqtTrace.Verbose($"ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: Initialize right before run: {string.Join(", ", discoveryCriteria.Sources)}");
                     proxyDiscoveryManager.Initialize(_skipDefaultAdapters);
                     proxyDiscoveryManager.InitializeDiscovery(discoveryCriteria, eventHandler, _skipDefaultAdapters);
                 }
@@ -292,7 +292,7 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
                     task?.Wait();
                 }
 
-                EqtTrace.Verbose($"ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: Run: {discoveryCriteria.Sources.Single().ToString()}");
+                EqtTrace.Verbose($"ProxyParallelDiscoveryManager.DiscoverTestsOnConcurrentManager: Run: {string.Join(", ", discoveryCriteria.Sources)}");
                 proxyDiscoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
             }).ContinueWith(t => HandleError(eventHandler, t), TaskContinuationOptions.OnlyOnFaulted);
 
