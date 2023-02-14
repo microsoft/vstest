@@ -200,6 +200,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSTest2", "playground\MSTes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "datacollector.arm64", "src\datacollector.arm64\datacollector.arm64.csproj", "{D27C951E-1935-4D76-A0E5-A00D7829C654}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vstest.console.arm64", "src\vstest.console.arm64\vstest.console.arm64.csproj", "{AD0EB901-E227-42E0-B7AE-28C3150B9A8B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -462,6 +464,10 @@ Global
 		{D27C951E-1935-4D76-A0E5-A00D7829C654}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D27C951E-1935-4D76-A0E5-A00D7829C654}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D27C951E-1935-4D76-A0E5-A00D7829C654}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD0EB901-E227-42E0-B7AE-28C3150B9A8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD0EB901-E227-42E0-B7AE-28C3150B9A8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD0EB901-E227-42E0-B7AE-28C3150B9A8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD0EB901-E227-42E0-B7AE-28C3150B9A8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -543,6 +549,7 @@ Global
 		{4DA57968-F547-4019-8381-03A218B6C385} = {6CE2F530-582B-4695-A209-41065E103426}
 		{874841C0-DCB9-4678-A952-5E06286CA2B0} = {6CE2F530-582B-4695-A209-41065E103426}
 		{D27C951E-1935-4D76-A0E5-A00D7829C654} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
+		{AD0EB901-E227-42E0-B7AE-28C3150B9A8B} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0541B30C-FF51-4E28-B172-83F5F3934BCD}
@@ -555,6 +562,7 @@ Global
 		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{71cb42ff-e750-4a3b-9c3a-ac938853cc89}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{76d4bb7e-d981-42d5-be96-6fad8def9a4a}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{7f26eda3-c8c4-4b7f-a9b6-d278c2f40a13}*SharedItemsImports = 13
+		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{ad0eb901-e227-42e0-b7ae-28c3150b9a8b}*SharedItemsImports = 5
 		src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems*{d27c951e-1935-4d76-a0e5-a00d7829c654}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
