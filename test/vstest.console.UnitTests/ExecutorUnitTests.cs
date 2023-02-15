@@ -340,7 +340,7 @@ public class ExecutorUnitTests
 
     [TestMethod]
     [DataRow("--ShowDeprecateDotnetVSTestMessage")]
-    [DataRow("--showdeprecateDotnetvTestMessage")]
+    [DataRow("--showdeprecateDotnetvsTestMessage")]
     public void ExecutorShouldPrintDotnetVSTestDeprecationMessage(string commandLine)
     {
         var mockOutput = new MockOutput();
@@ -352,9 +352,9 @@ public class ExecutorUnitTests
 
         new Executor(mockOutput, _mockTestPlatformEventSource.Object, processHelper.Object, environment.Object).Execute(commandLine);
 
-        Assert.AreEqual(6, mockOutput.Messages.Count);
-        Assert.AreEqual(OutputLevel.Warning, mockOutput.Messages[3].Level);
-        Assert.AreEqual("The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.", mockOutput.Messages[3].Message);
+        Assert.AreEqual(5, mockOutput.Messages.Count);
+        Assert.AreEqual(OutputLevel.Warning, mockOutput.Messages[2].Level);
+        Assert.AreEqual("The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.", mockOutput.Messages[2].Message);
     }
 
     private class MockOutput : IOutput
