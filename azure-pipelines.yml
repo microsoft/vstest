@@ -4,7 +4,7 @@ jobs:
 - job: Windows
   timeoutInMinutes: 120
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
   variables:
     buildConfiguration: 'Release'
   steps:
@@ -50,7 +50,7 @@ jobs:
   dependsOn: Windows
   timeoutInMinutes: 120
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
   variables:
     buildConfiguration: 'Release'
   steps:
