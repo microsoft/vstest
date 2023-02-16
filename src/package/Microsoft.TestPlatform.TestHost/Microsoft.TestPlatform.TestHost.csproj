@@ -19,7 +19,7 @@
       Testplatform host executes the test using specified adapter.
     </PackageDescription>
 
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <NoWarn>$(NoWarn);NU5128;MSB3270</NoWarn>
   </PropertyGroup>
 
   <ItemGroup Label="NuGet">

@@ -36,7 +36,7 @@
     <MicrosoftNetCompilersToolsetVersion>4.1.0-1.21507.14</MicrosoftNetCompilersToolsetVersion>
     <MicrosoftNetTestSdkVersion>15.7.2</MicrosoftNetTestSdkVersion>
     <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>17.5.0-preview-3-33219-258</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
-    <MicrosoftVisualStudioEnterpriseAspNetHelper>17.5.0-preview-3-33219-258</MicrosoftVisualStudioEnterpriseAspNetHelper>
+    <MicrosoftVisualStudioEnterpriseAspNetHelper>$(MicrosoftVisualStudioDiagnosticsUtilitiesVersion)</MicrosoftVisualStudioEnterpriseAspNetHelper>
     <MoqVersion>4.16.1</MoqVersion>
     <MonoOptionsVersion>5.3.0.1</MonoOptionsVersion>
     <McMasterExtensionsCommandLineUtils>2.3.0</McMasterExtensionsCommandLineUtils>

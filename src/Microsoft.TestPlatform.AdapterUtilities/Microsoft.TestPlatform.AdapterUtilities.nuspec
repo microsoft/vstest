@@ -18,7 +18,20 @@
 
     <file src="net462\Microsoft.TestPlatform.AdapterUtilities.dll" target="lib\net462" />
     <file src="net462\Microsoft.TestPlatform.AdapterUtilities.pdb" target="lib\net462" />
-    <file src="net462\**\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462" />
+
+    <file src="net462\cs\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\cs" />
+    <file src="net462\de\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\de" />
+    <file src="net462\es\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\es" />
+    <file src="net462\fr\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\fr" />
+    <file src="net462\it\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\it" />
+    <file src="net462\ja\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\ja" />
+    <file src="net462\ko\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\ko" />
+    <file src="net462\pl\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\pl" />
+    <file src="net462\pt-BR\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\pt-BR" />
+    <file src="net462\ru\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\ru" />
+    <file src="net462\tr\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\tr" />
+    <file src="net462\zh-Hans\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\zh-Hans" />
+    <file src="net462\zh-Hant\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net462\zh-Hant" />
 
     <!-- TODO: Include source files. -->
   </files>

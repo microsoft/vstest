@@ -915,10 +915,7 @@ function Create-NugetPackages {
     $timer = Start-Timer
 
     Write-Log "Create-NugetPackages: Started."
-    $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     $packageOutputDir = $TPB_PackageOutDir
-
-    Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "Icon.png") $stagingDir -Force
 
     # Packages folder should not be cleared on CI.
     # Artifacts from source-build are downloaded into this directory before the build starts, and this would remove them.
@@ -934,93 +931,42 @@ function Create-NugetPackages {
         New-Item $packageOutputDir -Type directory -Force
     }
 
-    $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
-
-    # Copy over the nuspecs to the staging directory
-    $nuspecFiles = @(
-        "Microsoft.CodeCoverage.nuspec",
-        "Microsoft.NET.Test.Sdk.nuspec",
-        "Microsoft.TestPlatform.AdapterUtilities.nuspec",
-        "Microsoft.TestPlatform.nuspec",
-        "Microsoft.TestPlatform.Portable.nuspec",
-        "TestPlatform.Extensions.TrxLogger.nuspec",
-        "TestPlatform.ObjectModel.nuspec",
-        "TestPlatform.TestHost.nuspec",
-        "TestPlatform.TranslationLayer.nuspec"
-        "TestPlatform.Internal.Uwp.nuspec"
-    )
-
-    $projectFiles = @(
-        "Microsoft.TestPlatform.CLI.csproj",
-        "Microsoft.TestPlatform.Build.csproj"
-    )
-
-    $dependencies = @(
-        "TestPlatform.Build.nuspec",
-        "TestPlatform.CLI.nuspec",
-
-        ## .target and .props Files
-        "Microsoft.NET.Test.Sdk.props",
-        "Microsoft.CodeCoverage.props",
-        "Microsoft.CodeCoverage.targets",
-
-        ## Content Directories
-        "netcoreapp",
-        "netfx"
-    )
-
-    # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
-    $skipAnalysis = @(
-        "TestPlatform.CLI.nuspec",
-        "Microsoft.TestPlatform.CLI.csproj"
-    )
-
-
-    foreach ($item in $nuspecFiles + $projectFiles + $dependencies) {
-        Copy-Item $tpNuspecDir\$item $stagingDir -Force -Recurse
-    }
-
-    # Copy empty and third patry notice file
-    Copy-Item $tpNuspecDir\"_._" $stagingDir -Force
-    Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force
-    Copy-Item $tpNuspecDir\..\"ThirdPartyNoticesCodeCoverage.txt" $stagingDir -Force
-
-    # Copy licenses folder
-    Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "licenses") $stagingDir -Force -Recurse
-
-    $testhostCore31PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore31")
-    Copy-Item $tpNuspecDir\"Microsoft.TestPlatform.TestHost.NetCore.props" $testhostCore31PackageDir\Microsoft.TestPlatform.TestHost.props -Force
-
-    # Call nuget pack on these components.
-    $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
     $dotnetExe = Get-DotNetPath
 
-    # Pass Newtonsoft.Json version to nuget pack to keep the version consistent across all nuget packages.
-    $JsonNetVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.JsonNetVersion
+    $packages = @(
+        "Microsoft.TestPlatform.AdapterUtilities",
+        "Microsoft.TestPlatform.Build",
+        "Microsoft.TestPlatform.Extensions.TrxLogger",
+        "Microsoft.TestPlatform.ObjectModel",
+        "Microsoft.TestPlatform.VsTestConsole.TranslationLayer",
+        #"Microsoft.CodeCoverage",
+        "Microsoft.NET.Test.Sdk",
+        #"Microsoft.TestPlatform",
+        "Microsoft.TestPlatform.CLI",
+        "Microsoft.TestPlatform.Internal.Uwp",
+        "Microsoft.TestPlatform.Portable",
+        "Microsoft.TestPlatform.TestHost"
+    )
 
-    # Additional external dependency folders
-    $microsoftFakesVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.MicrosoftFakesVersion
-    $FakesPackageDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness\$microsoftFakesVersion\contentFiles"
+    $packageFolderPackages = @(
+        "Microsoft.CodeCoverage",
+        "Microsoft.NET.Test.Sdk",
+        "Microsoft.TestPlatform",
+        "Microsoft.TestPlatform.CLI",
+        "Microsoft.TestPlatform.Internal.Uwp",
+        "Microsoft.TestPlatform.Portable",
+        "Microsoft.TestPlatform.TestHost"
+    )
 
-    # package them from stagingDir
-    foreach ($file in $nuspecFiles) {
-        $additionalArgs = ""
-        if ($skipAnalysis -contains $file) {
-            $additionalArgs = "-NoPackageAnalysis"
+    foreach ($package in $packages) {
+        $partialPath = [System.IO.Path]::Combine($env:TP_ROOT_DIR, "src")
+        if ($packageFolderPackages -contains $package) {
+            $partialPath = [System.IO.Path]::Combine($partialPath, "package")
         }
 
-        Invoke-Exe $nugetExe -Arguments "pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version;JsonNetVersion=$JsonNetVersion;Runtime=$TPB_TargetRuntime;NetCoreTargetFramework=$TPB_TargetFrameworkCore31;FakesPackageDir=$FakesPackageDir;NetStandard20Framework=$TPB_TargetFrameworkNS20;BranchName=$TPB_BRANCH;CommitId=$TPB_COMMIT $additionalArgs"
-    }
-
-    foreach ($file in $projectFiles) {
-        $additionalArgs = ""
-        if ($skipAnalysis -contains $file) {
-            $additionalArgs = "-NoPackageAnalysis"
-        }
-
-        Write-Host "Attempting to build package from '$file'."
-        Invoke-Exe $dotnetExe -Arguments "restore $stagingDir\$file" -CaptureOutput | Out-Null
-        Invoke-Exe $dotnetExe -Arguments "pack --no-build  $stagingDir\$file -o $packageOutputDir -p:Version=$TPB_Version -p:BranchName=`"$TPB_BRANCH`" -p:CommitId=`"$TPB_COMMIT`" /bl:pack_$file.binlog"
+        Write-Host "Attempting to build package from '$package.csproj'."
+        $projectPath = [System.IO.Path]::Combine($partialPath, "$package", "$package.csproj")
+        Invoke-Exe $dotnetExe -Arguments "pack --no-build $projectPath -o $packageOutputDir -p:Configuration=$TPB_Configuration /bl:pack_$package.Project.binlog"
     }
 
     # Verifies that expected number of files gets shipped in nuget packages.

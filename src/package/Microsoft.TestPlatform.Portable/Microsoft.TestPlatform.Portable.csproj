@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>$(NetCoreAppMinimum);$(NetFrameworkMinimum);net47;net471;net472;net48;netstandard2.0;netcoreapp3.1;net7.0</TargetFrameworks>
   </PropertyGroup>
@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>$(NoWarn);NU5128;NU1702;MSB3270;NETSDK1189</NoWarn> <!-- TODO: Should remove MSB3270 & NETSDK1189 -->
+    <NoWarn>$(NoWarn);NU5128;NU1702;MSB3270</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>

@@ -25,7 +25,7 @@
     <!-- netcoreapp3.1 -->
     <file src="netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.*.dll" target="lib\netcoreapp3.1\" />
     <file src="netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.*.pdb" target="lib\netcoreapp3.1\" />
-    <file src="netcoreapp3.1\Microsoft.TestPlatform.*.dll" target="lib\netcoreapp3.1\" />
+    <file src="netcoreapp3.1\Microsoft.TestPlatform.*.dll" exclude="netcoreapp3.1\**\Microsoft.TestPlatform.TestHost.dll" target="lib\netcoreapp3.1\" />
     <file src="netcoreapp3.1\Microsoft.TestPlatform.*.pdb" target="lib\netcoreapp3.1\" />
     <file src="netcoreapp3.1\testhost.dll" target="lib\netcoreapp3.1\" />
     <file src="netcoreapp3.1\testhost.pdb" target="lib\netcoreapp3.1\" />

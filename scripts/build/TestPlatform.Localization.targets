@@ -28,7 +28,7 @@
     <EmbeddedResource Include="$(ResourceDirectory)\*.resx" Exclude="@(_CopyOfResources)" />
   </ItemGroup>
 
-  <Target Name="Localize" Condition="'$(ProductProject)' == 'true' and @(EmbeddedResource) != ''" DependsOnTargets="_CreateLocalizeXLF;_CreateLocalizeResx" />
+  <Target Name="Localize" Condition="'$(ProductProject)' == 'true' and @(EmbeddedResource) != '' and '$(SkipLocalization)' != 'true'" DependsOnTargets="_CreateLocalizeXLF;_CreateLocalizeResx" />
     <!--<Message Importance="High" Text="resources are @(EmbeddedResource)" />
   </Target>-->
 

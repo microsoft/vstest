@@ -20,10 +20,6 @@
     </PackageDescription>
   </PropertyGroup>
 
-  <ItemGroup Label="NuGet">
-    <NuspecProperty Include="JsonNetVersion=$(JsonNetVersion)" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.CrossPlatEngine\Microsoft.TestPlatform.CrossPlatEngine.csproj" />

@@ -27,12 +27,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>$(NoWarn);NU5100;NU1702</NoWarn>
+    <NoWarn>$(NoWarn);NU5100;NU1702;MSB3270</NoWarn>
   </PropertyGroup>
-
-  <ItemGroup Label="NuGet">
-    <NuspecProperty Include="JsonNetVersion=$(JsonNetVersion)" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\datacollector\datacollector.csproj" />

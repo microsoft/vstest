@@ -3,6 +3,8 @@
   <PropertyGroup>
     <!-- TODO: Remove this when migration is done. -->
     <OutputPath>$(MSBuildThisProjectDir)bin\$(Configuration)\</OutputPath>
+
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>

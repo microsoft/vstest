@@ -25,6 +25,8 @@
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <DefineConstants>$(DefineConstants);USE_EXTERN_ALIAS</DefineConstants>
 
+    <SkipLocalization>true</SkipLocalization>
+
     <MSBuildWarningsAsMessages>
       $(MSBuildWarningsAsMessages);MSB3276;
     </MSBuildWarningsAsMessages>
@@ -69,7 +71,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>NullableHelpers.tt</DependentUpon>
     </Compile>
-    <Compile Include="$(TestPlatformRoot)src\vstest.console\Resources\Resources.Designer.cs">
+    <Compile Update="$(TestPlatformRoot)src\vstest.console\Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>

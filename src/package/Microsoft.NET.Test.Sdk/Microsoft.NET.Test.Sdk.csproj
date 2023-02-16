@@ -27,10 +27,6 @@
     <None Include="netcoreapp\Microsoft.NET.Test.Sdk.Program.cs" />
   </ItemGroup>
 
-  <ItemGroup Label="NuGet">
-    <NuspecProperty Include="JsonNetVersion=$(JsonNetVersion)" />
-  </ItemGroup>
-
   <ItemGroup>
     <None Update="_._">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
