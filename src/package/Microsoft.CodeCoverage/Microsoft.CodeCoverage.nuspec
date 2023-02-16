@@ -18,7 +18,7 @@
     <file src="net462\Microsoft.CodeCoverage.props" target="build\netstandard2.0\" />
     <file src="net462\Microsoft.CodeCoverage.targets" target="build\netstandard2.0\" />
 
-    <file src="net472\Microsoft.VisualStudio.TraceDataCollector\Microsoft.VisualStudio.TraceDataCollector.dll" target="build\netstandard2.0\" />
+    <file src="net462\Microsoft.VisualStudio.TraceDataCollector\Microsoft.VisualStudio.TraceDataCollector.dll" target="build\netstandard2.0\" />
     <file src="net462\Microsoft.CodeCoverage.Core\Microsoft.CodeCoverage.Core.dll" target="build\netstandard2.0\" />
     <file src="net462\Microsoft.CodeCoverage.Interprocess\Microsoft.CodeCoverage.Interprocess.dll" target="build\netstandard2.0\" />
     <file src="net462\Microsoft.CodeCoverage.Instrumentation\Microsoft.CodeCoverage.Instrumentation.dll" target="build\netstandard2.0\" />
