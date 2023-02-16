@@ -56,6 +56,7 @@ Param(
 
 . $PSScriptRoot\common.lib.ps1
 
+
 # Set Version from scripts/build/TestPlatform.Settings.targets, when we are running locally and not providing the version as the parameter 
 # or when the build is done directly in VS
 if([string]::IsNullOrWhiteSpace($Version))
