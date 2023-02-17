@@ -171,8 +171,8 @@ jobs:
     clean: all
   strategy:
     matrix:
-      Ubuntu_20_04:
-        vmImage: ubuntu-20.04
+      Ubuntu_18_04:
+        vmImage: ubuntu-18.04
         pwsh: true
       macOS_11:
         vmImage: macOS-11
