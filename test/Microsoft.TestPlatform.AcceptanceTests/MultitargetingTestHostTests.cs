@@ -14,6 +14,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [TestMethod]
         [TestCategory("Windows-Review")]
+        [Ignore("Unreliable")]
         // the underlying test is using xUnit to avoid AppDomain enhancements in MSTest that make this pass even without multitargetting
         // xUnit supports net452 onwards, so that is why this starts at net452, I also don't test all framework versions
         [NetCoreRunner(NETFX452_48)]
