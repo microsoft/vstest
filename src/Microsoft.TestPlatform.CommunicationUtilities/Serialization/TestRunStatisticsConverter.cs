@@ -23,13 +23,13 @@ public class TestRunStatisticsConverter : JsonConverter
     }
 
     /// <inheritdoc/>
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
         return serializer.Deserialize<TestRunStatistics>(reader);
     }
 
     /// <inheritdoc/>
-    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         serializer.Serialize(writer, value);
     }
