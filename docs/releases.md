@@ -26,7 +26,7 @@
 * Add postmortem blame mode [#4032](https://github.com/microsoft/vstest/pull/4032)
 * Add VSTEST_DISABLE_THREADPOOL_SIZE_INCREASE feature flag [#4046](https://github.com/microsoft/vstest/pull/4046)
 
-See full log [here](https://github.com/microsoft/vstest/compare/v17.4.0...v17.5.0)
+See full log [here](https://github.com/microsoft/vstest/compare/v17.4.1...v17.5.0)
 
 ### Artifacts
 
