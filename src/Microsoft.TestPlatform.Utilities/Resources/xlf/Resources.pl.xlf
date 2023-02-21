@@ -5,32 +5,32 @@
       <trans-unit id="InvalidRunSettingsXml">
         <source>Run settings XML does not contain "RunSettings" node.</source>
         <note></note>
-        <target state="translated">Plik XML parametrów uruchomieniowych nie zawiera węzła „RunSettings”.</target>
+        <target state="new">Run settings XML does not contain "RunSettings" node.</target>
       </trans-unit>
       <trans-unit id="InvalidSettingsIncorrectValue">
         <source>Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'.</source>
         <note></note>
-        <target state="translated">Nieprawidłowe ustawienie „{0}”. Nieprawidłowa wartość „{1}” określona dla elementu „{2}”.</target>
+        <target state="new">Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'.</target>
       </trans-unit>
       <trans-unit id="MissingRunSettingsNode">
         <source>Could not find 'RunSettings' node.</source>
         <note></note>
-        <target state="translated">Nie można odnaleźć węzła „RunSettings”.</target>
+        <target state="new">Could not find 'RunSettings' node.</target>
       </trans-unit>
       <trans-unit id="NoRunSettingsNodeFound">
         <source>Could not find 'RunSettings' node.</source>
         <note></note>
-        <target state="translated">Nie można odnaleźć węzła „RunSettings”.</target>
+        <target state="new">Could not find 'RunSettings' node.</target>
       </trans-unit>
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the settings.  Error: {0}.</source>
         <note></note>
-        <target state="translated">Wystąpił błąd podczas ładowania ustawień. Błąd: {0}</target>
+        <target state="new">An error occurred while loading the settings.  Error: {0}.</target>
       </trans-unit>
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
         <note></note>
-        <target state="translated">Określono nieoczekiwany plik ustawień.</target>
+        <target state="new">Unexpected settings file specified.</target>
       </trans-unit>
     </body>
   </file>
