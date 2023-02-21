@@ -1,5 +1,19 @@
 # Release Notes
 
+## 17.5.0
+
+### Issues Fixed
+
+* Cherry-pick "Remove chutzpah (#4249)" [#4282](https://github.com/microsoft/vstest/pull/4282)
+* Fix SDK issue [#4278](https://github.com/microsoft/vstest/pull/4278)
+
+See full log [here](https://github.com/microsoft/vstest/compare/v17.5.0-preview-20221221-03...v17.5.0)
+
+### Artifacts
+
+* TestPlatform vsix: [17.5.0](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/17.5/20230221-01;/TestPlatform.vsix)
+* Microsoft.TestPlatform.ObjectModel : [17.5.0](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/17.5.0)
+
 ## 17.5.0-preview-20221221-03
 
 ### Issues Fixed
