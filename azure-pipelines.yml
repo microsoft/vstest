@@ -1,4 +1,10 @@
-# Pipeline YAML for PR
+trigger:
+- main
+- rel/*
+
+pr:
+- main
+- rel/*
 
 jobs:
 - job: Windows
@@ -15,7 +21,7 @@ jobs:
     displayName: 'Run script build.cmd'
     inputs:
       filename: build.cmd
-      arguments: '-verbose -configuration $(buildConfiguration) -ci -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish"'
+      arguments: '-verbose -configuration $(buildConfiguration) -ci -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish, Pack, Manifest"'
       modifyEnvironment: false
       failOnStandardError: true
 
@@ -168,8 +174,8 @@ jobs:
       Ubuntu_18_04:
         vmImage: ubuntu-18.04
         pwsh: true
-      macOS_10_15_Catalina:
-        vmImage: macOS-10.15
+      macOS_11:
+        vmImage: macOS-11
         pwsh: true
   pool:
     vmImage: $[ variables['vmImage'] ]
@@ -215,5 +221,5 @@ jobs:
   parameters:
     platform:
       name: Managed
-      container: mcr.microsoft.com/dotnet-buildtools/prereqs:centos-7-3e800f1-20190501005343
+      container: mcr.microsoft.com/dotnet-buildtools/prereqs:centos-7
       buildScript: eng/common/build.sh

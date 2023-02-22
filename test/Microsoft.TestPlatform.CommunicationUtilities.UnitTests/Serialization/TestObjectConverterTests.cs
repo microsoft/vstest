@@ -164,6 +164,6 @@ public class TestObjectConverterTests
 
     private static T Deserialize<T>(string json)
     {
-        return JsonDataSerializer.Instance.Deserialize<T>(json);
+        return JsonDataSerializer.Instance.Deserialize<T>(json)!;
     }
 }

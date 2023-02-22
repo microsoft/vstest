@@ -80,7 +80,7 @@ public class JsonDataSerializerTests
         var json = _jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
 
         // This line should deserialize properly
-        var result = _jsonDataSerializer.Deserialize<ClassWithSelfReferencingLoop>(json, 1);
+        var result = _jsonDataSerializer.Deserialize<ClassWithSelfReferencingLoop>(json, 1)!;
 
         Assert.AreEqual(typeof(ClassWithSelfReferencingLoop), result.GetType());
         Assert.IsNull(result.InfiniteRefernce);

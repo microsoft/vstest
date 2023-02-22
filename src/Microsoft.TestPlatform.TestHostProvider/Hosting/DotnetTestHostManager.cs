@@ -733,8 +733,8 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 using (JsonTextReader reader = new(file))
                 {
                     JObject context = (JObject)JToken.ReadFrom(reader);
-                    JObject runtimeOptions = (JObject)context.GetValue("runtimeOptions");
-                    JToken additionalProbingPaths = runtimeOptions.GetValue("additionalProbingPaths");
+                    JObject runtimeOptions = (JObject)context.GetValue("runtimeOptions")!;
+                    JToken additionalProbingPaths = runtimeOptions.GetValue("additionalProbingPaths")!;
                     foreach (var x in additionalProbingPaths)
                     {
                         EqtTrace.Verbose("DotnetTestHostmanager: Looking for path {0} in folder {1}", testHostPath, x.ToString());
