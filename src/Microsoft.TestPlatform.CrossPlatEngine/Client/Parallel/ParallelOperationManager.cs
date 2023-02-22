@@ -163,6 +163,10 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         // but not from starting their assigned work at the same time.
 
         // Kick of all pre-started hosts from the ones that had the longest time to initialize.
+        //
+        // This code should be safe even outside the lock since HasWork is only changed when work is
+        // complete and only for the slot that completed work. It is not possible to complete work before
+        // starting it (which is what we are trying to do here).
         var startedWork = 0;
         foreach (var slot in slots.Where(s => s.HasWork && !s.IsRunning && s.IsPreStarted).OrderBy(s => s.PreStartTime))
         {
