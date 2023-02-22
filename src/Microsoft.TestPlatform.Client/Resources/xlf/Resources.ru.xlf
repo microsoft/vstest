@@ -4,23 +4,23 @@
     <body>
       <trans-unit id="InvalidStateForExecution">
         <source>The test run could not be executed because the initial state was invalid.</source>
-        <note></note>
+        <note />
         <target state="new">The test run could not be executed because the initial state was invalid.</target>
       </trans-unit>
       <trans-unit id="WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive">
         <source>Wait for completion operation is not allowed when there is no active test run. </source>
-        <note></note>
+        <note />
         <target state="new">Wait for completion operation is not allowed when there is no active test run. </target>
       </trans-unit>
       <trans-unit id="TestSessionTimeoutMessage">
         <source>Aborting test run: test run timeout of {0} milliseconds exceeded.</source>
         <target state="new">Aborting test run: test run timeout of {0} milliseconds exceeded.</target>
-        <note></note>
+        <note />
       </trans-unit>
       <trans-unit id="NoTestHostProviderFound">
         <source>No suitable test runtime provider found for this run.</source>
         <target state="new">No suitable test runtime provider found for this run.</target>
-        <note></note>
+        <note />
       </trans-unit>
     </body>
   </file>
