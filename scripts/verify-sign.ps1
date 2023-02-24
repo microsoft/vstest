@@ -35,7 +35,7 @@ $TPB_AssembliesPattern = @(
     "*test*.dll", "*qualitytools*.dll", "*test*.exe", "*datacollector*.dll", "*datacollector*.exe",
     "QTAgent*.exe", "Microsoft.VisualStudio*.dll", "Microsoft.TestPlatform.Build.dll", "Microsoft.DiaSymReader.dll",
     "Microsoft.IntelliTrace*.dll", "concrt140.dll", "msvcp140.dll", "vccorlib140.dll", "vcruntime140.dll", "codecoveragemessages.dll",
-    "covrun32.dll", "msdia140.dll", "covrun64.dll", "IntelliTrace.exe", "ProcessSnapshotCleanup.exe", "TDEnvCleanup.exe",
+    "covrun32.dll", "msdia140.dll", "covrun64.dll", "covrunarm64.dll", "IntelliTrace.exe", "ProcessSnapshotCleanup.exe", "TDEnvCleanup.exe",
     "CodeCoverage.exe", "Microsoft.ShDocVw.dll", "UIAComwrapper.dll", "Interop.UIAutomationClient.dll", "SettingsMigrator.exe",
     "Newtonsoft.Json.dll", "DumpMinitool*.exe"
 )
@@ -52,6 +52,9 @@ function Verify-Assemblies
 
             if ($signature.Status -eq "Valid") {
                 if ($signature.SignerCertificate.Subject -eq "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US") {
+                    Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path"
+                }
+                elseif ($signature.SignerCertificate.Subject -eq "CN=.NET, O=Microsoft Corporation, L=Redmond, S=Washington, C=US") {
                     Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path"
                 }
                 elseif ($signature.SignerCertificate.Subject -eq "CN=Microsoft 3rd Party Application Component, O=Microsoft Corporation, L=Redmond, S=Washington, C=US") {
@@ -78,6 +81,10 @@ function Verify-Assemblies
                     elseif ($signature.SignerCertificate.Thumbprint -eq "62009AAABDAE749FD47D19150958329BF6FF4B34") {
                         Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
                     }
+                    # For some dlls sign certificate is different signature. Skip such binaries.
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "F9A36937C16D0A69A43981DACB6B5686FAD84543") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
+                    }
                     # Microsoft 3rd Party Authenticode Signature
                     elseif ($signature.SignerCertificate.Thumbprint -eq "899FA016DEE8E665FF2A315A1151C43FB96C430B") {
                         Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
@@ -93,6 +100,10 @@ function Verify-Assemblies
                     # For some dlls sign certificate is different signature, which already come as signed from nuget packages. Skip such binaries.
                     elseif ($signature.SignerCertificate.Thumbprint -eq "81C25099511180D15B858DC2B7EC4C057B1CE4BF") {
                         Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
+                    }
+                    # .NET Foundation, Newtonsoft.Json.dll 13.0.1
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "4CFB89FAA49539A58968D81960B3C1258E8F6A34") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [.NET Foundation Signed]"
                     }
                     else {
                         Write-FailLog "Invalid ($($signature.SignerCertificate.Thumbprint)). File: $Path. [$($signature.SignerCertificate.Subject)]"

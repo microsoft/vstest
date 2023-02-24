@@ -6,7 +6,9 @@ param (
   [Parameter(Mandatory)]
   [string] $IsRtmBuild,
   [Parameter(Mandatory)]
-  $Branch
+  $Branch,
+  [Parameter(Mandatory)]
+  [string] $ForcePreviewOnRelBranch
 )
 
 $TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.FullName
@@ -17,7 +19,7 @@ $buildPrefix = $TpVersion.Trim()
 
 if ($IsRtmBuild.ToLower() -eq "false")
 {
-  if ($null -ne $Branch -and $Branch -like "refs/heads/rel/*")
+  if ($null -ne $Branch -and $Branch -like "refs/heads/rel/*" -and "false" -eq $ForcePreviewOnRelBranch)
   {
     $BuildSuffix = $BuildSuffix -replace "preview", "release"
   }
