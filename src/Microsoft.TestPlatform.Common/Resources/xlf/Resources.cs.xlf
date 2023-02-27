@@ -4,108 +4,108 @@
     <body>
       <trans-unit id="DataCollectionMessageFormat">
         <source>Data collection : {0}</source>
-        <note />
         <target state="new">Data collection : {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorMessageFormat">
         <source>Data collector '{0}' message: {1}.</source>
-        <note />
         <target state="new">Data collector '{0}' message: {1}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DuplicateExtensionUri">
         <source>Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</source>
-        <note />
         <target state="new">Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DuplicateSettingsName">
         <source>Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.</source>
-        <note />
         <target state="new">Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DuplicateSettingsProvided">
         <source>Duplicate run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
-        <note />
         <target state="new">Duplicate run settings section named '{0}' found.  Ignoring the duplicate settings.</target>
+        <note />
       </trans-unit>
       <trans-unit id="EmptyParenthesis">
         <source>Error: Empty parenthesis ( )</source>
-        <note />
         <target state="new">Error: Empty parenthesis ( )</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidCondition">
         <source>Error: Invalid Condition '{0}'</source>
-        <note />
         <target state="new">Error: Invalid Condition '{0}'</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidExtensionUriFormat">
         <source>Test Extension has an invalid URI '{0}': {1}</source>
-        <note />
         <target state="new">Test Extension has an invalid URI '{0}': {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidOperator">
         <source>Error: Invalid operator '{0}'</source>
-        <note />
         <target state="new">Error: Invalid operator '{0}'</target>
+        <note />
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</source>
-        <note />
         <target state="new">Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</target>
+        <note />
       </trans-unit>
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</source>
-        <note />
         <target state="new">Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</target>
+        <note />
       </trans-unit>
       <trans-unit id="MissingCloseParenthesis">
         <source>Error: Missing ')'</source>
-        <note />
         <target state="new">Error: Missing ')'</target>
+        <note />
       </trans-unit>
       <trans-unit id="MissingOpenParenthesis">
         <source>Error: Missing '('</source>
-        <note />
         <target state="new">Error: Missing '('</target>
+        <note />
       </trans-unit>
       <trans-unit id="MissingOperand">
         <source>Error: Missing operand</source>
-        <note />
         <target state="new">Error: Missing operand</target>
+        <note />
       </trans-unit>
       <trans-unit id="MissingOperator">
         <source>Missing Operator '|' or '&amp;'</source>
-        <note />
         <target state="new">Missing Operator '|' or '&amp;'</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunSettingsAlreadyLoaded">
         <source>The Run Settings have already been loaded.</source>
-        <note />
         <target state="new">The Run Settings have already been loaded.</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the run settings.  Error: {0}</source>
-        <note />
         <target state="new">An error occurred while loading the run settings.  Error: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="SettingsNodeInvalidName">
         <source>Invalid settings node specified. The name property of the settings node must be non-empty.</source>
-        <note />
         <target state="new">Invalid settings node specified. The name property of the settings node must be non-empty.</target>
+        <note />
       </trans-unit>
       <trans-unit id="SettingsProviderInitializationError">
         <source>An error occurred while initializing the settings provider named '{0}'. Error: {1}</source>
-        <note />
         <target state="new">An error occurred while initializing the settings provider named '{0}'. Error: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="SettingsProviderNotFound">
         <source>Settings Provider named '{0}' was not found.  The settings can not be loaded.</source>
-        <note />
         <target state="new">Settings Provider named '{0}' was not found.  The settings can not be loaded.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestCaseFilterFormatException">
         <source>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</source>
-        <note />
         <target state="new">Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorErrorOnGetVariable">
         <source>Data collector '{0}' failed to provide initialization information. Error: {1}</source>
