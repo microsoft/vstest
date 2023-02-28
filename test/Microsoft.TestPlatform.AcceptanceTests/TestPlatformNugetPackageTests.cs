@@ -19,7 +19,7 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
     [ClassInitialize]
     public static void ClassInit(TestContext _)
     {
-        var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
+        var packageLocation = Path.Combine(IntegrationTestEnvironment.RepoRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
         var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.*.nupkg").OrderBy(a => a).First();
         s_nugetPackageFolder = Path.Combine(new TempDirectory().Path, Path.GetFileNameWithoutExtension(nugetPackage)!);
         ZipFile.ExtractToDirectory(nugetPackage, s_nugetPackageFolder);

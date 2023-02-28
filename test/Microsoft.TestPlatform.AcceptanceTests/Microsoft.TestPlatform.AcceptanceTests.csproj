@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
     <IsTestProject>true</IsTestProject>
     <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
   </PropertyGroup>
-  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
+
   <PropertyGroup>
     <OutputType Condition=" $(TargetFramework.StartsWith('net6')) ">Exe</OutputType>
     <TargetFrameworks>net6.0;net48</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.AcceptanceTests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
@@ -27,8 +25,8 @@
     <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.Extensions.HtmlLogger\Microsoft.TestPlatform.Extensions.HtmlLogger.csproj" />
-    <ProjectReference Include="$(TestPlatformRoot)test\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />
+    <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.Extensions.HtmlLogger\Microsoft.TestPlatform.Extensions.HtmlLogger.csproj" />
+    <ProjectReference Include="$(RepoRoot)test\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsVersion)" />
@@ -49,5 +47,5 @@
     <Reference Include="System.Reflection" />
     <Reference Include="System.Text.RegularExpressions" />
   </ItemGroup>
-  <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
+
 </Project>

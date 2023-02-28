@@ -1,10 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
         <PackagesPath Condition="'$(TP_PACKAGES_DIR)' != ''">$(TP_PACKAGES_DIR)\</PackagesPath>
-        <PackagesPath Condition="'$(PackagesPath)' == ''">$(TestPlatformRoot)\packages\</PackagesPath>
+        <PackagesPath Condition="'$(PackagesPath)' == ''">$(RepoRoot)\packages\</PackagesPath>
     </PropertyGroup>
-    <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" />
+    <Import Project="$(RepoRoot)scripts/build/TestPlatform.Dependencies.props" />
 
     <!-- Required by Microsoft.Common.targets -->
     <Target Name="CreateManifestResourceNames" Condition="'@(EmbeddedResource)' != ''" />

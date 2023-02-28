@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
-  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
+
   <PropertyGroup>
     <!-- TODO: Do we need this for net6.0 as well? -->
     <TargetFramework>net48</TargetFramework>
@@ -26,5 +25,5 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
+
 </Project>

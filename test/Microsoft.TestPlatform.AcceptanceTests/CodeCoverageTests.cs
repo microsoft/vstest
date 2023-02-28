@@ -131,7 +131,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             AssemblyName = "CodeCoverageTest.dll",
             TargetPlatform = "x86",
             RunSettingsPath = Path.Combine(
-                IntegrationTestEnvironment.TestPlatformRootDirectory,
+                IntegrationTestEnvironment.RepoRootDirectory,
                 @"scripts", "vstest-codecoverage2.runsettings"),
             RunSettingsType = TestParameters.SettingsType.Custom,
             ExpectedPassedTests = 3,
@@ -153,7 +153,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             AssemblyName = "CodeCoverageTest.dll",
             TargetPlatform = "x64",
             RunSettingsPath = Path.Combine(
-                IntegrationTestEnvironment.TestPlatformRootDirectory,
+                IntegrationTestEnvironment.RepoRootDirectory,
                 @"scripts", "vstest-codecoverage2.runsettings"),
             RunSettingsType = TestParameters.SettingsType.Custom,
             ExpectedPassedTests = 3,
@@ -194,7 +194,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
             AssemblyName = "SimpleTestProject.dll",
             TargetPlatform = "x64",
             RunSettingsPath = Path.Combine(
-                IntegrationTestEnvironment.TestPlatformRootDirectory,
+                IntegrationTestEnvironment.RepoRootDirectory,
                 @"scripts", "vstest-codecoverage2.runsettings"),
             RunSettingsType = TestParameters.SettingsType.CoberturaOutput,
             ExpectedPassedTests = 1,
@@ -252,7 +252,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
         var assemblyPaths = GetAssetFullPath(testParameters.AssemblyName);
 
-        string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
+        string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.RepoRootDirectory,
             "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
 
         string diagFileName = Path.Combine(tempDirectory.Path, "diaglog.txt");
@@ -266,7 +266,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
         var defaultRunSettingsPath = Path.Combine(
-            IntegrationTestEnvironment.TestPlatformRootDirectory,
+            IntegrationTestEnvironment.RepoRootDirectory,
             @"scripts", "vstest-codecoverage.runsettings");
 
         var runSettings = string.Empty;

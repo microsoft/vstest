@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.TestUtilities;
 /// </summary>
 public class IntegrationTestEnvironment
 {
-    public static string TestPlatformRootDirectory { get; private set; } =
+    public static string RepoRootDirectory { get; private set; } =
         Environment.GetEnvironmentVariable("TP_ROOT_DIR")
         ?? Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
 
@@ -37,20 +37,20 @@ public class IntegrationTestEnvironment
             TargetFramework = "net462";
         }
 
-        if (TestPlatformRootDirectory.IsNullOrEmpty())
+        if (RepoRootDirectory.IsNullOrEmpty())
         {
             // Running in VS/IDE. Use artifacts directory as root.
             // Get root directory from test assembly output directory
-            TestPlatformRootDirectory = Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
+            RepoRootDirectory = Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
         }
 
-        TestAssetsPath = Path.Combine(TestPlatformRootDirectory, $@"test{Path.DirectorySeparatorChar}TestAssets");
+        TestAssetsPath = Path.Combine(RepoRootDirectory, $@"test{Path.DirectorySeparatorChar}TestAssets");
 
         // There is an assumption that integration tests will always run from a source enlistment.
         // Need to remove this assumption when we move to a CDP.
-        PackageDirectory = Path.Combine(TestPlatformRootDirectory, @"packages");
-        ToolsDirectory = Path.Combine(TestPlatformRootDirectory, @"tools");
-        TestArtifactsDirectory = Path.Combine(TestPlatformRootDirectory, "artifacts", "testArtifacts");
+        PackageDirectory = Path.Combine(RepoRootDirectory, @"packages");
+        ToolsDirectory = Path.Combine(RepoRootDirectory, @"tools");
+        TestArtifactsDirectory = Path.Combine(RepoRootDirectory, "artifacts", "testArtifacts");
         RunnerFramework = "net462";
     }
 
@@ -70,7 +70,7 @@ public class IntegrationTestEnvironment
     }
 
     public static Dictionary<string, string> DependencyVersions
-        => s_dependencyVersions ??= GetDependencies(TestPlatformRootDirectory);
+        => s_dependencyVersions ??= GetDependencies(RepoRootDirectory);
 
     /// <summary>
     /// Gets the nuget packages directory for enlistment.
@@ -88,7 +88,7 @@ public class IntegrationTestEnvironment
             // this is running in cli, but that's a bad idea, the console there does not have
             // a runtime config and will fail to start with error testhostpolicy.dll not found
             var publishDirectory = Path.Combine(
-                TestPlatformRootDirectory,
+                RepoRootDirectory,
                 "artifacts",
                 BuildConfiguration,
                 RunnerFramework,
@@ -260,9 +260,9 @@ public class IntegrationTestEnvironment
         return packagePath;
     }
 
-    private static Dictionary<string, string> GetDependencies(string testPlatformRoot)
+    private static Dictionary<string, string> GetDependencies(string repoRoot)
     {
-        var dependencyPropsFile = Path.Combine(testPlatformRoot, @"scripts\build\TestPlatform.Dependencies.props".Replace('\\', Path.DirectorySeparatorChar));
+        var dependencyPropsFile = Path.Combine(repoRoot, @"scripts\build\TestPlatform.Dependencies.props".Replace('\\', Path.DirectorySeparatorChar));
         var dependencyProps = new Dictionary<string, string>();
         if (!File.Exists(dependencyPropsFile))
         {

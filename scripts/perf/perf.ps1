@@ -119,7 +119,7 @@ function Get-TestAdapterPath($testadapter)
 {
     if($testadapter -eq "MsTest")
     {
-        return "$env:TP_PACKAGES_DIR\mstest.testadapter\$($Script:TPT_DependencyProps.Project.PropertyGroup.MSTestAdapterVersion)\build\_common"
+        return "$env:TP_PACKAGES_DIR\mstest.testadapter\$($Script:TPT_DependencyProps.Project.PropertyGroup.MSTestTestAdapterVersion)\build\_common"
     }
     if($testadapter -eq "xUnit")
     {
@@ -135,7 +135,7 @@ function Get-AdapterVersion($testadapter)
 {
     if($testadapter -eq "MsTest")
     {
-        return "$($Script:TPT_DependencyProps.Project.PropertyGroup.MSTestAdapterVersion)"
+        return "$($Script:TPT_DependencyProps.Project.PropertyGroup.MSTestTestAdapterVersion)"
     }
     if($testadapter -eq "xUnit")
     {
