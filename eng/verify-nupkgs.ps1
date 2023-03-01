@@ -6,6 +6,8 @@ Param(
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
+$ErrorActionPreference = 'Stop'
+
 function Unzip {
     param([string]$zipfile, [string]$outpath)
 
@@ -14,8 +16,8 @@ function Unzip {
     [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)
 }
 
-function Verify-Nuget-Packages {
-    Write-Host "Starting Verify-Nuget-Packages."
+function Confirm-NugetPackages {
+    Write-Verbose "Starting Confirm-NugetPackages."
     $expectedNumOfFiles = @{
         "Microsoft.CodeCoverage"                      = 59;
         "Microsoft.NET.Test.Sdk"                      = 16;
@@ -76,10 +78,10 @@ function Verify-Nuget-Packages {
     }
 
     if ($errors) {
-        Write-Error "There are $($errors.Count) errors:`n$($errors -join "`n")"
+        Write-Error "Validation of NuGet packages failed with $($errors.Count) errors:`n$($errors -join "`n")"
+    } else {
+        Write-Host "Successfully validated content of NuGet packages"
     }
-
-    Write-Host "Completed Verify-Nuget-Packages."
 }
 
-Verify-Nuget-Packages
+Confirm-NugetPackages
