@@ -1,5 +1,25 @@
 # Release Notes
 
+## 17.6.0-preview-20230223-05
+
+### Issues Fixed
+
+* Pre-start testhosts [#3666](https://github.com/microsoft/vstest/pull/3666)
+* Add `dotnet vstest` deprecation message [#4297](https://github.com/microsoft/vstest/pull/4297)
+* Catch unhandled exception and avoid crash on test host exit [#4291](https://github.com/microsoft/vstest/pull/4291)
+* Remove chutzpah [#4249](https://github.com/microsoft/vstest/pull/4249)
+* Fix string conversion of `Microsoft.TestPlatform.Extensions.TrxLogger.ObjectMode.TestOutcome` [#4243](https://github.com/microsoft/vstest/pull/4243)
+* Fix potential trx logger NRE [#4240](https://github.com/microsoft/vstest/pull/4240)
+* handle object disposed exception [#4221](https://github.com/microsoft/vstest/pull/4221)
+* Added support for checking testhost compatibility with test sessions [#4199](https://github.com/microsoft/vstest/pull/4199)
+
+See full log [here](https://github.com/microsoft/vstest/compare/v17.5.0-preview-20221221-03...v17.6.0-preview-20230223-05)
+
+### Artifacts
+
+* TestPlatform vsix: [17.6.0-preview-20230223-05](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/main/20230223-05;/TestPlatform.vsix)
+* Microsoft.TestPlatform.ObjectModel : [17.6.0-preview-20230223-05](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/17.6.0-preview-20230223-05)
+
 ## 17.5.0
 
 ### Issues Fixed
