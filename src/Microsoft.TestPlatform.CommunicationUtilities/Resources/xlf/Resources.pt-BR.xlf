@@ -4,28 +4,28 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <note />
         <target state="new">The active test run was aborted. Reason: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="ConnectionClosed">
         <source>An existing connection was forcibly closed by the remote host.</source>
-        <note />
         <target state="new">An existing connection was forcibly closed by the remote host.</target>
+        <note />
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted.</source>
-        <note />
         <target state="new">The active test discovery was aborted.</target>
+        <note />
       </trans-unit>
       <trans-unit id="AbortedTestDiscoveryWithReason">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <note />
         <target state="new">The active test discovery was aborted. Reason: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test host process.</source>
-        <note />
         <target state="new">Unable to communicate with test host process.</target>
+        <note />
       </trans-unit>
       <trans-unit id="UnexpectedMessage">
         <source>Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</source>
