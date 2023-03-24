@@ -1,5 +1,19 @@
 # Release Notes
 
+## 17.0.2
+
+### Issues Fixed
+
+* [rel/17.0] Update Newtonsoft.Json to 13.0.1 [#4309](https://github.com/microsoft/vstest/pull/4309)
+* [rel/17.0] Update dependencies from devdiv/DevDiv/vs-code-coverage [#3159](https://github.com/microsoft/vstest/pull/3159)
+
+See full log [here](https://github.com/microsoft/vstest/compare/v17.0.0...v17.0.2)
+
+### Drops
+
+* TestPlatform vsix: [17.0.2](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/17.0/20230324-01;/TestPlatform.vsix)
+* Microsoft.TestPlatform.ObjectModel : [17.0.2](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/17.0.2)
+
 ## 17.6.0-preview-20230223-05
 
 ### Issues Fixed
