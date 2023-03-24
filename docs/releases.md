@@ -1,5 +1,17 @@
 # Release Notes
 
+## 17.3.3
+
+### Issues Fixed
+* [rel/17.3] Update Newtonsoft.Json to 13.0.1 [#4299](https://github.com/microsoft/vstest/pull/4299)
+
+See full log [here](https://github.com/microsoft/vstest/compare/v17.3.2...v17.3.3)
+
+### Drops
+
+* TestPlatform vsix: [17.3.3](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/17.3/20230324-03;/TestPlatform.vsix)
+* Microsoft.TestPlatform.ObjectModel : [17.3.3](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/17.3.3)
+
 ## 17.2.1
 
 ### Issues Fixed
