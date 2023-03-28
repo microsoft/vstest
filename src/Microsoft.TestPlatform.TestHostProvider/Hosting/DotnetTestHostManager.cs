@@ -160,7 +160,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private Action<object?> ExitCallBack => process =>
     {
         TPDebug.Assert(_testHostProcessStdError is not null, "_testHostProcessStdError is null");
-        TestHostManagerCallbacks.ExitCallBack(_processHelper, process, _testHostProcessStdError, OnHostExited);
+        new TestHostManagerCallbacks(false, null).ExitCallBack(_processHelper, process, _testHostProcessStdError, OnHostExited);
     };
 
     /// <summary>
@@ -169,7 +169,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private Action<object?, string?> ErrorReceivedCallback => (process, data) =>
     {
         TPDebug.Assert(_testHostProcessStdError is not null, "_testHostProcessStdError is null");
-        TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, data);
+        new TestHostManagerCallbacks(false, null).ErrorReceivedCallback(_testHostProcessStdError, data);
     };
 
     /// <inheritdoc/>
