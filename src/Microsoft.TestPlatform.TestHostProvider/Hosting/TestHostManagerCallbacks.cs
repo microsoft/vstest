@@ -62,7 +62,7 @@ internal class TestHostManagerCallbacks
         }
     }
 
-    public void ExitCallBack(
+    public static void ExitCallBack(
         IProcessHelper processHelper,
         object? process,
         StringBuilder testHostProcessStdError,
