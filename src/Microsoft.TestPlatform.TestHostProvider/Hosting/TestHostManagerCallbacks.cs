@@ -22,6 +22,19 @@ internal class TestHostManagerCallbacks
 
     public TestHostManagerCallbacks(bool forwardOutput, IMessageLogger? logger)
     {
+        if (forwardOutput)
+        {
+            string? but = null;
+            if (logger == null)
+            {
+                but = " But logger is null, so it won't forward any output.";
+            }
+            EqtTrace.Verbose($"TestHostManagerCallbacks.ctor: Experimental forwarding output is enabled.{but}");
+        }
+        else
+        {
+            EqtTrace.Verbose($"TestHostManagerCallbacks.ctor: Experimental forwarding output is disabled.");
+        }
         _forwardOutput = forwardOutput;
         _messageLogger = logger;
     }
@@ -32,7 +45,7 @@ internal class TestHostManagerCallbacks
         testHostProcessStdOut.AppendSafeWithNewLine(data);
         if (_forwardOutput && _messageLogger != null && !StringUtils.IsNullOrWhiteSpace(data))
         {
-            _messageLogger.SendMessage(TestMessageLevel.Warning, data);
+            _messageLogger.SendMessage(TestMessageLevel.Informational, data);
         }
     }
 

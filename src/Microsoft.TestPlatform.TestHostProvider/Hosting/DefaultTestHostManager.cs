@@ -371,7 +371,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
 
         _messageLogger = logger;
-        _testhostManagerCallbacks = new TestHostManagerCallbacks(true, logger);
+        _testhostManagerCallbacks = new TestHostManagerCallbacks(_environmentVariableHelper.GetEnvironmentVariable("VSTEST_EXPERIMENTAL_FORWARD_OUTPUT_FEATURE") == "1", logger);
         _architecture = runConfiguration.TargetPlatform;
         _targetFramework = runConfiguration.TargetFramework;
         _testHostProcess = null;
