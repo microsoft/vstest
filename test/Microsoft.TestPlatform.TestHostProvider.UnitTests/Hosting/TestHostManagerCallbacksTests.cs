@@ -111,7 +111,7 @@ public class TestHostManagerCallbacksTests
             throw err;
         });
 
-        new TestHostManagerCallbacks(false, null).ExitCallBack(mock.Object, null, new StringBuilder(),
+        TestHostManagerCallbacks.ExitCallBack(mock.Object, null, new StringBuilder(),
             hostProviderEventArgs =>
             {
                 onHostExitedCalled = true;
