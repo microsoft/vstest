@@ -126,7 +126,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     {
         TPDebug.Assert(_testHostProcessStdError is not null, "LaunchTestHostAsync must have been called before ExitCallBack");
         TPDebug.Assert(_testhostManagerCallbacks is not null, "Initialize must have been called before ExitCallBack");
-        _testhostManagerCallbacks.ExitCallBack(_processHelper, process, _testHostProcessStdError, OnHostExited);
+        TestHostManagerCallbacks.ExitCallBack(_processHelper, process, _testHostProcessStdError, OnHostExited);
     };
 
     /// <summary>
