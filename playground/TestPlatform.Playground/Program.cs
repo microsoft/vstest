@@ -88,7 +88,7 @@ internal class Program
             """;
 
         var sources = new[] {
-            @"C:\Users\jajares\Downloads\UnitTestProject\bin\Debug\net472\UnitTestProject.dll"
+            Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
             //Path.Combine(playground, "MSTest2", "bin", "Debug", "net472", "MSTest2.dll"),
             //Path.Combine(playground, "MSTest1", "bin", "Debug", "net5.0", "MSTest1.dll"),
         };
@@ -124,7 +124,7 @@ internal class Program
         var consoleOptions = new ConsoleParameters
         {
             EnvironmentVariables = EnvironmentVariables.Variables,
-           //  LogFilePath = Path.Combine(here, "logs", "log.txt"),
+            LogFilePath = Path.Combine(here, "logs", "log.txt"),
             TraceLevel = TraceLevel.Off,
         };
         var options = new TestPlatformOptions
@@ -154,7 +154,7 @@ internal class Program
         //r.RunTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
         var rd = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery: {discoveryDuration} ms, Run: {rd} ms, Total: {discoveryDuration + rd} ms");
-        // Console.WriteLine($"Settings:\n{sourceSettings}");
+        Console.WriteLine($"Settings:\n{sourceSettings}");
     }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
