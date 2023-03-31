@@ -67,6 +67,7 @@ public class SampleDataCollectorAttachmentProcessor : IDataCollectorAttachmentPr
     public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
     {
         string finalFileName = configurationElement.FirstChild!.InnerText;
+        StringBuilder stringBuilder = new();
         string? finalFolder = null;
         foreach (var attachmentSet in attachments)
         {
@@ -74,11 +75,11 @@ public class SampleDataCollectorAttachmentProcessor : IDataCollectorAttachmentPr
             {
                 finalFolder ??= Path.GetDirectoryName(attachment.Uri.AbsolutePath);
 
-                new StringBuilder().AppendLine(File.ReadAllText(attachment.Uri.AbsolutePath).Trim());
+                stringBuilder.AppendLine(File.ReadAllText(attachment.Uri.AbsolutePath).Trim());
             }
         }
 
-        File.WriteAllText(Path.Combine(finalFolder!, finalFileName), new StringBuilder().ToString());
+        File.WriteAllText(Path.Combine(finalFolder!, finalFileName), stringBuilder.ToString());
 
         List<AttachmentSet> mergedAttachment = new();
         var mergedAttachmentSet = new AttachmentSet(new Uri("my://sample/datacollector"), "SampleDataCollector");

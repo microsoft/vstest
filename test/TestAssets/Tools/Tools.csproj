@@ -13,8 +13,8 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.TestPlatform" Version="$(NETTestSdkVersion)" />
-    <PackageReference Include="Microsoft.TestPlatform.CLI" Version="$(NETTestSdkVersion)" />
+    <PackageReference Include="Microsoft.TestPlatform" Version="$(PackageVersion)" />
+    <PackageReference Include="Microsoft.TestPlatform.CLI" Version="$(PackageVersion)" />
   </ItemGroup>
 
 </Project>

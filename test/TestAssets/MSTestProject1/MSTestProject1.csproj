@@ -13,7 +13,7 @@
       <Version>$(MSTestTestAdapterVersion)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>$(NETTestSdkVersion)</Version>
+      <Version>$(PackageVersion)</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' ">

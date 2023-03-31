@@ -1,18 +1,15 @@
 [CmdletBinding()]
 Param(
-    [Parameter(Mandatory=$true)]
-    [System.String] $configuration
+    [Parameter(Mandatory)]
+    [ValidateSet("Debug", "Release")]
+    [string] $configuration,
+
+    [Parameter(Mandatory)]
+    [string] $versionPrefix
 )
 
+$ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
-
-function Unzip {
-    param([string]$zipfile, [string]$outpath)
-
-    Write-Verbose "Unzipping '$zipfile' to '$outpath'."
-
-    [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)
-}
 
 function Verify-Nuget-Packages {
     Write-Host "Starting Verify-Nuget-Packages."
@@ -31,41 +28,66 @@ function Verify-Nuget-Packages {
         "Microsoft.TestPlatform.Internal.Uwp"         = 39;
     }
 
-    $packageDirectory = Resolve-Path (Join-Path $PSScriptRoot "../artifacts/packages/$configuration")
-    $tmpDirectory = Resolve-Path (Join-Path $PSScriptRoot "../artifacts/tmp/$configuration")
-    $nugetPackages = Get-ChildItem -Filter "*.nupkg" $packageDirectory -Recurse -Exclude "*.symbols.nupkg" | ForEach-Object { $_.FullName }
+    $packageDirectory = Resolve-Path "$PSScriptRoot/../artifacts/packages/$configuration"
+    $tmpDirectory = Resolve-Path "$PSScriptRoot/../artifacts/tmp/$configuration"
 
-    Write-Verbose "Unzip NuGet packages."
-    $unzipNugetPackageDirs = New-Object System.Collections.Generic.List[System.Object]
+    $pattern = "*.$versionPrefix*.nupkg"
+    $nugetPackages = @(Get-ChildItem $packageDirectory -Filter $pattern -Recurse -File | Where-Object { $_.Name -notLike "*.symbols.nupkg"})
+
+    if (0 -eq $nugetPackages.Length) { 
+        throw "No nuget packages matching $pattern were found in '$packageDirectory'."
+    }
+
+    $suffixes = @($nugetPackages -replace ".*?$([regex]::Escape($versionPrefix))(.*)\.nupkg", '$1' | Sort-Object -Unique)
+    if (1 -lt $suffixes.Length) { 
+        Write-Host "There are two different suffixes matching the same version prefix: '$($suffixes -join "', '")'".
+
+        $latestNuget = $nugetPackages | 
+            Where-Object { $_.Name -like "Microsoft.TestPlatform.ObjectModel.*" } | 
+            Sort-Object -Property LastWriteTime -Descending | 
+            Select-Object -First 1
+        
+        $suffix = $suffixes | Where { $latestNuget.Name.Contains("$versionPrefix$_.nupkg") }
+        $version = "$versionPrefix$suffix"
+        Write-Host "The most recently written Microsoft.TestPlatform.ObjectModel.* nuget, is $($latestNuget.Name), which has '$suffix' suffix. Selecting only packages with that suffix."
+
+        $nugetPackages = $nugetPackages | Where-Object { $_.Name -like "*$version.nupkg" }
+    }
+    else { 
+        $suffix = $suffixes[0]
+        $version = "$versionPrefix$suffix"
+    }
+
+
+    Write-Host "Found $(@($nugetPackages).Count) nuget packages:`n    $($nugetPackages.FullName -join "`n    ")"
+    Write-Host "Unzipping NuGet packages."
+    $unzipNugetPackageDirs = @()
     foreach ($nugetPackage in $nugetPackages) {
-        $unzipNugetPackageDir = $(Join-Path $tmpDirectory $(Get-Item $nugetPackage).BaseName)
-        $unzipNugetPackageDirs.Add($unzipNugetPackageDir)
+        $unzipNugetPackageDir = Join-Path $tmpDirectory $nugetPackage.BaseName
+        $unzipNugetPackageDirs += $unzipNugetPackageDir
 
         if (Test-Path -Path $unzipNugetPackageDir) {
             Remove-Item -Force -Recurse $unzipNugetPackageDir
         }
 
-        Unzip $nugetPackage $unzipNugetPackageDir
+        Unzip $nugetPackage.FullName $unzipNugetPackageDir
     }
 
-    $versionPropsXml = [xml](Get-Content $PSScriptRoot\Versions.props)
-    $version = $versionPropsXml.Project.PropertyGroup.VersionPrefix | Where-Object { $null -ne $_ } | Select-Object -First 1
-    if ($null -eq $version) {
-        throw "version is null"
-    }
-
-    Write-Verbose "Verify NuGet packages files."
+    Write-Host "Verify NuGet packages files."
     $errors = @()
     foreach ($unzipNugetPackageDir in $unzipNugetPackageDirs) {
         try {
-            $packageFullName = (Get-Item $unzipNugetPackageDir).BaseName
-            $versionIndex = $packageFullName.LastIndexOf($version)
-            $packageKey = $packageFullName.Substring(0, $versionIndex - 1) # Remove last dot
-            Write-Verbose "verifying package '$packageKey'."
+            $packageBaseName = (Get-Item $unzipNugetPackageDir).BaseName
+            $packageKey = $packageBaseName.Replace([string]".$version", [string]"")
+            Write-Host "Verifying package '$packageBaseName'."
 
             $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir).Count
+            if (-not $expectedNumOfFiles.ContainsKey($packageKey)) {
+                $errors += "Package '$packageKey' is not present in file expectedNumOfFiles table. Is that package known?"
+                continue
+            }
             if ($expectedNumOfFiles[$packageKey] -ne $actualNumOfFiles) {
-                $errors += "Number of files are not equal for '$packageKey', expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
+                $errors += "Number of files are not equal for '$packageBaseName', expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
             }
         }
         finally {
@@ -80,6 +102,14 @@ function Verify-Nuget-Packages {
     }
 
     Write-Host "Completed Verify-Nuget-Packages."
+}
+
+function Unzip {
+    param([string]$zipfile, [string]$outpath)
+
+    Write-Verbose "Unzipping '$zipfile' to '$outpath'."
+
+    [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)
 }
 
 Verify-Nuget-Packages

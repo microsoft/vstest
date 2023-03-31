@@ -55,7 +55,7 @@ $Script:TPT_ErrorMsgColor = "Red"
 $Script:TPT_PayLoads=New-Object System.Collections.ArrayList
 $Script:TPT_PerfIterations = 10
 $Script:TPT_Results = New-Object System.Collections.ArrayList
-$Script:TPT_DependencyProps = [xml] (Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)
+$Script:TPT_DependencyProps = [xml] (Get-Content $env:TP_ROOT_DIR\eng\Versions.props)
 
 $ResultObject = New-Object PSObject
 Add-Member -InputObject $ResultObject -MemberType NoteProperty -Name Runner -Value ""

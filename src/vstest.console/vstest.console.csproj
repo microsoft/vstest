@@ -22,9 +22,7 @@
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <DefineConstants>$(DefineConstants);USE_EXTERN_ALIAS</DefineConstants>
 
-    <MSBuildWarningsAsMessages>
-      $(MSBuildWarningsAsMessages);MSB3276;
-    </MSBuildWarningsAsMessages>
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3276</MSBuildWarningsAsMessages>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == '$(NetFrameworkMinimum)'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>

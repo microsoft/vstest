@@ -3,6 +3,8 @@ trigger:
 - main
 - rel/*
 - arcade
+- arcade-test-onboarding
+- arcade-tests-on-non-windows
 
 # Branch(es) that trigger(s) build(s) on PR
 pr:
@@ -47,6 +49,11 @@ variables:
     value: False
   - name: _InternalBuildArgs
     value: ' '
+  # Arcade is using global cache of nugets in non-windows build
+  # under some circumstances, but we don't respect that in our code and try to find them
+  # in .packages. Force the location of packages to that folder.
+  - name: NUGET_PACKAGES
+    value: '$(Build.SourcesDirectory)/.packages'
 
   # Produce real signed binaries for Internal builds
   - ${{ if eq(variables._RunAsInternal, True) }}:
@@ -103,9 +110,9 @@ stages:
           matrix:
             Release:
               _BuildConfig: Release
-            ${{ if eq(variables._RunAsPublic, True) }}:
-              Debug:
-                _BuildConfig: Debug
+            # ${{ if eq(variables._RunAsPublic, True) }}:
+            #   Debug:
+            #     _BuildConfig: Debug
         steps:
         # This steps help to understand versions of .NET runtime installed on the machine,
         # which is useful to diagnose some governance issues.
@@ -115,21 +122,23 @@ stages:
             command: custom
             custom: '--info'
 
-        - script: eng\common\CIBuild.cmd
+        - powershell: eng\try-ci-build.ps1
             -configuration $(_BuildConfig)
             -prepareMachine
             $(_InternalBuildArgs)
             /p:Test=false
           name: Build
           displayName: Build
+          continueOnError: true
 
-        # TODO: Re-enable test step when tests are ready
         # -ci is allowing to import some environment variables and some required configurations
-        # - script: Test.cmd
-        #     -configuration $(_BuildConfig)
-        #     -ci
-        #   name: Test
-        #   displayName: Test
+        - script: Test.cmd
+            -configuration $(_BuildConfig)
+            -ci
+            -integrationTest
+            -performanceTest
+          name: Test
+          displayName: Test
 
         # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
         # through the console or trx
@@ -140,25 +149,118 @@ stages:
             ArtifactName: TestResults
           condition: failed()
 
-        # TODO: Publishing to the feeds is making non-arcade CI acceptance tests fail so we disable these steps for now.
-        #       They will need to be re-enabled once this is merged to main.
-        - ${{ if eq(variables._RunAsInternal, True) }}:
-        #   - task: NuGetAuthenticate@0
-        #     displayName: 'NuGet Authenticate to dotnet-tools and test-tools feeds'
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish VSSetup'
+          inputs:
+            PathtoPublish: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
+            ArtifactName: VSSetupArtifacts
+      
+      - job: OtherOSes
+        dependsOn: Windows
+        workspace:
+          clean: all
+        variables:
+          # Publish Logs seems to depend on this name of variable, so we define it
+          # even when we don't use matrix.
+          - name: _BuildConfig
+            value: Release
+        strategy:
+          matrix:
+            Ubuntu_22_04:
+              vmImage: ubuntu-22.04
+              pwsh: true
+            macOS_11:
+              vmImage: macOS-11
+              pwsh: true
+        pool:
+          vmImage: $[ variables['vmImage'] ]
+        steps:
+        - checkout: self
+          fetchDepth: 1
+          clean: true
+        
+        # Build but don't pack, packing does not work on non-windows and we want to test what we built on Windows
+        # anyway. Because that is what we will publish.
+        - script: ./build.sh
+            --configuration $(_BuildConfig)
+            --ci
+          name: Build
+          displayName: Build
+          continueOnError: true
+        
+        # Download the built packages into local package source, as if we built them on this machine.
+        - task: DownloadPipelineArtifact@2
+          displayName: Download Package Artifacts
+          inputs:
+            artifactName: PackageArtifacts
+            targetPath: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
+        
+        - script: ./test.sh
+            --configuration $(_BuildConfig)
+            --ci
+            --integrationTest
+            --performanceTest
+          name: Test
+          displayName: Test
+        
+        # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
+        # through the console or trx
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Test Results folders'
+          inputs:
+            PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
+            ArtifactName: TestResults
+          condition: failed()
 
-        #   - task: NuGetCommand@2
-        #     displayName: 'Publish NuGet packages to dotnet-tools feed'
-        #     inputs:
-        #       command: push
-        #       packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
-        #       publishVstsFeed: 'public/dotnet-tools'
+      - job: Publish
+        dependsOn: OtherOSes
+        pool:
+          ${{ if eq(variables._RunAsPublic, True) }}:
+            name: NetCore-Public
+            demands: ImageOverride -equals windows.vs2022.amd64.open
+          ${{ if eq(variables._RunAsInternal, True) }}:
+            name: NetCore1ESPool-Internal
+            demands: ImageOverride -equals 1es-windows-2022
+        strategy:
+          matrix:
+            Release:
+              _BuildConfig: Release
+            # ${{ if eq(variables._RunAsPublic, True) }}:
+            #   Debug:
+            #     _BuildConfig: Debug
+        steps:
+          # Download the built packages into local package source, as if we built them on this machine.
+          - task: DownloadPipelineArtifact@2
+            displayName: Download Package Artifacts
+            inputs:
+              artifactName: PackageArtifacts
+              targetPath: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
+          
+          - task: DownloadPipelineArtifact@2
+            displayName: Download VSSetup Artifacts
+            inputs:
+              artifactName: VSSetupArtifacts
+              targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
+          
+          # TODO: Publishing to the feeds is making non-arcade CI acceptance tests fail so we disable these steps for now.
+          #       They will need to be re-enabled once this is merged to main.
+          - ${{ if eq(variables._RunAsInternal, True) }}:
+            - task: NuGetAuthenticate@0
+              displayName: 'NuGet Authenticate to dotnet-tools and test-tools feeds'
 
-        #   - task: NuGetCommand@2
-        #     displayName: 'Publish NuGet packages to test-tools feed'
-        #     inputs:
-        #       command: push
-        #       packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
-        #       publishVstsFeed: 'public/test-tools'
+            # - task: NuGetCommand@2
+            #   displayName: 'Publish NuGet packages to dotnet-tools feed'
+            #   inputs:
+            #     command: push
+            #     packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
+            #     publishVstsFeed: 'public/dotnet-tools'
+
+            # - task: NuGetCommand@2
+            #   displayName: 'Publish NuGet packages to test-tools feed'
+            #   inputs:
+            #     command: push
+            #     packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
+            #     publishVstsFeed: 'public/test-tools'
 
           # Publishes setup VSIXes to a drop.
           # Note: The insertion tool looks for the display name of this task in the logs.

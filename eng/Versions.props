@@ -48,15 +48,6 @@
     <FluentAssertionsVersion>6.7.0</FluentAssertionsVersion>
     <MoqVersion>4.16.1</MoqVersion>
 
-    <!-- this version needs to be the same as in TestPlatform.Settings.targets, we might want to unify this into
-    a single .props file, but the other version is used by multiple build scripts, so I just query it and validate that
-    they are both the same during build -->
-    <!-- this version also needs to be "statically" readable because the test fixture will inspect this file for the version
-    and because during the test `dotnet test` will run and re-build some of the test projects and at that time the version
-    from a build parameter would not be available, so I am writing this version from the build.ps1 script to keep it in sync -->
-    <!-- Note that before bumping this version, you need to have one NuGet package available -->
-    <NETTestSdkVersion>17.6.0-dev</NETTestSdkVersion>
-
     <!-- For coverage use our own package on latest stable -->
     <MicrosoftCodeCoverageVersion>17.4.1</MicrosoftCodeCoverageVersion>
 
