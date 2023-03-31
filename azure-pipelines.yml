@@ -2,9 +2,6 @@
 trigger:
 - main
 - rel/*
-- arcade
-- arcade-test-onboarding
-- arcade-tests-on-non-windows
 
 # Branch(es) that trigger(s) build(s) on PR
 pr:
