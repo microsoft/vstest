@@ -119,7 +119,7 @@ stages:
             command: custom
             custom: '--info'
 
-        - powershell: eng\try-ci-build.ps1
+        - powershell: eng\common\CIBuild.cmd
             -configuration $(_BuildConfig)
             -prepareMachine
             $(_InternalBuildArgs)
