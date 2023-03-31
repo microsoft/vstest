@@ -2,9 +2,6 @@
 trigger:
 - main
 - rel/*
-- arcade
-- arcade-test-onboarding
-- arcade-tests-on-non-windows
 
 # Branch(es) that trigger(s) build(s) on PR
 pr:
@@ -122,7 +119,7 @@ stages:
             command: custom
             custom: '--info'
 
-        - powershell: eng\try-ci-build.ps1
+        - powershell: eng\common\CIBuild.cmd
             -configuration $(_BuildConfig)
             -prepareMachine
             $(_InternalBuildArgs)
@@ -148,6 +145,20 @@ stages:
             PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
             ArtifactName: TestResults
           condition: failed()
+        
+        # Public pipeline does not upload packages into artifacts, but we need them for tests on Linux and MacOS.
+        - ${{ if eq(variables._RunAsPublic, True) }}:
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Shipping Packages'
+            inputs:
+              PathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
+              ArtifactName: PackageArtifacts
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish NonShippping Packages'
+            inputs:
+              PathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/NonShipping'
+              ArtifactName: PackageArtifacts
 
         - task: PublishBuildArtifacts@1
           displayName: 'Publish VSSetup'
@@ -262,22 +273,22 @@ stages:
             #     packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
             #     publishVstsFeed: 'public/test-tools'
 
-          # Publishes setup VSIXes to a drop.
-          # Note: The insertion tool looks for the display name of this task in the logs.
-          - task: ms-vseng.MicroBuildTasks.4305a8de-ba66-4d8b-b2d1-0dc4ecbbf5e8.MicroBuildUploadVstsDropFolder@1
-            displayName: Upload VSTS Drop
-            inputs:
-              DropName: $(VisualStudioDropName)
-              DropFolder: 'artifacts\VSSetup\$(_BuildConfig)\Insertion'
-              AccessToken: $(_DevDivDropAccessToken)
-            condition: succeeded()
+            # Publishes setup VSIXes to a drop.
+            # Note: The insertion tool looks for the display name of this task in the logs.
+            - task: ms-vseng.MicroBuildTasks.4305a8de-ba66-4d8b-b2d1-0dc4ecbbf5e8.MicroBuildUploadVstsDropFolder@1
+              displayName: Upload VSTS Drop
+              inputs:
+                DropName: $(VisualStudioDropName)
+                DropFolder: 'artifacts\VSSetup\$(_BuildConfig)\Insertion'
+                AccessToken: $(_DevDivDropAccessToken)
+              condition: succeeded()
 
-          - task: PublishBuildArtifacts@1
-            displayName: Publish Artifact VSSetup
-            inputs:
-              PathtoPublish: 'artifacts\VSSetup\$(_BuildConfig)'
-              ArtifactName: 'VSSetup'
-            condition: succeeded()
+            - task: PublishBuildArtifacts@1
+              displayName: Publish Artifact VSSetup
+              inputs:
+                PathtoPublish: 'artifacts\VSSetup\$(_BuildConfig)'
+                ArtifactName: 'VSSetup'
+              condition: succeeded()
 
   - ${{ if eq(variables._RunAsInternal, True) }}:
     - template: /eng/common/templates/job/onelocbuild.yml
