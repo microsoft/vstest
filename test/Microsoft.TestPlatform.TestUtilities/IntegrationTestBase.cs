@@ -583,7 +583,7 @@ public class IntegrationTestBase
 
         if (testFramework == UnitTestFramework.MSTest)
         {
-            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _testAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["MSTestAdapterVersion"]);
+            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _testAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["MSTestTestAdapterVersion"]);
         }
         else if (testFramework == UnitTestFramework.NUnit)
         {
@@ -949,7 +949,7 @@ public class IntegrationTestBase
             throw new NotSupportedException(nameof(architecture));
         }
 
-        string path = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "tools",
+        string path = Path.Combine(IntegrationTestEnvironment.RepoRootDirectory, "tools",
             architecture == "X86" ?
             "dotnet_x86" :
             $"dotnet",

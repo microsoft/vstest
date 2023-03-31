@@ -372,10 +372,10 @@ public class CompatibilityRowsBuilder
             Path = vstestConsolePath,
         };
 
-        string GetToolsPath(string fwkVersion) => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "packages",
+        string GetToolsPath(string fwkVersion) => Path.Combine(IntegrationTestEnvironment.RepoRootDirectory, "packages",
             packageName, version, "tools", fwkVersion, "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe");
 
-        string GetContentFilesPath(string fwkVersion) => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "packages",
+        string GetContentFilesPath(string fwkVersion) => Path.Combine(IntegrationTestEnvironment.RepoRootDirectory, "packages",
             packageName, version, "contentFiles", "any", fwkVersion, "vstest.console.dll");
     }
 
@@ -410,7 +410,7 @@ public class CompatibilityRowsBuilder
         if (s_depsXml != null)
             return s_depsXml;
 
-        var depsXmlPath = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "scripts", "build", "TestPlatform.Dependencies.props");
+        var depsXmlPath = Path.Combine(IntegrationTestEnvironment.RepoRootDirectory, "scripts", "build", "TestPlatform.Dependencies.props");
         var fileStream = File.OpenRead(depsXmlPath);
         var xmlTextReader = new XmlTextReader(fileStream) { Namespaces = false };
         var depsXml = new XmlDocument();

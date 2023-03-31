@@ -6,6 +6,11 @@
     "architecture": "x64"
   },
   "tools": {
+    "vs": {
+      "version": "17.0",
+      "allowPrerelease": false
+    },
+    "vswhere": "2.2.7",
     "dotnet": "8.0.100-alpha.1.23074.25"
   },
   "msbuild-sdks": {

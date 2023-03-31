@@ -18,7 +18,7 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     [ClassInitialize]
     public static void ClassInit(TestContext _)
     {
-        var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
+        var packageLocation = Path.Combine(IntegrationTestEnvironment.RepoRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
         var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.Portable.*.nupkg").ToList();
         s_portablePackageFolder = Path.Combine(packageLocation, Path.GetFileNameWithoutExtension(nugetPackage[0]));
         if (Directory.Exists(s_portablePackageFolder))
