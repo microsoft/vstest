@@ -169,7 +169,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private Action<object?, string?> ErrorReceivedCallback => (process, data) =>
     {
         TPDebug.Assert(_testHostProcessStdError is not null, "_testHostProcessStdError is null");
-        TestHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, data);
+        new TestHostManagerCallbacks(false, null).ErrorReceivedCallback(_testHostProcessStdError, data);
     };
 
     /// <inheritdoc/>
