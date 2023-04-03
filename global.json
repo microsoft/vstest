@@ -6,6 +6,29 @@
     "architecture": "x64"
   },
   "tools": {
+    "runtimes": {
+      "dotnet/x64": [
+        "2.1.0",
+        "3.1.0",
+        "5.0.0",
+        "6.0.0",
+        "7.0.0",
+        "8.0.0-alpha.1.23058.2"
+      ],
+      "dotnet/x86": [
+        "2.1.0",
+        "3.1.0",
+        "5.0.0",
+        "6.0.0",
+        "7.0.0",
+        "8.0.0-alpha.1.23058.2"
+      ]
+    },
+    "vs": {
+      "version": "17.0",
+      "allowPrerelease": false
+    },
+    "vswhere": "2.2.7",
     "dotnet": "8.0.100-preview.1.23115.2"
   },
   "msbuild-sdks": {
