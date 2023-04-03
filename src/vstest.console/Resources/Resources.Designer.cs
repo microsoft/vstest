@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine....vstest.console.Resources {
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
     using System;
     
     
