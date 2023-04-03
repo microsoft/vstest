@@ -94,11 +94,11 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = GetAssetFullPath("SimpleTestProject.dll");
+        var assemblyPath = GetAssetFullPath("SimpleTestProject.dll");
         var xunitAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll");
 
-        assemblyPaths = string.Join(" ", assemblyPaths, xunitAssemblyPath.AddDoubleQuote());
-        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: string.Empty, FrameworkArgValue, string.Empty);
+        assemblyPath = string.Join(" ", assemblyPath.AddDoubleQuote(), xunitAssemblyPath.AddDoubleQuote());
+        InvokeVsTestForExecution(assemblyPath, testAdapterPath: string.Empty, FrameworkArgValue, string.Empty);
 
         ValidateSummaryStatus(2, 2, 1);
         ExitCodeEquals(1); // failing tests
