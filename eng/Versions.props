@@ -39,6 +39,7 @@
     <TestPlatformMSDiaVersion>17.3.32621.448</TestPlatformMSDiaVersion>
     <TestPlatformRemoteExternalsVersion>17.3.32621.448</TestPlatformRemoteExternalsVersion>
     <VSSdkBuildToolsVersion>17.4.2116</VSSdkBuildToolsVersion>
+    <MicrosoftNetCompilersToolsetVersion>4.6.0-1.final</MicrosoftNetCompilersToolsetVersion>
   </PropertyGroup>
   <PropertyGroup Label="VSTest test settings">
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->

@@ -41,7 +41,7 @@
       <Uri>https://github.com/dotnet/arcade-services</Uri>
       <Sha>cd705029f2675970b42f9273ae359d0926c5e815</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.1.0-1.21507.14">
+    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.6.0-1.final">
       <Uri>https://github.com/dotnet/roslyn</Uri>
       <Sha>4b309dc5400e39a2eea09d82077737c1df5f347a</Sha>
     </Dependency>
