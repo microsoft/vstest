@@ -126,7 +126,6 @@ stages:
             /p:Test=false
           name: Build
           displayName: Build
-          continueOnError: true
 
         # -ci is allowing to import some environment variables and some required configurations
         - script: Test.cmd
@@ -197,7 +196,6 @@ stages:
             --ci
           name: Build
           displayName: Build
-          continueOnError: true
         
         # Download the built packages into local package source, as if we built them on this machine.
         - task: DownloadPipelineArtifact@2
@@ -259,19 +257,19 @@ stages:
             - task: NuGetAuthenticate@0
               displayName: 'NuGet Authenticate to dotnet-tools and test-tools feeds'
 
-            # - task: NuGetCommand@2
-            #   displayName: 'Publish NuGet packages to dotnet-tools feed'
-            #   inputs:
-            #     command: push
-            #     packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
-            #     publishVstsFeed: 'public/dotnet-tools'
+            - task: NuGetCommand@2
+              displayName: 'Publish NuGet packages to dotnet-tools feed'
+              inputs:
+                command: push
+                packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
+                publishVstsFeed: 'public/dotnet-tools'
 
-            # - task: NuGetCommand@2
-            #   displayName: 'Publish NuGet packages to test-tools feed'
-            #   inputs:
-            #     command: push
-            #     packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
-            #     publishVstsFeed: 'public/test-tools'
+            - task: NuGetCommand@2
+              displayName: 'Publish NuGet packages to test-tools feed'
+              inputs:
+                command: push
+                packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
+                publishVstsFeed: 'public/test-tools'
 
             # Publishes setup VSIXes to a drop.
             # Note: The insertion tool looks for the display name of this task in the logs.
