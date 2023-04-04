@@ -65,7 +65,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     {
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject3.dll");
+        var assemblyPaths = GetAssetFullPath("SimpleTestProject3.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame:CollectDump");
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
@@ -89,7 +89,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     {
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll");
+        var assemblyPaths = GetAssetFullPath("SimpleTestProject.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame:CollectDump");
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
@@ -113,7 +113,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     {
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll");
+        var assemblyPaths = GetAssetFullPath("SimpleTestProject.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame:CollectDump;CollectAlways=True");
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
