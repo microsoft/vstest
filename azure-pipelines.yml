@@ -93,6 +93,10 @@ stages:
       testResultsFormat: 'vstest'
       enableTelemetry: true
       enableSourceBuild: true
+      artifacts:
+        publish:
+          # We have no logs to publish. Disable uploading: https://github.com/dotnet/arcade/blob/main/Documentation/AzureDevOps/TemplateSchema.md#artifact-example
+          logs: false
       jobs:
       - job: Windows
         timeoutInMinutes: 120
