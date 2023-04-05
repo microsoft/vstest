@@ -54,8 +54,15 @@ function Verify-Assemblies
                 if ($signature.SignerCertificate.Subject -eq "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US") {
                     Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path"
                 }
+                elseif ($signature.SignerCertificate.Subject -eq "CN=.NET, O=Microsoft Corporation, L=Redmond, S=Washington, C=US") {
+                    Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path"
+                }
                 elseif ($signature.SignerCertificate.Subject -eq "CN=Microsoft 3rd Party Application Component, O=Microsoft Corporation, L=Redmond, S=Washington, C=US") {
                     Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [3rd Party]"
+                }
+                elseif ($signature.SignerCertificate.Subject -eq "CN=Microsoft Windows, O=Microsoft Corporation, L=Redmond, S=Washington, C=US") {
+                    # We see this on server only, review what is the actual signature on the dlls we ship.
+                    Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [???]"
                 }
                 else {
                     # For legacy components, sign certificate is always "prod" signature. Skip such binaries.
@@ -76,6 +83,10 @@ function Verify-Assemblies
                     }
                     # For some dlls sign certificate is different signature. Skip such binaries.
                     elseif ($signature.SignerCertificate.Thumbprint -eq "62009AAABDAE749FD47D19150958329BF6FF4B34") {
+                        Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
+                    }
+                    # For some dlls sign certificate is different signature. Skip such binaries.
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "F9A36937C16D0A69A43981DACB6B5686FAD84543") {
                         Write-Debug "Valid ($($signature.SignerCertificate.Thumbprint)): $Path [Prod Signed]"
                     }
                     # Microsoft 3rd Party Authenticode Signature
