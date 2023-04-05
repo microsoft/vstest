@@ -221,39 +221,34 @@ stages:
             ArtifactName: TestResults
           condition: failed()
 
-      - job: Publish
-        dependsOn: OtherOSes
-        pool:
-          ${{ if eq(variables._RunAsPublic, True) }}:
-            name: NetCore-Public
-            demands: ImageOverride -equals windows.vs2022.amd64.open
-          ${{ if eq(variables._RunAsInternal, True) }}:
-            name: NetCore1ESPool-Internal
-            demands: ImageOverride -equals 1es-windows-2022
-        strategy:
-          matrix:
-            Release:
-              _BuildConfig: Release
-            # ${{ if eq(variables._RunAsPublic, True) }}:
-            #   Debug:
-            #     _BuildConfig: Debug
-        steps:
-          # Download the built packages into local package source, as if we built them on this machine.
-          - task: DownloadPipelineArtifact@2
-            displayName: Download Package Artifacts
-            inputs:
-              artifactName: PackageArtifacts
-              targetPath: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
-          
-          - task: DownloadPipelineArtifact@2
-            displayName: Download VSSetup Artifacts
-            inputs:
-              artifactName: VSSetupArtifacts
-              targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
-          
-          # TODO: Publishing to the feeds is making non-arcade CI acceptance tests fail so we disable these steps for now.
-          #       They will need to be re-enabled once this is merged to main.
-          - ${{ if eq(variables._RunAsInternal, True) }}:
+      - ${{ if eq(variables._RunAsInternal, True) }}:
+        - job: Publish
+          dependsOn: OtherOSes
+          pool:
+              name: NetCore1ESPool-Internal
+              demands: ImageOverride -equals 1es-windows-2022
+          strategy:
+            matrix:
+              Release:
+                _BuildConfig: Release
+          steps:
+            # The template job needs a log, otherwise it writes a warning. We can disable log uploading only for
+            # the whole stage, which is not what we want to do. So we write an empty file instead.
+            - pwsh: 'New-Item -Type file -Force "$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)/empty.log"'
+              name: 'Add_empty_logfile'
+            # Download the built packages into local package source, as if we built them on this machine.
+            - task: DownloadPipelineArtifact@2
+              displayName: Download Package Artifacts
+              inputs:
+                artifactName: PackageArtifacts
+                targetPath: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
+            
+            - task: DownloadPipelineArtifact@2
+              displayName: Download VSSetup Artifacts
+              inputs:
+                artifactName: VSSetupArtifacts
+                targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
+
             - task: NuGetAuthenticate@0
               displayName: 'NuGet Authenticate to dotnet-tools and test-tools feeds'
 
