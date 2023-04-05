@@ -234,7 +234,7 @@ stages:
           steps:
             # The template job needs a log, otherwise it writes a warning. We can disable log uploading only for
             # the whole stage, which is not what we want to do. So we write an empty file instead.
-            - pwsh: '"" | Set-Content "$(Build.SourcesDirectory)/artifacts/logs/$(_BuildConfig)/empty.log"'
+            - pwsh: 'New-Item -Type file -Force "$(Build.SourcesDirectory)/artifacts/logs/$(_BuildConfig)/empty.log"'
               name: 'Add_empty_logfile'
             # Download the built packages into local package source, as if we built them on this machine.
             - task: DownloadPipelineArtifact@2
