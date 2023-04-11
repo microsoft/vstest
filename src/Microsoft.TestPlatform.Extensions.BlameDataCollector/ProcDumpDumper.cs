@@ -42,7 +42,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
     private Process? _process;
     private string? _outputFilePrefix;
     private bool _isCrashDumpInProgress;
-    private bool _crashDumpDetected;
+    private readonly List<DateTime> _crashDumpTimestamps = new();
     private readonly int _timeout = EnvironmentHelper.GetConnectionTimeout() * 1000;
     private readonly ProcDumpExecutableHelper _procDumpExecutableHelper;
 
@@ -87,14 +87,14 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         {
             EqtTrace.Info($"ProcDumpDumper.OutputReceivedCallback: Output received from procdump process contains 'initiated', crashdump is being written. Don't cancel procdump right now.");
             _isCrashDumpInProgress = true;
-            _crashDumpDetected = true;
         }
 
         if (data != null && data.Contains("complete"))
         {
             EqtTrace.Info($"ProcDumpDumper.OutputReceivedCallback: Output received from procdump process contains 'complete' dump is finished, you can cancel procdump if you need.");
             _isCrashDumpInProgress = false;
-            // Do not reset _crashDumpDetected back to false here. Any detected crash dumping should keep it true, so we don't throw away the dump. 
+            // Do not reset _crashDumpDetected back to false here. Any detected crash dumping should keep it true, so we don't throw away the dump.
+            _crashDumpTimestamps.Add(DateTime.Now);
         }
     };
 
@@ -240,7 +240,7 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
         }
     }
 
-    public IEnumerable<string> GetDumpFiles(bool processCrashed)
+    public IEnumerable<string> GetDumpFiles(bool processCrashed, DateTime? testSessionEndedTimestamp)
     {
         var allDumps = _fileHelper.DirectoryExists(_outputDirectory)
             ? _fileHelper.GetFiles(_outputDirectory, "*_crashdump*.dmp", SearchOption.AllDirectories)
@@ -258,7 +258,19 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
 
         // When we know there was a crash dump collected, either because we detected it from the procdump output, or because
         // we got that info from exit code, don't try to remove the extra crash dump that we generate on process exit.
-        if (_crashDumpDetected || processCrashed)
+        var crashDumpDetected = _crashDumpTimestamps.Count == 0
+            // When there are 0 crashdumps detected, we know the detection was false.
+            ? false
+            : _crashDumpTimestamps.Count > 1
+                // When there are more than 1 crashdumps detected, we know it was true, and want to keep all dumps.
+                ? true
+                : testSessionEndedTimestamp == null
+                    // When test session did not end and we have 1 crash dump it was a crash for sure.
+                    ? true
+                    // When session ended, and we created a dump within 100ms around it, it was most likely an
+                    // on process exit dump.
+                    : Math.Abs((_crashDumpTimestamps.Last() - (DateTime)testSessionEndedTimestamp!).TotalMilliseconds) > 100;
+        if (crashDumpDetected || processCrashed)
         {
             return allDumps;
         }
