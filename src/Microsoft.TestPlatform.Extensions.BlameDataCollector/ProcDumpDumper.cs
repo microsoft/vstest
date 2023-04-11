@@ -258,18 +258,38 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
 
         // When we know there was a crash dump collected, either because we detected it from the procdump output, or because
         // we got that info from exit code, don't try to remove the extra crash dump that we generate on process exit.
-        var crashDumpDetected = _crashDumpTimestamps.Count == 0
+
+        bool crashDumpDetected = false;
+        if (_crashDumpTimestamps.Count == 0)
+        {
             // When there are 0 crashdumps detected, we know the detection was false.
-            ? false
-            : _crashDumpTimestamps.Count > 1
-                // When there are more than 1 crashdumps detected, we know it was true, and want to keep all dumps.
-                ? true
-                : testSessionEndedTimestamp == null
-                    // When test session did not end and we have 1 crash dump it was a crash for sure.
-                    ? true
-                    // When session ended, and we created a dump within 100ms around it, it was most likely an
-                    // on process exit dump.
-                    : Math.Abs((_crashDumpTimestamps.Last() - (DateTime)testSessionEndedTimestamp!).TotalMilliseconds) > 100;
+            EqtTrace.Verbose($"There were 0 {nameof(_crashDumpTimestamps)} crash dump was not detected.");
+            crashDumpDetected = false;
+        }
+        else if (_crashDumpTimestamps.Count > 1)
+        {
+            // When there are more than 1 crashdumps detected, we know it was true, and want to keep all dumps.
+            EqtTrace.Verbose($"There were more than 1 {nameof(_crashDumpTimestamps)} ({_crashDumpTimestamps.Count}), keeping all crashdumps.");
+            crashDumpDetected = true;
+        }
+        // From here downwards we know that we have 1 crash dump.
+        else if (testSessionEndedTimestamp == null)
+        {
+            EqtTrace.Verbose($"There was 1 {nameof(_crashDumpTimestamps)} and the test session did not end, keeping all crashdumps.");
+            // When test session did not end and we have 1 crash dump it was a crash for sure.
+            crashDumpDetected = true;
+        }
+        else
+        {
+            EqtTrace.Verbose($"There was 1 {nameof(_crashDumpTimestamps)} and the test session did end. Comparing timestamps to see if we should keep the crashdump.");
+            // When session ended, and we created a dump within 100ms around it, it was most likely an
+            // on process exit dump, and we don't need to keep that, unless the user overrides it (e.g. by specifying CollectAlways).
+            var timestampDiff = Math.Abs((_crashDumpTimestamps.Last() - (DateTime)testSessionEndedTimestamp!).TotalMilliseconds);
+            var isCrashDump = timestampDiff > 100;
+            EqtTrace.Verbose($"{nameof(_crashDumpTimestamps)}: {_crashDumpTimestamps.Last().ToString("o", CultureInfo.InvariantCulture)}, {nameof(testSessionEndedTimestamp)}: {((DateTime)testSessionEndedTimestamp!).ToString("o", CultureInfo.InvariantCulture)}. The difference between the events is {timestampDiff} ms.");
+            crashDumpDetected = isCrashDump;
+        }
+
         if (crashDumpDetected || processCrashed)
         {
             return allDumps;
