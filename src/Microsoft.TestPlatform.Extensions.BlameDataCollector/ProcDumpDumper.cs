@@ -175,7 +175,6 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
             return;
         }
 
-        // Process? procDumpCancelProcess = null;
         try
         {
             if (_isCrashDumpInProgress)
@@ -284,9 +283,10 @@ public class ProcDumpDumper : ICrashDumper, IHangDumper
             EqtTrace.Verbose($"There was 1 {nameof(_crashDumpTimestamps)} and the test session did end. Comparing timestamps to see if we should keep the crashdump.");
             // When session ended, and we created a dump within 100ms around it, it was most likely an
             // on process exit dump, and we don't need to keep that, unless the user overrides it (e.g. by specifying CollectAlways).
-            var timestampDiff = Math.Abs((_crashDumpTimestamps.Last() - (DateTime)testSessionEndedTimestamp!).TotalMilliseconds);
+            var crashDumpTimestamp = _crashDumpTimestamps.Last();
+            var timestampDiff = Math.Abs((crashDumpTimestamp - (DateTime)testSessionEndedTimestamp!).TotalMilliseconds);
             var isCrashDump = timestampDiff > 100;
-            EqtTrace.Verbose($"{nameof(_crashDumpTimestamps)}: {_crashDumpTimestamps.Last().ToString("o", CultureInfo.InvariantCulture)}, {nameof(testSessionEndedTimestamp)}: {((DateTime)testSessionEndedTimestamp!).ToString("o", CultureInfo.InvariantCulture)}. The difference between the events is {timestampDiff} ms.");
+            EqtTrace.Verbose($"{nameof(_crashDumpTimestamps)}: {crashDumpTimestamp.ToString("o", CultureInfo.InvariantCulture)}, {nameof(testSessionEndedTimestamp)}: {((DateTime)testSessionEndedTimestamp!).ToString("o", CultureInfo.InvariantCulture)}. The difference between the events is {timestampDiff} ms.");
             crashDumpDetected = isCrashDump;
         }
 
