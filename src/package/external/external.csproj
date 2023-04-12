@@ -47,7 +47,7 @@
     <PackageReference Include="Microsoft.Internal.Intellitrace" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Internal.Dia" Version="$(TestPlatformMSDiaVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Internal.Dia.Interop" Version="$(TestPlatformMSDiaVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="15.8.3247" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.4.2116" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Interop" Version="$(InteropExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Telemetry" Version="16.3.58" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.RemoteControl" Version="16.3.23" PrivateAssets="All" />
