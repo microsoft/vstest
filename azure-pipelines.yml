@@ -5,8 +5,8 @@ trigger:
     - main
     - rel/*
     exclude:
-    - rel/15*
-    - rel/16*
+    - rel/15.*
+    - rel/16.*
     - rel/17.0
     - rel/17.1
     - rel/17.2
