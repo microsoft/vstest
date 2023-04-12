@@ -57,6 +57,7 @@
     <PackageReference Include="Microsoft.NETCore.ILAsm" Version="$(ILAsmPackageVersion)" />
     <PackageReference Include="Microsoft.NETCore.ILDAsm" Version="$(ILAsmPackageVersion)" />
     <PackageReference Include="Microsoft.DotNet.Build.Tasks.Feed" Version="$(MicrosoftDotNetBuildTasksFeedVersion)" PrivateAssets="All" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 
     <!-- Required for resolution of desktop dependencies in non windows environment.
          We've to set to net472 since the net451 and other packages have assemblies in wrong case.
