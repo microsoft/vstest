@@ -246,7 +246,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
         if (_collectProcessDumpOnCrash)
         {
-            // Detach the dumper from the testhost process to prevent testhost process. When the dumper is procdump.exe
+            // Detach the dumper from the testhost process to prevent crashing testhost process. When the dumper is procdump.exe
             // it must be detached before we try to dump the process, and simply killing it would take down the testhost process.
             //
             // Detaching also prevents creating an extra dump at the exit of the testhost process.
