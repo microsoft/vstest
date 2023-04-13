@@ -87,7 +87,7 @@
       <NuGetFrameworks Include="$(PkgNuGet_Frameworks)\lib\netstandard2.0\*"></NuGetFrameworks>
       <MicrosoftInternalDia Include="$(PkgMicrosoft_Internal_Dia)\tools\netstandard\**\*"></MicrosoftInternalDia>
       <MicrosoftInternalTestPlatformRemote Include="$(PkgMicrosoft_Internal_TestPlatform_Remote)\tools\netstandard\**\*"></MicrosoftInternalTestPlatformRemote>
-      <MicrosoftDiagnosticsNETCoreClient Include="$(PkgMicrosoft_Diagnostics_NETCore_Client)\lib\netcoreapp3.1\**\*"></MicrosoftDiagnosticsNETCoreClient>
+      <MicrosoftDiagnosticsNETCoreClient Include="$(PkgMicrosoft_Diagnostics_NETCore_Client)\lib\netstandard2.0\**\*"></MicrosoftDiagnosticsNETCoreClient>
       <NETStandardLibrary Include="$(PkgNETStandard_Library)\build\netstandard2.0\ref\**\*"></NETStandardLibrary>
       <MicrosoftInternalDia Include="$(PkgMicrosoft_Internal_Dia)\tools\net451\**\*"></MicrosoftInternalDia>
     </ItemGroup>
