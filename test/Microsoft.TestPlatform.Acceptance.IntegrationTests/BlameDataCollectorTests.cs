@@ -209,7 +209,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         var assemblyPaths = GetAssetFullPath("crash.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
-        arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;TestTimeout=10s;CollectDump;DumpType=full"" /diag:S:\t\logs\l1\");
+        arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;TestTimeout=15s;CollectDump;DumpType=full"" /diag:S:\t\logs\l1\");
 
         var env = new Dictionary<string, string?>
         {
