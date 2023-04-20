@@ -66,7 +66,6 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     private bool _uploadDumpFiles;
     private string? _tempDirectory;
     private string? _monitorPostmortemDumpFolderPath;
-    private DateTime? _testSessionEndedTimestamp;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BlameCollector"/> class.
@@ -256,13 +255,11 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         // Skip creating the dump if the option is set to none, and just kill the process.
         if ((_hangDumpType ?? HangDumpType.Full) != HangDumpType.None)
         {
-            var hangDumpSuccess = false;
             try
             {
                 Action<string> logWarning = m => _logger.LogWarning(_context.SessionDataCollectionContext, m);
                 var dumpDirectory = GetDumpDirectory();
                 _processDumpUtility.StartHangBasedProcessDump(_testHostProcessId, dumpDirectory, _hangDumpType == HangDumpType.Full, _targetFramework!, logWarning);
-                hangDumpSuccess = true;
             }
             catch (Exception ex)
             {
@@ -274,8 +271,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                 try
                 {
                     var dumpFiles = _processDumpUtility.GetDumpFiles(true,
-                        /* if we killed it by hang dumper, we already have our dump, otherwise it might have crashed, and we want all dumps */ !hangDumpSuccess,
-                        _testSessionEndedTimestamp);
+                        true /* Get all dumps that there are, if crashdump was created before we hangdumped, get it. It probably has interesting info. */);
                     foreach (var dumpFile in dumpFiles)
                     {
                         try
@@ -503,7 +499,6 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// <param name="args">SessionEndEventArgs</param>
     private void SessionEndedHandler(object? sender, SessionEndEventArgs args)
     {
-        _testSessionEndedTimestamp = DateTime.Now;
         TPDebug.Assert(_testSequence != null && _testObjectDictionary != null && _context != null && _dataCollectionSink != null && _logger != null, "Initialize must be called before calling this method");
         ResetInactivityTimer();
 
@@ -535,7 +530,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             {
                 try
                 {
-                    var dumpFiles = _processDumpUtility.GetDumpFiles(warnOnNoDumpFiles: _collectDumpAlways, processCrashedWhenRunningTests, _testSessionEndedTimestamp);
+                    var dumpFiles = _processDumpUtility.GetDumpFiles(warnOnNoDumpFiles: _collectDumpAlways, processCrashedWhenRunningTests);
                     foreach (var dumpFile in dumpFiles)
                     {
                         if (!dumpFile.IsNullOrEmpty())

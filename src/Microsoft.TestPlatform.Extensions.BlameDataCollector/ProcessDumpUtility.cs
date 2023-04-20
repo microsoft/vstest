@@ -46,7 +46,7 @@ internal class ProcessDumpUtility : IProcessDumpUtility
         EqtTrace.Info($"ProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: {data ?? "<null>"}");
 
     /// <inheritdoc/>
-    public IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed, DateTime? testSessionEndedTimestamp)
+    public IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed)
     {
         if (!_wasHangDumped)
         {
@@ -56,7 +56,7 @@ internal class ProcessDumpUtility : IProcessDumpUtility
         // If the process was hang dumped we killed it ourselves, so it crashed when executing tests,
         // but we already have the hang dump, and should not also collect the exit dump that we got
         // from killing the process by the hang dumper.
-        IEnumerable<string> crashDumps = _crashDumper?.GetDumpFiles(processCrashed, testSessionEndedTimestamp) ?? new List<string>();
+        IEnumerable<string> crashDumps = _crashDumper?.GetDumpFiles(processCrashed) ?? new List<string>();
 
         IEnumerable<string> hangDumps = _fileHelper.DirectoryExists(_hangDumpDirectory)
             ? _fileHelper.GetFiles(_hangDumpDirectory, "*_hangdump*.dmp", SearchOption.TopDirectoryOnly)

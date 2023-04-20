@@ -16,7 +16,7 @@ public interface IProcessDumpUtility
     /// <returns>
     /// Path of dump file
     /// </returns>
-    IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed, DateTime? testSessionEndedTimestamp);
+    IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed);
 
     /// <summary>
     /// Launch proc dump process

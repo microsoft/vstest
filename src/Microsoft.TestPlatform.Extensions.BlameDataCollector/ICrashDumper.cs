@@ -14,5 +14,5 @@ public interface ICrashDumper
 
     void DetachFromTargetProcess(int processId);
 
-    IEnumerable<string> GetDumpFiles(bool processCrashed, DateTime? testSessionEndTimestamp);
+    IEnumerable<string> GetDumpFiles(bool processCrashed);
 }
