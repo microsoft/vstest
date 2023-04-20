@@ -371,7 +371,7 @@ public class BlameCollectorTests
             _context);
 
         // Setup
-        _ = _mockProcessDumpUtility.Setup(x => x.GetDumpFiles(It.IsAny<bool>(), It.IsAny<bool>())).Returns(new[] { _filepath });
+        _mockProcessDumpUtility.Setup(x => x.GetDumpFiles(It.IsAny<bool>(), It.IsAny<bool>())).Returns(new[] { _filepath });
         _mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
             .Returns(_filepath);
 
