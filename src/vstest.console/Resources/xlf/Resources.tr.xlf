@@ -107,8 +107,8 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;Günlükçü URI/FriendlyName&gt;
-      Test sonuçları için bir günlükçü belirtin. Örneğin, sonuçları bir
+        <target state="translated">--logger|/logger:&lt;Günlükçü URI/FriendlyName&gt;
+      Test sonuçları için bir günlükçü belirtin. Örneğin, sonuçları bir 
       Visual Studio Test Sonuçları Dosyası'na (TRX) kaydetmek için şunu kullanın: /logger:trx[;LogFileName=&lt;Varsayılan olarak benzersiz dosya adını alır&gt;]
       İlgili LogFileName ile TestResults dizininde dosya oluşturur.
 
@@ -213,9 +213,9 @@
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="needs-review-translation">--InIsolation|/InIsolation
-      Testleri yalıtılmış bir işlemde çalıştırır. Bu, vstest.console.exe
-      işleminin testlerdeki bir hata nedeniyle durdurulması olasılığını azaltır,
+        <target state="translated">--InIsolation|/InIsolation
+      Testleri yalıtılmış bir işlemde çalıştırır. Bu, vstest.console.exe 
+      işleminin testlerdeki bir hata nedeniyle durdurulması olasılığını azaltır, 
       ancak testler daha yavaş çalışabilir.</target>
         <note />
       </trans-unit>
@@ -224,9 +224,9 @@
       This makes vstest.console.exe process use or skip the VSIX extensions 
       installed(if any) in the test run. 
       Example  /UseVsixExtensions:true</source>
-        <target state="needs-review-translation">/UseVsixExtensions
-      Bu işlem vstest.console.exe işleminin test çalıştırmasında yüklü VSIX
-      uzantılarını (varsa) kullanmasını veya atlamasını sağlar.
+        <target state="translated">/UseVsixExtensions
+      Bu işlem vstest.console.exe işleminin test çalıştırmasında yüklü VSIX 
+      uzantılarını (varsa) kullanmasını veya atlamasını sağlar. 
       Örnek /UseVsixExtensions:true</target>
         <note />
       </trans-unit>
@@ -245,8 +245,8 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="needs-review-translation">  Testleri çalıştırmak için:
-    &gt;vstest.console.exe tests.dll
+        <target state="translated">  Testleri çalıştırmak için:
+    &gt;vstest.console.exe tests.dll 
   Testleri veri toplayıcılar gibi ek ayarlarla çalıştırmak için:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
         <note />
@@ -390,8 +390,8 @@
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
-        <target state="needs-review-translation">--Platform|/Platform:&lt;Platform türü&gt;
-      Test yürütmesi için kullanılacak hedef platform mimarisi.
+        <target state="translated">--Platform|/Platform:&lt;Platform türü&gt;
+      Test yürütmesi için kullanılacak hedef platform mimarisi. 
       Geçerli değerler x86, x64 ve ARM'dir.</target>
         <note />
       </trans-unit>
@@ -405,8 +405,8 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="needs-review-translation">--Framework|/Framework:&lt;Framework Sürümü&gt;
-      Test yürütme için kullanılacak hedef .Net Framework sürümü.
+        <target state="translated">--Framework|/Framework:&lt;Framework Sürümü&gt;
+      Test yürütme için kullanılacak hedef .Net Framework sürümü. 
       Geçerli değerler: ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" vb.
       Diğer desteklenen değerler: Framework40, Framework45, FrameworkCore10 ve FrameworkUap10.</target>
         <note />
@@ -518,9 +518,9 @@
       This makes vstest.console.exe process use custom test adapters
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
-        <target state="needs-review-translation">--TestAdapterPath|/TestAdapterPath
+        <target state="translated">--TestAdapterPath|/TestAdapterPath
       Bu, vstest.console.exe işleminin test çalıştırmasında verilen yoldan
-      (varsa) özel test bağdaştırıcılarını kullanmasını sağlar.
+      (varsa) özel test bağdaştırıcılarını kullanmasını sağlar. 
       Örnek  /TestAdapterPath:&lt;özelBağdaştırıcılarınYolu&gt;</target>
         <note />
       </trans-unit>
@@ -802,8 +802,8 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="needs-review-translation">RunSettings bağımsız değişkenleri:
-      Komut satırı aracılığıyla runsettings yapılandırmalarını geçirmek için kullanılan bağımsız değişkenler. Bağımsız değişkenler "-- " karakterlerinden sonra [ad]=[değer] biçiminde ad-değer çifti olarak belirtilebilir. -- karakterlerinden sonra boşluk olduğuna dikkat edin.
+        <target state="translated">RunSettings bağımsız değişkenleri:
+      Komut satırı aracılığıyla runsettings yapılandırmalarını geçirmek için kullanılan bağımsız değişkenler. Bağımsız değişkenler "-- " karakterlerinden sonra [ad]=[değer] biçiminde ad-değer çifti olarak belirtilebilir. -- karakterlerinden sonra boşluk olduğuna dikkat edin. 
       Birden fazla [ad]=[değer] çiftini ayırmak için bir boşluk kullanın.
       RunSettings bağımsız değişkenleri desteği hakkında daha fazla bilgi: https://aka.ms/vstest-runsettings-arguments</target>
         <note />
@@ -872,14 +872,14 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       Testi blame modunda çalıştırır. Bu seçenek, test ana bilgisayarının kilitlenmesine neden olan sorunlu testin ayrı tutulmasını sağlar.
       Geçerli dizinde, kilitlenmeden önce testin yürütülme düzenini yakalayan,
-      “Sequence.xml” adlı bir çıkış dosyası oluşturur.
+      “Sequence.xml” adlı bir çıkış dosyası oluşturur. 
       İsteğe bağlı olarak test ana bilgisayarının işlem dökümünü çıkarmayı seçebilirsiniz.
       Dökümü çıkarmayı seçtiğinizde, kilitlenme durumunda varsayılan olarak bir mini döküm çıkarılır.
       Dilerseniz bazı isteğe bağlı parametrelerle bu varsayılan davranışı geçersiz kılabilirsiniz:
-      CollectAlways - Kilitlenme olmasa da her çıkışta döküm çıkarma (true/false)
+      CollectAlways - Kilitlenme olmasa da her çıkışta döküm çıkarma (true/false) 
       DumpType - Döküm türünü belirtme (mini/full).
       Örnek: /Blame
                /Blame:CollectDump
@@ -958,8 +958,8 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;Günlükçü URI/FriendlyName&gt;
-      Test sonuçları için bir günlükçü belirtin. Örneğin, sonuçları bir
+        <target state="translated">--logger|/logger:&lt;Günlükçü URI/FriendlyName&gt;
+      Test sonuçları için bir günlükçü belirtin. Örneğin, sonuçları bir 
       Visual Studio Test Sonuçları Dosyası'na (TRX) kaydetmek için şunu kullanın: /logger:trx[;LogFileName=&lt;Varsayılan olarak benzersiz dosya adını alır&gt;]
       İlgili LogFileName ile TestResults dizininde dosya oluşturur.
 
@@ -1078,9 +1078,9 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       Example: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
                -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
-        <target state="needs-review-translation">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+        <target state="translated">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
       Bir ortam değişkeninin değerini ayarlar. Değişken mevcut değilse oluşturur, varsa geçersiz kılar. Bu, /InIsolation anahtarını kapsar ve testleri yalıtılmış bir işlemde çalıştırılmaya zorlar.
-
+      
       Birden çok değişken sağlamak için bu bağımsız değişken birden çok kez belirtilebilir.
 
       Örnek: -e:VARIABLE1=VALUE1
@@ -1124,24 +1124,24 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
         - NextToSource: Load adapters next to source. 
 
         - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
-        <target state="needs-review-translation">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
       Bu, bağdaştırıcı yükleme davranışını etkiliyor.
 
       Şu anda desteklenen davranışlar:
-        - Açık: Test Platformu yalnızca /TestAdapterPath (veya RunConfiguration.TestAdaptersPaths düğümü) tarafından belirtilen bağdaştırıcıları yükler.
+        - Açık: Test Platformu yalnızca /TestAdapterPath (veya RunConfiguration.TestAdaptersPaths düğümü) tarafından belirtilen bağdaştırıcıları yükler. 
                     Belirli bir bağdaştırıcı yolu sağlanırsa, bağdaştırıcı yüklenir; bir dizin yolu sağlanırsa Özyinelemeli seçeneği de belirtilmediği sürece bağdaştırıcılar doğrudan bu klasörde yüklenir.
                     Bağdaştırıcı yolu belirtilmezse test çalıştırması başarısız olur.
                     Bu, /InIsolation geçiş işlemini belirtir ve testleri yalıtılmış bir işlemde çalıştırılmaya zorlar.
-
-        - Varsayılan: Bu bağımsız değişken belirtilmemişse, Test Platformu bağdaştırıcıları yükler.
+        
+        - Varsayılan: Bu bağımsız değişken belirtilmemişse, Test Platformu bağdaştırıcıları yükler. 
                    Kaynağın yanında, sağlanan ek bağdaştırıcı yolları ve varsayılan dizinden uzantılar alır.
 
-        - DefaultRuntimeProviders: Test Platformu ile gönderilen varsayılan çalışma zamanı sağlayıcılarını yükleyin.
+        - DefaultRuntimeProviders: Test Platformu ile gönderilen varsayılan çalışma zamanı sağlayıcılarını yükleyin. 
                                    "Explicit" seçeneği ayarlandığında bu belirtilmezse, bir test ana bilgisayar sağlayıcısının açıkça belirtilmesi gerekir.
 
 - ExtensionsDirectory: Bağdaştırıcıları Uzantılar klasörünün içine yükleyin.
 
-        - NextToSource: Bağdaştırıcıları kaynağın yanında yükle.
+        - NextToSource: Bağdaştırıcıları kaynağın yanında yükle. 
 
         - Özyinelemeli: Bağdaştırıcılar yüklenirken klasörleri özyinelemeli olarak arayın. Bu, "Explicit" veya "NextToSource" öğesinin de belirtilmesini gerektirir.</target>
         <note>Do not translate "Default", "DefaultRuntimeProviders", "ExtensionsDirectory", "NextToSource" or "Recursive".</note>

@@ -107,8 +107,8 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      为测试结果指定一个记录器。例如，若要将结果记录到
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      为测试结果指定一个记录器。例如，若要将结果记录到 
        Visual Studio 测试结果文件(TRX)中，请使用/logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       使用给定的  LogFileName 在 TestResults 目录中创建文件。
 
@@ -213,8 +213,8 @@
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="needs-review-translation">--InIsolation|/InIsolation
-      在独立进程中运行测试。虽然这可使 vstest.console.exe
+        <target state="translated">--InIsolation|/InIsolation
+      在独立进程中运行测试。虽然这可使 vstest.console.exe 
       进程在测试出现错误时停止的可能性较小，但是测试的
       运行速度会较慢。</target>
         <note />
@@ -224,7 +224,7 @@
       This makes vstest.console.exe process use or skip the VSIX extensions 
       installed(if any) in the test run. 
       Example  /UseVsixExtensions:true</source>
-        <target state="needs-review-translation">/ UseVsixExtensions
+        <target state="translated">/ UseVsixExtensions
       这可使 vstest.console.exe 进程在测试运行中使用或者跳过
       安装的 VSIX 扩展(如果有)。
       示例  /UseVsixExtensions:true</target>
@@ -245,8 +245,8 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="needs-review-translation"> 运行测试:
-  &gt;vstest.console.exe tests.dll
+        <target state="translated"> 运行测试:
+  &gt;vstest.console.exe tests.dll 
  使用其他设置(如数据收集器)运行测试:
   &gt;vstest.console.exe tests.dll /Settings:Local.RunSettings</target>
         <note />
@@ -390,7 +390,7 @@
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
-        <target state="needs-review-translation">--Platform|/Platform:&lt;Platform type&gt;
+        <target state="translated">--Platform|/Platform:&lt;Platform type&gt;
       用于执行测试的目标平台体系结构。
    有效值为 x86、x64 和 ARM。</target>
         <note />
@@ -405,7 +405,7 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="needs-review-translation">--Framework|/Framework:&lt;Framework Version&gt;
+        <target state="translated">--Framework|/Framework:&lt;Framework Version&gt;
       用于执行测试的目标 .Net Framework 版本。
       有效值为 ".NETFramework,Version=v4.5.1".NETCoreApp,Version=v1.0" 等。
       其他支持的值为 Framework40、Framework45、FrameworkCore10 和 FrameworkUap10。</target>
@@ -518,7 +518,7 @@
       This makes vstest.console.exe process use custom test adapters
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
-        <target state="needs-review-translation">--TestAdapterPath|/TestAdapterPath
+        <target state="translated">--TestAdapterPath|/TestAdapterPath
       这将使 vstest.console.exe 进程在测试运行中使用
    给定路径(如果有)中的自定义测试适配器。
    示例 /TestAdapterPath:&lt;pathToCustomAdapters&gt;</target>
@@ -802,7 +802,7 @@
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="needs-review-translation">RunSettings 参数:
+        <target state="translated">RunSettings 参数:
       通过命令行传递 runsettings 配置的参数。参数可以指定为名称-值对，其形式为“-- ”后跟 [名称]=[值]。请注意 -- 后的空格。
       使用空格分隔多个 [名称]=[值].
       有关 RunSettings 参数支持的详细信息，请访问: https://aka.ms/vstest-runsettings-arguments</target>
@@ -872,7 +872,7 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       在追责模式下运行测试。此选项有助于隔离导致测试主机崩溃的问题测试。
       它会在当前目录中创建一个输出文件 "Sequence.xml"，
       用于在崩溃之前捕获测试的执行顺序。
@@ -958,7 +958,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       为测试结果指定一个记录器。例如，若要将结果记录到
       Visual Studio 测试结果文件(TRX)中，请使用 /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       使用给定的  LogFileName 在 TestResults 目录中创建文件。
@@ -1078,9 +1078,9 @@
       Example: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
                -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
-        <target state="needs-review-translation">-e|--Environment|/e|/环境:&lt;NAME&gt;=&lt;VALUE&gt;
+        <target state="translated">-e|--Environment|/e|/环境:&lt;NAME&gt;=&lt;VALUE&gt;
       设置环境变量的值。如果该变量不存在，则创建它；如果它已存在，则替代它。这将表示 /InIsolation 开关并强制在隔离的进程中运行测试。
-
+      
       可多次指定此参数来提供多个变量。
 
       示例: -e:VARIABLE1=VALUE1
@@ -1124,7 +1124,7 @@
         - NextToSource: Load adapters next to source. 
 
         - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
-        <target state="needs-review-translation">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
       这会影响适配器加载行为。
 
       当前支持的行为:
@@ -1132,7 +1132,7 @@
                     如果提供了特定适配器路径，则会加载适配器；如果提供了目录路径，则将直接加载该文件夹中的适配器，除非还指定了 Recursive 选项。
                     如果未指定适配器路径，则测试运行将失败。
                     这将暗示 /InIsolation 开关并强制测试在隔离进程中运行。
-
+        
         - 默认: 如果未指定此参数，则测试平台将加载适配器。
                    它将从源旁边、提供的附加适配器路径和默认目录中选取扩展。
 

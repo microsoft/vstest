@@ -7,8 +7,8 @@
 The test running when the crash occurred: 
 {0}
 This test may, or may not be the source of the crash.</source>
-        <target state="needs-review-translation">La serie de pruebas activa se anuló porque el proceso de host se cerró de forma inesperada. Compruebe la pila de llamadas anterior, si está disponible, para obtener más información sobre el origen de la excepción.
-Prueba en ejecución cuando se produjo el bloqueo:
+        <target state="translated">La serie de pruebas activa se anuló porque el proceso de host se cerró de forma inesperada. Compruebe la pila de llamadas anterior, si está disponible, para obtener más información sobre el origen de la excepción.
+Prueba en ejecución cuando se produjo el bloqueo: 
 {0}
 Esta prueba puede ser el origen del bloqueo o no serlo.</target>
         <note>{0} is a single test (or in rare cases multiple tests) that were running when test host crashed.</note>
@@ -55,7 +55,7 @@ Esta prueba puede ser el origen del bloqueo o no serlo.</target>
       </trans-unit>
       <trans-unit id="NotGeneratingSequenceFile">
         <source>All tests finished running, Sequence file will not be generated</source>
-        <target state="needs-review-translation">Todas las pruebas han terminado de ejecutarse; no se generará el archivo Sequence.</target>
+        <target state="translated">Todas las pruebas han terminado de ejecutarse; no se generará el archivo Sequence.</target>
         <note>"Sequence" is the name of the file. No . at the end, because this is a blame message and the . will be added automatically.</note>
       </trans-unit>
       <trans-unit id="Dumping">

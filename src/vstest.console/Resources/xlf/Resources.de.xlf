@@ -107,7 +107,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;URI/Anzeigename für Protokollierung&gt;
+        <target state="translated">--logger|/logger:&lt;URI/Anzeigename für Protokollierung&gt;
       Geben Sie eine Protokollierung für Testergebnisse an. Um Ergebnisse beispielsweise in einer
       Visual Studio-Testergebnisdatei (TRX) zu protokollieren, verwenden Sie /logger:trx[;LogFileName=&lt;Standardmäßig eindeutiger Dateiname&gt;]
       Erstellt die Datei im TestResults-Verzeichnis mit dem angegebenen LogFileName.
@@ -213,7 +213,7 @@
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="needs-review-translation">/InIsolation/InIsolation
+        <target state="translated">/InIsolation/InIsolation
       Führt die Tests in einem isolierten Prozess aus. Auf diese Weise ist es unwahrscheinlicher, dass der Prozess
       "vstest.console.exe" bei einem Fehler in den Tests beendet wird.
       Tests werden aber ggf. langsamer ausgeführt.</target>
@@ -224,8 +224,8 @@
       This makes vstest.console.exe process use or skip the VSIX extensions 
       installed(if any) in the test run. 
       Example  /UseVsixExtensions:true</source>
-        <target state="needs-review-translation">/UseVsixExtensions
-      Bewirkt, dass der Prozess "vstest.console.exe" die installierten VSIX-Extensions
+        <target state="translated">/UseVsixExtensions
+      Bewirkt, dass der Prozess "vstest.console.exe" die installierten VSIX-Extensions 
       (sofern vorhanden) im Testlauf verwendet oder überspringt.
       Beispiel /UseVsixExtensions:true</target>
         <note />
@@ -245,8 +245,8 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="needs-review-translation">  Zum Ausführen von Tests:
-    &gt;vstest.console.exe tests.dll
+        <target state="translated">  Zum Ausführen von Tests:
+    &gt;vstest.console.exe tests.dll 
   Zum Ausführen von Tests mit zusätzlichen Einstellungen wie Datensammlern:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
         <note />
@@ -390,8 +390,8 @@
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
-        <target state="needs-review-translation">--Platform|/Platform:&lt;Plattformtyp&gt;
-      Zielplattformarchitektur für die Testausführung.
+        <target state="translated">--Platform|/Platform:&lt;Plattformtyp&gt;
+      Zielplattformarchitektur für die Testausführung. 
       Gültige Werte sind x86, x64 und ARM.</target>
         <note />
       </trans-unit>
@@ -405,8 +405,8 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="needs-review-translation">--Framework|/Framework:&lt;Frameworkversion&gt;
-      Die .NET-Framework-Zielversion für die Testausführung.
+        <target state="translated">--Framework|/Framework:&lt;Frameworkversion&gt;
+      Die .NET-Framework-Zielversion für die Testausführung. 
       Gültige Werte sind ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" usw.
       Weitere unterstützte Werte: Framework40, Framework45, FrameworkCore10, FrameworkUap10.</target>
         <note />
@@ -518,9 +518,9 @@
       This makes vstest.console.exe process use custom test adapters
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
-        <target state="needs-review-translation">--TestAdapterPath|/TestAdapterPath
+        <target state="translated">--TestAdapterPath|/TestAdapterPath
       Hierdurch verwendet der Prozess "vstest.console.exe" im Testlauf
-      benutzerdefinierte Testadapter aus einem angegeben Pfad (soweit vorhanden).
+      benutzerdefinierte Testadapter aus einem angegeben Pfad (soweit vorhanden). 
       Beispiel: /TestAdapterPath:&lt;Pfad_zu_benutzerdefinierten_Adaptern&gt;</target>
         <note />
       </trans-unit>
@@ -802,7 +802,7 @@
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="needs-review-translation">RunSettings-Argumente:
+        <target state="translated">RunSettings-Argumente:
       An die RunSettings-Konfigurationen über die Befehlszeile zu übergebende Argumente. Argumente werden unter Umständen als Name-Wert-Paar der Form [Name]=[Wert] nach "-- " übergeben. Beachten Sie das Leerzeichen nach "--".
       Trennen Sie mehrere Paare der Form [Name]=[Wert] mithilfe von Leerzeichen.
       Weitere Informationen zur Unterstützung von RunSettings-Argumenten: https://aka.ms/vstest-runsettings-arguments</target>
@@ -872,14 +872,14 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       Führt den Test im blame-Modus aus. Diese Option ist hilfreich zum Isolieren des problematischen Tests, der einen Absturz des Testhosts verursacht.
       Im aktuellen Verzeichnis wird eine Ausgabedatei namens "Sequence.xml" erstellt,
       in der die Reihenfolge der Testausführung vor dem Absturz erfasst wird.
       Optional können Sie eine Prozesssicherung für den Testhost erfassen.
       Wenn Sie sich zum Erfassen einer Sicherung entschließen, wird bei einem Absturz standardmäßig eine Minisicherung erfasst.
       Dieses Standardverhalten können Sie durch einige optionale Parameter außer Kraft setzen:
-      CollectAlways: Zum Erfassen einer Sicherung beim Beenden, selbst wenn kein Absturz eintritt (TRUE/FALSE).
+      CollectAlways: Zum Erfassen einer Sicherung beim Beenden, selbst wenn kein Absturz eintritt (TRUE/FALSE). 
       DumpType: Zur Angabe des Sicherungstyps (mini/full).
       Beispiel: /Blame
                /Blame:CollectDump
@@ -958,7 +958,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;URI/Anzeigename für Protokollierung&gt;
+        <target state="translated">--logger|/logger:&lt;URI/Anzeigename für Protokollierung&gt;
       Geben Sie eine Protokollierung für Testergebnisse an. Um Ergebnisse beispielsweise in einer
       Visual Studio-Testergebnisdatei (TRX) zu protokollieren, verwenden Sie /logger:trx[;LogFileName=&lt;Standardmäßig eindeutiger Dateiname&gt;]
       Erstellt die Datei im TestResults-Verzeichnis mit dem angegebenen LogFileName.
@@ -1078,9 +1078,9 @@
       Example: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
                -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
-        <target state="needs-review-translation">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+        <target state="translated">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
       Legt den Wert einer Umgebungsvariablen fest. Erstellt die Variable, wenn Sie nicht vorhanden ist, und setzt sie andernfalls außer Kraft. Dies impliziert die Option "/InIsolation" und erzwingt die Ausführung der Tests in einem isolierten Prozess.
-
+      
       Dieses Argument kann mehrmals angegeben werden, um mehrere Variablen bereitzustellen.
 
       Beispiel: -e:VARIABLE1=WERT1
@@ -1124,24 +1124,24 @@
         - NextToSource: Load adapters next to source. 
 
         - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
-        <target state="needs-review-translation">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
       Dies wirkt sich auf das Ladeverhalten des Adapters aus.
 
       Derzeit unterstützte Verhaltensweisen:
-      – Explicit: Test Platform lädt nur Adapter, die durch /TestAdapterPath (oder runConfiguration.TestAdaptersPaths-Knoten) angegeben sind.
+      – Explicit: Test Platform lädt nur Adapter, die durch /TestAdapterPath (oder runConfiguration.TestAdaptersPaths-Knoten) angegeben sind. 
       Wenn ein bestimmter Adapterpfad angegeben wird, wird der Adapter geladen. Wenn ein Verzeichnispfad bereitgestellt wird, werden Adapter direkt in diesen Ordner geladen, es sei denn, die Option „Rekursiv“ ist ebenfalls angegeben.
       Wenn kein Adapterpfad angegeben ist, schlägt der Testlauf fehl.
       Dies impliziert den Schalter „/InIsolation“, und es wird erzwungen, dass die Tests in einem isolierten Prozess ausgeführt werden.
 
-      – Standard: Die Testplattform lädt Adapter, wenn dieses Argument nicht angegeben wurde.
+      – Standard: Die Testplattform lädt Adapter, wenn dieses Argument nicht angegeben wurde. 
       Werden Erweiterungen von der Quelle aus abgerufen, werden zusätzliche Adapterpfade und das Standardverzeichnis bereitgestellt.
 
-      – DefaultRuntimeProviders: StandardruntimeProvider laden, die im Lieferumfang der Testplattform enthalten sind.
+      – DefaultRuntimeProviders: StandardruntimeProvider laden, die im Lieferumfang der Testplattform enthalten sind. 
       Wenn dies nicht angegeben wird, wenn die Option "Explicit" festgelegt ist, muss ein Testhostanbieter explizit angegeben werden.
 
       – ExtensionsDirectory: Laden Sie Adapter in den Ordner "Extensions".
 
-      – NextToSource: Laden Sie Adapter neben der Quelle.
+      – NextToSource: Laden Sie Adapter neben der Quelle. 
 
       – Rekursiv: Suchen Sie beim Laden von Adaptern rekursiv nach Ordnern. Hierfür muss auch „Explicit“ oder „NextToSource“ angegeben werden.</target>
         <note>Do not translate "Default", "DefaultRuntimeProviders", "ExtensionsDirectory", "NextToSource" or "Recursive".</note>

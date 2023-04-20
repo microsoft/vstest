@@ -1,7 +1,19 @@
 # Branches that trigger a build on commit
 trigger:
-- main
-- rel/*
+  branches:
+    include:
+    - main
+    - rel/*
+    exclude:
+    - rel/15.*
+    - rel/16.*
+    - rel/17.0
+    - rel/17.1
+    - rel/17.2
+    - rel/17.3
+    - rel/17.4
+    - rel/17.5
+    - rel/17.6
 
 # Branch(es) that trigger(s) build(s) on PR
 pr:
@@ -23,7 +35,7 @@ pr:
 
 parameters:
 - name: isRTM
-  displayName: "Release a RTM version?"
+  displayName: "Produce RTM version?"
   type: boolean
   default: False
 
@@ -76,6 +88,10 @@ variables:
         /p:DotNetSymbolServerTokenSymWeb=$(symweb-symbol-server-pat)
         /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
         /p:VisualStudioDropName=$(VisualStudioDropName)
+
+  - ${{ if eq(parameters.isRTM, True) }}:
+    - name: _InternalBuildArgs
+      value: $(_InternalBuildArgs) /p:DotNetFinalVersionKind=release
 
 stages:
 
@@ -144,7 +160,7 @@ stages:
             PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
             ArtifactName: TestResults
           condition: failed()
-        
+
         # Public pipeline does not upload packages into artifacts, but we need them for tests on Linux and MacOS.
         - ${{ if eq(variables._RunAsPublic, True) }}:
           - task: PublishBuildArtifacts@1
@@ -164,7 +180,7 @@ stages:
           inputs:
             PathtoPublish: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
             ArtifactName: VSSetupArtifacts
-      
+
       - job: OtherOSes
         dependsOn: Windows
         workspace:
@@ -188,7 +204,7 @@ stages:
         - checkout: self
           fetchDepth: 1
           clean: true
-        
+
         # Build but don't pack, packing does not work on non-windows and we want to test what we built on Windows
         # anyway. Because that is what we will publish.
         - script: ./build.sh
@@ -196,14 +212,14 @@ stages:
             --ci
           name: Build
           displayName: Build
-        
+
         # Download the built packages into local package source, as if we built them on this machine.
         - task: DownloadPipelineArtifact@2
           displayName: Download Package Artifacts
           inputs:
             artifactName: PackageArtifacts
             targetPath: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
-        
+
         - script: ./test.sh
             --configuration $(_BuildConfig)
             --ci
@@ -211,7 +227,7 @@ stages:
             --performanceTest
           name: Test
           displayName: Test
-        
+
         # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
         # through the console or trx
         - task: PublishBuildArtifacts@1
@@ -242,7 +258,7 @@ stages:
               inputs:
                 artifactName: PackageArtifacts
                 targetPath: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
-            
+
             - task: DownloadPipelineArtifact@2
               displayName: Download VSSetup Artifacts
               inputs:

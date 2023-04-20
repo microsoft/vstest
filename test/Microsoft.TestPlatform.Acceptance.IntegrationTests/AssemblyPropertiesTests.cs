@@ -38,7 +38,6 @@ public class AssemblyPropertiesTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // TODO: platform tests depend on test assets but we don't build them if you don't run acceptance tests.
     public void GetAssemblyTypeForManagedExe()
     {
         var assemblyPath = _testEnvironment.GetTestAsset("ConsoleManagedApp.exe", "net462");
