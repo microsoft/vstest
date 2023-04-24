@@ -14,6 +14,21 @@
       <Sha>5ce78f66d89ea529e459abddb129ab36cb5bd936</Sha>
       <SourceBuild RepoName="diagnostics" ManagedOnly="true" />
     </Dependency>
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="8.0.0-alpha.1.23219.1">
+      <Uri>https://github.com/dotnet/source-build-externals</Uri>
+      <Sha>d1db09ce5c5a2aeab37d01336765861c0283f76f</Sha>
+      <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
+    </Dependency>
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.23224.2">
+      <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
+      <Sha>13c96423adba681296bda86bdbe24631a9b5e9bc</Sha>
+      <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
+    </Dependency>
+    <Dependency Name="Microsoft.Extensions.DependencyModel" Version="8.0.0-preview.4.23210.1">
+      <Uri>https://github.com/dotnet/runtime</Uri>
+      <Sha>053e17a0daf4be907db34d64fc51bc133c284fae</Sha>
+      <SourceBuild RepoName="runtime" />
+    </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
     <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="8.0.0-beta.23226.4">
@@ -21,33 +36,10 @@
       <Sha>469dcc0cbcba5221727c8a5b9eec4a478e24a780</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.Build.Tasks.Feed" Version="8.0.0-beta.23226.4">
-      <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>469dcc0cbcba5221727c8a5b9eec4a478e24a780</Sha>
-    </Dependency>
-    <Dependency Name="Microsoft.DotNet.SignTool" Version="8.0.0-beta.23226.4">
-      <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>469dcc0cbcba5221727c8a5b9eec4a478e24a780</Sha>
-    </Dependency>
-    <Dependency Name="Microsoft.DotNet.Helix.Sdk" Version="8.0.0-beta.23226.4">
-      <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>469dcc0cbcba5221727c8a5b9eec4a478e24a780</Sha>
-    </Dependency>
-    <Dependency Name="Microsoft.DotNet.SwaggerGenerator.MSBuild" Version="8.0.0-beta.23226.4">
-      <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>469dcc0cbcba5221727c8a5b9eec4a478e24a780</Sha>
-    </Dependency>
-    <Dependency Name="Microsoft.DotNet.Maestro.Client" Version="1.1.0-beta.20074.1">
-      <Uri>https://github.com/dotnet/arcade-services</Uri>
-      <Sha>cd705029f2675970b42f9273ae359d0926c5e815</Sha>
-    </Dependency>
-    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.6.0-1.final">
+    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.6.0-1.23107.10">
       <Uri>https://github.com/dotnet/roslyn</Uri>
-      <Sha>4b309dc5400e39a2eea09d82077737c1df5f347a</Sha>
-    </Dependency>
-    <Dependency Name="Microsoft.SourceLink" Version="1.0.0-beta2-19554-01">
-      <Uri>https://github.com/dotnet/sourcelink</Uri>
-      <Sha>afa9aa7032f810ad91d84857b95ad1d071192afa</Sha>
+      <Sha>50bd09a9eefdf9bc3653dbf6d9624b31a023c7c0</Sha>
+      <SourceBuild RepoName="roslyn" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="Microsoft.DiaSymReader.Pdb2Pdb" Version="1.1.0-beta2-19575-01">
       <Uri>https://github.com/dotnet/symreader-converter</Uri>
@@ -57,9 +49,15 @@
       <Uri>https://github.com/dotnet/symreader-converter</Uri>
       <Sha>c5ba7c88f92e2dde156c324a8c8edc04d9fa4fe0</Sha>
     </Dependency>
-    <Dependency Name="XliffTasks" Version="1.0.0-beta.21272.1">
+    <Dependency Name="Microsoft.DotNet.XliffTasks" Version="1.0.0-beta.23165.1" CoherentParentDependency="Microsoft.DotNet.Arcade.Sdk">
       <Uri>https://github.com/dotnet/xliff-tasks</Uri>
-      <Sha>f5321d0c7b3f5e6103440fc017253bcdb50a0a26</Sha>
+      <Sha>b7fb98b199d0b1b6188da4f4bf4f5accddac98d4</Sha>
+      <SourceBuild RepoName="xliff-tasks" ManagedOnly="true" />
+    </Dependency>
+    <Dependency Name="Microsoft.SourceLink.GitHub" Version="1.2.0-beta-23165-02" CoherentParentDependency="Microsoft.DotNet.Arcade.Sdk">
+      <Uri>https://github.com/dotnet/sourcelink</Uri>
+      <Sha>3f43bf1b2dead2cb51f20dc47f6dfd7981248820</Sha>
+      <SourceBuild RepoName="sourcelink" ManagedOnly="true" />
     </Dependency>
   </ToolsetDependencies>
 </Dependencies>

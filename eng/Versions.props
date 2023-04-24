@@ -21,7 +21,7 @@
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>
     <MicrosoftCodeAnalysisVersion>3.8.0-3.20427.2</MicrosoftCodeAnalysisVersion>
     <MicrosoftDiagnosticsNETCoreClientVersion>0.2.0-preview.23211.1</MicrosoftDiagnosticsNETCoreClientVersion>
-    <MicrosoftExtensionsDependencyModelPackageVersion>3.0.0-preview4-27615-11</MicrosoftExtensionsDependencyModelPackageVersion>
+    <MicrosoftExtensionsDependencyModelPackageVersion>8.0.0-preview.4.23210.1</MicrosoftExtensionsDependencyModelPackageVersion>
     <MicrosoftExtensionsFileSystemGlobbingVersion>2.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
     <MicrosoftFakesVersion>17.4.0-beta.22478.3</MicrosoftFakesVersion>
     <MicrosoftInternalCodeCoverageVersion>17.7.1-beta.23228.3</MicrosoftInternalCodeCoverageVersion>
@@ -39,7 +39,7 @@
     <TestPlatformMSDiaVersion>17.6.33617.297</TestPlatformMSDiaVersion>
     <TestPlatformRemoteExternalsVersion>17.6.33617.297</TestPlatformRemoteExternalsVersion>
     <VSSdkBuildToolsVersion>17.4.2116</VSSdkBuildToolsVersion>
-    <MicrosoftNetCompilersToolsetVersion>4.6.0-1.final</MicrosoftNetCompilersToolsetVersion>
+    <MicrosoftNetCompilersToolsetVersion>4.6.0-1.23107.10</MicrosoftNetCompilersToolsetVersion>
   </PropertyGroup>
   <PropertyGroup Label="VSTest test settings">
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
