@@ -3,7 +3,7 @@
     <UsagePattern IdentityGlob="Microsoft.SourceBuild.Intermediate.*/*" />
 
     <!-- Tracked with https://github.com/microsoft/vstest/issues/4403 -->
-    <UsagePattern IdentityGlob="Microsoft.CodeCoverage.IO/17.7.1-beta.23225.2" />
+    <UsagePattern IdentityGlob="Microsoft.CodeCoverage.IO/17.7.1-beta.23225.3" />
     <UsagePattern IdentityGlob="Microsoft.Internal.TestPlatform.Remote/17.6.33617.297" />
   </IgnorePatterns>
 </UsageData>
