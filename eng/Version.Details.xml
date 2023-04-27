@@ -24,11 +24,6 @@
       <Sha>4bf273ec25cc3983d6a5991cf0a4aa082cb255a5</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.DependencyModel" Version="8.0.0-preview.4.23210.1">
-      <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>053e17a0daf4be907db34d64fc51bc133c284fae</Sha>
-      <SourceBuild RepoName="runtime" />
-    </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
     <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="8.0.0-beta.23226.4">
