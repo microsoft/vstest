@@ -21,7 +21,7 @@
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>
     <MicrosoftCodeAnalysisVersion>3.8.0-3.20427.2</MicrosoftCodeAnalysisVersion>
     <MicrosoftDiagnosticsNETCoreClientVersion>0.2.0-preview.23211.1</MicrosoftDiagnosticsNETCoreClientVersion>
-    <MicrosoftExtensionsDependencyModelPackageVersion>6.0.0</MicrosoftExtensionsDependencyModelPackageVersion>
+    <MicrosoftExtensionsDependencyModelPackageVersion>3.0.0-preview4-27615-11</MicrosoftExtensionsDependencyModelPackageVersion>
     <MicrosoftExtensionsFileSystemGlobbingVersion>2.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
     <MicrosoftFakesVersion>17.4.0-beta.22478.3</MicrosoftFakesVersion>
     <MicrosoftInternalCodeCoverageVersion>17.7.1-beta.23228.3</MicrosoftInternalCodeCoverageVersion>
@@ -35,7 +35,6 @@
     <SystemMemoryVersion>4.5.5</SystemMemoryVersion>
     <SystemNetHttpVersion>4.3.4</SystemNetHttpVersion>
     <SystemReflectionMetadataVersion>1.6.0</SystemReflectionMetadataVersion>
-    <SystemRuntimeCompilerServicesUnsafeVersion>6.0.0</SystemRuntimeCompilerServicesUnsafeVersion>
     <SystemUriVersion>4.3.2</SystemUriVersion>
     <TestPlatformMSDiaVersion>17.6.33617.297</TestPlatformMSDiaVersion>
     <TestPlatformRemoteExternalsVersion>17.6.33617.297</TestPlatformRemoteExternalsVersion>

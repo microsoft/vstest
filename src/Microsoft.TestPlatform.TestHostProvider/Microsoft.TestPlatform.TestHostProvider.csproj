@@ -26,7 +26,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="$(JsonNetVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="$(MicrosoftExtensionsDependencyModelPackageVersion)" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="$(SystemRuntimeCompilerServicesUnsafeVersion)" Condition=" '$(DotNetBuildFromSource)' != 'true' " />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" Condition=" '$(DotNetBuildFromSource)' != 'true' " />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="NullableHelpers.cs">
