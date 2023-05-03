@@ -88,6 +88,7 @@ variables:
         /p:DotNetSymbolServerTokenSymWeb=$(symweb-symbol-server-pat)
         /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
         /p:VisualStudioDropName=$(VisualStudioDropName)
+        /p:GenerateSbom=true
 
   - ${{ if eq(parameters.isRTM, True) }}:
     - name: _InternalBuildArgs
