@@ -80,6 +80,7 @@ variables:
       value: True
     - name: VisualStudioDropName
       value: Products/$(System.TeamProject)/$(Build.DefinitionName)/$(Build.SourceBranchName)/$(Build.BuildNumber)
+    - template: /eng/restore-internal-tools.yml
     - name: _InternalBuildArgs
       value: /p:DotNetSignType=$(_SignType)
         /p:TeamName=$(_TeamName)
