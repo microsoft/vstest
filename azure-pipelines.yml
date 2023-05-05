@@ -136,6 +136,10 @@ stages:
             command: custom
             custom: '--info'
 
+        # Restore internal tools required for SBOM generation
+        - ${{ if eq(variables._RunAsInternal, True) }}:
+          - template: /eng/restore-internal-tools.yml
+
         - powershell: eng\common\CIBuild.cmd
             -configuration $(_BuildConfig)
             -prepareMachine
