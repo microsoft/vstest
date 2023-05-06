@@ -62,7 +62,7 @@ variables:
   # under some circumstances, but we don't respect that in our code and try to find them
   # in .packages. Force the location of packages to that folder.
   - name: NUGET_PACKAGES
-    value: '$(Build.SourcesDirectory)/.packages'
+    value: '$(Build.SourcesDirectory)/.packages/'
 
   # Produce real signed binaries for Internal builds
   - ${{ if eq(variables._RunAsInternal, True) }}:
