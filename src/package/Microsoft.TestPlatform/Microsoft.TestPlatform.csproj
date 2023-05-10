@@ -81,7 +81,7 @@
     <PackageReference Include="Microsoft.VisualStudio.TraceDataCollector" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.VisualStudio.CUIT" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="$(VSSdkBuildToolsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="$(MicrosoftVSSDKBuildToolsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness" Version="$(MicrosoftFakesVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Internal.TestPlatform.Remote" Version="$(TestPlatformRemoteExternalsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
   </ItemGroup>
