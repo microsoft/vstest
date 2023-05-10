@@ -94,13 +94,23 @@
     <!-- Test host dependencies -->
     <ItemGroup>
       <!-- We still need to manually include artifacts from the other tfms -->
-      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost\$(Configuration)\net4*\win*\*.*" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost\$(Configuration)\net4*\win*\*.*" Exclude="$(ArtifactsBinDir)\testhost\$(Configuration)\net4*\win*\testhost*.exe" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost\$(Configuration)\net47\win*\testhost.net47.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net47.exe" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost\$(Configuration)\net471\win*\testhost.net471.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net471.exe" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost\$(Configuration)\net472\win*\testhost.net472.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net472.exe" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost\$(Configuration)\net48\win*\testhost.net48.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net48.exe" />
 
-      <!-- We still need to manually include dlls artifacts the other tfms -->
-      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.x86\$(Configuration)\net4*\win*\*.*" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.x86\$(Configuration)\net4*\win*\*.*" Exclude="$(ArtifactsBinDir)\testhost.x86\$(Configuration)\net4*\win*\testhost*x86.exe" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.x86\$(Configuration)\net47\win*\testhost.net47.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net47.x86.exe" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.x86\$(Configuration)\net471\win*\testhost.net471.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net471.x86.exe" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.x86\$(Configuration)\net472\win*\testhost.net472.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net472.x86.exe" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.x86\$(Configuration)\net48\win*\testhost.net48.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net48.x86.exe" />
 
-      <!-- We still need to manually include dlls artifacts the other tfms -->
-      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net4*\win*\*.*" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net4*\win*\*.*" Exclude="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net4*\win*\testhost*" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net47\win*\testhost.net47.arm64.exe" Ngen="true" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net47.arm64.exe" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net471\win*\testhost.net471.arm64.exe" Ngen="true" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net471.arm64.exe" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net472\win*\testhost.net472.arm64.exe" Ngen="true" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net472.arm64.exe" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net48\win*\testhost.net48.arm64.exe" Ngen="true" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net48.arm64.exe" />
     </ItemGroup>
 
     <!-- Cpp Extensions -->
