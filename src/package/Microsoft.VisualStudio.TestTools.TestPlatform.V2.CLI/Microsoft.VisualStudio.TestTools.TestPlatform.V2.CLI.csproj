@@ -108,7 +108,7 @@
       <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.x86\$(Configuration)\net472\win*\testhost.net472.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net472.x86.exe" />
       <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.x86\$(Configuration)\net48\win*\testhost.net48.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net48.x86.exe" />
 
-      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net4*\win*\*.*" Exclude="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net4*\win*\testhost*" />
+      <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net4*\win*\*.*" Exclude="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net4*\win*\testhost*.exe" />
       <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\$(NetFrameworkMinimum)\win*\testhost.arm64.exe" Ngen="true" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.arm64.exe" />
       <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net47\win*\testhost.net47.arm64.exe" Ngen="true" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net47.arm64.exe" />
       <VsixSourceItem Include="$(ArtifactsBinDir)\testhost.arm64\$(Configuration)\net471\win*\testhost.net471.arm64.exe" Ngen="true" NgenArchitecture="Arm64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net471.arm64.exe" />
