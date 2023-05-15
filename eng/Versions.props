@@ -44,7 +44,7 @@
   </PropertyGroup>
   <PropertyGroup Label="VSTest test settings">
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
-    <FluentAssertionsVersion>6.7.0</FluentAssertionsVersion>
+    <FluentAssertionsVersion>6.11.0</FluentAssertionsVersion>
     <MoqVersion>4.16.1</MoqVersion>
     <!-- For coverage use our own package on latest stable -->
     <MicrosoftCodeCoverageVersion>17.4.1</MicrosoftCodeCoverageVersion>
@@ -59,9 +59,11 @@
     <NUnit3FrameworkVersion>3.10.1</NUnit3FrameworkVersion>
     <NUnit3AdapterVersion>3.11.0</NUnit3AdapterVersion>
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
-    <!-- Versions that are used when building projects from TestAssets.sln for compatibility tests. See Invoke-TestAssetsBuild in scripts/build.ps1.
-    Exact versions are used to avoid Nuget substituting them by closest match, if we make a typo.
-    These versions need to be "statically" readable because we read this file as xml in our build and tests. -->
+    <!--
+      Versions that are used when building projects from TestAssets.sln for compatibility tests. See Invoke-TestAssetsBuild in scripts/build.ps1.
+      Exact versions are used to avoid Nuget substituting them by closest match, if we make a typo.
+      These versions need to be "statically" readable because we read this file as xml in our build and tests.
+    -->
     <!-- <MSTestFrameworkLatestVersion></MSTestFrameworkLatestVersion> is not here, because we don't build MSTest locally, so we don't have access to the latest version. -->
     <MSTestFrameworkLatestPreviewVersion>[2.3.0-preview-20220613-02]</MSTestFrameworkLatestPreviewVersion>
     <MSTestFrameworkLatestStableVersion>[2.2.10]</MSTestFrameworkLatestStableVersion>
