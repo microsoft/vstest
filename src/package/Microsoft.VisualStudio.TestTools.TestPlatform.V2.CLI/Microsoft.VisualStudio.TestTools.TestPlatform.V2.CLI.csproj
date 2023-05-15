@@ -28,8 +28,9 @@
 
     <!-- Properties for items we include in VSIX -->
     <ExtensionInstallationRelativeToVS>[installDir]\Common7\IDE\Extensions\TestPlatform</ExtensionInstallationRelativeToVS>
+    <TestPlatformBinFolder>$(ArtifactsBinDir)Microsoft.TestPlatform\$(Configuration)\$(NetFrameworkMinimum)\</TestPlatformBinFolder>
     <TestPlatformCliBinFolder>$(ArtifactsBinDir)Microsoft.TestPlatform.CLI\$(Configuration)\$(NetFrameworkMinimum)\</TestPlatformCliBinFolder>
-    <InternalTestPlatformRemoteFolder>$(TestPlatformCliBinFolder)Microsoft.Internal.TestPlatform.Remote\Extensions\</InternalTestPlatformRemoteFolder>
+    <InternalTestPlatformRemoteFolder>$(TestPlatformBinFolder)Microsoft.Internal.TestPlatform.Remote\Extensions\</InternalTestPlatformRemoteFolder>
     <TestPlatformBinFolder>$(ArtifactsBinDir)Microsoft.TestPlatform\$(Configuration)\net472\</TestPlatformBinFolder>
     <MsDiaFolder>$(TestPlatformBinFolder)Microsoft.Internal.Dia\</MsDiaFolder>
     <CUITFolder>$(TestPlatformBinFolder)Microsoft.VisualStudio.CUIT\</CUITFolder>
