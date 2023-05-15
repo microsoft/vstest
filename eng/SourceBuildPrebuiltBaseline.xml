@@ -6,4 +6,7 @@
     <UsagePattern IdentityGlob="Microsoft.Internal.TestPlatform.Remote/17.6.33617.297" />
     <UsagePattern IdentityGlob="Microsoft.Extensions.DependencyModel/3.0.0-preview4-27615-11" />
   </IgnorePatterns>
+  <Usages>
+    <Usage Id="System.ComponentModel.Composition" Version="7.0.0" IsDirectDependency="true" />
+  </Usages>
 </UsageData>
