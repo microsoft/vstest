@@ -37,6 +37,7 @@
     <SystemNetHttpVersion>4.3.4</SystemNetHttpVersion>
     <SystemReflectionMetadataVersion>1.6.0</SystemReflectionMetadataVersion>
     <SystemUriVersion>4.3.2</SystemUriVersion>
+    <TestPlatformExternalsVersion>17.6.33617.297</TestPlatformExternalsVersion>
     <TestPlatformMSDiaVersion>17.6.33617.297</TestPlatformMSDiaVersion>
     <TestPlatformRemoteExternalsVersion>17.6.33617.297</TestPlatformRemoteExternalsVersion>
     <MicrosoftVSSDKBuildToolsVersion>17.4.2116</MicrosoftVSSDKBuildToolsVersion>
@@ -85,7 +86,5 @@
     <NuGetFrameworksVersion>5.11.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
     <JsonNetVersion>13.0.1</JsonNetVersion>
-    <!-- We cannot reuse $(msbuildvar) because we need the text value inside build.ps1 -->
-    <TestPlatformExternalsVersion>17.6.33617.297</TestPlatformExternalsVersion>
   </PropertyGroup>
 </Project>
