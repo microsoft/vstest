@@ -38,7 +38,7 @@
     <SystemReflectionMetadataVersion>1.6.0</SystemReflectionMetadataVersion>
     <SystemUriVersion>4.3.2</SystemUriVersion>
     <TestPlatformMSDiaVersion>17.6.33617.297</TestPlatformMSDiaVersion>
-    <!-- DO NOT BUMP THIS VERSION - it seems to be causing issues after VS insertion -->
+    <!-- DO NOT BUMP THIS VERSION - it seems to be causing issues after VS insertion for CPP unit test -->
     <TestPlatformRemoteExternalsVersion>17.3.32621.448</TestPlatformRemoteExternalsVersion>
     <MicrosoftVSSDKBuildToolsVersion>17.4.2116</MicrosoftVSSDKBuildToolsVersion>
     <MicrosoftNetCompilersToolsetVersion>4.6.0-1.23107.10</MicrosoftNetCompilersToolsetVersion>
