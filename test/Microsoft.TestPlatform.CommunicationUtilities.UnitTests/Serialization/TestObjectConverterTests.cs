@@ -45,8 +45,14 @@ public class TestObjectConverterTests
         var json = Serialize(test);
 
         // Use raw deserialization to validate basic properties
-        var expectedJson = "{\"Properties\":[{\"Key\":{\"Id\":\"2\",\"Label\":\"label2\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Int32\"},\"Value\":29},{\"Key\":{\"Id\":\"1\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Guid\"},\"Value\":\"02048dfd-3da7-475d-a011-8dd1121855ec\"}]}";
-        Assert.AreEqual(expectedJson, json);
+        // Because properties are backed up by a ConcurrentDictionary we don't have control over the order of serialization
+        var expectedJsonWithKey1First = "{\"Properties\":[{\"Key\":{\"Id\":\"1\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Guid\"},\"Value\":\"02048dfd-3da7-475d-a011-8dd1121855ec\"},{\"Key\":{\"Id\":\"2\",\"Label\":\"label2\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Int32\"},\"Value\":29}]}";
+        var expectedJsonWithKey2First = "{\"Properties\":[{\"Key\":{\"Id\":\"2\",\"Label\":\"label2\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Int32\"},\"Value\":29},{\"Key\":{\"Id\":\"1\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Guid\"},\"Value\":\"02048dfd-3da7-475d-a011-8dd1121855ec\"}]}";
+
+        if (json != expectedJsonWithKey1First && json != expectedJsonWithKey2First)
+        {
+            Assert.Fail($"Was expecting <{json}> to be either <{expectedJsonWithKey1First}> or <{expectedJsonWithKey2First}>.");
+        }
     }
 
     [TestMethod]
