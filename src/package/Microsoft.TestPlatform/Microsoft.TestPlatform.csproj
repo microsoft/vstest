@@ -83,7 +83,6 @@
     <PackageReference Include="Microsoft.VisualStudio.CUIT" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="$(MicrosoftVSSDKBuildToolsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness" Version="$(MicrosoftFakesVersion)" PrivateAssets="All" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.Internal.TestPlatform.Remote" Version="$(TestPlatformRemoteExternalsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
   </ItemGroup>
 
   <Target Name="CopyFiles" AfterTargets="Build" Condition=" '$(TargetFramework)' == 'net472' ">
@@ -130,6 +129,5 @@
     <Copy SourceFiles="@(MicrosoftVisualStudioCUITFiles)" DestinationFolder="$(OutDir)\Microsoft.VisualStudio.CUIT" />
     <Copy SourceFiles="@(MicrosoftVSSDKBuildToolsFiles)" DestinationFolder="$(OutDir)\Microsoft.VSSDK.BuildTools" />
     <Copy SourceFiles="@(MicrosoftQualityToolsTestingFakesTestRunnerHarnessFiles)" DestinationFiles="$(OutDir)\Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Copy SourceFiles="@(MicrosoftInternalTestPlatformRemoteFiles)" DestinationFiles="$(OutDir)\Microsoft.Internal.TestPlatform.Remote\%(RecursiveDir)%(Filename)%(Extension)" />
   </Target>
 </Project>
