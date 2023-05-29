@@ -16,13 +16,13 @@
   <PropertyGroup Label="VSTest dependencies">
     <CoverletCoverageVersion>1.2.0</CoverletCoverageVersion>
     <InteropExternalsVersion>17.3.32622.426</InteropExternalsVersion>
-    <MicrosoftBuildFrameworkPackageVersion>16.0.461</MicrosoftBuildFrameworkPackageVersion>
+    <MicrosoftBuildFrameworkPackageVersion>17.6.3</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildPackageVersion>$(MicrosoftBuildFrameworkPackageVersion)</MicrosoftBuildPackageVersion>
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>
     <MicrosoftCodeAnalysisVersion>3.8.0-3.20427.2</MicrosoftCodeAnalysisVersion>
-    <MicrosoftDiagnosticsNETCoreClientVersion>0.2.0-preview.23211.1</MicrosoftDiagnosticsNETCoreClientVersion>
-    <MicrosoftExtensionsDependencyModelPackageVersion>3.0.0-preview4-27615-11</MicrosoftExtensionsDependencyModelPackageVersion>
-    <MicrosoftExtensionsFileSystemGlobbingVersion>2.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
+    <MicrosoftDiagnosticsNETCoreClientVersion>0.2.421201</MicrosoftDiagnosticsNETCoreClientVersion>
+    <MicrosoftExtensionsDependencyModelPackageVersion>5.0.0</MicrosoftExtensionsDependencyModelPackageVersion>
+    <MicrosoftExtensionsFileSystemGlobbingVersion>6.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
     <MicrosoftFakesVersion>17.4.0-beta.22478.3</MicrosoftFakesVersion>
     <MicrosoftInternalCodeCoverageVersion>17.7.2-beta.23276.1</MicrosoftInternalCodeCoverageVersion>
     <MicrosoftCodeCoverageIOVersion>17.7.0</MicrosoftCodeCoverageIOVersion>
@@ -32,17 +32,20 @@
     <NewtonsoftJsonVersion>13.0.1</NewtonsoftJsonVersion>
     <RoslynBannedApiAnalyzersVersion>3.3.3</RoslynBannedApiAnalyzersVersion>
     <RoslynPublicApiAnalyzersVersion>3.3.4-beta1.21554.2</RoslynPublicApiAnalyzersVersion>
-    <SystemCollectionsImmutableVersion>1.5.0</SystemCollectionsImmutableVersion>
+    <SystemCollectionsImmutableVersion>6.0.0</SystemCollectionsImmutableVersion>
     <SystemComponentModelCompositionVersion>4.5.0</SystemComponentModelCompositionVersion>
     <SystemComponentModelCompositionForSourceBuildVersion>7.0.0</SystemComponentModelCompositionForSourceBuildVersion>
     <SystemMemoryVersion>4.5.5</SystemMemoryVersion>
     <SystemNetHttpVersion>4.3.4</SystemNetHttpVersion>
-    <SystemReflectionMetadataVersion>1.6.0</SystemReflectionMetadataVersion>
+    <SystemReflectionMetadataVersion>6.0.1</SystemReflectionMetadataVersion>
     <SystemUriVersion>4.3.2</SystemUriVersion>
     <TestPlatformExternalsVersion>17.7.0-preview-2-33725-504</TestPlatformExternalsVersion>
     <TestPlatformMSDiaVersion>17.7.0-preview-2-33725-504</TestPlatformMSDiaVersion>
     <MicrosoftVSSDKBuildToolsVersion>17.4.2116</MicrosoftVSSDKBuildToolsVersion>
     <MicrosoftNetCompilersToolsetVersion>4.6.0-1.23107.10</MicrosoftNetCompilersToolsetVersion>
+    <!-- NuGetFrameworksVersion version also needs to be updated in src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.nuspec -->
+    <NuGetFrameworksVersion>6.6.0</NuGetFrameworksVersion>
+    <ILAsmPackageVersion>7.0.0</ILAsmPackageVersion>
   </PropertyGroup>
   <PropertyGroup Label="VSTest test settings">
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
@@ -83,9 +86,5 @@
     <VSTestConsoleMostDownloadedVersion>[16.6.1]</VSTestConsoleMostDownloadedVersion>
     <VSTestConsolePreviousStableVersion>[16.11.0]</VSTestConsolePreviousStableVersion>
     <VSTestConsoleLegacyStableVersion>[15.9.2]</VSTestConsoleLegacyStableVersion>
-    <!-- This version also needs to be updated in src\package\nuspec\TestPlatform.ObjectModel.nuspec -->
-    <NuGetFrameworksVersion>5.11.0</NuGetFrameworksVersion>
-    <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
-    <JsonNetVersion>13.0.1</JsonNetVersion>
   </PropertyGroup>
 </Project>
