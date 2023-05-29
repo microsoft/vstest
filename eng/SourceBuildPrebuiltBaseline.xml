@@ -2,5 +2,6 @@
   <IgnorePatterns>
     <UsagePattern IdentityGlob="Microsoft.SourceBuild.Intermediate.*/*" />
     <UsagePattern IdentityGlob="Microsoft.Extensions.DependencyModel/3.0.0" />
+    <UsagePattern IdentityGlob="System.Text.Json/4.6.0" />
   </IgnorePatterns>
 </UsageData>
