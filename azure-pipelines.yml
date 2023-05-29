@@ -1,6 +1,8 @@
-trigger:
-- main
-- rel/*
+# Don't trigger internal build, anything before 17.7 is built on TestPlatform.CI.Real pipeline
+# that is not YAML based.
+# trigger:
+# - main
+# - rel/*
 
 pr:
 - main
