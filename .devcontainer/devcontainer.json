@@ -20,9 +20,8 @@
 		"ms-dotnettools.csharp",
 		"VisualStudioExptTeam.vscodeintellicode",
 		"ms-vscode.powershell",
-		"jmrog.vscode-nuget-package-manager",
+		"jmrog.vscode-nuget-package-manager"
 	],
-	"postCreateCommand": "./build.sh"
+	"postCreateCommand": "./build.sh",
+	"builtBy": "Pipeline Foundation"
 }
-
-// Built with ❤ by [Pipeline Foundation](https://pipeline.foundation)
