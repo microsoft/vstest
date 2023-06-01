@@ -125,7 +125,7 @@
     <file src="net472\NuGet.Frameworks\NuGet.Frameworks.dll" target="contentFiles\any\netcoreapp3.1\TestHostNetFramework" />
 
     <file src="net472\NETStandard.Library\**\*.dll" exclude="**\System.ValueTuple.dll;**\mscorlib.dll;**\*.xml" target="contentFiles\any\netcoreapp3.1\TestHostNetFramework" />
-    <file src="net472\System*.dll" exclude="net472\System.ComponentModel.Composition.dll" target="contentFiles\any\netcoreapp3.1\TestHostNetFramework" />
+    <file src="net472\System*.dll" exclude="net472\System.Text.Encodings.Web.dll;net472\System.Text.Json.dll;net472\System.ComponentModel.Composition.dll" target="contentFiles\any\netcoreapp3.1\TestHostNetFramework" />
 
     <!-- Resources -->
     <file src="netcoreapp3.1\Microsoft.CodeCoverage.IO\cs\Microsoft.CodeCoverage.IO.resources.dll" target="contentFiles\any\netcoreapp3.1\cs" />
