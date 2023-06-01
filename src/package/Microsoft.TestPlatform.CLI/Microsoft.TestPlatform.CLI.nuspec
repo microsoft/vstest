@@ -124,7 +124,7 @@
     <file src="net472\Newtonsoft.Json\Newtonsoft.Json.dll" target="contentFiles\any\netcoreapp3.1\TestHostNetFramework" />
     <file src="net472\NuGet.Frameworks\NuGet.Frameworks.dll" target="contentFiles\any\netcoreapp3.1\TestHostNetFramework" />
 
-    <file src="net472\NETStandard.Library\**\*.dll" exclude="**\mscorlib.dll;**\*.xml" target="contentFiles\any\netcoreapp3.1\TestHostNetFramework" />
+    <file src="net472\NETStandard.Library\**\*.dll" exclude="**\System.ValueTuple.dll;**\mscorlib.dll;**\*.xml" target="contentFiles\any\netcoreapp3.1\TestHostNetFramework" />
     <file src="net472\System*.dll" exclude="net472\System.ComponentModel.Composition.dll" target="contentFiles\any\netcoreapp3.1\TestHostNetFramework" />
 
     <!-- Resources -->

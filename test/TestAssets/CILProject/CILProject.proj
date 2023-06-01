@@ -17,7 +17,7 @@
 
     <!-- Default to ILAsm shipped with buildtools -->
     <PropertyGroup Condition="'$(IlasmToolPath)' == ''">
-        <IlasmPath>$(PackagesPath)microsoft.netcore.ilasm\$(ILAsmPackageVersion)\runtimes\native</IlasmPath>
+        <IlasmPath>$(PackagesPath)microsoft.netcore.ilasm\$(MicrosoftNetCoreILAsmVersion)\runtimes\native</IlasmPath>
         <IlasmToolPath Condition="'$(RunningOnUnix)'!='true' And Exists('$(IlasmPath)ilasm.exe')">$(IlasmPath)ilasm.exe</IlasmToolPath>
         <IlasmToolPath Condition="'$(RunningOnUnix)'=='true' And Exists('$(IlasmPath)ilasm')">$(IlasmPath)ilasm</IlasmToolPath>
     </PropertyGroup>
@@ -38,7 +38,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NETCore.ILAsm" Version="$(ILAsmPackageVersion)" />
+        <PackageReference Include="Microsoft.NETCore.ILAsm" Version="$(MicrosoftNetCoreILAsmVersion)" />
     </ItemGroup>
 
     <Target Name="CoreCompile" Inputs="$(MSBuildAllProjects);@(Compile)" Outputs="@(IntermediateAssembly);" Returns="" DependsOnTargets="GetIlasmPath;$(CoreCompileDependsOn)">
