@@ -12,5 +12,3 @@ TelemetryDataConstants.cs @cvpoienaru @nohwnd
 # Visual Studio.
 /src/Microsoft.TestPlatform.AdapterUtilities/ @nohwnd @Evangelink
 /test/Microsoft.TestPlatform.AdapterUtilities.UnitTests/ @nohwnd @Evangelink
-
-/eng/SourceBuild* @dotnet/source-build-internal
