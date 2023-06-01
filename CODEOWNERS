@@ -10,7 +10,7 @@ TelemetryDataConstants.cs @cvpoienaru @nohwnd
 
 # Changes here might break our contracts with other adapters, and possibly
 # Visual Studio.
-/src/Microsoft.TestPlatform.AdapterUtilities/ @haplois @Evangelink
-/test/Microsoft.TestPlatform.AdapterUtilities.UnitTests/  @haplois @Evangelink
+/src/Microsoft.TestPlatform.AdapterUtilities/ @nohwnd @Evangelink
+/test/Microsoft.TestPlatform.AdapterUtilities.UnitTests/ @nohwnd @Evangelink
 
 /eng/SourceBuild* @dotnet/source-build-internal
