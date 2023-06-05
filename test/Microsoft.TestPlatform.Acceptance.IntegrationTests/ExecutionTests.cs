@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 
 using TestPlatform.TestUtilities;
 using System.Linq;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using FluentAssertions;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -419,5 +421,101 @@ public class ExecutionTests : AcceptanceTestBase
         StringAssert.Contains(StdOut, $"Skipping source: {portableAssembly} (.NETPortable,Version=v4.5,Profile=Profile259,");
 
         ExitCodeEquals(1);
+    }
+
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetCoreTargetFrameworkDataSource]
+    public void RunXunitTestsWhenProvidingAllDllsInBin(RunnerInfo runnerInfo)
+    {
+        // This is the default filter of AzDo VSTest task:
+        //     testAssemblyVer2: |
+        //       **\*test *.dll
+        //       ! * *\*TestAdapter.dll
+        //       ! * *\obj\**
+        // Because of this in typical run we get a lot of dlls that we are sure don't have tests, like Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
+        // or testhost.dll. Those dlls are built for netcoreapp3.1 tfm, so theoretically they should be tests, but attempting to run them fails to find runtimeconfig.json
+        // or deps.json, and fails the run.
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var testAssemblyPath = _testEnvironment.GetTestAsset("XUTestProject.dll");
+        var allDllsMatchingTestPattern = Directory.GetFiles(Path.GetDirectoryName(testAssemblyPath)!, "*test*.dll");
+
+        string assemblyPaths = string.Join(" ", allDllsMatchingTestPattern.Concat(new[] { testAssemblyPath }).Select(s => s.AddDoubleQuote()));
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: string.Empty, FrameworkArgValue, string.Empty);
+        var fails = this.StdErrWithWhiteSpace.Split('\n').Where(s => !s.IsNullOrWhiteSpace()).Select(s => s.Trim()).ToList();
+        fails.Should().HaveCount(2, "because there is 1 failed test, and one message that tests failed.");
+        fails.Last().Should().Be("Test Run Failed.");
+    }
+
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetCoreTargetFrameworkDataSource()]
+    public void RunMstestTestsWhenProvidingAllDllsInBin(RunnerInfo runnerInfo)
+    {
+        // This is the default filter of AzDo VSTest task:
+        //     testAssemblyVer2: |
+        //       **\*test *.dll
+        //       ! * *\*TestAdapter.dll
+        //       ! * *\obj\**
+        // Because of this in typical run we get a lot of dlls that we are sure don't have tests, like Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
+        // or testhost.dll. Those dlls are built for netcoreapp3.1 tfm, so theoretically they should be tests, but attempting to run them fails to find runtimeconfig.json
+        // or deps.json, and fails the run.
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var testAssemblyPath = _testEnvironment.GetTestAsset("SimpleTestProject.dll");
+        var allDllsMatchingTestPattern = Directory.GetFiles(Path.GetDirectoryName(testAssemblyPath)!, "*test*.dll");
+
+        string assemblyPaths = string.Join(" ", allDllsMatchingTestPattern.Concat(new[] { testAssemblyPath }).Select(s => s.AddDoubleQuote()));
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: string.Empty, FrameworkArgValue, string.Empty);
+
+        StdErrHasTestRunFailedMessageButNoOtherError();
+    }
+
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetCoreTargetFrameworkDataSource()]
+    public void RunNunitTestsWhenProvidingAllDllsInBin(RunnerInfo runnerInfo)
+    {
+        // This is the default filter of AzDo VSTest task:
+        //     testAssemblyVer2: |
+        //       **\*test *.dll
+        //       ! * *\*TestAdapter.dll
+        //       ! * *\obj\**
+        // Because of this in typical run we get a lot of dlls that we are sure don't have tests, like Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
+        // or testhost.dll. Those dlls are built for netcoreapp3.1 tfm, so theoretically they should be tests, but attempting to run them fails to find runtimeconfig.json
+        // or deps.json, and fails the run.
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var testAssemblyPath = _testEnvironment.GetTestAsset("NUTestProject.dll");
+        var allDllsMatchingTestPattern = Directory.GetFiles(Path.GetDirectoryName(testAssemblyPath)!, "*test*.dll");
+
+        string assemblyPaths = string.Join(" ", allDllsMatchingTestPattern.Concat(new[] { testAssemblyPath }).Select(s => s.AddDoubleQuote()));
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: string.Empty, FrameworkArgValue, string.Empty);
+
+        StdErrHasTestRunFailedMessageButNoOtherError();
+    }
+
+    [TestMethod]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    public void RunTestsWhenProvidingJustPlatformDllsFailsTheRun(RunnerInfo runnerInfo)
+    {
+        // This is the default filter of AzDo VSTest task:
+        //     testAssemblyVer2: |
+        //       **\*test *.dll
+        //       ! * *\*TestAdapter.dll
+        //       ! * *\obj\**
+        // Because of this in typical run we get a lot of dlls that we are sure don't have tests, like Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
+        // or testhost.dll. Those dlls are built for netcoreapp3.1 tfm, so theoretically they should be tests, but attempting to run them fails to find runtimeconfig.json
+        // or deps.json, and fails the run.
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var xunitAssemblyPath = _testEnvironment.GetTestAsset("SimpleTestProject.dll");
+        var allDllsMatchingTestPattern = Directory.GetFiles(Path.GetDirectoryName(xunitAssemblyPath)!, "*test*.dll").Where(f => !f.EndsWith("SimpleTestProject.dll"));
+
+        string assemblyPaths = string.Join(" ", allDllsMatchingTestPattern.Select(s => s.AddDoubleQuote()));
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: string.Empty, FrameworkArgValue, string.Empty);
+
+        StdErr.Should().Be("No test source files were specified. ", "because all platform files we provided were filtered out");
     }
 }
