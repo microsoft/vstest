@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 
 using TestPlatform.TestUtilities;
-using static System.Net.Mime.MediaTypeNames;
 using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using FluentAssertions;
