@@ -291,7 +291,7 @@ public class DataCollectionManagerTests
     }
 
     [TestMethod]
-    public void SessionStaretedShouldContinueDataCollectionIfExceptionIsThrownWhileSendingEventsToDataCollector()
+    public void SessionStartedShouldContinueDataCollectionIfExceptionIsThrownWhileSendingEventsToDataCollector()
     {
         SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.SessionStart += (sender, eventArgs) => throw new Exception());
 
@@ -453,7 +453,7 @@ public class DataCollectionManagerTests
     }
 
     [TestMethod]
-    public void TestCaseEndedShouldNotSendEventToDataCollectorIfDataColletionIsNotEnbled()
+    public void TestCaseEndedShouldNotSendEventToDataCollectorIfDataCollectionIsNotEnbled()
     {
         var isEndInvoked = false;
         var runSettings = string.Format(CultureInfo.InvariantCulture, _defaultRunSettings, _dataCollectorSettings);

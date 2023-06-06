@@ -45,7 +45,7 @@ public class CommunicationLayerIntegrationTests
     }
 
     [TestMethod]
-    public void BeforeTestRunStartShouldGetEnviornmentVariables()
+    public void BeforeTestRunStartShouldGetEnvironmentVariables()
     {
         var dataCollectionRequestSender = new DataCollectionRequestSender();
 
