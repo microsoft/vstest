@@ -1473,7 +1473,6 @@ internal class TestRequestManager : ITestRequestManager
 
 internal static class KnownPlatformSourceFilter
 {
-
     // Running tests on AzureDevops, many projects use the default filter
     // which includes all *test*.dll, this includes many of the TestPlatform dlls,
     // which we cannot run, and don't want to attempt to run.
@@ -1481,15 +1480,22 @@ internal static class KnownPlatformSourceFilter
     // so we skip the most used adapters here as well.
     private static readonly HashSet<string> KnownPlatformSources = new(new string[]
     {
+        "Microsoft.TestPlatform.AdapterUtilities.dll",
+        "Microsoft.TestPlatform.AdapterUtilities.resources.dll",
         "Microsoft.TestPlatform.CommunicationUtilities.dll",
+        "Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
         "Microsoft.TestPlatform.CoreUtilities.dll",
+        "Microsoft.TestPlatform.CoreUtilities.resources.dll",
         "Microsoft.TestPlatform.CrossPlatEngine.dll",
+        "Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
         "Microsoft.TestPlatform.PlatformAbstractions.dll",
         "Microsoft.TestPlatform.Utilities.dll",
+        "Microsoft.TestPlatform.Utilities.resources.dll",
         "Microsoft.VisualStudio.TestPlatform.Common.dll",
+        "Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
         "Microsoft.VisualStudio.TestPlatform.ObjectModel.dll",
+        "Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
         "testhost.dll",
-        "Microsoft.TestPlatform.AdapterUtilities.dll",
 
         // NUnit
         "NUnit3.TestAdapter.dll",
@@ -1499,11 +1505,15 @@ internal static class KnownPlatformSourceFilter
         "xunit.runner.visualstudio.dotnetcore.testadapter.dll",
 
         // MSTest
+        "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll",
+        "Microsoft.VisualStudio.TestPlatform.TestFramework.dll",
+        "Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll",
+        // For MSTest up to v3
         "Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll",
+        "Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll",
         "Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll",
         "Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll",
-        "Microsoft.VisualStudio.TestPlatform.TestFramework.dll",
-        "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll",
+        "Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll",
     }, StringComparer.OrdinalIgnoreCase);
 
 
