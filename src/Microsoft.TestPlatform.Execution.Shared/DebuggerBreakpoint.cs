@@ -12,6 +12,11 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
+#if USE_EXTERN_ALIAS
+using Abstraction::Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+#else
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+#endif
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.Execution;
@@ -158,6 +163,28 @@ internal static class DebuggerBreakpoint
             }
 
             Break();
+        }
+    }
+
+    internal static void WaitForNativeDebugger(string environmentVariable)
+    {
+        if (string.IsNullOrWhiteSpace(environmentVariable))
+        {
+            throw new ArgumentException($"'{nameof(environmentVariable)}' cannot be null or whitespace.", nameof(environmentVariable));
+        }
+
+        // Check if native debugging is enabled and OS is windows.
+        var nativeDebugEnabled = Environment.GetEnvironmentVariable(environmentVariable);
+
+        if (!string.IsNullOrEmpty(nativeDebugEnabled) && nativeDebugEnabled.Equals("1", StringComparison.Ordinal)
+                                                      && new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows))
+        {
+            while (!IsDebuggerPresent())
+            {
+                Task.Delay(1000).Wait();
+            }
+
+            BreakNative();
         }
     }
 
