@@ -49,7 +49,7 @@ public class TestCaseFilterExpression : ITestCaseFilterExpression
     public string[]? ValidForProperties(IEnumerable<string>? supportedProperties, Func<string, TestProperty?> propertyProvider)
     {
         string[]? invalidProperties = null;
-        if (null != _filterWrapper && _validForMatch)
+        if (_validForMatch)
         {
             invalidProperties = _filterWrapper.ValidForProperties(supportedProperties, propertyProvider);
         }
@@ -69,13 +69,6 @@ public class TestCaseFilterExpression : ITestCaseFilterExpression
             return false;
         }
 
-        if (null == _filterWrapper)
-        {
-            // can be null when parsing error occurs. Invalid filter results in no match.
-            return false;
-        }
-
         return _filterWrapper.Evaluate(propertyValueProvider);
     }
-
 }
