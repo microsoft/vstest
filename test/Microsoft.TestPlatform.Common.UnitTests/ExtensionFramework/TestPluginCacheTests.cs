@@ -269,7 +269,7 @@ public class TestPluginCacheTests
         var temp = Path.GetTempPath();
         var resolutionPaths = TestPluginCache.GetResolutionPaths($@"{temp}{Path.DirectorySeparatorChar}Idonotexist.dll").Select(p => p.Replace("/", "\\")).ToList();
 
-        var tpCommonDirectory = Path.GetDirectoryName(typeof(TestPluginCache)..Assembly.Location)!;
+        var tpCommonDirectory = Path.GetDirectoryName(typeof(TestPluginCache).Assembly.Location)!;
         var expectedPaths = new List<string> { temp, tpCommonDirectory }.ConvertAll(p => p.Replace("/", "\\").TrimEnd('\\'));
 
         CollectionAssert.AreEqual(expectedPaths, resolutionPaths, $"Collection {string.Join(", ", resolutionPaths)}, is not equal to the expected collection {string.Join(", ", expectedPaths)}.");

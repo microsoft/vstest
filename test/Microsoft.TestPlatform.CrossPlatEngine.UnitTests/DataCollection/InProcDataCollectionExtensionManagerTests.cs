@@ -301,7 +301,7 @@ public class InProcDataCollectionExtensionManagerTests
         {
         }
 
-        protected override IInProcDataCollector CreateDataCollector(string assemblyQualifiedName, string codebase, XmlElement configuration, TypeInfo interfaceTypeInfo)
+        protected override IInProcDataCollector CreateDataCollector(string assemblyQualifiedName, string codebase, XmlElement configuration, Type interfaceType)
         {
             return new MockDataCollector(assemblyQualifiedName, codebase, configuration);
         }
