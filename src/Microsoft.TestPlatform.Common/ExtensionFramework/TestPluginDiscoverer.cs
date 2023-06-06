@@ -91,9 +91,8 @@ internal static class TestPluginDiscoverer
             }
             try
             {
-                Assembly? assembly = null;
                 var assemblyName = Path.GetFileNameWithoutExtension(file);
-                assembly = Assembly.Load(new AssemblyName(assemblyName));
+                var assembly = Assembly.Load(new AssemblyName(assemblyName));
                 if (assembly != null)
                 {
                     GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos, file);

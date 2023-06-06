@@ -128,7 +128,7 @@ public class TestPluginCache
             return TestExtensions.GetTestExtensionCache<TPluginInfo>();
         }
 
-        Dictionary<string, TPluginInfo>? pluginInfos = null;
+        Dictionary<string, TPluginInfo>? pluginInfos;
         SetupAssemblyResolver(null);
 
         // Some times TestPlatform.core.dll assembly fails to load in the current appdomain (from devenv.exe).
