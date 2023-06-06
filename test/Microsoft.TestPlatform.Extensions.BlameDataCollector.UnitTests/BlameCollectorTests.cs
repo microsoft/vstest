@@ -620,7 +620,7 @@ public class BlameCollectorTests
     [TestMethod]
     public void TriggerTestHostLaunchedHandlerShouldLogNoWarningWhenDumpTypeIsUsedWithHangDumpBecauseEitherHangDumpTypeOrDumpTypeCanBeSpecified()
     {
-        var dumpConfig = GetDumpConfigurationElement(isFullDump: true, false, colectDumpOnHang: true, 1800000);
+        var dumpConfig = GetDumpConfigurationElement(isFullDump: true, false, collectDumpOnHang: true, 1800000);
 
         // Initializing Blame Data Collector
         _blameDataCollector.Initialize(
