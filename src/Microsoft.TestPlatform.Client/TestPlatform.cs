@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
 using Microsoft.VisualStudio.TestPlatform.Client.Execution;
