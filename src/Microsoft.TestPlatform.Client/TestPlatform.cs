@@ -22,8 +22,6 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
-
 namespace Microsoft.VisualStudio.TestPlatform.Client;
 
 /// <summary>
