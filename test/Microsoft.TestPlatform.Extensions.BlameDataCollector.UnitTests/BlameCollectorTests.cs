@@ -698,7 +698,7 @@ public class BlameCollectorTests
     private static XmlElement GetDumpConfigurationElement(
         bool isFullDump = false,
         bool collectDumpOnExit = false,
-        bool colectDumpOnHang = false,
+        bool collectDumpOnHang = false,
         int inactivityTimeInMilliseconds = 0)
     {
         var xmldoc = new XmlDocument();
@@ -721,7 +721,7 @@ public class BlameCollectorTests
             node.Attributes.Append(collectDumpOnExitAttribute);
         }
 
-        if (colectDumpOnHang)
+        if (collectDumpOnHang)
         {
             var hangDumpNode = xmldoc.CreateElement(Constants.CollectDumpOnTestSessionHang);
             outernode.AppendChild(hangDumpNode);
