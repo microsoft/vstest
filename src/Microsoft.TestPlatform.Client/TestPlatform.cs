@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
 using Microsoft.VisualStudio.TestPlatform.Client.Execution;
@@ -276,7 +275,7 @@ internal class TestPlatform : ITestPlatform
         }
 
         string extensionsFolder = Path.Combine(
-            Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation())!,
+            Path.GetDirectoryName(typeof(TestPlatform).Assembly.GetAssemblyLocation())!,
             "Extensions");
         if (!fileHelper.DirectoryExists(extensionsFolder))
         {

@@ -201,7 +201,7 @@ public static partial class ManagedNameHelper
             hierarchyValues[HierarchyConstants.Levels.ClassIndex] = managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1);
             hierarchyValues[HierarchyConstants.Levels.NamespaceIndex] = managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]);
         }
-        hierarchyValues[HierarchyConstants.Levels.ContainerIndex] = method.DeclaringType?.GetTypeInfo()?.Assembly?.GetName()?.Name ?? string.Empty;
+        hierarchyValues[HierarchyConstants.Levels.ContainerIndex] = method.DeclaringType?.Assembly?.GetName()?.Name ?? string.Empty;
     }
 
     /// <summary>
