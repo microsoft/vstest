@@ -166,28 +166,6 @@ internal static class DebuggerBreakpoint
         }
     }
 
-    internal static void WaitForNativeDebugger(string environmentVariable)
-    {
-        if (string.IsNullOrWhiteSpace(environmentVariable))
-        {
-            throw new ArgumentException($"'{nameof(environmentVariable)}' cannot be null or whitespace.", nameof(environmentVariable));
-        }
-
-        // Check if native debugging is enabled and OS is windows.
-        var nativeDebugEnabled = Environment.GetEnvironmentVariable(environmentVariable);
-
-        if (!string.IsNullOrEmpty(nativeDebugEnabled) && nativeDebugEnabled.Equals("1", StringComparison.Ordinal)
-                                                      && new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows))
-        {
-            while (!IsDebuggerPresent())
-            {
-                Task.Delay(1000).Wait();
-            }
-
-            BreakNative();
-        }
-    }
-
     private static void Break()
     {
         if (ShouldNotBreak())

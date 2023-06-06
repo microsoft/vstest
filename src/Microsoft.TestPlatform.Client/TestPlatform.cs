@@ -191,18 +191,6 @@ internal class TestPlatform : ITestPlatform
         _testEngine.GetExtensionManager().ClearExtensions();
     }
 
-    private static void ThrowExceptionIfTestHostManagerIsNull(
-        ITestRuntimeProvider? testHostManager,
-        string settingsXml)
-    {
-        if (testHostManager == null)
-        {
-            EqtTrace.Error($"{nameof(TestPlatform)}.{nameof(ThrowExceptionIfTestHostManagerIsNull)}: No suitable testHostProvider found for runsettings: {settingsXml}");
-            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
-        }
-    }
-
-
     private void AddExtensionAssemblies(string? runSettings, TestAdapterLoadingStrategy adapterLoadingStrategy)
     {
         IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
