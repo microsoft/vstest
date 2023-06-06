@@ -103,7 +103,7 @@ public class ArgumentProcessorFactoryTests
     }
 
     [TestMethod]
-    public void BuildCommadMapsForProcessorWithIsSpecialCommandSetAddsProcessorToSpecialMap()
+    public void BuildCommandMapsForProcessorWithIsSpecialCommandSetAddsProcessorToSpecialMap()
     {
         var specialCommands = GetArgumentProcessors(specialCommandFilter: true);
 
@@ -127,7 +127,7 @@ public class ArgumentProcessorFactoryTests
     }
 
     [TestMethod]
-    public void BuildCommadMapsForMultipleProcessorAddsProcessorToAppropriateMaps()
+    public void BuildCommandMapsForMultipleProcessorAddsProcessorToAppropriateMaps()
     {
         var commandProcessors = GetArgumentProcessors(specialCommandFilter: false);
         var commands = commandProcessors.Select(a => a.Metadata.Value.CommandName);
