@@ -33,7 +33,7 @@ public class TestExtensionManagerTests
     [TestMethod]
     public void UseAdditionalExtensionsShouldUpdateAdditionalExtensionsInCache()
     {
-        var extensions = new List<string> { typeof(TestExtensionManagerTests).GetTypeInfo().Assembly.Location };
+        var extensions = new List<string> { typeof(TestExtensionManagerTests).Assembly.Location };
 
         _testExtensionManager.UseAdditionalExtensions(extensions, true);
 

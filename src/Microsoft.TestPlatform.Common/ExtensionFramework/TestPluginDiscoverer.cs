@@ -156,7 +156,7 @@ internal static class TestPluginDiscoverer
 
             if (types.Count == 0)
             {
-                types.AddRange(assembly.GetTypes().Where(type => type.GetTypeInfo() is { } typeInfo && typeInfo.IsClass && !typeInfo.IsAbstract));
+                types.AddRange(assembly.GetTypes().Where(type => type.IsClass && !type.IsAbstract));
             }
         }
         catch (ReflectionTypeLoadException e)
@@ -166,7 +166,7 @@ internal static class TestPluginDiscoverer
             if (e.Types?.Length > 0)
             {
                 // Unloaded types on e.Types are null, make sure we skip them.
-                types.AddRange(e.Types.Where(type => type != null && type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract)!);
+                types.AddRange(e.Types.Where(type => type != null && type.IsClass && !type.IsAbstract)!);
             }
 
             if (e.LoaderExceptions != null)
@@ -209,7 +209,7 @@ internal static class TestPluginDiscoverer
         string filePath)
         where TPluginInfo : TestPluginInformation
     {
-        if (!extensionType.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
+        if (!extensionType.IsAssignableFrom(type))
         {
             return;
         }

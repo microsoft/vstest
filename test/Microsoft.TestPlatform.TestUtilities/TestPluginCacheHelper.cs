@@ -18,7 +18,7 @@ public static class TestPluginCacheHelper
     public static TestableTestPluginCache SetupMockAdditionalPathExtensions(Type callingTest)
     {
         return SetupMockAdditionalPathExtensions(
-            new string[] { callingTest.GetTypeInfo().Assembly.Location });
+            new string[] { callingTest.Assembly.Location });
     }
 
     public static TestableTestPluginCache SetupMockAdditionalPathExtensions(string[] extensions)
@@ -43,7 +43,7 @@ public static class TestPluginCacheHelper
 
     public static void SetupMockExtensions(Type callingTest, Action callback, Mock<IFileHelper>? mockFileHelper = null)
     {
-        SetupMockExtensions(new[] { callingTest.GetTypeInfo().Assembly.Location }, callback, mockFileHelper);
+        SetupMockExtensions(new[] { callingTest.Assembly.Location }, callback, mockFileHelper);
     }
 
     public static void SetupMockExtensions(string[] extensions, Action callback, Mock<IFileHelper>? mockFileHelper = null)

@@ -48,7 +48,7 @@ public class DotnetDataCollectionLauncherTests
     [TestMethod]
     public void LaunchDataCollectorShouldAppendDoubleQuoteForDataCollectorDllPath()
     {
-        var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation())!;
+        var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).Assembly.GetAssemblyLocation())!;
         var dataCollectorAssemblyPath = Path.Combine(currentWorkingDirectory, "datacollector.dll");
 
         List<string> arguments = new();

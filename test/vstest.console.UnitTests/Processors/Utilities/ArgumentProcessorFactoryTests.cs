@@ -162,9 +162,9 @@ public class ArgumentProcessorFactoryTests
 
     private static IEnumerable<IArgumentProcessor> GetArgumentProcessors(bool specialCommandFilter)
     {
-        var allProcessors = typeof(ArgumentProcessorFactory).GetTypeInfo()
+        var allProcessors = typeof(ArgumentProcessorFactory)
             .Assembly.GetTypes()
-            .Where(t => !t.GetTypeInfo().IsAbstract && !t.Name.Equals("IArgumentProcessor") && typeof(IArgumentProcessor).IsAssignableFrom(t));
+            .Where(t => !t.IsAbstract && !t.Name.Equals("IArgumentProcessor") && typeof(IArgumentProcessor).IsAssignableFrom(t));
 
         foreach (var processor in allProcessors)
         {

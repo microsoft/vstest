@@ -92,7 +92,7 @@ public class BaseRunTestsTests
             new PlatformThread(),
             _mockDataSerializer.Object);
 
-        TestPluginCacheHelper.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
+        TestPluginCacheHelper.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).Assembly.Location }, () => { });
     }
 
     [TestCleanup]
@@ -247,7 +247,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldInvokeTheTestExecutorIfAdapterAssemblyIsKnown()
     {
-        var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+        var assemblyLocation = typeof(BaseRunTestsTests).Assembly.Location;
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
         {
             new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
@@ -326,7 +326,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldReportAWarningIfExecutorUriIsNotDefinedInExtensionAssembly()
     {
-        var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+        var assemblyLocation = typeof(BaseRunTestsTests).Assembly.Location;
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
         {
             new Tuple<Uri, string>(new Uri("executor://nonexistent/"), assemblyLocation)
@@ -362,7 +362,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldNotAddExecutorUriToExecutorUriListIfNoTestsAreRun()
     {
-        var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+        var assemblyLocation = typeof(BaseRunTestsTests).Assembly.Location;
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
         {
             new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
@@ -379,7 +379,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldAddExecutorUriToExecutorUriListIfExecutorHasRunTests()
     {
-        var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+        var assemblyLocation = typeof(BaseRunTestsTests).Assembly.Location;
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
         {
             new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
@@ -404,7 +404,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldReportWarningIfExecutorThrowsAnException()
     {
-        var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+        var assemblyLocation = typeof(BaseRunTestsTests).Assembly.Location;
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
         {
             new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
@@ -435,7 +435,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldNotFailOtherExecutorsRunIfOneExecutorThrowsAnException()
     {
-        var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+        var assemblyLocation = typeof(BaseRunTestsTests).Assembly.Location;
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
         {
             new Tuple<Uri, string>(new Uri(BadBaseRunTestsExecutorUri), assemblyLocation),
@@ -468,7 +468,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldIterateThroughAllExecutors()
     {
-        var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+        var assemblyLocation = typeof(BaseRunTestsTests).Assembly.Location;
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
         {
             new Tuple<Uri, string>(new Uri(BadBaseRunTestsExecutorUri), assemblyLocation),
@@ -607,7 +607,7 @@ public class BaseRunTestsTests
     public void RunTestsShouldNotifyItsImplementersOfAnyExceptionThrownByTheExecutors()
     {
         bool? isExceptionThrown = null;
-        var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+        var assemblyLocation = typeof(BaseRunTestsTests).Assembly.Location;
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
         {
             new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
@@ -627,7 +627,7 @@ public class BaseRunTestsTests
     [TestMethod]
     public void RunTestsShouldReportLogMessagesFromExecutors()
     {
-        var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+        var assemblyLocation = typeof(BaseRunTestsTests).Assembly.Location;
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
         {
             new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
@@ -695,7 +695,7 @@ public class BaseRunTestsTests
         {
             { "DummyMessage", "DummyValue" }
         };
-        var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+        var assemblyLocation = typeof(BaseRunTestsTests).Assembly.Location;
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
         {
             new Tuple<Uri, string>(new Uri(BadBaseRunTestsExecutorUri), assemblyLocation),
@@ -810,8 +810,8 @@ public class BaseRunTestsTests
             _mockThread.Object,
             _mockDataSerializer.Object);
 
-        TestPluginCacheHelper.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
-        var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+        TestPluginCacheHelper.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).Assembly.Location }, () => { });
+        var assemblyLocation = typeof(BaseRunTestsTests).Assembly.Location;
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
         {
             new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
@@ -845,7 +845,7 @@ public class BaseRunTestsTests
             new PlatformThread(),
             _mockDataSerializer.Object);
 
-        var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+        var assemblyLocation = typeof(BaseRunTestsTests).Assembly.Location;
         var executorUriExtensionMap = new List<Tuple<Uri, string>>
         {
             new Tuple<Uri, string>(new Uri(BadBaseRunTestsExecutorUri), assemblyLocation),

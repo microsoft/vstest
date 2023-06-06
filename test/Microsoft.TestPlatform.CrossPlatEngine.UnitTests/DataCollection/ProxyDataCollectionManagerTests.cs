@@ -160,7 +160,7 @@ public class ProxyDataCollectionManagerTests
 
         var result = _proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
 
-        var extensionsFolderPath = Path.Combine(Path.GetDirectoryName(typeof(ITestPlatform).GetTypeInfo().Assembly.Location)!, "Extensions");
+        var extensionsFolderPath = Path.Combine(Path.GetDirectoryName(typeof(ITestPlatform).Assembly.Location)!, "Extensions");
         var expectedSettingsXml = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><RunConfiguration><TestAdaptersPaths>{extensionsFolderPath}</TestAdaptersPaths></RunConfiguration></RunSettings>";
         _mockDataCollectionRequestSender.Verify(
             x => x.SendBeforeTestRunStartAndGetResult(expectedSettingsXml, sourceList, true, It.IsAny<ITestMessageEventHandler>()), Times.Once);

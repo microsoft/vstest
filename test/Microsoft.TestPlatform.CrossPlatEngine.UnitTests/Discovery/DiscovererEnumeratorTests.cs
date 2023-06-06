@@ -50,7 +50,7 @@ public class DiscovererEnumeratorTests
         _discovererEnumerator = new DiscovererEnumerator(_mockRequestData.Object, _discoveryResultCache, _mockTestPlatformEventSource.Object, _mockAssemblyProperties.Object, _cancellationTokenSource.Token);
         _runSettingsMock = new Mock<IRunSettings>();
         _messageLoggerMock = new Mock<IMessageLogger>();
-        TestPluginCacheHelper.SetupMockExtensions(new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+        TestPluginCacheHelper.SetupMockExtensions(new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location },
             () => { });
         TestDiscoveryExtensionManager.Destroy();
     }
@@ -71,9 +71,9 @@ public class DiscovererEnumeratorTests
     public void LoadTestsShouldReportWarningOnNoDiscoverers()
     {
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(TestPluginCache).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(TestPluginCache).Assembly.Location },
             () => { });
-        var sources = new List<string> { typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location };
+        var sources = new List<string> { typeof(DiscoveryResultCacheTests).Assembly.Location };
 
         var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
         {
@@ -91,7 +91,7 @@ public class DiscovererEnumeratorTests
     public void LoadTestsShouldNotCallIntoDiscoverersIfNoneMatchesSources()
     {
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location },
             () => { });
         var sources = new List<string> { "temp.jpeg" };
 
@@ -116,7 +116,7 @@ public class DiscovererEnumeratorTests
     public void LoadTestsShouldCallOnlyNativeDiscovererIfNativeAssembliesPassed()
     {
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location },
             () => { });
 
         _mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("native.dll")).Returns(AssemblyType.Native);
@@ -151,7 +151,7 @@ public class DiscovererEnumeratorTests
     public void LoadTestsShouldCallOnlyManagedDiscovererIfManagedAssembliesPassed()
     {
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location },
             () => { });
 
         _mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("managed.dll")).Returns(AssemblyType.Managed);
@@ -186,7 +186,7 @@ public class DiscovererEnumeratorTests
     public void LoadTestsShouldCallBothNativeAndManagedDiscoverersWithCorrectSources()
     {
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location },
             () => { });
 
         _mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("native.dll")).Returns(AssemblyType.Native);
@@ -229,13 +229,13 @@ public class DiscovererEnumeratorTests
     public void LoadTestsShouldCallIntoADiscovererThatMatchesTheSources()
     {
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location },
             () => { });
 
         var sources = new List<string>
         {
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location,
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
+            typeof(DiscoveryResultCacheTests).Assembly.Location,
+            typeof(DiscoveryResultCacheTests).Assembly.Location
         };
 
         var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
@@ -270,13 +270,13 @@ public class DiscovererEnumeratorTests
     public void LoadTestsShouldCallIntoMultipleDiscoverersThatMatchesTheSources()
     {
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location },
             () => { });
 
         var dllsources = new List<string>
         {
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location,
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
+            typeof(DiscoveryResultCacheTests).Assembly.Location,
+            typeof(DiscoveryResultCacheTests).Assembly.Location
         };
 
         var jsonsources = new List<string>
@@ -351,13 +351,13 @@ public class DiscovererEnumeratorTests
     public void LoadTestsShouldCallIntoOtherDiscoverersWhenCreatingOneFails()
     {
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location },
             () => { });
 
         var sources = new List<string>
         {
             "test1.csv",
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
+            typeof(DiscoveryResultCacheTests).Assembly.Location
         };
 
         var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
@@ -395,13 +395,13 @@ public class DiscovererEnumeratorTests
     public void LoadTestsShouldCallIntoOtherDiscoverersEvenIfDiscoveryInOneFails()
     {
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location },
             () => { });
 
         var sources = new List<string>
         {
             "test1.cs",
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
+            typeof(DiscoveryResultCacheTests).Assembly.Location
         };
 
         var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
@@ -450,13 +450,13 @@ public class DiscovererEnumeratorTests
         };
 
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location },
             () => { });
 
         var sources = new List<string>
         {
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location,
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
+            typeof(DiscoveryResultCacheTests).Assembly.Location,
+            typeof(DiscoveryResultCacheTests).Assembly.Location
         };
 
         var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
@@ -485,13 +485,13 @@ public class DiscovererEnumeratorTests
     public void LoadTestsShouldNotCallIntoDiscoverersWhenCancelled()
     {
         // Setup
-        string[] extensions = new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location };
+        string[] extensions = new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location };
         TestPluginCacheHelper.SetupMockExtensions(extensions, () => { });
 
         var dllsources = new List<string>
         {
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location,
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
+            typeof(DiscoveryResultCacheTests).Assembly.Location,
+            typeof(DiscoveryResultCacheTests).Assembly.Location
         };
         var jsonsources = new List<string>
         {
@@ -573,13 +573,13 @@ public class DiscovererEnumeratorTests
     public void LoadTestsShouldIterateOverAllExtensionsInTheMapAndDiscoverTests()
     {
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location },
             () => { });
 
         var dllsources = new List<string>
         {
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location,
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
+            typeof(DiscoveryResultCacheTests).Assembly.Location,
+            typeof(DiscoveryResultCacheTests).Assembly.Location
         };
         var jsonsources = new List<string>
         {
@@ -589,7 +589,7 @@ public class DiscovererEnumeratorTests
 
         var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
         {
-            { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location, jsonsources },
+            { typeof(DiscovererEnumeratorTests).Assembly.Location, jsonsources },
             { "_none_", dllsources }
         };
 
@@ -683,8 +683,8 @@ public class DiscovererEnumeratorTests
         out Dictionary<string, IEnumerable<string>> extensionSourceMap,
         out string sourcesString)
     {
-        var crossPlatEngineAssemblyLocation = typeof(DiscovererEnumerator).GetTypeInfo().Assembly.Location;
-        var objectModelAseeAssemblyLocation = typeof(TestCase).GetTypeInfo().Assembly.Location;
+        var crossPlatEngineAssemblyLocation = typeof(DiscovererEnumerator).Assembly.Location;
+        var objectModelAseeAssemblyLocation = typeof(TestCase).Assembly.Location;
         var sources = new string[] { crossPlatEngineAssemblyLocation, objectModelAseeAssemblyLocation };
 
         extensionSourceMap = new Dictionary<string, IEnumerable<string>>
@@ -697,12 +697,12 @@ public class DiscovererEnumeratorTests
     private void InvokeLoadTestWithMockSetup()
     {
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(DiscovererEnumeratorTests).Assembly.Location },
             () => { });
 
         var sources = new List<string>
         {
-            typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
+            typeof(DiscoveryResultCacheTests).Assembly.Location
         };
 
         var extensionSourceMap = new Dictionary<string, IEnumerable<string>>

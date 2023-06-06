@@ -235,7 +235,7 @@ public partial class ProcessHelper : IProcessHelper
     /// <inheritdoc/>
     public string? GetTestEngineDirectory()
     {
-        return Path.GetDirectoryName(typeof(ProcessHelper).GetTypeInfo().Assembly.Location);
+        return Path.GetDirectoryName(typeof(ProcessHelper).Assembly.Location);
     }
 
     /// <inheritdoc/>

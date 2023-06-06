@@ -68,7 +68,7 @@ internal abstract class TestExtensionPluginInformation : TestPluginInformation
     {
         string extensionUri = string.Empty;
 
-        object[] attributes = testLoggerType.GetTypeInfo().GetCustomAttributes(typeof(ExtensionUriAttribute), false).ToArray();
+        object[] attributes = testLoggerType.GetCustomAttributes(typeof(ExtensionUriAttribute), false).ToArray();
         if (attributes.Length > 0)
         {
             ExtensionUriAttribute extensionUriAttribute = (ExtensionUriAttribute)attributes[0];
@@ -81,7 +81,7 @@ internal abstract class TestExtensionPluginInformation : TestPluginInformation
 
         if (extensionUri.IsNullOrEmpty())
         {
-            EqtTrace.Error("The type \"{0}\" defined in \"{1}\" does not have ExtensionUri attribute.", testLoggerType.ToString(), testLoggerType.GetTypeInfo().Module.Name);
+            EqtTrace.Error("The type \"{0}\" defined in \"{1}\" does not have ExtensionUri attribute.", testLoggerType.ToString(), testLoggerType.Module.Name);
         }
 
         return extensionUri;

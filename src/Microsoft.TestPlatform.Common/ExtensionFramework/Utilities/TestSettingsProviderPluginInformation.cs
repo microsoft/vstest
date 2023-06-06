@@ -68,7 +68,7 @@ internal class TestSettingsProviderPluginInformation : TestPluginInformation
     {
         string settingName = string.Empty;
 
-        object[] attributes = testSettingsProviderType.GetTypeInfo().GetCustomAttributes(typeof(SettingsNameAttribute), false).ToArray();
+        object[] attributes = testSettingsProviderType.GetCustomAttributes(typeof(SettingsNameAttribute), false).ToArray();
         if (attributes != null && attributes.Length > 0)
         {
             SettingsNameAttribute settingsNameAttribute = (SettingsNameAttribute)attributes[0];

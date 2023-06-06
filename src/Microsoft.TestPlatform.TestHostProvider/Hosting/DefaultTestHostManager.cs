@@ -180,7 +180,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         string testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
 
-        var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
+        var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).Assembly.Location);
         var argumentsString = " " + connectionInfo.ToCommandLineOptions();
 
         TPDebug.Assert(currentWorkingDirectory is not null, "Current working directory must not be null.");

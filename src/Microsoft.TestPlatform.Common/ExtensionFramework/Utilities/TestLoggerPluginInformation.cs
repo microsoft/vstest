@@ -54,7 +54,7 @@ internal class TestLoggerPluginInformation : TestExtensionPluginInformation
     {
         string friendlyName = string.Empty;
 
-        object[] attributes = testLoggerType.GetTypeInfo().GetCustomAttributes(typeof(FriendlyNameAttribute), false).ToArray();
+        object[] attributes = testLoggerType.GetCustomAttributes(typeof(FriendlyNameAttribute), false).ToArray();
         if (attributes.Length > 0)
         {
             FriendlyNameAttribute friendlyNameAttribute = (FriendlyNameAttribute)attributes[0];

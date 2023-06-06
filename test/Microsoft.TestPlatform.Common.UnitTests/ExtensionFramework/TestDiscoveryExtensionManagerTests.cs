@@ -49,7 +49,7 @@ public class TestDiscoveryExtensionManagerTests
     {
         var extensionManager =
             TestDiscoveryExtensionManager.GetDiscoveryExtensionManager(
-                typeof(TestDiscoveryExtensionManagerTests).GetTypeInfo().Assembly.Location);
+                typeof(TestDiscoveryExtensionManagerTests).Assembly.Location);
 
         Assert.IsNotNull(extensionManager.Discoverers);
         Assert.IsTrue(extensionManager.Discoverers.Any());

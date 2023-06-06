@@ -296,7 +296,7 @@ internal class DiscovererEnumerator
             return false;
         }
 
-        var discovererLocation = discoverer.Value.GetType().GetTypeInfo().Assembly.GetAssemblyLocation();
+        var discovererLocation = discoverer.Value.GetType().Assembly.GetAssemblyLocation();
 
         return Path.GetDirectoryName(discovererLocation)!
             .Equals(Constants.DefaultAdapterLocation, StringComparison.OrdinalIgnoreCase);

@@ -100,12 +100,12 @@ internal class InProcDataCollectionExtensionManager
     /// <returns>
     /// The <see cref="IInProcDataCollector"/>.
     /// </returns>
-    protected virtual IInProcDataCollector CreateDataCollector(string assemblyQualifiedName, string codebase, XmlElement configuration, TypeInfo interfaceTypeInfo)
+    protected virtual IInProcDataCollector CreateDataCollector(string assemblyQualifiedName, string codebase, XmlElement configuration, Type interfaceType)
     {
         var inProcDataCollector = new InProcDataCollector(
             codebase,
             assemblyQualifiedName,
-            interfaceTypeInfo,
+            interfaceType,
             configuration?.OuterXml);
 
         inProcDataCollector.LoadDataCollector(_inProcDataCollectionSink);
@@ -215,7 +215,7 @@ internal class InProcDataCollectionExtensionManager
 
             _inProcDataCollectorSettingsCollection = inProcDataCollectionRunSettings!.DataCollectorSettingsList;
 
-            var interfaceTypeInfo = typeof(InProcDataCollection).GetTypeInfo();
+            var interfaceTypeInfo = typeof(InProcDataCollection);
             foreach (var inProcDc in _inProcDataCollectorSettingsCollection)
             {
                 var codeBase = GetCodebase(inProcDc.CodeBase!);

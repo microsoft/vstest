@@ -134,7 +134,7 @@ public class TestAdapterPathArgumentProcessorTests
         var mockOutput = new Mock<IOutput>();
         var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, new FileHelper());
 
-        var currentAssemblyPath = typeof(TestAdapterPathArgumentExecutor).GetTypeInfo().Assembly.Location;
+        var currentAssemblyPath = typeof(TestAdapterPathArgumentExecutor).Assembly.Location;
         var currentFolder = Path.GetDirectoryName(currentAssemblyPath);
 
         executor.Initialize(currentFolder);

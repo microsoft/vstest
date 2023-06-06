@@ -47,7 +47,7 @@ public class TestExecutorExtensionManagerTests
     {
         var extensionManager =
             TestExecutorExtensionManager.GetExecutionExtensionManager(
-                typeof(TestExecutorExtensionManagerTests).GetTypeInfo().Assembly.Location);
+                typeof(TestExecutorExtensionManagerTests).Assembly.Location);
 
         Assert.IsNotNull(extensionManager.TestExtensions);
         Assert.IsTrue(extensionManager.TestExtensions.Any());

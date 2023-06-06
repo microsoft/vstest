@@ -37,7 +37,7 @@ public class TestLoggerManagerTests
     public void Initialize()
     {
         TestPluginCacheHelper.SetupMockExtensions(
-            new string[] { typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location },
+            new string[] { typeof(TestLoggerManagerTests).Assembly.Location },
             () => { });
     }
 
@@ -276,8 +276,6 @@ public class TestLoggerManagerTests
         var mockRequestData = new Mock<IRequestData>();
         var mockMetricsCollection = new Mock<IMetricsCollection>();
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
-
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -667,7 +665,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -722,7 +720,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(InvalidLogger).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -774,7 +772,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(InvalidLogger).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -802,7 +800,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -833,7 +831,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -865,7 +863,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(LoggerWithInitializationError).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -891,7 +889,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -917,7 +915,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -948,7 +946,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -976,21 +974,6 @@ public class TestLoggerManagerTests
         var mockMetricsCollection = new Mock<IMetricsCollection>();
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
-        var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
-
-        string settingsXml =
-            @"<?xml version=""1.0"" encoding=""utf-8""?>
-                <RunSettings>
-                  <LoggerRunSettings>
-                    <Loggers>
-                      <Logger friendlyName=""TestLoggerExtension"" />
-                      <Logger uri=""testlogger://logger2""></Logger>
-                      <Logger assemblyQualifiedName=""" + assemblyQualifiedName + @""" codeBase=""" + codeBase + @"""></Logger>
-                    </Loggers>
-                  </LoggerRunSettings>
-                </RunSettings>";
-
         var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
 
         Assert.IsFalse(testLoggerManager.LoggersInitialized);
@@ -1003,9 +986,6 @@ public class TestLoggerManagerTests
         var mockRequestData = new Mock<IRequestData>();
         var mockMetricsCollection = new Mock<IMetricsCollection>();
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
-
-        var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -1031,7 +1011,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -1071,7 +1051,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -1111,7 +1091,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -1152,7 +1132,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -1183,7 +1163,7 @@ public class TestLoggerManagerTests
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
         var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -1221,7 +1201,7 @@ public class TestLoggerManagerTests
         var mockMetricsCollection = new Mock<IMetricsCollection>();
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -1259,7 +1239,7 @@ public class TestLoggerManagerTests
         var mockMetricsCollection = new Mock<IMetricsCollection>();
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -1297,7 +1277,7 @@ public class TestLoggerManagerTests
         var mockMetricsCollection = new Mock<IMetricsCollection>();
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -1335,7 +1315,7 @@ public class TestLoggerManagerTests
         var mockMetricsCollection = new Mock<IMetricsCollection>();
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -1380,7 +1360,7 @@ public class TestLoggerManagerTests
         var mockMetricsCollection = new Mock<IMetricsCollection>();
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -1424,7 +1404,7 @@ public class TestLoggerManagerTests
         var mockMetricsCollection = new Mock<IMetricsCollection>();
         mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
-        var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+        var codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
 
         string settingsXml =
             @"<?xml version=""1.0"" encoding=""utf-8""?>

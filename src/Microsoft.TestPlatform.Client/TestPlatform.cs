@@ -292,7 +292,7 @@ internal class TestPlatform : ITestPlatform
         }
 
         string extensionsFolder = Path.Combine(
-            Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation())!,
+            Path.GetDirectoryName(typeof(TestPlatform).Assembly.GetAssemblyLocation())!,
             "Extensions");
         if (!fileHelper.DirectoryExists(extensionsFolder))
         {

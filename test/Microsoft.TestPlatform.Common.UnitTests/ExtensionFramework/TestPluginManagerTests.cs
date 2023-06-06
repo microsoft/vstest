@@ -109,7 +109,7 @@ public class TestPluginManagerTests
     public void GetTestExtensionsForAnExtensionAssemblyShouldReturnExtensionsInThatAssembly()
     {
         TestPluginManager.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
-                typeof(TestPluginManagerTests).GetTypeInfo().Assembly.Location,
+                typeof(TestPluginManagerTests).Assembly.Location,
                 out _,
                 out var testExtensions);
 

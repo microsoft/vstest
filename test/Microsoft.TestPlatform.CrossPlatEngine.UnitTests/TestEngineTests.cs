@@ -32,7 +32,7 @@ public class TestEngineTests
 
     public TestEngineTests()
     {
-        TestPluginCacheHelper.SetupMockExtensions(new[] { typeof(TestEngineTests).GetTypeInfo().Assembly.Location }, () => { });
+        TestPluginCacheHelper.SetupMockExtensions(new[] { typeof(TestEngineTests).Assembly.Location }, () => { });
         _mockProcessHelper = new Mock<IProcessHelper>();
         _mockRequestData = new Mock<IRequestData>();
         _mockMetricsCollection = new Mock<IMetricsCollection>();

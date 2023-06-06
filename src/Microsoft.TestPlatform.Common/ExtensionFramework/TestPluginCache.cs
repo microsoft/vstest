@@ -349,7 +349,7 @@ public class TestPluginCache
         var extensionDirectory = Path.GetDirectoryName(Path.GetFullPath(extensionAssembly))!;
         resolutionPaths.Add(extensionDirectory);
 
-        var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.GetAssemblyLocation())!;
+        var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).Assembly.GetAssemblyLocation())!;
         if (!resolutionPaths.Contains(currentDirectory))
         {
             resolutionPaths.Add(currentDirectory);
@@ -374,7 +374,7 @@ public class TestPluginCache
         }
 
         // Keep current directory for resolution
-        var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.GetAssemblyLocation())!;
+        var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).Assembly.GetAssemblyLocation())!;
         if (!resolutionPaths.Contains(currentDirectory))
         {
             resolutionPaths.Add(currentDirectory);

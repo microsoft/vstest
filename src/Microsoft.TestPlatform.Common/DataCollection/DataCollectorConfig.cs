@@ -155,6 +155,6 @@ internal class DataCollectorConfig : TestExtensionPluginInformation
 
         // If any attribute constructor on the type throws, the exception will bubble up through
         // the "GetCustomAttributes" method.
-        return dataCollectorType.GetTypeInfo().GetCustomAttributes(attributeType, true).ToArray();
+        return dataCollectorType.GetCustomAttributes(attributeType, true).ToArray();
     }
 }

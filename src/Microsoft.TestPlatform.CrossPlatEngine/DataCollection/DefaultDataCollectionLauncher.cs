@@ -53,7 +53,7 @@ internal class DefaultDataCollectionLauncher : DataCollectionLauncher
     /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
     public override int LaunchDataCollector(IDictionary<string, string?>? environmentVariables, IList<string> commandLineArguments)
     {
-        var dataCollectorDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
+        var dataCollectorDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).Assembly.GetAssemblyLocation());
         TPDebug.Assert(dataCollectorDirectory is not null, "dataCollectorDirectory is not null");
 
         var currentProcessPath = _processHelper.GetCurrentProcessFileName();
