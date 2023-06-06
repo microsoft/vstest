@@ -12,11 +12,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-#if USE_EXTERN_ALIAS
-using Abstraction::Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-#else
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-#endif
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.Execution;
