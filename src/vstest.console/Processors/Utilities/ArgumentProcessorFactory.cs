@@ -266,7 +266,7 @@ internal class ArgumentProcessorFactory
         var processorExecutor = processor.Executor;
         var lazyArgumentProcessor = new Lazy<IArgumentExecutor>(() =>
         {
-            IArgumentExecutor? instance = null;
+            IArgumentExecutor? instance;
             try
             {
                 instance = processorExecutor!.Value;
@@ -307,7 +307,7 @@ internal class ArgumentProcessorFactory
         var processorExecutor = processor.Executor;
         var lazyArgumentProcessor = new Lazy<IArgumentExecutor>(() =>
         {
-            IArgumentsExecutor? instance = null;
+            IArgumentsExecutor? instance;
             try
             {
                 instance = (IArgumentsExecutor)processorExecutor!.Value;

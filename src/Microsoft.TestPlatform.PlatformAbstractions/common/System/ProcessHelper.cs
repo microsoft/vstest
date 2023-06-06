@@ -66,7 +66,6 @@ public partial class ProcessHelper : IProcessHelper
         catch (Exception)
         {
             process.Dispose();
-            process = null;
 
             //EqtTrace.Error("TestHost Object {0} failed to launch with the following exception: {1}", processPath, exception.Message);
             throw;
