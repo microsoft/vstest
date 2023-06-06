@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Execution;
 
 internal static class WellKnownDebugEnvironmentVariables
 {
+    public const string VSTEST_BLAMEDATACOLLECTOR_DEBUG = nameof(VSTEST_BLAMEDATACOLLECTOR_DEBUG);
     public const string VSTEST_RUNNER_DEBUG = nameof(VSTEST_RUNNER_DEBUG);
     public const string VSTEST_RUNNER_DEBUG_ATTACHVS = nameof(VSTEST_RUNNER_DEBUG_ATTACHVS);
 }
