@@ -107,7 +107,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       テスト結果のロガーを指定します。たとえば、結果のログを
       Visual Studio のテスト結果ファイル (TRX) に記録するには、/logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;] を使用します
       TestResults ディレクトリに、指定された LogFileName でファイルを作成します。
@@ -213,8 +213,8 @@
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="needs-review-translation">--InIsolation|/InIsolation
-      分離プロセスでテストを実行します。これにより、vstest.console.exe
+        <target state="translated">--InIsolation|/InIsolation
+      分離プロセスでテストを実行します。これにより、vstest.console.exe 
       プロセスがテスト時にエラーで停止する可能性は低くなりますが、
       テストの速度が遅くなる場合があります。</target>
         <note />
@@ -224,9 +224,9 @@
       This makes vstest.console.exe process use or skip the VSIX extensions 
       installed(if any) in the test run. 
       Example  /UseVsixExtensions:true</source>
-        <target state="needs-review-translation">/UseVsixExtensions
+        <target state="translated">/UseVsixExtensions
       これにより、テストの実行で vstest.console.exe プロセスによってインストール済みの
-      VSIX 拡張機能 (ある場合) が使用またはスキップされます。
+      VSIX 拡張機能 (ある場合) が使用またはスキップされます。 
       例 /UseVsixExtensions:true</target>
         <note />
       </trans-unit>
@@ -245,8 +245,8 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="needs-review-translation">  テストを実行する:
-    &gt;vstest.console.exe tests.dll
+        <target state="translated">  テストを実行する:
+    &gt;vstest.console.exe tests.dll 
   テストをデータ コレクターなどの追加設定を指定して実行する:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
         <note />
@@ -390,7 +390,7 @@
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
-        <target state="needs-review-translation">--Platform|/Platform:&lt;Platform type&gt;
+        <target state="translated">--Platform|/Platform:&lt;Platform type&gt;
       テストの実行に使用するターゲット プラットフォームのアーキテクチャです。
       有効な値は、x86、x64、ARM です。</target>
         <note />
@@ -405,7 +405,7 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="needs-review-translation">--Framework|/Framework:&lt;Framework Version&gt;
+        <target state="translated">--Framework|/Framework:&lt;Framework Version&gt;
       テストの実行に使用する、.Net Framework のターゲット バージョン。
       有効な値は ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" などです。
       サポートされている他の値は、Framework40、Framework45、FrameworkCore10、FrameworkUap10 です。</target>
@@ -518,8 +518,8 @@
       This makes vstest.console.exe process use custom test adapters
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
-        <target state="needs-review-translation">--TestAdapterPath|/TestAdapterPath
-      テストの実行で、vstest.console.exe プロセスが指定されたパス (ある場合)
+        <target state="translated">--TestAdapterPath|/TestAdapterPath
+      テストの実行で、vstest.console.exe プロセスが指定されたパス (ある場合) 
       からのカスタム テスト アダプターを使用するようにします。
       例  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</target>
         <note />
@@ -802,7 +802,7 @@
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="needs-review-translation">RunSettings 引数:
+        <target state="translated">RunSettings 引数:
       commandline 経由で runsettings 構成を渡す引数。引数は、"-- " の後に [name]=[value] の形式で名前と値のペアとして指定できます。-- の後のスペースにご注意ください。
       複数の [name]=[value] を区切るにはスペースを使用します。
       RunSettings 引数のサポートに関する詳細情報: https://aka.ms/vstest-runsettings-arguments</target>
@@ -872,14 +872,14 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       テストを Blame モードで実行します。このオプションは、テスト ホストのクラッシュを引き起こしているテストを分離するのに役立ちます。
       現在のディレクトリに "Sequence.xml" という出力ファイルを作成し、
       そのファイルにクラッシュ前のテストの実行順序をキャプチャします。
       必要に応じて、テスト ホストのプロセス ダンプを収集することもできます。
       ダンプを収集するように選択すると、既定ではクラッシュ時にミニ ダンプが収集されます。
       この既定の動作を次のオプション パラメーターでオーバーライドすることもできます:
-      CollectAlways - クラッシュが発生していなくても終了時にダンプを収集します (true/false)
+      CollectAlways - クラッシュが発生していなくても終了時にダンプを収集します (true/false) 
       DumpType - ダンプの種類を指定します (mini/full)。
       例: /Blame
                /Blame:CollectDump
@@ -958,7 +958,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       テスト結果のロガーを指定します。たとえば、結果のログを
       Visual Studio のテスト結果ファイル (TRX) に記録するには、/logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;] を使用します
       TestResults ディレクトリに、指定された LogFileName でファイルを作成します。
@@ -1078,9 +1078,9 @@
       Example: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
                -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
-        <target state="needs-review-translation">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+        <target state="translated">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
       環境変数の値を設定します。変数が存在しない場合は作成され、存在する場合はオーバーライドされます。これにより、/InIsolation スイッチが暗黙に指定されるため、テストは強制的に分離プロセスで実行されます。
-
+      
       この引数は、複数の変数を指定するために複数回指定できます。
 
       例: -e:VARIABLE1=VALUE1
@@ -1124,16 +1124,16 @@
         - NextToSource: Load adapters next to source. 
 
         - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
-        <target state="needs-review-translation">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
       これはアダプターの読み込み動作時の振る舞いに影響します。
 
       現在サポートされている振る舞い:
         - Explicit: テスト プラットフォームは、/TestAdapterPath (または RunConfiguration.TestAdaptersPaths ノード) で指定されたアダプターのみを読み込みます。
                     特定のアダプター パスが指定されている場合、アダプターが読み込まれます; ディレクトリ パスが指定されている場合は、Recursive オプションも指定されていない限り、そのフォルダー内のアダプターが直接読み込まれます。
                     アダプター パスが指定されていない場合、テスト実行は失敗します。
-                    これは/InIsolation スイッチを示し、テストを強制的に分離されたプロセスで実行します。
-
-- Default : この引数が指定されていない場合は、アダプターを読み込むテスト プラットフォームが存在します。
+                    これは /InIsolation スイッチを示し、テストを強制的に分離されたプロセスで実行します。
+        
+        - Default : この引数が指定されていない場合は、アダプターを読み込むテスト プラットフォームが存在します。
                    追加のアダプター パスを指定し、既定のディレクトリから、ソースの隣から拡張機能を取得します。
 
         - DefaultRuntimeProviders: テスト プラットフォームに付属の既定のランタイム プロバイダーを読み込みます。
@@ -1226,7 +1226,7 @@
       </trans-unit>
       <trans-unit id="VSTestDeprecationMessage">
         <source>The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.</source>
-        <target state="new">The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.</target>
+        <target state="translated">dotnet vstest コマンドは dotnet テストに置き換えられ、アセンブリの実行に使用できるようになりました。https://aka.ms/dotnet-test をご覧ください。</target>
         <note />
       </trans-unit>
     </body>

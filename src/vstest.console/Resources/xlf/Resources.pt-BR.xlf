@@ -107,8 +107,8 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Especifique um agente para os resultados de teste. Por exemplo, para registrar os resultados em um Arquivo de Resultados de Teste (TRX) do
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      Especifique um agente para os resultados de teste. Por exemplo, para registrar os resultados em um Arquivo de Resultados de Teste (TRX) do 
       Visual Studio use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       Cria um arquivo no diretório TestResults com o LogFileName determinado.
 
@@ -213,9 +213,9 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="needs-review-translation">--InIsolation|/InIsolation
-      Executa os testes em um processo isolado. Isso diminui a probabilidade de que o processo vstest.console.exe
-      seja interrompido em um erro nos testes, mas os testes
+        <target state="translated">--InIsolation|/InIsolation
+      Executa os testes em um processo isolado. Isso diminui a probabilidade de que o processo vstest.console.exe 
+      seja interrompido em um erro nos testes, mas os testes 
       podem ficar mais lentos.</target>
         <note />
       </trans-unit>
@@ -224,9 +224,9 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       This makes vstest.console.exe process use or skip the VSIX extensions 
       installed(if any) in the test run. 
       Example  /UseVsixExtensions:true</source>
-        <target state="needs-review-translation">/UseVsixExtensions
-      Faz o processo vstest.console.exe usar ou ignorar as extensões VSIX instaladas
-      (caso haja alguma) na execução de teste.
+        <target state="translated">/UseVsixExtensions
+      Faz o processo vstest.console.exe usar ou ignorar as extensões VSIX instaladas 
+      (caso haja alguma) na execução de teste. 
       Exemplo  /UseVsixExtensions:true</target>
         <note />
       </trans-unit>
@@ -245,8 +245,8 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="needs-review-translation">  Para executar testes:
-    &gt;vstest.console.exe tests.dll
+        <target state="translated">  Para executar testes:
+    &gt;vstest.console.exe tests.dll 
   Para executar testes com configurações adicionais, como coletores de dados:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
         <note />
@@ -390,8 +390,8 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
-        <target state="needs-review-translation">--Platform|/Platform:&lt;Platform type&gt;
-      Arquitetura da plataforma destino a ser usada na execução de teste.
+        <target state="translated">--Platform|/Platform:&lt;Platform type&gt;
+      Arquitetura da plataforma destino a ser usada na execução de teste. 
       Os valores válidos são x86, x64 e ARM.</target>
         <note />
       </trans-unit>
@@ -405,8 +405,8 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="needs-review-translation">--Framework|/Framework:&lt;Versão do Framework&gt;
-      Versão de destino do .NET Framework a ser usada para execução de teste.
+        <target state="translated">--Framework|/Framework:&lt;Versão do Framework&gt;
+      Versão de destino do .NET Framework a ser usada para execução de teste. 
       Os valores válidos são ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Outros valores permitidos são Framework40, Framework45, FrameworkCore10 e FrameworkUap10.</target>
         <note />
@@ -518,9 +518,9 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       This makes vstest.console.exe process use custom test adapters
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
-        <target state="needs-review-translation">--TestAdapterPath|/TestAdapterPath
+        <target state="translated">--TestAdapterPath|/TestAdapterPath
       Faz com que o processo vstest.console.exe use adaptadores de teste personalizados
-      de um arquivo fornecido (caso haja algum) na execução de teste.
+      de um arquivo fornecido (caso haja algum) na execução de teste. 
       Exemplo:  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</target>
         <note />
       </trans-unit>
@@ -585,7 +585,7 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       to all available cores on the machine may be used.
       The number of cores to use may be configured using a settings file.</source>
         <target state="translated">--Parallel|/Parallel
-      Especifica que os testes sejam executados em paralelo. Por padrão,
+      Especifica que os testes sejam executados em paralelo. Por padrão, 
       podem ser usados todos os núcleos disponíveis no computador.
       O número de núcleos a serem usados pode ser configurado usando um arquivo de configurações.</target>
         <note />
@@ -802,8 +802,8 @@ Alterar o nível de rastreamento dos logs, como mostrado abaixo
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="needs-review-translation">Argumentos de RunSettings:
-      Argumentos para transmitir as configurações de runsettings através da commandline. Os argumentos podem ser especificados como um par nome-valor do formulário [name]=[value] após "-- ". Observe o espaço após --.
+        <target state="translated">Argumentos de RunSettings:
+      Argumentos para transmitir as configurações de runsettings através da commandline. Os argumentos podem ser especificados como um par nome-valor do formulário [name]=[value] após "-- ". Observe o espaço após --. 
       Use um espaço para separar vários [name]=[value].
       Mais informações sobre o suporte para os argumentos de RunSettings: https://aka.ms/vstest-runsettings-arguments</target>
         <note />
@@ -872,14 +872,14 @@ Alterar o nível de rastreamento dos logs, como mostrado abaixo
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       Executa o teste em modo blame. Essa opção é útil para isolar o teste com problema causando falha no host de teste .
      Ele cria um arquivo de saída no diretório atual como "Sequence.xml",
       que captura a ordem de execução do teste antes da falha.
       Você pode optar por coletar o processo de despejo para o host de teste.
       Ao optar por coletar despejo, por padrão, um mini despejo será coletado em uma falha.
      Você também pode optar por sobrescrever este comportamento padrão por alguns parâmetros opcionais:
-      CollectAlways - Para coletar despejo na saída mesmo que não haja falha (true/false)
+      CollectAlways - Para coletar despejo na saída mesmo que não haja falha (true/false) 
       DumpType - Para especificar o tipo de despejo (mini/full).
       Exemplo: /Blame
                /Blame:CollectDump
@@ -958,8 +958,8 @@ Alterar o nível de rastreamento dos logs, como mostrado abaixo
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Especifique um agente para os resultados de teste. Por exemplo, para registrar os resultados em um Arquivo de Resultados de Teste (TRX) do
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      Especifique um agente para os resultados de teste. Por exemplo, para registrar os resultados em um Arquivo de Resultados de Teste (TRX) do 
       Visual Studio use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       Cria um arquivo no diretório TestResults com o LogFileName determinado.
 
@@ -1078,9 +1078,9 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       Example: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
                -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
-        <target state="needs-review-translation">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+        <target state="translated">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
       Define o valor de uma variável de ambiente. Cria a variável caso ela não exista e substitui caso exista. Isso implicará a opção /InIsolation e forçará a execução dos testes em um processo isolado.
-
+      
       Esse argumento pode ser especificado várias vezes para fornecer várias variáveis.
 
       Exemplo: -e:VARIABLE1=VALUE1
@@ -1124,7 +1124,7 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
         - NextToSource: Load adapters next to source. 
 
         - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
-        <target state="needs-review-translation">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
       Isto afeta o comportamento de carregamento do adaptador.
 
       Comportamentos suportados atualmente:
@@ -1132,16 +1132,16 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
                     Se um caminho específico do adaptador for fornecido, o adaptador será carregado; se um caminho de diretório for fornecido adaptadores diretamente naquela pasta será carregado, a menos que a opção Recursive também seja especificada.
                     Se nenhum caminho de adaptador for especificado, a execução do teste falhará.
                     Isto implicará /InIsolation switch e forçará os testes a serem executados em um processo isolado.
-
+        
         - Padrão: Plataforma de teste carregará adaptadores é se este argumento não tiver sido especificado.
                    Ela captará extensões ao lado da fonte, desde que os caminhos do adaptador adicionais e a partir do diretório padrão.
 
-        - DefaultRuntimeProviders: Carregar os provedores de tempo de execução padrão enviados com a Plataforma de Teste.
+        - DefaultRuntimeProviders: Carregar os provedores de tempo de execução padrão enviados com a Plataforma de Teste. 
                                    Se isto não for especificado quando a opção "Explicit" estiver definida, um provedor de host de teste precisa ser especificado explicitamente.
 
         - ExtensionsDirectory: Carregar adaptadores dentro da pasta Extensões.
 
-        - NextToSource: Adaptadores de carga ao lado da fonte.
+        - NextToSource: Adaptadores de carga ao lado da fonte. 
 
         - Recursivo: Buscar recursivamente as pastas ao carregar adaptadores. Isto requer que "Explicit" ou "NextToSource" seja especificado também.</target>
         <note>Do not translate "Default", "DefaultRuntimeProviders", "ExtensionsDirectory", "NextToSource" or "Recursive".</note>
@@ -1226,7 +1226,7 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       </trans-unit>
       <trans-unit id="VSTestDeprecationMessage">
         <source>The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.</source>
-        <target state="new">The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.</target>
+        <target state="translated">O comando dotnet vstest foi substituído pelo dotnet test, que agora pode ser usado para executar assemblies. Confira https://aka.ms/dotnet-test.</target>
         <note />
       </trans-unit>
     </body>

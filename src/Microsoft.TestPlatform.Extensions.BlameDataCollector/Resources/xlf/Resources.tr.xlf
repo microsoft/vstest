@@ -7,8 +7,8 @@
 The test running when the crash occurred: 
 {0}
 This test may, or may not be the source of the crash.</source>
-        <target state="needs-review-translation">Konak işleminden beklenmedik şekilde çıkış yapıldığından etkin Test Çalıştırması durduruldu. Özel durumun kaynağı hakkında daha fazla bilgi almak için varsa yukarıdan çağrı yığınını inceleyin.
-Kilitlenme oluştuğunda çalışan test:
+        <target state="translated">Konak işleminden beklenmedik şekilde çıkış yapıldığından etkin Test Çalıştırması durduruldu. Özel durumun kaynağı hakkında daha fazla bilgi almak için varsa yukarıdan çağrı yığınını inceleyin.
+Kilitlenme oluştuğunda çalışan test: 
 {0}
 Bu test, kilitlenmenin kaynağı olmayabilir veya olmayabilir.</target>
         <note>{0} is a single test (or in rare cases multiple tests) that were running when test host crashed.</note>
@@ -55,7 +55,7 @@ Bu test, kilitlenmenin kaynağı olmayabilir veya olmayabilir.</target>
       </trans-unit>
       <trans-unit id="NotGeneratingSequenceFile">
         <source>All tests finished running, Sequence file will not be generated</source>
-        <target state="needs-review-translation">Tüm testlerin çalışması tamamlandı. Dizi dosyası oluşturulmayacak.</target>
+        <target state="translated">Tüm testlerin çalışması tamamlandı. Dizi dosyası oluşturulmayacak.</target>
         <note>"Sequence" is the name of the file. No . at the end, because this is a blame message and the . will be added automatically.</note>
       </trans-unit>
       <trans-unit id="Dumping">

@@ -7,8 +7,8 @@
 The test running when the crash occurred: 
 {0}
 This test may, or may not be the source of the crash.</source>
-        <target state="needs-review-translation">因為主機處理序在未預期的狀況下結束，所以已中止使用中的測試回合。請檢查上方的呼叫堆疊 (若有的話)，以取得例外狀況來源的詳細資訊。
-發生損毀時正在執行的測試:
+        <target state="translated">因為主機處理序在未預期的狀況下結束，所以已中止使用中的測試回合。請檢查上方的呼叫堆疊 (若有的話)，以取得例外狀況來源的詳細資訊。
+發生損毀時正在執行的測試: 
 {0}
 此測試可能是或不是損毀的來源。</target>
         <note>{0} is a single test (or in rare cases multiple tests) that were running when test host crashed.</note>
@@ -55,7 +55,7 @@ This test may, or may not be the source of the crash.</source>
       </trans-unit>
       <trans-unit id="NotGeneratingSequenceFile">
         <source>All tests finished running, Sequence file will not be generated</source>
-        <target state="needs-review-translation">所有測試皆已執行完成，將不會產生 Sequence 檔案</target>
+        <target state="translated">所有測試皆已執行完成，將不會產生 Sequence 檔案</target>
         <note>"Sequence" is the name of the file. No . at the end, because this is a blame message and the . will be added automatically.</note>
       </trans-unit>
       <trans-unit id="Dumping">

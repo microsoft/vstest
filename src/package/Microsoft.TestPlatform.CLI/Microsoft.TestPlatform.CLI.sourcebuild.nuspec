@@ -18,7 +18,6 @@
     <file src="$SourceBuildTfm$\datacollector.deps.json" target="contentFiles\any\$SourceBuildTfm$" />
     <file src="$SourceBuildTfm$\datacollector.runtimeconfig.json" target="contentFiles\any\$SourceBuildTfm$" />
 
-    <file src="$SourceBuildTfm$\Microsoft.CodeCoverage.IO\Microsoft.CodeCoverage.IO.dll" target="contentFiles\any\$SourceBuildTfm$" />
     <file src="$SourceBuildTfm$\Microsoft.Extensions.DependencyModel\Microsoft.Extensions.DependencyModel.dll" target="contentFiles\any\$SourceBuildTfm$" />
     <file src="$SourceBuildTfm$\Microsoft.Extensions.FileSystemGlobbing\Microsoft.Extensions.FileSystemGlobbing.dll" target="contentFiles\any\$SourceBuildTfm$" />
 
@@ -34,7 +33,7 @@
 
     <file src="$SourceBuildTfm$\Newtonsoft.Json\Newtonsoft.Json.dll" target="contentFiles\any\$SourceBuildTfm$" />
     <file src="$SourceBuildTfm$\NuGet.Frameworks\NuGet.Frameworks.dll" target="contentFiles\any\$SourceBuildTfm$" />
-    <file src="$SourceBuildTfm$\Microsoft.Internal.TestPlatform.Remote\Extensions\System.ComponentModel.Composition.dll" target="contentFiles\any\$SourceBuildTfm$" />
+    <file src="$SourceBuildTfm$\System.ComponentModel.Composition.dll" target="contentFiles\any\$SourceBuildTfm$" />
 
     <file src="$TesthostRuntimeconfig$\testhost-1.0.runtimeconfig.json" target="contentFiles\any\$SourceBuildTfm$" />
     <file src="$TesthostRuntimeconfig$\testhost-1.1.runtimeconfig.json" target="contentFiles\any\$SourceBuildTfm$" />
