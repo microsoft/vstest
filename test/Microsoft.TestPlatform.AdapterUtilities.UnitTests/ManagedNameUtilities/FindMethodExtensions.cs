@@ -39,7 +39,7 @@ internal static class FindMethodExtensions
             }
         }
 
-        if (methodParameterTypes != null && methodParameterTypes.Length >= 0)
+        if (methodParameterTypes.Length > 0)
         {
             candidates = candidates.Where(m => m.Parameters.Length == methodParameterTypes.Length);
             if (candidates.Any() && !candidates.Skip(1).Any())
