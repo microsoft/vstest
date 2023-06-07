@@ -232,10 +232,8 @@ public static partial class ManagedNameHelper
     /// </remarks>
     public static MethodBase GetMethod(Assembly assembly, string managedTypeName, string managedMethodName)
     {
-        Type? type;
-
         var parsedManagedTypeName = ReflectionHelpers.ParseEscapedString(managedTypeName);
-        type = assembly.GetType(parsedManagedTypeName, throwOnError: false, ignoreCase: false);
+        var type = assembly.GetType(parsedManagedTypeName, throwOnError: false, ignoreCase: false);
 
         if (type == null)
         {
@@ -291,10 +289,8 @@ public static partial class ManagedNameHelper
             return true;
         }
 
-        MemberInfo[] methods;
-
         var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
-        methods = type.FindMembers(MemberTypes.Method, bindingFlags, Filter, null);
+        var methods = type.FindMembers(MemberTypes.Method, bindingFlags, Filter, null);
 
         return (MethodInfo?)(methods.Length switch
         {
