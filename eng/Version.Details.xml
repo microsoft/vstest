@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.Internal.CodeCoverage" Version="17.7.2-beta.23305.1">
+    <Dependency Name="Microsoft.Internal.CodeCoverage" Version="17.7.2-beta.23308.3">
       <Uri>https://dev.azure.com/devdiv/DevDiv/_git/vs-code-coverage</Uri>
-      <Sha>ecdb50835e976c840e69cb6a4f6ef37ed1b04e9f</Sha>
+      <Sha>d211308037c90cd5e1892c3a88f7de77e44d269d</Sha>
     </Dependency>
     <Dependency Name="Microsoft.Diagnostics.NETCore.Client" Version="0.2.0-preview.23211.1">
       <Uri>https://github.com/dotnet/diagnostics</Uri>
@@ -23,6 +23,10 @@
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
       <Sha>4a3b4b6b37bdafe501477bf2e564380e1962ce61</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
+    </Dependency>
+    <Dependency Name="NuGet.Frameworks" Version="5.5.0">
+      <Uri>https://github.com/nuget/nuget.client</Uri>
+      <Sha>4ba7bfa82f894ec32a554ca8d2df143675c85735</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
