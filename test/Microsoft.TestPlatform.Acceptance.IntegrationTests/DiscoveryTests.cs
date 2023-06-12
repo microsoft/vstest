@@ -9,6 +9,7 @@ using System.Reflection;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
@@ -113,5 +114,28 @@ public class DiscoveryTests : AcceptanceTestBase
 
             CollectionAssert.AreEquivalent(expected, actual, $"Specified types using TypesToLoadAttribute in \"{extension}\" assembly doesn't match the expected.");
         }
+    }
+
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    public void DiscoverTestsShouldSucceedWhenAtLeastOneDllFindsRuntimeProvider(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var testDll = GetAssetFullPath("MSTestProject1.dll");
+        var nonTestDll = GetTestDllForFramework("NetStandard2Library.dll", "netstandard2.0");
+
+        var testAndNonTestDll = new[] { testDll, nonTestDll };
+        var quotedDlls = string.Join(" ", testAndNonTestDll.Select(a => a.AddDoubleQuote()));
+
+        var arguments = PrepareArguments(quotedDlls, GetTestAdapterPath(), string.Empty, framework: string.Empty, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /listtests");
+        arguments = string.Concat(arguments, " /logger:\"console;prefix=true\"");
+        InvokeVsTest(arguments);
+
+        StringAssert.Contains(StdOut, $"Skipping source: {nonTestDll} (.NETStandard,Version=v2.0,");
+
+        ExitCodeEquals(0);
     }
 }

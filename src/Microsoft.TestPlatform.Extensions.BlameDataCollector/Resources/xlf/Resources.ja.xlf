@@ -7,8 +7,8 @@
 The test running when the crash occurred: 
 {0}
 This test may, or may not be the source of the crash.</source>
-        <target state="needs-review-translation">ホスト プロセスが予期せずに終了したため、アクティブなテストの実行が中止されました。(使用可能な場合) 上記の呼び出し履歴を調べて、例外の発生元に関する詳細情報を取得してください。
-クラッシュの発生時に実行中だったテスト:
+        <target state="translated">ホスト プロセスが予期せずに終了したため、アクティブなテストの実行が中止されました。(使用可能な場合) 上記の呼び出し履歴を調べて、例外の発生元に関する詳細情報を取得してください。
+クラッシュの発生時に実行中だったテスト: 
 {0}
 このテストは、必ずしもクラッシュの原因ではない場合もあります。</target>
         <note>{0} is a single test (or in rare cases multiple tests) that were running when test host crashed.</note>
@@ -55,7 +55,7 @@ This test may, or may not be the source of the crash.</source>
       </trans-unit>
       <trans-unit id="NotGeneratingSequenceFile">
         <source>All tests finished running, Sequence file will not be generated</source>
-        <target state="needs-review-translation">すべてのテストの実行が完了しました。Sequence ファイルは生成されません</target>
+        <target state="translated">すべてのテストの実行が完了しました。Sequence ファイルは生成されません</target>
         <note>"Sequence" is the name of the file. No . at the end, because this is a blame message and the . will be added automatically.</note>
       </trans-unit>
       <trans-unit id="Dumping">

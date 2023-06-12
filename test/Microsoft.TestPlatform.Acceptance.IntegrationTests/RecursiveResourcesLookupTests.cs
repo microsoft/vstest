@@ -17,7 +17,7 @@ public class RecursiveResourcesLookupTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPath = BuildMultipleAssemblyPath("RecursiveResourceLookupCrash.dll");
+        var assemblyPath = GetAssetFullPath("RecursiveResourceLookupCrash.dll");
         var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         InvokeVsTest(arguments);
 

@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -37,11 +38,6 @@ internal class CommandLineOptions
     /// The use vsix extensions key.
     /// </summary>
     public const string UseVsixExtensionsKey = "UseVsixExtensions";
-
-    /// <summary>
-    /// The default use vsix extensions value.
-    /// </summary>
-    public const bool DefaultUseVsixExtensionsValue = false;
 
     /// <summary>
     /// The default retrieval timeout for fetching of test results or test cases
@@ -292,7 +288,8 @@ internal class CommandLineOptions
                 string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidArgument, source), ex);
         }
         // Add the matching files to source list
-        _sources = _sources.Union(matchingFiles).ToList();
+        var filteredFiles = KnownPlatformSourceFilter.FilterKnownPlatformSources(matchingFiles);
+        _sources = _sources.Union(filteredFiles).ToList();
     }
 
     /// <summary>

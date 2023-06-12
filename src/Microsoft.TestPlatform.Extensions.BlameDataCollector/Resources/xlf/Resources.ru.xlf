@@ -7,8 +7,8 @@
 The test running when the crash occurred: 
 {0}
 This test may, or may not be the source of the crash.</source>
-        <target state="needs-review-translation">Активный тестовый запуск был прерван из-за непредвиденного завершения хост-процесса. Просмотрите стек вызовов выше (если он доступен), чтобы получить дополнительные сведения об источнике исключения.
-Тест, который выполнялся в момент возникновения сбоя:
+        <target state="translated">Активный тестовый запуск был прерван из-за непредвиденного завершения хост-процесса. Просмотрите стек вызовов выше (если он доступен), чтобы получить дополнительные сведения об источнике исключения.
+Тест, который выполнялся в момент возникновения сбоя: 
 {0}
 Этот тест может являться источником сбоя.</target>
         <note>{0} is a single test (or in rare cases multiple tests) that were running when test host crashed.</note>
@@ -55,7 +55,7 @@ This test may, or may not be the source of the crash.</source>
       </trans-unit>
       <trans-unit id="NotGeneratingSequenceFile">
         <source>All tests finished running, Sequence file will not be generated</source>
-        <target state="needs-review-translation">Все тесты завершены, файл последовательности не будет создан.</target>
+        <target state="translated">Все тесты завершены, файл последовательности не будет создан.</target>
         <note>"Sequence" is the name of the file. No . at the end, because this is a blame message and the . will be added automatically.</note>
       </trans-unit>
       <trans-unit id="Dumping">

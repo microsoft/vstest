@@ -7,8 +7,8 @@
 The test running when the crash occurred: 
 {0}
 This test may, or may not be the source of the crash.</source>
-        <target state="needs-review-translation">Aktivní testovací běh se přerušil, protože proces hostitele se neočekávaně ukončil. Prověřte prosím výše zásobník volání, pokud je k dispozici. Nabídne vám další informace o původu výjimky.
-Test, který běžel, když došlo k chybovému ukončení:
+        <target state="translated">Aktivní testovací běh se přerušil, protože proces hostitele se neočekávaně ukončil. Prověřte prosím výše zásobník volání, pokud je k dispozici. Nabídne vám další informace o původu výjimky.
+Test, který běžel, když došlo k chybovému ukončení: 
 {0}
 Tento test může a nemusí být příčinou chybového ukončení.</target>
         <note>{0} is a single test (or in rare cases multiple tests) that were running when test host crashed.</note>
@@ -55,7 +55,7 @@ Tento test může a nemusí být příčinou chybového ukončení.</target>
       </trans-unit>
       <trans-unit id="NotGeneratingSequenceFile">
         <source>All tests finished running, Sequence file will not be generated</source>
-        <target state="needs-review-translation">Všechny testy se dokončily. Soubor sekvence se nevygeneruje.</target>
+        <target state="translated">Všechny testy se dokončily. Soubor sekvence se nevygeneruje.</target>
         <note>"Sequence" is the name of the file. No . at the end, because this is a blame message and the . will be added automatically.</note>
       </trans-unit>
       <trans-unit id="Dumping">

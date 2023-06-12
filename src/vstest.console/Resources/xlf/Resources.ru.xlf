@@ -107,8 +107,8 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;URI/понятное_имя_средства_ведения_журнала&gt;
-      Укажите средство ведения журнала результатов тестирования.  Например, чтобы сохранять результаты в файле
+        <target state="translated">--logger|/logger:&lt;URI/понятное_имя_средства_ведения_журнала&gt;
+      Укажите средство ведения журнала результатов тестирования. Например, чтобы сохранять результаты в файле
       результатов тестов Visual Studio (TRX), укажите /logger:trx[;LogFileName=&lt;по умолчанию уникальное имя файла&gt;]
       Создает файл в каталоге TestResults с заданным именем LogFileName.
 
@@ -213,7 +213,7 @@
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="needs-review-translation">--InIsolation|/InIsolation
+        <target state="translated">--InIsolation|/InIsolation
       Запуск тестов в изолированном процессе. Это снижает вероятность
       остановки процесса vstest.console.exe из-за ошибки в тестах, но
       тесты могут выполняться медленнее.</target>
@@ -224,9 +224,9 @@
       This makes vstest.console.exe process use or skip the VSIX extensions 
       installed(if any) in the test run. 
       Example  /UseVsixExtensions:true</source>
-        <target state="needs-review-translation">/UseVsixExtensions
+        <target state="translated">/UseVsixExtensions
       Определяет использование или пропуск процессом vstest.console.exe
-      установленных расширений VSIX (при наличии) в тестовом запуске.
+      установленных расширений VSIX (при наличии) в тестовом запуске. 
       Пример: /UseVsixExtensions:true</target>
         <note />
       </trans-unit>
@@ -245,8 +245,8 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="needs-review-translation">  Запуск тестов:
-    &gt;vstest.console.exe tests.dll
+        <target state="translated">  Запуск тестов:
+    &gt;vstest.console.exe tests.dll 
   Запуск тестов с дополнительными параметрами, например со сборщиками данных:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
         <note />
@@ -390,8 +390,8 @@
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
-        <target state="needs-review-translation">--Platform|/Platform:&lt;тип_платформы&gt;
-      Архитектура целевой платформы, в которой будут выполняться тесты.
+        <target state="translated">--Platform|/Platform:&lt;тип_платформы&gt;
+      Архитектура целевой платформы, в которой будут выполняться тесты. 
       Допустимые значения: x86, x64 и ARM.</target>
         <note />
       </trans-unit>
@@ -405,8 +405,8 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="needs-review-translation">--Framework|/Framework:&lt;версия платформы&gt;
-      Целевая версия платформы .NET Framework, используемая для выполнения тестов.
+        <target state="translated">--Framework|/Framework:&lt;версия платформы&gt;
+      Целевая версия платформы .NET Framework, используемая для выполнения тестов. 
       Допустимые значения: ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" и т. п.
       Другие поддерживаемые значения: Framework40, Framework45, FrameworkCore10 и FrameworkUap10.</target>
         <note />
@@ -518,9 +518,9 @@
       This makes vstest.console.exe process use custom test adapters
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
-        <target state="needs-review-translation">--TestAdapterPath|/TestAdapterPath
+        <target state="translated">--TestAdapterPath|/TestAdapterPath
       Процесс vstest.console.exe будет использовать пользовательские адаптеры тестов
-      по заданному пути (при наличии) в тестовом запуске.
+      по заданному пути (при наличии) в тестовом запуске. 
       Пример: /TestAdapterPath:&lt;путь_к_пользовательским_адаптерам_тестов&gt;</target>
         <note />
       </trans-unit>
@@ -802,8 +802,8 @@
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="needs-review-translation">Аргументы RunSettings:
-      Аргументы для передачи конфигураций runsettings через командную строку. Аргументы могут быть указаны как пара "имя-значение" в формате [имя]=[значение] после "-- ". Обратите внимание на пробел после --.
+        <target state="translated">Аргументы RunSettings:
+      Аргументы для передачи конфигураций runsettings через командную строку. Аргументы могут быть указаны как пара "имя-значение" в формате [имя]=[значение] после "-- ". Обратите внимание на пробел после --. 
       Используйте пробел для разделения нескольких пар [имя]=[значение].
       Дополнительные сведения о поддержке аргументов RunSettings: https://aka.ms/vstest-runsettings-arguments</target>
         <note />
@@ -872,14 +872,14 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[значение];[DumpType]=[значение]
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[значение];[DumpType]=[значение]
       Выполняет тест в blame-режиме. Этот вариант помогает изолировать проблемный тест, вызывающий сбой хоста для тестов.
       В текущем каталоге создается выходной файл "Sequence.xml",
       который записывает порядок выполнения теста перед сбоем.
       При необходимости вы можете выполнить сбор дампа процессов хоста для тестов.
       В этом случае по умолчанию при сбое будет собран мини-дамп.
       Вы также можете переопределить поведение по умолчанию с помощью дополнительных параметров:
-      CollectAlways — собирает дамп по завершении даже при отсутствии сбоев (true/false)
+      CollectAlways — собирает дамп по завершении даже при отсутствии сбоев (true/false) 
       DumpType — задает тип дампа, mini (мини-дамп) или full (полный).
       Пример: /Blame
                /Blame:CollectDump
@@ -958,8 +958,8 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;URI/понятное_имя_средства_ведения_журнала&gt;
-      Укажите средство ведения журнала результатов тестирования.  Например, чтобы сохранять результаты в файле
+        <target state="translated">--logger|/logger:&lt;URI/понятное_имя_средства_ведения_журнала&gt;
+      Укажите средство ведения журнала результатов тестирования. Например, чтобы сохранять результаты в файле
       результатов тестов Visual Studio (TRX), укажите /logger:trx[;LogFileName=&lt;по умолчанию уникальное имя файла&gt;]
       Создает файл в каталоге TestResults с заданным именем LogFileName.
 
@@ -1078,9 +1078,9 @@
       Example: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
                -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
-        <target state="needs-review-translation">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+        <target state="translated">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
       Устанавливает значение переменной среды. Если переменной среды не существует, она создается. Если переменная среды существует, она переопределяется. Этот параметр подразумевает использование параметра /InIsolation и принудительно выполняет тесты в изолированном процессе.
-
+      
       Этот аргумент может быть указан несколько раз для нескольких переменных среды.
 
       Пример: -e:VARIABLE1=VALUE1
@@ -1124,26 +1124,26 @@
         - NextToSource: Load adapters next to source. 
 
         - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
-        <target state="needs-review-translation">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
       Это влияет на действия адаптера при загрузке.
 
       Действия, поддерживаемые в настоящее время:
-        — Явный: Платформа тестирования будет загружать только адаптеры, указанные в параметре /TestAdapterPath (или узле RunConfiguration.TestAdaptersPaths).
-                    Если указан конкретный путь к адаптеру, адаптер будет загружен; если указан путь к каталогу, то адаптеры, указанные непосредственно в этой папке, будут загружены, если не указан параметр Recursive.
+        – Explicit: платформа тестирования будет загружать только адаптеры, указанные в параметре /TestAdapterPath (или узле RunConfiguration.TestAdaptersPaths). 
+                    Если указан конкретный путь к адаптеру, адаптер будет загружен. Если указан путь к каталогу, будут загружены адаптеры непосредственно из этой папки в случае, когда не указан параметр Recursive.
                     Если путь к адаптеру не указан, тестовый запуск завершится ошибкой.
                     Это подразумевает переключение /InIsolation и принудительное выполнение тестов в изолированном процессе.
-
-        — Default: Платформа тестирования будет загружать адаптеры, если этот аргумент не указан.
+        
+        – Default: платформа тестирования будет загружать адаптеры, если этот аргумент не указан. 
                    Платформа будет выбирать расширения недалеко от источника, при условии наличия дополнительных путей к адаптеру, а также из каталога по умолчанию.
 
-        — DefaultRuntimeProviders: загрузка поставщиков среды выполнения по умолчанию, поставляемых с платформой тестирования.
-                                   Если это не указано, когда задан параметр \"Явный\", поставщик узла тестирования должен быть указан явно.
+        – DefaultRuntimeProviders: загрузка поставщиков среды выполнения по умолчанию, поставляемых с платформой тестирования. 
+                                   Если это не указано, когда задан параметр "Explicit", поставщик узла тестирования должен быть указан явно.
 
-        — ExtensionsDirectory: загружать адаптеры в папку \"Расширения\".
+        – ExtensionsDirectory: загружать адаптеры в папку "Расширения". 
 
-        — NextToSource: загружать параметры рядом с источником.
+        – NextToSource: загружать параметры рядом с источником. 
 
-        — Recursive: рекурсивный поиск папок при загрузке адаптеров. Для этого также необходимо указать параметры \"Явный\" или \"NextToSource\".</target>
+        – Recursive: рекурсивный поиск папок при загрузке адаптеров. Для этого также необходимо указать параметры "Explicit" или "NextToSource".</target>
         <note>Do not translate "Default", "DefaultRuntimeProviders", "ExtensionsDirectory", "NextToSource" or "Recursive".</note>
       </trans-unit>
       <trans-unit id="TestAdapterLoadingStrategyValueInvalid">
@@ -1226,7 +1226,7 @@
       </trans-unit>
       <trans-unit id="VSTestDeprecationMessage">
         <source>The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.</source>
-        <target state="new">The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.</target>
+        <target state="translated">Команда dotnet vstest заменяется на dotnet test, которую теперь можно использовать для выполнения сборок. Сведения: https://aka.ms/dotnet-test.</target>
         <note />
       </trans-unit>
     </body>
