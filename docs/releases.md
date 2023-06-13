@@ -1,23 +1,5 @@
 # Release Notes
 
-## 17.7.0-preview.23280.1
-
-### Issues Fixed
-* Fix execution gets stucks on single netstandard source [#4497](https://github.com/microsoft/vstest/pull/4497)
-* Pass workloads to proxy managers [#4422](https://github.com/microsoft/vstest/pull/4422)
-* Fix no-suitable provider found [#4475](https://github.com/microsoft/vstest/pull/4475)
-* Fix version of CppUnitTestFramework dlls [#4457](https://github.com/microsoft/vstest/pull/4457)
-* fix: TestObject use ConcurrentDictionary instead of Dictionary [#4450](https://github.com/microsoft/vstest/pull/4450)
-* Fix hangdump running into crashdump [#4378](https://github.com/microsoft/vstest/pull/4378)
-* Remove explicit framework ref assembly ref [#4407](https://github.com/microsoft/vstest/pull/4407)
-
-See full log [here](https://github.com/microsoft/vstest/compare/v17.7.0-preview.23214.2...v17.7.0-preview.23280.1)
-
-### Drops
-
-* TestPlatform vsix: [17.7.0-preview.23280.1](https://vsdrop.corp.microsoft.com/file/v1/Products/internal/microsoft-vstest/main/20230530.1;/Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.vsix)
-* Microsoft.TestPlatform.ObjectModel : [17.7.0-preview.23280.1](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/17.7.0-preview.23280.1)
-
 ## 17.6.1 and newer
 
 Please see release notes directly in the release page: https://github.com/microsoft/vstest/releases
