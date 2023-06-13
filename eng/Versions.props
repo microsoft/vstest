@@ -2,9 +2,11 @@
 <Project>
   <PropertyGroup Label="Version settings">
     <!-- This repo version -->
-    <!-- Workaround for https://github.com/microsoft/vstest/issues/4544 
-    Use semantic versioning V1 because V2 will produce version like 17.7.0-preview.23280.1+94103c3f and DTAExecutionHost 
-    is trying to parse that version and will consider any version with more than 4 `.` in it as invalid. -->
+    <!-- 
+        Workaround for https://github.com/microsoft/vstest/issues/4544 
+        Use semantic versioning V1 because V2 will produce version like 17.7.0-preview.23280.1+94103c3f and DTAExecutionHost 
+        is trying to parse that version and will consider any version with more than 4 `.` in it as invalid. 
+    -->
     <SemanticVersioningV1>true</SemanticVersioningV1>
     <VersionPrefix>17.7.0</VersionPrefix>
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
