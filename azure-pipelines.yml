@@ -321,6 +321,6 @@ stages:
     parameters:
       publishingInfraVersion: 3
       SDLValidationParameters:
-        enable: eq(variables['SDLEnabled'], 'true')
+        enable: eq(parameters.SDLEnabled, True)
         continueOnError: false
         params: ' -SourceToolsList @("policheck","credscan")'
