@@ -591,6 +591,32 @@ public class HtmlLoggerTests
         Assert.AreEqual(0, _htmlLogger.TestRunDetails.Summary.PassPercentage);
     }
 
+    [TestMethod]
+    public void TestCompleteHandlerShouldHandleInvalidCharReferences()
+    {
+        System.Diagnostics.Debugger.Break();
+        VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger hl = new(_mockFileHelper.Object, new Mock<IHtmlTransformer>().Object, new DataContractSerializer(typeof(TestRunDetails)));
+        hl.Initialize(_events.Object, _parameters);
+
+        MemoryStream xmlStream = new();
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Open, FileAccess.Read)).Returns(xmlStream);
+        _mockFileHelper.Setup(x => x.Exists(It.IsAny<string>())).Returns(false);
+
+        MemoryStream htmlStream = new();
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(htmlStream);
+        _mockFileHelper.Setup(x => x.Exists(It.IsAny<string>())).Returns(false);
+
+        var testCase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+        var testResult = new ObjectModel.TestResult(testCase) { Outcome = TestOutcome.Failed };
+        testResult.Messages.Add(new(TestResultMessage.StandardErrorCategory, "\uFFFF"));
+
+        hl.TestResultHandler(new object(), new TestResultEventArgs(testResult));
+
+        hl.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
+
+        //Assert.AreEqual(htmlFileContent, new StreamReader(htmlStream).ReadToEnd());
+    }
+
     private static TestCase CreateTestCase(string testCaseName)
     {
         return new TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");
