@@ -5,15 +5,15 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
-using System.Runtime.Serialization;
+using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
@@ -28,13 +28,14 @@ public class JsonDataSerializer : IDataSerializer
 
     private static readonly JsonSerializer PayloadSerializerV1; // payload serializer for version <= 1
     private static readonly JsonSerializer PayloadSerializerV2; // payload serializer for version >= 2
+    private static readonly JsonSerializer FastSerializer;
     private static readonly JsonSerializerSettings FastJsonSettings; // serializer settings for faster json
     private static readonly JsonSerializerSettings JsonSettings; // serializer settings for serializer v1, which should use to deserialize message headers
     private static readonly JsonSerializer Serializer; // generic serializer
 
     static JsonDataSerializer()
     {
-        //we set as many of the settings as possible here to their default values as this reduces the risk of someone using JsonConvert.DefaultSettings affecting us
+
         var jsonSettings = new JsonSerializerSettings
         {
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
@@ -95,6 +96,8 @@ public class JsonDataSerializer : IDataSerializer
             ContractResolver = contractResolver,
         };
 
+        FastSerializer = JsonSerializer.Create(FastJsonSettings);
+
         PayloadSerializerV1.ContractResolver = new TestPlatformContractResolver1();
         PayloadSerializerV2.ContractResolver = contractResolver;
 
@@ -141,7 +144,7 @@ public class JsonDataSerializer : IDataSerializer
         {
             // PERF: If the fast path fails, deserialize into header object that does not have any Payload. When the message type info
             // is at the start of the message, this is also pretty fast. Again, this won't touch the payload.
-            MessageHeader header = JsonConvert.DeserializeObject<MessageHeader>(rawMessage, JsonSettings)!;
+            MessageHeader header = DeserializeObjectFast<MessageHeader>(rawMessage)!;
             version = header.Version;
             messageType = header.MessageType;
         }
@@ -207,7 +210,7 @@ public class JsonDataSerializer : IDataSerializer
         {
             // PERF: Fast path is compatibile only with protocol versions that use serializer_2,
             // and this is faster than deserializing via deserializer_2.
-            var messageWithPayload = JsonConvert.DeserializeObject<PayloadedMessage<T>>(rawMessage, FastJsonSettings);
+            var messageWithPayload = DeserializeObjectFast<PayloadedMessage<T>>(rawMessage);
 
             return messageWithPayload == null ? default : messageWithPayload.Payload;
         }
@@ -221,6 +224,12 @@ public class JsonDataSerializer : IDataSerializer
             TPDebug.Assert(rawMessagePayload is not null, "rawMessagePayload should not be null");
             return Deserialize<T>(payloadSerializer, rawMessagePayload);
         }
+    }
+
+    private static T? DeserializeObjectFast<T>(string value)
+    {
+        using JsonTextReader reader = new(new StringReader(value));
+        return (T?)FastSerializer.Deserialize(reader, typeof(T));
     }
 
     private static bool FastHeaderParse(string rawMessage, out int version, out string? messageType)
@@ -381,7 +390,7 @@ public class JsonDataSerializer : IDataSerializer
         }
         else
         {
-            return JsonConvert.SerializeObject(new VersionedMessageForSerialization { MessageType = messageType, Version = version, Payload = payload }, FastJsonSettings);
+            return Serialize(FastSerializer, new VersionedMessageForSerialization { MessageType = messageType, Version = version, Payload = payload });
         }
     }
 
