@@ -3,7 +3,9 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
+using System.Runtime.Serialization;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
@@ -11,6 +13,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
@@ -31,6 +34,7 @@ public class JsonDataSerializer : IDataSerializer
 
     static JsonDataSerializer()
     {
+        //we set as many of the settings as possible here to their default values as this reduces the risk of someone using JsonConvert.DefaultSettings affecting us
         var jsonSettings = new JsonSerializerSettings
         {
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
@@ -38,6 +42,22 @@ public class JsonDataSerializer : IDataSerializer
             DateTimeZoneHandling = DateTimeZoneHandling.Utc,
             TypeNameHandling = TypeNameHandling.None,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            MissingMemberHandling = MissingMemberHandling.Ignore,
+            NullValueHandling = NullValueHandling.Include,
+            DefaultValueHandling = DefaultValueHandling.Include,
+            ObjectCreationHandling = ObjectCreationHandling.Auto,
+            PreserveReferencesHandling = PreserveReferencesHandling.None,
+            ConstructorHandling = ConstructorHandling.Default,
+            MetadataPropertyHandling = MetadataPropertyHandling.Default,
+            Formatting = Formatting.None,
+            FloatParseHandling = FloatParseHandling.Double,
+            FloatFormatHandling = FloatFormatHandling.String,
+            StringEscapeHandling = StringEscapeHandling.Default,
+            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+            Culture = CultureInfo.InvariantCulture,
+            CheckAdditionalContent = false,
+            DateFormatString = @"yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK",
+            MaxDepth = 64,
         };
 
         JsonSettings = jsonSettings;
@@ -54,10 +74,24 @@ public class JsonDataSerializer : IDataSerializer
             DateTimeZoneHandling = jsonSettings.DateTimeZoneHandling,
             TypeNameHandling = jsonSettings.TypeNameHandling,
             ReferenceLoopHandling = jsonSettings.ReferenceLoopHandling,
+            MissingMemberHandling = jsonSettings.MissingMemberHandling,
             // PERF: Null value handling has very small impact on serialization and deserialization. Enabling it does not warrant the risk we run
-            // of changing how our consumers get their data.
-            // NullValueHandling = NullValueHandling.Ignore,
-
+            // of changing how our consumers get their data. so we leave it at the default value
+            NullValueHandling = jsonSettings.NullValueHandling,
+            DefaultValueHandling = jsonSettings.DefaultValueHandling,
+            ObjectCreationHandling = jsonSettings.ObjectCreationHandling,
+            PreserveReferencesHandling = jsonSettings.PreserveReferencesHandling,
+            ConstructorHandling = jsonSettings.ConstructorHandling,
+            MetadataPropertyHandling = jsonSettings.MetadataPropertyHandling,
+            Formatting = jsonSettings.Formatting,
+            FloatParseHandling = jsonSettings.FloatParseHandling,
+            FloatFormatHandling = jsonSettings.FloatFormatHandling,
+            StringEscapeHandling = jsonSettings.StringEscapeHandling,
+            TypeNameAssemblyFormatHandling = jsonSettings.TypeNameAssemblyFormatHandling,
+            Culture = jsonSettings.Culture,
+            CheckAdditionalContent = jsonSettings.CheckAdditionalContent,
+            DateFormatString = jsonSettings.DateFormatString,
+            MaxDepth = jsonSettings.MaxDepth,
             ContractResolver = contractResolver,
         };
 
@@ -73,6 +107,8 @@ public class JsonDataSerializer : IDataSerializer
         payloadSerializer2.TraceWriter = new MemoryTraceWriter();
 #endif
     }
+
+
 
     /// <summary>
     /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
