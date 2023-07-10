@@ -38,6 +38,10 @@ parameters:
   displayName: "Produce RTM version?"
   type: boolean
   default: False
+- name: SDLEnabled
+  displayName: "Run SDL validation"
+  type: boolean
+  default: False
 
 variables:
   # Cannot use key:value syntax in root defined variables
@@ -316,3 +320,7 @@ stages:
   - template: eng\common\templates\post-build\post-build.yml
     parameters:
       publishingInfraVersion: 3
+      SDLValidationParameters:
+        enable: false
+        continueOnError: false
+        params: ' -SourceToolsList @("policheck","credscan")'
