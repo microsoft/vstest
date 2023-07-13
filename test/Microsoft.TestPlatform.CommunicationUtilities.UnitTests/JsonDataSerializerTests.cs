@@ -69,6 +69,38 @@ public class JsonDataSerializerTests
         JsonConvert.DefaultSettings = null;
     }
 
+
+    [TestMethod]
+    [DataRow(0)]
+    [DataRow(1)]
+    [DataRow(2)]
+    [DataRow(3)]
+    [DataRow(4)]
+    [DataRow(5)]
+    [DataRow(6)]
+    [DataRow(7)]
+
+    public void SerializePayloadIsUnaffectedByJsonConverterDefaultSettings(int version)
+    {
+
+        Assert.IsNull(JsonConvert.DefaultSettings);
+        //todo: how to check feature flag
+        var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero);
+        var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
+        var withDefaultSettingUnchanged = JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, payload, version);
+
+
+        JsonConvert.DefaultSettings = () =>
+        {
+            Assert.Fail("Should Not Access DefaultSettings");
+            return new();
+        };
+        var withDefaultSettingUpdated = JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, payload);
+
+        //restore the default settings to null
+        JsonConvert.DefaultSettings = null;
+    }
+
     [TestMethod]
     public void SerializePayloadShouldSerializeAnObjectWithSelfReferencingLoop()
     {

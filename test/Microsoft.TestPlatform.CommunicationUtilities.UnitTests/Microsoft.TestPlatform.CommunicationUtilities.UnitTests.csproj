@@ -16,9 +16,4 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>$(JsonNetVersion)</Version>
-    </PackageReference>
-  </ItemGroup>
 </Project>
