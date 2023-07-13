@@ -26,7 +26,15 @@ public class JsonDataSerializerTests
     }
 
     [TestMethod]
-    public void SerializePayloadShouldNotPickDefaultSettings()
+    [DataRow(0)]
+    [DataRow(1)]
+    [DataRow(2)]
+    [DataRow(3)]
+    [DataRow(4)]
+    [DataRow(5)]
+    [DataRow(6)]
+    [DataRow(7)]
+    public void SerializePayloadShouldNotPickDefaultSettings(int version)
     {
         JsonConvert.DefaultSettings = () => new JsonSerializerSettings
         {
@@ -40,8 +48,9 @@ public class JsonDataSerializerTests
         classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(classWithSelfReferencingLoop);
         classWithSelfReferencingLoop.InfiniteRefernce!.InfiniteRefernce = classWithSelfReferencingLoop;
 
-        string serializedPayload = _jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
+        string serializedPayload = _jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop, version);
         Assert.AreEqual("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}", serializedPayload);
+        JsonConvert.DefaultSettings = null;
     }
 
     [TestMethod]
@@ -57,6 +66,7 @@ public class JsonDataSerializerTests
 
         Message message = _jsonDataSerializer.DeserializeMessage("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}");
         Assert.AreEqual("dummy", message?.MessageType);
+        JsonConvert.DefaultSettings = null;
     }
 
     [TestMethod]
