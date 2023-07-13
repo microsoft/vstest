@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Client
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Client;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
