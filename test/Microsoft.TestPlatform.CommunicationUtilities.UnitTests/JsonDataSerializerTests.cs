@@ -33,7 +33,8 @@ public class JsonDataSerializerTests
             ContractResolver = new DefaultContractResolver
             {
                 NamingStrategy = new SnakeCaseNamingStrategy()
-            }
+            },
+            PreserveReferencesHandling = PreserveReferencesHandling.All,
         };
 
         var classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(null);
@@ -52,7 +53,8 @@ public class JsonDataSerializerTests
             ContractResolver = new DefaultContractResolver
             {
                 NamingStrategy = new SnakeCaseNamingStrategy()
-            }
+            },
+            PreserveReferencesHandling = PreserveReferencesHandling.All,
         };
 
         Message message = _jsonDataSerializer.DeserializeMessage("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}");
