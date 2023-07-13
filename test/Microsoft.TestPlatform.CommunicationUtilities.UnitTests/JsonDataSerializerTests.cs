@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Client;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -53,7 +52,15 @@ public class JsonDataSerializerTests
         classWithSelfReferencingLoop.InfiniteRefernce!.InfiniteRefernce = classWithSelfReferencingLoop;
 
         string serializedPayload = _jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop, version);
-        Assert.AreEqual("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}", serializedPayload);
+        if (version <= 1)
+        {
+            Assert.AreEqual("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}", serializedPayload);
+        }
+        else
+        {
+            Assert.AreEqual($"{{\"Version\":{version},\"MessageType\":\"dummy\",\"Payload\":{{\"InfiniteRefernce\":{{}}}}}}", serializedPayload);
+        }
+
         JsonConvert.DefaultSettings = null;
     }
 
