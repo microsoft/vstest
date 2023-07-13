@@ -9,8 +9,11 @@
     <!--
       Sometimes NU1702 is not suppressed correctly, so force reducing severity of the warning.
       See https://github.com/NuGet/Home/issues/9147
+      NU1605: Ignore package downgrade because Microsoft.CodeCoverage.Telemetry depends on Newtonsoft.Json
+      (>= 13.0.3) but we depend on Newtonsoft.Json (>= 13.0.1).
     -->
-    <MSBuildWarningsAsMessages>NU1702;NETSDK1023</MSBuildWarningsAsMessages>
+    <MSBuildWarningsAsMessages>NU1702;NU1605;NETSDK1023</MSBuildWarningsAsMessages>
+    <NoWarn>$(NoWarn);NU1605</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
