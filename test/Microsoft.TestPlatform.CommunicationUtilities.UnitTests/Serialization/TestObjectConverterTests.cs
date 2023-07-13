@@ -6,8 +6,12 @@ using System.Linq;
 
 using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Newtonsoft.Json;
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization;
 
@@ -161,6 +165,31 @@ public class TestObjectConverterTests
         testobj.SetPropertyValue<object>(property, false);
 
         Assert.AreEqual(false, testobj.GetPropertyValue(property));
+    }
+
+    [TestMethod]
+    [DataRow(1)]
+    [DataRow(2)]
+
+    public void SerializePayloadIsUnaffectedByJsonConverterDefaultSettings(int version)
+    {
+
+        Assert.IsNull(JsonConvert.DefaultSettings);
+        //todo: how to check feature flag
+        var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero);
+        var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
+        var withDefaultSettingUnchanged = JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, payload, version);
+
+
+        JsonConvert.DefaultSettings = () =>
+        {
+            Assert.Fail("Should Not Access DefaultSettings");
+            return new();
+        };
+        var withDefaultSettingUpdated = JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, payload);
+
+        //restore the default settings to null
+        JsonConvert.DefaultSettings = null;
     }
 
     private static string Serialize<T>(T data)
