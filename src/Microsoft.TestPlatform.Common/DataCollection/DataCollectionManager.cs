@@ -267,6 +267,21 @@ internal class DataCollectionManager : IDataCollectionManager
     }
 
     /// <inheritdoc/>
+    public Collection<TelemetryEvent> GetTelemetryEvents()
+    {
+        List<TelemetryEvent> telemetryEvents = new();
+        foreach (DataCollectorInformation dataCollectorInformation in RunDataCollectors.Values)
+        {
+            if (dataCollectorInformation.DataCollector is ITelemetryEventsProvider telemetryEventsProvider)
+            {
+                telemetryEvents.AddRange(telemetryEventsProvider.GetTelemetryEvents());
+            }
+        }
+
+        return new Collection<TelemetryEvent>(telemetryEvents);
+    }
+
+    /// <inheritdoc/>
     public void TestHostLaunched(int processId)
     {
         if (!_isDataCollectionEnabled)

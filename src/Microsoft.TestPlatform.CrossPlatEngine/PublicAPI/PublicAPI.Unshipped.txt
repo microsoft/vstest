@@ -1,1 +1,3 @@
 #nullable enable
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.DataCollectionResult.DataCollectionResult(System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet!>? attachments, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector!>? invokedDataCollectors, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent!>? telemetryEvents) -> void
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.DataCollectionResult.TelemetryEvents.get -> System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent!>?

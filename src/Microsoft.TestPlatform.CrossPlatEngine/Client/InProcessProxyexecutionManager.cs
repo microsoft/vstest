@@ -100,7 +100,8 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
             eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
 
             // Send a run complete to caller.
-            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), TimeSpan.Zero);
+            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(),
+                new Collection<InvokedDataCollector>(), new Collection<TelemetryEvent>(), TimeSpan.Zero);
             eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
         }
 

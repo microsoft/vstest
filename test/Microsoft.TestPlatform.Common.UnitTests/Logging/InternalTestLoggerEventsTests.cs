@@ -129,7 +129,7 @@ public class InternalTestLoggerEventsBehaviors
 
         _loggerEvents.EnableEvents();
         // Send the test run complete event.
-        _loggerEvents.CompleteTestRun(null, false, false, null, null, null, new TimeSpan());
+        _loggerEvents.CompleteTestRun(null, false, false, null, null, null, null, new TimeSpan());
 
         var waitSuccess = waitHandle.WaitOne(500);
         Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
@@ -187,7 +187,7 @@ public class InternalTestLoggerEventsBehaviors
     {
         var loggerEvents = GetDisposedLoggerEvents();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => loggerEvents.CompleteTestRun(null, true, false, null, null, null, new TimeSpan()));
+        Assert.ThrowsException<ObjectDisposedException>(() => loggerEvents.CompleteTestRun(null, true, false, null, null, null, null, new TimeSpan()));
     }
 
     [TestMethod]

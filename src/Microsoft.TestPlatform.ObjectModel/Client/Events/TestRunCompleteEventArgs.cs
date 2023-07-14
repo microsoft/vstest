@@ -22,6 +22,7 @@ public class TestRunCompleteEventArgs : EventArgs
     {
         AttachmentSets = new Collection<AttachmentSet>();
         InvokedDataCollectors = new Collection<InvokedDataCollector>();
+        TelemetryEvents = new Collection<TelemetryEvent>();
     }
 
     /// <summary>
@@ -68,6 +69,36 @@ public class TestRunCompleteEventArgs : EventArgs
         Collection<AttachmentSet>? attachmentSets,
         Collection<InvokedDataCollector>? invokedDataCollectors,
         TimeSpan elapsedTime)
+        : this(
+              stats,
+              isCanceled,
+              isAborted,
+              error,
+              attachmentSets,
+              invokedDataCollectors,
+              null,
+              elapsedTime)
+    { }
+
+    /// <summary>
+    /// Default constructor.
+    /// </summary>
+    /// <param name="stats">The final stats for the test run. This parameter is only set for communications between the test host and the clients (like VS)</param>
+    /// <param name="isCanceled">Specifies whether the test run is canceled.</param>
+    /// <param name="isAborted">Specifies whether the test run is aborted.</param>
+    /// <param name="error">Specifies the error encountered during the execution of the test run.</param>
+    /// <param name="attachmentSets">Attachment sets associated with the run.</param>
+    /// <param name="InvokedDataCollectors">Invoked data collectors</param>
+    /// <param name="elapsedTime">Time elapsed in just running tests</param>
+    public TestRunCompleteEventArgs(
+        ITestRunStatistics? stats,
+        bool isCanceled,
+        bool isAborted,
+        Exception? error,
+        Collection<AttachmentSet>? attachmentSets,
+        Collection<InvokedDataCollector>? invokedDataCollectors,
+        Collection<TelemetryEvent>? telemetryEvents,
+        TimeSpan elapsedTime)
     {
         TestRunStatistics = stats;
         IsCanceled = isCanceled;
@@ -75,6 +106,7 @@ public class TestRunCompleteEventArgs : EventArgs
         Error = error;
         AttachmentSets = attachmentSets ?? new Collection<AttachmentSet>(); // Ensuring attachmentSets are not null, so that new attachmentSets can be combined whenever required.
         InvokedDataCollectors = invokedDataCollectors ?? new Collection<InvokedDataCollector>(); // Ensuring that invoked data collectors are not null.
+        TelemetryEvents = telemetryEvents ?? new Collection<TelemetryEvent>(); // Ensuring that telemetry events are not null.
         ElapsedTimeInRunningTests = elapsedTime;
 
         DiscoveredExtensions = new Dictionary<string, HashSet<string>>();
@@ -115,6 +147,12 @@ public class TestRunCompleteEventArgs : EventArgs
     /// </summary>
     [DataMember]
     public Collection<InvokedDataCollector> InvokedDataCollectors { get; private set; }
+
+    /// <summary>
+    /// Gets the telemetry events for the test session.
+    /// </summary>
+    [DataMember]
+    public Collection<TelemetryEvent> TelemetryEvents { get; private set; }
 
     /// <summary>
     /// Gets the time elapsed in just running the tests.

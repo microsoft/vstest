@@ -1178,7 +1178,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestMessageLevel.Error,
                 TranslationLayerResources.AbortedTestsRun);
             var completeArgs = new TestRunCompleteEventArgs(
-                null, false, true, exception, null, null, TimeSpan.Zero);
+                null, false, true, exception, null, null, null, TimeSpan.Zero);
             eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
             // Earlier we were closing the connection with vstest.console in case of exceptions.
@@ -1258,7 +1258,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestMessageLevel.Error,
                 TranslationLayerResources.AbortedTestsRun);
             var completeArgs = new TestRunCompleteEventArgs(
-                null, false, true, exception, null, null, TimeSpan.Zero);
+                null, false, true, exception, null, null, null, TimeSpan.Zero);
             eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
             // Earlier we were closing the connection with vstest.console in case of exceptions.

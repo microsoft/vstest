@@ -30,6 +30,11 @@ public class RunEventHandler : ITestRunEventsHandler
     public List<InvokedDataCollector> InvokedDataCollectors { get; private set; }
 
     /// <summary>
+    /// Gets the list of the telemetry events.
+    /// </summary>
+    public List<TelemetryEvent> TelemetryEvents { get; private set; }
+
+    /// <summary>
     /// Gets the metrics.
     /// </summary>
     public IDictionary<string, object>? Metrics { get; private set; }
@@ -52,6 +57,7 @@ public class RunEventHandler : ITestRunEventsHandler
         Errors = new List<string?>();
         Attachments = new List<AttachmentSet>();
         InvokedDataCollectors = new List<InvokedDataCollector>();
+        TelemetryEvents = new List<TelemetryEvent>();
     }
 
     public void EnsureSuccess()
@@ -91,6 +97,11 @@ public class RunEventHandler : ITestRunEventsHandler
         if (testRunCompleteArgs.InvokedDataCollectors != null)
         {
             InvokedDataCollectors.AddRange(testRunCompleteArgs.InvokedDataCollectors);
+        }
+
+        if (testRunCompleteArgs.TelemetryEvents != null)
+        {
+            TelemetryEvents.AddRange(testRunCompleteArgs.TelemetryEvents);
         }
 
         Metrics = testRunCompleteArgs.Metrics;

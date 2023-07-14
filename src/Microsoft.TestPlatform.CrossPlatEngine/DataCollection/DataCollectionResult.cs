@@ -13,9 +13,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 public class DataCollectionResult
 {
     public DataCollectionResult(Collection<AttachmentSet>? attachments, Collection<InvokedDataCollector>? invokedDataCollectors)
+        : this(attachments, invokedDataCollectors, new Collection<TelemetryEvent>())
+    {
+    }
+
+    public DataCollectionResult(Collection<AttachmentSet>? attachments, Collection<InvokedDataCollector>? invokedDataCollectors,
+        Collection<TelemetryEvent>? telemetryEvents)
     {
         Attachments = attachments;
         InvokedDataCollectors = invokedDataCollectors;
+        TelemetryEvents = telemetryEvents;
     }
 
     /// <summary>
@@ -27,4 +34,9 @@ public class DataCollectionResult
     /// Get the list of the invoked data collectors.
     /// </summary>
     public Collection<InvokedDataCollector>? InvokedDataCollectors { get; }
+
+    /// <summary>
+    /// Get the list of the telemetry events.
+    /// </summary>
+    public Collection<TelemetryEvent>? TelemetryEvents { get; }
 }

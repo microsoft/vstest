@@ -222,6 +222,7 @@ public class ProxyDataCollectionManagerTests
     {
         var attachments = new Collection<AttachmentSet>();
         var invokedDataCollectors = new Collection<InvokedDataCollector>();
+        var telemetryEvents = new Collection<TelemetryEvent>();
         var dispName = "MockAttachments";
         var uri = new Uri("Mock://Attachments");
         var attachmentSet = new AttachmentSet(uri, dispName);
@@ -233,7 +234,7 @@ public class ProxyDataCollectionManagerTests
             {"key", "value"}
         };
 
-        _mockDataCollectionRequestSender.Setup(x => x.SendAfterTestRunEndAndGetResult(It.IsAny<ITestRunEventsHandler>(), It.IsAny<bool>())).Returns(new AfterTestRunEndResult(attachments, invokedDataCollectors, metrics));
+        _mockDataCollectionRequestSender.Setup(x => x.SendAfterTestRunEndAndGetResult(It.IsAny<ITestRunEventsHandler>(), It.IsAny<bool>())).Returns(new AfterTestRunEndResult(attachments, invokedDataCollectors, metrics, telemetryEvents));
 
         var result = _proxyDataCollectionManager.AfterTestRunEnd(false, null);
 

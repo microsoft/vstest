@@ -1,2 +1,4 @@
 #nullable enable
+Microsoft.VisualStudio.TestPlatform.Common.DataCollection.AfterTestRunEndResult.AfterTestRunEndResult(System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet!>! attachmentSets, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector!>? invokedDataCollectors, System.Collections.Generic.IDictionary<string!, object!>! metrics, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent!>? telemetryEvents) -> void
+Microsoft.VisualStudio.TestPlatform.Common.DataCollection.AfterTestRunEndResult.TelemetryEvents.get -> System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent!>?
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.ITestDiscovererCapabilities.IsDirectoryBased.get -> bool

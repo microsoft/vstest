@@ -76,6 +76,7 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
                 _runDataAggregator.GetAggregatedException(),
                 new Collection<AttachmentSet>(_runDataAggregator.RunCompleteArgsAttachments),
                 new Collection<InvokedDataCollector>(_runDataAggregator.InvokedDataCollectors),
+                new Collection<TelemetryEvent>(_runDataAggregator.TelemetryEvents),
                 _runDataAggregator.ElapsedTime);
 
             // Collect Final RunState
@@ -124,6 +125,7 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
             runContextAttachments,
             testRunCompleteArgs.AttachmentSets,
             testRunCompleteArgs.InvokedDataCollectors,
+            testRunCompleteArgs.TelemetryEvents,
             testRunCompleteArgs.DiscoveredExtensions);
 
         // Aggregate Run Data Metrics

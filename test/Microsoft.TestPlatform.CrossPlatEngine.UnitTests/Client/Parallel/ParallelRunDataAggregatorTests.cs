@@ -49,7 +49,7 @@ public class ParallelRunDataAggregatorTests
             new AttachmentSet(new Uri("x://hello1"), "hello1")
         };
 
-        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, attachmentSet1, null, null);
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, attachmentSet1, null, null, null);
 
 
         Assert.AreEqual(1, aggregator.RunCompleteArgsAttachments.Count, "RunCompleteArgsAttachments List must have data.");
@@ -59,7 +59,7 @@ public class ParallelRunDataAggregatorTests
             new AttachmentSet(new Uri("x://hello2"), "hello2")
         };
 
-        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, attachmentSet2, null, null);
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, attachmentSet2, null, null, null);
 
         Assert.AreEqual(2, aggregator.RunCompleteArgsAttachments.Count, "RunCompleteArgsAttachments List must have aggregated data.");
     }
@@ -74,7 +74,7 @@ public class ParallelRunDataAggregatorTests
             new AttachmentSet(new Uri("x://hello1"), "hello1")
         };
 
-        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, attachmentSet1, null, null, null);
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, attachmentSet1, null, null, null, null);
 
         Assert.AreEqual(1, aggregator.RunContextAttachments.Count, "RunContextAttachments List must have data.");
 
@@ -83,7 +83,7 @@ public class ParallelRunDataAggregatorTests
             new AttachmentSet(new Uri("x://hello2"), "hello2")
         };
 
-        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, attachmentSet2, null, null, null);
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, attachmentSet2, null, null, null, null);
 
         Assert.AreEqual(2, aggregator.RunContextAttachments.Count, "RunContextAttachments List must have aggregated data.");
     }
@@ -97,18 +97,18 @@ public class ParallelRunDataAggregatorTests
         {
             new InvokedDataCollector(new Uri("datacollector://sample"),"sample", typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location,false)
         };
-        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors, null);
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors, null, null);
         Assert.AreEqual(1, aggregator.InvokedDataCollectors.Count, "InvokedDataCollectors List must have data.");
 
         var invokedDataCollectors2 = new Collection<InvokedDataCollector>()
         {
             new InvokedDataCollector(new Uri("datacollector://sample2"),"sample2", typeof(int).AssemblyQualifiedName!, typeof(int).Assembly.Location,false)
         };
-        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors2, null);
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors2, null, null);
         Assert.AreEqual(2, aggregator.InvokedDataCollectors.Count, "InvokedDataCollectors List must have aggregated data.");
 
-        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors, null);
-        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors2, null);
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors, null, null);
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors2, null, null);
 
         Assert.AreEqual(2, aggregator.InvokedDataCollectors.Count, "InvokedDataCollectors List must have aggregated data.");
         Assert.AreEqual(invokedDataCollectors[0].AssemblyQualifiedName, aggregator.InvokedDataCollectors[0].AssemblyQualifiedName);
@@ -120,33 +120,60 @@ public class ParallelRunDataAggregatorTests
     }
 
     [TestMethod]
+    public void AggregateShouldAggregateTelemetryEventsCorrectly()
+    {
+        var aggregator = new ParallelRunDataAggregator(Constants.EmptyRunSettings);
+
+        var telemetryEvents = new Collection<TelemetryEvent>()
+        {
+            new TelemetryEvent("event", new Dictionary<string, object>())
+        };
+
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, null, telemetryEvents, null);
+        Assert.AreEqual(1, aggregator.TelemetryEvents.Count, "TelemetryEvents List must have data.");
+
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, null, telemetryEvents, null);
+        Assert.AreEqual(2, aggregator.TelemetryEvents.Count, "TelemetryEvents List must have aggregated data.");
+
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, null, telemetryEvents, null);
+        Assert.AreEqual(3, aggregator.TelemetryEvents.Count, "TelemetryEvents List must have aggregated data.");
+
+        Assert.AreEqual(telemetryEvents[0].Name, aggregator.TelemetryEvents[0].Name);
+        Assert.AreEqual(telemetryEvents[0].Name, aggregator.TelemetryEvents[1].Name);
+        Assert.AreEqual(telemetryEvents[0].Name, aggregator.TelemetryEvents[2].Name);
+        Assert.AreEqual(telemetryEvents[0].Properties, aggregator.TelemetryEvents[0].Properties);
+        Assert.AreEqual(telemetryEvents[0].Properties, aggregator.TelemetryEvents[1].Properties);
+        Assert.AreEqual(telemetryEvents[0].Properties, aggregator.TelemetryEvents[2].Properties);
+    }
+
+    [TestMethod]
     public void AggregateShouldAggregateAbortedAndCanceledCorrectly()
     {
         var aggregator = new ParallelRunDataAggregator(Constants.EmptyRunSettings);
 
         aggregator.Aggregate(null, null, null, TimeSpan.Zero, isAborted: false, isCanceled: false, runContextAttachments: null,
-            runCompleteArgsAttachments: null, invokedDataCollectors: null, discoveredExtensions: null);
+            runCompleteArgsAttachments: null, invokedDataCollectors: null, telemetryEvents: null, discoveredExtensions: null);
 
         Assert.IsFalse(aggregator.IsAborted, "Aborted must be false");
 
         Assert.IsFalse(aggregator.IsCanceled, "Canceled must be false");
 
         aggregator.Aggregate(null, null, null, TimeSpan.Zero, isAborted: true, isCanceled: false, runContextAttachments: null,
-            runCompleteArgsAttachments: null, invokedDataCollectors: null, discoveredExtensions: null);
+            runCompleteArgsAttachments: null, invokedDataCollectors: null, telemetryEvents: null, discoveredExtensions: null);
 
         Assert.IsTrue(aggregator.IsAborted, "Aborted must be true");
 
         Assert.IsFalse(aggregator.IsCanceled, "Canceled must still be false");
 
         aggregator.Aggregate(null, null, null, TimeSpan.Zero, isAborted: false, isCanceled: true, runContextAttachments: null,
-            runCompleteArgsAttachments: null, invokedDataCollectors: null, discoveredExtensions: null);
+            runCompleteArgsAttachments: null, invokedDataCollectors: null, telemetryEvents: null, discoveredExtensions: null);
 
         Assert.IsTrue(aggregator.IsAborted, "Aborted must continue be true");
 
         Assert.IsTrue(aggregator.IsCanceled, "Canceled must be true");
 
         aggregator.Aggregate(null, null, null, TimeSpan.Zero, isAborted: false, isCanceled: false, runContextAttachments: null,
-            runCompleteArgsAttachments: null, invokedDataCollectors: null, discoveredExtensions: null);
+            runCompleteArgsAttachments: null, invokedDataCollectors: null, telemetryEvents: null, discoveredExtensions: null);
 
         Assert.IsTrue(aggregator.IsAborted, "Aborted must continue be true");
 
@@ -160,23 +187,23 @@ public class ParallelRunDataAggregatorTests
         var aggregator = new ParallelRunDataAggregator(Constants.EmptyRunSettings);
 
         aggregator.Aggregate(null, null, null, TimeSpan.Zero, isAborted: false, isCanceled: false, runContextAttachments: null,
-            runCompleteArgsAttachments: null, invokedDataCollectors: null, discoveredExtensions: null);
+            runCompleteArgsAttachments: null, invokedDataCollectors: null, telemetryEvents: null, discoveredExtensions: null);
 
         Assert.AreEqual(TimeSpan.Zero, aggregator.ElapsedTime, "Timespan must be zero");
 
         aggregator.Aggregate(null, null, null, TimeSpan.FromMilliseconds(100), isAborted: false, isCanceled: false, runContextAttachments: null,
-            runCompleteArgsAttachments: null, invokedDataCollectors: null, discoveredExtensions: null);
+            runCompleteArgsAttachments: null, invokedDataCollectors: null, telemetryEvents: null, discoveredExtensions: null);
 
         Assert.AreEqual(TimeSpan.FromMilliseconds(100), aggregator.ElapsedTime, "Timespan must be 100ms");
 
 
         aggregator.Aggregate(null, null, null, TimeSpan.FromMilliseconds(200), isAborted: false, isCanceled: false, runContextAttachments: null,
-            runCompleteArgsAttachments: null, invokedDataCollectors: null, discoveredExtensions: null);
+            runCompleteArgsAttachments: null, invokedDataCollectors: null, telemetryEvents: null, discoveredExtensions: null);
 
         Assert.AreEqual(TimeSpan.FromMilliseconds(200), aggregator.ElapsedTime, "Timespan should be Max of all 200ms");
 
         aggregator.Aggregate(null, null, null, TimeSpan.FromMilliseconds(150), isAborted: false, isCanceled: false, runContextAttachments: null,
-            runCompleteArgsAttachments: null, invokedDataCollectors: null, discoveredExtensions: null);
+            runCompleteArgsAttachments: null, invokedDataCollectors: null, telemetryEvents: null, discoveredExtensions: null);
 
         Assert.AreEqual(TimeSpan.FromMilliseconds(200), aggregator.ElapsedTime, "Timespan should be Max of all i.e. 200ms");
     }
@@ -187,13 +214,13 @@ public class ParallelRunDataAggregatorTests
         var aggregator = new ParallelRunDataAggregator(Constants.EmptyRunSettings);
 
         aggregator.Aggregate(null, null, exception: null, elapsedTime: TimeSpan.Zero, isAborted: false, isCanceled: false, runContextAttachments: null,
-            runCompleteArgsAttachments: null, invokedDataCollectors: null, discoveredExtensions: null);
+            runCompleteArgsAttachments: null, invokedDataCollectors: null, telemetryEvents: null, discoveredExtensions: null);
 
         Assert.IsNull(aggregator.GetAggregatedException(), "Aggregated exception must be null");
 
         var exception1 = new NotImplementedException();
         aggregator.Aggregate(null, null, exception: exception1, elapsedTime: TimeSpan.Zero, isAborted: false, isCanceled: false, runContextAttachments: null,
-            runCompleteArgsAttachments: null, invokedDataCollectors: null, discoveredExtensions: null);
+            runCompleteArgsAttachments: null, invokedDataCollectors: null, telemetryEvents: null, discoveredExtensions: null);
 
         var aggregatedException = aggregator.GetAggregatedException() as AggregateException;
         Assert.IsNotNull(aggregatedException, "Aggregated exception must NOT be null");
@@ -203,7 +230,7 @@ public class ParallelRunDataAggregatorTests
 
         var exception2 = new NotSupportedException();
         aggregator.Aggregate(null, null, exception: exception2, elapsedTime: TimeSpan.Zero, isAborted: false, isCanceled: false, runContextAttachments: null,
-            runCompleteArgsAttachments: null, invokedDataCollectors: null, discoveredExtensions: null);
+            runCompleteArgsAttachments: null, invokedDataCollectors: null, telemetryEvents: null, discoveredExtensions: null);
 
         aggregatedException = aggregator.GetAggregatedException() as AggregateException;
         Assert.IsNotNull(aggregatedException, "Aggregated exception must NOT be null");
@@ -217,18 +244,18 @@ public class ParallelRunDataAggregatorTests
     {
         var aggregator = new ParallelRunDataAggregator(Constants.EmptyRunSettings);
 
-        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, null, null);
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, null, null, null);
 
         Assert.AreEqual(0, aggregator.ExecutorUris.Count, "ExecutorUris List must not have data.");
 
         var uri1 = "x://hello1";
-        aggregator.Aggregate(null, new List<string>() { uri1 }, null, TimeSpan.Zero, false, false, null, null, null, null);
+        aggregator.Aggregate(null, new List<string>() { uri1 }, null, TimeSpan.Zero, false, false, null, null, null, null, null);
 
         Assert.AreEqual(1, aggregator.ExecutorUris.Count, "ExecutorUris List must have data.");
         Assert.IsTrue(aggregator.ExecutorUris.Contains(uri1), "ExecutorUris List must have correct data.");
 
         var uri2 = "x://hello2";
-        aggregator.Aggregate(null, new List<string>() { uri2 }, null, TimeSpan.Zero, false, false, null, null, null, null);
+        aggregator.Aggregate(null, new List<string>() { uri2 }, null, TimeSpan.Zero, false, false, null, null, null, null, null);
 
         Assert.AreEqual(2, aggregator.ExecutorUris.Count, "ExecutorUris List must have aggregated data.");
         Assert.IsTrue(aggregator.ExecutorUris.Contains(uri2), "ExecutorUris List must have correct data.");
@@ -239,7 +266,7 @@ public class ParallelRunDataAggregatorTests
     {
         var aggregator = new ParallelRunDataAggregator(Constants.EmptyRunSettings);
 
-        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, null, null);
+        aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, null, null, null);
 
         var runStats = aggregator.GetAggregatedRunStats();
         Assert.AreEqual(0, runStats.ExecutedTests, "RunStats must not have data.");
@@ -253,7 +280,7 @@ public class ParallelRunDataAggregatorTests
             { TestOutcome.None, 2 }
         };
 
-        aggregator.Aggregate(new TestRunStatistics(12, stats1), null, null, TimeSpan.Zero, false, false, null, null, null, null);
+        aggregator.Aggregate(new TestRunStatistics(12, stats1), null, null, TimeSpan.Zero, false, false, null, null, null, null, null);
 
         runStats = aggregator.GetAggregatedRunStats();
         Assert.AreEqual(12, runStats.ExecutedTests, "RunStats must have aggregated data.");
@@ -273,7 +300,7 @@ public class ParallelRunDataAggregatorTests
             { TestOutcome.None, 3 }
         };
 
-        aggregator.Aggregate(new TestRunStatistics(11, stats2), null, null, TimeSpan.Zero, false, false, null, null, null, null);
+        aggregator.Aggregate(new TestRunStatistics(11, stats2), null, null, TimeSpan.Zero, false, false, null, null, null, null, null);
 
         runStats = aggregator.GetAggregatedRunStats();
         Assert.AreEqual(23, runStats.ExecutedTests, "RunStats must have aggregated data.");

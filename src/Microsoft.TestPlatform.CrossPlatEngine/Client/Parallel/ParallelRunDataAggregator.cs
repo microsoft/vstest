@@ -36,6 +36,7 @@ internal class ParallelRunDataAggregator
         RunContextAttachments = new Collection<AttachmentSet>();
         RunCompleteArgsAttachments = new List<AttachmentSet>();
         InvokedDataCollectors = new Collection<InvokedDataCollector>();
+        TelemetryEvents = new Collection<TelemetryEvent>();
         Exceptions = new List<Exception>();
         DiscoveredExtensions = new Dictionary<string, HashSet<string>>();
         _executorUris = new List<string>();
@@ -54,6 +55,8 @@ internal class ParallelRunDataAggregator
     public List<AttachmentSet> RunCompleteArgsAttachments { get; }
 
     public Collection<InvokedDataCollector> InvokedDataCollectors { get; set; }
+
+    public Collection<TelemetryEvent> TelemetryEvents { get; set; }
 
     public List<Exception> Exceptions { get; }
 
@@ -143,6 +146,7 @@ internal class ParallelRunDataAggregator
         ICollection<AttachmentSet>? runContextAttachments,
         Collection<AttachmentSet>? runCompleteArgsAttachments,
         Collection<InvokedDataCollector>? invokedDataCollectors,
+        Collection<TelemetryEvent>? telemetryEvents,
         Dictionary<string, HashSet<string>>? discoveredExtensions)
     {
         lock (_dataUpdateSyncObject)
@@ -172,6 +176,14 @@ internal class ParallelRunDataAggregator
                     {
                         InvokedDataCollectors.Add(invokedDataCollector);
                     }
+                }
+            }
+
+            if (telemetryEvents?.Count > 0)
+            {
+                foreach (var telemetryEvent in telemetryEvents)
+                {
+                    TelemetryEvents.Add(telemetryEvent);
                 }
             }
 

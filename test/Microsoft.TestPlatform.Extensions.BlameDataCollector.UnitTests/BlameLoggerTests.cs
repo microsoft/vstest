@@ -75,7 +75,7 @@ public class BlameLoggerTests
 
         // Setup and Raise event
         _mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>()));
-        loggerEvents.CompleteTestRun(null, false, false, null, null, null, new TimeSpan(1, 0, 0, 0));
+        loggerEvents.CompleteTestRun(null, false, false, null, null, null, null, new TimeSpan(1, 0, 0, 0));
 
         // Verify Call
         _mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
@@ -97,7 +97,7 @@ public class BlameLoggerTests
         _blameLogger.Initialize(loggerEvents, null);
 
         // Setup and Raise event
-        loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new Collection<InvokedDataCollector>(), new TimeSpan(1, 0, 0, 0));
+        loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new Collection<InvokedDataCollector>(), new Collection<TelemetryEvent>(), new TimeSpan(1, 0, 0, 0));
 
         // Verify Call
         _mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
@@ -135,7 +135,7 @@ public class BlameLoggerTests
 
         // Setup and Raise event
         _mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);
-        loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new Collection<InvokedDataCollector>(), new TimeSpan(1, 0, 0, 0));
+        loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new Collection<InvokedDataCollector>(), new Collection<TelemetryEvent>(), new TimeSpan(1, 0, 0, 0));
 
         // Verify Call
         _mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.Is<string>(str => str.EndsWith(".xml"))), Times.Exactly(count));

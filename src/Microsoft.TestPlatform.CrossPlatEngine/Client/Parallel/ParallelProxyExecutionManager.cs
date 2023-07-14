@@ -462,7 +462,8 @@ internal sealed class ParallelProxyExecutionManager : IParallelProxyExecutionMan
                         // Aborted is sent to allow the current execution manager replaced with another instance
                         // Ensure that the test run aggregator in parallel run events handler doesn't add these statistics
                         // (since the test run didn't even start)
-                        var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), TimeSpan.Zero);
+                        var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(),
+                            new Collection<InvokedDataCollector>(), new Collection<TelemetryEvent>(), TimeSpan.Zero);
                         handler.HandleTestRunComplete(completeArgs, null, null, null);
                     },
                     TaskContinuationOptions.OnlyOnFaulted);

@@ -40,8 +40,14 @@ public class DataCollectionRequestSenderTests
         var attachment = new AttachmentSet(datacollectorUri, displayName);
         attachment.Attachments.Add(new UriDataAttachment(attachmentUri, "filename.txt"));
         var invokedDataCollector = new InvokedDataCollector(datacollectorUri, displayName, typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location, false);
+        IDictionary<string, object> telemetryEventProps = new Dictionary<string, object>
+        {
+            { "a", "b" },
+            { "c", 1 }
+        };
+        TelemetryEvent telemetryEvent = new("vs/codecoverage", telemetryEventProps);
         _mockDataSerializer.Setup(x => x.DeserializePayload<AfterTestRunEndResult>(It.IsAny<Message>())).Returns(
-            new AfterTestRunEndResult(new Collection<AttachmentSet>() { attachment }, new Collection<InvokedDataCollector>() { invokedDataCollector }, new Dictionary<string, object>()));
+            new AfterTestRunEndResult(new Collection<AttachmentSet>() { attachment }, new Collection<InvokedDataCollector>() { invokedDataCollector }, new Dictionary<string, object>(), new Collection<TelemetryEvent>() { telemetryEvent }));
         _mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.AfterTestRunEndResult, Payload = null });
 
         var result = _requestSender.SendAfterTestRunEndAndGetResult(null, false);
@@ -61,6 +67,11 @@ public class DataCollectionRequestSenderTests
         Assert.AreEqual(datacollectorUri, result.InvokedDataCollectors[0].Uri);
         Assert.AreEqual(invokedDataCollector.FilePath, result.InvokedDataCollectors[0].FilePath);
         Assert.AreEqual(invokedDataCollector.AssemblyQualifiedName, result.InvokedDataCollectors[0].AssemblyQualifiedName);
+        Assert.AreEqual(1, result.TelemetryEvents!.Count);
+        Assert.AreEqual(telemetryEvent.Name, result.TelemetryEvents![0].Name);
+        Assert.AreEqual(2, result.TelemetryEvents![0].Properties.Count);
+        Assert.AreEqual("b", (string)result.TelemetryEvents![0].Properties["a"]);
+        Assert.AreEqual(1, (int)result.TelemetryEvents![0].Properties["c"]);
     }
 
     [TestMethod]

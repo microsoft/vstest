@@ -68,6 +68,7 @@ internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
             _runDataAggregator.GetAggregatedException(),
             _runDataAggregator.RunContextAttachments,
             _runDataAggregator.InvokedDataCollectors,
+            _runDataAggregator.TelemetryEvents,
             _runDataAggregator.ElapsedTime);
 
         // Add Metrics from Test Host

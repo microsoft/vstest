@@ -24,6 +24,7 @@ public class AfterTestRunEndResult
         AttachmentSets = null!;
         InvokedDataCollectors = null!;
         Metrics = null!;
+        TelemetryEvents = null!;
     }
 
     /// <summary>
@@ -36,7 +37,7 @@ public class AfterTestRunEndResult
     /// The metrics.
     /// </param>
     public AfterTestRunEndResult(Collection<AttachmentSet> attachmentSets, IDictionary<string, object> metrics)
-        : this(attachmentSets, new Collection<InvokedDataCollector>(), metrics)
+        : this(attachmentSets, new Collection<InvokedDataCollector>(), metrics, new Collection<TelemetryEvent>())
     { }
 
     /// <summary>
@@ -54,10 +55,34 @@ public class AfterTestRunEndResult
     public AfterTestRunEndResult(Collection<AttachmentSet> attachmentSets,
         Collection<InvokedDataCollector>? invokedDataCollectors,
         IDictionary<string, object> metrics)
+        : this(attachmentSets, invokedDataCollectors, metrics, new Collection<TelemetryEvent>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AfterTestRunEndResult"/> class.
+    /// </summary>
+    /// <param name="attachmentSets">
+    /// The collection of attachment sets.
+    /// </param>
+    /// <param name="invokedDataCollectors">
+    /// The collection of the DataCollectors invoked during test session
+    /// </param>
+    /// <param name="metrics">
+    /// The metrics.
+    /// </param>
+    /// <param name="telemetryEvents">
+    /// The telemetry events.
+    /// </param>
+    public AfterTestRunEndResult(Collection<AttachmentSet> attachmentSets,
+        Collection<InvokedDataCollector>? invokedDataCollectors,
+        IDictionary<string, object> metrics,
+        Collection<TelemetryEvent>? telemetryEvents)
     {
         AttachmentSets = attachmentSets;
         InvokedDataCollectors = invokedDataCollectors;
         Metrics = metrics;
+        TelemetryEvents = telemetryEvents;
     }
 
     [DataMember]
@@ -68,4 +93,7 @@ public class AfterTestRunEndResult
 
     [DataMember]
     public IDictionary<string, object> Metrics { get; private set; }
+
+    [DataMember]
+    public Collection<TelemetryEvent>? TelemetryEvents { get; private set; }
 }

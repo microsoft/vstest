@@ -400,6 +400,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                         // This is required as TMI adapter is sending attachments as List which cannot be type casted to Collection.
                         runContextAttachments != null ? new Collection<AttachmentSet>(runContextAttachments.ToList()) : null,
                         runCompleteArgs.InvokedDataCollectors,
+                        runCompleteArgs.TelemetryEvents,
                         _runRequestTimeTracker.Elapsed);
 
                 // Add extensions discovered by vstest.console.
@@ -569,6 +570,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                 testRunCompletePayload.TestRunCompleteArgs.Error,
                 testRunCompletePayload.TestRunCompleteArgs.AttachmentSets,
                 testRunCompletePayload.TestRunCompleteArgs.InvokedDataCollectors,
+                testRunCompletePayload.TestRunCompleteArgs.TelemetryEvents,
                 _runRequestTimeTracker!.Elapsed);
         LoggerManager.HandleTestRunComplete(testRunCompleteArgs);
     }

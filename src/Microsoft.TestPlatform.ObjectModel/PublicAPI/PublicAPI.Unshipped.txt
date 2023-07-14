@@ -1,1 +1,9 @@
 ﻿#nullable enable
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.TelemetryEvents.get -> System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent!>!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.TestRunCompleteEventArgs(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunStatistics? stats, bool isCanceled, bool isAborted, System.Exception? error, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet!>? attachmentSets, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector!>? invokedDataCollectors, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent!>? telemetryEvents, System.TimeSpan elapsedTime) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ITelemetryEventsProvider
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ITelemetryEventsProvider.GetTelemetryEvents() -> System.Collections.Generic.IEnumerable<Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent!>!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.Name.get -> string!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.Properties.get -> System.Collections.Generic.IDictionary<string!, object!>!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.TelemetryEvent(string! name, System.Collections.Generic.IDictionary<string!, object!>! properties) -> void

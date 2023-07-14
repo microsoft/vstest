@@ -220,13 +220,16 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
             && testRunCompleteArgs.Error == null
             && _messageProcessingUnrecoverableError != null)
         {
-            var curentArgs = testRunCompleteArgs;
+            var currentArgs = testRunCompleteArgs;
             testRunCompleteArgs = new TestRunCompleteEventArgs(
-                curentArgs.TestRunStatistics,
-                curentArgs.IsCanceled,
-                curentArgs.IsAborted,
+                currentArgs.TestRunStatistics,
+                currentArgs.IsCanceled,
+                currentArgs.IsAborted,
                 _messageProcessingUnrecoverableError,
-                _pathConverter.UpdateAttachmentSets(curentArgs.AttachmentSets, PathConversionDirection.Send), curentArgs.InvokedDataCollectors, curentArgs.ElapsedTimeInRunningTests
+                _pathConverter.UpdateAttachmentSets(currentArgs.AttachmentSets, PathConversionDirection.Send),
+                currentArgs.InvokedDataCollectors,
+                currentArgs.TelemetryEvents,
+                currentArgs.ElapsedTimeInRunningTests
             );
         }
         var data = _dataSerializer.SerializePayload(

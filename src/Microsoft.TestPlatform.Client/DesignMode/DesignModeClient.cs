@@ -498,7 +498,7 @@ public class DesignModeClient : IDesignModeClient
             _communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
             var runCompletePayload = new TestRunCompletePayload()
             {
-                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue),
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, null, TimeSpan.MinValue),
                 LastRunTests = null
             };
 

@@ -410,7 +410,8 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
             _requestData.MetricsCollection.Add(TelemetryDataConstants.InvokedDataCollectors, string.Join(",", invokedDataCollectorsForMetrics.ToArray()));
         }
 
-        var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, invokedDataCollectors, _requestData.MetricsCollection.Metrics);
+        var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, invokedDataCollectors,
+            _requestData.MetricsCollection.Metrics, _dataCollectionManager.GetTelemetryEvents());
 
         // Dispose all datacollectors before sending attachments to vstest.console process.
         // As datacollector process exits itself on parent process(vstest.console) exits.

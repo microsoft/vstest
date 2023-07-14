@@ -317,7 +317,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
         // message ensures another execution manager created to replace the current one.
         // This will help if the current execution manager is aborted due to irreparable
         // error and the test host is lost as well.
-        var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), TimeSpan.Zero);
+        var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new Collection<TelemetryEvent>(), TimeSpan.Zero);
         var testRunCompletePayload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
         HandleRawMessage(_dataSerializer.SerializePayload(MessageType.ExecutionComplete, testRunCompletePayload));
         HandleTestRunComplete(completeArgs, null, null, null);

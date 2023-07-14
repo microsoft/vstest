@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Abstraction::Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Client;
@@ -25,7 +27,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Abstraction::Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
@@ -517,7 +518,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         catch (Exception ex)
         {
             EqtTrace.Error("InProcessVsTestConsoleWrapper.RunTests: Exception occurred: " + ex);
-            var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue);
+            var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, null, TimeSpan.MinValue);
 
             testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
             testRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, null, null, null);
@@ -590,7 +591,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         catch (Exception ex)
         {
             EqtTrace.Error("InProcessVsTestConsoleWrapper.RunTests: Exception occurred: " + ex);
-            var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue);
+            var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, null, TimeSpan.MinValue);
 
             testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
             testRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, null, null, null);
@@ -682,7 +683,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         catch (Exception ex)
         {
             EqtTrace.Error("InProcessVsTestConsoleWrapper.RunTestsWithCustomTestHost: Exception occurred: " + ex);
-            var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue);
+            var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, null, TimeSpan.MinValue);
 
             testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
             testRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, null, null, null);
@@ -774,7 +775,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         catch (Exception ex)
         {
             EqtTrace.Error("InProcessVsTestConsoleWrapper.RunTestsWithCustomTestHost: Exception occurred: " + ex);
-            var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue);
+            var testRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, null, TimeSpan.MinValue);
 
             testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
             testRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, null, null, null);

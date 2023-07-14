@@ -247,7 +247,7 @@ internal class TestLoggerManager : ITestLoggerManager
             try
             {
                 _loggerEvents.CompleteTestRun(e.TestRunStatistics, e.IsCanceled, e.IsAborted, e.Error,
-                    e.AttachmentSets, e.InvokedDataCollectors, e.ElapsedTimeInRunningTests);
+                    e.AttachmentSets, e.InvokedDataCollectors, e.TelemetryEvents, e.ElapsedTimeInRunningTests);
             }
             finally
             {

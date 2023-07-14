@@ -163,7 +163,7 @@ public class ExecutionManager : IExecutionManager
     {
         if (_activeTestRun == null)
         {
-            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, true, false, null, null, null, TimeSpan.Zero);
+            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, true, false, null, null, null, null, TimeSpan.Zero);
             testRunEventsHandler.HandleTestRunComplete(testRunCompleteEventArgs, null, null, null);
         }
         else
@@ -179,7 +179,7 @@ public class ExecutionManager : IExecutionManager
     {
         if (_activeTestRun == null)
         {
-            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero);
+            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, true, null, null, null, null, TimeSpan.Zero);
             testRunEventsHandler.HandleTestRunComplete(testRunCompleteEventArgs, null, null, null);
         }
         else

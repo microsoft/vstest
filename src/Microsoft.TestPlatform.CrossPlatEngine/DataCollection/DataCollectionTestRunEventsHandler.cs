@@ -31,6 +31,7 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
 
     private Collection<AttachmentSet>? _dataCollectionAttachmentSets;
     private Collection<InvokedDataCollector>? _invokedDataCollectors;
+    private Collection<TelemetryEvent>? _telemetryEvents;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DataCollectionTestRunEventsHandler"/> class.
@@ -115,6 +116,15 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
                 }
             }
 
+            _telemetryEvents = dataCollectionResult?.TelemetryEvents;
+            if (_telemetryEvents?.Count > 0)
+            {
+                foreach (var telemetryEvent in _telemetryEvents)
+                {
+                    testRunCompletePayload?.TestRunCompleteArgs?.TelemetryEvents.Add(telemetryEvent);
+                }
+            }
+
             rawMessage = _dataSerializer.SerializePayload(
                 MessageType.ExecutionComplete,
                 testRunCompletePayload);
@@ -152,6 +162,16 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
             foreach (var dataCollector in _invokedDataCollectors)
             {
                 testRunCompleteArgs.InvokedDataCollectors.Add(dataCollector);
+            }
+        }
+
+        // At the moment, we don't support running telemetry collecting inside testhost process, so it will always be empty inside "TestRunCompleteEventArgs testRunCompleteArgs".
+        // We store telementry events inside "DataCollectionTestRunEventsHandler.HandleRawMessage" method.
+        if (_telemetryEvents != null && _telemetryEvents.Count != 0)
+        {
+            foreach (var telemetryEvent in _telemetryEvents)
+            {
+                testRunCompleteArgs.TelemetryEvents.Add(telemetryEvent);
             }
         }
 

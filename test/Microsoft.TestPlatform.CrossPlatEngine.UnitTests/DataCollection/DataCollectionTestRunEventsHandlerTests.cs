@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
@@ -113,12 +114,17 @@ public class DataCollectionTestRunEventsHandlerTests
             new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location, true)
         };
 
+        var telemetryEvents = new Collection<TelemetryEvent>()
+        {
+            new TelemetryEvent("event", new Dictionary<string, object>() { { "a", "b" } })
+        };
+
         var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
         _mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
         _mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
             .Returns(new TestRunCompletePayload() { TestRunCompleteArgs = testRunCompleteEventArgs });
         _proxyDataCollectionManager.Setup(p => p.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()))
-            .Returns(new DataCollectionResult(null, invokedDataCollectors));
+            .Returns(new DataCollectionResult(null, invokedDataCollectors, telemetryEvents));
         _mockDataSerializer.Setup(r => r.SerializePayload(It.IsAny<string>(), It.IsAny<object>())).Callback((string message, object o) =>
         {
             var testRunCompleteArgs = o as TestRunCompletePayload;

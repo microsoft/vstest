@@ -285,11 +285,13 @@ internal class InternalTestLoggerEvents : TestLoggerEvents, IDisposable
     /// <param name="attachmentSet">Run level attachment sets</param>
     /// <param name="invokedDataCollectors">Invoked data collectors</param>
     /// <param name="elapsedTime">Time elapsed in just running the tests.</param>
-    internal void CompleteTestRun(ITestRunStatistics? stats, bool isCanceled, bool isAborted, Exception? error, Collection<AttachmentSet>? attachmentSet, Collection<InvokedDataCollector>? invokedDataCollectors, TimeSpan elapsedTime)
+    internal void CompleteTestRun(ITestRunStatistics? stats, bool isCanceled, bool isAborted, Exception? error,
+        Collection<AttachmentSet>? attachmentSet, Collection<InvokedDataCollector>? invokedDataCollectors,
+        Collection<TelemetryEvent>? telemetryEvents, TimeSpan elapsedTime)
     {
         CheckDisposed();
 
-        var args = new TestRunCompleteEventArgs(stats, isCanceled, isAborted, error, attachmentSet, invokedDataCollectors, elapsedTime);
+        var args = new TestRunCompleteEventArgs(stats, isCanceled, isAborted, error, attachmentSet, invokedDataCollectors, telemetryEvents, elapsedTime);
 
         // Sending 0 size as this event is not expected to contain any data.
         SafeInvokeAsync(() => TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");

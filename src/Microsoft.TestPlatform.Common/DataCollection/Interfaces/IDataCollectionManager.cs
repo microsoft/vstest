@@ -72,4 +72,10 @@ internal interface IDataCollectionManager : IDisposable
     /// </summary>
     /// <returns>Collection of data collectors.</returns>
     Collection<InvokedDataCollector> GetInvokedDataCollectors();
+
+    /// <summary>
+    /// Return a collections of the telemetry events
+    /// </summary>
+    /// <returns>Collection of telemetry events.</returns>
+    Collection<TelemetryEvent> GetTelemetryEvents();
 }
