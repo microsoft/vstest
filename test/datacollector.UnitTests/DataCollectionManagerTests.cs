@@ -348,6 +348,17 @@ public class DataCollectionManagerTests
     }
 
     [TestMethod]
+    public void GetTelemetryEventsShouldReturnCorrectEvent()
+    {
+        var dataCollectorSettingsWithNullFriendlyName = string.Format(CultureInfo.InvariantCulture, _defaultRunSettings, string.Format(CultureInfo.InvariantCulture, _defaultDataCollectionSettings, string.Empty, _uri, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).Assembly.Location, string.Empty).Replace("friendlyName=\"\"", string.Empty));
+        _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithNullFriendlyName);
+        var telemetryEvents = _dataCollectionManager.GetTelemetryEvents();
+        Assert.AreEqual(1, telemetryEvents.Count);
+        Assert.AreEqual("testevent", telemetryEvents[0].Name);
+        Assert.AreEqual("value", telemetryEvents[0].Properties["prop"]);
+    }
+
+    [TestMethod]
     public void SessionEndedShouldReturnAttachments()
     {
         var attachment = new AttachmentSet(new Uri("my://custom/datacollector"), "CustomDataCollector");
@@ -558,8 +569,12 @@ internal class TestableDataCollectionManager : DataCollectionManager
 [DataCollectorFriendlyName("CustomDataCollector")]
 [DataCollectorTypeUri("my://custom/datacollector")]
 [DataCollectorAttachmentProcessor(typeof(AttachmentProcessorDataCollector2))]
-public abstract class DataCollector2 : ObjectModel.DataCollection.DataCollector
+public abstract class DataCollector2 : ObjectModel.DataCollection.DataCollector, ITelemetryEventsProvider
 {
+    public IEnumerable<TelemetryEvent> GetTelemetryEvents()
+    {
+        yield return new TelemetryEvent("testevent", new Dictionary<string, object>() { { "prop", "value" } });
+    }
 }
 
 [DataCollectorFriendlyName("Code Coverage")]
