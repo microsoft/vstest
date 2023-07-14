@@ -164,7 +164,8 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
             }
         }
 
-        return new DataCollectionResult(afterTestRunEnd?.AttachmentSets, afterTestRunEnd?.InvokedDataCollectors, afterTestRunEnd?.TelemetryEvents);
+        return new DataCollectionResult(afterTestRunEnd?.AttachmentSets, afterTestRunEnd?.InvokedDataCollectors,
+            _requestData.IsTelemetryOptedIn ? afterTestRunEnd?.TelemetryEvents : null);
     }
 
     /// <summary>
