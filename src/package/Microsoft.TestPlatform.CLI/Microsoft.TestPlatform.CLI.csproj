@@ -75,6 +75,7 @@
     <PackageReference Include="NuGet.Frameworks" Version="$(NuGetFrameworksVersion)" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Diagnostics.NETCore.Client" Version="$(MicrosoftDiagnosticsNETCoreClientVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Internal.Dia" Version="$(TestPlatformMSDiaVersion)" PrivateAssets="All" GeneratePathProperty="true" Condition="'$(TargetFramework)'=='net472'" />
+    <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" GeneratePathProperty="true" Condition="'$(TargetFramework)' != 'net472'" />
   </ItemGroup>
 
   <Target Name="CopyFiles" AfterTargets="Build">
@@ -82,6 +83,7 @@
       <MicrosoftCodeCoverageIO Include="$(PkgMicrosoft_CodeCoverage_IO)\lib\netstandard2.0\**\*"></MicrosoftCodeCoverageIO>
       <MicrosoftExtensionsDependencyModel Include="$(PkgMicrosoft_Extensions_DependencyModel)\lib\netstandard2.0\*"></MicrosoftExtensionsDependencyModel>
       <MicrosoftExtensionsFileSystemGlobbing Include="$(PkgMicrosoft_Extensions_FileSystemGlobbing)\lib\netstandard2.0\*"></MicrosoftExtensionsFileSystemGlobbing>
+      <NewtonsoftJson Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*"></NewtonsoftJson>
       <NuGetFrameworks Include="$(PkgNuGet_Frameworks)\lib\netstandard2.0\*"></NuGetFrameworks>
       <MicrosoftInternalDia Include="$(PkgMicrosoft_Internal_Dia)\tools\netstandard\**\*"></MicrosoftInternalDia>
       <SystemComponentModelComposition Include="$(PkgSystem_ComponentModel_Composition)\lib\netstandard2.0\**\*"></SystemComponentModelComposition>
@@ -92,6 +94,7 @@
     <Copy SourceFiles="@(MicrosoftCodeCoverageIO)" DestinationFiles="$(OutDir)\Microsoft.CodeCoverage.IO\%(RecursiveDir)%(Filename)%(Extension)" Condition=" '$(DotNetBuildFromSource)' != 'true' " />
     <Copy SourceFiles="@(MicrosoftExtensionsDependencyModel)" DestinationFiles="$(OutDir)\Microsoft.Extensions.DependencyModel\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftExtensionsFileSystemGlobbing)" DestinationFiles="$(OutDir)\Microsoft.Extensions.FileSystemGlobbing\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(NewtonsoftJson)" DestinationFiles="$(OutDir)\Newtonsoft.Json\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(NuGetFrameworks)" DestinationFiles="$(OutDir)\NuGet.Frameworks\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(SystemComponentModelComposition)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftDiagnosticsNETCoreClient)" DestinationFiles="$(OutDir)\Microsoft.Diagnostics.NETCore.Client\%(RecursiveDir)%(Filename)%(Extension)" />
