@@ -16,6 +16,7 @@
       or use the -\-self-contained argument.
       -->
     <MSBuildWarningsAsMessages>NETSDK1201</MSBuildWarningsAsMessages>
+    <NoWarn>$(NoWarn);NETSDK1201</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
