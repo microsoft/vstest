@@ -97,19 +97,51 @@ public class JsonDataSerializerTests
         //todo: how to check feature flag
         var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero);
         var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
-        var withDefaultSettingUnchanged = JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, payload, version);
-
 
         JsonConvert.DefaultSettings = () =>
         {
+            //restore the default settings to null
+            JsonConvert.DefaultSettings = null;
             Assert.Fail("Should Not Access DefaultSettings");
             return new();
         };
-        var withDefaultSettingUpdated = JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, payload);
+
+        var withDefaultSettingUpdated = JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, payload, version);
 
         //restore the default settings to null
         JsonConvert.DefaultSettings = null;
     }
+
+    [TestMethod]
+    [DataRow(0)]
+    [DataRow(1)]
+    [DataRow(2)]
+    [DataRow(3)]
+    [DataRow(4)]
+    [DataRow(5)]
+    [DataRow(6)]
+    [DataRow(7)]
+    public void DeserializePayloadIsUnaffectedByJsonConverterDefaultSettings(int version)
+    {
+
+        Assert.IsNull(JsonConvert.DefaultSettings, "If this is not null some other test didn't clean up its default setti0ngs");
+
+        JsonConvert.DefaultSettings = () =>
+        {
+            //restore the default settings to null
+            JsonConvert.DefaultSettings = null;
+            Assert.Fail("Should Not Access DefaultSettings");
+            return new();
+        };
+
+        // This line should deserialize properly
+        Message message = _jsonDataSerializer.DeserializeMessage($"{{\"Version\":\"{version}\",\"MessageType\":\"dummy\",\"Payload\":{{\"InfiniteRefernce\":{{}}}}}}");
+
+
+        //restore the default settings to null
+        JsonConvert.DefaultSettings = null;
+    }
+
 
     [TestMethod]
     public void SerializePayloadShouldSerializeAnObjectWithSelfReferencingLoop()
