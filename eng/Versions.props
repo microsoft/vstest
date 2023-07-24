@@ -30,13 +30,12 @@
     <MicrosoftExtensionsDependencyModelPackageVersion>3.0.0</MicrosoftExtensionsDependencyModelPackageVersion>
     <MicrosoftExtensionsFileSystemGlobbingVersion>2.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
     <MicrosoftFakesVersion>17.4.0-beta.22478.3</MicrosoftFakesVersion>
-    <MicrosoftInternalCodeCoverageVersion>17.8.1-beta.23363.3</MicrosoftInternalCodeCoverageVersion>
+    <MicrosoftInternalCodeCoverageVersion>17.8.3-beta.23369.5</MicrosoftInternalCodeCoverageVersion>
     <MicrosoftNetCompilersToolsetVersion>4.7.0-3.23315.4</MicrosoftNetCompilersToolsetVersion>
     <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>17.6.33910.51</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
     <MicrosoftVisualStudioEnterpriseAspNetHelper>$(MicrosoftVisualStudioDiagnosticsUtilitiesVersion)</MicrosoftVisualStudioEnterpriseAspNetHelper>
     <MicrosoftVisualStudioInteropVersion>17.3.32622.426</MicrosoftVisualStudioInteropVersion>
     <MicrosoftVSSDKBuildToolsVersion>17.4.2116</MicrosoftVSSDKBuildToolsVersion>
-    <NETStandardLibraryVersion>2.0.3</NETStandardLibraryVersion>
     <NewtonsoftJsonVersion>13.0.1</NewtonsoftJsonVersion>
     <RoslynBannedApiAnalyzersVersion>3.3.3</RoslynBannedApiAnalyzersVersion>
     <RoslynPublicApiAnalyzersVersion>3.3.4-beta1.21554.2</RoslynPublicApiAnalyzersVersion>
