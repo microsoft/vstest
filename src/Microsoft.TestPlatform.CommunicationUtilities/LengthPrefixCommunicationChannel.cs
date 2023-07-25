@@ -18,6 +18,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 /// </summary>
 public class LengthPrefixCommunicationChannel : ICommunicationChannel
 {
+
+    private const int NoSubscriberTimeoutMs = 100;
+
     private readonly BinaryReader _reader;
 
     private readonly BinaryWriter _writer;
