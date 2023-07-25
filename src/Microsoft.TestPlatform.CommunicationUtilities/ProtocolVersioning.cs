@@ -54,4 +54,5 @@ internal static class ProtocolVersioning
     public const int Version5 = 5;
     public const int Version6 = 6;
     public const int Version7 = 7;
+    public const int Version8 = 8;
 }

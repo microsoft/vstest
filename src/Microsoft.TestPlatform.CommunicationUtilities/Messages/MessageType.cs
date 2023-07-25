@@ -281,4 +281,10 @@ public static class MessageType
     [ProtocolVersion(Version7, typeof(EditorAttachDebuggerPayload))]
     public const string EditorAttachDebugger2 = "TestExecution.EditorAttachDebugger2";
 
+    /// <summary>
+    /// Telemetry event.
+    /// </summary>
+    [ProtocolVersion(Version8, typeof(TelemetryEvent))]
+    public const string TelemetryEventMessage = "TestPlatform.TelemetryEvent";
+
 }

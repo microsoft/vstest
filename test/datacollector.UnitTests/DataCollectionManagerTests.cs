@@ -35,6 +35,7 @@ public class DataCollectionManagerTests
     private readonly List<KeyValuePair<string, string>> _codeCoverageEnvVarList;
     private readonly Mock<IDataCollectionAttachmentManager> _mockDataCollectionAttachmentManager;
     private readonly Mock<IDataCollectionTelemetryManager> _mockDataCollectionTelemetryManager;
+    private readonly Mock<ITelemetryReporter> _mockTelemetryReporter;
 
     public DataCollectionManagerTests()
     {
@@ -51,8 +52,9 @@ public class DataCollectionManagerTests
         _mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
         _mockDataCollectionAttachmentManager.SetReturnsDefault(new List<AttachmentSet>());
         _mockDataCollectionTelemetryManager = new Mock<IDataCollectionTelemetryManager>();
+        _mockTelemetryReporter = new Mock<ITelemetryReporter>();
 
-        _dataCollectionManager = new TestableDataCollectionManager(_mockDataCollectionAttachmentManager.Object, _mockMessageSink.Object, _mockDataCollector.Object, _mockCodeCoverageDataCollector.Object, _mockDataCollectionTelemetryManager.Object);
+        _dataCollectionManager = new TestableDataCollectionManager(_mockDataCollectionAttachmentManager.Object, _mockMessageSink.Object, _mockDataCollector.Object, _mockCodeCoverageDataCollector.Object, _mockDataCollectionTelemetryManager.Object, _mockTelemetryReporter.Object);
     }
 
     [TestMethod]
@@ -485,14 +487,14 @@ internal class TestableDataCollectionManager : DataCollectionManager
 
     public TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink,
         ObjectModel.DataCollection.DataCollector dataCollector, ObjectModel.DataCollection.DataCollector ccDataCollector,
-        IDataCollectionTelemetryManager dataCollectionTelemetryManager) : this(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
+        IDataCollectionTelemetryManager dataCollectionTelemetryManager, ITelemetryReporter telemetryReporter) : this(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager, telemetryReporter)
     {
         _dataCollector = dataCollector;
         _ccDataCollector = ccDataCollector;
     }
 
     internal TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink,
-        IDataCollectionTelemetryManager dataCollectionTelemetryManager) : base(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
+        IDataCollectionTelemetryManager dataCollectionTelemetryManager, ITelemetryReporter telemetryReporter) : base(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager, telemetryReporter)
     {
     }
 
