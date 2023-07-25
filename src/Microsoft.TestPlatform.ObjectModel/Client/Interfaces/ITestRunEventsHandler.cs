@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -10,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 /// <summary>
 /// Interface contract for handling test run events during run operation
 /// </summary>
-public interface ITestRunEventsHandler : ITestMessageEventHandler
+public interface ITestRunEventsHandler : ITestMessageEventHandler, ITelemetryEventsHandler
 {
     /// <summary>
     /// Handle the TestRunCompletion event from a test engine

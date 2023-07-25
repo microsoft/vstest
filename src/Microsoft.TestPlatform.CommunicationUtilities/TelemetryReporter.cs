@@ -4,23 +4,29 @@
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 internal class TelemetryReporter : ITelemetryReporter
 {
+    private readonly IRequestData _requestData;
     private readonly ICommunicationManager _communicationManager;
     private readonly IDataSerializer _dataSerializer;
 
-    public TelemetryReporter(ICommunicationManager communicationManager, IDataSerializer dataSerializer)
+    public TelemetryReporter(IRequestData requestData, ICommunicationManager communicationManager, IDataSerializer dataSerializer)
     {
+        _requestData = requestData;
         _communicationManager = communicationManager;
         _dataSerializer = dataSerializer;
     }
 
     public void Report(TelemetryEvent telemetryEvent)
     {
-        string message = _dataSerializer.SerializePayload(MessageType.TelemetryEventMessage, telemetryEvent);
-        _communicationManager.SendRawMessage(message);
+        if (_requestData.IsTelemetryOptedIn)
+        {
+            string message = _dataSerializer.SerializePayload(MessageType.TelemetryEventMessage, telemetryEvent);
+            _communicationManager.SendRawMessage(message);
+        }
     }
 }

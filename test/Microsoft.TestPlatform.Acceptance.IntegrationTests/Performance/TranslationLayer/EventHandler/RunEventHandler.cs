@@ -74,5 +74,10 @@ public class RunEventHandler : ITestRunEventsHandler
         // No op
         return -1;
     }
+
+    public void HandleTelemetryEvent(TelemetryEvent telemetryEvent)
+    {
+        // No op
+    }
 }
 #endif

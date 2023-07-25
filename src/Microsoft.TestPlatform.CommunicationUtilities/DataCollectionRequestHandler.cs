@@ -137,11 +137,12 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
                 if (Instance == null)
                 {
                     var requestData = new RequestData();
+                    var telemetryReporter = new TelemetryReporter(requestData, communicationManager, JsonDataSerializer.Instance);
 
                     Instance = new DataCollectionRequestHandler(
                         communicationManager,
                         messageSink,
-                        DataCollectionManager.Create(messageSink, requestData, new TelemetryReporter(communicationManager, JsonDataSerializer.Instance)),
+                        DataCollectionManager.Create(messageSink, requestData, telemetryReporter),
                         new DataCollectionTestCaseEventHandler(messageSink),
                         JsonDataSerializer.Instance,
                         new FileHelper(),
