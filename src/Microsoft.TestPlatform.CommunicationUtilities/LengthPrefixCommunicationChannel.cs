@@ -87,6 +87,11 @@ public class LengthPrefixCommunicationChannel : ICommunicationChannel
             // connection is closed.
             if (MessageReceived != null)
             {
+                if (MessageReceived.GetInvocationList().Length == 0)
+                {
+                    Task.Delay(NoSubscriberTimeoutMs);
+                }
+
                 var data = _reader.ReadString();
                 MessageReceived.SafeInvoke(this, new MessageReceivedEventArgs { Data = data }, "LengthPrefixCommunicationChannel: MessageReceived");
             }
