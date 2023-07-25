@@ -1169,6 +1169,10 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 {
                     AttachDebuggerToProcess(customHostLauncher, message);
                 }
+                else if (string.Equals(MessageType.TelemetryEventMessage, message.MessageType))
+                {
+                    HandleTelemetryEvent(eventHandler, message);
+                }
             }
         }
         catch (Exception exception)
@@ -1248,6 +1252,10 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
                 {
                     AttachDebuggerToProcess(customHostLauncher, message);
+                }
+                else if (string.Equals(MessageType.TelemetryEventMessage, message.MessageType))
+                {
+                    HandleTelemetryEvent(eventHandler, message);
                 }
             }
         }
@@ -1497,6 +1505,22 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 MessageType.EditorAttachDebuggerCallback,
                 ackPayload,
                 _protocolVersion);
+        }
+    }
+
+    private void HandleTelemetryEvent(ITelemetryEventsHandler telemetryEventsHandler, Message message)
+    {
+        try
+        {
+            TelemetryEvent? telemetryEvent = _dataSerializer.DeserializePayload<TelemetryEvent>(message);
+            if (telemetryEvent is not null)
+            {
+                telemetryEventsHandler.HandleTelemetryEvent(telemetryEvent);
+            }
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error("VsTestConsoleRequestSender.HandleTelemetryEvent: Error while handling telemetry event: {0}", ex);
         }
     }
 }
