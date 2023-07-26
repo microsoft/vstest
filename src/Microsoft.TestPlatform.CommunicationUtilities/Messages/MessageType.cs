@@ -284,7 +284,5 @@ public static class MessageType
     /// <summary>
     /// Telemetry event.
     /// </summary>
-    [ProtocolVersion(Version8, typeof(TelemetryEvent))]
     public const string TelemetryEventMessage = "TestPlatform.TelemetryEvent";
-
 }
