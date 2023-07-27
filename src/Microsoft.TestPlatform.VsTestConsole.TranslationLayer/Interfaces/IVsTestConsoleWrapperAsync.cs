@@ -195,14 +195,16 @@ public interface IVsTestConsoleWrapperAsync
     ///     string,
     ///     TestPlatformOptions,
     ///     TestSessionInfo,
-    ///     ITestRunEventsHandler3)"/>.
+    ///     ITestRunEventsHandler,
+    ///     ITelemetryEventsHandler)"/>.
     /// </summary>
     Task RunTestsAsync(
         IEnumerable<string> sources,
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler3 testRunEventsHandler);
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler);
 
     /// <summary>
     /// Asynchronous equivalent of <see cref="
@@ -253,14 +255,16 @@ public interface IVsTestConsoleWrapperAsync
     ///     string,
     ///     TestPlatformOptions,
     ///     TestSessionInfo,
-    ///     ITestRunEventsHandler3)"/>.
+    ///     ITestRunEventsHandler,
+    ///     ITelemetryEventsHandler)"/>.
     /// </summary>
     Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler3 testRunEventsHandler);
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler);
 
     /// <summary>
     /// Asynchronous equivalent of <see cref="
@@ -317,7 +321,8 @@ public interface IVsTestConsoleWrapperAsync
     ///     string,
     ///     TestPlatformOptions,
     ///     TestSessionInfo,
-    ///     ITestRunEventsHandler3,
+    ///     ITestRunEventsHandler,
+    ///     ITelemetryEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
     Task RunTestsWithCustomTestHostAsync(
@@ -325,7 +330,8 @@ public interface IVsTestConsoleWrapperAsync
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler3 testRunEventsHandler,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher customTestHostLauncher);
 
     /// <summary>
@@ -383,7 +389,8 @@ public interface IVsTestConsoleWrapperAsync
     ///     string,
     ///     TestPlatformOptions,
     ///     TestSessionInfo,
-    ///     ITestRunEventsHandler3,
+    ///     ITestRunEventsHandler,
+    ///     ITelemetryEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
     Task RunTestsWithCustomTestHostAsync(
@@ -391,7 +398,8 @@ public interface IVsTestConsoleWrapperAsync
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler3 testRunEventsHandler,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher customTestHostLauncher);
 
     /// <summary>

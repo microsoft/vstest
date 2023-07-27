@@ -533,14 +533,15 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler3 testRunEventsHandler)
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler)
     {
         RunTests(
             sources,
             runSettings,
             options,
             testSessionInfo,
-            (ITestRunEventsHandler)testRunEventsHandler);
+            testRunEventsHandler);
     }
 
     /// <inheritdoc/>
@@ -622,14 +623,15 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler3 testRunEventsHandler)
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler)
     {
         RunTests(
             testCases,
             runSettings,
             options,
             testSessionInfo,
-            (ITestRunEventsHandler)testRunEventsHandler);
+            testRunEventsHandler);
     }
 
     /// <inheritdoc/>
@@ -730,7 +732,8 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler3 testRunEventsHandler,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher? customTestHostLauncher)
     {
         RunTestsWithCustomTestHost(
@@ -738,7 +741,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             runSettings,
             options,
             testSessionInfo,
-            (ITestRunEventsHandler)testRunEventsHandler,
+            testRunEventsHandler,
             customTestHostLauncher);
     }
 
@@ -840,7 +843,8 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler3 testRunEventsHandler,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher? customTestHostLauncher)
     {
         RunTestsWithCustomTestHost(
@@ -848,7 +852,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             runSettings,
             options,
             testSessionInfo,
-            (ITestRunEventsHandler)testRunEventsHandler,
+            testRunEventsHandler,
             customTestHostLauncher);
     }
 
@@ -1028,7 +1032,8 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler3 testRunEventsHandler)
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler)
     {
         throw new NotImplementedException();
     }
@@ -1080,7 +1085,8 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler3 testRunEventsHandler)
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler)
     {
         throw new NotImplementedException();
     }
@@ -1137,7 +1143,8 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler3 testRunEventsHandler,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
         throw new NotImplementedException();
@@ -1195,7 +1202,8 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler3 testRunEventsHandler,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
         throw new NotImplementedException();
