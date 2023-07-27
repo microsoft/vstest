@@ -293,11 +293,6 @@ internal class Program
             => testCases?.Any() == true
                 ? "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName))
                 : "\t<empty>";
-
-        public void HandleTelemetryEvent(TelemetryEvent telemetryEvent)
-        {
-            Console.WriteLine($"[RUN.TELEMETRYEVENT!!!!!!!!!!!!!!]: name: {telemetryEvent.Name}");
-        }
     }
 
     internal class DebuggerTestHostLauncher : ITestHostLauncher2
