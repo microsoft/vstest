@@ -3,7 +3,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-public interface ITelemetryEventsHandler
+/// <summary>
+/// Interface contract for handling test run events during run operation.
+/// </summary>
+public interface ITestRunEventsHandler3 : ITestRunEventsHandler, ITelemetryEventsHandler
 {
-    void HandleTelemetryEvent(TelemetryEvent telemetryEvent);
 }

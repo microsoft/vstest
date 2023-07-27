@@ -805,6 +805,7 @@ public class VsTestConsoleRequestSenderTests
         InitializeCommunication();
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
+        var telemetryMockHandler = new Mock<ITelemetryEventsHandler>();
 
         var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
         var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
@@ -820,7 +821,7 @@ public class VsTestConsoleRequestSenderTests
         var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
 
-        _requestSender.StartTestRun(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object);
+        _requestSender.StartTestRun(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object, telemetryMockHandler.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -834,6 +835,7 @@ public class VsTestConsoleRequestSenderTests
         await InitializeCommunicationAsync();
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
+        var telemetryMockHandler = new Mock<ITelemetryEventsHandler>();
 
         var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
         var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
@@ -849,7 +851,7 @@ public class VsTestConsoleRequestSenderTests
         var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
 
-        await _requestSender.StartTestRunAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object);
+        await _requestSender.StartTestRunAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object, telemetryMockHandler.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -863,6 +865,7 @@ public class VsTestConsoleRequestSenderTests
         InitializeCommunication();
 
         var mockHandler = new Mock<ITestRunEventsHandler>();
+        var telemetryMockHandler = new Mock<ITelemetryEventsHandler>();
 
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
         var testResult = new TestResult(testCase);
@@ -901,7 +904,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
             () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
-        _requestSender.StartTestRun(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object);
+        _requestSender.StartTestRun(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object, telemetryMockHandler.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");

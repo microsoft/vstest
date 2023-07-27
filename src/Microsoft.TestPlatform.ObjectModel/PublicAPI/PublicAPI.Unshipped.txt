@@ -1,6 +1,7 @@
 ﻿#nullable enable
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.ITelemetryEventsHandler
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.ITelemetryEventsHandler.HandleTelemetryEvent(Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent! telemetryEvent) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITelemetryEventsHandler
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITelemetryEventsHandler.HandleTelemetryEvent(Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent! telemetryEvent) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunEventsHandler3
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ITelemetryInitializer
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ITelemetryInitializer.Initialize(Microsoft.VisualStudio.TestPlatform.ObjectModel.ITelemetryReporter! telemetryReporter) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ITelemetryReporter

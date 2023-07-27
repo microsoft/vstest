@@ -205,7 +205,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler runEventsHandler)
+        ITestRunEventsHandler runEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
 
@@ -219,6 +220,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestSessionInfo = testSessionInfo
             },
             runEventsHandler,
+            telemetryEventsHandler,
             null);
     }
 
@@ -228,7 +230,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler runEventsHandler)
+        ITestRunEventsHandler runEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
 
@@ -242,6 +245,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestSessionInfo = testSessionInfo
             },
             runEventsHandler,
+            telemetryEventsHandler,
             null).ConfigureAwait(false);
     }
 
@@ -251,7 +255,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler runEventsHandler)
+        ITestRunEventsHandler runEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
 
@@ -265,6 +270,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestSessionInfo = testSessionInfo
             },
             runEventsHandler,
+            telemetryEventsHandler,
             null);
     }
 
@@ -274,7 +280,8 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
-        ITestRunEventsHandler runEventsHandler)
+        ITestRunEventsHandler runEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
 
@@ -288,6 +295,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestSessionInfo = testSessionInfo
             },
             runEventsHandler,
+            telemetryEventsHandler,
             null).ConfigureAwait(false);
     }
 
@@ -298,6 +306,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher customHostLauncher)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
@@ -313,6 +322,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestSessionInfo = testSessionInfo
             },
             runEventsHandler,
+            telemetryEventsHandler,
             customHostLauncher);
     }
 
@@ -323,6 +333,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher customHostLauncher)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
@@ -338,6 +349,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestSessionInfo = testSessionInfo
             },
             runEventsHandler,
+            telemetryEventsHandler,
             customHostLauncher).ConfigureAwait(false);
     }
 
@@ -348,6 +360,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher customHostLauncher)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
@@ -363,6 +376,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestSessionInfo = testSessionInfo
             },
             runEventsHandler,
+            telemetryEventsHandler,
             customHostLauncher);
     }
 
@@ -373,6 +387,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler runEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher customHostLauncher)
     {
         EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
@@ -388,6 +403,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 TestSessionInfo = testSessionInfo
             },
             runEventsHandler,
+            telemetryEventsHandler,
             customHostLauncher).ConfigureAwait(false);
     }
 
@@ -1114,6 +1130,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         string messageType,
         object payload,
         ITestRunEventsHandler eventHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher? customHostLauncher)
     {
         try
@@ -1171,7 +1188,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 }
                 else if (string.Equals(MessageType.TelemetryEventMessage, message.MessageType))
                 {
-                    HandleTelemetryEvent(eventHandler, message);
+                    HandleTelemetryEvent(telemetryEventsHandler, message);
                 }
             }
         }
@@ -1200,6 +1217,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         string messageType,
         object payload,
         ITestRunEventsHandler eventHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher? customHostLauncher)
     {
         try
@@ -1255,7 +1273,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
                 }
                 else if (string.Equals(MessageType.TelemetryEventMessage, message.MessageType))
                 {
-                    HandleTelemetryEvent(eventHandler, message);
+                    HandleTelemetryEvent(telemetryEventsHandler, message);
                 }
             }
         }
