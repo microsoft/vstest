@@ -102,6 +102,7 @@ public class DataCollectionManagerTests
 
         Assert.IsTrue(_dataCollectionManager.RunDataCollectors.ContainsKey(_mockDataCollector.Object.GetType()));
         _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+        _mockDataCollector.Verify(x => x.Initialize(_mockTelemetryReporter.Object), Times.Once);
     }
 
     [TestMethod]
@@ -112,6 +113,7 @@ public class DataCollectionManagerTests
 
         Assert.AreEqual(1, _dataCollectionManager.RunDataCollectors.Count);
         _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+        _mockDataCollector.Verify(x => x.Initialize(_mockTelemetryReporter.Object), Times.Once);
     }
 
     [TestMethod]
@@ -122,6 +124,7 @@ public class DataCollectionManagerTests
 
         Assert.AreEqual(1, _dataCollectionManager.RunDataCollectors.Count);
         _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+        _mockDataCollector.Verify(x => x.Initialize(_mockTelemetryReporter.Object), Times.Once);
     }
 
     [TestMethod]
@@ -132,6 +135,7 @@ public class DataCollectionManagerTests
 
         Assert.AreEqual(1, _dataCollectionManager.RunDataCollectors.Count);
         _mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+        _mockDataCollector.Verify(x => x.Initialize(_mockTelemetryReporter.Object), Times.Once);
     }
 
     [TestMethod]
@@ -560,8 +564,11 @@ internal class TestableDataCollectionManager : DataCollectionManager
 [DataCollectorFriendlyName("CustomDataCollector")]
 [DataCollectorTypeUri("my://custom/datacollector")]
 [DataCollectorAttachmentProcessor(typeof(AttachmentProcessorDataCollector2))]
-public abstract class DataCollector2 : ObjectModel.DataCollection.DataCollector
+public abstract class DataCollector2 : ObjectModel.DataCollection.DataCollector, ITelemetryInitializer
 {
+    public virtual void Initialize(ITelemetryReporter telemetryReporter)
+    {
+    }
 }
 
 [DataCollectorFriendlyName("Code Coverage")]

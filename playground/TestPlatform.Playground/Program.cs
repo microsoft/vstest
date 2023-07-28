@@ -35,7 +35,7 @@ internal class Program
 
         var thisAssemblyPath = Assembly.GetEntryAssembly()!.Location;
         var here = Path.GetDirectoryName(thisAssemblyPath)!;
-        //var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
+        var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
 
@@ -58,9 +58,16 @@ internal class Program
                     <!-- The settings below are what VS sends by default. -->
                     <CollectSourceInformation>False</CollectSourceInformation>
                     <DesignMode>True</DesignMode>
-                    <TestAdaptersPaths>D:\devdiv\vscodecoverage\artifacts\test\Microsoft.CodeCoverage\</TestAdaptersPaths>
                 </RunConfiguration>
-
+                <BoostTestInternalSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                    <VSProcessId>999999</VSProcessId>
+                </BoostTestInternalSettings>
+                <GoogleTestAdapterSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <SolutionSettings>
+                  <Settings />
+                </SolutionSettings>
+                <ProjectSettings />
+                </GoogleTestAdapterSettings>
 
                 <!-- Blame hang -->
                 <!-- <LoggerRunSettings>
@@ -68,36 +75,21 @@ internal class Program
                     <Logger friendlyName="blame" enabled="True" />
                   </Loggers>
                 </LoggerRunSettings>
-            -->
                 <DataCollectionRunSettings>
                   <DataCollectors>
-                      <DataCollector friendlyName="Code Coverage" uri="datacollector://Microsoft/CodeCoverage/2.0" assemblyQualifiedName="Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-                          <Configuration>
-                             <CodeCoverage>
-                                <EnableStaticManagedInstrumentation>False</EnableStaticManagedInstrumentation>
-                                <EnableDynamicManagedInstrumentation>True</EnableDynamicManagedInstrumentation>
-                                <EnableDynamicNativeInstrumentation>False</EnableDynamicNativeInstrumentation>
-                                <UseVerifiableInstrumentation>False</UseVerifiableInstrumentation>
-                                <ModulePaths>
-                                <Include>
-                                  <ModulePath>.*xunit.*</ModulePath>
-                                </Include>
-                              </ModulePaths>
-                             </CodeCoverage>
-                          </Configuration>
-                        </DataCollector>
-
+                    <DataCollector friendlyName="blame" enabled="True">
+                      <Configuration>
+                        <CollectDumpOnTestSessionHang TestTimeout="10s" HangDumpType="Full" />
+                      </Configuration>
+                    </DataCollector>
                   </DataCollectors>
-                </DataCollectionRunSettings> 
+                </DataCollectionRunSettings> -->
             </RunSettings>
             """;
 
-        Console.WriteLine(sourceSettings);
-
         var sources = new[] {
-            Path.Combine(@"D:\examples\xunit2321432\bin\Debug\net6.0", "xunit2321432.dll")!
-            //Path.Combine(playground, "bin", "MSTest1", "Debug", "net472", "MSTest1.dll"),
-            //Path.Combine(playground, "bin", "MSTest2", "Debug", "net472", "MSTest2.dll"),
+            Path.Combine(playground, "bin", "MSTest1", "Debug", "net472", "MSTest1.dll"),
+            Path.Combine(playground, "bin", "MSTest2", "Debug", "net472", "MSTest2.dll"),
             // The built in .NET projects don't now work right now in Playground, there is some conflict with Arcade.
             // But if you create one outside of Playground it will work. 
             //Path.Combine(playground, "bin", "MSTest1", "Debug", "net7.0", "MSTest1.dll"),
@@ -147,21 +139,21 @@ internal class Program
         //// TestSessions
         // r.StartTestSession(sources, sourceSettings, sessionHandler);
 #pragma warning restore CS0618 // Type or member is obsolete
-        //var discoveryHandler = new PlaygroundTestDiscoveryHandler(detailedOutput);
+        var discoveryHandler = new PlaygroundTestDiscoveryHandler(detailedOutput);
         var sw = Stopwatch.StartNew();
         // Discovery
-        //r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
         var discoveryDuration = sw.ElapsedMilliseconds;
-        //Console.WriteLine($"Discovery done in {discoveryDuration} ms");
+        Console.WriteLine($"Discovery done in {discoveryDuration} ms");
         sw.Restart();
         // Run with test cases and custom testhost launcher
         //r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput), new DebuggerTestHostLauncher());
         //// Run with test cases and without custom testhost launcher
-        //r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
+        r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
         //// Run with sources and custom testhost launcher and debugging
         //r.RunTestsWithCustomTestHost(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput), new DebuggerTestHostLauncher());
         //// Run with sources
-        r.RunTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
+        //r.RunTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
         var rd = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery: {discoveryDuration} ms, Run: {rd} ms, Total: {discoveryDuration + rd} ms");
         // Console.WriteLine($"Settings:\n{sourceSettings}");
