@@ -38,6 +38,7 @@ public class VsTestConsoleRequestSenderTests
     private readonly int _waitTimeout = 2000;
     private readonly int _protocolVersion = 7;
     private readonly IDataSerializer _serializer = JsonDataSerializer.Instance;
+    private readonly Mock<ITelemetryEventsHandler> _telemetryHandler;
 
     public VsTestConsoleRequestSenderTests()
     {
@@ -46,6 +47,7 @@ public class VsTestConsoleRequestSenderTests
             _mockCommunicationManager.Object,
             JsonDataSerializer.Instance,
             new Mock<ITestPlatformEventSource>().Object);
+        _telemetryHandler = new Mock<ITelemetryEventsHandler>();
     }
 
     #region Communication Tests
@@ -956,7 +958,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
             () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
-        await _requestSender.StartTestRunAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object);
+        await _requestSender.StartTestRunAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object, _telemetryHandler.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -978,7 +980,7 @@ public class VsTestConsoleRequestSenderTests
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
         // Act.
-        _requestSender.StartTestRun(sources, null, null, null, mockHandler.Object);
+        _requestSender.StartTestRun(sources, null, null, null, mockHandler.Object, _telemetryHandler.Object);
 
         // Assert.
         Assert.IsNotNull(receivedRequest);
@@ -1001,7 +1003,7 @@ public class VsTestConsoleRequestSenderTests
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
         // Act.
-        _requestSender.StartTestRun(sources, null, new TestPlatformOptions() { TestCaseFilter = filter }, null, mockHandler.Object);
+        _requestSender.StartTestRun(sources, null, new TestPlatformOptions() { TestCaseFilter = filter }, null, mockHandler.Object, _telemetryHandler.Object);
 
         // Assert.
         Assert.IsNotNull(receivedRequest);
@@ -1061,7 +1063,7 @@ public class VsTestConsoleRequestSenderTests
 
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runprocessInfoPayload));
 
-        _requestSender.StartTestRunWithCustomHost(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object, mockLauncher.Object);
+        _requestSender.StartTestRunWithCustomHost(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object, mockLauncher.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1122,7 +1124,7 @@ public class VsTestConsoleRequestSenderTests
 
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runprocessInfoPayload));
 
-        await _requestSender.StartTestRunWithCustomHostAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object, mockLauncher.Object);
+        await _requestSender.StartTestRunWithCustomHostAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object, _telemetryHandler.Object, mockLauncher.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1174,7 +1176,7 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>(), _protocolVersion)).
             Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
-        _requestSender.StartTestRunWithCustomHost(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object, mockLauncher.Object);
+        _requestSender.StartTestRunWithCustomHost(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object, mockLauncher.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1223,7 +1225,7 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>(), _protocolVersion)).
             Callback(() => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
-        await _requestSender.StartTestRunWithCustomHostAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object, mockLauncher.Object);
+        await _requestSender.StartTestRunWithCustomHostAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object, _telemetryHandler.Object, mockLauncher.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1243,7 +1245,7 @@ public class VsTestConsoleRequestSenderTests
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
         // Act.
-        _requestSender.StartTestRunWithCustomHost(sources, null, null, null, mockHandler.Object, new Mock<ITestHostLauncher>().Object);
+        _requestSender.StartTestRunWithCustomHost(sources, null, null, null, mockHandler.Object, _telemetryHandler.Object, new Mock<ITestHostLauncher>().Object);
 
         // Assert.
         Assert.IsNotNull(receivedRequest);
@@ -1266,7 +1268,7 @@ public class VsTestConsoleRequestSenderTests
             Callback((string msg, object requestpayload, int protocol) => receivedRequest = (TestRunRequestPayload)requestpayload);
 
         // Act.
-        _requestSender.StartTestRunWithCustomHost(sources, null, new TestPlatformOptions() { TestCaseFilter = filter }, null, mockHandler.Object, new Mock<ITestHostLauncher>().Object);
+        _requestSender.StartTestRunWithCustomHost(sources, null, new TestPlatformOptions() { TestCaseFilter = filter }, null, mockHandler.Object, _telemetryHandler.Object, new Mock<ITestHostLauncher>().Object);
 
         // Assert.
         Assert.IsNotNull(receivedRequest);
@@ -1293,7 +1295,7 @@ public class VsTestConsoleRequestSenderTests
         var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
 
-        _requestSender.StartTestRun(new List<TestCase>(), null, new TestPlatformOptions(), null, mockHandler.Object);
+        _requestSender.StartTestRun(new List<TestCase>(), null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1320,7 +1322,7 @@ public class VsTestConsoleRequestSenderTests
         var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
 
-        await _requestSender.StartTestRunAsync(new List<TestCase>(), null, new TestPlatformOptions(), null, mockHandler.Object);
+        await _requestSender.StartTestRunAsync(new List<TestCase>(), null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1371,7 +1373,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
             () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
-        _requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
+        _requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1422,7 +1424,7 @@ public class VsTestConsoleRequestSenderTests
         mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
             () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
 
-        await _requestSender.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
+        await _requestSender.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1471,7 +1473,7 @@ public class VsTestConsoleRequestSenderTests
                     ICollection<AttachmentSet> attachments,
                     ICollection<string> executorUris) => receivedChangeEventArgs = stats);
 
-        _requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
+        _requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object);
 
         Assert.IsNotNull(receivedChangeEventArgs);
         Assert.IsTrue(receivedChangeEventArgs.NewTestResults!.Any());
@@ -1524,7 +1526,7 @@ public class VsTestConsoleRequestSenderTests
                     ICollection<AttachmentSet> attachments,
                     ICollection<string> executorUris) => receivedChangeEventArgs = stats);
 
-        await _requestSender.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
+        await _requestSender.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object);
 
         Assert.IsNotNull(receivedChangeEventArgs);
         Assert.IsTrue(receivedChangeEventArgs.NewTestResults!.Any());
@@ -1581,7 +1583,7 @@ public class VsTestConsoleRequestSenderTests
                     _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
                 });
 
-        _requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
+        _requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object);
 
         Assert.IsNotNull(receivedChangeEventArgs);
         Assert.IsTrue(receivedChangeEventArgs.NewTestResults!.Any());
@@ -1638,7 +1640,7 @@ public class VsTestConsoleRequestSenderTests
                     _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete));
                 });
 
-        await _requestSender.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object);
+        await _requestSender.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object);
 
         Assert.IsNotNull(receivedChangeEventArgs);
         Assert.IsTrue(receivedChangeEventArgs.NewTestResults!.Any());
@@ -1700,7 +1702,7 @@ public class VsTestConsoleRequestSenderTests
 
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runprocessInfoPayload));
 
-        _requestSender.StartTestRunWithCustomHost(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object, mockLauncher.Object);
+        _requestSender.StartTestRunWithCustomHost(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object, mockLauncher.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1759,7 +1761,7 @@ public class VsTestConsoleRequestSenderTests
 
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runprocessInfoPayload));
 
-        await _requestSender.StartTestRunWithCustomHostAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object, mockLauncher.Object);
+        await _requestSender.StartTestRunWithCustomHostAsync(testCaseList, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object, mockLauncher.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1802,7 +1804,7 @@ public class VsTestConsoleRequestSenderTests
                 }
             });
         _requestSender.InitializeCommunication();
-        _requestSender.StartTestRunWithCustomHost(sources, null, new TestPlatformOptions(), null, mockHandler.Object, mockLauncher.Object);
+        _requestSender.StartTestRunWithCustomHost(sources, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object, mockLauncher.Object);
 
         mockLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
     }
@@ -1842,7 +1844,7 @@ public class VsTestConsoleRequestSenderTests
             });
 
         await _requestSender.InitializeCommunicationAsync(_waitTimeout);
-        await _requestSender.StartTestRunWithCustomHostAsync(sources, null, null, null, mockHandler.Object, mockLauncher.Object);
+        await _requestSender.StartTestRunWithCustomHostAsync(sources, null, null, null, mockHandler.Object, _telemetryHandler.Object, mockLauncher.Object);
 
         mockLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
     }
@@ -1857,7 +1859,7 @@ public class VsTestConsoleRequestSenderTests
 
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, payload, _protocolVersion)).Throws(exception);
 
-        _requestSender.StartTestRun(sources, null, new TestPlatformOptions(), null, mockHandler.Object);
+        _requestSender.StartTestRun(sources, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once, "Test Run Complete must be called");
         mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
@@ -1874,7 +1876,7 @@ public class VsTestConsoleRequestSenderTests
 
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, payload, _protocolVersion)).Throws(exception);
 
-        await _requestSender.StartTestRunAsync(sources, null, null, null, mockHandler.Object);
+        await _requestSender.StartTestRunAsync(sources, null, null, null, mockHandler.Object, _telemetryHandler.Object);
 
         mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once, "Test Run Complete must be called");
         mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
@@ -1907,7 +1909,7 @@ public class VsTestConsoleRequestSenderTests
 
         mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null)).Callback(() => manualEvent.Set());
 
-        _requestSender.StartTestRun(sources, null, new TestPlatformOptions(), null, mockHandler.Object);
+        _requestSender.StartTestRun(sources, null, new TestPlatformOptions(), null, mockHandler.Object, _telemetryHandler.Object);
 
         manualEvent.WaitOne();
         mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
@@ -1936,7 +1938,7 @@ public class VsTestConsoleRequestSenderTests
                 Assert.IsTrue(c.IsCancellationRequested);
             }).Returns(Task.FromResult((Message?)null));
 
-        await _requestSender.StartTestRunAsync(sources, null, null, null, mockHandler.Object);
+        await _requestSender.StartTestRunAsync(sources, null, null, null, mockHandler.Object, _telemetryHandler.Object);
 
         mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
     }

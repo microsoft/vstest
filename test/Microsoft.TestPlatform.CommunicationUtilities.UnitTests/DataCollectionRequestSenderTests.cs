@@ -37,12 +37,14 @@ public class DataCollectionRequestSenderTests
         var datacollectorUri = new Uri("my://custom/datacollector");
         var attachmentUri = new Uri("my://filename.txt");
         var displayName = "CustomDataCollector";
+        var rawMessage = "rawMessage";
         var attachment = new AttachmentSet(datacollectorUri, displayName);
         attachment.Attachments.Add(new UriDataAttachment(attachmentUri, "filename.txt"));
         var invokedDataCollector = new InvokedDataCollector(datacollectorUri, displayName, typeof(string).AssemblyQualifiedName!, typeof(string).Assembly.Location, false);
         _mockDataSerializer.Setup(x => x.DeserializePayload<AfterTestRunEndResult>(It.IsAny<Message>())).Returns(
             new AfterTestRunEndResult(new Collection<AttachmentSet>() { attachment }, new Collection<InvokedDataCollector>() { invokedDataCollector }, new Dictionary<string, object>()));
-        _mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.AfterTestRunEndResult, Payload = null });
+        _mockCommunicationManager.Setup(x => x.ReceiveRawMessage()).Returns(rawMessage);
+        _mockDataSerializer.Setup(x => x.DeserializeMessage(rawMessage)).Returns(new Message() { MessageType = MessageType.AfterTestRunEndResult, Payload = null });
 
         var result = _requestSender.SendAfterTestRunEndAndGetResult(null, false);
 
@@ -74,8 +76,10 @@ public class DataCollectionRequestSenderTests
     [TestMethod]
     public void SendBeforeTestRunStartAndGetResultShouldSendBeforeTestRunStartMessageAndPayload()
     {
+        var rawMessage = "rawMessage";
         var testSources = new List<string>() { "test1.dll" };
-        _mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.BeforeTestRunStartResult, Payload = null });
+        _mockCommunicationManager.Setup(x => x.ReceiveRawMessage()).Returns(rawMessage);
+        _mockDataSerializer.Setup(x => x.DeserializeMessage(rawMessage)).Returns(new Message() { MessageType = MessageType.BeforeTestRunStartResult, Payload = null });
         _requestSender.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, true, null);
 
         _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStart, It.Is<BeforeTestRunStartPayload>(p => p.SettingsXml == string.Empty && p.IsTelemetryOptedIn)));
