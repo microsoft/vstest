@@ -915,6 +915,59 @@ public class VsTestConsoleRequestSenderTests
     }
 
     [TestMethod]
+    public void StartTestRunShouldCompleteWithSingleTestAndTelemetryMessage()
+    {
+        InitializeCommunication();
+
+        var mockHandler = new Mock<ITestRunEventsHandler>();
+        var telemetryMockHandler = new Mock<ITelemetryEventsHandler>();
+
+        var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
+        var testResult = new TestResult(testCase);
+        testResult.Outcome = TestOutcome.Passed;
+
+        var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
+        var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
+
+        var testsChangedArgs = new TestRunChangedEventArgs(null,
+            new List<TestResult>() { testResult }, null);
+
+        var testsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
+
+        var payload = new TestRunCompletePayload()
+        {
+            ExecutorUris = null,
+            LastRunTests = dummyLastRunArgs,
+            RunAttachments = null,
+            TestRunCompleteArgs = dummyCompleteArgs
+        };
+
+        var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
+
+        var mpayload = new TelemetryEvent("aaa", new Dictionary<string, object>());
+        var message = CreateMessage(MessageType.TelemetryEventMessage, mpayload);
+
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsPayload));
+
+        mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
+            (testRunChangedArgs) =>
+            {
+                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults!.Any(), "TestResults must be passed properly");
+                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
+            });
+
+        telemetryMockHandler.Setup(mh => mh.HandleTelemetryEvent(It.IsAny<TelemetryEvent>())).Callback(
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
+
+        _requestSender.StartTestRun(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), null, mockHandler.Object, telemetryMockHandler.Object);
+
+        mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
+            It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
+        mockHandler.Verify(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()), Times.Once, "RunChangedArgs must be called");
+        telemetryMockHandler.Verify(mh => mh.HandleTelemetryEvent(It.IsAny<TelemetryEvent>()), Times.Once, "TestMessage event must be called");
+    }
+
+    [TestMethod]
     public async Task StartTestRunAsyncShouldCompleteWithSingleTestAndMessage()
     {
         await InitializeCommunicationAsync();
@@ -964,6 +1017,58 @@ public class VsTestConsoleRequestSenderTests
             It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
         mockHandler.Verify(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()), Times.Once, "RunChangedArgs must be called");
         mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once, "TestMessage event must be called");
+    }
+
+    [TestMethod]
+    public async Task StartTestRunAsyncShouldCompleteWithSingleTestAndTelemetryMessage()
+    {
+        await InitializeCommunicationAsync();
+
+        var mockHandler = new Mock<ITestRunEventsHandler>();
+
+        var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
+        var testResult = new TestResult(testCase);
+        testResult.Outcome = TestOutcome.Passed;
+
+        var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
+        var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
+
+        var testsChangedArgs = new TestRunChangedEventArgs(null,
+            new List<TestResult>() { testResult }, null);
+
+        var testsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
+
+        var payload = new TestRunCompletePayload()
+        {
+            ExecutorUris = null,
+            LastRunTests = dummyLastRunArgs,
+            RunAttachments = null,
+            TestRunCompleteArgs = dummyCompleteArgs
+        };
+
+        var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
+
+        var mpayload = new TelemetryEvent("aaa", new Dictionary<string, object>());
+        var message = CreateMessage(MessageType.TelemetryEventMessage, mpayload);
+
+        _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(testsPayload));
+
+        mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
+            (testRunChangedArgs) =>
+            {
+                Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults!.Any(), "TestResults must be passed properly");
+                _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(message));
+            });
+
+        _telemetryHandler.Setup(mh => mh.HandleTelemetryEvent(It.IsAny<TelemetryEvent>())).Callback(
+            () => _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<Message?>(runComplete)));
+
+        await _requestSender.StartTestRunAsync(new List<string>() { "1.dll" }, null, null, null, mockHandler.Object, _telemetryHandler.Object);
+
+        mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
+            It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
+        mockHandler.Verify(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()), Times.Once, "RunChangedArgs must be called");
+        _telemetryHandler.Verify(mh => mh.HandleTelemetryEvent(It.IsAny<TelemetryEvent>()), Times.Once, "TestMessage event must be called");
     }
 
     [TestMethod]
