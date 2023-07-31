@@ -172,7 +172,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public ITestSession? StartTestSession(
         IList<string> sources,
         string? runSettings,
@@ -186,7 +185,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public ITestSession? StartTestSession(
         IList<string> sources,
         string? runSettings,
@@ -202,7 +200,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public ITestSession? StartTestSession(
         IList<string> sources,
         string? runSettings,
@@ -230,7 +227,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public bool StopTestSession(
         TestSessionInfo? testSessionInfo,
         ITestSessionEventsHandler eventsHandler)
@@ -242,7 +238,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public bool StopTestSession(
         TestSessionInfo? testSessionInfo,
         TestPlatformOptions? options,
@@ -603,7 +598,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
@@ -617,7 +611,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
@@ -633,7 +626,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
@@ -661,7 +653,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task<bool> StopTestSessionAsync(
         TestSessionInfo? testSessionInfo,
         ITestSessionEventsHandler eventsHandler)
@@ -673,7 +664,6 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task<bool> StopTestSessionAsync(
         TestSessionInfo? testSessionInfo,
         TestPlatformOptions? options,

@@ -97,7 +97,6 @@ public class VsTestConsoleWrapperAsyncTests
     }
 
     [TestMethod]
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task StartTestSessionAsyncShouldCallRequestSenderWithCorrectArguments1()
     {
         var testSessionInfo = new TestSessionInfo();
@@ -130,7 +129,6 @@ public class VsTestConsoleWrapperAsyncTests
     }
 
     [TestMethod]
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task StartTestSessionAsyncShouldCallRequestSenderWithCorrectArguments2()
     {
         var testSessionInfo = new TestSessionInfo();
@@ -165,7 +163,6 @@ public class VsTestConsoleWrapperAsyncTests
     }
 
     [TestMethod]
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task StartTestSessionAsyncShouldCallRequestSenderWithCorrectArguments3()
     {
         var testSessionInfo = new TestSessionInfo();
@@ -202,7 +199,6 @@ public class VsTestConsoleWrapperAsyncTests
     }
 
     [TestMethod]
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task StopTestSessionAsyncShouldCallRequestSenderWithCorrectArguments()
     {
         var testPlatformOptions = new TestPlatformOptions();

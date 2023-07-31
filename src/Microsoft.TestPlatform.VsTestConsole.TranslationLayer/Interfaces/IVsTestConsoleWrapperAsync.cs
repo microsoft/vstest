@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +29,6 @@ public interface IVsTestConsoleWrapperAsync
     ///     string,
     ///     ITestSessionEventsHandler)"/>.
     /// </summary>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
@@ -44,7 +42,6 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestPlatformOptions,
     ///     ITestSessionEventsHandler)"/>.
     /// </summary>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
@@ -60,7 +57,6 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestSessionEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
@@ -74,7 +70,6 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestSessionInfo,
     ///     ITestSessionEventsHandler)"/>.
     /// </summary>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     Task<bool> StopTestSessionAsync(
         TestSessionInfo? testSessionInfo,
         ITestSessionEventsHandler eventsHandler);
@@ -86,7 +81,6 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestPlatformOptions,
     ///     ITestSessionEventsHandler)"/>.
     /// </summary>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     Task<bool> StopTestSessionAsync(
         TestSessionInfo? testSessionInfo,
         TestPlatformOptions? options,

@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -30,7 +29,6 @@ public interface IVsTestConsoleWrapper : IVsTestConsoleWrapperAsync
     /// <param name="eventsHandler">The session event handler.</param>
     ///
     /// <returns>A test session info object.</returns>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     ITestSession? StartTestSession(
         IList<string> sources,
         string? runSettings,
@@ -46,7 +44,6 @@ public interface IVsTestConsoleWrapper : IVsTestConsoleWrapperAsync
     /// <param name="eventsHandler">The session event handler.</param>
     ///
     /// <returns>A test session info object.</returns>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     ITestSession? StartTestSession(
         IList<string> sources,
         string? runSettings,
@@ -64,7 +61,6 @@ public interface IVsTestConsoleWrapper : IVsTestConsoleWrapperAsync
     /// <param name="testHostLauncher">The custom host launcher.</param>
     ///
     /// <returns>A test session info object.</returns>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     ITestSession? StartTestSession(
         IList<string> sources,
         string? runSettings,
@@ -80,7 +76,6 @@ public interface IVsTestConsoleWrapper : IVsTestConsoleWrapperAsync
     /// <param name="eventsHandler">The session event handler.</param>
     ///
     /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     bool StopTestSession(
         TestSessionInfo? testSessionInfo,
         ITestSessionEventsHandler eventsHandler);
@@ -94,7 +89,6 @@ public interface IVsTestConsoleWrapper : IVsTestConsoleWrapperAsync
     /// <param name="eventsHandler">The session event handler.</param>
     ///
     /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     bool StopTestSession(
         TestSessionInfo? testSessionInfo,
         TestPlatformOptions? options,

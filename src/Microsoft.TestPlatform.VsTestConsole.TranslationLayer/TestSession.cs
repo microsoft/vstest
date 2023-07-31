@@ -18,7 +18,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 /// Defines a test session object that can be used to make calls to the vstest.console
 /// process.
 /// </summary>
-[Obsolete("This API is not final yet and is subject to changes.", false)]
 public class TestSession : ITestSession
 {
     private bool _disposed;
@@ -27,7 +26,6 @@ public class TestSession : ITestSession
     private readonly IVsTestConsoleWrapper _consoleWrapper;
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public TestSessionInfo? TestSessionInfo { get; private set; }
     /// <summary>
     /// Initializes a new instance of the <see cref="TestSession"/> class.
@@ -54,7 +52,6 @@ public class TestSession : ITestSession
     /// <summary>
     /// Disposes of the current instance of the <see cref="TestSession"/> class.
     /// </summary>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void Dispose()
     {
         Dispose(true);
@@ -83,28 +80,24 @@ public class TestSession : ITestSession
 
     #region ITestSession
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void AbortTestRun()
     {
         _consoleWrapper.AbortTestRun();
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void CancelDiscovery()
     {
         _consoleWrapper.CancelDiscovery();
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void CancelTestRun()
     {
         _consoleWrapper.CancelTestRun();
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void DiscoverTests(
         IEnumerable<string> sources,
         string discoverySettings,
@@ -118,7 +111,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void DiscoverTests(
         IEnumerable<string> sources,
         string discoverySettings,
@@ -134,7 +126,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void RunTests(
         IEnumerable<string> sources,
         string runSettings,
@@ -148,7 +139,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void RunTests(
         IEnumerable<string> sources,
         string runSettings,
@@ -164,7 +154,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void RunTests(
         IEnumerable<TestCase> testCases,
         string runSettings,
@@ -178,7 +167,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void RunTests(
         IEnumerable<TestCase> testCases,
         string runSettings,
@@ -194,7 +182,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void RunTestsWithCustomTestHost(
         IEnumerable<string> sources,
         string runSettings,
@@ -210,7 +197,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void RunTestsWithCustomTestHost(
         IEnumerable<string> sources,
         string runSettings,
@@ -228,7 +214,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void RunTestsWithCustomTestHost(
         IEnumerable<TestCase> testCases,
         string runSettings,
@@ -244,7 +229,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void RunTestsWithCustomTestHost(
         IEnumerable<TestCase> testCases,
         string runSettings,
@@ -262,21 +246,18 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public bool StopTestSession()
     {
         return StopTestSession(_eventsHandler);
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public bool StopTestSession(ITestSessionEventsHandler eventsHandler)
     {
         return StopTestSession(options: null, eventsHandler);
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public bool StopTestSession(
         TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler)
@@ -302,7 +283,6 @@ public class TestSession : ITestSession
 
     #region ITestSessionAsync
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task DiscoverTestsAsync(
         IEnumerable<string> sources,
         string discoverySettings,
@@ -318,7 +298,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task DiscoverTestsAsync(
         IEnumerable<string> sources,
         string discoverySettings,
@@ -334,7 +313,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task RunTestsAsync(
         IEnumerable<string> sources,
         string runSettings,
@@ -348,7 +326,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task RunTestsAsync(
         IEnumerable<string> sources,
         string runSettings,
@@ -364,7 +341,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
         string runSettings,
@@ -378,7 +354,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
         string runSettings,
@@ -394,7 +369,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string runSettings,
@@ -410,7 +384,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string runSettings,
@@ -428,7 +401,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string runSettings,
@@ -444,7 +416,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string runSettings,
@@ -462,21 +433,18 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task<bool> StopTestSessionAsync()
     {
         return await StopTestSessionAsync(_eventsHandler).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task<bool> StopTestSessionAsync(ITestSessionEventsHandler eventsHandler)
     {
         return await StopTestSessionAsync(options: null, eventsHandler).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task<bool> StopTestSessionAsync(
         TestPlatformOptions? options,
         ITestSessionEventsHandler eventsHandler)

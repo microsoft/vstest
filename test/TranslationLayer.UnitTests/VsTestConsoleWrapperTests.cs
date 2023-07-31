@@ -96,7 +96,6 @@ public class VsTestConsoleWrapperTests
     }
 
     [TestMethod]
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void StartTestSessionShouldCallRequestSenderWithCorrectArguments1()
     {
         var testSessionInfo = new TestSessionInfo();
@@ -129,7 +128,6 @@ public class VsTestConsoleWrapperTests
     }
 
     [TestMethod]
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void StartTestSessionShouldCallRequestSenderWithCorrectArguments2()
     {
         var testSessionInfo = new TestSessionInfo();
@@ -164,7 +162,6 @@ public class VsTestConsoleWrapperTests
     }
 
     [TestMethod]
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void StartTestSessionShouldCallRequestSenderWithCorrectArguments3()
     {
         var testSessionInfo = new TestSessionInfo();
@@ -201,7 +198,6 @@ public class VsTestConsoleWrapperTests
     }
 
     [TestMethod]
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void StopTestSessionShouldCallRequestSenderWithCorrectArguments()
     {
         var testSessionInfo = new TestSessionInfo();
