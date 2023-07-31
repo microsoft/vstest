@@ -10,7 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+// using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -35,7 +35,6 @@ internal class Program
 
         var thisAssemblyPath = Assembly.GetEntryAssembly()!.Location;
         var here = Path.GetDirectoryName(thisAssemblyPath)!;
-        var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
 
@@ -43,120 +42,139 @@ internal class Program
             <RunSettings>
                 <RunConfiguration>
 
-                    <!-- <MaxCpuCount>1</MaxCpuCount> -->
-                    <!-- <DisableParallelization>True<DisableParallelization> -->
-                    <!-- <TargetPlatform>x86</TargetPlatform> -->
-                    <!-- <TargetFrameworkVersion>net472</TargetFrameworkVersion> -->
-
-                    <!-- Per test coverage support -->
-                    <!--
                     <MaxCpuCount>0</MaxCpuCount>
-                    <ForceOneTestAtTimePerTestHost>True</ForceOneTestAtTimePerTestHost>
-                    <TargetFrameworkTestHostDemultiplexer>4</TargetFrameworkTestHostDemultiplexer>
-                    -->
+            </RunConfiguration>
 
-                    <!-- The settings below are what VS sends by default. -->
-                    <CollectSourceInformation>False</CollectSourceInformation>
-                    <DesignMode>True</DesignMode>
-                </RunConfiguration>
-                <BoostTestInternalSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                    <VSProcessId>999999</VSProcessId>
-                </BoostTestInternalSettings>
-                <GoogleTestAdapterSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                <SolutionSettings>
-                  <Settings />
-                </SolutionSettings>
-                <ProjectSettings />
-                </GoogleTestAdapterSettings>
-
-                <!-- Blame hang -->
-                <!-- <LoggerRunSettings>
-                  <Loggers>
-                    <Logger friendlyName="blame" enabled="True" />
-                  </Loggers>
-                </LoggerRunSettings>
-                <DataCollectionRunSettings>
-                  <DataCollectors>
-                    <DataCollector friendlyName="blame" enabled="True">
-                      <Configuration>
-                        <CollectDumpOnTestSessionHang TestTimeout="10s" HangDumpType="Full" />
-                      </Configuration>
-                    </DataCollector>
-                  </DataCollectors>
-                </DataCollectionRunSettings> -->
             </RunSettings>
             """;
 
         var sources = new[] {
-            Path.Combine(playground, "bin", "MSTest1", "Debug", "net472", "MSTest1.dll"),
-            Path.Combine(playground, "bin", "MSTest2", "Debug", "net472", "MSTest2.dll"),
-            // The built in .NET projects don't now work right now in Playground, there is some conflict with Arcade.
-            // But if you create one outside of Playground it will work. 
-            //Path.Combine(playground, "bin", "MSTest1", "Debug", "net7.0", "MSTest1.dll"),
+           @"S:\t\dlls99\mstest1\bin\Debug\net8.0\mstest1.dll",
+@"S:\t\dlls99\mstest10\bin\Debug\net8.0\mstest10.dll",
+@"S:\t\dlls99\mstest11\bin\Debug\net8.0\mstest11.dll",
+@"S:\t\dlls99\mstest12\bin\Debug\net8.0\mstest12.dll",
+@"S:\t\dlls99\mstest13\bin\Debug\net8.0\mstest13.dll",
+@"S:\t\dlls99\mstest14\bin\Debug\net8.0\mstest14.dll",
+@"S:\t\dlls99\mstest15\bin\Debug\net8.0\mstest15.dll",
+@"S:\t\dlls99\mstest16\bin\Debug\net8.0\mstest16.dll",
+@"S:\t\dlls99\mstest17\bin\Debug\net8.0\mstest17.dll",
+@"S:\t\dlls99\mstest18\bin\Debug\net8.0\mstest18.dll",
+@"S:\t\dlls99\mstest19\bin\Debug\net8.0\mstest19.dll",
+@"S:\t\dlls99\mstest2\bin\Debug\net8.0\mstest2.dll",
+@"S:\t\dlls99\mstest20\bin\Debug\net8.0\mstest20.dll",
+@"S:\t\dlls99\mstest21\bin\Debug\net8.0\mstest21.dll",
+@"S:\t\dlls99\mstest22\bin\Debug\net8.0\mstest22.dll",
+@"S:\t\dlls99\mstest23\bin\Debug\net8.0\mstest23.dll",
+@"S:\t\dlls99\mstest24\bin\Debug\net8.0\mstest24.dll",
+@"S:\t\dlls99\mstest25\bin\Debug\net8.0\mstest25.dll",
+@"S:\t\dlls99\mstest26\bin\Debug\net8.0\mstest26.dll",
+@"S:\t\dlls99\mstest27\bin\Debug\net8.0\mstest27.dll",
+@"S:\t\dlls99\mstest28\bin\Debug\net8.0\mstest28.dll",
+@"S:\t\dlls99\mstest29\bin\Debug\net8.0\mstest29.dll",
+@"S:\t\dlls99\mstest3\bin\Debug\net8.0\mstest3.dll",
+@"S:\t\dlls99\mstest30\bin\Debug\net8.0\mstest30.dll",
+@"S:\t\dlls99\mstest31\bin\Debug\net8.0\mstest31.dll",
+@"S:\t\dlls99\mstest32\bin\Debug\net8.0\mstest32.dll",
+@"S:\t\dlls99\mstest33\bin\Debug\net8.0\mstest33.dll",
+@"S:\t\dlls99\mstest34\bin\Debug\net8.0\mstest34.dll",
+@"S:\t\dlls99\mstest35\bin\Debug\net8.0\mstest35.dll",
+@"S:\t\dlls99\mstest36\bin\Debug\net8.0\mstest36.dll",
+@"S:\t\dlls99\mstest37\bin\Debug\net8.0\mstest37.dll",
+@"S:\t\dlls99\mstest38\bin\Debug\net8.0\mstest38.dll",
+@"S:\t\dlls99\mstest39\bin\Debug\net8.0\mstest39.dll",
+@"S:\t\dlls99\mstest4\bin\Debug\net8.0\mstest4.dll",
+@"S:\t\dlls99\mstest40\bin\Debug\net8.0\mstest40.dll",
+@"S:\t\dlls99\mstest41\bin\Debug\net8.0\mstest41.dll",
+@"S:\t\dlls99\mstest42\bin\Debug\net8.0\mstest42.dll",
+@"S:\t\dlls99\mstest43\bin\Debug\net8.0\mstest43.dll",
+@"S:\t\dlls99\mstest44\bin\Debug\net8.0\mstest44.dll",
+@"S:\t\dlls99\mstest45\bin\Debug\net8.0\mstest45.dll",
+@"S:\t\dlls99\mstest46\bin\Debug\net8.0\mstest46.dll",
+@"S:\t\dlls99\mstest47\bin\Debug\net8.0\mstest47.dll",
+@"S:\t\dlls99\mstest48\bin\Debug\net8.0\mstest48.dll",
+@"S:\t\dlls99\mstest49\bin\Debug\net8.0\mstest49.dll",
+@"S:\t\dlls99\mstest5\bin\Debug\net8.0\mstest5.dll",
+@"S:\t\dlls99\mstest50\bin\Debug\net8.0\mstest50.dll",
+@"S:\t\dlls99\mstest51\bin\Debug\net8.0\mstest51.dll",
+@"S:\t\dlls99\mstest52\bin\Debug\net8.0\mstest52.dll",
+@"S:\t\dlls99\mstest53\bin\Debug\net8.0\mstest53.dll",
+@"S:\t\dlls99\mstest54\bin\Debug\net8.0\mstest54.dll",
+@"S:\t\dlls99\mstest55\bin\Debug\net8.0\mstest55.dll",
+@"S:\t\dlls99\mstest56\bin\Debug\net8.0\mstest56.dll",
+@"S:\t\dlls99\mstest57\bin\Debug\net8.0\mstest57.dll",
+@"S:\t\dlls99\mstest58\bin\Debug\net8.0\mstest58.dll",
+@"S:\t\dlls99\mstest59\bin\Debug\net8.0\mstest59.dll",
+@"S:\t\dlls99\mstest6\bin\Debug\net8.0\mstest6.dll",
+@"S:\t\dlls99\mstest60\bin\Debug\net8.0\mstest60.dll",
+@"S:\t\dlls99\mstest61\bin\Debug\net8.0\mstest61.dll",
+@"S:\t\dlls99\mstest62\bin\Debug\net8.0\mstest62.dll",
+@"S:\t\dlls99\mstest63\bin\Debug\net8.0\mstest63.dll",
+@"S:\t\dlls99\mstest64\bin\Debug\net8.0\mstest64.dll",
+@"S:\t\dlls99\mstest65\bin\Debug\net8.0\mstest65.dll",
+@"S:\t\dlls99\mstest66\bin\Debug\net8.0\mstest66.dll",
+@"S:\t\dlls99\mstest67\bin\Debug\net8.0\mstest67.dll",
+@"S:\t\dlls99\mstest68\bin\Debug\net8.0\mstest68.dll",
+@"S:\t\dlls99\mstest69\bin\Debug\net8.0\mstest69.dll",
+@"S:\t\dlls99\mstest7\bin\Debug\net8.0\mstest7.dll",
+@"S:\t\dlls99\mstest70\bin\Debug\net8.0\mstest70.dll",
+@"S:\t\dlls99\mstest71\bin\Debug\net8.0\mstest71.dll",
+@"S:\t\dlls99\mstest72\bin\Debug\net8.0\mstest72.dll",
+@"S:\t\dlls99\mstest73\bin\Debug\net8.0\mstest73.dll",
+@"S:\t\dlls99\mstest74\bin\Debug\net8.0\mstest74.dll",
+@"S:\t\dlls99\mstest75\bin\Debug\net8.0\mstest75.dll",
+@"S:\t\dlls99\mstest76\bin\Debug\net8.0\mstest76.dll",
+@"S:\t\dlls99\mstest77\bin\Debug\net8.0\mstest77.dll",
+@"S:\t\dlls99\mstest78\bin\Debug\net8.0\mstest78.dll",
+@"S:\t\dlls99\mstest79\bin\Debug\net8.0\mstest79.dll",
+@"S:\t\dlls99\mstest8\bin\Debug\net8.0\mstest8.dll",
+@"S:\t\dlls99\mstest80\bin\Debug\net8.0\mstest80.dll",
+@"S:\t\dlls99\mstest81\bin\Debug\net8.0\mstest81.dll",
+@"S:\t\dlls99\mstest82\bin\Debug\net8.0\mstest82.dll",
+@"S:\t\dlls99\mstest83\bin\Debug\net8.0\mstest83.dll",
+@"S:\t\dlls99\mstest84\bin\Debug\net8.0\mstest84.dll",
+@"S:\t\dlls99\mstest85\bin\Debug\net8.0\mstest85.dll",
+@"S:\t\dlls99\mstest86\bin\Debug\net8.0\mstest86.dll",
+@"S:\t\dlls99\mstest87\bin\Debug\net8.0\mstest87.dll",
+@"S:\t\dlls99\mstest88\bin\Debug\net8.0\mstest88.dll",
+@"S:\t\dlls99\mstest89\bin\Debug\net8.0\mstest89.dll",
+@"S:\t\dlls99\mstest9\bin\Debug\net8.0\mstest9.dll",
+@"S:\t\dlls99\mstest90\bin\Debug\net8.0\mstest90.dll",
+@"S:\t\dlls99\mstest91\bin\Debug\net8.0\mstest91.dll",
+@"S:\t\dlls99\mstest92\bin\Debug\net8.0\mstest92.dll",
+@"S:\t\dlls99\mstest93\bin\Debug\net8.0\mstest93.dll",
+@"S:\t\dlls99\mstest94\bin\Debug\net8.0\mstest94.dll",
+@"S:\t\dlls99\mstest95\bin\Debug\net8.0\mstest95.dll",
+@"S:\t\dlls99\mstest96\bin\Debug\net8.0\mstest96.dll",
+@"S:\t\dlls99\mstest97\bin\Debug\net8.0\mstest97.dll",
+@"S:\t\dlls99\mstest98\bin\Debug\net8.0\mstest98.dll",
+@"S:\t\dlls99\mstest99\bin\Debug\net8.0\mstest99.dll"
         };
 
-        //// Console mode
-        //// Uncomment if providing command line parameters is easier for you
-        //// than converting them to settings, or when you debug command line scenario specifically.
-        //var settingsFile = Path.GetTempFileName();
-        //try
-        //{
-        //    File.WriteAllText(settingsFile, sourceSettings);
-        //    var processStartInfo = new ProcessStartInfo
-        //    {
-        //        FileName = console,
-        //        Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile} --listtests",
-        //        UseShellExecute = false,
-        //    };
-        //    EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
-        //    var process = Process.Start(processStartInfo);
-        //    process.WaitForExit();
-        //    if (process.ExitCode != 0)
-        //    {
-        //        throw new Exception($"Process failed with {process.ExitCode}");
-        //    }
-        //}
-        //finally
-        //{
-        //    try { File.Delete(settingsFile); } catch { }
-        //}
-
-        // design mode
-        var detailedOutput = true;
-        var consoleOptions = new ConsoleParameters
+        // Console mode
+        // Uncomment if providing command line parameters is easier for you
+        // than converting them to settings, or when you debug command line scenario specifically.
+        var settingsFile = Path.GetTempFileName();
+        try
         {
-            EnvironmentVariables = EnvironmentVariables.Variables,
-            // LogFilePath = Path.Combine(here, "logs", "log.txt"),
-            // TraceLevel = TraceLevel.Verbose,
-        };
-        var options = new TestPlatformOptions
+            File.WriteAllText(settingsFile, sourceSettings);
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = console,
+                Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile}",
+                UseShellExecute = false,
+            };
+            EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
+            var process = Process.Start(processStartInfo);
+            process.WaitForExit();
+            if (process.ExitCode != 0)
+            {
+                throw new Exception($"Process failed with {process.ExitCode}");
+            }
+        }
+        finally
         {
-            CollectMetrics = true,
-        };
-        var r = new VsTestConsoleWrapper(console, consoleOptions);
-        var sessionHandler = new TestSessionHandler();
-#pragma warning disable CS0618 // Type or member is obsolete
-        //// TestSessions
-        // r.StartTestSession(sources, sourceSettings, sessionHandler);
-#pragma warning restore CS0618 // Type or member is obsolete
-        var discoveryHandler = new PlaygroundTestDiscoveryHandler(detailedOutput);
-        var sw = Stopwatch.StartNew();
-        // Discovery
-        r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
-        var discoveryDuration = sw.ElapsedMilliseconds;
-        Console.WriteLine($"Discovery done in {discoveryDuration} ms");
-        sw.Restart();
-        // Run with test cases and custom testhost launcher
-        //r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput), new DebuggerTestHostLauncher());
-        //// Run with test cases and without custom testhost launcher
-        r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
-        //// Run with sources and custom testhost launcher and debugging
-        //r.RunTestsWithCustomTestHost(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput), new DebuggerTestHostLauncher());
-        //// Run with sources
-        //r.RunTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
-        var rd = sw.ElapsedMilliseconds;
-        Console.WriteLine($"Discovery: {discoveryDuration} ms, Run: {rd} ms, Total: {discoveryDuration + rd} ms");
-        // Console.WriteLine($"Settings:\n{sourceSettings}");
+            try { File.Delete(settingsFile); } catch { }
+        }
     }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
