@@ -222,11 +222,6 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                         if (EqtTrace.IsVerboseEnabled)
                         {
                             EqtTrace.Verbose($"ParallelOperationManager.RunWorkInParallel: Started host in slot number {slot.Index} for work (source): {GetSourcesForSlotExpensive(slot)}.");
-                            if (string.IsNullOrWhiteSpace(GetSourcesForSlotExpensive(slot)))
-                            {
-                                Thread.Sleep(100);
-                                EqtTrace.Verbose($"ParallelOperationManager.RunWorkInParallel: Started host AGAIN in slot number {slot.Index} for work (source): {GetSourcesForSlotExpensive(slot)}.");
-                            }
                         }
                         _runWorkload(slot.Manager!, slot.EventHandler!, slot.Work!, slot.IsPreStarted, slot.InitTask);
                     }
