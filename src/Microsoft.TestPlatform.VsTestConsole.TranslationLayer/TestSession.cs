@@ -10,6 +10,7 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
@@ -145,12 +146,30 @@ public class TestSession : ITestSession
         TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler)
     {
+        RunTests(
+            sources,
+            runSettings,
+            options,
+            testRunEventsHandler,
+            new NoOpTelemetryEventsHandler());
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public void RunTests(
+        IEnumerable<string> sources,
+        string runSettings,
+        TestPlatformOptions? options,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler)
+    {
         _consoleWrapper.RunTests(
             sources,
             runSettings,
             options,
             TestSessionInfo,
-            testRunEventsHandler);
+            testRunEventsHandler,
+            telemetryEventsHandler);
     }
 
     /// <inheritdoc/>
@@ -173,12 +192,29 @@ public class TestSession : ITestSession
         TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler)
     {
+        RunTests(
+            testCases,
+            runSettings,
+            options,
+            testRunEventsHandler,
+            new NoOpTelemetryEventsHandler());
+    }
+
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public void RunTests(
+        IEnumerable<TestCase> testCases,
+        string runSettings,
+        TestPlatformOptions? options,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler)
+    {
         _consoleWrapper.RunTests(
             testCases,
             runSettings,
             options,
             TestSessionInfo,
-            testRunEventsHandler);
+            testRunEventsHandler,
+            telemetryEventsHandler);
     }
 
     /// <inheritdoc/>
@@ -204,12 +240,32 @@ public class TestSession : ITestSession
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
+        RunTestsWithCustomTestHost(
+            sources,
+            runSettings,
+            options,
+            testRunEventsHandler,
+            new NoOpTelemetryEventsHandler(),
+            customTestHostLauncher);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public void RunTestsWithCustomTestHost(
+        IEnumerable<string> sources,
+        string runSettings,
+        TestPlatformOptions? options,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
+        ITestHostLauncher customTestHostLauncher)
+    {
         _consoleWrapper.RunTestsWithCustomTestHost(
             sources,
             runSettings,
             options,
             TestSessionInfo,
             testRunEventsHandler,
+            telemetryEventsHandler,
             customTestHostLauncher);
     }
 
@@ -236,12 +292,32 @@ public class TestSession : ITestSession
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
+        RunTestsWithCustomTestHost(
+            testCases,
+            runSettings,
+            options,
+            testRunEventsHandler,
+            new NoOpTelemetryEventsHandler(),
+            customTestHostLauncher);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public void RunTestsWithCustomTestHost(
+        IEnumerable<TestCase> testCases,
+        string runSettings,
+        TestPlatformOptions? options,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
+        ITestHostLauncher customTestHostLauncher)
+    {
         _consoleWrapper.RunTestsWithCustomTestHost(
             testCases,
             runSettings,
             options,
             TestSessionInfo,
             testRunEventsHandler,
+            telemetryEventsHandler,
             customTestHostLauncher);
     }
 
@@ -332,12 +408,30 @@ public class TestSession : ITestSession
         TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler)
     {
+        await RunTestsAsync(
+            sources,
+            runSettings,
+            options,
+            testRunEventsHandler,
+            new NoOpTelemetryEventsHandler()).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public async Task RunTestsAsync(
+        IEnumerable<string> sources,
+        string runSettings,
+        TestPlatformOptions? options,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler)
+    {
         await _consoleWrapper.RunTestsAsync(
             sources,
             runSettings,
             options,
             TestSessionInfo,
-            testRunEventsHandler).ConfigureAwait(false);
+            testRunEventsHandler,
+            telemetryEventsHandler).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -360,12 +454,30 @@ public class TestSession : ITestSession
         TestPlatformOptions? options,
         ITestRunEventsHandler testRunEventsHandler)
     {
+        await RunTestsAsync(
+            testCases,
+            runSettings,
+            options,
+            testRunEventsHandler,
+            new NoOpTelemetryEventsHandler()).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public async Task RunTestsAsync(
+        IEnumerable<TestCase> testCases,
+        string runSettings,
+        TestPlatformOptions? options,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler)
+    {
         await _consoleWrapper.RunTestsAsync(
             testCases,
             runSettings,
             options,
             TestSessionInfo,
-            testRunEventsHandler).ConfigureAwait(false);
+            testRunEventsHandler,
+            telemetryEventsHandler).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -391,12 +503,32 @@ public class TestSession : ITestSession
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
+        await RunTestsWithCustomTestHostAsync(
+            sources,
+            runSettings,
+            options,
+            testRunEventsHandler,
+            new NoOpTelemetryEventsHandler(),
+            customTestHostLauncher).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public async Task RunTestsWithCustomTestHostAsync(
+        IEnumerable<string> sources,
+        string runSettings,
+        TestPlatformOptions? options,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
+        ITestHostLauncher customTestHostLauncher)
+    {
         await _consoleWrapper.RunTestsWithCustomTestHostAsync(
             sources,
             runSettings,
             options,
             TestSessionInfo,
             testRunEventsHandler,
+            telemetryEventsHandler,
             customTestHostLauncher).ConfigureAwait(false);
     }
 
@@ -423,12 +555,32 @@ public class TestSession : ITestSession
         ITestRunEventsHandler testRunEventsHandler,
         ITestHostLauncher customTestHostLauncher)
     {
+        await RunTestsWithCustomTestHostAsync(
+            testCases,
+            runSettings,
+            options,
+            testRunEventsHandler,
+            new NoOpTelemetryEventsHandler(),
+            customTestHostLauncher).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    public async Task RunTestsWithCustomTestHostAsync(
+        IEnumerable<TestCase> testCases,
+        string runSettings,
+        TestPlatformOptions? options,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
+        ITestHostLauncher customTestHostLauncher)
+    {
         await _consoleWrapper.RunTestsWithCustomTestHostAsync(
             testCases,
             runSettings,
             options,
             TestSessionInfo,
             testRunEventsHandler,
+            telemetryEventsHandler,
             customTestHostLauncher).ConfigureAwait(false);
     }
 

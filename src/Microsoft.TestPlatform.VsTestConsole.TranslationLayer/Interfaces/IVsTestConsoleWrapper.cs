@@ -195,6 +195,24 @@ public interface IVsTestConsoleWrapper : IVsTestConsoleWrapperAsync
     /// Starts a test run.
     /// </summary>
     ///
+    /// <param name="sources">The list of source assemblies for the test run.</param>
+    /// <param name="runSettings">The run settings for the run.</param>
+    /// <param name="options">The test platform options.</param>
+    /// <param name="testSessionInfo">The test session info object.</param>
+    /// <param name="testRunEventsHandler">The run event handler.</param>
+    /// <param name="telemetryEventsHandler">The telemetry events handler.</param>
+    void RunTests(
+        IEnumerable<string> sources,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler);
+
+    /// <summary>
+    /// Starts a test run.
+    /// </summary>
+    ///
     /// <param name="testCases">The list of test cases for the test run.</param>
     /// <param name="runSettings">The run settings for the run.</param>
     /// <param name="testRunEventsHandler">The run event handler.</param>
@@ -232,6 +250,24 @@ public interface IVsTestConsoleWrapper : IVsTestConsoleWrapperAsync
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler);
+
+    /// <summary>
+    /// Starts a test run.
+    /// </summary>
+    ///
+    /// <param name="testCases">The list of test cases for the test run.</param>
+    /// <param name="runSettings">The run settings for the run.</param>
+    /// <param name="options">The test platform options.</param>
+    /// <param name="testSessionInfo">The test session info object.</param>
+    /// <param name="testRunEventsHandler">The run event handler.</param>
+    /// <param name="telemetryEventsHandler">The telemetry events handler.</param>
+    void RunTests(
+        IEnumerable<TestCase> testCases,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler);
 
     /// <summary>
     /// Starts a test run.
@@ -285,6 +321,26 @@ public interface IVsTestConsoleWrapper : IVsTestConsoleWrapperAsync
     /// Starts a test run.
     /// </summary>
     ///
+    /// <param name="sources">The list of source assemblies for the test run.</param>
+    /// <param name="runSettings">The run settings for the run.</param>
+    /// <param name="options">The test platform options.</param>
+    /// <param name="testSessionInfo">The test session info object.</param>
+    /// <param name="testRunEventsHandler">The run event handler.</param>
+    /// <param name="telemetryEventsHandler">The telemetry events handler.</param>
+    /// <param name="customTestHostLauncher">The custom host launcher.</param>
+    void RunTestsWithCustomTestHost(
+        IEnumerable<string> sources,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
+        ITestHostLauncher customTestHostLauncher);
+
+    /// <summary>
+    /// Starts a test run.
+    /// </summary>
+    ///
     /// <param name="testCases">The list of test cases for the test run.</param>
     /// <param name="runSettings">The run settings for the run.</param>
     /// <param name="testRunEventsHandler">The run event handler.</param>
@@ -327,6 +383,26 @@ public interface IVsTestConsoleWrapper : IVsTestConsoleWrapperAsync
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler,
+        ITestHostLauncher customTestHostLauncher);
+
+    /// <summary>
+    /// Starts a test run.
+    /// </summary>
+    ///
+    /// <param name="testCases">The list of test cases for the test run.</param>
+    /// <param name="runSettings">The run settings for the run.</param>
+    /// <param name="options">The test platform options.</param>
+    /// <param name="testSessionInfo">The test session info object.</param>
+    /// <param name="testRunEventsHandler">The run event handler.</param>
+    /// <param name="telemetryEventsHandler">The telemetry events handler.</param>
+    /// <param name="customTestHostLauncher">The custom host launcher.</param>
+    void RunTestsWithCustomTestHost(
+        IEnumerable<TestCase> testCases,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher customTestHostLauncher);
 
     /// <summary>

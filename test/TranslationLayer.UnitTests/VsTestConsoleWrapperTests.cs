@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
@@ -34,6 +35,7 @@ public class VsTestConsoleWrapperTests
         new TestCase("d.e.f", new Uri("g://uri"), "d.dll")
     };
     private readonly ConsoleParameters _consoleParameters;
+    private readonly Mock<ITelemetryEventsHandler> _telemetryEventsHandler;
 
     public VsTestConsoleWrapperTests()
     {
@@ -48,6 +50,7 @@ public class VsTestConsoleWrapperTests
             _consoleParameters,
             new Mock<ITestPlatformEventSource>().Object,
             _mockProcessHelper.Object);
+        _telemetryEventsHandler = new Mock<ITelemetryEventsHandler>();
 
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
@@ -333,7 +336,7 @@ public class VsTestConsoleWrapperTests
     {
         _consoleWrapper.RunTests(_testSources, "RunSettings", new Mock<ITestRunEventsHandler>().Object);
 
-        _mockRequestSender.Verify(rs => rs.StartTestRun(_testSources, "RunSettings", It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        _mockRequestSender.Verify(rs => rs.StartTestRun(_testSources, "RunSettings", It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<NoOpTelemetryEventsHandler>()), Times.Once);
     }
 
     [TestMethod]
@@ -345,7 +348,7 @@ public class VsTestConsoleWrapperTests
             null,
             new Mock<ITestRunEventsHandler>().Object);
 
-        _mockRequestSender.Verify(rs => rs.StartTestRun(_testSources, "RunSettings", null, null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        _mockRequestSender.Verify(rs => rs.StartTestRun(_testSources, "RunSettings", null, null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<NoOpTelemetryEventsHandler>()), Times.Once);
     }
 
     [TestMethod]
@@ -358,7 +361,7 @@ public class VsTestConsoleWrapperTests
             options,
             new Mock<ITestRunEventsHandler>().Object);
 
-        _mockRequestSender.Verify(rs => rs.StartTestRun(_testSources, "RunSettings", options, null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        _mockRequestSender.Verify(rs => rs.StartTestRun(_testSources, "RunSettings", options, null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<NoOpTelemetryEventsHandler>()), Times.Once);
     }
 
     [TestMethod]
@@ -379,7 +382,33 @@ public class VsTestConsoleWrapperTests
                 "RunSettings",
                 options,
                 testSessionInfo,
-                It.IsAny<ITestRunEventsHandler>()),
+                It.IsAny<ITestRunEventsHandler>(),
+                It.IsAny<NoOpTelemetryEventsHandler>()),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void RunTestsWithSourcesShouldSucceedWhenUsingSessionsAndTelemetryHandler()
+    {
+        var testSessionInfo = new TestSessionInfo();
+        var options = new TestPlatformOptions() { TestCaseFilter = "PacMan" };
+
+        _consoleWrapper.RunTests(
+            _testSources,
+            "RunSettings",
+            options,
+            testSessionInfo,
+            new Mock<ITestRunEventsHandler>().Object,
+            _telemetryEventsHandler.Object);
+
+        _mockRequestSender.Verify(
+            rs => rs.StartTestRun(
+                _testSources,
+                "RunSettings",
+                options,
+                testSessionInfo,
+                It.IsAny<ITestRunEventsHandler>(),
+                _telemetryEventsHandler.Object),
             Times.Once);
     }
 
@@ -392,7 +421,7 @@ public class VsTestConsoleWrapperTests
             new Mock<ITestRunEventsHandler>().Object,
             new Mock<ITestHostLauncher>().Object);
 
-        _mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(_testSources, "RunSettings", It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+        _mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(_testSources, "RunSettings", It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<NoOpTelemetryEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
     }
 
     [TestMethod]
@@ -413,6 +442,7 @@ public class VsTestConsoleWrapperTests
                 options,
                 null,
                 It.IsAny<ITestRunEventsHandler>(),
+                It.IsAny<NoOpTelemetryEventsHandler>(),
                 It.IsAny<ITestHostLauncher>()),
             Times.Once);
     }
@@ -437,6 +467,33 @@ public class VsTestConsoleWrapperTests
                 options,
                 testSessionInfo,
                 It.IsAny<ITestRunEventsHandler>(),
+                It.IsAny<NoOpTelemetryEventsHandler>(),
+                It.IsAny<ITestHostLauncher>()),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void RunTestsWithSourcesAndACustomHostShouldSucceedWhenUsingSessionsWithTelemetryHandler()
+    {
+        var testSessionInfo = new TestSessionInfo();
+        var options = new TestPlatformOptions() { TestCaseFilter = "PacMan" };
+        _consoleWrapper.RunTestsWithCustomTestHost(
+            _testSources,
+            "RunSettings",
+            options,
+            testSessionInfo,
+            new Mock<ITestRunEventsHandler>().Object,
+            _telemetryEventsHandler.Object,
+            new Mock<ITestHostLauncher>().Object);
+
+        _mockRequestSender.Verify(
+            rs => rs.StartTestRunWithCustomHost(
+                _testSources,
+                "RunSettings",
+                options,
+                testSessionInfo,
+                It.IsAny<ITestRunEventsHandler>(),
+                _telemetryEventsHandler.Object,
                 It.IsAny<ITestHostLauncher>()),
             Times.Once);
     }
@@ -446,7 +503,7 @@ public class VsTestConsoleWrapperTests
     {
         _consoleWrapper.RunTests(_testCases, "RunSettings", new Mock<ITestRunEventsHandler>().Object);
 
-        _mockRequestSender.Verify(rs => rs.StartTestRun(_testCases, "RunSettings", It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        _mockRequestSender.Verify(rs => rs.StartTestRun(_testCases, "RunSettings", It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<NoOpTelemetryEventsHandler>()), Times.Once);
     }
 
     [TestMethod]
@@ -454,7 +511,7 @@ public class VsTestConsoleWrapperTests
     {
         _consoleWrapper.RunTests(_testCases, "RunSettings", null, new Mock<ITestRunEventsHandler>().Object);
 
-        _mockRequestSender.Verify(rs => rs.StartTestRun(_testCases, "RunSettings", null, null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        _mockRequestSender.Verify(rs => rs.StartTestRun(_testCases, "RunSettings", null, null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<NoOpTelemetryEventsHandler>()), Times.Once);
     }
 
     [TestMethod]
@@ -464,7 +521,7 @@ public class VsTestConsoleWrapperTests
 
         _consoleWrapper.RunTests(_testCases, "RunSettings", options, new Mock<ITestRunEventsHandler>().Object);
 
-        _mockRequestSender.Verify(rs => rs.StartTestRun(_testCases, "RunSettings", options, null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        _mockRequestSender.Verify(rs => rs.StartTestRun(_testCases, "RunSettings", options, null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<NoOpTelemetryEventsHandler>()), Times.Once);
     }
 
     [TestMethod]
@@ -486,7 +543,33 @@ public class VsTestConsoleWrapperTests
                 "RunSettings",
                 options,
                 testSessionInfo,
-                It.IsAny<ITestRunEventsHandler>()),
+                It.IsAny<ITestRunEventsHandler>(),
+                It.IsAny<NoOpTelemetryEventsHandler>()),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void RunTestsWithSelectedTestsShouldSucceedWhenUsingSessionsWithTelemetryHandler()
+    {
+        var testSessionInfo = new TestSessionInfo();
+        var options = new TestPlatformOptions() { TestCaseFilter = "PacMan" };
+
+        _consoleWrapper.RunTests(
+            _testCases,
+            "RunSettings",
+            options,
+            testSessionInfo,
+            new Mock<ITestRunEventsHandler>().Object,
+            _telemetryEventsHandler.Object);
+
+        _mockRequestSender.Verify(
+            rs => rs.StartTestRun(
+                _testCases,
+                "RunSettings",
+                options,
+                testSessionInfo,
+                It.IsAny<ITestRunEventsHandler>(),
+                _telemetryEventsHandler.Object),
             Times.Once);
     }
 
@@ -499,7 +582,7 @@ public class VsTestConsoleWrapperTests
             new Mock<ITestRunEventsHandler>().Object,
             new Mock<ITestHostLauncher>().Object);
 
-        _mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(_testCases, "RunSettings", It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+        _mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(_testCases, "RunSettings", It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<NoOpTelemetryEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
     }
 
     [TestMethod]
@@ -512,7 +595,7 @@ public class VsTestConsoleWrapperTests
             new Mock<ITestRunEventsHandler>().Object,
             new Mock<ITestHostLauncher>().Object);
 
-        _mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(_testCases, "RunSettings", null, null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+        _mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(_testCases, "RunSettings", null, null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<NoOpTelemetryEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
     }
 
     [TestMethod]
@@ -527,7 +610,7 @@ public class VsTestConsoleWrapperTests
             new Mock<ITestRunEventsHandler>().Object,
             new Mock<ITestHostLauncher>().Object);
 
-        _mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(_testCases, "RunSettings", options, null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+        _mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(_testCases, "RunSettings", options, null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<NoOpTelemetryEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
     }
 
     [TestMethod]
@@ -551,6 +634,34 @@ public class VsTestConsoleWrapperTests
                 options,
                 testSessionInfo,
                 It.IsAny<ITestRunEventsHandler>(),
+                It.IsAny<NoOpTelemetryEventsHandler>(),
+                It.IsAny<ITestHostLauncher>()),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void RunTestsWithSelectedTestsAndACustomHostShouldSucceedWhenUsingSessionsWithTelemetryHandler()
+    {
+        var testSessionInfo = new TestSessionInfo();
+        var options = new TestPlatformOptions() { TestCaseFilter = "PacMan" };
+
+        _consoleWrapper.RunTestsWithCustomTestHost(
+            _testCases,
+            "RunSettings",
+            options,
+            testSessionInfo,
+            new Mock<ITestRunEventsHandler>().Object,
+            _telemetryEventsHandler.Object,
+            new Mock<ITestHostLauncher>().Object);
+
+        _mockRequestSender.Verify(
+            rs => rs.StartTestRunWithCustomHost(
+                _testCases,
+                "RunSettings",
+                options,
+                testSessionInfo,
+                It.IsAny<ITestRunEventsHandler>(),
+                _telemetryEventsHandler.Object,
                 It.IsAny<ITestHostLauncher>()),
             Times.Once);
     }
