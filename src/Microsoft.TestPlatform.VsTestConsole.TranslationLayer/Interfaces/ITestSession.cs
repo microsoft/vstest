@@ -87,7 +87,6 @@ public interface ITestSession : IDisposable, ITestSessionAsync
     /// <param name="options">The test platform options.</param>
     /// <param name="testRunEventsHandler">The run event handler.</param>
     /// <param name="telemetryEventsHandler">The telemetry event handler.</param>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     void RunTests(
         IEnumerable<string> sources,
         string runSettings,
@@ -130,7 +129,6 @@ public interface ITestSession : IDisposable, ITestSessionAsync
     /// <param name="options">The test platform options.</param>
     /// <param name="testRunEventsHandler">The run event handler.</param>
     /// <param name="telemetryEventsHandler">The telemetry event handler.</param>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     void RunTests(
         IEnumerable<TestCase> testCases,
         string runSettings,
@@ -178,7 +176,6 @@ public interface ITestSession : IDisposable, ITestSessionAsync
     /// <param name="testRunEventsHandler">The run event handler.</param>
     /// <param name="telemetryEventsHandler">The telemetry event handler.</param>
     /// <param name="customTestHostLauncher">The custom host launcher.</param>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     void RunTestsWithCustomTestHost(
         IEnumerable<string> sources,
         string runSettings,
@@ -227,7 +224,6 @@ public interface ITestSession : IDisposable, ITestSessionAsync
     /// <param name="testRunEventsHandler">The run event handler.</param>
     /// <param name="telemetryEventsHandler">The telemetry event handler.</param>
     /// <param name="customTestHostLauncher">The custom host launcher.</param>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     void RunTestsWithCustomTestHost(
         IEnumerable<TestCase> testCases,
         string runSettings,

@@ -155,7 +155,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void RunTests(
         IEnumerable<string> sources,
         string runSettings,
@@ -200,7 +199,6 @@ public class TestSession : ITestSession
             new NoOpTelemetryEventsHandler());
     }
 
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void RunTests(
         IEnumerable<TestCase> testCases,
         string runSettings,
@@ -250,7 +248,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void RunTestsWithCustomTestHost(
         IEnumerable<string> sources,
         string runSettings,
@@ -302,7 +299,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public void RunTestsWithCustomTestHost(
         IEnumerable<TestCase> testCases,
         string runSettings,
@@ -417,7 +413,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task RunTestsAsync(
         IEnumerable<string> sources,
         string runSettings,
@@ -463,7 +458,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
         string runSettings,
@@ -513,7 +507,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string runSettings,
@@ -565,7 +558,6 @@ public class TestSession : ITestSession
     }
 
     /// <inheritdoc/>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public async Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string runSettings,
