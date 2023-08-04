@@ -62,4 +62,4 @@ dotnet test --%  -- TestRunParameters.Parameter(name="myParam", value="value")
 dotnet test -- TestRunParameters.Parameter\(name=\"myParam\",\ value=\"value\"\) 
 ```
 
-In this example, `\"myParam\"` corresponds to the name of you parameter and `\"value\"` - the value of your parameter. Note, that `\` are escaping characters and they should stay as shown above.
+In this example, `\"myParam\"` corresponds to the name of you parameter and `\"value\"` - the value of your parameter. Note, that `\` are escaping characters and they should stay as shown above, unless you are in PowerShell 7.3+. For more examples in PowerShell, such as using variables for the data, please [refer here](https://github.com/microsoft/vstest/issues/4637).
