@@ -57,6 +57,9 @@ internal partial class FeatureFlag : IFeatureFlag
     // Disable the SerialTestRunDecorator
     public const string DISABLE_SERIALTESTRUN_DECORATOR = VSTEST_ + nameof(DISABLE_SERIALTESTRUN_DECORATOR);
 
+    // Disable setting UTF8 encoding in console.
+    public const string DISABLE_UTF8_CONSOLE_ENCODING = VSTEST_ + nameof(DISABLE_UTF8_CONSOLE_ENCODING);
+
     [Obsolete("Only use this in tests.")]
     internal static void Reset()
     {
