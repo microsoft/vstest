@@ -439,10 +439,15 @@ internal class Executor
         if (!isDiag)
         {
             var end = Product.Version?.IndexOf("-release");
-
             if (end >= 0)
             {
                 assemblyVersion = Product.Version?.Substring(0, end.Value);
+            }
+
+            end = assemblyVersion?.IndexOf("+");
+            if (end >= 0)
+            {
+                assemblyVersion = assemblyVersion?.Substring(0, end.Value);
             }
         }
 
