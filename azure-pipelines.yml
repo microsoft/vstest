@@ -87,6 +87,8 @@ variables:
     - name: VisualStudioDropName
       value: Products/$(System.TeamProject)/$(Build.DefinitionName)/$(Build.SourceBranchName)/$(Build.BuildNumber)
     - name: _InternalBuildArgs
+      # IncludeSourceRevisionInInformationalVersion prevents ProductVersion (on file), and AssemblyInformationalVersion
+      # from appending +<commitId>, which breaks DTAAgent.
       value: /p:DotNetSignType=$(_SignType)
         /p:TeamName=$(_TeamName)
         /p:DotNetFinalVersionKind=$(_ReleaseVersionKind)
@@ -96,6 +98,7 @@ variables:
         /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
         /p:VisualStudioDropName=$(VisualStudioDropName)
         /p:GenerateSbom=true
+        /p:IncludeSourceRevisionInInformationalVersion=false
 
 stages:
 
@@ -152,9 +155,11 @@ stages:
           displayName: Build
 
         # -ci is allowing to import some environment variables and some required configurations
+        # -nobl avoid overwriting binlog of the main Build
         - script: Test.cmd
             -configuration $(_BuildConfig)
             -ci
+            -nobl
             -integrationTest
             -performanceTest
           name: Test
