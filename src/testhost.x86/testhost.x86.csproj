@@ -17,6 +17,13 @@
     <OutputType>Exe</OutputType>
     <IsTestProject>false</IsTestProject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!--
+    NETSDK1201: For projects targeting .NET 8.0 and higher, specifying a RuntimeIdentifier will no longer produce a
+    self contained app by default. To continue building self-contained apps, set the SelfContained property to true
+    or use the -\-self-contained argument.
+    -->
+    <MSBuildWarningsAsMessages>NETSDK1201</MSBuildWarningsAsMessages>
+    <NoWarn>$(NoWarn);NETSDK1201</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) ">
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
