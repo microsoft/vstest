@@ -35,6 +35,8 @@
     <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>17.6.33910.51</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
     <MicrosoftVisualStudioEnterpriseAspNetHelper>$(MicrosoftVisualStudioDiagnosticsUtilitiesVersion)</MicrosoftVisualStudioEnterpriseAspNetHelper>
     <MicrosoftVisualStudioInteropVersion>17.3.32622.426</MicrosoftVisualStudioInteropVersion>
+    <MicrosoftVSTelemetryVersion>17.6.46</MicrosoftVSTelemetryVersion>
+    <MicrosoftVSUtilitiesInternalVersion>16.3.42</MicrosoftVSUtilitiesInternalVersion>
     <MicrosoftVSSDKBuildToolsVersion>17.4.2116</MicrosoftVSSDKBuildToolsVersion>
     <NewtonsoftJsonVersion>13.0.1</NewtonsoftJsonVersion>
     <RoslynBannedApiAnalyzersVersion>3.3.3</RoslynBannedApiAnalyzersVersion>
