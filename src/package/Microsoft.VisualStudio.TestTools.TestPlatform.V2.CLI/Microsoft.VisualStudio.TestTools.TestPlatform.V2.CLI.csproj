@@ -291,6 +291,9 @@
       <VsixSourceItem Include="$(FileSystemGlobbingFolder)Microsoft.Extensions.FileSystemGlobbing.dll" />
       <VsixSourceItem Include="$(VSSDKBuildToolsFolder)System.Diagnostics.DiagnosticSource.dll" />
       <VsixSourceItem Include="$(VSSDKBuildToolsFolder)System.Runtime.CompilerServices.Unsafe.dll" />
+      <VsixSourceItem Include="$(VSSDKBuildToolsFolder)System.Runtime.CompilerServices.Unsafe.dll">
+        <VSIXSubPath>Extensions</VSIXSubPath>
+      </VsixSourceItem>
       <VsixSourceItem Include="$(VSQualityToolsFolder)*" Exclude="$(VSQualityToolsFolder)*.pdb" />
     </ItemGroup>
 
