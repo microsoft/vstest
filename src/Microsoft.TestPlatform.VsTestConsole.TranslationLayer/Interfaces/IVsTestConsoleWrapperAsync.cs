@@ -21,6 +21,7 @@ public interface IVsTestConsoleWrapperAsync
     /// <summary>
     /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.StartSession"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task StartSessionAsync();
 
     /// <summary>
@@ -30,7 +31,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     string,
     ///     ITestSessionEventsHandler)"/>.
     /// </summary>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
@@ -44,7 +45,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestPlatformOptions,
     ///     ITestSessionEventsHandler)"/>.
     /// </summary>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
@@ -60,7 +61,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestSessionEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task<ITestSession?> StartTestSessionAsync(
         IList<string> sources,
         string? runSettings,
@@ -74,7 +75,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestSessionInfo,
     ///     ITestSessionEventsHandler)"/>.
     /// </summary>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task<bool> StopTestSessionAsync(
         TestSessionInfo? testSessionInfo,
         ITestSessionEventsHandler eventsHandler);
@@ -97,6 +98,7 @@ public interface IVsTestConsoleWrapperAsync
     /// IVsTestConsoleWrapper.InitializeExtensions(
     ///     IEnumerable{string})"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task InitializeExtensionsAsync(IEnumerable<string> pathToAdditionalExtensions);
 
     /// <summary>
@@ -106,6 +108,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     string,
     ///     ITestDiscoveryEventsHandler)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task DiscoverTestsAsync(
         IEnumerable<string> sources,
         string? discoverySettings,
@@ -119,6 +122,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestPlatformOptions,
     ///     ITestDiscoveryEventsHandler2)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task DiscoverTestsAsync(
         IEnumerable<string> sources,
         string? discoverySettings,
@@ -134,6 +138,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestSessionInfo,
     ///     ITestDiscoveryEventsHandler2)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task DiscoverTestsAsync(
         IEnumerable<string> sources,
         string? discoverySettings,
@@ -144,6 +149,7 @@ public interface IVsTestConsoleWrapperAsync
     /// <summary>
     /// See <see cref="IVsTestConsoleWrapper.CancelDiscovery"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     void CancelDiscovery();
 
     /// <summary>
@@ -153,6 +159,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     string,
     ///     ITestRunEventsHandler)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -166,6 +173,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestPlatformOptions,
     ///     ITestRunEventsHandler)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -181,6 +189,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestSessionInfo,
     ///     ITestRunEventsHandler)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -191,10 +200,30 @@ public interface IVsTestConsoleWrapperAsync
     /// <summary>
     /// Asynchronous equivalent of <see cref="
     /// IVsTestConsoleWrapper.RunTests(
+    ///     IEnumerable{string},
+    ///     string,
+    ///     TestPlatformOptions,
+    ///     TestSessionInfo,
+    ///     ITestRunEventsHandler,
+    ///     ITelemetryEventsHandler)"/>.
+    /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
+    Task RunTestsAsync(
+        IEnumerable<string> sources,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler);
+
+    /// <summary>
+    /// Asynchronous equivalent of <see cref="
+    /// IVsTestConsoleWrapper.RunTests(
     ///     IEnumerable{TestCase},
     ///     string,
     ///     ITestRunEventsHandler)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -208,6 +237,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestPlatformOptions,
     ///     ITestRunEventsHandler)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -223,6 +253,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestSessionInfo,
     ///     ITestRunEventsHandler)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -232,12 +263,32 @@ public interface IVsTestConsoleWrapperAsync
 
     /// <summary>
     /// Asynchronous equivalent of <see cref="
+    ///     IVsTestConsoleWrapper.RunTests(
+    ///     IEnumerable{TestCase},
+    ///     string,
+    ///     TestPlatformOptions,
+    ///     TestSessionInfo,
+    ///     ITestRunEventsHandler,
+    ///     ITelemetryEventsHandler)"/>.
+    /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
+    Task RunTestsAsync(
+        IEnumerable<TestCase> testCases,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler);
+
+    /// <summary>
+    /// Asynchronous equivalent of <see cref="
     /// IVsTestConsoleWrapper.RunTestsWithCustomTestHost(
     ///     IEnumerable{string},
     ///     string,
     ///     ITestRunEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -253,6 +304,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestRunEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -270,6 +322,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestRunEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -281,11 +334,33 @@ public interface IVsTestConsoleWrapperAsync
     /// <summary>
     /// Asynchronous equivalent of <see cref="
     /// IVsTestConsoleWrapper.RunTestsWithCustomTestHost(
+    ///     IEnumerable{string},
+    ///     string,
+    ///     TestPlatformOptions,
+    ///     TestSessionInfo,
+    ///     ITestRunEventsHandler,
+    ///     ITelemetryEventsHandler,
+    ///     ITestHostLauncher)"/>.
+    /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
+    Task RunTestsWithCustomTestHostAsync(
+        IEnumerable<string> sources,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
+        ITestHostLauncher customTestHostLauncher);
+
+    /// <summary>
+    /// Asynchronous equivalent of <see cref="
+    /// IVsTestConsoleWrapper.RunTestsWithCustomTestHost(
     ///     IEnumerable{TestCase},
     ///     string,
     ///     ITestRunEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -301,6 +376,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestRunEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -318,22 +394,46 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestRunEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
         TestPlatformOptions? options,
         TestSessionInfo? testSessionInfo,
         ITestRunEventsHandler testRunEventsHandler,
+        ITestHostLauncher customTestHostLauncher);
+
+    /// <summary>
+    /// Asynchronous equivalent of <see cref="
+    /// IVsTestConsoleWrapper.RunTestsWithCustomTestHost(
+    ///     IEnumerable{TestCase},
+    ///     string,
+    ///     TestPlatformOptions,
+    ///     TestSessionInfo,
+    ///     ITestRunEventsHandler,
+    ///     ITelemetryEventsHandler,
+    ///     ITestHostLauncher)"/>.
+    /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
+    Task RunTestsWithCustomTestHostAsync(
+        IEnumerable<TestCase> testCases,
+        string? runSettings,
+        TestPlatformOptions? options,
+        TestSessionInfo? testSessionInfo,
+        ITestRunEventsHandler testRunEventsHandler,
+        ITelemetryEventsHandler telemetryEventsHandler,
         ITestHostLauncher customTestHostLauncher);
 
     /// <summary>
     /// See <see cref="IVsTestConsoleWrapper.CancelTestRun"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     void CancelTestRun();
 
     /// <summary>
     /// See <see cref="IVsTestConsoleWrapper.AbortTestRun"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     void AbortTestRun();
 
     /// <summary>
@@ -381,5 +481,6 @@ public interface IVsTestConsoleWrapperAsync
     /// <summary>
     /// See <see cref="IVsTestConsoleWrapper.EndSession"/>.
     /// </summary>
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     void EndSession();
 }
