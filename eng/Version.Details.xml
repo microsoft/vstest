@@ -28,6 +28,11 @@
       <Uri>https://github.com/nuget/nuget.client</Uri>
       <Sha>4ba7bfa82f894ec32a554ca8d2df143675c85735</Sha>
     </Dependency>
+    <!-- Necessary for source-build. This allows the live version of the package to be used by source-build. -->
+    <Dependency Name="System.ComponentModel.Composition" Version="4.5.0">
+      <Uri>https://github.com/dotnet/corefx</Uri>
+      <Sha>30ab651fcb4354552bd4891619a0bdd81e0ebdbf</Sha>
+    </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
     <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="8.0.0-beta.23364.2">
