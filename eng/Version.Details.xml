@@ -19,9 +19,9 @@
       <Sha>e3cc6c792114ebdfe6627742d2820dbe1ae5bc47</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.23414.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.23451.1">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>45f5554ac6813e1e155c47fd80ec146c684f65e8</Sha>
+      <Sha>0030d238c7929b0e9b06576837b60ad90037b1d2</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="NuGet.Frameworks" Version="6.5.0">
