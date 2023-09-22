@@ -90,10 +90,6 @@
     <VSTestConsoleMostDownloadedVersion>[16.6.1]</VSTestConsoleMostDownloadedVersion>
     <VSTestConsolePreviousStableVersion>[16.11.0]</VSTestConsolePreviousStableVersion>
     <VSTestConsoleLegacyStableVersion>[15.9.2]</VSTestConsoleLegacyStableVersion>
-    <!-- This version also needs to be updated in src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.nuspec -->
-    <!-- This version needs to be the same or lower than <NuGetFrameworksPackageVersion> https://github.com/dotnet/sdk/blob/release/main/eng/Versions.props
-    (or the respective branch. It also needs to be on nuget.org. -->
-    <NuGetFrameworksVersion>6.5.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
   </PropertyGroup>
 </Project>
