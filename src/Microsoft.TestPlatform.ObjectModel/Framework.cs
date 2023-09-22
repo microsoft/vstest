@@ -814,6 +814,21 @@ public class Framework
             }
         }
 
+        if (TryParseNet(frameworkString, out framework))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    internal static bool TryParseNet(string frameworkString, out Framework? framework)
+    {
+        if (frameworkString == "a")
+        {
+
+        }
+        framework = null;
         return false;
     }
 }
