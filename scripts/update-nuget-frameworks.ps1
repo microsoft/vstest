@@ -1,6 +1,24 @@
+param (
+    [String] $VersionTag = "6.8.0.117"
+)
+
 $root = Resolve-Path "$PSScriptRoot/.."
 
-$source = "S:\c\NuGet.Client"
+$source = "$root/artifacts/tmp/NuGet.Client"
+
+if (Test-Path $source) { 
+    Remove-Item -Recurse -Force $source
+}
+
+git clone --depth 1 --branch $VersionTag https://github.com/NuGet/NuGet.Client.git $source
+if (0 -ne $LASTEXITCODE) {
+    throw "Cloning failed."
+}
+
+$commit = git -C $source log -1 --pretty=format:"%h"
+if (0 -ne $LASTEXITCODE) {
+    throw "Getting commit failed."
+}
 
 $destination = "$root/src/Microsoft.TestPlatform.ObjectModel/Nuget.Frameworks/"
 
@@ -82,3 +100,14 @@ dotnet_diagnostic.IDE1006.severity = none
     }
     $finalContent | Set-Content -Path $path -Encoding utf8NoBOM
 }
+
+
+@"
+This directory contains code that is copied from https://github.com/NuGet/NuGet.Client/tree/dev/src/NuGet.Core/NuGet.Frameworks, with the namespaces changed
+and class visibility changed. This is done to ensure we are providing the same functionality as Nuget.Frameworks, without depending on the package explicitly.
+
+The files in this folder are coming from tag $VersionTag, on commit $commit.
+
+To update this code, run the script in: $($PSCommandPath -replace [regex]::Escape($root)) , with -VersionTag <theDesiredVersion>.
+
+"@ | Set-Content "$destination/README.md" 
