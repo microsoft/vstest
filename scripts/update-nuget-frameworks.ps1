@@ -110,4 +110,9 @@ The files in this folder are coming from tag $VersionTag, on commit $commit.
 
 To update this code, run the script in: $($PSCommandPath -replace [regex]::Escape($root)) , with -VersionTag <theDesiredVersion>.
 
-"@ | Set-Content "$destination/README.md" 
+"@ | Set-Content "$destination/README.md"
+
+$tpnPath = "$root/src/package/ThirdPartyNotices.txt"
+$tpn = Get-Content $tpnPath -Raw
+$tpn = $tpn -replace "Nuget.Client version.*\(", "Nuget.Client version $versionTag \("
+$tpn | Set-Content -Path $tpnPath -Encoding utf8NoBOM -NoNewline
