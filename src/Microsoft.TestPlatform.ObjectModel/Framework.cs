@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 using System.Globalization;
 
 using NuGetClone.Frameworks;
+using System;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -40,9 +41,9 @@ public class Framework
     public string FrameworkName { get; private set; }
 
     /// <summary>
-    /// Common short name, as well as directory name, such as net5.0.
+    /// Common short name, as well as directory name, such as net5.0. Is null when the framework is not correct.
     /// </summary>
-    public string ShortName { get; private set; }
+    public string? ShortName { get; private set; }
 
     /// <summary>
     /// Gets the framework version.
@@ -61,7 +62,8 @@ public class Framework
             return null;
         }
 
-        string name, frameworkName, shortName, version;
+        string name, frameworkName, version;
+        string? shortName = null;
         try
         {
             // IDE always sends framework in form of ENUM, which always throws exception
@@ -103,7 +105,16 @@ public class Framework
             // e.g. .NETFramework,Version=v3.5
             name = nugetFramework.DotNetFrameworkName;
             // e.g. net35
-            shortName = nugetFramework.GetShortFolderName();
+            try
+            {
+                // .NETPortable4.5 for example, is not a valid framework
+                // and this will throw.
+                shortName = nugetFramework.GetShortFolderName();
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error(ex);
+            }
             // e.g. .NETFramework
             frameworkName = nugetFramework.Framework;
             // e.g. 3.5.0.0

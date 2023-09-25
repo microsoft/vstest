@@ -24,7 +24,6 @@ $destination = "$root/src/Microsoft.TestPlatform.ObjectModel/Nuget.Frameworks/"
 
 $frameworksPath = "$source/src/NuGet.Core/NuGet.Frameworks"
 $frameworkItems = @(
-    "Strings.Designer.cs"
     "DefaultFrameworkMappings.cs"
     "DefaultFrameworkNameProvider.cs"
     "DefaultPortableFrameworkMappings.cs"
