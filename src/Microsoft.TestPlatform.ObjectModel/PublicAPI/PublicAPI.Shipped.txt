@@ -970,5 +970,4 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.DirectoryBasedTestDiscovererAttr
 Microsoft.VisualStudio.TestPlatform.ObjectModel.DirectoryBasedTestDiscovererAttribute.DirectoryBasedTestDiscovererAttribute() -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Framework.FrameworkName.get -> string!
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Framework.ShortName.get -> string!
-static Microsoft.VisualStudio.TestPlatform.ObjectModel.Framework.GetShortFolderName(string! frameworkName) -> string!
 

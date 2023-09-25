@@ -487,7 +487,7 @@ public class TrxLogger : ITestLoggerWithParameters
             {
                 if (_parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var framework) && framework != null)
                 {
-                    framework = Framework.GetShortFolderName(framework);
+                    framework = Framework.FromString(framework)?.ShortName ?? framework;
                     logFilePrefixValue = logFilePrefixValue + "_" + framework;
                 }
 

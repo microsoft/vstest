@@ -222,7 +222,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         }
 
         parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out _targetFramework);
-        _targetFramework = !_targetFramework.IsNullOrEmpty() ? Framework.GetShortFolderName(_targetFramework) : _targetFramework;
+        _targetFramework = Framework.FromString(_targetFramework)?.ShortName ?? _targetFramework;
 
         Initialize(events, string.Empty);
     }

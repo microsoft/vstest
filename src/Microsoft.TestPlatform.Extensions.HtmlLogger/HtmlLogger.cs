@@ -283,7 +283,7 @@ public class HtmlLogger : ITestLoggerWithParameters
             var framework = _parametersDictionary[DefaultLoggerParameterNames.TargetFramework];
             if (framework != null)
             {
-                framework = Framework.GetShortFolderName(framework);
+                framework = Framework.FromString(framework)?.ShortName ?? framework;
                 logFilePrefixValue = logFilePrefixValue + "_" + framework;
             }
 
