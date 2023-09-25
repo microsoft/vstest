@@ -4,6 +4,8 @@
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.ObjectModel</AssemblyName>
     <TargetFrameworks>net7.0;$(NetFrameworkMinimum);$(NetCoreAppMinimum);netstandard2.0;</TargetFrameworks>
+    <!-- Suppress warning that is caused by Nuget.Frameworks code that we copy. -->
+    <NoWarn>$(NoWarn);SYSLIB0051</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
