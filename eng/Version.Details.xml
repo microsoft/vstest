@@ -24,10 +24,6 @@
       <Sha>0030d238c7929b0e9b06576837b60ad90037b1d2</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="NuGet.Frameworks" Version="6.5.0">
-      <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>4ba7bfa82f894ec32a554ca8d2df143675c85735</Sha>
-    </Dependency>
     <!-- Necessary for source-build. This allows the live version of the package to be used by source-build. -->
     <Dependency Name="System.ComponentModel.Composition" Version="4.5.0">
       <Uri>https://github.com/dotnet/corefx</Uri>
