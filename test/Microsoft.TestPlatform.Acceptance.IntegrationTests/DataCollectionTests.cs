@@ -26,7 +26,7 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll");
+        var assemblyPaths = GetAssetFullPath("SimpleTestProject2.dll");
         string runSettings = GetRunsettingsFilePath(TempDirectory.Path);
         string diagFileName = Path.Combine(TempDirectory.Path, "diaglog.txt");
         var extensionsPath = Path.GetDirectoryName(GetTestDllForFramework("OutOfProcDataCollector.dll", runnerInfo.RunnerFramework));
@@ -51,7 +51,7 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject2.dll");
+        var assemblyPaths = GetAssetFullPath("SimpleTestProject2.dll");
         string diagFileName = Path.Combine(TempDirectory.Path, "diaglog.txt");
         var extensionsPath = Path.GetDirectoryName(GetTestDllForFramework("OutOfProcDataCollector.dll", runnerInfo.RunnerFramework));
 
@@ -101,8 +101,8 @@ public class DataCollectionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll");
-        var secondAssemblyPath = BuildMultipleAssemblyPath("SimpleTestProject2.dll");
+        var assemblyPath = GetAssetFullPath("SimpleTestProject.dll");
+        var secondAssemblyPath = GetAssetFullPath("SimpleTestProject2.dll");
         string runSettings = GetRunsettingsFilePath(TempDirectory.Path);
         string diagFileName = Path.Combine(TempDirectory.Path, "diaglog.txt");
         var extensionsPath = Path.GetDirectoryName(GetTestDllForFramework("AttachmentProcessorDataCollector.dll", "netstandard2.0"));

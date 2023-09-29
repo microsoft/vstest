@@ -21,7 +21,7 @@ public class MultitargetingTestHostTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPath = BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll");
+        var assemblyPath = GetAssetFullPath("MultitargetedNetFrameworkProject.dll");
         var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
 
         // Tell the test project which target framework we are expecting it to run as.

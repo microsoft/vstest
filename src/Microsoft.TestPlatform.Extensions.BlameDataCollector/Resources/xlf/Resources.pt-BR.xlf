@@ -7,8 +7,8 @@
 The test running when the crash occurred: 
 {0}
 This test may, or may not be the source of the crash.</source>
-        <target state="needs-review-translation">A Execução de Teste ativa foi anulada porque o processo do host foi encerrado inesperadamente. Inspecione a pilha de chamadas acima, caso ela esteja disponível, para obter mais informações sobre a origem da exceção.
-O teste em execução quando a falha ocorreu:
+        <target state="translated">A Execução de Teste ativa foi anulada porque o processo do host foi encerrado inesperadamente. Inspecione a pilha de chamadas acima, caso ela esteja disponível, para obter mais informações sobre a origem da exceção.
+O teste em execução quando a falha ocorreu: 
 {0}
 Esse teste pode ser a origem da falha ou não.</target>
         <note>{0} is a single test (or in rare cases multiple tests) that were running when test host crashed.</note>
@@ -55,7 +55,7 @@ Esse teste pode ser a origem da falha ou não.</target>
       </trans-unit>
       <trans-unit id="NotGeneratingSequenceFile">
         <source>All tests finished running, Sequence file will not be generated</source>
-        <target state="needs-review-translation">A execução de todos os testes foi concluída. O arquivo de sequência não será gerado.</target>
+        <target state="translated">A execução de todos os testes foi concluída. O arquivo de sequência não será gerado.</target>
         <note>"Sequence" is the name of the file. No . at the end, because this is a blame message and the . will be added automatically.</note>
       </trans-unit>
       <trans-unit id="Dumping">

@@ -19,7 +19,7 @@
       </trans-unit>
       <trans-unit id="CommandLineWarning">
         <source>Warning: {0}</source>
-        <target state="needs-review-translation">警告: {0}</target>
+        <target state="translated">警告: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="Error_ArgumentIsEmpty">

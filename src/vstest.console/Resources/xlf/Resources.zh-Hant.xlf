@@ -107,7 +107,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;記錄器 URI/易記名稱&gt;
+        <target state="translated">--logger|/logger:&lt;記錄器 URI/易記名稱&gt;
       指定測試結果的記錄器。例如，使用 /logger:trx[;LogFileName=&lt;預設為唯一的檔案名稱&gt;]，
       將結果記錄至 Visual Studio 測試結果檔案 (TRX)
       以指定的 LogFileName，在 TestResults 目錄中建立檔案。
@@ -213,9 +213,9 @@
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="needs-review-translation">--InIsolation|/InIsolation
-      在隔離的處理序中執行測試。這樣會降低 vstest.console.exe
-      處理序在測試中發生錯誤而停止的可能性，但是測試
+        <target state="translated">--InIsolation|/InIsolation
+      在隔離的處理序中執行測試。這樣會降低 vstest.console.exe 
+      處理序在測試中發生錯誤而停止的可能性，但是測試 
       可能會執行得較慢。</target>
         <note />
       </trans-unit>
@@ -224,8 +224,8 @@
       This makes vstest.console.exe process use or skip the VSIX extensions 
       installed(if any) in the test run. 
       Example  /UseVsixExtensions:true</source>
-        <target state="needs-review-translation">/UseVsixExtensions
-      這可讓 vstest.console.exe 處理序使用或略過測試回合中
+        <target state="translated">/UseVsixExtensions
+      這可讓 vstest.console.exe 處理序使用或略過測試回合中 
       已安裝的 VSIX 延伸模組 (如果有的話)。
       範例  /UseVsixExtensions:true</target>
         <note />
@@ -245,8 +245,8 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="needs-review-translation">  執行測試:
-    &gt;vstest.console.exe tests.dll
+        <target state="translated">  執行測試:
+    &gt;vstest.console.exe tests.dll 
   執行測試，同時附上像是資料收集器等其他設定:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
         <note />
@@ -390,7 +390,7 @@
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
-        <target state="needs-review-translation">--Platform|/Platform:&lt;平台類型&gt;
+        <target state="translated">--Platform|/Platform:&lt;平台類型&gt;
       用於測試執行的目標平台架構。
       有效值為 x86、x64 和 ARM。</target>
         <note />
@@ -405,8 +405,8 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="needs-review-translation">--Framework|/Framework:&lt;Framework 版本&gt;
-      用於測試執行的目標.Net Framework 版本。
+        <target state="translated">--Framework|/Framework:&lt;Framework 版本&gt;
+      用於測試執行的目標.Net Framework 版本。 
       有效的值為 ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" 等等。
       其他支援的值為 Framework40、Framework45、FrameworkCore10 與 FrameworkUap10。</target>
         <note />
@@ -518,7 +518,7 @@
       This makes vstest.console.exe process use custom test adapters
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
-        <target state="needs-review-translation">--TestAdapterPath|/TestAdapterPath
+        <target state="translated">--TestAdapterPath|/TestAdapterPath
       這可讓 vstest.console.exe 處理序在測試回合中，
       使用指定路徑 (如有指定) 中的自訂測試配接器。
       範例 /TestAdapterPath:&lt;自訂配接器的路徑&gt;</target>
@@ -802,7 +802,7 @@
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="needs-review-translation">RunSettings 引數:
+        <target state="translated">RunSettings 引數:
       透過命令列傳遞 runsettings 組態的引數。引數可以接在 "-- " 之後，以 [名稱]=[值] 的格式指定名稱/值配對。請注意 -- 之後的空格。
       使用空格以隔開多個 [名稱]=[值]。
       RunSettings 引數支援的詳細資訊: https://aka.ms/vstest-runsettings-arguments</target>
@@ -872,14 +872,14 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       以 blame 模式執行測試。此選項在隔離造成測試主機當機的問題測試時相當實用。
       它會在目前的目錄建立輸出檔案 "Sequence.xml"，
       該檔案會擷取當機前的測試執行順序。
       您也可以選擇收集測試主機的處理序傾印。
       當您選擇收集傾印時，預設會在當機時收集迷你傾印／
       您也可以選擇使用一些選用參數來覆寫此預設行為:
-      CollectAlways - 即使沒有當機，也在離開時收集傾印 (true/false)
+      CollectAlways - 即使沒有當機，也在離開時收集傾印 (true/false) 
       DumpType - 指定傾印類型 (mini/full)。
       範例: /Blame
                /Blame:CollectDump
@@ -958,7 +958,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;記錄器 URI/易記名稱&gt;
+        <target state="translated">--logger|/logger:&lt;記錄器 URI/易記名稱&gt;
       指定測試結果的記錄器。例如，使用 /logger:trx[;LogFileName=&lt;預設為唯一的檔案名稱&gt;]，
       將結果記錄至 Visual Studio 測試結果檔案 (TRX)
       以指定的 LogFileName，在 TestResults 目錄中建立檔案。
@@ -1078,9 +1078,9 @@
       Example: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
                -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
-        <target state="needs-review-translation">-e|--Environment|/e|/Environment: &lt;NAME&gt;=&lt;VALUE&gt;
+        <target state="translated">-e|--Environment|/e|/Environment: &lt;NAME&gt;=&lt;VALUE&gt;
       設定環境變數的值。若變數不存在，則加以建立；若有則予以覆寫。這表示 /InIsolation 會在隔離流程中將測試切換並強制執行。
-
+      
       此引數可供多次指定，以提供多項變數。
 
       範例: -e:VARIABLE1=VALUE1
@@ -1124,7 +1124,7 @@
         - NextToSource: Load adapters next to source. 
 
         - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
-        <target state="needs-review-translation">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
       這會影響介面卡載入行為。
 
       目前支援的行:
@@ -1132,7 +1132,7 @@
                     如果提供特定介面卡路徑，將會載入介面卡; 如果目錄路徑是直接在該資料夾中提供介面卡，則會載入，除非同時指定 [Recursive] 選項。
                     如果沒有指定介面卡路徑，測試回合將會失敗。
                     這會隱含 /InIsolation 切換參數，並強制在隔離的處理常式中執行測試。
-
+        
         - Default: 如果尚未指定此引數，則測試平台會載入介面卡。
                    它會從來源旁邊、提供的額外介面卡路徑以及預設目錄中挑選擴充功能。
 

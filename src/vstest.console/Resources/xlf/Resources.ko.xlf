@@ -107,8 +107,8 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      테스트 결과의 로거를 지정합니다. 예를 들어
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      테스트 결과의 로거를 지정합니다. 예를 들어 
       Visual Studio TRX(테스트 결과 파일)에 결과를 기록하려면 /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]를 사용합니다.
       지정된 LogFileName으로 TestResults 디렉터리에서 파일을 만듭니다.
 
@@ -213,9 +213,9 @@
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="needs-review-translation">--InIsolation|/InIsolation
-      격리 모드에서 테스트를 실행합니다. 이렇게 하면 테스트에서 오류가 발생해도
-      vstest.console.exe가 중지될 가능성이 작아지지만 테스트 실행 속도가
+        <target state="translated">--InIsolation|/InIsolation
+      격리 모드에서 테스트를 실행합니다. 이렇게 하면 테스트에서 오류가 발생해도 
+      vstest.console.exe가 중지될 가능성이 작아지지만 테스트 실행 속도가 
       느려질 수 있습니다.</target>
         <note />
       </trans-unit>
@@ -224,9 +224,9 @@
       This makes vstest.console.exe process use or skip the VSIX extensions 
       installed(if any) in the test run. 
       Example  /UseVsixExtensions:true</source>
-        <target state="needs-review-translation">/UseVsixExtensions
-      이 옵션을 사용하면 vstest.console.exe 프로세스가 테스트 실행에서 설치된 VSIX 확장(있는 경우)을
-      사용하거나 건너뛸 수 있습니다.
+        <target state="translated">/UseVsixExtensions
+      이 옵션을 사용하면 vstest.console.exe 프로세스가 테스트 실행에서 설치된 VSIX 확장(있는 경우)을 
+      사용하거나 건너뛸 수 있습니다. 
       예:  /UseVsixExtensions:true</target>
         <note />
       </trans-unit>
@@ -245,8 +245,8 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="needs-review-translation">  테스트를 실행하려면:
-    &gt;vstest.console.exe tests.dll
+        <target state="translated">  테스트를 실행하려면:
+    &gt;vstest.console.exe tests.dll 
   데이터 수집기와 같은 추가 설정을 사용하여 테스트를 실행하려면:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
         <note />
@@ -315,7 +315,7 @@
       Examples: /Tests:TestMethod1
                 /Tests:TestMethod1,testMethod2</source>
         <target state="translated">--Tests|/Tests:&lt;Test Names&gt;
-      제공된 값과 일치하는 이름으로 테스트를 실행합니다. 여러 값을 제공하려면
+      제공된 값과 일치하는 이름으로 테스트를 실행합니다. 여러 값을 제공하려면 
       쉼표로 구분합니다.
       예: /Tests:TestMethod1
                 /Tests:TestMethod1,testMethod2</target>
@@ -390,8 +390,8 @@
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
-        <target state="needs-review-translation">--Platform|/Platform:&lt;Platform type&gt;
-      테스트를 실행하는 데 사용할 대상 플랫폼 아키텍처입니다.
+        <target state="translated">--Platform|/Platform:&lt;Platform type&gt;
+      테스트를 실행하는 데 사용할 대상 플랫폼 아키텍처입니다. 
       유효한 값은 x86, x64 및 ARM입니다.</target>
         <note />
       </trans-unit>
@@ -405,8 +405,8 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="needs-review-translation">--Framework|/Framework:&lt;Framework Version&gt;
-      테스트 실행에 사용할 대상 .NET Framework 버전입니다.
+        <target state="translated">--Framework|/Framework:&lt;Framework Version&gt;
+      테스트 실행에 사용할 대상 .NET Framework 버전입니다. 
       유효한 값은 ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" 등입니다.
       기타 지원되는 값은 Framework40, Framework45, FrameworkCore10 및 FrameworkUap10입니다.</target>
         <note />
@@ -518,9 +518,9 @@
       This makes vstest.console.exe process use custom test adapters
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
-        <target state="needs-review-translation">--TestAdapterPath|/TestAdapterPath
+        <target state="translated">--TestAdapterPath|/TestAdapterPath
       이 옵션을 사용하면 vstest.console.exe 프로세스가 테스트 실행 시
-      지정된 경로(있는 경우)에서 사용자 지정 테스트 어댑터를 사용합니다.
+      지정된 경로(있는 경우)에서 사용자 지정 테스트 어댑터를 사용합니다. 
       예:  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</target>
         <note />
       </trans-unit>
@@ -802,8 +802,8 @@
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="needs-review-translation">RunSettings 인수:
-      명령줄을 통해 runsettings 구성을 전달하기 위한 인수입니다. 인수는 "--" 뒤에 [name]=[value] 형식의 이름-값 쌍으로 지정할 수 있습니다. -- 뒤의 공백에 주의하세요.
+        <target state="translated">RunSettings 인수:
+      명령줄을 통해 runsettings 구성을 전달하기 위한 인수입니다. 인수는 "--" 뒤에 [name]=[value] 형식의 이름-값 쌍으로 지정할 수 있습니다. -- 뒤의 공백에 주의하세요. 
       여러 [name]=[value]를 구분하려면 공백을 사용합니다.
       RunSettings 인수 지원에 대한 자세한 정보: https://aka.ms/vstest-runsettings-arguments</target>
         <note />
@@ -872,14 +872,14 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       원인 모드에서 테스트를 실행합니다. 이 옵션은 테스트 호스트 크래시를 유발하는 문제 있는 테스트를 격리하는 데 유용합니다.
       이 경우 현재 디렉터리에 "Sequence.xml"라는 출력 파일을 만들며,
       이 파일에는 크래시 이전 테스트 실행 순서가 캡처되어 있습니다.
       필요에 따라 테스트 호스트에 대한 프로세스 덤프를 수집하도록 선택할 수 있습니다.
       덤프를 수집하도록 선택하는 경우 기본적으로 크래시에 대한 미니 덤프가 수집됩니다.
       다음과 같은 몇 가지 선택적 매개 변수로 이 기본 동작을 재정의하도록 선택할 수도 있습니다.
-      CollectAlways - 크래시가 없는 경우에도 종료 시 덤프를 수집함(true/false)
+      CollectAlways - 크래시가 없는 경우에도 종료 시 덤프를 수집함(true/false) 
       DumpType - 덤프 유형을 지정함(mini/full).
       예: /Blame
                /Blame:CollectDump
@@ -958,8 +958,8 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="needs-review-translation">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      테스트 결과의 로거를 지정합니다. 예를 들어
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      테스트 결과의 로거를 지정합니다. 예를 들어 
       Visual Studio TRX(테스트 결과 파일)에 결과를 기록하려면 /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]를 사용합니다.
       지정된 LogFileName으로 TestResults 디렉터리에서 파일을 만듭니다.
 
@@ -1078,9 +1078,9 @@
       Example: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
                -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
-        <target state="needs-review-translation">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+        <target state="translated">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
       환경 변수의 값을 설정합니다. 변수가 없는 경우 변수를 만들고, 변수가 있으면 재정의합니다. 이는 /InIsolation 전환을 의미하며 격리된 프로세스에서 테스트를 강제로 실행합니다.
-
+      
       이 인수를 여러 번 지정하여 여러 변수를 제공할 수 있습니다.
 
       예: -e:VARIABLE1=VALUE1
@@ -1124,24 +1124,24 @@
         - NextToSource: Load adapters next to source. 
 
         - Recursive: Recursively search folders when loading adapters. This requires "Explicit" or "NextToSource" to be specified too.</source>
-        <target state="needs-review-translation">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
+        <target state="translated">--TestAdapterLoadingStrategy|/TestAdapterLoadingStrategy:&lt;strategy&gt;
       이는 어댑터 로딩 동작에 영향을 미칩니다.
 
       현재 지원되는 동작:
-      - 명시적: 테스트 플랫폼은 /TestAdapterPath(또는 RunConfiguration.TestAdaptersPaths 노드)에 지정된 어댑터만 로드합니다.
+      - 명시적: 테스트 플랫폼은 /TestAdapterPath(또는 RunConfiguration.TestAdaptersPaths 노드)에 지정된 어댑터만 로드합니다. 
       특정 어댑터 경로가 제공되면 어댑터가 로드됩니다. 디렉터리 경로가 제공되면 재귀 옵션도 지정되지 않는 한 해당 폴더에 직접 어댑터가 로드됩니다.
      어댑터 경로를 지정하지 않으면 테스트 실행이 실패합니다.
    이는 /InIsolation을 전환을 의미하고 테스트가 격리된 프로세스에서 실행되도록 합니다.
-
- - 기본값: 테스트 플랫폼은 이 인수가 지정되지 않은 경우 어댑터를 로드합니다.
+ 
+ - 기본값: 테스트 플랫폼은 이 인수가 지정되지 않은 경우 어댑터를 로드합니다. 
         추가 어댑터 경로를 제공하고 기본 디렉터리에서 소스 옆에 있는 확장 프로그램을 선택합니다.
 
- -      DefaultRuntimeProviders: 테스트 플랫폼과 함께 제공되는 기본 런타임 공급자를 로드합니다.
+ -      DefaultRuntimeProviders: 테스트 플랫폼과 함께 제공되는 기본 런타임 공급자를 로드합니다. 
  '명시적' 옵션이 설정되어 있을 때 지정하지 않으면 테스트 호스트 공급자를 명시적으로 지정해야 합니다.
 
-       - ExtensionsDirectory: Extensions 폴더 내부에 어댑터를 로드합니다.
+       - ExtensionsDirectory: Extensions 폴더 내부에 어댑터를 로드합니다. 
 
-       - NextToSource: 소스 옆에 어댑터를 로드합니다.
+       - NextToSource: 원본 옆에 어댑터를 로드합니다. 
 
         - 재귀: 어댑터를 로드할 때 폴더를 재귀적으로 검색합니다. 이렇게 하려면 "명시적" 또는 "NextToSource"도 지정해야 합니다.</target>
         <note>Do not translate "Default", "DefaultRuntimeProviders", "ExtensionsDirectory", "NextToSource" or "Recursive".</note>
@@ -1226,7 +1226,7 @@
       </trans-unit>
       <trans-unit id="VSTestDeprecationMessage">
         <source>The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.</source>
-        <target state="new">The dotnet vstest command is superseded by dotnet test, which can now be used to run assemblies. See https://aka.ms/dotnet-test.</target>
+        <target state="translated">dotnet vstest 명령은 이제 어셈블리를 실행하는 데 사용할 수 있는 dotnet test로 대체되었습니다. https://aka.ms/dotnet-test를 참조하세요.</target>
         <note />
       </trans-unit>
     </body>

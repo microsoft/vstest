@@ -1,7 +1,19 @@
 # Branches that trigger a build on commit
 trigger:
-- main
-- rel/*
+  branches:
+    include:
+    - main
+    - rel/*
+    exclude:
+    - rel/15.*
+    - rel/16.*
+    - rel/17.0
+    - rel/17.1
+    - rel/17.2
+    - rel/17.3
+    - rel/17.4
+    - rel/17.5
+    - rel/17.6
 
 # Branch(es) that trigger(s) build(s) on PR
 pr:
@@ -23,7 +35,11 @@ pr:
 
 parameters:
 - name: isRTM
-  displayName: "Release a RTM version?"
+  displayName: "Produce RTM version?"
+  type: boolean
+  default: False
+- name: SDLEnabled
+  displayName: "Run SDL validation"
   type: boolean
   default: False
 
@@ -46,11 +62,17 @@ variables:
     value: False
   - name: _InternalBuildArgs
     value: ' '
+  - name: _ReleaseVersionKind
+    value: ''
   # Arcade is using global cache of nugets in non-windows build
   # under some circumstances, but we don't respect that in our code and try to find them
   # in .packages. Force the location of packages to that folder.
   - name: NUGET_PACKAGES
-    value: '$(Build.SourcesDirectory)/.packages'
+    value: '$(Build.SourcesDirectory)/.packages/'
+
+  - ${{ if eq(parameters.isRTM, True) }}:
+    - name: _ReleaseVersionKind
+      value: release
 
   # Produce real signed binaries for Internal builds
   - ${{ if eq(variables._RunAsInternal, True) }}:
@@ -69,13 +91,18 @@ variables:
     - name: VisualStudioDropName
       value: Products/$(System.TeamProject)/$(Build.DefinitionName)/$(Build.SourceBranchName)/$(Build.BuildNumber)
     - name: _InternalBuildArgs
+      # IncludeSourceRevisionInInformationalVersion prevents ProductVersion (on file), and AssemblyInformationalVersion
+      # from appending +<commitId>, which breaks DTAAgent.
       value: /p:DotNetSignType=$(_SignType)
         /p:TeamName=$(_TeamName)
+        /p:DotNetFinalVersionKind=$(_ReleaseVersionKind)
         /p:DotNetPublishUsingPipelines=true
         /p:DotNetSymbolServerTokenMsdl=$(microsoft-symbol-server-pat)
         /p:DotNetSymbolServerTokenSymWeb=$(symweb-symbol-server-pat)
         /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
         /p:VisualStudioDropName=$(VisualStudioDropName)
+        /p:GenerateSbom=true
+        /p:IncludeSourceRevisionInInformationalVersion=false
 
 stages:
 
@@ -119,6 +146,10 @@ stages:
             command: custom
             custom: '--info'
 
+        # Restore internal tools required for SBOM generation
+        - ${{ if eq(variables._RunAsInternal, True) }}:
+          - template: /eng/restore-internal-tools.yml
+
         - powershell: eng\common\CIBuild.cmd
             -configuration $(_BuildConfig)
             -prepareMachine
@@ -126,12 +157,13 @@ stages:
             /p:Test=false
           name: Build
           displayName: Build
-          continueOnError: true
 
         # -ci is allowing to import some environment variables and some required configurations
+        # -nobl avoid overwriting binlog of the main Build
         - script: Test.cmd
             -configuration $(_BuildConfig)
             -ci
+            -nobl
             -integrationTest
             -performanceTest
           name: Test
@@ -145,7 +177,7 @@ stages:
             PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
             ArtifactName: TestResults
           condition: failed()
-        
+
         # Public pipeline does not upload packages into artifacts, but we need them for tests on Linux and MacOS.
         - ${{ if eq(variables._RunAsPublic, True) }}:
           - task: PublishBuildArtifacts@1
@@ -165,7 +197,7 @@ stages:
           inputs:
             PathtoPublish: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
             ArtifactName: VSSetupArtifacts
-      
+
       - job: OtherOSes
         dependsOn: Windows
         workspace:
@@ -189,7 +221,7 @@ stages:
         - checkout: self
           fetchDepth: 1
           clean: true
-        
+
         # Build but don't pack, packing does not work on non-windows and we want to test what we built on Windows
         # anyway. Because that is what we will publish.
         - script: ./build.sh
@@ -197,15 +229,14 @@ stages:
             --ci
           name: Build
           displayName: Build
-          continueOnError: true
-        
+
         # Download the built packages into local package source, as if we built them on this machine.
         - task: DownloadPipelineArtifact@2
           displayName: Download Package Artifacts
           inputs:
             artifactName: PackageArtifacts
             targetPath: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
-        
+
         - script: ./test.sh
             --configuration $(_BuildConfig)
             --ci
@@ -213,7 +244,7 @@ stages:
             --performanceTest
           name: Test
           displayName: Test
-        
+
         # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
         # through the console or trx
         - task: PublishBuildArtifacts@1
@@ -223,55 +254,50 @@ stages:
             ArtifactName: TestResults
           condition: failed()
 
-      - job: Publish
-        dependsOn: OtherOSes
-        pool:
-          ${{ if eq(variables._RunAsPublic, True) }}:
-            name: NetCore-Public
-            demands: ImageOverride -equals windows.vs2022.amd64.open
-          ${{ if eq(variables._RunAsInternal, True) }}:
-            name: NetCore1ESPool-Internal
-            demands: ImageOverride -equals 1es-windows-2022
-        strategy:
-          matrix:
-            Release:
-              _BuildConfig: Release
-            # ${{ if eq(variables._RunAsPublic, True) }}:
-            #   Debug:
-            #     _BuildConfig: Debug
-        steps:
-          # Download the built packages into local package source, as if we built them on this machine.
-          - task: DownloadPipelineArtifact@2
-            displayName: Download Package Artifacts
-            inputs:
-              artifactName: PackageArtifacts
-              targetPath: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
-          
-          - task: DownloadPipelineArtifact@2
-            displayName: Download VSSetup Artifacts
-            inputs:
-              artifactName: VSSetupArtifacts
-              targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
-          
-          # TODO: Publishing to the feeds is making non-arcade CI acceptance tests fail so we disable these steps for now.
-          #       They will need to be re-enabled once this is merged to main.
-          - ${{ if eq(variables._RunAsInternal, True) }}:
+      - ${{ if eq(variables._RunAsInternal, True) }}:
+        - job: Publish
+          dependsOn: OtherOSes
+          pool:
+              name: NetCore1ESPool-Internal
+              demands: ImageOverride -equals 1es-windows-2022
+          strategy:
+            matrix:
+              Release:
+                _BuildConfig: Release
+          steps:
+            # The template job needs a log, otherwise it writes a warning. We can disable log uploading only for
+            # the whole stage, which is not what we want to do. So we write an empty file instead.
+            - pwsh: 'New-Item -Type file -Force "$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)/empty.log"'
+              name: 'Add_empty_logfile'
+            # Download the built packages into local package source, as if we built them on this machine.
+            - task: DownloadPipelineArtifact@2
+              displayName: Download Package Artifacts
+              inputs:
+                artifactName: PackageArtifacts
+                targetPath: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
+
+            - task: DownloadPipelineArtifact@2
+              displayName: Download VSSetup Artifacts
+              inputs:
+                artifactName: VSSetupArtifacts
+                targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
+
             - task: NuGetAuthenticate@0
               displayName: 'NuGet Authenticate to dotnet-tools and test-tools feeds'
 
-            # - task: NuGetCommand@2
-            #   displayName: 'Publish NuGet packages to dotnet-tools feed'
-            #   inputs:
-            #     command: push
-            #     packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
-            #     publishVstsFeed: 'public/dotnet-tools'
+            - task: NuGetCommand@2
+              displayName: 'Publish NuGet packages to dotnet-tools feed'
+              inputs:
+                command: push
+                packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
+                publishVstsFeed: 'public/dotnet-tools'
 
-            # - task: NuGetCommand@2
-            #   displayName: 'Publish NuGet packages to test-tools feed'
-            #   inputs:
-            #     command: push
-            #     packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
-            #     publishVstsFeed: 'public/test-tools'
+            - task: NuGetCommand@2
+              displayName: 'Publish NuGet packages to test-tools feed'
+              inputs:
+                command: push
+                packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
+                publishVstsFeed: 'public/test-tools'
 
             # Publishes setup VSIXes to a drop.
             # Note: The insertion tool looks for the display name of this task in the logs.
@@ -302,3 +328,7 @@ stages:
   - template: eng\common\templates\post-build\post-build.yml
     parameters:
       publishingInfraVersion: 3
+      SDLValidationParameters:
+        enable: false
+        continueOnError: false
+        params: ' -SourceToolsList @("policheck","credscan")'

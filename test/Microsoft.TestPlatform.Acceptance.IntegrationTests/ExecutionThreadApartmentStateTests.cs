@@ -16,7 +16,7 @@ public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject3.dll");
+        var assemblyPaths = GetAssetFullPath("SimpleTestProject3.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /testcasefilter:UITestMethod");
         InvokeVsTest(arguments);
@@ -30,7 +30,7 @@ public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPaths =
-            BuildMultipleAssemblyPath("SimpleTestProject2.dll");
+            GetAssetFullPath("SimpleTestProject2.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /testcasefilter:PassingTest2 -- RunConfiguration.ExecutionThreadApartmentState=STA");
         InvokeVsTest(arguments);
@@ -45,7 +45,7 @@ public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPaths =
-            BuildMultipleAssemblyPath("SimpleTestProject3.dll");
+            GetAssetFullPath("SimpleTestProject3.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /testcasefilter:UITestMethod -- RunConfiguration.ExecutionThreadApartmentState=MTA");
         InvokeVsTest(arguments);
@@ -60,7 +60,7 @@ public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPaths =
-            BuildMultipleAssemblyPath("SimpleTestProject3.dll");
+            GetAssetFullPath("SimpleTestProject3.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /tests:UITestWithSleep1,UITestMethod -- RunConfiguration.ExecutionThreadApartmentState=STA RunConfiguration.TestSessionTimeout=2000");
         InvokeVsTest(arguments);

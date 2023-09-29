@@ -18,7 +18,7 @@ public class DebugAssertTests : AcceptanceTestBase
         // is to not crash the process when we are running in debug, and debugger is attached
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assemblyPath = BuildMultipleAssemblyPath("CrashingOnDebugAssertTestProject.dll");
+        var assemblyPath = GetAssetFullPath("CrashingOnDebugAssertTestProject.dll");
         var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         InvokeVsTest(arguments);
 
