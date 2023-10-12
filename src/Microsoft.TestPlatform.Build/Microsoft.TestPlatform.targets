@@ -38,7 +38,7 @@ Copyright (c) .NET Foundation. All rights reserved.
   <Target Name="_VSTestMSBuild" Condition="'$(IsTestProject)' == 'true'">
     <CallTarget Condition="!$(VSTestNoBuild)" Targets="BuildProject" />
 
-    <VSTestTask
+    <VSTestTask2
       TestFileFullPath="$(TargetPath)"
       VSTestSetting="$([MSBuild]::ValueOrDefault($(VSTestSetting), '$(RunSettingsFilePath)'))"
       VSTestTestAdapterPath="$(VSTestTestAdapterPath)"
@@ -73,7 +73,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     
     <CallTarget Targets="ShowCallOfVSTestTaskWithParameter" />
 
-    <VSTestForwardingTask
+    <VSTestTask
       TestFileFullPath="$(TargetPath)"
       VSTestSetting="$([MSBuild]::ValueOrDefault($(VSTestSetting), '$(RunSettingsFilePath)'))"
       VSTestTestAdapterPath="$(VSTestTestAdapterPath)"
