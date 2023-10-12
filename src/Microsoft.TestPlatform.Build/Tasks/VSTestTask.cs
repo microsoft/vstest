@@ -2,16 +2,21 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.IO;
-using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.Threading;
 
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Microsoft.TestPlatform.Build.Trace;
 
 namespace Microsoft.TestPlatform.Build.Tasks;
 
-public class VSTestTask : ToolTask, ITestTask
+public class VSTestTask : Task, ITestTask
 {
+    private int _activeProcessId;
+
+    private const string DotnetExe = "dotnet";
+
     [Required]
     public ITaskItem? TestFileFullPath { get; set; }
     public string? VSTestSetting { get; set; }
@@ -40,60 +45,66 @@ public class VSTestTask : ToolTask, ITestTask
     public string? VSTestArtifactsProcessingMode { get; set; }
     public string? VSTestSessionCorrelationId { get; set; }
 
-    protected override string? ToolName
+    public override bool Execute()
     {
-        get
+        var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
+        Tracing.traceEnabled = string.Equals(traceEnabledValue, "1", StringComparison.OrdinalIgnoreCase);
+
+        var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_BUILD_DEBUG");
+        if (string.Equals(debugEnabled, "1", StringComparison.Ordinal))
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                return "dotnet.exe";
-            else
-                return "dotnet";
-        }
-    }
+            Console.WriteLine("Waiting for debugger attach...");
 
-    public VSTestTask()
-    {
-        LogStandardErrorAsError = true;
-        StandardOutputImportance = "Normal";
-    }
+            var currentProcess = Process.GetCurrentProcess();
+            Console.WriteLine($"Process Id: {currentProcess.Id}, Name: {currentProcess.ProcessName}");
 
-    protected override string? GenerateCommandLineCommands()
-    {
-        return TestTaskUtils.CreateCommandLineArguments(this);
-    }
-
-    protected override string? GenerateFullPathToTool()
-    {
-        if (!ToolPath.IsNullOrEmpty())
-        {
-            return Path.Combine(Path.GetDirectoryName(Path.GetFullPath(ToolPath))!, ToolExe);
-        }
-
-        //TODO: https://github.com/dotnet/sdk/issues/20 Need to get the dotnet path from MSBuild?
-
-        var dhp = Environment.GetEnvironmentVariable("DOTNET_HOST_PATH");
-        if (!dhp.IsNullOrEmpty())
-        {
-            var path = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(dhp))!, ToolExe);
-            if (File.Exists(path))
+            while (!Debugger.IsAttached)
             {
-                return path;
+                Thread.Sleep(1000);
             }
+
+            Debugger.Break();
         }
 
-        if (File.Exists(ToolExe))
+        // Avoid logging "Task returned false but did not log an error." on test failure, because we don't
+        // write MSBuild error. https://github.com/dotnet/msbuild/blob/51a1071f8871e0c93afbaf1b2ac2c9e59c7b6491/src/Framework/IBuildEngine7.cs#L12
+        var allowFailureWithoutError = BuildEngine.GetType().GetProperty("AllowFailureWithoutError");
+        allowFailureWithoutError?.SetValue(BuildEngine, true);
+
+        var processInfo = new ProcessStartInfo
         {
-            return Path.GetFullPath(ToolExe);
-        }
+            FileName = DotnetExe,
+            Arguments = TestTaskUtils.CreateCommandLineArguments(this),
+            UseShellExecute = false,
+        };
 
-        var values = Environment.GetEnvironmentVariable("PATH");
-        foreach (var p in values!.Split(Path.PathSeparator))
+        if (!VSTestFramework.IsNullOrEmpty())
         {
-            var fullPath = Path.Combine(p, ToolExe);
-            if (File.Exists(fullPath))
-                return fullPath;
+            Console.WriteLine(Resources.Resources.TestRunningSummary, TestFileFullPath, VSTestFramework);
         }
 
-        return null;
+        Tracing.Trace("VSTest: Starting vstest.console...");
+        Tracing.Trace($"VSTest: Arguments: {processInfo.FileName} {processInfo.Arguments}");
+
+        using var activeProcess = new Process { StartInfo = processInfo };
+        activeProcess.Start();
+        _activeProcessId = activeProcess.Id;
+
+        activeProcess.WaitForExit();
+        Tracing.Trace($"VSTest: Exit code: {activeProcess.ExitCode}");
+        return activeProcess.ExitCode == 0;
+    }
+
+    public void Cancel()
+    {
+        Tracing.Trace("VSTest: Killing the process...");
+        try
+        {
+            Process.GetProcessById(_activeProcessId).Kill();
+        }
+        catch (ArgumentException ex)
+        {
+            Tracing.Trace($"VSTest: Killing process throws ArgumentException with the following message {ex}. It may be that process is not running");
+        }
     }
 }

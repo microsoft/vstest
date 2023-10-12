@@ -11,13 +11,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.Build.UnitTests;
 
 [TestClass]
-public class VsTestTaskTests
+public class VsTestTask2Tests
 {
-    private readonly VSTestTask _vsTestTask;
+    private readonly VSTestTask2 _vsTestTask;
 
-    public VsTestTaskTests()
+    public VsTestTask2Tests()
     {
-        _vsTestTask = new VSTestTask
+        _vsTestTask = new VSTestTask2
         {
             BuildEngine = new FakeBuildEngine(),
             TestFileFullPath = new TaskItem(@"C:\path\to\test-assembly.dll"),

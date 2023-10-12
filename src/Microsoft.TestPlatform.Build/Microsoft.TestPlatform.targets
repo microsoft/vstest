@@ -17,9 +17,9 @@ Copyright (c) .NET Foundation. All rights reserved.
     <VSTestNoBuild Condition="'$(VSTestNoBuild)' == ''">False</VSTestNoBuild>
     <VSTestUseConsole Condition="'$(VSTestUseConsole)' == ''">False</VSTestUseConsole>
   </PropertyGroup>
-  <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestForwardingTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
-  <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestLogsTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
   <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
+  <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestLogsTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
+  <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestTask2" AssemblyFile="$(VSTestTaskAssemblyFile)" />
 
   <!--
     ============================================================
