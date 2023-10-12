@@ -111,7 +111,6 @@ Microsoft.TestPlatform.Build.Tasks.VSTestTask2.VSTestTraceDataCollectorDirectory
 Microsoft.TestPlatform.Build.Tasks.VSTestTask2.VSTestVerbosity.get -> string?
 Microsoft.TestPlatform.Build.Tasks.VSTestTask2.VSTestVerbosity.set -> void
 Microsoft.TestPlatform.Build.Trace.Tracing
-Microsoft.TestPlatform.Build.Utils.ArgumentEscaper
 override Microsoft.TestPlatform.Build.Tasks.VSTestLogsTask.Execute() -> bool
 override Microsoft.TestPlatform.Build.Tasks.VSTestTask.Execute() -> bool
 override Microsoft.TestPlatform.Build.Tasks.VSTestTask2.GenerateCommandLineCommands() -> string?
@@ -119,4 +118,3 @@ override Microsoft.TestPlatform.Build.Tasks.VSTestTask2.GenerateFullPathToTool()
 override Microsoft.TestPlatform.Build.Tasks.VSTestTask2.ToolName.get -> string?
 static Microsoft.TestPlatform.Build.Trace.Tracing.Trace(string! message) -> void
 static Microsoft.TestPlatform.Build.Trace.Tracing.traceEnabled -> bool
-static Microsoft.TestPlatform.Build.Utils.ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(string! arg) -> string!

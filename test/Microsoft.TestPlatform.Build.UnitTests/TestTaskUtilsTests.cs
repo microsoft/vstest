@@ -11,13 +11,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.Build.UnitTests;
 
 [TestClass]
-public class VsTestTask2Tests
+public class TestTaskUtilsTests
 {
-    private readonly VSTestTask2 _vsTestTask;
+    private readonly ITestTask _vsTestTask;
 
-    public VsTestTask2Tests()
+    public TestTaskUtilsTests()
     {
-        _vsTestTask = new VSTestTask2
+        _vsTestTask = new VSTestTask
         {
             BuildEngine = new FakeBuildEngine(),
             TestFileFullPath = new TaskItem(@"C:\path\to\test-assembly.dll"),
@@ -274,7 +274,7 @@ public class VsTestTask2Tests
 
         var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
 
-        string notExpectedArg = $"--testAdapterPath:\"{this._vsTestTask.VSTestTraceDataCollectorDirectoryPath?.ItemSpec}\"";
+        string notExpectedArg = $"--testAdapterPath:\"{_vsTestTask.VSTestTraceDataCollectorDirectoryPath?.ItemSpec}\"";
         StringAssert.DoesNotMatch(commandline, new Regex(Regex.Escape(notExpectedArg)));
     }
 
