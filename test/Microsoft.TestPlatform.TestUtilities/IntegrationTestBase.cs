@@ -198,7 +198,7 @@ public class IntegrationTestBase
         var vstestConsolePath = GetDotnetRunnerPath();
 
         //TODO: set this property by default in the dotnet test command (cf. https://github.com/microsoft/vstest/pull/2702)
-        debugEnvironmentVariables["VsTestUseConsole"] = "True";
+        debugEnvironmentVariables["VsTestUseConsoleOutput"] = "True";
 
         if (arguments.Contains(".csproj"))
         {
