@@ -8,8 +8,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
+/// <summary>
+/// Running dotnet test + csproj and using MSBuild for the output.
+/// </summary>
 [TestClass]
-public class DotnetTestTests : AcceptanceTestBase
+public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
 {
     [TestMethod]
     // patched dotnet is not published on non-windows systems
@@ -20,12 +23,14 @@ public class DotnetTestTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("SimpleTestProject.csproj");
-        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}");
+        // --logger: console will output standard messages to msbuild output, which will be hidden by default
+        // that is why provide also --verbosity:normal so msbuild shows that console output
+        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" --verbosity:normal /p:VsTestUseMSBuildOutput=true /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}");
 
         // ensure our dev version is used
         StdOutputContains("-dev");
         ValidateSummaryStatus(1, 1, 1);
-        ExitCodeEquals(1);
+        ExitCodeEquals(100);
     }
 
     [TestMethod]

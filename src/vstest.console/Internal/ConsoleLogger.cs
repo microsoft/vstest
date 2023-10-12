@@ -301,17 +301,17 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         if (!result.ErrorMessage.IsNullOrEmpty())
         {
             addAdditionalNewLine = true;
-            Output.Information(false, ConsoleColor.Red, TestResultPrefix + CommandLineResources.ErrorMessageBanner);
+            Output.Error(false, TestResultPrefix + CommandLineResources.ErrorMessageBanner);
             var errorMessage = string.Format(CultureInfo.CurrentCulture, "{0}{1}{2}", TestResultPrefix, TestMessageFormattingPrefix, result.ErrorMessage);
-            Output.Information(false, ConsoleColor.Red, errorMessage);
+            Output.Error(false, errorMessage);
         }
 
         if (!result.ErrorStackTrace.IsNullOrEmpty())
         {
             addAdditionalNewLine = false;
-            Output.Information(false, ConsoleColor.Red, TestResultPrefix + CommandLineResources.StacktraceBanner);
+            Output.Error(false, TestResultPrefix + CommandLineResources.StacktraceBanner);
             var stackTrace = string.Format(CultureInfo.CurrentCulture, "{0}{1}", TestResultPrefix, result.ErrorStackTrace);
-            Output.Information(false, ConsoleColor.Red, stackTrace);
+            Output.Error(false, stackTrace);
         }
 
         var stdOutMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.StandardOutCategory);
@@ -335,8 +335,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
             if (!stdErrMessages.IsNullOrEmpty())
             {
-                Output.Information(false, ConsoleColor.Red, TestResultPrefix + CommandLineResources.StdErrMessagesBanner);
-                Output.Information(false, ConsoleColor.Red, stdErrMessages);
+                Output.Error(false, TestResultPrefix + CommandLineResources.StdErrMessagesBanner);
+                Output.Error(false, stdErrMessages);
             }
         }
 
@@ -567,7 +567,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                     // Pause the progress indicator before displaying test result information
                     _progressIndicator?.Pause();
 
-                    Output.Write(GetFormattedTestIndicator(CommandLineResources.FailedTestIndicator), OutputLevel.Information, ConsoleColor.Red);
+                    Output.Write(GetFormattedTestIndicator(CommandLineResources.FailedTestIndicator), OutputLevel.Error, ConsoleColor.Red);
                     Output.WriteLine(testDisplayName, OutputLevel.Information);
                     DisplayFullInformation(e.Result);
 
@@ -792,13 +792,17 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                         color = ConsoleColor.Yellow;
                     }
 
-                    if (color != null)
+                    if (color == null)
                     {
-                        Output.Write(outputLine, OutputLevel.Information, color.Value);
+                        Output.Write(outputLine, OutputLevel.Information);
+                    }
+                    else if (color == ConsoleColor.Red)
+                    {
+                        Output.Error(false, outputLine);
                     }
                     else
                     {
-                        Output.Write(outputLine, OutputLevel.Information);
+                        Output.Write(outputLine, OutputLevel.Information, color.Value);
                     }
 
                     Output.Information(false, CommandLineResources.TestRunSummaryAssemblyAndFramework,
@@ -870,7 +874,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
             }
             if (failedTests > 0)
             {
-                Output.Information(false, ConsoleColor.Red, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, failedTests));
+                Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, failedTests));
             }
             if (skippedTests > 0)
             {

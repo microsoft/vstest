@@ -15,7 +15,20 @@ internal static class TestTaskUtils
         const string codeCoverageString = "Code Coverage";
         const string vsTestAppName = "vstest.console.dll";
 
-        var isConsoleLoggerSpecifiedByUser = false;
+        // We have 2 tasks:
+        // VSTestTask that writes directly to console output and does not write via msbuild
+        // and VSTestTask2 that uses msbuild tools task to capture standard output and translates
+        // all output to Error to msbuild errors.
+        //
+        // Here we are choosing a vstest.console logger to use. Those loggers both write to standard output
+        // and error output in vstest.console process, but MSBuild task is not focusing on writing with nice colors
+        // but instead on writing cohesive messages in one go, so MSBuild can capture them as single message, and not
+        // as 20 different messages for 20 lines.
+        var loggerToUse = task is VSTestTask ? "Console" : "Microsoft.TestPlatform.MSBuildLogger";
+        // User is free to override the logging using the standard vstest.parameters
+        // otherwise we just add the appropriate logger and use the msbuild verbosity
+        // to forward it to the vstest.console logger.
+        var isLoggerSpecifiedByUser = false;
         var isCollectCodeCoverageEnabled = false;
         var isRunSettingsEnabled = false;
 
@@ -61,9 +74,9 @@ internal static class TestTaskUtils
             {
                 builder.AppendSwitchIfNotNull("--logger:", arg);
 
-                if (arg != null && arg.StartsWith("console", StringComparison.OrdinalIgnoreCase))
+                if (arg != null && arg.StartsWith(loggerToUse, StringComparison.OrdinalIgnoreCase))
                 {
-                    isConsoleLoggerSpecifiedByUser = true;
+                    isLoggerSpecifiedByUser = true;
                 }
             }
         }
@@ -86,8 +99,9 @@ internal static class TestTaskUtils
             builder.AppendFileNameIfNotNull(task.TestFileFullPath);
         }
 
-        // Console logger was not specified by user, but verbosity was, hence add default console logger with verbosity as specified
-        if (!task.VSTestVerbosity.IsNullOrWhiteSpace() && !isConsoleLoggerSpecifiedByUser)
+        // The logger to use (console or msbuild) logger was not specified by user,
+        // add the logger and verbosity, so we know what to use in vstest.console.
+        if (!task.VSTestVerbosity.IsNullOrWhiteSpace() && !isLoggerSpecifiedByUser)
         {
             var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
             var quietTestLogging = new List<string>() { "q", "quiet" };
@@ -103,7 +117,7 @@ internal static class TestTaskUtils
                 vsTestVerbosity = "quiet";
             }
 
-            builder.AppendSwitchUnquotedIfNotNull("--logger:", $"Console;Verbosity={vsTestVerbosity}");
+            builder.AppendSwitchUnquotedIfNotNull("--logger:", $"{loggerToUse};Verbosity={vsTestVerbosity}");
         }
 
         if (task.VSTestBlame || task.VSTestBlameCrash || task.VSTestBlameHang)
