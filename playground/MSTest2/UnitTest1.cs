@@ -11,13 +11,13 @@ public class UnitTest2
     [TestMethod]
     public void TestMethod1()
     {
-        // Thread.Sleep(1000);
+        throw new System.InvalidOperationException("oh no");
     }
 
-    [TestMethod]
+    [TestMethod(displayName: "AAAAAAAAAAAAAAAAAAAA")]
     public void TestMethod2()
     {
-        // Thread.Sleep(1000);
+        throw new System.ArgumentException("hello mister eisn\nzwai policajt");
     }
 
     [TestMethod]

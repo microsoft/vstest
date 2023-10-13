@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -43,6 +42,9 @@ internal class MSBuildLogger : ITestLoggerWithParameters
         get;
         private set;
     }
+
+    // Default constructor is needed for a logger to be able to activate it.
+    public MSBuildLogger() { }
 
     /// <summary>
     /// Constructor added for testing purpose
@@ -127,8 +129,9 @@ internal class MSBuildLogger : ITestLoggerWithParameters
                         testDisplayName = e.Result.TestCase.DisplayName;
                     }
 
-                    stringBuilder.Append(testDisplayName ?? "<unknown>").AppendLine(":");
+                    stringBuilder.Append(testDisplayName ?? "<unknown>").Append(": ");
                     AppendFullError(e.Result, stringBuilder);
+                    Output.Error(false, stringBuilder.ToString());
                     break;
                 }
         }
@@ -141,16 +144,15 @@ internal class MSBuildLogger : ITestLoggerWithParameters
 
         if (!result.ErrorMessage.IsNullOrEmpty())
         {
-            stringBuilder.AppendLine(TestResultPrefix + CommandLineResources.ErrorMessageBanner);
-            var errorMessage = string.Format(CultureInfo.CurrentCulture, "{0}{1}{2}", TestResultPrefix, TestMessageFormattingPrefix, result.ErrorMessage);
-            stringBuilder.AppendLine(errorMessage);
+            stringBuilder.Append(result.ErrorMessage);
         }
+
+        stringBuilder.AppendLine();
 
         if (!result.ErrorStackTrace.IsNullOrEmpty())
         {
-            stringBuilder.AppendLine(TestResultPrefix + CommandLineResources.StacktraceBanner);
-            var stackTrace = string.Format(CultureInfo.CurrentCulture, "{0}{1}", TestResultPrefix, result.ErrorStackTrace);
-            stringBuilder.AppendLine(stackTrace);
+            stringBuilder.AppendLine(CommandLineResources.StacktraceBanner);
+            stringBuilder.AppendLine(result.ErrorStackTrace);
         }
     }
 

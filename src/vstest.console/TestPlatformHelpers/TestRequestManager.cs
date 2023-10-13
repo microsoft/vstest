@@ -1197,9 +1197,9 @@ internal class TestRequestManager : ITestRequestManager
         // Update assemblyQualifiedName and codeBase of existing logger.
         if (existingLoggerIndex >= 0)
         {
-            var msbuildLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
-            msbuildLogger.AssemblyQualifiedName = typeof(MSBuildLogger).AssemblyQualifiedName;
-            msbuildLogger.CodeBase = typeof(MSBuildLogger).Assembly.Location;
+            var msBuildLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
+            msBuildLogger.AssemblyQualifiedName = typeof(MSBuildLogger).AssemblyQualifiedName;
+            msBuildLogger.CodeBase = typeof(MSBuildLogger).Assembly.Location;
             RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(
                 document,
                 ObjectModel.Constants.LoggerRunSettingsName,
