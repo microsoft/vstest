@@ -1,8 +1,58 @@
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory)]
-    [string] $VSTestExe
+    [string] $NugetDir
 )
+
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+$Script:RootDir = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.FullName
+
+function Find-NugetPackage {
+    param (
+        [string]$NugetDir
+    )
+
+    Write-Host "Searching in nuget dir: $NugetDir"
+    $nuget = Get-ChildItem -Path $NugetDir |
+        Where-Object { $_.Name -match "Microsoft.TestPlatform\.\d+\.\d+\.\d+.*.nupkg" } |
+        Where-Object { $_.Name -notMatch ".*symbols.*" }
+
+    Write-Host "Found nuget: $nuget"
+
+    return $nuget
+}
+
+function Create-TemporaryDirectory {
+    param (
+        [string]$TmpDir
+    )
+
+    if (!(Test-Path $tmpDir)) {
+        Write-Host "Creating temporary directory ..."
+        New-Item -ItemType Directory -Force -Path $tmpDir
+    }
+}
+
+function Delete-TemporaryDirectory {
+    param (
+        [string]$TmpDir
+    )
+
+    if ($null -ne $TmpDir -and (Test-Path $TmpDir)) {
+        Remove-Item -Force -Recurse $TmpDir | Out-Null
+    }
+}
+
+function Unzip-NugetPackage {
+    param (
+        [string]$NugetPackage,
+        [string]$TmpDir
+    )
+
+    Write-Host "Unzipping file `"$NugetPackage`" to path `"$TmpDir`""
+    [System.IO.Compression.ZipFile]::ExtractToDirectory($NugetPackage, $TmpDir)
+}
 
 function Match-VersionAgainstBranch {
     param (
@@ -43,7 +93,28 @@ function Match-VersionAgainstBranch {
     Exit 0
 }
 
-$Script:VSTestProductVersion = (Get-Item $VSTestExe).VersionInfo.ProductVersion
-$Script:CurrentBranch = git branch --show-current
+function Verify-Version {
+    param (
+        [string]$NugetDir
+    )
 
-Match-VersionAgainstBranch -VSTestVersion $VSTestProductVersion -BranchName $CurrentBranch
+    $tmpDir = Join-Path $RootDir "tmp"
+    try {
+        $nuget = Find-NugetPackage -NugetDir $NugetDir
+        $nugetFullPath = Join-Path $NugetDir $nuget
+
+        Create-TemporaryDirectory -TmpDir $tmpDir
+        Unzip-NugetPackage -NugetPackage $nugetFullPath -TmpDir $tmpDir
+
+        $vsTestExe = [IO.Path]::Combine($tmpDir, 'tools', 'net462', 'Common7', 'IDE', 'Extensions', 'TestPlatform', 'vstest.console.exe')
+        $vsTestProductVersion = (Get-Item $vsTestExe).VersionInfo.ProductVersion
+        $currentBranch = git branch --show-current
+
+        Match-VersionAgainstBranch -VSTestVersion $vsTestProductVersion -BranchName $currentBranch
+    }
+    finally {
+        Delete-TemporaryDirectory -TmpDir $tmpDir
+    }
+}
+
+Verify-Version -NugetDir $NugetDir

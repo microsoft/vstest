@@ -160,7 +160,7 @@ stages:
 
         - ${{ if eq(variables._RunAsInternal, True) }}:
            - powershell: eng\verify-version.ps1
-            -VSTestExe $(Build.SourcesDirectory)/artifacts/bin/Microsoft.TestPlatform/$(_BuildConfig)/**/vstest.console.exe
+            -NugetDir $(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping"
           name: Check Branding
           displayName: Check Branding
 
