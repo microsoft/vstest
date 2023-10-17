@@ -158,6 +158,12 @@ stages:
           name: Build
           displayName: Build
 
+        - ${{ if eq(variables._RunAsInternal, True) }}:
+           - powershell: eng\verify-version.ps1
+            -NugetDir $(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping"
+          name: Check Branding
+          displayName: Check Branding
+
         # -ci is allowing to import some environment variables and some required configurations
         # -nobl avoid overwriting binlog of the main Build
         - script: Test.cmd
