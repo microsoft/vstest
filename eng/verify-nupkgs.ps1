@@ -91,7 +91,7 @@ function Verify-Nuget-Packages {
             }
 
             if ($packageKey -eq "Microsoft.TestPlatform") {
-                Verify-Version -nugetDir $unzipNugetPackageDir
+                Verify-Version -nugetDir $unzipNugetPackageDir -errors $errors
             }
         }
         finally {
@@ -130,30 +130,22 @@ function Match-VersionAgainstBranch {
     $isReleaseBranch = $branchName -like "rel/*"
     $isPreviewBranch = $branchName -like "main"
 
-    if (!$isReleaseBranch -and !$isPreviewBranch)
-    {
+    if (!$isReleaseBranch -and !$isPreviewBranch) {
         Write-Host "Skipping check since branch is neither `"release`" nor `"preview`""
         return
     }
 
     Write-Host "Matching branch against product version ... "
-    if ($isReleaseBranch -and !$versionIsRTM -and !$versionIsRelease)
-    {
-        Write-Error "Release version `"$vsTestVersion`" should either be RTM, or contain a `"release`" suffix."
-        Exit 1
+    if ($isReleaseBranch -and !$versionIsRTM -and !$versionIsRelease) {
+        $errors += "Release version `"$vsTestVersion`" should either be RTM, or contain a `"release`" suffix."
     }
-    if ($isPreviewBranch -and !$versionIsPreview)
-    {
-        Write-Error "Preview version `"$vsTestVersion`" should contain a `"preview`" suffix."
-        Exit 2
+    if ($isPreviewBranch -and !$versionIsPreview) {
+        $errors += "Preview version `"$vsTestVersion`" should contain a `"preview`" suffix."
     }
-
-    Write-Host "Branch and version check was successful."
-    Exit 0
 }
 
 function Verify-Version {
-    param ([string]$nugetDir)
+    param ([string]$nugetDir, [string[]] $errors)
 
     $vsTestExe = "$nugetDir/tools/net462/Common7/IDE/Extensions/TestPlatform/vstest.console.exe"
     $vsTestProductVersion = (Get-Item $vsTestExe).VersionInfo.ProductVersion
