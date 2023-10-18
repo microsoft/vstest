@@ -117,7 +117,7 @@ function Unzip {
 }
 
 function Match-VersionAgainstBranch {
-    param ([string]$vsTestVersion, [string]$branchName)
+    param ([string]$vsTestVersion, [string]$branchName,  [string[]]$errors)
 
     # Output useful info.
     Write-Host "VSTest Product Version: `"$vsTestVersion`""
@@ -151,7 +151,7 @@ function Verify-Version {
     $vsTestProductVersion = (Get-Item $vsTestExe).VersionInfo.ProductVersion
     $currentBranch = git branch --show-current
 
-    Match-VersionAgainstBranch -vsTestVersion $vsTestProductVersion -branchName $currentBranch
+    Match-VersionAgainstBranch -vsTestVersion $vsTestProductVersion -branchName $currentBranch -errors $errors
 }
 
 Verify-Nuget-Packages
