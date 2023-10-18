@@ -155,7 +155,7 @@ function Match-VersionAgainstBranch {
 function Verify-Version {
     param ([string]$nugetDir)
 
-    $vsTestExe = [IO.Path]::Combine($nugetDir, 'tools', 'net462', 'Common7', 'IDE', 'Extensions', 'TestPlatform', 'vstest.console.exe')
+    $vsTestExe = "$nugetDir/tools/net462/Common7/IDE/Extensions/TestPlatform/vstest.console.exe"
     $vsTestProductVersion = (Get-Item $vsTestExe).VersionInfo.ProductVersion
     $currentBranch = git branch --show-current
 
