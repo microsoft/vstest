@@ -9,7 +9,6 @@
     <IsSourceFile>false</IsSourceFile>
     <IsSourceFile Condition="$([MSBuild]::MakeRelative($(RepoRoot), $(MSBuildProjectFullPath)).StartsWith('src/')) OR $([MSBuild]::MakeRelative($(RepoRoot), $(MSBuildProjectFullPath)).StartsWith('src\'))">true</IsSourceFile>
     <SrcPackageFolder>$(RepoRoot)src\package\</SrcPackageFolder>
-    <GitBranch>$([System.IO.File]::ReadAlltext('$(RepoRoot)\.git\HEAD').Replace('ref: refs/heads/', '').Trim())</GitBranch>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
