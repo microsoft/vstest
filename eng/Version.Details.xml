@@ -59,10 +59,9 @@
       <Uri>https://github.com/dotnet/symreader-converter</Uri>
       <Sha>c5ba7c88f92e2dde156c324a8c8edc04d9fa4fe0</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.XliffTasks" Version="1.0.0-beta.23516.1" CoherentParentDependency="Microsoft.DotNet.Arcade.Sdk">
-      <Uri>https://github.com/dotnet/xliff-tasks</Uri>
-      <Sha>d66a09c8b11e1235273c8e6cd946e5c8e247f189</Sha>
-      <SourceBuild RepoName="xliff-tasks" ManagedOnly="true" />
+    <Dependency Name="Microsoft.DotNet.XliffTasks" Version="9.0.0-beta.23528.1">
+      <Uri>https://github.com/dotnet/arcade</Uri>
+      <Sha>a4d49646dbac90883d3672f1c08134d84cca5707</Sha>
     </Dependency>
   </ToolsetDependencies>
 </Dependencies>
