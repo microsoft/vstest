@@ -46,7 +46,7 @@
       <Sha>bb2b4326ddf03d86c92bd125dba87e9d8df63463</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.7.0-3.23315.4">
+    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.8.0-1.23419.1">
       <Uri>https://github.com/dotnet/roslyn</Uri>
       <Sha>50bd09a9eefdf9bc3653dbf6d9624b31a023c7c0</Sha>
       <SourceBuild RepoName="roslyn" ManagedOnly="true" />
