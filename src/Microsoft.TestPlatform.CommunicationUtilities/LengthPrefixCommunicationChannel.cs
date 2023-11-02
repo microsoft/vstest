@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
@@ -37,7 +36,7 @@ public class LengthPrefixCommunicationChannel : ICommunicationChannel
     }
 
     /// <inheritdoc />
-    public event EventHandler<MessageReceivedEventArgs>? MessageReceived;
+    public TrackableEvent<MessageReceivedEventArgs> MessageReceived { get; } = new TrackableEvent<MessageReceivedEventArgs>();
 
     /// <inheritdoc />
     public Task Send(string data)
@@ -85,15 +84,8 @@ public class LengthPrefixCommunicationChannel : ICommunicationChannel
             // Try read data even if no one is listening to the data stream. Some server
             // implementations (like Sockets) depend on the read operation to determine if a
             // connection is closed.
-            if (MessageReceived != null)
-            {
-                var data = _reader.ReadString();
-                MessageReceived.SafeInvoke(this, new MessageReceivedEventArgs { Data = data }, "LengthPrefixCommunicationChannel: MessageReceived");
-            }
-            else
-            {
-                EqtTrace.Verbose("LengthPrefixCommunicationChannel.NotifyDataAvailable: New data are waiting to be received, but there is no subscriber to be notified. Not reading them from the stream.");
-            }
+            var data = _reader.ReadString();
+            MessageReceived.Notify(this, new MessageReceivedEventArgs { Data = data }, "LengthPrefixCommunicationChannel: MessageReceived");
         }
         catch (ObjectDisposedException ex) when (!_reader.BaseStream.CanRead)
         {

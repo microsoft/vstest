@@ -2,7 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
@@ -11,7 +14,7 @@ public interface ICommunicationChannel : IDisposable
     /// <summary>
     /// Event raised when data is received on the communication channel.
     /// </summary>
-    event EventHandler<MessageReceivedEventArgs> MessageReceived;
+    TrackableEvent<MessageReceivedEventArgs> MessageReceived { get; }
 
     /// <summary>
     /// Frames and sends the provided data over communication channel.
@@ -25,4 +28,63 @@ public interface ICommunicationChannel : IDisposable
     /// </summary>
     /// <returns>A <see cref="Task"/> implying async nature of the function.</returns>
     Task NotifyDataAvailable();
+}
+
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable
+public class TrackableEvent<T>
+#pragma warning restore CA1001 // Types that own disposable fields should be disposable
+{
+    private readonly ManualResetEventSlim _slim;
+
+    internal event EventHandler<T>? Event;
+
+    public TrackableEvent()
+    {
+        _slim = new ManualResetEventSlim(Event != null);
+    }
+
+    public void Notify(object sender, T eventArgs, string traceDisplayName)
+    {
+        var e = Event;
+        if (e != null)
+        {
+            e.SafeInvoke(sender, eventArgs!, traceDisplayName);
+        }
+    }
+
+    public bool WaitForSubscriber(int timeoutMilliseconds, CancellationToken cancellationToken)
+    {
+        return _slim.Wait(timeoutMilliseconds, cancellationToken);
+    }
+
+    public void Subscribe(EventHandler<T> eventHandler)
+    {
+        Event += eventHandler;
+        if (Event != null)
+        {
+            _slim.Set();
+        }
+        // return new UnsubscribeToken(() => Unsubscribe(eventHandler));
+    }
+
+    public void Unsubscribe(EventHandler<T> eventHandler)
+    {
+        Event -= eventHandler;
+        if (Event == null)
+        {
+            _slim.Reset();
+        }
+    }
+}
+
+internal class UnsubscribeToken : IDisposable
+{
+    private readonly Action _unsubscribeCallback;
+    internal UnsubscribeToken(Action value) => _unsubscribeCallback = value;
+
+    public void Unsubscribe() => _unsubscribeCallback();
+    public void Dispose()
+    {
+        _unsubscribeCallback();
+    }
 }
