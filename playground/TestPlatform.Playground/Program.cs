@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -34,7 +35,6 @@ internal class Program
 
         var thisAssemblyPath = Assembly.GetEntryAssembly()!.Location;
         var here = Path.GetDirectoryName(thisAssemblyPath)!;
-        var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
 
         var console = Path.Combine(here, "vstest.console", "vstest.console.exe");
 
@@ -87,38 +87,52 @@ internal class Program
             """;
 
         var sources = new[] {
-            Path.Combine(playground, "bin", "MSTest1", "Debug", "net472", "MSTest1.dll"),
-            Path.Combine(playground, "bin", "MSTest2", "Debug", "net462", "MSTest2.dll"),
+  //         @"S:\t\mstest85\bin\Debug\net7.0\mstest85.dll",
+  //@"S:\t\mstest85\bin\Debug\net6.0\mstest85.dll",
+  //@"S:\t\mstest85\bin\Debug\net8.0\mstest85.dll",
+  @"S:\t\nunit5\bin\Debug\net7.0\nunit5.dll",
+   @"S:\t\nunit5\bin\Debug\net8.0\nunit5.dll",
+   @"S:\t\nunit5\bin\Debug\net6.0\nunit5.dll",
             // The built in .NET projects don't now work right now in Playground, there is some conflict with Arcade.
             // But if you create one outside of Playground it will work. 
             //Path.Combine(playground, "bin", "MSTest1", "Debug", "net7.0", "MSTest1.dll"),
         };
 
-        // Console mode
-        // Uncomment if providing command line parameters is easier for you
-        // than converting them to settings, or when you debug command line scenario specifically.
-        var settingsFile = Path.GetTempFileName();
-        try
+        // design mode
+        var detailedOutput = true;
+        var consoleOptions = new ConsoleParameters
         {
-            File.WriteAllText(settingsFile, sourceSettings);
-            var processStartInfo = new ProcessStartInfo
-            {
-                FileName = console,
-                Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile} --logger:console;verbosity=detailed",
-                UseShellExecute = false,
-            };
-            EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
-            var process = Process.Start(processStartInfo);
-            process.WaitForExit();
-            if (process.ExitCode != 0)
-            {
-                throw new Exception($"Process failed with {process.ExitCode}");
-            }
-        }
-        finally
+            EnvironmentVariables = EnvironmentVariables.Variables,
+            LogFilePath = Path.Combine(here, "logs", "log.txt"),
+            TraceLevel = TraceLevel.Verbose,
+        };
+        var options = new TestPlatformOptions
         {
-            try { File.Delete(settingsFile); } catch { }
-        }
+            CollectMetrics = true,
+        };
+        var r = new VsTestConsoleWrapper(console, consoleOptions);
+        var sessionHandler = new TestSessionHandler();
+#pragma warning disable CS0618 // Type or member is obsolete
+        //// TestSessions
+        // r.StartTestSession(sources, sourceSettings, sessionHandler);
+#pragma warning restore CS0618 // Type or member is obsolete
+        //var discoveryHandler = new PlaygroundTestDiscoveryHandler(detailedOutput);
+        var sw = Stopwatch.StartNew();
+        // Discovery
+        //r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        //var discoveryDuration = sw.ElapsedMilliseconds;
+        //Console.WriteLine($"Discovery done in {discoveryDuration} ms");
+        sw.Restart();
+        // Run with test cases and custom testhost launcher
+        //r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput), new DebuggerTestHostLauncher());
+        //// Run with test cases and without custom testhost launcher
+        //r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
+        //// Run with sources and custom testhost launcher and debugging
+        // r.RunTestsWithCustomTestHost(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput), new DebuggerTestHostLauncher());
+        //// Run with sources
+        r.RunTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
+        //Console.WriteLine($"Discovery: {discoveryDuration} ms, Run: {rd} ms, Total: {discoveryDuration + rd} ms");
+        // Console.WriteLine($"Settings:\n{sourceSettings}");
     }
 
     public class PlaygroundTestDiscoveryHandler : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2

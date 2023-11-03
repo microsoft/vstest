@@ -27,7 +27,7 @@ public interface ICommunicationChannel : IDisposable
     /// Notification from server/client that data is available.
     /// </summary>
     /// <returns>A <see cref="Task"/> implying async nature of the function.</returns>
-    Task NotifyDataAvailable();
+    Task NotifyDataAvailable(CancellationToken cancellationToken);
 }
 
 #pragma warning disable CA1001 // Types that own disposable fields should be disposable
@@ -54,7 +54,10 @@ public class TrackableEvent<T>
 
     public bool WaitForSubscriber(int timeoutMilliseconds, CancellationToken cancellationToken)
     {
-        return _slim.Wait(timeoutMilliseconds, cancellationToken);
+        var _ = timeoutMilliseconds;
+        var __ = cancellationToken;
+        return Event != null;
+        //return _slim.Wait(timeoutMilliseconds, cancellationToken);
     }
 
     public void Subscribe(EventHandler<T> eventHandler)
@@ -64,7 +67,6 @@ public class TrackableEvent<T>
         {
             _slim.Set();
         }
-        // return new UnsubscribeToken(() => Unsubscribe(eventHandler));
     }
 
     public void Unsubscribe(EventHandler<T> eventHandler)

@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -70,7 +71,7 @@ public class LengthPrefixCommunicationChannel : ICommunicationChannel
     }
 
     /// <inheritdoc />
-    public Task NotifyDataAvailable()
+    public Task NotifyDataAvailable(CancellationToken cancellationToken)
     {
         try
         {
@@ -84,8 +85,11 @@ public class LengthPrefixCommunicationChannel : ICommunicationChannel
             // Try read data even if no one is listening to the data stream. Some server
             // implementations (like Sockets) depend on the read operation to determine if a
             // connection is closed.
-            var data = _reader.ReadString();
-            MessageReceived.Notify(this, new MessageReceivedEventArgs { Data = data }, "LengthPrefixCommunicationChannel: MessageReceived");
+            if (MessageReceived.WaitForSubscriber(1000, cancellationToken))
+            {
+                var data = _reader.ReadString();
+                MessageReceived.Notify(this, new MessageReceivedEventArgs { Data = data }, "LengthPrefixCommunicationChannel: MessageReceived");
+            }
         }
         catch (ObjectDisposedException ex) when (!_reader.BaseStream.CanRead)
         {
