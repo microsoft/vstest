@@ -476,7 +476,7 @@ public class TestRequestHandlerTests
 
     private void SendMessageOnChannel(string data)
     {
-        _mockChannel.Raise(c => c.MessageReceived += null, new MessageReceivedEventArgs { Data = data });
+        _mockChannel.Raise(c => c.MessageReceived.Subscribe((sender, args) => { }), new MessageReceivedEventArgs { Data = data });
     }
 
     private void SendSessionEnd()

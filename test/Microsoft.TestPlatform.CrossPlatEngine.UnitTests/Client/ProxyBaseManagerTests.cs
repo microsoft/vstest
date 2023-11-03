@@ -87,7 +87,7 @@ public class ProxyBaseManagerTests
     public void SetupChannelMessage<TPayload>(string messageType, string returnMessageType, TPayload returnPayload)
     {
         _mockChannel.Setup(mc => mc.Send(It.Is<string>(s => s.Contains(messageType))))
-            .Callback(() => _mockChannel.Raise(c => c.MessageReceived += null, _mockChannel.Object, new MessageReceivedEventArgs { Data = messageType }));
+            .Callback(() => _mockChannel.Raise(c => c.MessageReceived.Subscribe((sender, args) => { }), _mockChannel.Object, new MessageReceivedEventArgs { Data = messageType }));
 
         _mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>())).Returns(messageType);
         _mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>(), It.IsAny<int>())).Returns(messageType);
@@ -97,7 +97,7 @@ public class ProxyBaseManagerTests
 
     public void RaiseMessageReceived(string data)
     {
-        _mockChannel.Raise(c => c.MessageReceived += null, _mockChannel.Object,
+        _mockChannel.Raise(c => c.MessageReceived.Subscribe((sender, args) => { }), _mockChannel.Object,
             new MessageReceivedEventArgs { Data = data });
     }
 

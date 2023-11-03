@@ -873,7 +873,7 @@ public class TestRequestSenderTests
     private void RaiseMessageReceivedEvent()
     {
         _mockChannel.Raise(
-            c => c.MessageReceived += null,
+            c => c.MessageReceived.Subscribe((sender, args) => { }),
             _mockChannel.Object,
             new MessageReceivedEventArgs { Data = "DummyData" });
     }
