@@ -54,10 +54,7 @@ public class TrackableEvent<T>
 
     public bool WaitForSubscriber(int timeoutMilliseconds, CancellationToken cancellationToken)
     {
-        var _ = timeoutMilliseconds;
-        var __ = cancellationToken;
-        return Event != null;
-        //return _slim.Wait(timeoutMilliseconds, cancellationToken);
+        return _slim.Wait(timeoutMilliseconds, cancellationToken);
     }
 
     public void Subscribe(EventHandler<T> eventHandler)
