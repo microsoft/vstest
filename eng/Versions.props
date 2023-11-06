@@ -2,13 +2,13 @@
 <Project>
   <PropertyGroup Label="Version settings">
     <!-- This repo version -->
-    <!-- 
-        Workaround for https://github.com/microsoft/vstest/issues/4544 
-        Use semantic versioning V1 because V2 will produce version like 17.7.0-preview.23280.1+94103c3f and DTAExecutionHost 
-        is trying to parse that version and will consider any version with more than 4 `.` in it as invalid. 
+    <!--
+        Workaround for https://github.com/microsoft/vstest/issues/4544
+        Use semantic versioning V1 because V2 will produce version like 17.7.0-preview.23280.1+94103c3f and DTAExecutionHost
+        is trying to parse that version and will consider any version with more than 4 `.` in it as invalid.
     -->
     <SemanticVersioningV1>true</SemanticVersioningV1>
-    <VersionPrefix>17.7.0</VersionPrefix>
+    <VersionPrefix>17.9.0</VersionPrefix>
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
   </PropertyGroup>
   <PropertyGroup Label="Arcade settings">
@@ -16,8 +16,6 @@
     <UsingToolXliff>true</UsingToolXliff>
     <!-- Opt-in to Arcade tools for building VSIX projects. -->
     <UsingToolVSSDK>true</UsingToolVSSDK>
-    <!-- Use the correct compiler version -->
-    <UsingToolMicrosoftNetCompilers>true</UsingToolMicrosoftNetCompilers>
   </PropertyGroup>
   <PropertyGroup Label="VSTest dependencies">
     <CoverletCoverageVersion>1.2.0</CoverletCoverageVersion>
@@ -30,25 +28,25 @@
     <MicrosoftExtensionsDependencyModelPackageVersion>3.0.0</MicrosoftExtensionsDependencyModelPackageVersion>
     <MicrosoftExtensionsFileSystemGlobbingVersion>2.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
     <MicrosoftFakesVersion>17.4.0-beta.22478.3</MicrosoftFakesVersion>
-    <MicrosoftInternalCodeCoverageVersion>17.7.2-beta.23312.4</MicrosoftInternalCodeCoverageVersion>
-    <MicrosoftNetCompilersToolsetVersion>4.6.0-1.23107.10</MicrosoftNetCompilersToolsetVersion>
-    <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>17.6.33617.297</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
+    <MicrosoftInternalCodeCoverageVersion>17.9.4-beta.23554.3</MicrosoftInternalCodeCoverageVersion>
+    <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>17.6.33910.51</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
     <MicrosoftVisualStudioEnterpriseAspNetHelper>$(MicrosoftVisualStudioDiagnosticsUtilitiesVersion)</MicrosoftVisualStudioEnterpriseAspNetHelper>
     <MicrosoftVisualStudioInteropVersion>17.3.32622.426</MicrosoftVisualStudioInteropVersion>
+    <MicrosoftVSTelemetryVersion>17.6.46</MicrosoftVSTelemetryVersion>
+    <MicrosoftVSUtilitiesInternalVersion>16.3.42</MicrosoftVSUtilitiesInternalVersion>
     <MicrosoftVSSDKBuildToolsVersion>17.4.2116</MicrosoftVSSDKBuildToolsVersion>
-    <NETStandardLibraryVersion>2.0.3</NETStandardLibraryVersion>
     <NewtonsoftJsonVersion>13.0.1</NewtonsoftJsonVersion>
+    <NewtonsoftJsonVersion Condition="'$(DotNetBuildFromSource)' == 'true'">13.0.3</NewtonsoftJsonVersion>
     <RoslynBannedApiAnalyzersVersion>3.3.3</RoslynBannedApiAnalyzersVersion>
     <RoslynPublicApiAnalyzersVersion>3.3.4-beta1.21554.2</RoslynPublicApiAnalyzersVersion>
     <SystemCollectionsImmutableVersion>1.5.0</SystemCollectionsImmutableVersion>
-    <SystemComponentModelCompositionForSourceBuildVersion>7.0.0</SystemComponentModelCompositionForSourceBuildVersion>
     <SystemComponentModelCompositionVersion>4.5.0</SystemComponentModelCompositionVersion>
     <SystemMemoryVersion>4.5.5</SystemMemoryVersion>
     <SystemNetHttpVersion>4.3.4</SystemNetHttpVersion>
     <SystemReflectionMetadataVersion>1.6.0</SystemReflectionMetadataVersion>
     <SystemUriVersion>4.3.2</SystemUriVersion>
-    <TestPlatformExternalsVersion>17.7.0-preview-3-33808-347</TestPlatformExternalsVersion>
-    <TestPlatformMSDiaVersion>17.7.0-preview-3-33808-347</TestPlatformMSDiaVersion>
+    <TestPlatformExternalsVersion>17.7.33819.109</TestPlatformExternalsVersion>
+    <TestPlatformMSDiaVersion>17.7.33819.109</TestPlatformMSDiaVersion>
   </PropertyGroup>
   <PropertyGroup Label="VSTest test settings">
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
@@ -89,11 +87,6 @@
     <VSTestConsoleMostDownloadedVersion>[16.6.1]</VSTestConsoleMostDownloadedVersion>
     <VSTestConsolePreviousStableVersion>[16.11.0]</VSTestConsolePreviousStableVersion>
     <VSTestConsoleLegacyStableVersion>[15.9.2]</VSTestConsoleLegacyStableVersion>
-    <!-- This version also needs to be updated in src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.nuspec -->
-    <!-- This version needs to be the same or lower than <NuGetFrameworksPackageVersion> https://github.com/dotnet/sdk/blob/release/main/eng/Versions.props
-    (or the respective branch. It also needs to be on nuget.org. -->
-    <NuGetFrameworksVersion>6.5.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
-    <JsonNetVersion>13.0.1</JsonNetVersion>
   </PropertyGroup>
 </Project>

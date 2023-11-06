@@ -5,7 +5,10 @@ Param(
     [string] $configuration,
 
     [Parameter(Mandatory)]
-    [string] $versionPrefix
+    [string] $versionPrefix,
+
+    [Parameter(Mandatory)]
+    [string] $currentBranch
 )
 
 $ErrorActionPreference = 'Stop'
@@ -16,13 +19,13 @@ function Verify-Nuget-Packages {
     $expectedNumOfFiles = @{
         "Microsoft.CodeCoverage"                      = 59;
         "Microsoft.NET.Test.Sdk"                      = 16;
-        "Microsoft.TestPlatform"                      = 608;
+        "Microsoft.TestPlatform"                      = 605;
         "Microsoft.TestPlatform.Build"                = 21;
-        "Microsoft.TestPlatform.CLI"                  = 493;
+        "Microsoft.TestPlatform.CLI"                  = 470;
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 35;
         "Microsoft.TestPlatform.ObjectModel"          = 93;
         "Microsoft.TestPlatform.AdapterUtilities"     = 34;
-        "Microsoft.TestPlatform.Portable"             = 595;
+        "Microsoft.TestPlatform.Portable"             = 592;
         "Microsoft.TestPlatform.TestHost"             = 63;
         "Microsoft.TestPlatform.TranslationLayer"     = 123;
         "Microsoft.TestPlatform.Internal.Uwp"         = 39;
@@ -34,26 +37,26 @@ function Verify-Nuget-Packages {
     $pattern = "*.$versionPrefix*.nupkg"
     $nugetPackages = @(Get-ChildItem $packageDirectory -Filter $pattern -Recurse -File | Where-Object { $_.Name -notLike "*.symbols.nupkg"})
 
-    if (0 -eq $nugetPackages.Length) { 
+    if (0 -eq $nugetPackages.Length) {
         throw "No nuget packages matching $pattern were found in '$packageDirectory'."
     }
 
     $suffixes = @($nugetPackages -replace ".*?$([regex]::Escape($versionPrefix))(.*)\.nupkg", '$1' | Sort-Object -Unique)
-    if (1 -lt $suffixes.Length) { 
+    if (1 -lt $suffixes.Length) {
         Write-Host "There are two different suffixes matching the same version prefix: '$($suffixes -join "', '")'".
 
-        $latestNuget = $nugetPackages | 
-            Where-Object { $_.Name -like "Microsoft.TestPlatform.ObjectModel.*" } | 
-            Sort-Object -Property LastWriteTime -Descending | 
+        $latestNuget = $nugetPackages |
+            Where-Object { $_.Name -like "Microsoft.TestPlatform.ObjectModel.*" } |
+            Sort-Object -Property LastWriteTime -Descending |
             Select-Object -First 1
-        
+
         $suffix = $suffixes | Where { $latestNuget.Name.Contains("$versionPrefix$_.nupkg") }
         $version = "$versionPrefix$suffix"
         Write-Host "The most recently written Microsoft.TestPlatform.ObjectModel.* nuget, is $($latestNuget.Name), which has '$suffix' suffix. Selecting only packages with that suffix."
 
         $nugetPackages = $nugetPackages | Where-Object { $_.Name -like "*$version.nupkg" }
     }
-    else { 
+    else {
         $suffix = $suffixes[0]
         $version = "$versionPrefix$suffix"
     }
@@ -89,6 +92,10 @@ function Verify-Nuget-Packages {
             if ($expectedNumOfFiles[$packageKey] -ne $actualNumOfFiles) {
                 $errors += "Number of files are not equal for '$packageBaseName', expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
             }
+
+            if ($packageKey -eq "Microsoft.TestPlatform") {
+                Verify-Version -nugetDir $unzipNugetPackageDir -errors $errors
+            }
         }
         finally {
             if ($null -ne $unzipNugetPackageDir -and (Test-Path $unzipNugetPackageDir)) {
@@ -110,6 +117,43 @@ function Unzip {
     Write-Verbose "Unzipping '$zipfile' to '$outpath'."
 
     [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)
+}
+
+function Match-VersionAgainstBranch {
+    param ([string]$vsTestVersion, [string]$branchName,  [string[]]$errors)
+
+    # Output useful info.
+    Write-Host "VSTest Product Version: `"$vsTestVersion`""
+    Write-Host "Current Branch: `"$branchName`""
+
+    $versionIsRTM = $vsTestVersion -match "^\d+\.\d+\.\d+$"
+    $versionIsRelease = $vsTestVersion -match "^\d+\.\d+\.\d+\-release\-\d{8}\-\d{2}$"
+    $versionIsPreview = $vsTestVersion -match "^\d+\.\d+\.\d+\-preview\-\d{8}\-\d{2}$"
+
+    $isReleaseBranch = $branchName -like "rel/*"
+    $isPreviewBranch = $branchName -like "main"
+
+    if (!$isReleaseBranch -and !$isPreviewBranch) {
+        Write-Host "Skipping check since branch is neither `"release`" nor `"preview`""
+        return
+    }
+
+    Write-Host "Matching branch against product version ... "
+    if ($isReleaseBranch -and !$versionIsRTM -and !$versionIsRelease) {
+        $errors += "Release version `"$vsTestVersion`" should either be RTM, or contain a `"release`" suffix."
+    }
+    if ($isPreviewBranch -and !$versionIsPreview) {
+        $errors += "Preview version `"$vsTestVersion`" should contain a `"preview`" suffix."
+    }
+}
+
+function Verify-Version {
+    param ([string]$nugetDir, [string[]] $errors)
+
+    $vsTestExe = "$nugetDir/tools/net462/Common7/IDE/Extensions/TestPlatform/vstest.console.exe"
+    $vsTestProductVersion = (Get-Item $vsTestExe).VersionInfo.ProductVersion
+
+    Match-VersionAgainstBranch -vsTestVersion $vsTestProductVersion -branchName $currentBranch -errors $errors
 }
 
 Verify-Nuget-Packages
