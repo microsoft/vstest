@@ -118,7 +118,8 @@ public static class OutputExtensions
 
 #if NET5_0_OR_GREATER
         if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() || OperatingSystem.IsBrowser() || OperatingSystem.IsTvOS())
-            return; // Console color not supported on these platforms.
+            // Console color not supported on these platforms.
+            action.Invoke();
 #endif
 
         var previousForegroundColor = Console.ForegroundColor;
