@@ -4,7 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -20,18 +21,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 [FriendlyName(FriendlyName)]
 internal class MSBuildLogger : ITestLoggerWithParameters
 {
-    private const string TestMessageFormattingPrefix = " ";
-    private const string TestResultPrefix = "  ";
-
     public const string ExtensionUri = "logger://Microsoft/TestPlatform/MSBuildLogger/v1";
 
     // This name is not so friendly on purpose, because MSBuild seems like a name that someone might have
     // already claimed, and we will use this just programmatically.
     public const string FriendlyName = "Microsoft.TestPlatform.MSBuildLogger";
-
-    public const string VerbosityParam = "verbosity";
-
-    public Verbosity VerbosityLevel { get; private set; } = Verbosity.Minimal;
 
     /// <summary>
     /// Gets instance of IOutput used for sending output.
@@ -73,20 +67,6 @@ internal class MSBuildLogger : ITestLoggerWithParameters
 
     public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters)
     {
-        ValidateArg.NotNull(parameters, nameof(parameters));
-
-        if (parameters.Count == 0)
-        {
-            throw new ArgumentException("No default parameters added", nameof(parameters));
-        }
-
-        var verbosityExists = parameters.TryGetValue(VerbosityParam, out var verbosity);
-        if (verbosityExists && Enum.TryParse(verbosity, true, out Verbosity verbosityLevel))
-        {
-            // We don't use this anywhere for now.
-            VerbosityLevel = verbosityLevel;
-        }
-
         Initialize(events, string.Empty);
     }
 
@@ -116,51 +96,68 @@ internal class MSBuildLogger : ITestLoggerWithParameters
         ValidateArg.NotNull(sender, nameof(sender));
         ValidateArg.NotNull(e, nameof(e));
         TPDebug.Assert(Output != null, "Initialize should have been called.");
-
         switch (e.Result.Outcome)
         {
             case TestOutcome.Failed:
                 {
-                    var stringBuilder = new StringBuilder();
-                    var testDisplayName = e.Result.DisplayName;
-
-                    if (e.Result.DisplayName.IsNullOrWhiteSpace())
+                    var result = e.Result;
+                    if (!StringUtils.IsNullOrWhiteSpace(result.ErrorStackTrace))
                     {
-                        testDisplayName = e.Result.TestCase.DisplayName;
+                        var error = result.ErrorMessage == null ? null : Regex.Split(result.ErrorMessage, Environment.NewLine)[0];
+                        string? stackFrame = null;
+                        var stackFrames = Regex.Split(result.ErrorStackTrace, Environment.NewLine);
+                        if (stackFrames.Length > 0)
+                        {
+                            stackFrame = stackFrames[0];
+                        }
+                        if (stackFrame != null)
+                        {
+                            // stack frame looks like this '   at Program.<Main>$(String[] args) in S:\t\ConsoleApp81\ConsoleApp81\Program.cs:line 9'
+                            var match = Regex.Match(stackFrame, @"^\s+at (?<code>.+) in (?<file>.+):line (?<line>\d+)$?");
+
+                            string? line;
+                            string? file;
+                            string? code;
+                            if (match.Success)
+                            {
+                                // get the exact info from stack frame.
+                                code = match.Groups["code"].Value;
+                                file = match.Groups["file"].Value;
+                                line = match.Groups["line"].Value;
+                            }
+                            else
+                            {
+                                // if there are no symbols but we collect source info, us the source info.
+                                file = result.TestCase.CodeFilePath;
+                                line = result.TestCase.LineNumber > 0 ? result.TestCase.LineNumber.ToString(CultureInfo.InvariantCulture) : null;
+                                code = stackFrame;
+                            }
+
+                            var message = $"||||{ReplaceSeparator(file)}||||{line}||||{ReplaceSeparator(code)}||||{ReplaceSeparator(error)}";
+
+                            Output.Error(false, message);
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        Output.Error(false, result.DisplayName?.Replace(Environment.NewLine, " ") ?? string.Empty);
                     }
 
-                    stringBuilder.Append(testDisplayName ?? "<unknown>").Append(": ");
-                    AppendFullError(e.Result, stringBuilder);
-                    Output.Error(false, stringBuilder.ToString());
+
                     break;
                 }
         }
     }
 
-    private static void AppendFullError(TestResult result, StringBuilder stringBuilder)
+    private static string? ReplaceSeparator(string? text)
     {
-        TPDebug.Assert(result != null, "a null result can not be displayed");
-        TPDebug.Assert(Output != null, "Initialize should have been called.");
-
-        if (!result.ErrorMessage.IsNullOrEmpty())
+        if (text == null)
         {
-            stringBuilder.Append(result.ErrorMessage);
+            return null;
         }
 
-        stringBuilder.AppendLine();
-
-        if (!result.ErrorStackTrace.IsNullOrEmpty())
-        {
-            stringBuilder.AppendLine(CommandLineResources.StacktraceBanner);
-            stringBuilder.AppendLine(result.ErrorStackTrace);
-        }
+        return text.Replace("||||", "____");
     }
 
-    internal enum Verbosity
-    {
-        Quiet,
-        Minimal,
-        Normal,
-        Detailed
-    }
 }

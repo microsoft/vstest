@@ -40,6 +40,10 @@ public class VSTestTask2 : ToolTask, ITestTask
     public string? VSTestArtifactsProcessingMode { get; set; }
     public string? VSTestSessionCorrelationId { get; set; }
 
+
+    private readonly string _splitter = "||||";
+    private readonly string[] _splitterArray = new[] { "||||" };
+
     protected override string? ToolName
     {
         get
@@ -53,8 +57,37 @@ public class VSTestTask2 : ToolTask, ITestTask
 
     public VSTestTask2()
     {
-        LogStandardErrorAsError = true;
+        LogStandardErrorAsError = false;
         StandardOutputImportance = "Normal";
+    }
+
+    protected override void LogEventsFromTextOutput(string singleLine, MessageImportance messageImportance)
+    {
+        if (singleLine.StartsWith(_splitter))
+        {
+            var parts = singleLine.Split(_splitterArray, StringSplitOptions.None);
+            if (parts.Length == 5)
+            {
+                var line = 0;
+                var file = parts[1];
+                var _ = !StringUtils.IsNullOrWhiteSpace(parts[3]) && int.TryParse(parts[2], out line);
+                var code = parts[3];
+                var message = parts[4];
+
+                // Join them with space if both are not null,
+                // otherwise use the one that is not null.
+                string? error = code != null && message != null
+                    ? code + " " + message
+                    : code ?? message;
+
+                file ??= string.Empty;
+
+                Log.LogError(null, "VSTEST1", null, file, line, 0, 0, 0, error, null);
+                return;
+            }
+        }
+
+        base.LogEventsFromTextOutput(singleLine, messageImportance);
     }
 
     protected override string? GenerateCommandLineCommands()

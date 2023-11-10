@@ -76,6 +76,7 @@ internal static class TestTaskUtils
 
                 if (arg != null && arg.StartsWith(loggerToUse, StringComparison.OrdinalIgnoreCase))
                 {
+                    System.Diagnostics.Trace.WriteLine($">>>> : User specified logger: {arg}");
                     isLoggerSpecifiedByUser = true;
                 }
             }
@@ -101,20 +102,23 @@ internal static class TestTaskUtils
 
         // The logger to use (console or msbuild) logger was not specified by user,
         // add the logger and verbosity, so we know what to use in vstest.console.
-        if (!task.VSTestVerbosity.IsNullOrWhiteSpace() && !isLoggerSpecifiedByUser)
+        if (!isLoggerSpecifiedByUser)
         {
-            var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
-            var quietTestLogging = new List<string>() { "q", "quiet" };
-
             string vsTestVerbosity = "minimal";
-            string taskVsTestVerbosity = task.VSTestVerbosity.ToLowerInvariant();
-            if (normalTestLogging.Contains(taskVsTestVerbosity))
+            if (!task.VSTestVerbosity.IsNullOrWhiteSpace())
             {
-                vsTestVerbosity = "normal";
-            }
-            else if (quietTestLogging.Contains(taskVsTestVerbosity))
-            {
-                vsTestVerbosity = "quiet";
+                var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
+                var quietTestLogging = new List<string>() { "q", "quiet" };
+
+                string taskVsTestVerbosity = task.VSTestVerbosity.ToLowerInvariant();
+                if (normalTestLogging.Contains(taskVsTestVerbosity))
+                {
+                    vsTestVerbosity = "normal";
+                }
+                else if (quietTestLogging.Contains(taskVsTestVerbosity))
+                {
+                    vsTestVerbosity = "quiet";
+                }
             }
 
             builder.AppendSwitchUnquotedIfNotNull("--logger:", $"{loggerToUse};Verbosity={vsTestVerbosity}");
