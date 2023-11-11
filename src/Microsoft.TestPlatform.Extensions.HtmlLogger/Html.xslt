@@ -135,8 +135,9 @@
     <xsl:for-each select ="tp:TestResultCollection">
       <xsl:variable name="Source" select="tp:Id" />
       <xsl:if test="tp:FailedResultList!=''">
-        <details open>
-          <summary><xsl:value-of select = "tp:Source" /></summary>
+        <details>
+            <xsl:attribute name="open"/>
+            <summary><xsl:value-of select = "tp:Source" /></summary>
           <div class ="inner-row" Id="{concat($Source,'-failedResult')}">
             <xsl:for-each select ="tp:FailedResultList/tp:TestResult"><xsl:call-template name ="TestResult"/></xsl:for-each>
           </div>
