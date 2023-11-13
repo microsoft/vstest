@@ -76,14 +76,4 @@ public class TrackableEvent<T>
     }
 }
 
-internal class UnsubscribeToken : IDisposable
-{
-    private readonly Action _unsubscribeCallback;
-    internal UnsubscribeToken(Action value) => _unsubscribeCallback = value;
-
-    public void Unsubscribe() => _unsubscribeCallback();
-    public void Dispose()
-    {
-        _unsubscribeCallback();
-    }
 }
