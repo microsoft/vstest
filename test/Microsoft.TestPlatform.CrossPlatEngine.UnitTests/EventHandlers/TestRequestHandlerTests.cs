@@ -43,6 +43,7 @@ public class TestRequestHandlerTests
         _mockCommunicationClient = new Mock<ICommunicationEndPoint>();
         _mockCommunicationEndpointFactory = new Mock<ICommunicationEndpointFactory>();
         _mockChannel = new Mock<ICommunicationChannel>();
+        _mockChannel.Setup(mc => mc.MessageReceived).Returns(new TrackableEvent<MessageReceivedEventArgs>());
         _dataSerializer = JsonDataSerializer.Instance;
         _testHostConnectionInfo = new TestHostConnectionInfo
         {
@@ -73,6 +74,7 @@ public class TestRequestHandlerTests
             JsonDataSerializer.Instance,
             _jobQueue);
         _requestHandler.InitializeCommunication();
+
         _mockCommunicationClient.Raise(e => e.Connected += null, new ConnectedEventArgs(_mockChannel.Object));
     }
 

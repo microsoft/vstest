@@ -43,7 +43,7 @@ public class TrackableEvent<T>
         _slim = new ManualResetEventSlim(Event != null);
     }
 
-    public void Notify(object sender, T eventArgs, string traceDisplayName)
+    public virtual void Notify(object sender, T eventArgs, string traceDisplayName)
     {
         var e = Event;
         if (e != null)
@@ -52,12 +52,12 @@ public class TrackableEvent<T>
         }
     }
 
-    public bool WaitForSubscriber(int timeoutMilliseconds, CancellationToken cancellationToken)
+    public virtual bool WaitForSubscriber(int timeoutMilliseconds, CancellationToken cancellationToken)
     {
         return _slim.Wait(timeoutMilliseconds, cancellationToken);
     }
 
-    public void Subscribe(EventHandler<T> eventHandler)
+    public virtual void Subscribe(EventHandler<T>? eventHandler)
     {
         Event += eventHandler;
         if (Event != null)
@@ -66,7 +66,7 @@ public class TrackableEvent<T>
         }
     }
 
-    public void Unsubscribe(EventHandler<T> eventHandler)
+    public virtual void Unsubscribe(EventHandler<T>? eventHandler)
     {
         Event -= eventHandler;
         if (Event == null)
