@@ -25,7 +25,7 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
         var projectPath = GetIsolatedTestAsset("SimpleTestProject.csproj");
         // --logger: console will output standard messages to msbuild output, which will be hidden by default
         // that is why provide also --verbosity:normal so msbuild shows that console output
-        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" --verbosity:normal /p:VsTestUseMSBuildOutput=true /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}");
+        InvokeDotnetTest($@"{projectPath} --verbosity:normal /p:VsTestUseMSBuildOutput=true /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}");
 
         // ensure our dev version is used
         StdOutputContains("-dev");

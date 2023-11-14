@@ -103,7 +103,13 @@ internal class MSBuildLogger : ITestLoggerWithParameters
                     var result = e.Result;
                     if (!StringUtils.IsNullOrWhiteSpace(result.ErrorStackTrace))
                     {
-                        var error = result.ErrorMessage == null ? null : Regex.Split(result.ErrorMessage, Environment.NewLine)[0];
+                        var maxLength = 1000;
+                        string? error = null;
+                        if (result.ErrorMessage != null)
+                        {
+                            var oneLineMessage = result.ErrorMessage.Replace(Environment.NewLine, " ");
+                            error = oneLineMessage.Length > maxLength ? oneLineMessage.Substring(0, maxLength) : oneLineMessage;
+                        }
                         string? stackFrame = null;
                         var stackFrames = Regex.Split(result.ErrorStackTrace, Environment.NewLine);
                         if (stackFrames.Length > 0)
@@ -115,25 +121,32 @@ internal class MSBuildLogger : ITestLoggerWithParameters
                             // stack frame looks like this '   at Program.<Main>$(String[] args) in S:\t\ConsoleApp81\ConsoleApp81\Program.cs:line 9'
                             var match = Regex.Match(stackFrame, @"^\s+at (?<code>.+) in (?<file>.+):line (?<line>\d+)$?");
 
-                            string? line;
+                            string? line = null;
                             string? file;
-                            string? code;
+                            string? place;
                             if (match.Success)
                             {
                                 // get the exact info from stack frame.
-                                code = match.Groups["code"].Value;
+                                place = match.Groups["code"].Value;
                                 file = match.Groups["file"].Value;
                                 line = match.Groups["line"].Value;
                             }
-                            else
+                            else if (!StringUtils.IsNullOrEmpty(result.TestCase.CodeFilePath))
                             {
                                 // if there are no symbols but we collect source info, us the source info.
                                 file = result.TestCase.CodeFilePath;
                                 line = result.TestCase.LineNumber > 0 ? result.TestCase.LineNumber.ToString(CultureInfo.InvariantCulture) : null;
-                                code = stackFrame;
+                                place = stackFrame;
+                            }
+                            else
+                            {
+                                // if there are no symbols and no source info use the dll
+                                place = result.TestCase.DisplayName;
+                                file = result.TestCase.Source;
                             }
 
-                            var message = $"||||{ReplaceSeparator(file)}||||{line}||||{ReplaceSeparator(code)}||||{ReplaceSeparator(error)}";
+                            place = $"({result.TestCase.DisplayName}) {place}";
+                            var message = $"||||{ReplaceSeparator(file)}||||{line}||||{ReplaceSeparator(place)}||||{ReplaceSeparator(error)}";
 
                             Output.Error(false, message);
                             return;
