@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -110,28 +112,28 @@ internal class MSBuildLogger : ITestLoggerWithParameters
                             var oneLineMessage = result.ErrorMessage.Replace(Environment.NewLine, " ");
                             error = oneLineMessage.Length > maxLength ? oneLineMessage.Substring(0, maxLength) : oneLineMessage;
                         }
+
                         string? stackFrame = null;
                         var stackFrames = Regex.Split(result.ErrorStackTrace, Environment.NewLine);
+                        string? line = null;
+                        string? file = null;
+                        string? place = null;
                         if (stackFrames.Length > 0)
                         {
-                            stackFrame = stackFrames[0];
-                        }
-                        if (stackFrame != null)
-                        {
-                            // stack frame looks like this '   at Program.<Main>$(String[] args) in S:\t\ConsoleApp81\ConsoleApp81\Program.cs:line 9'
-                            var match = Regex.Match(stackFrame, @"^\s+at (?<code>.+) in (?<file>.+):line (?<line>\d+)$?");
-
-                            string? line = null;
-                            string? file;
-                            string? place;
-                            if (match.Success)
+                            foreach (var frame in stackFrames.Take(20))
                             {
-                                // get the exact info from stack frame.
-                                place = match.Groups["code"].Value;
-                                file = match.Groups["file"].Value;
-                                line = match.Groups["line"].Value;
+                                if (TryGetStackFrameLocation(frame, out line, out file, out place))
+                                {
+                                    break;
+                                }
                             }
-                            else if (!StringUtils.IsNullOrEmpty(result.TestCase.CodeFilePath))
+                        }
+
+                        // We did not find any stack frame with location in the first 20 frames.
+                        // Try getting location of the test.
+                        if (file == null)
+                        {
+                            if (!StringUtils.IsNullOrEmpty(result.TestCase.CodeFilePath))
                             {
                                 // if there are no symbols but we collect source info, us the source info.
                                 file = result.TestCase.CodeFilePath;
@@ -144,13 +146,14 @@ internal class MSBuildLogger : ITestLoggerWithParameters
                                 place = result.TestCase.DisplayName;
                                 file = result.TestCase.Source;
                             }
-
-                            place = $"({result.TestCase.DisplayName}) {place}";
-                            var message = $"||||{ReplaceSeparator(file)}||||{line}||||{ReplaceSeparator(place)}||||{ReplaceSeparator(error)}";
-
-                            Output.Error(false, message);
-                            return;
                         }
+
+                        place = $"({result.TestCase.DisplayName}) {place}";
+                        var message = $"||||{ReplaceSeparator(file)}||||{line}||||{ReplaceSeparator(place)}||||{ReplaceSeparator(error)}";
+
+                        Trace.WriteLine(">>>>MESSAGE:" + message);
+                        Output.Error(false, message);
+                        return;
                     }
                     else
                     {
@@ -162,6 +165,29 @@ internal class MSBuildLogger : ITestLoggerWithParameters
                 }
         }
     }
+
+    private static bool TryGetStackFrameLocation(string stackFrame, out string? line, out string? file, out string? place)
+    {
+        // stack frame looks like this '   at Program.<Main>$(String[] args) in S:\t\ConsoleApp81\ConsoleApp81\Program.cs:line 9'
+        var match = Regex.Match(stackFrame, @"^\s+at (?<code>.+) in (?<file>.+):line (?<line>\d+)$?");
+
+        line = null;
+        file = null;
+        place = null;
+
+        if (match.Success)
+        {
+            // get the exact info from stack frame.
+            place = match.Groups["code"].Value;
+            file = match.Groups["file"].Value;
+            line = match.Groups["line"].Value;
+        }
+
+        Trace.WriteLine($">>>> {(match.Success ? "MATCH" : "NOMATCH")} {stackFrame}");
+
+        return match.Success;
+    }
+
 
     private static string? ReplaceSeparator(string? text)
     {
