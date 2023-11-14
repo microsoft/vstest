@@ -12,12 +12,22 @@
       SkippedTests:
     </span><span class="skippedTests">0</span><br><br></div>
     <h2>Results</h2>
-    <div class="row">
+    <div class="row" onclick="ToggleClass('ID0EE')">
       <div><span class="pass">
         ✔
       </span><span>SampleUnitTestProject.UnitTest1.PassingTest</span><div class="duration"><span>7ms</span><br></div>
       </div><br></div>
-  </body><style>
+  </body><script language="javascript">
+        function ToggleClass(id) {
+        var elem = document.getElementById(id);
+        if (elem.style.display == "none") {
+        elem.style.display = "block";
+        }
+        else {
+        elem.style.display = "none";
+        }
+        }
+      </script><style>
         #testtable {
         border-collapse: collapse;
         }
