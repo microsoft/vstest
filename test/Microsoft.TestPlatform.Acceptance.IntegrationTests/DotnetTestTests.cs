@@ -20,7 +20,7 @@ public class DotnetTestTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("SimpleTestProject.csproj");
-        InvokeDotnetTest($@"{projectPath} /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}");
+        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}");
 
         // ensure our dev version is used
         StdOutputContains("-dev");
