@@ -41,8 +41,13 @@ public class VSTestTask2 : ToolTask, ITestTask
     public string? VSTestSessionCorrelationId { get; set; }
 
 
-    private readonly string _splitter = "||||";
-    private readonly string[] _splitterArray = new[] { "||||" };
+    private readonly string _errorSplitter = "||||";
+    private readonly string[] _errorSplitterArray = new[] { "||||" };
+
+    private readonly string _fullErrorSplitter = "~~~~";
+    private readonly string[] _fullErrorSplitterArray = new[] { "~~~~" };
+
+    private readonly string _fullErrorNewlineSplitter = "!!!!";
 
     protected override string? ToolName
     {
@@ -63,9 +68,9 @@ public class VSTestTask2 : ToolTask, ITestTask
 
     protected override void LogEventsFromTextOutput(string singleLine, MessageImportance messageImportance)
     {
-        if (singleLine.StartsWith(_splitter))
+        if (singleLine.StartsWith(_errorSplitter))
         {
-            var parts = singleLine.Split(_splitterArray, StringSplitOptions.None);
+            var parts = singleLine.Split(_errorSplitterArray, StringSplitOptions.None);
             if (parts.Length == 5)
             {
                 var line = 0;
@@ -83,6 +88,34 @@ public class VSTestTask2 : ToolTask, ITestTask
                 file ??= string.Empty;
 
                 Log.LogError(null, "VSTEST1", null, file, line, 0, 0, 0, error, null);
+                return;
+            }
+        }
+
+        if (singleLine.StartsWith(_fullErrorSplitter))
+        {
+            var parts = singleLine.Split(_fullErrorSplitterArray, StringSplitOptions.None);
+            if (parts.Length > 1)
+            {
+                var message = parts[1];
+                if (message != null)
+                {
+                    message = message.Replace(_fullErrorNewlineSplitter, Environment.NewLine);
+                }
+
+                string? stackTrace = null;
+                if (parts.Length > 2)
+                {
+                    stackTrace = parts[2];
+                    if (stackTrace != null)
+                    {
+                        stackTrace = stackTrace.Replace(_fullErrorNewlineSplitter, Environment.NewLine);
+                    }
+                }
+
+                var logMessage = $"{message}{Environment.NewLine}StackTrace:{Environment.NewLine}{stackTrace}";
+
+                Log.LogMessage(MessageImportance.Low, logMessage);
                 return;
             }
         }

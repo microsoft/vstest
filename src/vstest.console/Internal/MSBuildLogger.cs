@@ -149,10 +149,13 @@ internal class MSBuildLogger : ITestLoggerWithParameters
                         }
 
                         place = $"({result.TestCase.DisplayName}) {place}";
-                        var message = $"||||{ReplaceSeparator(file)}||||{line}||||{ReplaceSeparator(place)}||||{ReplaceSeparator(error)}";
+                        var message = $"||||{ReplacePipeSeparator(file)}||||{line}||||{ReplacePipeSeparator(place)}||||{ReplacePipeSeparator(error)}";
 
                         Trace.WriteLine(">>>>MESSAGE:" + message);
                         Output.Error(false, message);
+
+                        var fullError = $"~~~~{ReplaceTildaSeparator(result.ErrorMessage)}~~~~{ReplaceTildaSeparator(result.ErrorStackTrace)}";
+                        Output.Information(false, fullError);
                         return;
                     }
                     else
@@ -189,14 +192,32 @@ internal class MSBuildLogger : ITestLoggerWithParameters
     }
 
 
-    private static string? ReplaceSeparator(string? text)
+    private static string? ReplacePipeSeparator(string? text)
     {
         if (text == null)
         {
             return null;
         }
 
+        // Remove any occurrence of message splitter.
         return text.Replace("||||", "____");
+    }
+
+    private static string? ReplaceTildaSeparator(string? text)
+    {
+        if (text == null)
+        {
+            return null;
+        }
+
+        // Remove any occurrence of message splitter.
+        text = text.Replace("~~~~", "____");
+        // Clean up any occurrence of newline splitter.
+        text = text.Replace("!!!!", "____");
+        // Replace newlines with newline splitter.
+        text = text.Replace(Environment.NewLine, "!!!!");
+
+        return text;
     }
 
 }
