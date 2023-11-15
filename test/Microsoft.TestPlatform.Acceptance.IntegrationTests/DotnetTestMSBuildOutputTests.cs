@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.IO;
-
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -23,78 +21,17 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("SimpleTestProject.csproj");
-        // --logger: console will output standard messages to msbuild output, which will be hidden by default
-        // that is why provide also --verbosity:normal so msbuild shows that console output
-        InvokeDotnetTest($@"{projectPath} --verbosity:normal /p:VsTestUseMSBuildOutput=true /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}");
+        InvokeDotnetTest($@"{projectPath} /p:VsTestUseMSBuildOutput=true /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}");
 
-        // ensure our dev version is used
-        StdOutputContains("-dev");
-        ValidateSummaryStatus(1, 1, 1);
-        ExitCodeEquals(100);
-    }
+        // The output:
+        // Determining projects to restore...
+        //   Restored C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\SimpleTestProject.csproj (in 441 ms).
+        //   SimpleTestProject -> C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\artifacts\bin\TestAssets\SimpleTestProject\Debug\net462\SimpleTestProject.dll
+        //   SimpleTestProject -> C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\artifacts\bin\TestAssets\SimpleTestProject\Debug\netcoreapp3.1\SimpleTestProject.dll
+        // C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\UnitTest1.cs(41): error VSTEST1: (FailingTest) SampleUnitTestProject.UnitTest1.FailingTest() Assert.AreEqual failed. Expected:<2>. Actual:<3>.  [C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\SimpleTestProject.csproj::TargetFramework=net462]
+        // C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\UnitTest1.cs(41): error VSTEST1: (FailingTest) SampleUnitTestProject.UnitTest1.FailingTest() Assert.AreEqual failed. Expected:<2>. Actual:<3>.  [C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\SimpleTestProject.csproj::TargetFramework=netcoreapp3.1]
 
-    [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
-    public void RunDotnetTestWithDll(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        var assemblyPath = GetAssetFullPath("SimpleTestProject.dll");
-        InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal""");
-
-        // ensure our dev version is used
-        StdOutputContains("-dev");
-        ValidateSummaryStatus(1, 1, 1);
-        ExitCodeEquals(1);
-    }
-
-    [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
-    public void RunDotnetTestWithCsprojPassInlineSettings(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        var projectPath = GetIsolatedTestAsset("ParametrizedTestProject.csproj");
-        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name =\""weburl\"", value=\""http://localhost//def\"")");
-
-        ValidateSummaryStatus(1, 0, 0);
-        ExitCodeEquals(0);
-    }
-
-    [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
-    public void RunDotnetTestWithDllPassInlineSettings(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        var assemblyPath = GetAssetFullPath("ParametrizedTestProject.dll");
-        InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name=\""weburl\"", value=\""http://localhost//def\"")");
-
-        ValidateSummaryStatus(1, 0, 0);
-        ExitCodeEquals(0);
-    }
-
-    [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
-    [Ignore("TODO: This scenario is broken in real environment as well (running with shipped `dotnet test`. Old tests (before arcade) use location of vstest.console that have more dlls in place than what we ship, and they make it work.")]
-    public void RunDotnetTestWithNativeDll(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        string assemblyRelativePath = @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\x64\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-        var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
-
-        InvokeDotnetTest($@"{assemblyAbsolutePath} --logger:""Console;Verbosity=normal"" --diag:c:\temp\logscpp\");
-
-        ValidateSummaryStatus(1, 1, 0);
+        StdOutputContains("error VSTEST1: (FailingTest) SampleUnitTestProject.UnitTest1.FailingTest() Assert.AreEqual failed. Expected:<2>. Actual:<3>.");
         ExitCodeEquals(1);
     }
 }
