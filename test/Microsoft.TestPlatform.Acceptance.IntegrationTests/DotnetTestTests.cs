@@ -12,6 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class DotnetTestTests : AcceptanceTestBase
 {
     [TestMethod]
+    [Ignore("TODO: Re-enable when https://github.com/microsoft/vstest/issues/4014 is fixed")]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
@@ -29,6 +30,7 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [Ignore("TODO: Re-enable when https://github.com/microsoft/vstest/issues/4014 is fixed")]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
@@ -46,6 +48,7 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [Ignore("TODO: Re-enable when https://github.com/microsoft/vstest/issues/4014 is fixed")]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
