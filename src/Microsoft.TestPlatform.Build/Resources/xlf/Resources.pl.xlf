@@ -14,7 +14,7 @@
       </trans-unit>
       <trans-unit id="TestFilePathCannotBeEmptyOrNull">
         <source>Test file path cannot be empty or null.</source>
-        <target state="new">Test file path cannot be empty or null.</target>
+        <target state="translated">Ścieżka pliku testowego nie może być pusta ani nie może mieć wartości null.</target>
         <note />
       </trans-unit>
       <trans-unit id="TestRunningSummary">

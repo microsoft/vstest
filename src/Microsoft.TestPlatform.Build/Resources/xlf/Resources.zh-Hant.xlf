@@ -14,7 +14,7 @@
       </trans-unit>
       <trans-unit id="TestFilePathCannotBeEmptyOrNull">
         <source>Test file path cannot be empty or null.</source>
-        <target state="new">Test file path cannot be empty or null.</target>
+        <target state="translated">測試檔案路徑不可為空白或 null。</target>
         <note />
       </trans-unit>
       <trans-unit id="TestRunningSummary">
