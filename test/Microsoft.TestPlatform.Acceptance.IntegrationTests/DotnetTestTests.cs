@@ -23,7 +23,7 @@ public class DotnetTestTests : AcceptanceTestBase
         InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}");
 
         // ensure our dev version is used
-        StdOutputContains("-dev");
+        StdOutputContains(IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion);
         ValidateSummaryStatus(1, 1, 1);
         ExitCodeEquals(1);
     }
@@ -40,7 +40,7 @@ public class DotnetTestTests : AcceptanceTestBase
         InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal""");
 
         // ensure our dev version is used
-        StdOutputContains("-dev");
+        StdOutputContains(IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion);
         ValidateSummaryStatus(1, 1, 1);
         ExitCodeEquals(1);
     }
@@ -54,8 +54,10 @@ public class DotnetTestTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("ParametrizedTestProject.csproj");
-        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name =\""weburl\"", value=\""http://localhost//def\"")");
+        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion} -- TestRunParameters.Parameter(name =\""weburl\"", value=\""http://localhost//def\"")");
 
+        // ensure our dev version is used
+        StdOutputContains(IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion);
         ValidateSummaryStatus(1, 0, 0);
         ExitCodeEquals(0);
     }
