@@ -14,5 +14,6 @@
     <UsagePattern IdentityGlob="System.Security.Permissions/4.5.0" />
     <!-- Caused by dependency on System.ComponentModel.Composition.4.5.0. This version is overridden in full source-build. -->
     <UsagePattern IdentityGlob="System.Security.Principal.Windows/4.5.0" />
+    <UsagePattern IdentityGlob="Microsoft.Diagnostics.NETCore.Client/0.2.452401" />
   </IgnorePatterns>
 </UsageData>
