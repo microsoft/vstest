@@ -67,7 +67,7 @@
       These versions need to be "statically" readable because we read this file as xml in our build and tests.
     -->
     <!-- <MSTestFrameworkLatestVersion></MSTestFrameworkLatestVersion> is not here, because we don't build MSTest locally, so we don't have access to the latest version. -->
-    <MSTestFrameworkLatestPreviewVersion>[3.1.1]</MSTestFrameworkLatestPreviewVersion>
+    <MSTestFrameworkLatestPreviewVersion>[3.2.0-preview.23577.2]</MSTestFrameworkLatestPreviewVersion>
     <MSTestFrameworkLatestStableVersion>[3.1.1]</MSTestFrameworkLatestStableVersion>
     <MSTestFrameworkRecentStableVersion>[3.0.2]</MSTestFrameworkRecentStableVersion>
     <MSTestFrameworkMostDownloadedVersion>[2.2.10]</MSTestFrameworkMostDownloadedVersion>

@@ -33,7 +33,7 @@ public class CodeCoverageDataAttachmentsHandlerTests
 
     public TestContext? TestContext { get; set; }
 
-    internal string TestFilesDirectory => Path.Combine(TestContext!.DeploymentDirectory, "TestFiles");
+    internal string TestFilesDirectory => Path.Combine(TestContext!.DeploymentDirectory!, "TestFiles");
 
     public CodeCoverageDataAttachmentsHandlerTests()
     {
