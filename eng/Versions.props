@@ -67,20 +67,20 @@
       These versions need to be "statically" readable because we read this file as xml in our build and tests.
     -->
     <!-- <MSTestFrameworkLatestVersion></MSTestFrameworkLatestVersion> is not here, because we don't build MSTest locally, so we don't have access to the latest version. -->
-    <MSTestFrameworkLatestPreviewVersion>[3.0.4]</MSTestFrameworkLatestPreviewVersion>
-    <MSTestFrameworkLatestStableVersion>[3.0.4]</MSTestFrameworkLatestStableVersion>
-    <MSTestFrameworkRecentStableVersion>[2.2.10]</MSTestFrameworkRecentStableVersion>
-    <MSTestFrameworkMostDownloadedVersion>[2.1.0]</MSTestFrameworkMostDownloadedVersion>
-    <MSTestFrameworkPreviousStableVersion>[2.1.0]</MSTestFrameworkPreviousStableVersion>
+    <MSTestFrameworkLatestPreviewVersion>[3.1.1]</MSTestFrameworkLatestPreviewVersion>
+    <MSTestFrameworkLatestStableVersion>[3.1.1]</MSTestFrameworkLatestStableVersion>
+    <MSTestFrameworkRecentStableVersion>[3.0.2]</MSTestFrameworkRecentStableVersion>
+    <MSTestFrameworkMostDownloadedVersion>[2.2.10]</MSTestFrameworkMostDownloadedVersion>
+    <MSTestFrameworkPreviousStableVersion>[2.1.2]</MSTestFrameworkPreviousStableVersion>
     <MSTestFrameworkLegacyStableVersion>[1.4.0]</MSTestFrameworkLegacyStableVersion>
     <!-- Versions that are used to restore previous versions of console, translation layer, and test.sdk for compatibility tests.
     See Invoke-TestAssetsBuild in scripts/build.ps1. Exact versions are used to avoid Nuget substituting them by closest match, if we make a typo.
     These versions need to be "statically" readable because we read this file as xml in our build and tests. -->
     <!-- <VSTestConsoleLatestVersion></VSTestConsoleLatestVersion> is not here, NETTestSdkVersion is used instead, because that is the version of the locally built latest package.  -->
-    <VSTestConsoleLatestPreviewVersion>[17.6.2]</VSTestConsoleLatestPreviewVersion>
-    <VSTestConsoleLatestStableVersion>[17.6.2]</VSTestConsoleLatestStableVersion>
-    <VSTestConsoleRecentStableVersion>[17.5.0]</VSTestConsoleRecentStableVersion>
-    <VSTestConsoleMostDownloadedVersion>[17.2.0]</VSTestConsoleMostDownloadedVersion>
+    <VSTestConsoleLatestPreviewVersion>[17.9.0-preview-23531-01]</VSTestConsoleLatestPreviewVersion>
+    <VSTestConsoleLatestStableVersion>[17.8.0]</VSTestConsoleLatestStableVersion>
+    <VSTestConsoleRecentStableVersion>[17.7.0</VSTestConsoleRecentStableVersion>
+    <VSTestConsoleMostDownloadedVersion>[17.5.0]</VSTestConsoleMostDownloadedVersion>
     <VSTestConsolePreviousStableVersion>[16.11.0]</VSTestConsolePreviousStableVersion>
     <VSTestConsoleLegacyStableVersion>[15.9.2]</VSTestConsoleLegacyStableVersion>
     <!-- This version also needs to be updated in src\package\nuspec\TestPlatform.ObjectModel.nuspec -->
