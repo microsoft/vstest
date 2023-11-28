@@ -57,6 +57,34 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [TestCategory("Windows-Review")]
+    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    public void HtmlLoggerWithFriendlyNameContainsExpectedContent(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        var htmlFileName = "TestResults.html";
+        arguments = string.Concat(arguments, $" /logger:\"html;LogFileName={htmlFileName}\"");
+        InvokeVsTest(arguments);
+
+        var htmlLogFilePath = Path.Combine(TempDirectory.Path, htmlFileName);
+        XmlDocument report = LoadReport(htmlLogFilePath);
+
+        AssertExpectedHtml(report.DocumentElement!);
+    }
+
+    private static XmlDocument LoadReport(string htmlLogFilePath)
+    {
+        // XML reader cannot handle <br> tags because they are not closed, and hence are not valid XML.
+        // They are correct HTML though, so we patch it here. 
+        var text = File.ReadAllText(htmlLogFilePath).Replace("<br>", "<br/>");
+        var report = new XmlDocument();
+        report.Load(new StringReader(text));
+        return report;
+    }
+
+    [TestMethod]
     [NetCoreTargetFrameworkDataSource]
     public void TrxLoggerWithExecutorUriShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
@@ -161,6 +189,21 @@ public class LoggerTests : AcceptanceTestBase
         string? outcomeValue = GetElementAtributeValueFromTrx(trxFilePath, "ResultSummary", "outcome");
 
         Assert.AreEqual("Completed", outcomeValue);
+    }
+
+    private static void AssertExpectedHtml(XmlElement root)
+    {
+        XmlNodeList elementList = root.GetElementsByTagName("details");
+        Assert.AreEqual(2, elementList.Count);
+
+        foreach (XmlElement element in elementList)
+        {
+            Assert.AreEqual("summary", element.FirstChild?.Name);
+            if (element.HasAttributes)
+            {
+                Assert.AreEqual("open", element.Attributes[0].Name);
+            }
+        }
     }
 
     private static bool IsValidXml(string xmlFilePath)

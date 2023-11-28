@@ -42,16 +42,29 @@ public class Build : IntegrationTestBase
 #pragma warning disable RS0030 // Do not used banned APIs
         Environment.SetEnvironmentVariable("DOTNET_MULTILEVEL_LOOKUP", "0");
         Environment.SetEnvironmentVariable("DOTNET_ROOT", DotnetDir);
+        Environment.SetEnvironmentVariable("DOTNET_ROOT(x86)", Path.Combine(DotnetDir, "dotnet-sdk-x86"));
         Environment.SetEnvironmentVariable("PATH", $"{DotnetDir};{Environment.GetEnvironmentVariable("PATH")}");
 #pragma warning restore RS0030 // Do not used banned APIs
     }
 
     private static void CopyAndPatchDotnet()
     {
-        // TODO: patch dotnet with latest build targets
         var patchedDotnetDir = Path.GetFullPath(Path.Combine(Root, "artifacts", "tmp", ".dotnet"));
 
+        // Copy dotnet.
         DirectoryUtils.CopyDirectory(new DirectoryInfo(DotnetDir), new DirectoryInfo(patchedDotnetDir));
+
+        // Copy target file and build task dll into it.
+        var netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
+        var packageName = $"Microsoft.TestPlatform.Build.{netTestSdkVersion}.nupkg";
+        var packagePath = Path.GetFullPath(Path.Combine(IntegrationTestEnvironment.PublishDirectory, packageName));
+
+        // e.g. artifacts\tmp\.dotnet\sdk\
+        var sdkDirectory = Path.Combine(patchedDotnetDir, "sdk");
+        // e.g. artifacts\tmp\.dotnet\sdk\8.0.100-preview.6.23330.14
+        var dotnetSdkDirectory = Directory.GetDirectories(sdkDirectory).Single();
+        DirectoryUtils.CopyDirectory(Path.Combine(packagePath, "lib", "netstandard2.0"), dotnetSdkDirectory);
+        DirectoryUtils.CopyDirectory(Path.Combine(packagePath, "runtimes", "any", "native"), dotnetSdkDirectory);
     }
 
     private static void BuildTestAssetsCompatibility()
@@ -103,7 +116,7 @@ public class Build : IntegrationTestBase
         // We use the same version properties for NET.Test.Sdk as for VSTestConsole, for now.
         foreach (var sdkPropertyName in vstestConsoleVersionProperties)
         {
-            string? netTestSdkVersion = null;
+            string? netTestSdkVersion;
             if (sdkPropertyName == "VSTestConsoleLatestVersion")
             {
                 netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
@@ -336,6 +349,7 @@ public class Build : IntegrationTestBase
         {
             $"Microsoft.TestPlatform.{netTestSdkVersion}.nupkg",
             $"Microsoft.TestPlatform.CLI.{netTestSdkVersion}.nupkg",
+            $"Microsoft.TestPlatform.Build.{netTestSdkVersion}.nupkg",
             $"Microsoft.CodeCoverage.{netTestSdkVersion}.nupkg",
             $"Microsoft.TestPlatform.Portable.{netTestSdkVersion}.nupkg",
         };

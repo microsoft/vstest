@@ -9,7 +9,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -167,7 +166,7 @@ internal class TestRequestManager : ITestRequestManager
         EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests started.");
 
         // TODO: Normalize rest of the data on the request as well
-        discoveryPayload.Sources = discoveryPayload.Sources?.Distinct().ToList() ?? new List<string>();
+        discoveryPayload.Sources = KnownPlatformSourceFilter.FilterKnownPlatformSources(discoveryPayload.Sources?.Distinct().ToList());
         discoveryPayload.RunSettings ??= "<RunSettings></RunSettings>";
 
         var runsettings = discoveryPayload.RunSettings;
@@ -275,6 +274,11 @@ internal class TestRequestManager : ITestRequestManager
     {
         EqtTrace.Info("TestRequestManager.RunTests: run tests started.");
         testRunRequestPayload.RunSettings ??= "<RunSettings></RunSettings>";
+        if (testRunRequestPayload.Sources != null)
+        {
+            testRunRequestPayload.Sources = KnownPlatformSourceFilter.FilterKnownPlatformSources(testRunRequestPayload.Sources);
+        }
+
         var runsettings = testRunRequestPayload.RunSettings;
 
         if (testRunRequestPayload.TestPlatformOptions != null)
@@ -805,7 +809,7 @@ internal class TestRequestManager : ITestRequestManager
         settingsUpdated |= UpdateDesignMode(document, runConfiguration);
         settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
         settingsUpdated |= UpdateTargetDevice(navigator, document);
-        settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
+        settingsUpdated |= AddOrUpdateBuiltInLoggers(document, runConfiguration, loggerRunSettings);
         settingsUpdated |= AddOrUpdateBatchSize(document, runConfiguration, isDiscovery);
 
         updatedRunSettingsXml = navigator.OuterXml;
@@ -888,27 +892,43 @@ internal class TestRequestManager : ITestRequestManager
         return runsettings;
     }
 
-    private bool AddOrUpdateConsoleLogger(
+    private bool AddOrUpdateBuiltInLoggers(
         XmlDocument document,
         RunConfiguration runConfiguration,
         LoggerRunSettings loggerRunSettings)
     {
-        // Update console logger settings.
+        // Update built-in logger settings if requested by the user on command line to populate
+        // the default assembly path to those loggers so we can find them.
         bool consoleLoggerUpdated = UpdateConsoleLoggerIfExists(document, loggerRunSettings);
+        bool msbuildLoggerUpdated = UpdateMSBuildLoggerIfExists(document, loggerRunSettings);
 
-        // In case of CLI, add console logger if not already present.
         bool designMode = runConfiguration.DesignModeSet
             ? runConfiguration.DesignMode
             : _commandLineOptions.IsDesignMode;
-        if (!designMode && !consoleLoggerUpdated)
+
+        // In design mode (under IDE) don't add the default logger, we are "logging"
+        // via messages to vstest console wrapper.
+        if (!designMode)
         {
-            AddConsoleLogger(document, loggerRunSettings);
+            // When we are not in design mode, add one of the default loggers.
+
+            // If msbuild logger was present on the command line, we are being called from
+            // dotnet sdk via vstest task, and should output to msbuild. If user additionally
+            // specified console logger it is allowed but we won't add automatically.
+            if (!msbuildLoggerUpdated) // msbuild logger is not present on command line
+            {
+                if (!consoleLoggerUpdated) // console logger is not present on commandline
+                {
+                    // Add console logger because that is the default
+                    AddConsoleLogger(document, loggerRunSettings);
+                }
+            }
         }
 
         // Update is required:
         //     1) in case of CLI;
         //     2) in case of design mode if console logger is present in runsettings.
-        return !designMode || consoleLoggerUpdated;
+        return !designMode || consoleLoggerUpdated || msbuildLoggerUpdated;
     }
 
     private static bool UpdateTargetDevice(
@@ -1110,7 +1130,7 @@ internal class TestRequestManager : ITestRequestManager
             FriendlyName = ConsoleLogger.FriendlyName,
             Uri = new Uri(ConsoleLogger.ExtensionUri),
             AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName,
-            CodeBase = typeof(ConsoleLogger).GetTypeInfo().Assembly.Location,
+            CodeBase = typeof(ConsoleLogger).Assembly.Location,
             IsEnabled = true
         };
 
@@ -1131,20 +1151,55 @@ internal class TestRequestManager : ITestRequestManager
         XmlDocument document,
         LoggerRunSettings loggerRunSettings)
     {
-        var defaultConsoleLogger = new LoggerSettings
+        var logger = new LoggerSettings
         {
             FriendlyName = ConsoleLogger.FriendlyName,
             Uri = new Uri(ConsoleLogger.ExtensionUri)
         };
 
-        var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(defaultConsoleLogger);
+        var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(logger);
 
         // Update assemblyQualifiedName and codeBase of existing logger.
         if (existingLoggerIndex >= 0)
         {
             var consoleLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
             consoleLogger.AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName;
-            consoleLogger.CodeBase = typeof(ConsoleLogger).GetTypeInfo().Assembly.Location;
+            consoleLogger.CodeBase = typeof(ConsoleLogger).Assembly.Location;
+            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(
+                document,
+                ObjectModel.Constants.LoggerRunSettingsName,
+                loggerRunSettings.ToXml().InnerXml);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Add MSBuild console logger in runsettings if exists.
+    /// </summary>
+    /// <param name="document">Runsettings document.</param>
+    /// <param name="loggerRunSettings">Logger run settings.</param>
+    /// <returns>True if updated console logger in runsettings successfully.</returns>
+    private static bool UpdateMSBuildLoggerIfExists(
+        XmlDocument document,
+        LoggerRunSettings loggerRunSettings)
+    {
+        var logger = new LoggerSettings
+        {
+            FriendlyName = MSBuildLogger.FriendlyName,
+            Uri = new Uri(MSBuildLogger.ExtensionUri)
+        };
+
+        var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(logger);
+
+        // Update assemblyQualifiedName and codeBase of existing logger.
+        if (existingLoggerIndex >= 0)
+        {
+            var msBuildLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
+            msBuildLogger.AssemblyQualifiedName = typeof(MSBuildLogger).AssemblyQualifiedName;
+            msBuildLogger.CodeBase = typeof(MSBuildLogger).Assembly.Location;
             RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(
                 document,
                 ObjectModel.Constants.LoggerRunSettingsName,
@@ -1463,5 +1518,75 @@ internal class TestRequestManager : ITestRequestManager
             sources = sourcesSet.ToList();
         }
         return sources;
+    }
+}
+
+internal static class KnownPlatformSourceFilter
+{
+    // Running tests on AzureDevops, many projects use the default filter
+    // which includes all *test*.dll, this includes many of the TestPlatform dlls,
+    // which we cannot run, and don't want to attempt to run.
+    // The default filter also filters out !*TestAdapter*.dll but it is easy to forget
+    // so we skip the most used adapters here as well.
+    private static readonly HashSet<string> KnownPlatformSources = new(new string[]
+    {
+        "Microsoft.TestPlatform.AdapterUtilities.dll",
+        "Microsoft.TestPlatform.AdapterUtilities.resources.dll",
+        "Microsoft.TestPlatform.CommunicationUtilities.dll",
+        "Microsoft.TestPlatform.CommunicationUtilities.resources.dll",
+        "Microsoft.TestPlatform.CoreUtilities.dll",
+        "Microsoft.TestPlatform.CoreUtilities.resources.dll",
+        "Microsoft.TestPlatform.CrossPlatEngine.dll",
+        "Microsoft.TestPlatform.CrossPlatEngine.resources.dll",
+        "Microsoft.TestPlatform.PlatformAbstractions.dll",
+        "Microsoft.TestPlatform.Utilities.dll",
+        "Microsoft.TestPlatform.Utilities.resources.dll",
+        "Microsoft.VisualStudio.TestPlatform.Common.dll",
+        "Microsoft.VisualStudio.TestPlatform.Common.resources.dll",
+        "Microsoft.VisualStudio.TestPlatform.ObjectModel.dll",
+        "Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
+        "testhost.dll",
+
+        // NUnit
+        "NUnit3.TestAdapter.dll",
+
+        // XUnit
+        "xunit.runner.visualstudio.testadapter.dll",
+        "xunit.runner.visualstudio.dotnetcore.testadapter.dll",
+
+        // MSTest
+        "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll",
+        "Microsoft.VisualStudio.TestPlatform.TestFramework.dll",
+        "Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll",
+        // For MSTest up to v3
+        "Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll",
+        "Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll",
+        "Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll",
+        "Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll",
+        "Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll",
+    }, StringComparer.OrdinalIgnoreCase);
+
+
+    internal static List<string> FilterKnownPlatformSources(List<string>? sources)
+    {
+        if (sources == null)
+        {
+            return new List<string>();
+        }
+
+        var filteredSources = new List<string>();
+        foreach (string source in sources)
+        {
+            if (KnownPlatformSources.Contains(Path.GetFileName(source)))
+            {
+                EqtTrace.Info($"TestRequestManager.FilterKnownPlatformSources: Known platform dll was provided in sources, removing it '{source}'");
+            }
+            else
+            {
+                filteredSources.Add(source);
+            }
+        }
+
+        return filteredSources;
     }
 }
