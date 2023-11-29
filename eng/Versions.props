@@ -83,7 +83,7 @@
     <!-- <VSTestConsoleLatestVersion></VSTestConsoleLatestVersion> is not here, NETTestSdkVersion is used instead, because that is the version of the locally built latest package.  -->
     <VSTestConsoleLatestPreviewVersion>[17.9.0-preview-23531-01]</VSTestConsoleLatestPreviewVersion>
     <VSTestConsoleLatestStableVersion>[17.8.0]</VSTestConsoleLatestStableVersion>
-    <VSTestConsoleRecentStableVersion>[17.7.0</VSTestConsoleRecentStableVersion>
+    <VSTestConsoleRecentStableVersion>[17.7.0]</VSTestConsoleRecentStableVersion>
     <VSTestConsoleMostDownloadedVersion>[17.5.0]</VSTestConsoleMostDownloadedVersion>
     <VSTestConsolePreviousStableVersion>[16.11.0]</VSTestConsolePreviousStableVersion>
     <VSTestConsoleLegacyStableVersion>[15.9.2]</VSTestConsoleLegacyStableVersion>
