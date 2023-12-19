@@ -22,7 +22,7 @@
     <MicrosoftBuildFrameworkPackageVersion>16.0.461</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildPackageVersion>$(MicrosoftBuildFrameworkPackageVersion)</MicrosoftBuildPackageVersion>
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>
-    <MicrosoftCodeAnalysisVersion>3.8.0-3.20427.2</MicrosoftCodeAnalysisVersion>
+    <MicrosoftCodeAnalysisVersion>4.9.0-2.final</MicrosoftCodeAnalysisVersion>
     <MicrosoftCodeCoverageIOVersion>17.7.0</MicrosoftCodeCoverageIOVersion>
     <MicrosoftDiagnosticsNETCoreClientVersion>0.2.452401</MicrosoftDiagnosticsNETCoreClientVersion>
     <MicrosoftExtensionsDependencyModelPackageVersion>3.0.0</MicrosoftExtensionsDependencyModelPackageVersion>
