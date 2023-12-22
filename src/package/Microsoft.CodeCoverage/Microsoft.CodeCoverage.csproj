@@ -40,7 +40,7 @@
     <Copy SourceFiles="@(MicrosoftCodeCoverageCore)" DestinationFiles="$(OutDir)\Microsoft.CodeCoverage.Core\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftCodeCoverageInterprocess)" DestinationFiles="$(OutDir)\Microsoft.CodeCoverage.Interprocess\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftCodeCoverageInstrumentation)" DestinationFiles="$(OutDir)\Microsoft.CodeCoverage.Instrumentation\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Copy SourceFiles="@(MicrosoftCodeCoverageInstrumentationCore)" DestinationFiles="$(OutDir)\Microsoft.CodeCoverage.InstrumentationCore\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(MicrosoftCodeCoverageInstrumentationCore)" DestinationFiles="$(OutDir)\Microsoft.CodeCoverage.Instrumentation.Core\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftInternalCodeCoverage)" DestinationFiles="$(OutDir)\Microsoft.Internal.CodeCoverage\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftVisualStudioTraceDataCollector)" DestinationFiles="$(OutDir)\Microsoft.VisualStudio.TraceDataCollector\%(RecursiveDir)%(Filename)%(Extension)" />
   </Target>
