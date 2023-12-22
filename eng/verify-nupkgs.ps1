@@ -17,9 +17,9 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 function Verify-Nuget-Packages {
     Write-Host "Starting Verify-Nuget-Packages."
     $expectedNumOfFiles = @{
-        "Microsoft.CodeCoverage"                      = 59;
+        "Microsoft.CodeCoverage"                      = 60;
         "Microsoft.NET.Test.Sdk"                      = 16;
-        "Microsoft.TestPlatform"                      = 606;
+        "Microsoft.TestPlatform"                      = 607;
         "Microsoft.TestPlatform.Build"                = 21;
         "Microsoft.TestPlatform.CLI"                  = 471;
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 35;
