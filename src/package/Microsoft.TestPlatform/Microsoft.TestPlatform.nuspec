@@ -242,6 +242,7 @@
 
     <file src="net472\Microsoft.CodeCoverage.Interprocess.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.CodeCoverage.Interprocess.dll" />
     <file src="net472\Microsoft.CodeCoverage.Instrumentation.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.CodeCoverage.Instrumentation.dll" />
+    <file src="net472\Microsoft.CodeCoverage.Instrumentation.Core.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.CodeCoverage.Instrumentation.Core.dll" />
     <file src="net472\Mono.Cecil.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Mono.Cecil.dll" />
     <file src="net472\Mono.Cecil.Pdb.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Mono.Cecil.Pdb.dll" />
     <file src="net472\Mono.Cecil.Rocks.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Mono.Cecil.Rocks.dll" />
