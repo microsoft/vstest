@@ -5,13 +5,13 @@
       <Uri>https://dev.azure.com/devdiv/DevDiv/_git/vs-code-coverage</Uri>
       <Sha>eb7f655d26aad09abc9da2ea1814f4debc70559b</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Diagnostics.NETCore.Client" Version="0.2.0-preview.24058.1">
+    <Dependency Name="Microsoft.Diagnostics.NETCore.Client" Version="0.2.0-preview.24062.1">
       <Uri>https://github.com/dotnet/diagnostics</Uri>
-      <Sha>9b4cfdfde85a1bcab1e87e78be8db99785ba3e1f</Sha>
+      <Sha>82c9a134f8c13dcfe8a9c243a19ee1861bbcb8ea</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.diagnostics" Version="8.0.0-preview.24058.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.diagnostics" Version="8.0.0-preview.24062.1">
       <Uri>https://github.com/dotnet/diagnostics</Uri>
-      <Sha>9b4cfdfde85a1bcab1e87e78be8db99785ba3e1f</Sha>
+      <Sha>82c9a134f8c13dcfe8a9c243a19ee1861bbcb8ea</Sha>
       <SourceBuild RepoName="diagnostics" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="9.0.0-alpha.1.24054.2">
