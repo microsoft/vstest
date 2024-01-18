@@ -32,6 +32,8 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
         // C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\UnitTest1.cs(41): error VSTEST1: (FailingTest) SampleUnitTestProject.UnitTest1.FailingTest() Assert.AreEqual failed. Expected:<2>. Actual:<3>.  [C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\SimpleTestProject.csproj::TargetFramework=netcoreapp3.1]
 
         StdOutputContains("error VSTEST1: (FailingTest) SampleUnitTestProject.UnitTest1.FailingTest() Assert.AreEqual failed. Expected:<2>. Actual:<3>.");
+        StdOutputContains("passed PassingTest");
+        StdOutputContains("skipped SkippingTest");
         ExitCodeEquals(1);
     }
 }
