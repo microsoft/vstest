@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -20,7 +20,7 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var projectPath = GetIsolatedTestAsset("SimpleTestProject.csproj");
+        var projectPath = GetIsolatedTestAsset("TerminalLoggerTestProject.csproj");
         InvokeDotnetTest($@"{projectPath} /p:VsTestUseMSBuildOutput=true /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}");
 
         // The output:
@@ -31,7 +31,7 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
         // C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\UnitTest1.cs(41): error VSTEST1: (FailingTest) SampleUnitTestProject.UnitTest1.FailingTest() Assert.AreEqual failed. Expected:<2>. Actual:<3>.  [C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\SimpleTestProject.csproj::TargetFramework=net462]
         // C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\UnitTest1.cs(41): error VSTEST1: (FailingTest) SampleUnitTestProject.UnitTest1.FailingTest() Assert.AreEqual failed. Expected:<2>. Actual:<3>.  [C:\Users\nohwnd\AppData\Local\Temp\vstest\xvoVt\SimpleTestProject.csproj::TargetFramework=netcoreapp3.1]
 
-        StdOutputContains("error VSTEST1: (FailingTest) SampleUnitTestProject.UnitTest1.FailingTest() Assert.AreEqual failed. Expected:<2>. Actual:<3>.");
+        StdOutputContains("TerminalLoggerUnitTests.UnitTest1.FailingTest() Assert.AreEqual failed. Expected:<ğğğ𦮙我們剛才從𓋴𓅓𓏏𓇏𓇌𓀀 (System.String)>. Actual:<3 (System.Int32)>.");
         // We are sending those as low prio messages, they won't show up on screen but will be in binlog.
         //StdOutputContains("passed PassingTest");
         //StdOutputContains("skipped SkippingTest");
