@@ -23,6 +23,8 @@
     <NuspecBasePath>$(OutputPath)</NuspecBasePath>
     <PackageId>Microsoft.TestPlatform.CLI</PackageId>
     <PackageTags>vstest visual-studio unittest testplatform mstest microsoft test testing</PackageTags>
+    <PackageProjectUrl>https://github.com/microsoft/vstest</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/microsoft/vstest</RepositoryUrl>
     <PackageDescription>
       The cross platform Microsoft Test Platform.
     </PackageDescription>
