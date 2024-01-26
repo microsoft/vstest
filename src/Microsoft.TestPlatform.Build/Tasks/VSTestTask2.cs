@@ -141,8 +141,14 @@ public class VSTestTask2 : ToolTask, ITestTask
                 return;
             }
         }
+        else
+        {
+            Log.LogMessage(MessageImportance.Low, singleLine);
+        }
 
-        base.LogEventsFromTextOutput(singleLine, messageImportance);
+        // Do not call the base, it parses out the output, and if it sees "error" in any place it will log it as error
+        // we don't want this, we only want to log errors from the text messages we receive that start error splitter.
+        // base.LogEventsFromTextOutput(singleLine, messageImportance);
     }
 
     protected override string? GenerateCommandLineCommands()
