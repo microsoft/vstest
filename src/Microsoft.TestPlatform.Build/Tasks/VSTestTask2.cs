@@ -42,7 +42,7 @@ public class VSTestTask2 : ToolTask, ITestTask
     public string? VSTestArtifactsProcessingMode { get; set; }
     public string? VSTestSessionCorrelationId { get; set; }
 
-    protected override Encoding StandardErrorEncoding => _disableUtf8ConsoleEncoding ? base.StandardErrorEncoding ? Encoding.UTF8;
+    protected override Encoding StandardErrorEncoding => _disableUtf8ConsoleEncoding ? base.StandardErrorEncoding : Encoding.UTF8;
     protected override Encoding StandardOutputEncoding => _disableUtf8ConsoleEncoding ? base.StandardOutputEncoding : Encoding.UTF8;
 
     private readonly string _testResultSplitter = "++++";
