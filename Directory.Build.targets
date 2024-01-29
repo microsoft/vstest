@@ -7,7 +7,6 @@
   <PropertyGroup Condition=" '$(DotNetBuildFromSource)' == 'true' ">
     <!-- Force setting TargetFrameworks to previous and current net -->
     <TargetFrameworks>$(NetPrevious);$(NetCurrent)</TargetFrameworks>
-    <TargetFramework Condition=" '$(TargetFramework)' != '' ">$(NetCurrent)</TargetFramework>
   </PropertyGroup>
 
   <!-- Test project settings -->
