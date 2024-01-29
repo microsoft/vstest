@@ -8,27 +8,12 @@
     <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
   </PropertyGroup>
 
-  <Choose>
-    <When Condition=" '$(DotNetBuildFromSource)' == 'true' ">
-      <PropertyGroup>
-        <NuspecFile>Microsoft.TestPlatform.Build.sourcebuild.nuspec</NuspecFile>
-      </PropertyGroup>
-
-      <ItemGroup Label="NuGet">
-        <NuspecProperty Include="SourceBuildTfmCurrent=$(NetCurrent)" />
-        <NuspecProperty Include="SourceBuildTfmPrevious=$(NetPrevious)" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <NuspecFile>Microsoft.TestPlatform.Build.nuspec</NuspecFile>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
-
   <PropertyGroup>
     <!-- This package is included even in source build -->
     <IsPackable>true</IsPackable>
+    <NuspecFile Condition=" '$(DotNetBuildFromSource)' != 'true' ">Microsoft.TestPlatform.Build.nuspec</NuspecFile>
+    <NuspecFile Condition=" '$(DotNetBuildFromSource)' == 'true' AND '$(DotNetBuildFromSourceFlavor)' != 'Product' ">Microsoft.TestPlatform.Build.sourcebuild.nuspec</NuspecFile>
+    <NuspecFile Condition=" '$(DotNetBuildFromSource)' == 'true' AND '$(DotNetBuildFromSourceFlavor)' == 'Product' ">Microsoft.TestPlatform.Build.sourcebuild.product.nuspec</NuspecFile>
     <NuspecBasePath>$(OutputPath)</NuspecBasePath>
     <PackageId>Microsoft.TestPlatform.Build</PackageId>
     <PackageTags>vstest visual-studio unittest testplatform mstest microsoft test testing</PackageTags>
@@ -40,6 +25,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework" Version="$(MicrosoftBuildFrameworkPackageVersion)" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="$(MicrosoftBuildUtilitiesCorePackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Label="NuGet">
+    <NuspecProperty Include="SourceBuildTfmPrevious=$(NetPrevious)" />
+    <NuspecProperty Include="SourceBuildTfmCurrent=$(NetCurrent)" />
   </ItemGroup>
 
   <ItemGroup>
