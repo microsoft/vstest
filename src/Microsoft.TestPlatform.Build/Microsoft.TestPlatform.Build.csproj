@@ -2,30 +2,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
     <AssemblyName>Microsoft.TestPlatform.Build</AssemblyName>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
     <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
   </PropertyGroup>
 
-  <Choose>
-    <When Condition=" '$(DotNetBuildFromSource)' == 'true' ">
-      <PropertyGroup>
-        <Tfm>$(NetCurrent)</Tfm>
-      </PropertyGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <Tfm>netstandard2.0</Tfm>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
-
   <PropertyGroup>
     <!-- This package is included even in source build -->
     <IsPackable>true</IsPackable>
-    <NuspecFile>Microsoft.TestPlatform.Build.nuspec</NuspecFile>
+    <NuspecFile Condition=" '$(DotNetBuildFromSource)' != 'true' ">Microsoft.TestPlatform.Build.nuspec</NuspecFile>
+    <NuspecFile Condition=" '$(DotNetBuildFromSource)' == 'true' AND '$(DotNetBuildFromSourceFlavor)' != 'Product' ">Microsoft.TestPlatform.Build.sourcebuild.nuspec</NuspecFile>
+    <NuspecFile Condition=" '$(DotNetBuildFromSource)' == 'true' AND '$(DotNetBuildFromSourceFlavor)' == 'Product' ">Microsoft.TestPlatform.Build.sourcebuild.product.nuspec</NuspecFile>
     <NuspecBasePath>$(OutputPath)</NuspecBasePath>
     <PackageId>Microsoft.TestPlatform.Build</PackageId>
     <PackageTags>vstest visual-studio unittest testplatform mstest microsoft test testing</PackageTags>
@@ -36,13 +24,14 @@
     </PackageDescription>
   </PropertyGroup>
 
-  <ItemGroup Label="NuGet">
-    <NuspecProperty Include="tfm=$(Tfm)" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework" Version="$(MicrosoftBuildFrameworkPackageVersion)" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="$(MicrosoftBuildUtilitiesCorePackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Label="NuGet">
+    <NuspecProperty Include="SourceBuildTfmPrevious=$(NetPrevious)" />
+    <NuspecProperty Include="SourceBuildTfmCurrent=$(NetCurrent)" />
   </ItemGroup>
 
   <ItemGroup>
