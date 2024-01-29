@@ -5,8 +5,6 @@
 
   <!-- Source build properties -->
   <PropertyGroup Condition=" '$(DotNetBuildFromSource)' == 'true' ">
-    <!-- Reset setting TargetFramework if it was set -->
-    <TargetFramework Condition=" '$(TargetFramework)' != '' "></TargetFramework>
     <!-- Force setting TargetFrameworks to previous and current net -->
     <TargetFrameworks>$(NetPrevious);$(NetCurrent)</TargetFrameworks>
   </PropertyGroup>
