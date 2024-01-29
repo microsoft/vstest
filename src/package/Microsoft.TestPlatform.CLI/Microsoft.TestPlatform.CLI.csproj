@@ -7,6 +7,8 @@
     <When Condition=" '$(DotNetBuildFromSource)' == 'true' ">
       <PropertyGroup>
         <NuspecFile>Microsoft.TestPlatform.CLI.sourcebuild.nuspec</NuspecFile>
+        <NuspecProperty Include="SourceBuildTfmCurrent=$(NetCurrent)" />
+        <NuspecProperty Include="SourceBuildTfmPrevious=$(NetPrevious)" />
       </PropertyGroup>
     </When>
     <Otherwise>
@@ -31,7 +33,6 @@
   <ItemGroup Label="NuGet">
     <NuspecProperty Include="SrcPackageFolder=$(SrcPackageFolder)" />
     <NuspecProperty Include="TesthostRuntimeconfig=$(RepoRoot)temp\testhost" />
-    <NuspecProperty Include="SourceBuildTfm=$(NetCurrent)" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -1,0 +1,48 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    $CommonMetadataElements$
+
+    <dependencies>
+      <group targetFramework="$SourceBuildTfmPrevious$" />
+      <group targetFramework="$SourceBuildTfmCurrent$" />
+    </dependencies>
+  </metadata>
+
+  <files>
+    $CommonFileElements$
+
+    <file src="$SourceBuildTfmPrevious$/Microsoft.TestPlatform.targets" target="runtimes/any/native" />
+    <file src="$SourceBuildTfmCurrent$/Microsoft.TestPlatform.targets" target="runtimes/any/native" />
+    <file src="$SourceBuildTfmPrevious$/Microsoft.TestPlatform.Build.dll" target="lib/$SourceBuildTfmPrevious$" />
+    <file src="$SourceBuildTfmCurrent$/Microsoft.TestPlatform.Build.dll" target="lib/$SourceBuildTfmCurrent$" />
+
+    <!-- Add localized resources -->
+    <file src="$SourceBuildTfmPrevious$/cs/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/cs" />
+    <file src="$SourceBuildTfmCurrent$/cs/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/cs" />
+    <file src="$SourceBuildTfmPrevious$/de/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/de" />
+    <file src="$SourceBuildTfmCurrent$/de/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/de" />
+    <file src="$SourceBuildTfmPrevious$/es/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/es" />
+    <file src="$SourceBuildTfmCurrent$/es/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/es" />
+    <file src="$SourceBuildTfmPrevious$/fr/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/fr" />
+    <file src="$SourceBuildTfmCurrent$/fr/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/fr" />
+    <file src="$SourceBuildTfmPrevious$/it/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/it" />
+    <file src="$SourceBuildTfmCurrent$/it/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/it" />
+    <file src="$SourceBuildTfmPrevious$/ja/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/ja" />
+    <file src="$SourceBuildTfmCurrent$/ja/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/ja" />
+    <file src="$SourceBuildTfmPrevious$/ko/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/ko" />
+    <file src="$SourceBuildTfmCurrent$/ko/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/ko" />
+    <file src="$SourceBuildTfmPrevious$/pl/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/pl" />
+    <file src="$SourceBuildTfmCurrent$/pl/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/pl" />
+    <file src="$SourceBuildTfmPrevious$/pt-BR/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/pt-BR" />
+    <file src="$SourceBuildTfmCurrent$/pt-BR/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/pt-BR" />
+    <file src="$SourceBuildTfmPrevious$/ru/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/ru" />
+    <file src="$SourceBuildTfmCurrent$/ru/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/ru" />
+    <file src="$SourceBuildTfmPrevious$/tr/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/tr" />
+    <file src="$SourceBuildTfmCurrent$/tr/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/tr" />
+    <file src="$SourceBuildTfmPrevious$/zh-Hans/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/zh-Hans" />
+    <file src="$SourceBuildTfmCurrent$/zh-Hans/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/zh-Hans" />
+    <file src="$SourceBuildTfmPrevious$/zh-Hant/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmPrevious$/zh-Hant" />
+    <file src="$SourceBuildTfmCurrent$/zh-Hant/Microsoft.TestPlatform.Build.resources.dll" target="lib/$SourceBuildTfmCurrent$/zh-Hant" />
+  </files>
+</package>

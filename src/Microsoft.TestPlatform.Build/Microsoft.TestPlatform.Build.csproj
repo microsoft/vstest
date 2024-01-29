@@ -12,12 +12,14 @@
   <Choose>
     <When Condition=" '$(DotNetBuildFromSource)' == 'true' ">
       <PropertyGroup>
-        <Tfm>$(NetCurrent)</Tfm>
+        <NuspecFile>Microsoft.TestPlatform.Build.sourcebuild.nuspec</NuspecFile>
+        <NuspecProperty Include="SourceBuildTfmCurrent=$(NetCurrent)" />
+        <NuspecProperty Include="SourceBuildTfmPrevious=$(NetPrevious)" />
       </PropertyGroup>
     </When>
     <Otherwise>
       <PropertyGroup>
-        <Tfm>netstandard2.0</Tfm>
+        <NuspecFile>Microsoft.TestPlatform.Build.nuspec</NuspecFile>
       </PropertyGroup>
     </Otherwise>
   </Choose>
@@ -25,7 +27,6 @@
   <PropertyGroup>
     <!-- This package is included even in source build -->
     <IsPackable>true</IsPackable>
-    <NuspecFile>Microsoft.TestPlatform.Build.nuspec</NuspecFile>
     <NuspecBasePath>$(OutputPath)</NuspecBasePath>
     <PackageId>Microsoft.TestPlatform.Build</PackageId>
     <PackageTags>vstest visual-studio unittest testplatform mstest microsoft test testing</PackageTags>

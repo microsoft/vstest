@@ -5,10 +5,10 @@
 
   <!-- Source build properties -->
   <PropertyGroup Condition=" '$(DotNetBuildFromSource)' == 'true' ">
-    <!-- Force setting TargetFrameworks to net7.0 only if it was set -->
-    <TargetFrameworks Condition=" '$(TargetFrameworks)' != '' ">$(NetCurrent)</TargetFrameworks>
-    <!-- Force setting TargetFramework to net7.0 only if it was set -->
-    <TargetFramework Condition=" '$(TargetFramework)' != '' ">$(NetCurrent)</TargetFramework>
+    <!-- Reset setting TargetFramework if it was set -->
+    <TargetFramework Condition=" '$(TargetFramework)' != '' "></TargetFramework>
+    <!-- Force setting TargetFrameworks to previous and current net -->
+    <TargetFrameworks>$(NetPrevious);$(NetCurrent)</TargetFrameworks>
   </PropertyGroup>
 
   <!-- Test project settings -->
