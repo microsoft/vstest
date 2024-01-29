@@ -7,9 +7,12 @@
     <When Condition=" '$(DotNetBuildFromSource)' == 'true' ">
       <PropertyGroup>
         <NuspecFile>Microsoft.TestPlatform.CLI.sourcebuild.nuspec</NuspecFile>
+      </PropertyGroup>
+
+      <ItemGroup Label="NuGet">
         <NuspecProperty Include="SourceBuildTfmCurrent=$(NetCurrent)" />
         <NuspecProperty Include="SourceBuildTfmPrevious=$(NetPrevious)" />
-      </PropertyGroup>
+      </ItemGroup>
     </When>
     <Otherwise>
       <PropertyGroup>

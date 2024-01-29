@@ -13,9 +13,12 @@
     <When Condition=" '$(DotNetBuildFromSource)' == 'true' ">
       <PropertyGroup>
         <NuspecFile>Microsoft.TestPlatform.Build.sourcebuild.nuspec</NuspecFile>
+      </PropertyGroup>
+
+      <ItemGroup Label="NuGet">
         <NuspecProperty Include="SourceBuildTfmCurrent=$(NetCurrent)" />
         <NuspecProperty Include="SourceBuildTfmPrevious=$(NetPrevious)" />
-      </PropertyGroup>
+      </ItemGroup>
     </When>
     <Otherwise>
       <PropertyGroup>
@@ -34,10 +37,6 @@
       Build tasks and targets for running tests with Test Platform
     </PackageDescription>
   </PropertyGroup>
-
-  <ItemGroup Label="NuGet">
-    <NuspecProperty Include="tfm=$(Tfm)" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework" Version="$(MicrosoftBuildFrameworkPackageVersion)" />
