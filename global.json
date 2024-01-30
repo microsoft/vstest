@@ -1,6 +1,6 @@
 {
   "sdk": {
-    "version": "9.0.100-alpha.1.24073.1",
+    "version": "9.0.100-alpha.1.23615.4",
     "rollForward": "minor",
     "allowPrerelease": false,
     "architecture": "x64"
