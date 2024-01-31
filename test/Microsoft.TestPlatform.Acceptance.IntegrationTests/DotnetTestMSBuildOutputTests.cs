@@ -12,13 +12,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// Running dotnet test + csproj and using MSBuild for the output.
 /// </summary>
 [TestClass]
-[Ignore(
-"""
-    Ignored because we need to update to dotnet SDK 9.0.100-alpha.1.24073.1 or newer,
-    but that depends on newer version of MSBuild sdk that is not published yet, and so our build fails in Signing validation.
-    We need that upgrade because older SDK is hardcoding the same ENV variable that we are using to disable this functionality.
-    So when we patch the targets and build dll in the current SDK this new functionality is always disabled and we cannot test it with older SDK.
-""")]
 public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
 {
     [TestMethod]
