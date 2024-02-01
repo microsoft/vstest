@@ -11,7 +11,7 @@
   <files>
     $CommonFileElements$
 
-    <file src="$SourceBuildTfmPrevious$/Microsoft.TestPlatform.targets" target="runtimes/any/native" />
+    <file src="$SourceBuildTfmCurrent$/Microsoft.TestPlatform.targets" target="runtimes/any/native" />
     <file src="$SourceBuildTfmCurrent$/Microsoft.TestPlatform.Build.dll" target="lib/$SourceBuildTfmCurrent$" />
 
     <!-- Add localized resources -->
