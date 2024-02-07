@@ -76,7 +76,6 @@
   <PropertyGroup>
     <Copyright>$(CopyrightMicrosoft)</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageLicenseFullPath>$(SrcPackageFolder)licenses/LICENSE_MIT.txt</PackageLicenseFullPath>
     <!-- Prevent warning about deprecated target frameworks -->
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <DefineConstants Condition=" '$(DotNetBuildFromSource)' == 'true' ">$(DefineConstants);DOTNET_BUILD_FROM_SOURCE</DefineConstants>
@@ -88,10 +87,6 @@
     <!-- Workaround for AD0001 in analyzers with .NET 9. See https://github.com/dotnet/arcade/issues/14311 -->
     <BuildWithNetFrameworkHostedCompiler>true</BuildWithNetFrameworkHostedCompiler>
   </PropertyGroup>
-
-  <ItemGroup>
-    <NuspecProperty Include="MITPackageLicenseFullPath=$(PackageLicenseFullPath)" />
-  </ItemGroup>
 
   <!-- Sign config -->
   <PropertyGroup>
