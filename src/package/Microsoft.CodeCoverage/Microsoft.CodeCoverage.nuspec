@@ -80,5 +80,8 @@
     <file src="net462\Microsoft.VisualStudio.TraceDataCollector\tr\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard2.0\tr" />
     <file src="net462\Microsoft.VisualStudio.TraceDataCollector\zh-Hans\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard2.0\zh-Hans" />
     <file src="net462\Microsoft.VisualStudio.TraceDataCollector\zh-Hant\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard2.0\zh-Hant" />
+
+    <file src="$MITPackageLicenseFullPath$" target="" />
+
   </files>
 </package>

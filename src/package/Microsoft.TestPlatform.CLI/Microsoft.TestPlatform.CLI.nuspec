@@ -416,5 +416,7 @@
     <file src="netcoreapp3.1\zh-Hans\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" target="contentFiles\any\netcoreapp3.1\Extensions\zh-Hans" />
     <file src="netcoreapp3.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" target="contentFiles\any\netcoreapp3.1\Extensions\zh-Hant" />
 
+    <file src="$MITPackageLicenseFullPath$" target="" />
+
   </files>
 </package>

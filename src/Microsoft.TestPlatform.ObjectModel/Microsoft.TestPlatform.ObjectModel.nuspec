@@ -112,5 +112,8 @@
     <file src="netstandard2.0\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll"             target="lib\netstandard2.0\zh-Hans" />
     <file src="netstandard2.0\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll"             target="lib\netstandard2.0\zh-Hant" />
     <!-- /netstandard 2.0 -->
+
+    <file src="$MITPackageLicenseFullPath$" target="" />
+
   </files>
 </package>
