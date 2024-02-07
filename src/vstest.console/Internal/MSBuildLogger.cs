@@ -62,7 +62,6 @@ internal class MSBuildLogger : ITestLoggerWithParameters
         events.TestRunMessage += TestMessageHandler;
         events.TestResult += TestResultHandler;
         events.TestRunComplete += TestRunCompleteHandler;
-        events.TestRunStart += TestRunStartHandler;
     }
 
     public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters)
@@ -83,17 +82,6 @@ internal class MSBuildLogger : ITestLoggerWithParameters
             case TestMessageLevel.Error:
                 SendMessage($"output-error", e.Message);
                 break;
-        }
-    }
-
-    private void TestRunStartHandler(object? sender, TestRunStartEventArgs e)
-    {
-        TPDebug.Assert(Output != null, "Initialize should have been called");
-
-        var source = e.TestRunCriteria.Sources?.FirstOrDefault();
-        if (source != null)
-        {
-            SendMessage("run-start", source);
         }
     }
 

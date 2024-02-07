@@ -36,12 +36,12 @@ Copyright (c) .NET Foundation. All rights reserved.
 
   <!--
     Used when called from dotnet msbuild command line: uses MSBuild logs but does not allow for console colorization.
-    We call to empty target _VSTestMSBuild2 to mark start of the actual test running, in case we need to do build before
+    We call to empty target _TestRunStarted to mark start of the actual test running, in case we need to do build before
     the test running. This is used in MSBuild Terminal Logger to detect that the current project will run some tests.
   -->
   <Target Name="_VSTestMSBuild" Condition="'$(IsTestProject)' == 'true'">
     <CallTarget Condition="!$(VSTestNoBuild)" Targets="BuildProject" />
-    <CallTarget Targets="_VSTestMSBuild2" />
+    <CallTarget Targets="_TestRunStarted" />
 
     <VSTestTask2
       TestFileFullPath="$(TargetPath)"
@@ -72,7 +72,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     />
   </Target>
 
-  <Target Name="_VSTestMSBuild2" />
+  <Target Name="_TestRunStarted" />
 
   <!-- Used when called from dotnet test command line: does not use MSBuild logs to allow for console colorization -->
   <Target Name="_VSTestConsole">

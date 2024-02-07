@@ -83,13 +83,6 @@ public class VSTestTask2 : ToolTask, ITestTask
                     Log.LogError(data[0]);
                     break;
 
-                case "run-start1":
-                    if (useTerminalLogger)
-                    {
-                        Log.LogMessage("VSTESTTLSTART", null, null, null, 0, 0, 0, 0, MessageImportance.High, data[0]);
-                    }
-                    break;
-
                 case "run-cancel1":
                 case "run-abort1":
                     Log.LogError(data[0]);
@@ -103,7 +96,7 @@ public class VSTestTask2 : ToolTask, ITestTask
                     var visibleMessage = "Run completed";
                     if (useTerminalLogger)
                     {
-                        var message = new ExtendedBuildMessageEventArgs("VSTESTTLFINISH", visibleMessage, null, null, MessageImportance.High)
+                        var message = new ExtendedBuildMessageEventArgs("TLTESTFINISH", visibleMessage, null, null, MessageImportance.High)
                         {
                             ExtendedMetadata = new Dictionary<string, string?>
                             {
@@ -144,22 +137,15 @@ public class VSTestTask2 : ToolTask, ITestTask
                             ? testResultWithTime
                             : $"{testResultWithTime}{n}Outputs:{n}{outputs}";
 
-                        if (useTerminalLogger)
+                        var message = new ExtendedBuildMessageEventArgs("TLTESTPASSED", testPassed, null, null, MessageImportance.High)
                         {
-                            var message = new ExtendedBuildMessageEventArgs("VSTESTTLPASSED", testPassed, null, null, MessageImportance.High)
+                            ExtendedMetadata = new Dictionary<string, string?>
                             {
-                                ExtendedMetadata = new Dictionary<string, string?>
-                                {
-                                    ["localizedResult"] = data[0],
-                                    ["displayName"] = data[1],
-                                }
-                            };
-                            BuildEngine.LogMessageEvent(message);
-                        }
-                        else
-                        {
-                            Log.LogMessage(MessageImportance.Low, testPassed);
-                        }
+                                ["localizedResult"] = data[0],
+                                ["displayName"] = data[1],
+                            }
+                        };
+                        BuildEngine.LogMessageEvent(message);
                     }
                     break;
                 case "test-skipped2":
@@ -170,21 +156,15 @@ public class VSTestTask2 : ToolTask, ITestTask
                         var displayName = data[1];
 
                         var testSkipped = $"{indicator} {displayName}";
-                        if (useTerminalLogger)
+                        var message = new ExtendedBuildMessageEventArgs("TLTESTSKIPPED", testSkipped, null, null, MessageImportance.High)
                         {
-                            Log.LogMessage("VSTESTTLSKIPPED", null, null, null, 0, 0, 0, 0, MessageImportance.High, AsForwardedMessage(data));
-                            var message = new ExtendedBuildMessageEventArgs("VSTESTTLSKIPPED", testSkipped, null, null, MessageImportance.High)
+                            ExtendedMetadata = new Dictionary<string, string?>
                             {
-                                ExtendedMetadata = new Dictionary<string, string?>
-                                {
-                                    ["localizedResult"] = data[0],
-                                    ["displayName"] = data[1],
-                                }
-                            };
-                            BuildEngine.LogMessageEvent(message);
-                        }
-
-                        Log.LogMessage(MessageImportance.Low, testSkipped);
+                                ["localizedResult"] = data[0],
+                                ["displayName"] = data[1],
+                            }
+                        };
+                        BuildEngine.LogMessageEvent(message);
                     }
                     break;
                 case "test-failed7":
