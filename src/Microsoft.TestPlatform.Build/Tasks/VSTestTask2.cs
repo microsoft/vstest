@@ -248,7 +248,7 @@ public class VSTestTask2 : ToolTask, ITestTask
         }
         else
         {
-            // We will receive output, such as vstest version, forward it to msbuild log, prefixed with ">" so I can find that out, with minimal impact on user.
+            // We will receive output, such as vstest version, forward it to msbuild log.
 
             // DO NOT call the base, it parses out the output, and if it sees "error" in any place it will log it as error
             // we don't want this, we only want to log errors from the text messages we receive that start error splitter.
@@ -256,7 +256,7 @@ public class VSTestTask2 : ToolTask, ITestTask
 
             if (!StringUtils.IsNullOrWhiteSpace(singleLine))
             {
-                Log.LogMessage(MessageImportance.Low, $"> {singleLine}");
+                Log.LogMessage(MessageImportance.Low, singleLine);
             }
         }
     }

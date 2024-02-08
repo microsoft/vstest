@@ -113,12 +113,12 @@ internal class MSBuildLogger : ITestLoggerWithParameters
             var time = e.ElapsedTimeInRunningTests.TotalMilliseconds;
 
             var summary = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
-                        failed > 0 ? CommandLineResources.FailedTestIndicator : CommandLineResources.PassedTestIndicator,
+                        (failed > 0 ? CommandLineResources.FailedTestIndicator : CommandLineResources.PassedTestIndicator) + "!",
                         failed,
                         passed,
                         skipped,
                         total,
-                        GetFormattedDurationString(e.ElapsedTimeInRunningTests)
+                        $"[{GetFormattedDurationString(e.ElapsedTimeInRunningTests)}]"
                         );
 
             SendMessage("run-finish",
