@@ -87,24 +87,25 @@ public class VSTestTask2 : ToolTask, ITestTask
                 case "run-abort1":
                     Log.LogError(data[0]);
                     break;
-                case "run-finish5":
-                    // 0 - total tests
-                    // 1 - passed tests
-                    // 2 - skipped tests
-                    // 3 - failed tests
-                    // 4 - duration
-                    var visibleMessage = "Run completed";
+                case "run-finish6":
+                    // 0 - Localized summary
+                    // 1 - total tests
+                    // 2 - passed tests
+                    // 3 - skipped tests
+                    // 4 - failed tests
+                    // 5 - duration
+                    var summary = data[0];
                     if (useTerminalLogger)
                     {
-                        var message = new ExtendedBuildMessageEventArgs("TLTESTFINISH", visibleMessage, null, null, MessageImportance.High)
+                        var message = new ExtendedBuildMessageEventArgs("TLTESTFINISH", summary, null, null, MessageImportance.High)
                         {
                             ExtendedMetadata = new Dictionary<string, string?>
                             {
-                                ["total"] = data[0],
-                                ["passed"] = data[1],
-                                ["skipped"] = data[2],
-                                ["failed"] = data[3],
-                                ["duration"] = data[4],
+                                ["total"] = data[1],
+                                ["passed"] = data[2],
+                                ["skipped"] = data[3],
+                                ["failed"] = data[4],
+                                ["duration"] = data[5],
                             }
                         };
 
@@ -112,7 +113,7 @@ public class VSTestTask2 : ToolTask, ITestTask
                     }
                     else
                     {
-                        Log.LogMessage(MessageImportance.Low, visibleMessage);
+                        Log.LogMessage(MessageImportance.Low, summary);
                     }
                     break;
                 case "test-passed4":
@@ -137,15 +138,22 @@ public class VSTestTask2 : ToolTask, ITestTask
                             ? testResultWithTime
                             : $"{testResultWithTime}{n}Outputs:{n}{outputs}";
 
-                        var message = new ExtendedBuildMessageEventArgs("TLTESTPASSED", testPassed, null, null, MessageImportance.High)
+                        if (useTerminalLogger)
                         {
-                            ExtendedMetadata = new Dictionary<string, string?>
+                            var message = new ExtendedBuildMessageEventArgs("TLTESTPASSED", testPassed, null, null, MessageImportance.High)
                             {
-                                ["localizedResult"] = data[0],
-                                ["displayName"] = data[1],
-                            }
-                        };
-                        BuildEngine.LogMessageEvent(message);
+                                ExtendedMetadata = new Dictionary<string, string?>
+                                {
+                                    ["localizedResult"] = data[0],
+                                    ["displayName"] = data[1],
+                                }
+                            };
+                            BuildEngine.LogMessageEvent(message);
+                        }
+                        else
+                        {
+                            Log.LogMessage(MessageImportance.Low, testPassed);
+                        }
                     }
                     break;
                 case "test-skipped2":
@@ -156,15 +164,22 @@ public class VSTestTask2 : ToolTask, ITestTask
                         var displayName = data[1];
 
                         var testSkipped = $"{indicator} {displayName}";
-                        var message = new ExtendedBuildMessageEventArgs("TLTESTSKIPPED", testSkipped, null, null, MessageImportance.High)
+                        if (useTerminalLogger)
                         {
-                            ExtendedMetadata = new Dictionary<string, string?>
+                            var message = new ExtendedBuildMessageEventArgs("TLTESTSKIPPED", testSkipped, null, null, MessageImportance.High)
                             {
-                                ["localizedResult"] = data[0],
-                                ["displayName"] = data[1],
-                            }
-                        };
-                        BuildEngine.LogMessageEvent(message);
+                                ExtendedMetadata = new Dictionary<string, string?>
+                                {
+                                    ["localizedResult"] = data[0],
+                                    ["displayName"] = data[1],
+                                }
+                            };
+                            BuildEngine.LogMessageEvent(message);
+                        }
+                        else
+                        {
+                            Log.LogMessage(MessageImportance.Low, testSkipped);
+                        }
                     }
                     break;
                 case "test-failed7":

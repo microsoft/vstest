@@ -111,7 +111,18 @@ internal class MSBuildLogger : ITestLoggerWithParameters
             var skipped = e.TestRunStatistics?[TestOutcome.Skipped] ?? 0;
             var failed = e.TestRunStatistics?[TestOutcome.Failed] ?? 0;
             var time = e.ElapsedTimeInRunningTests.TotalMilliseconds;
+
+            var summary = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
+                        failed > 0 ? CommandLineResources.FailedTestIndicator : CommandLineResources.PassedTestIndicator,
+                        failed,
+                        passed,
+                        skipped,
+                        total,
+                        GetFormattedDurationString(e.ElapsedTimeInRunningTests)
+                        );
+
             SendMessage("run-finish",
+                summary,
                 total.ToString(CultureInfo.InvariantCulture),
                 passed.ToString(CultureInfo.InvariantCulture),
                 skipped.ToString(CultureInfo.InvariantCulture),
@@ -317,5 +328,51 @@ internal class MSBuildLogger : ITestLoggerWithParameters
                 stringBuilder.AppendFormat(CultureInfo.CurrentCulture, "{0}{1}", testMessageFormattingPrefix, messageText);
             }
         }
+    }
+
+    /// <summary>
+    /// Converts the time span format to readable string.
+    /// </summary>
+    /// <param name="duration"></param>
+    /// <returns></returns>
+    internal static string? GetFormattedDurationString(TimeSpan duration)
+    {
+        if (duration == default)
+        {
+            return null;
+        }
+
+        var time = new List<string>();
+        if (duration.Days > 0)
+        {
+            time.Add("> 1d");
+        }
+        else
+        {
+            if (duration.Hours > 0)
+            {
+                time.Add(duration.Hours + "h");
+            }
+
+            if (duration.Minutes > 0)
+            {
+                time.Add(duration.Minutes + "m");
+            }
+
+            if (duration.Hours == 0)
+            {
+                if (duration.Seconds > 0)
+                {
+                    time.Add(duration.Seconds + "s");
+                }
+
+                if (duration.Milliseconds > 0 && duration.Minutes == 0)
+                {
+                    time.Add(duration.Milliseconds + "ms");
+                }
+            }
+        }
+
+        return time.Count == 0 ? "< 1ms" : string.Join(" ", time);
     }
 }
