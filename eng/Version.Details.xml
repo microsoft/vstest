@@ -19,9 +19,9 @@
       <Sha>414a85bf970355c0e91d6a2de1ee183fafbfcecd</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="9.0.0-alpha.1.24101.2">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="9.0.0-alpha.1.24109.1">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>69b60d2af1775f374c91b3e52da02de6b7de1943</Sha>
+      <Sha>8ee50f75f960fbfb20fce0fefc5a3b05d15b1d21</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
     <!-- Necessary for source-build. This allows the live version of the package to be used by source-build. -->
