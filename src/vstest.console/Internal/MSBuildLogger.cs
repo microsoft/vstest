@@ -245,10 +245,10 @@ internal class MSBuildLogger : ITestLoggerWithParameters
 
     private static string FormatMessage(string name, params string?[] data)
     {
-        return $"||||{name}{data.Length}||||{string.Join("||||", data.Select(Clean))}";
+        return $"||||{name}{data.Length}||||{string.Join("||||", data.Select(Escape))}";
     }
 
-    private static string? Clean(string? input)
+    private static string? Escape(string? input)
     {
         if (input == null)
         {
