@@ -335,11 +335,11 @@ internal class MSBuildLogger : ITestLoggerWithParameters
     /// </summary>
     /// <param name="duration"></param>
     /// <returns></returns>
-    internal static string? GetFormattedDurationString(TimeSpan duration)
+    internal static string GetFormattedDurationString(TimeSpan duration)
     {
         if (duration == default)
         {
-            return null;
+            return "< 1ms";
         }
 
         var time = new List<string>();
