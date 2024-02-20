@@ -525,9 +525,12 @@ internal class TestRequestManager : ITestRequestManager
                 var testSessionStarted = _testPlatform.StartTestSession(requestData, criteria, eventsHandler, sourceToSourceDetailMap, new NullWarningLogger());
                 if (!testSessionStarted)
                 {
-                    // Note: StartTestSession will invoke the HandleStartTestSessionComplete event
-                    // if the test session is started successfully. If it is not started, we need
-                    // to invoke the event here.
+                    // Note: We need to send back a TestSessionComplete event, so that the caller
+                    // completes a session start request.
+                    // StartTestSession will invoke the HandleStartTestSessionComplete event
+                    // if the test session is started successfully. However, if it is not started,
+                    // HandleStartTestSessionComplete will not send an event. That's why we need
+                    // to do it here.
                     eventsHandler.HandleStartTestSessionComplete(new());
                     EqtTrace.Warning("TestRequestManager.StartTestSession: Unable to start test session.");
                 }
