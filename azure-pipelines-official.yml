@@ -115,8 +115,8 @@ extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
     pool:
-      name: Azure-Pipelines-1ESPT-ExDShared
-      image: windows-2022
+      name: $(DncEngInternalBuildPool)
+      image: 1es-windows-2022-pt
       os: windows
     customBuildTags:
     - ES365AIMigrationTooling
@@ -139,12 +139,8 @@ extends:
           - job: Windows
             timeoutInMinutes: 120
             pool:
-              ${{ if eq(variables._RunAsPublic, True) }}:
-                name: NetCore-Public
-                demands: ImageOverride -equals windows.vs2022.amd64.open
-              ${{ if eq(variables._RunAsInternal, True) }}:
-                name: NetCore1ESPool-Internal
-                demands: ImageOverride -equals 1es-windows-2022
+              name: $(DncEngInternalBuildPool)
+              demands: ImageOverride -equals 1es-windows-2022-pt
             strategy:
               matrix:
                 Release:
@@ -226,7 +222,7 @@ extends:
             strategy:
               matrix:
                 Ubuntu_22_04:
-                  vmImage: ubuntu-22.04
+                  vmImage: 1es-ubuntu-2204-pt
                   pwsh: true
                 macOS_11:
                   vmImage: macOS-11
