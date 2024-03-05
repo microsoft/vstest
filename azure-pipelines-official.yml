@@ -109,6 +109,7 @@ resources:
     type: git
     name: 1ESPipelineTemplates/1ESPipelineTemplates
     ref: refs/tags/release
+
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
@@ -118,173 +119,132 @@ extends:
       os: windows
     customBuildTags:
     - ES365AIMigrationTooling
-
-stages:
-
-- stage: build
-  displayName: Build
-  jobs:
-
-  - template: /eng/common/templates/jobs/jobs.yml@self
-    parameters:
-      enableMicrobuild: true
-      enablePublishBuildArtifacts: true
-      enablePublishBuildAssets: true
-      enablePublishUsingPipelines: true
-      enablePublishTestResults: true
-      testResultsFormat: 'vstest'
-      enableTelemetry: true
-      enableSourceBuild: true
+    stages:
+    - stage: build
+      displayName: Build
       jobs:
-      - job: Windows
-        timeoutInMinutes: 120
-        pool:
-          ${{ if eq(variables._RunAsPublic, True) }}:
-            name: NetCore-Public
-            demands: ImageOverride -equals windows.vs2022.amd64.open
-          ${{ if eq(variables._RunAsInternal, True) }}:
-            name: NetCore1ESPool-Internal
-            demands: ImageOverride -equals 1es-windows-2022
-        strategy:
-          matrix:
-            Release:
-              _BuildConfig: Release
-            # ${{ if eq(variables._RunAsPublic, True) }}:
-            #   Debug:
-            #     _BuildConfig: Debug
-        steps:
-        # This steps help to understand versions of .NET runtime installed on the machine,
-        # which is useful to diagnose some governance issues.
-        - task: DotNetCoreCLI@2
-          displayName: 'dotnet --info'
-          inputs:
-            command: custom
-            custom: '--info'
 
-        # Restore internal tools required for SBOM generation
-        - ${{ if eq(variables._RunAsInternal, True) }}:
-          - template: /eng/restore-internal-tools.yml
+      - template: /eng/common/templates/jobs/jobs.yml@self
+        parameters:
+          enableMicrobuild: true
+          enablePublishBuildArtifacts: true
+          enablePublishBuildAssets: true
+          enablePublishUsingPipelines: true
+          enablePublishTestResults: true
+          testResultsFormat: 'vstest'
+          enableTelemetry: true
+          enableSourceBuild: true
+          jobs:
+          - job: Windows
+            timeoutInMinutes: 120
+            pool:
+              ${{ if eq(variables._RunAsPublic, True) }}:
+                name: NetCore-Public
+                demands: ImageOverride -equals windows.vs2022.amd64.open
+              ${{ if eq(variables._RunAsInternal, True) }}:
+                name: NetCore1ESPool-Internal
+                demands: ImageOverride -equals 1es-windows-2022
+            strategy:
+              matrix:
+                Release:
+                  _BuildConfig: Release
+                # ${{ if eq(variables._RunAsPublic, True) }}:
+                #   Debug:
+                #     _BuildConfig: Debug
+            steps:
+            # This steps help to understand versions of .NET runtime installed on the machine,
+            # which is useful to diagnose some governance issues.
+            - task: DotNetCoreCLI@2
+              displayName: 'dotnet --info'
+              inputs:
+                command: custom
+                custom: '--info'
 
-        - powershell: eng\common\CIBuild.cmd
-            -configuration $(_BuildConfig)
-            -prepareMachine
-            $(_InternalBuildArgs)
-            /p:Test=false
-            /p:SourceBranchName=$(Build.SourceBranchName)
-          name: Build
-          displayName: Build
+            # Restore internal tools required for SBOM generation
+            - ${{ if eq(variables._RunAsInternal, True) }}:
+              - template: /eng/restore-internal-tools.yml
 
-        # -ci is allowing to import some environment variables and some required configurations
-        # -nobl avoid overwriting binlog of the main Build
-        - script: Test.cmd
-            -configuration $(_BuildConfig)
-            -ci
-            -nobl
-            -integrationTest
-            -performanceTest
-          name: Test
-          displayName: Test
+            - powershell: eng\common\CIBuild.cmd
+                -configuration $(_BuildConfig)
+                -prepareMachine
+                $(_InternalBuildArgs)
+                /p:Test=false
+                /p:SourceBranchName=$(Build.SourceBranchName)
+              name: Build
+              displayName: Build
 
-        # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
-        # through the console or trx
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Test Results folders'
-          inputs:
-            PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
-            ArtifactName: TestResults
-          condition: failed()
+            # -ci is allowing to import some environment variables and some required configurations
+            # -nobl avoid overwriting binlog of the main Build
+            - script: Test.cmd
+                -configuration $(_BuildConfig)
+                -ci
+                -nobl
+                -integrationTest
+                -performanceTest
+              name: Test
+              displayName: Test
 
-        # Public pipeline does not upload packages into artifacts, but we need them for tests on Linux and MacOS.
-        - ${{ if eq(variables._RunAsPublic, True) }}:
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Shipping Packages'
-            inputs:
-              PathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
-              ArtifactName: PackageArtifacts
+            # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
+            # through the console or trx
+            - task: PublishBuildArtifacts@1
+              displayName: 'Publish Test Results folders'
+              inputs:
+                PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
+                ArtifactName: TestResults
+              condition: failed()
 
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish NonShippping Packages'
-            inputs:
-              PathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/NonShipping'
-              ArtifactName: PackageArtifacts
+            # Public pipeline does not upload packages into artifacts, but we need them for tests on Linux and MacOS.
+            - ${{ if eq(variables._RunAsPublic, True) }}:
+              - task: PublishBuildArtifacts@1
+                displayName: 'Publish Shipping Packages'
+                inputs:
+                  PathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
+                  ArtifactName: PackageArtifacts
 
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish VSSetup'
-          inputs:
-            PathtoPublish: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
-            ArtifactName: VSSetupArtifacts
+              - task: PublishBuildArtifacts@1
+                displayName: 'Publish NonShippping Packages'
+                inputs:
+                  PathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/NonShipping'
+                  ArtifactName: PackageArtifacts
 
-      - job: OtherOSes
-        dependsOn: Windows
-        workspace:
-          clean: all
-        variables:
-          # Publish Logs seems to depend on this name of variable, so we define it
-          # even when we don't use matrix.
-          - name: _BuildConfig
-            value: Release
-        strategy:
-          matrix:
-            Ubuntu_22_04:
-              vmImage: ubuntu-22.04
-              pwsh: true
-            macOS_11:
-              vmImage: macOS-11
-              pwsh: true
-        pool:
-          vmImage: $[ variables['vmImage'] ]
-        steps:
-        - checkout: self
-          fetchDepth: 1
-          clean: true
+            - task: PublishBuildArtifacts@1
+              displayName: 'Publish VSSetup'
+              inputs:
+                PathtoPublish: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
+                ArtifactName: VSSetupArtifacts
 
-        # Build but don't pack, packing does not work on non-windows and we want to test what we built on Windows
-        # anyway. Because that is what we will publish.
-        - script: ./build.sh
-            --configuration $(_BuildConfig)
-            --ci
-          name: Build
-          displayName: Build
+          - job: OtherOSes
+            dependsOn: Windows
+            workspace:
+              clean: all
+            variables:
+              # Publish Logs seems to depend on this name of variable, so we define it
+              # even when we don't use matrix.
+              - name: _BuildConfig
+                value: Release
+            strategy:
+              matrix:
+                Ubuntu_22_04:
+                  vmImage: ubuntu-22.04
+                  pwsh: true
+                macOS_11:
+                  vmImage: macOS-11
+                  pwsh: true
+            pool:
+              vmImage: $[ variables['vmImage'] ]
+            steps:
+            - checkout: self
+              fetchDepth: 1
+              clean: true
 
-        # Download the built packages into local package source, as if we built them on this machine.
-        - task: DownloadPipelineArtifact@2
-          displayName: Download Package Artifacts
-          inputs:
-            artifactName: PackageArtifacts
-            targetPath: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
+            # Build but don't pack, packing does not work on non-windows and we want to test what we built on Windows
+            # anyway. Because that is what we will publish.
+            - script: ./build.sh
+                --configuration $(_BuildConfig)
+                --ci
+              name: Build
+              displayName: Build
 
-        - script: ./test.sh
-            --configuration $(_BuildConfig)
-            --ci
-            --integrationTest
-            --performanceTest
-          name: Test
-          displayName: Test
-
-        # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
-        # through the console or trx
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Test Results folders'
-          inputs:
-            PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
-            ArtifactName: TestResults
-          condition: failed()
-
-      - ${{ if eq(variables._RunAsInternal, True) }}:
-        - job: Publish
-          dependsOn: OtherOSes
-          pool:
-              name: NetCore1ESPool-Internal
-              demands: ImageOverride -equals 1es-windows-2022
-          strategy:
-            matrix:
-              Release:
-                _BuildConfig: Release
-          steps:
-            # The template job needs a log, otherwise it writes a warning. We can disable log uploading only for
-            # the whole stage, which is not what we want to do. So we write an empty file instead.
-            - pwsh: 'New-Item -Type file -Force "$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)/empty.log"'
-              name: 'Add_empty_logfile'
             # Download the built packages into local package source, as if we built them on this machine.
             - task: DownloadPipelineArtifact@2
               displayName: Download Package Artifacts
@@ -292,59 +252,98 @@ stages:
                 artifactName: PackageArtifacts
                 targetPath: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
 
-            - task: DownloadPipelineArtifact@2
-              displayName: Download VSSetup Artifacts
-              inputs:
-                artifactName: VSSetupArtifacts
-                targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
+            - script: ./test.sh
+                --configuration $(_BuildConfig)
+                --ci
+                --integrationTest
+                --performanceTest
+              name: Test
+              displayName: Test
 
-            - task: NuGetAuthenticate@1
-              displayName: 'NuGet Authenticate to dotnet-tools and test-tools feeds'
-
-            - task: NuGetCommand@2
-              displayName: 'Publish NuGet packages to dotnet-tools feed'
-              inputs:
-                command: push
-                packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
-                publishVstsFeed: 'public/dotnet-tools'
-
-            - task: NuGetCommand@2
-              displayName: 'Publish NuGet packages to test-tools feed'
-              inputs:
-                command: push
-                packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
-                publishVstsFeed: 'public/test-tools'
-
-            # Publishes setup VSIXes to a drop.
-            # Note: The insertion tool looks for the display name of this task in the logs.
-            - task: ms-vseng.MicroBuildTasks.4305a8de-ba66-4d8b-b2d1-0dc4ecbbf5e8.MicroBuildUploadVstsDropFolder@1
-              displayName: Upload VSTS Drop
-              inputs:
-                DropName: $(VisualStudioDropName)
-                DropFolder: 'artifacts\VSSetup\$(_BuildConfig)\Insertion'
-                AccessToken: $(_DevDivDropAccessToken)
-              condition: succeeded()
-
+            # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
+            # through the console or trx
             - task: PublishBuildArtifacts@1
-              displayName: Publish Artifact VSSetup
+              displayName: 'Publish Test Results folders'
               inputs:
-                PathtoPublish: 'artifacts\VSSetup\$(_BuildConfig)'
-                ArtifactName: 'VSSetup'
-              condition: succeeded()
+                PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
+                ArtifactName: TestResults
+              condition: failed()
 
-  - ${{ if eq(variables._RunAsInternal, True) }}:
-    - template: /eng/common/templates/job/onelocbuild.yml@self
-      parameters:
-        GitHubOrg: microsoft
-        MirrorRepo: vstest
-        LclSource: lclFilesfromPackage
-        LclPackageId: 'LCL-JUNO-PROD-VSTEST'
+          - ${{ if eq(variables._RunAsInternal, True) }}:
+            - job: Publish
+              dependsOn: OtherOSes
+              pool:
+                  name: NetCore1ESPool-Internal
+                  demands: ImageOverride -equals 1es-windows-2022
+              strategy:
+                matrix:
+                  Release:
+                    _BuildConfig: Release
+              steps:
+                # The template job needs a log, otherwise it writes a warning. We can disable log uploading only for
+                # the whole stage, which is not what we want to do. So we write an empty file instead.
+                - pwsh: 'New-Item -Type file -Force "$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)/empty.log"'
+                  name: 'Add_empty_logfile'
+                # Download the built packages into local package source, as if we built them on this machine.
+                - task: DownloadPipelineArtifact@2
+                  displayName: Download Package Artifacts
+                  inputs:
+                    artifactName: PackageArtifacts
+                    targetPath: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
 
-- ${{ if eq(variables._RunAsInternal, True) }}:
-  - template: eng\common\templates\post-build\post-build.yml@self
-    parameters:
-      publishingInfraVersion: 3
-      SDLValidationParameters:
-        enable: false
-        continueOnError: false
-        params: ' -SourceToolsList @("policheck","credscan")'
+                - task: DownloadPipelineArtifact@2
+                  displayName: Download VSSetup Artifacts
+                  inputs:
+                    artifactName: VSSetupArtifacts
+                    targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
+
+                - task: NuGetAuthenticate@1
+                  displayName: 'NuGet Authenticate to dotnet-tools and test-tools feeds'
+
+                - task: NuGetCommand@2
+                  displayName: 'Publish NuGet packages to dotnet-tools feed'
+                  inputs:
+                    command: push
+                    packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
+                    publishVstsFeed: 'public/dotnet-tools'
+
+                - task: NuGetCommand@2
+                  displayName: 'Publish NuGet packages to test-tools feed'
+                  inputs:
+                    command: push
+                    packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
+                    publishVstsFeed: 'public/test-tools'
+
+                # Publishes setup VSIXes to a drop.
+                # Note: The insertion tool looks for the display name of this task in the logs.
+                - task: ms-vseng.MicroBuildTasks.4305a8de-ba66-4d8b-b2d1-0dc4ecbbf5e8.MicroBuildUploadVstsDropFolder@1
+                  displayName: Upload VSTS Drop
+                  inputs:
+                    DropName: $(VisualStudioDropName)
+                    DropFolder: 'artifacts\VSSetup\$(_BuildConfig)\Insertion'
+                    AccessToken: $(_DevDivDropAccessToken)
+                  condition: succeeded()
+
+                - task: PublishBuildArtifacts@1
+                  displayName: Publish Artifact VSSetup
+                  inputs:
+                    PathtoPublish: 'artifacts\VSSetup\$(_BuildConfig)'
+                    ArtifactName: 'VSSetup'
+                  condition: succeeded()
+
+      - ${{ if eq(variables._RunAsInternal, True) }}:
+        - template: /eng/common/templates/job/onelocbuild.yml@self
+          parameters:
+            GitHubOrg: microsoft
+            MirrorRepo: vstest
+            LclSource: lclFilesfromPackage
+            LclPackageId: 'LCL-JUNO-PROD-VSTEST'
+
+    - ${{ if eq(variables._RunAsInternal, True) }}:
+      - template: eng\common\templates\post-build\post-build.yml@self
+        parameters:
+          publishingInfraVersion: 3
+          SDLValidationParameters:
+            enable: false
+            continueOnError: false
+            params: ' -SourceToolsList @("policheck","credscan")'
