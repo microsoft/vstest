@@ -301,17 +301,15 @@ extends:
                 - task: NuGetAuthenticate@1
                   displayName: 'NuGet Authenticate to dotnet-tools and test-tools feeds'
 
-                - task: NuGetCommand@2
+                - task:  1ES.PublishNuget@1
                   displayName: 'Publish NuGet packages to dotnet-tools feed'
                   inputs:
-                    command: push
                     packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
                     publishVstsFeed: 'public/dotnet-tools'
 
-                - task: NuGetCommand@2
+                - task:  1ES.PublishNuget@1
                   displayName: 'Publish NuGet packages to test-tools feed'
                   inputs:
-                    command: push
                     packagesToPush: 'artifacts/packages/$(_BuildConfig)/**/*.nupkg;!artifacts/packages/$(_BuildConfig)/**/*.symbols.nupkg'
                     publishVstsFeed: 'public/test-tools'
 
