@@ -186,7 +186,7 @@ extends:
 
             # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
             # through the console or trx
-            - task: PublishBuildArtifacts@1
+            - task: 1ES.PublishBuildArtifacts@1
               displayName: 'Publish Test Results folders'
               inputs:
                 PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
@@ -195,19 +195,19 @@ extends:
 
             # Public pipeline does not upload packages into artifacts, but we need them for tests on Linux and MacOS.
             - ${{ if eq(variables._RunAsPublic, True) }}:
-              - task: PublishBuildArtifacts@1
+              - task: 1ES.PublishBuildArtifacts@1
                 displayName: 'Publish Shipping Packages'
                 inputs:
                   PathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/Shipping'
                   ArtifactName: PackageArtifacts
 
-              - task: PublishBuildArtifacts@1
+              - task: 1ES.PublishBuildArtifacts@1
                 displayName: 'Publish NonShippping Packages'
                 inputs:
                   PathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/NonShipping'
                   ArtifactName: PackageArtifacts
 
-            - task: PublishBuildArtifacts@1
+            - task: 1ES.PublishBuildArtifacts@1
               displayName: 'Publish VSSetup'
               inputs:
                 PathtoPublish: '$(Build.SourcesDirectory)/artifacts/VSSetup/$(_BuildConfig)'
