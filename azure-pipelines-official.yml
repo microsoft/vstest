@@ -103,6 +103,21 @@ variables:
         /p:VisualStudioDropName=$(VisualStudioDropName)
         /p:GenerateSbom=true
         /p:IncludeSourceRevisionInInformationalVersion=false
+resources:
+  repositories:
+  - repository: 1ESPipelineTemplates
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  parameters:
+    pool:
+      name: Azure-Pipelines-1ESPT-ExDShared
+      image: windows-2022
+      os: windows
+    customBuildTags:
+    - ES365AIMigrationTooling
 
 stages:
 
@@ -110,7 +125,7 @@ stages:
   displayName: Build
   jobs:
 
-  - template: /eng/common/templates/jobs/jobs.yml
+  - template: /eng/common/templates/jobs/jobs.yml@self
     parameters:
       enableMicrobuild: true
       enablePublishBuildArtifacts: true
@@ -318,7 +333,7 @@ stages:
               condition: succeeded()
 
   - ${{ if eq(variables._RunAsInternal, True) }}:
-    - template: /eng/common/templates/job/onelocbuild.yml
+    - template: /eng/common/templates/job/onelocbuild.yml@self
       parameters:
         GitHubOrg: microsoft
         MirrorRepo: vstest
@@ -326,7 +341,7 @@ stages:
         LclPackageId: 'LCL-JUNO-PROD-VSTEST'
 
 - ${{ if eq(variables._RunAsInternal, True) }}:
-  - template: eng\common\templates\post-build\post-build.yml
+  - template: eng\common\templates\post-build\post-build.yml@self
     parameters:
       publishingInfraVersion: 3
       SDLValidationParameters:
