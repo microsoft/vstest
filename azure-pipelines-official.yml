@@ -262,7 +262,7 @@ extends:
 
             # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
             # through the console or trx
-            - task: PublishBuildArtifacts@1
+            - task: 1ES.PublishBuildArtifacts@1
               displayName: 'Publish Test Results folders'
               inputs:
                 PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
@@ -324,7 +324,7 @@ extends:
                     AccessToken: $(_DevDivDropAccessToken)
                   condition: succeeded()
 
-                - task: PublishBuildArtifacts@1
+                - task: 1ES.PublishBuildArtifacts@1
                   displayName: Publish Artifact VSSetup
                   inputs:
                     PathtoPublish: 'artifacts\VSSetup\$(_BuildConfig)'
