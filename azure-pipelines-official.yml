@@ -44,6 +44,7 @@ parameters:
   default: False
 
 variables:
+  - template: /eng/common/templates-official/variables/pool-providers.yml@self
   # Cannot use key:value syntax in root defined variables
   - name: _TeamName
     value: TestPlatformTeam
@@ -124,7 +125,7 @@ extends:
       displayName: Build
       jobs:
 
-      - template: /eng/common/templates/jobs/jobs.yml@self
+      - template: /eng/common/templates-official/jobs/jobs.yml@self
         parameters:
           enableMicrobuild: true
           enablePublishBuildArtifacts: true
@@ -332,7 +333,7 @@ extends:
                   condition: succeeded()
 
       - ${{ if eq(variables._RunAsInternal, True) }}:
-        - template: /eng/common/templates/job/onelocbuild.yml@self
+        - template: /eng/common/templates-official/job/onelocbuild.yml@self
           parameters:
             GitHubOrg: microsoft
             MirrorRepo: vstest
@@ -340,7 +341,7 @@ extends:
             LclPackageId: 'LCL-JUNO-PROD-VSTEST'
 
     - ${{ if eq(variables._RunAsInternal, True) }}:
-      - template: eng\common\templates\post-build\post-build.yml@self
+      - template: eng\common\templates-official\post-build\post-build.yml@self
         parameters:
           publishingInfraVersion: 3
           SDLValidationParameters:
