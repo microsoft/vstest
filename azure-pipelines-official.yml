@@ -223,11 +223,14 @@ extends:
               matrix:
                 Ubuntu_22_04:
                   vmImage: 1es-ubuntu-2204-pt
+                  name: $(DncEngInternalBuildPool)
                   pwsh: true
                 macOS_11:
                   vmImage: macOS-11
+                  name: NetCore1ESPool-Internal
                   pwsh: true
             pool:
+              name: $[ variables['name'] ]
               vmImage: $[ variables['vmImage'] ]
             steps:
             - checkout: self
@@ -270,8 +273,8 @@ extends:
             - job: Publish
               dependsOn: OtherOSes
               pool:
-                  name: NetCore1ESPool-Internal
-                  demands: ImageOverride -equals 1es-windows-2022
+                  name: $(DncEngInternalBuildPool)
+                  demands: ImageOverride -equals 1es-windows-2022-pt
               strategy:
                 matrix:
                   Release:
