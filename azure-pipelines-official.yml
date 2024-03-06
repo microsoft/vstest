@@ -240,7 +240,7 @@ extends:
           - job: Publish
             dependsOn: 
               - ${{ each pool in parameters.otherOsPools }}:
-                - job: ${{ pool.os }}
+                - ${{ pool.os }}
             pool:
                 name: $(DncEngInternalBuildPool)
                 demands: ImageOverride -equals 1es-windows-2022-pt
