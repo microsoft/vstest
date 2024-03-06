@@ -73,6 +73,10 @@ variables:
   # in .packages. Force the location of packages to that folder.
   - name: NUGET_PACKAGES
     value: '$(Build.SourcesDirectory)/.packages/'
+  # Publish Logs seems to depend on this name of variable, so we define it
+  # even when we don't use matrix.
+  - name: _BuildConfig
+    value: Release
 
   - ${{ if eq(parameters.isRTM, True) }}:
     - name: _ReleaseVersionKind
@@ -193,11 +197,6 @@ extends:
               dependsOn: Windows
               workspace:
                 clean: all
-              variables:
-                # Publish Logs seems to depend on this name of variable, so we define it
-                # even when we don't use matrix.
-                - name: _BuildConfig
-                  value: Release
               pool:
                 name: ${{ pool.name }}
                 os: ${{ pool.os }}
