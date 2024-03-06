@@ -200,7 +200,6 @@ extends:
                 demands: ImageOverride -equals ${{ pool.image }}
                 os: ${{ pool.os }}
                 image: ${{ pool.image }}
-                vmImage: ${{ pool.image }}
               steps:
               - checkout: self
                 fetchDepth: 1
