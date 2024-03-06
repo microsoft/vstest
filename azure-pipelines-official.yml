@@ -165,8 +165,6 @@ extends:
                 -configuration $(_BuildConfig)
                 -ci
                 -nobl
-                -integrationTest
-                -performanceTest
               name: Test
               displayName: Test
 
@@ -247,8 +245,6 @@ extends:
             - script: ./test.sh
                 --configuration $(_BuildConfig)
                 --ci
-                --integrationTest
-                --performanceTest
               name: Test
               displayName: Test
 
