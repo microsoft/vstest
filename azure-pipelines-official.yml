@@ -49,11 +49,9 @@ parameters:
   - name: netcore1espool-internal
     image: 1es-ubuntu-2204-pt
     os: linux
-    pwsh: true
   - name: Azure Pipelines
     image: macOS-11
     os: macOS
-    pwsh: true
 
 variables:
   - template: /eng/common/templates-official/variables/pool-providers.yml@self
@@ -202,6 +200,7 @@ extends:
                 demands: ImageOverride -equals ${{ pool.image }}
                 os: ${{ pool.os }}
                 image: ${{ pool.image }}
+                vmImage: ${{ pool.image }}
               steps:
               - checkout: self
                 fetchDepth: 1
