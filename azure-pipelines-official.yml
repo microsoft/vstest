@@ -238,7 +238,9 @@ extends:
                 condition: failed()
 
           - job: Publish
-            dependsOn: OtherOSes
+            dependsOn: 
+              - ${{ each pool in parameters.otherOsPools }}:
+                - job: ${{ pool.os }}
             pool:
                 name: $(DncEngInternalBuildPool)
                 demands: ImageOverride -equals 1es-windows-2022-pt
