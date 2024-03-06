@@ -189,7 +189,7 @@ extends:
                 ArtifactName: VSSetupArtifacts
           
           - ${{ each pool in parameters.otherOsPools }}:
-            - job: OtherOSes
+            - job: ${{ pool.os }}
               dependsOn: Windows
               workspace:
                 clean: all
