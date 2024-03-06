@@ -15,7 +15,7 @@
   <!--
     Source build the product: this is the all up build of the product which needs only NetCurrent
   -->
-  <PropertyGroup Condition=" '$(DotNetBuildSourceOnly)' == 'true' and '$(DotNetBuild)' == 'true' ">
+  <PropertyGroup Condition=" '$(DotNetBuildSourceOnly)' == 'true' and '$(DotNetBuildOrchestrator)' == 'true' ">
     <TargetFrameworks>$(NetCurrent)</TargetFrameworks>
   </PropertyGroup>
 
