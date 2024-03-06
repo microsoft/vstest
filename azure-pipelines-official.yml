@@ -267,13 +267,15 @@ extends:
               - task:  1ES.PublishNuget@1
                 displayName: 'Publish NuGet packages to dotnet-tools feed'
                 inputs:
-                  packagesToPush: 'artifacts/packages/Release/**/*.nupkg;!artifacts/packages/Release/**/*.symbols.nupkg'
+                  packageParentPath: '$(Build.SourcesDirectory)'
+                  packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
                   publishVstsFeed: 'public/dotnet-tools'
 
               - task:  1ES.PublishNuget@1
                 displayName: 'Publish NuGet packages to test-tools feed'
                 inputs:
-                  packagesToPush: 'artifacts/packages/Release/**/*.nupkg;!artifacts/packages/Release/**/*.symbols.nupkg'
+                  packageParentPath: '$(Build.SourcesDirectory)'
+                  packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
                   publishVstsFeed: 'public/test-tools'
 
               # Publishes setup VSIXes to a drop.
