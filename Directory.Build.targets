@@ -8,7 +8,7 @@
     necessary as the output of this leg is used in other CI source build legs. Those could be
     targeting NetCurrent or NetPrevious hence we must produce both.
   -->
-  <PropertyGroup Condition=" '$(DotNetBuildSourceOnly)' == 'true' and '$(DotNetBuild)' != 'true' ">
+  <PropertyGroup Condition=" '$(DotNetBuildSourceOnly)' == 'true' and '$(DotNetBuildOrchestrator)' != 'true' ">
     <TargetFrameworks>$(NetPrevious);$(NetCurrent)</TargetFrameworks>
   </PropertyGroup>
 
