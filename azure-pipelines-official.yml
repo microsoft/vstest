@@ -105,7 +105,7 @@ extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
     pool:
-      name: VSEngSS-MicroBuild2022-1ES
+      name: Azure-Pipelines-1ESPT-ExDShared
       image: 1es-windows-2022-pt
       os: windows
     customBuildTags:
@@ -129,7 +129,7 @@ extends:
           - job: Windows
             timeoutInMinutes: 120
             pool:
-              name: VSEngSS-MicroBuild2022-1ES
+              name: Azure-Pipelines-1ESPT-ExDShared
               demands: ImageOverride -equals 1es-windows-2022-pt
             strategy:
               matrix:
@@ -210,7 +210,7 @@ extends:
               matrix:
                 Ubuntu_22_04:
                   vmImage: 1es-ubuntu-2204-pt
-                  name: VSEngSS-MicroBuild2022-1ES
+                  name: Azure-Pipelines-1ESPT-ExDShared
                   os: linux
                   pwsh: true
                 macOS_11:
