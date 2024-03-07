@@ -177,19 +177,19 @@ extends:
               displayName: Test
 
             templateContext:
-                outputs:
-                # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
-                # through the console or trx
-                - output: pipelineArtifact
-                  targetPath: $(System.DefaultWorkingDirectory)/out
-                  artifactName: TestResults
-                  displayName: 'Publish Test Results folders'
-                  condition: failed()
+              outputs:
+              # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
+              # through the console or trx
+              - output: pipelineArtifact
+                targetPath: $(System.DefaultWorkingDirectory)/out
+                artifactName: TestResults
+                displayName: 'Publish Test Results folders'
+                condition: failed()
 
-                - output: pipelineArtifact
-                  displayName: 'Publish VSSetup'
-                  targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/Release'
-                  artifactName: VSSetupArtifacts 
+              - output: pipelineArtifact
+                displayName: 'Publish VSSetup'
+                targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/Release'
+                artifactName: VSSetupArtifacts 
           
           - ${{ each pool in parameters.otherOsPools }}:
             - job: ${{ pool.os }}
