@@ -186,10 +186,10 @@ extends:
                 displayName: 'Publish Test Results folders'
                 condition: failed()
 
-              - output: pipelineArtifact
+              - output: buildArtifacts
                 displayName: 'Publish VSSetup'
-                targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/Release'
-                artifactName: VSSetupArtifacts 
+                PathtoPublish: '$(Build.SourcesDirectory)/artifacts/VSSetup/Release'
+                ArtifactName: VSSetupArtifacts 
           
           - ${{ each pool in parameters.otherOsPools }}:
             - job: ${{ pool.os }}
