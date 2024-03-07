@@ -264,42 +264,42 @@ extends:
                   artifactName: VSSetupArtifacts
                   targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/Release'
 
-              templateContext:
-                outputs:
-                # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
-                # through the console or trx
-                - output: pipelineArtifact
-                  targetPath: $(System.DefaultWorkingDirectory)/out
-                  artifactName: TestResults
-                  displayName: 'Publish Test Results folders'
-                  condition: failed()
+            templateContext:
+              outputs:
+              # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
+              # through the console or trx
+              - output: pipelineArtifact
+                targetPath: $(System.DefaultWorkingDirectory)/out
+                artifactName: TestResults
+                displayName: 'Publish Test Results folders'
+                condition: failed()
 
-                - output: nuget
-                  displayName: 'Publish NuGet packages to dotnet-tools feed'
-                  packageParentPath: '$(Build.SourcesDirectory)'
-                  packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
-                  publishVstsFeed: 'public/dotnet-tools'
+              - output: nuget
+                displayName: 'Publish NuGet packages to dotnet-tools feed'
+                packageParentPath: '$(Build.SourcesDirectory)'
+                packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
+                publishVstsFeed: 'public/dotnet-tools'
 
-                - output: nuget
-                  displayName: 'Publish NuGet packages to test-tools feed'
-                  packageParentPath: '$(Build.SourcesDirectory)'
-                  packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
-                  publishVstsFeed: 'public/test-tools'
+              - output: nuget
+                displayName: 'Publish NuGet packages to test-tools feed'
+                packageParentPath: '$(Build.SourcesDirectory)'
+                packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
+                publishVstsFeed: 'public/test-tools'
 
-                # Publishes setup VSIXes to a drop.
-                # Note: The insertion tool looks for the display name of this task in the logs.
-                - output: microBuildVstsDrop
-                  displayName: Upload VSTS Drop
-                  dropName: $(VisualStudioDropName)
-                  dropFolder: 'artifacts\VSSetup\Release\Insertion'
-                  accessToken: $(_DevDivDropAccessToken)
-                  condition: succeeded()
+              # Publishes setup VSIXes to a drop.
+              # Note: The insertion tool looks for the display name of this task in the logs.
+              - output: microBuildVstsDrop
+                displayName: Upload VSTS Drop
+                dropName: $(VisualStudioDropName)
+                dropFolder: 'artifacts\VSSetup\Release\Insertion'
+                accessToken: $(_DevDivDropAccessToken)
+                condition: succeeded()
 
-                - output: pipelineArtifact
-                  displayName: Publish Artifact VSSetup
-                  targetPath: 'artifacts\VSSetup\Release'
-                  artifactName: 'VSSetup'
-                  condition: succeeded()
+              - output: pipelineArtifact
+                displayName: Publish Artifact VSSetup
+                targetPath: 'artifacts\VSSetup\Release'
+                artifactName: 'VSSetup'
+                condition: succeeded()
 
       - template: /eng/common/templates-official/job/onelocbuild.yml@self
         parameters:
