@@ -113,7 +113,7 @@ steps:
   continueOnError: true
   condition: succeededOrFailed()
 
-- task: 1ES.PublishPipelineArtifact@1
+- task: PublishPipelineArtifact@1
   displayName: Publish BuildLogs
   inputs:
     targetPath: '$(Build.StagingDirectory)/BuildLogs'
