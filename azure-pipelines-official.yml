@@ -144,7 +144,6 @@ extends:
             timeoutInMinutes: 120
             pool:
               name: netcore1espool-internal
-              image: 1es-windows-2022-pt
               demands: ImageOverride -equals 1es-windows-2022-pt
             steps:
             # This steps help to understand versions of .NET runtime installed on the machine,
@@ -176,20 +175,20 @@ extends:
               name: Test
               displayName: Test
 
-            templateContext:
-              outputs:
-              # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
-              # through the console or trx
-              - output: pipelineArtifact
-                targetPath: $(System.DefaultWorkingDirectory)/out
-                artifactName: TestResults
-                displayName: 'Publish Test Results folders'
-                condition: failed()
+            # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
+            # through the console or trx
+            - task: 1ES.PublishBuildArtifacts@1
+              displayName: 'Publish Test Results folders'
+              inputs:
+                PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/Release'
+                ArtifactName: TestResults
+              condition: failed()
 
-              - output: buildArtifacts
-                displayName: 'Publish VSSetup'
+            - task: 1ES.PublishBuildArtifacts@1
+              displayName: 'Publish VSSetup'
+              inputs:
                 PathtoPublish: '$(Build.SourcesDirectory)/artifacts/VSSetup/Release'
-                ArtifactName: VSSetupArtifacts 
+                ArtifactName: VSSetupArtifacts
           
           - ${{ each pool in parameters.otherOsPools }}:
             - job: ${{ pool.os }}
@@ -227,24 +226,22 @@ extends:
                 name: Test
                 displayName: Test
 
-              templateContext:
-                outputs:
-                # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
-                # through the console or trx
-                - output: pipelineArtifact
-                  targetPath: $(System.DefaultWorkingDirectory)/out
-                  artifactName: TestResults
-                  displayName: 'Publish Test Results folders'
-                  condition: failed()
+              # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
+              # through the console or trx
+              - task: 1ES.PublishBuildArtifacts@1
+                displayName: 'Publish Test Results folders'
+                inputs:
+                  PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/Release'
+                  ArtifactName: TestResults
+                condition: failed()
 
           - job: Publish
             dependsOn: 
               - ${{ each pool in parameters.otherOsPools }}:
                 - ${{ pool.os }}
             pool:
-                name: netcore1espool-internal
+                name: $(DncEngInternalBuildPool)
                 demands: ImageOverride -equals 1es-windows-2022-pt
-                image: 1es-windows-2022-pt
                 os: windows
             steps:
               # The template job needs a log, otherwise it writes a warning. We can disable log uploading only for
@@ -264,41 +261,38 @@ extends:
                   artifactName: VSSetupArtifacts
                   targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/Release'
 
-            templateContext:
-              outputs:
-              # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
-              # through the console or trx
-              - output: pipelineArtifact
-                targetPath: $(System.DefaultWorkingDirectory)/out
-                artifactName: TestResults
-                displayName: 'Publish Test Results folders'
-                condition: failed()
+              - task: NuGetAuthenticate@1
+                displayName: 'NuGet Authenticate to dotnet-tools and test-tools feeds'
 
-              - output: nuget
+              - task:  1ES.PublishNuget@1
                 displayName: 'Publish NuGet packages to dotnet-tools feed'
-                packageParentPath: '$(Build.SourcesDirectory)'
-                packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
-                publishVstsFeed: 'public/dotnet-tools'
+                inputs:
+                  packageParentPath: '$(Build.SourcesDirectory)'
+                  packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
+                  publishVstsFeed: 'public/dotnet-tools'
 
-              - output: nuget
+              - task:  1ES.PublishNuget@1
                 displayName: 'Publish NuGet packages to test-tools feed'
-                packageParentPath: '$(Build.SourcesDirectory)'
-                packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
-                publishVstsFeed: 'public/test-tools'
+                inputs:
+                  packageParentPath: '$(Build.SourcesDirectory)'
+                  packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
+                  publishVstsFeed: 'public/test-tools'
 
               # Publishes setup VSIXes to a drop.
               # Note: The insertion tool looks for the display name of this task in the logs.
-              - output: microBuildVstsDrop
+              - task: 1ES.MicroBuildVstsDrop@1
                 displayName: Upload VSTS Drop
-                dropName: $(VisualStudioDropName)
-                dropFolder: 'artifacts\VSSetup\Release\Insertion'
-                accessToken: $(_DevDivDropAccessToken)
+                inputs:
+                  dropName: $(VisualStudioDropName)
+                  dropFolder: 'artifacts\VSSetup\Release\Insertion'
+                  accessToken: $(_DevDivDropAccessToken)
                 condition: succeeded()
 
-              - output: pipelineArtifact
+              - task: 1ES.PublishBuildArtifacts@1
                 displayName: Publish Artifact VSSetup
-                targetPath: 'artifacts\VSSetup\Release'
-                artifactName: 'VSSetup'
+                inputs:
+                  PathtoPublish: 'artifacts\VSSetup\Release'
+                  ArtifactName: 'VSSetup'
                 condition: succeeded()
 
       - template: /eng/common/templates-official/job/onelocbuild.yml@self
