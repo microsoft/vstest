@@ -271,14 +271,14 @@ extends:
               - task:  1ES.PublishNuget@1
                 displayName: 'Publish NuGet packages to dotnet-tools feed'
                 inputs:
-                  packageParentPath: '$(Build.SourcesDirectory)'
+                  packageParentPath: '$(Build.SourcesDirectory)/artifacts/packages/Release'
                   packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
                   publishVstsFeed: 'public/dotnet-tools'
 
               - task:  1ES.PublishNuget@1
                 displayName: 'Publish NuGet packages to test-tools feed'
                 inputs:
-                  packageParentPath: '$(Build.SourcesDirectory)'
+                  packageParentPath: '$(Build.SourcesDirectory)/artifacts/packages/Release'
                   packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
                   publishVstsFeed: 'public/test-tools'
 
