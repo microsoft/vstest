@@ -299,12 +299,13 @@ extends:
                   ArtifactName: 'VSSetup'
                 condition: succeeded()
 
-      - template: /eng/common/templates-official/job/onelocbuild.yml@self
-        parameters:
-          GitHubOrg: microsoft
-          MirrorRepo: vstest
-          LclSource: lclFilesfromPackage
-          LclPackageId: 'LCL-JUNO-PROD-VSTEST'
+      - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+        - template: /eng/common/templates-official/job/onelocbuild.yml@self
+          parameters:
+            GitHubOrg: microsoft
+            MirrorRepo: vstest
+            LclSource: lclFilesfromPackage
+            LclPackageId: 'LCL-JUNO-PROD-VSTEST'
 
     - template: eng\common\templates-official\post-build\post-build.yml@self
       parameters:
