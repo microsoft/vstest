@@ -47,7 +47,7 @@ parameters:
   type: object
   default:
   - name: $(DncEngInternalBuildPool)
-    image: build.ubuntu.2204.amd64
+    image: 1es-ubuntu-2204-pt
     os: linux
   - name: Azure Pipelines
     image: macOS-11
