@@ -163,11 +163,24 @@ internal class MSBuildLogger : ITestLoggerWithParameters
                 var result = e.Result;
                 Debug.WriteLine(">>>>ERR:" + result.ErrorMessage);
                 Debug.WriteLine(">>>>STK:" + result.ErrorStackTrace);
+
+                var formattedError = new StringBuilder();
+
+                formattedError.Append(result.TestCase.DisplayName);
+                formattedError.Append(" (");
+                formattedError.Append(GetFormattedDurationString(e.Result.Duration));
+                formattedError.Append("): ");
+
+                formattedError.Append(Resources.Resources.ErrorMessageBanner);
+                formattedError.Append(' ');
+                formattedError.AppendLine(result.ErrorMessage);
+
+                string? line = null;
+                string? file = null;
+
                 if (!StringUtils.IsNullOrWhiteSpace(result.ErrorStackTrace))
                 {
                     var stackFrames = Regex.Split(result.ErrorStackTrace, Environment.NewLine);
-                    string? line = null;
-                    string? file = null;
                     if (stackFrames.Length > 0)
                     {
                         foreach (var frame in stackFrames.Take(20))
@@ -196,28 +209,12 @@ internal class MSBuildLogger : ITestLoggerWithParameters
                         }
                     }
 
-                    var formattedError = new StringBuilder();
-
-                    formattedError.Append(result.TestCase.DisplayName);
-                    formattedError.Append('(');
-                    formattedError.Append(GetFormattedDurationString(e.Result.Duration));
-                    formattedError.Append("): ");
-
-                    formattedError.Append(Resources.Resources.ErrorMessageBanner);
-                    formattedError.Append(' ');
-                    formattedError.AppendLine(result.ErrorMessage);
-
                     formattedError.AppendLine(Resources.Resources.StacktraceBanner);
                     formattedError.AppendLine(result.ErrorStackTrace);
+                }
 
-                    AppendOutputs(result, formattedError);
-                    SendMessage("test-failed", result.DisplayName, formattedError.ToString(), file ?? string.Empty, line ?? "0");
-                    return;
-                }
-                else
-                {
-                    SendMessage("test-failed", result.DisplayName, result.ErrorMessage, string.Empty, "0");
-                }
+                AppendOutputs(result, formattedError);
+                SendMessage("test-failed", formattedError.ToString().TrimEnd(), file ?? string.Empty, line ?? "0");
 
                 break;
         }
@@ -287,7 +284,6 @@ internal class MSBuildLogger : ITestLoggerWithParameters
         {
             stringBuilder.AppendLine(testResultPrefix + CommandLineResources.StdErrMessagesBanner);
             AddFormattedOutput(stdErrMessagesCollection, stringBuilder);
-
         }
 
         var dbgTrcMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.DebugTraceCategory);

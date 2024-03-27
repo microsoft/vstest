@@ -428,12 +428,12 @@ public class IntegrationTestBase
 
     public void StdOutputContains(string substring)
     {
-        Assert.IsTrue(_standardTestOutput.Contains(substring), $"StdOutput:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.IsTrue(_standardTestOutput.Contains(substring), $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void StdOutputDoesNotContains(string substring)
     {
-        Assert.IsFalse(_standardTestOutput.Contains(substring), $"StdOutput:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.IsFalse(_standardTestOutput.Contains(substring), $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Not expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void ExitCodeEquals(int exitCode)
