@@ -16,9 +16,9 @@
       <SourceBuild RepoName="diagnostics" ManagedOnly="true" />
     </Dependency>
     <!-- Intermediate is necessary for source build. -->
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="9.0.0-alpha.1.24112.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="9.0.0-alpha.1.24175.4">
       <Uri>https://github.com/dotnet/source-build-externals</Uri>
-      <Sha>ddfb60463c966af55fd0e222c2266170e83d1324</Sha>
+      <Sha>52d6569d44f86b5d442017f4a9eb3cda4c766afb</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
     <!-- Intermediate is necessary for source build. -->
