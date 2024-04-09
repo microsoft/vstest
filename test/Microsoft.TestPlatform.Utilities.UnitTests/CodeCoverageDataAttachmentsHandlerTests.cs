@@ -50,7 +50,6 @@ public class CodeCoverageDataAttachmentsHandlerTests
 #endif
     }
 
-#if !NETFRAMEWORK
     [ClassInitialize]
     public static void ClassInitialize(TestContext context)
     {
@@ -62,7 +61,6 @@ public class CodeCoverageDataAttachmentsHandlerTests
         foreach (var file in files)
             File.Copy(file, Path.Combine(testFilesDirectory, Path.GetFileName(file)));
     }
-#endif
 
     [TestMethod]
     public async Task HandleDataCollectionAttachmentSetsShouldReturnEmptySetWhenNoAttachmentsOrAttachmentsAreNull()
