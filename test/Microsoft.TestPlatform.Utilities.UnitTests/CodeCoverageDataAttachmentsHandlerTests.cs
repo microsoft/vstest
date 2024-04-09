@@ -50,7 +50,7 @@ public class CodeCoverageDataAttachmentsHandlerTests
 #endif
     }
 
-#if NETFRAMEWORK
+#if !NETFRAMEWORK
     [ClassInitialize]
     public static void ClassInitialize(TestContext context)
     {
