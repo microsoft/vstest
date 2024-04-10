@@ -598,7 +598,8 @@ public class IntegrationTestBase
             var version = IntegrationTestEnvironment.DependencyVersions["MSTestTestAdapterVersion"];
             if (version.StartsWith("3"))
             {
-                adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, _testEnvironment.TargetFramework);
+                var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : _testEnvironment.TargetFramework;
+                adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, tfm);
             }
             else
             {
