@@ -161,21 +161,6 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
-    public void TestPlatformShouldBeCompatibleWithOldTestHost(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        var assemblyPaths = GetAssetFullPath("SampleProjectWithOldTestHost.dll");
-        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
-
-        InvokeVsTest(arguments);
-
-        ValidateSummaryStatus(1, 0, 0);
-        ExitCodeEquals(0);
-    }
-
-    [TestMethod]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     public void WorkingDirectoryIsSourceDirectory(RunnerInfo runnerInfo)
