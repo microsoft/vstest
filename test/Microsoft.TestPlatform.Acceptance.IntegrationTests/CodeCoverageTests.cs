@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
+using Microsoft.CodeCoverage.Core;
 using Microsoft.CodeCoverage.Core.Reports.Coverage;
 using Microsoft.TestPlatform.TestUtilities;
 
@@ -313,11 +314,11 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         var testSignFunction = module.SkippedFunctions.FirstOrDefault(f => f.Name.Equals("TestSign()"));
         Assert.IsNotNull(testSignFunction);
-        Assert.AreEqual("name_excluded", testSignFunction.FunctionSkipReason);
+        Assert.AreEqual(FunctionSkipReason.name_excluded, testSignFunction.FunctionSkipReason);
 
         var skippedTestMethod = module.SkippedFunctions.FirstOrDefault(f => f.Name.Equals("__CxxPureMSILEntry_Test()"));
         Assert.IsNotNull(skippedTestMethod);
-        Assert.AreEqual("name_excluded", skippedTestMethod.FunctionSkipReason);
+        Assert.AreEqual(FunctionSkipReason.name_excluded, skippedTestMethod.FunctionSkipReason);
 
         var testAbsFunction = module.Functions.FirstOrDefault(f => f.Name.Equals("TestAbs()"));
         Assert.IsNotNull(testAbsFunction);
