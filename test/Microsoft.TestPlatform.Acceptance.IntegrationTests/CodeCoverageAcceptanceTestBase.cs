@@ -32,7 +32,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
     protected static ModuleData? GetModule(CoverageReport coverageReport, string name)
     {
         var module = coverageReport.Modules.FirstOrDefault(m => string.Equals(m.Name, name, StringComparison.OrdinalIgnoreCase));
-        module ??= coverageReport.Modules.FirstOrDefault(m => string.Equals(Path.GetFileNameWithoutExtension(m.Name), name, StringComparison.OrdinalIgnoreCase));
+        module ??= coverageReport.Modules.FirstOrDefault(m => string.Equals(m.Name, Path.GetFileNameWithoutExtension(name), StringComparison.OrdinalIgnoreCase));
 
         return module;
     }
