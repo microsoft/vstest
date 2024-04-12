@@ -50,7 +50,8 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
 
     protected static void AssertCoverage(ModuleData module, double expectedCoverage)
     {
-        var coverage = double.Parse(module.BlockCoverage, CultureInfo.InvariantCulture);
+        string coverageData = module.CoverageBuffer.Length == 0 ? module.LineCoverage : module.BlockCoverage;
+        var coverage = double.Parse(coverageData, CultureInfo.InvariantCulture);
         Console.WriteLine($"Checking coverage for {module.Name}. Expected at least: {expectedCoverage}. Result: {coverage}");
         Assert.IsTrue(coverage > expectedCoverage, $"Coverage check failed for {module.Name}. Expected at least: {expectedCoverage}. Found: {coverage}");
     }
