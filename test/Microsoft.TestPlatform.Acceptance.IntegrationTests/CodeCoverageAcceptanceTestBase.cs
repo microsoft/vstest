@@ -4,12 +4,9 @@
 using System;
 using System.Globalization;
 using System.IO;
-using System.Threading;
 using System.Xml;
 
 using Microsoft.CodeCoverage.Core;
-using Microsoft.CodeCoverage.IO;
-using Microsoft.CodeCoverage.IO.Coverage;
 using Microsoft.TestPlatform.TestUtilities;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -61,7 +58,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
 
         CoverageFileUtilityV2 utility = new(new TpCoverageFileConfiguration());
         var output = Path.Combine(tempDirectory.Path, Guid.NewGuid().ToString() + ".xml");
-        utility.ToXmlFileAsync(coverageResult, output, CancellationToken.None).Wait();
+        utility.MergeCoverageFilesAsync(output, [coverageResult], CoverageMergeOperation.MergeToXml, default).Wait();
         coverage.Load(output);
         return coverage;
     }
