@@ -48,7 +48,7 @@ public class IntegrationTestBase
     private readonly string _msTestPre3_0AdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _msTestAdapterRelativePath = @"mstest.testadapter\{0}\build\{1}".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _nUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build".Replace('\\', Path.DirectorySeparatorChar);
-    private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
+    private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\{1}".Replace('\\', Path.DirectorySeparatorChar);
 
     public enum UnitTestFramework
     {
@@ -612,7 +612,8 @@ public class IntegrationTestBase
         }
         else if (testFramework == UnitTestFramework.XUnit)
         {
-            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"]);
+            var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "netcoreapp3.1";
+            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"], tfm);
         }
 
         return _testEnvironment.GetNugetPackage(adapterRelativePath);

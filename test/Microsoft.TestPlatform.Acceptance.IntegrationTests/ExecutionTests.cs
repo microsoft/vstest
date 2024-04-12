@@ -509,8 +509,8 @@ public class ExecutionTests : AcceptanceTestBase
         // or deps.json, and fails the run.
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var xunitAssemblyPath = _testEnvironment.GetTestAsset("SimpleTestProject.dll");
-        var allDllsMatchingTestPattern = Directory.GetFiles(Path.GetDirectoryName(xunitAssemblyPath)!, "*test*.dll").Where(f => !f.EndsWith("SimpleTestProject.dll"));
+        var testAssemblyPath = _testEnvironment.GetTestAsset("SimpleTestProject.dll");
+        var allDllsMatchingTestPattern = Directory.GetFiles(Path.GetDirectoryName(testAssemblyPath)!, "*test*.dll").Where(f => !f.EndsWith("SimpleTestProject.dll"));
 
         string assemblyPaths = string.Join(" ", allDllsMatchingTestPattern.Select(s => s.AddDoubleQuote()));
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: string.Empty, FrameworkArgValue, string.Empty);
