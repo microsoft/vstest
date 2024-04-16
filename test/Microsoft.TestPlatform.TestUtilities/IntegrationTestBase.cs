@@ -45,9 +45,10 @@ public class IntegrationTestBase
 
     protected readonly IntegrationTestEnvironment _testEnvironment;
 
-    private readonly string _testAdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
+    private readonly string _msTestPre3_0AdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
+    private readonly string _msTestAdapterRelativePath = @"mstest.testadapter\{0}\build\{1}".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _nUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build".Replace('\\', Path.DirectorySeparatorChar);
-    private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
+    private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\{1}".Replace('\\', Path.DirectorySeparatorChar);
 
     public enum UnitTestFramework
     {
@@ -594,7 +595,16 @@ public class IntegrationTestBase
 
         if (testFramework == UnitTestFramework.MSTest)
         {
-            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _testAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["MSTestTestAdapterVersion"]);
+            var version = IntegrationTestEnvironment.DependencyVersions["MSTestTestAdapterVersion"];
+            if (version.StartsWith("3"))
+            {
+                var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : _testEnvironment.TargetFramework;
+                adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, tfm);
+            }
+            else
+            {
+                adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestPre3_0AdapterRelativePath, version);
+            }
         }
         else if (testFramework == UnitTestFramework.NUnit)
         {
@@ -602,7 +612,8 @@ public class IntegrationTestBase
         }
         else if (testFramework == UnitTestFramework.XUnit)
         {
-            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"]);
+            var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "netcoreapp3.1";
+            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"], tfm);
         }
 
         return _testEnvironment.GetNugetPackage(adapterRelativePath);
