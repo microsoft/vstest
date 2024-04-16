@@ -23,7 +23,14 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
     [ClassCleanup]
     public static void ClassCleanup()
     {
-        Directory.Delete(s_nugetPackageFolder, true);
+        try
+        {
+            Directory.Delete(s_nugetPackageFolder, true);
+        }
+        catch (UnauthorizedAccessException) 
+        {
+
+        }
     }
 
     [TestMethod]
