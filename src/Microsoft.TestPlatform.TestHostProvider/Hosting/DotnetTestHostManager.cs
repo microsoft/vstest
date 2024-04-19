@@ -69,13 +69,13 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private StringBuilder? _testHostProcessStdError;
     private StringBuilder? _testHostProcessStdOut;
     private bool _hostExitedEventRaised;
-    private IMessageLogger? _messageLogger;
     private string _hostPackageVersion = "15.0.0";
     private Architecture _architecture;
     private Framework? _targetFramework;
     private bool _isVersionCheckRequired = true;
     private string? _dotnetHostPath;
-    private TestHostManagerCallbacks? _testHostManagerCallbacks;
+
+    private protected TestHostManagerCallbacks? _testHostManagerCallbacks;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
@@ -190,7 +190,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     public void Initialize(IMessageLogger? logger, string runsettingsXml)
     {
         _hostExitedEventRaised = false;
-        _messageLogger = logger;
         _testHostManagerCallbacks = new TestHostManagerCallbacks(_environmentVariableHelper.GetEnvironmentVariable("VSTEST_EXPERIMENTAL_FORWARD_OUTPUT_FEATURE") == "1", logger);
 
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
