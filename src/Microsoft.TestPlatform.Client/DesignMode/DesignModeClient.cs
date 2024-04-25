@@ -25,6 +25,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
@@ -42,6 +43,7 @@ public class DesignModeClient : IDesignModeClient
     private readonly ProtocolConfig _protocolConfig = Constants.DefaultProtocolConfig;
     private readonly IEnvironment _platformEnvironment;
     private readonly TestSessionMessageLogger _testSessionMessageLogger;
+    private readonly bool _forwardOutput;
     private readonly object _lockObject = new();
     [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the public API.")]
     [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Part of the public API")]
@@ -76,6 +78,7 @@ public class DesignModeClient : IDesignModeClient
         _dataSerializer = dataSerializer;
         _platformEnvironment = platformEnvironment;
         _testSessionMessageLogger = TestSessionMessageLogger.Instance;
+        _forwardOutput = !FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_STANDARD_OUTPUT_FORWARDING);
         _testSessionMessageLogger.TestRunMessage += TestRunMessageHandler;
     }
 
@@ -445,8 +448,15 @@ public class DesignModeClient : IDesignModeClient
             case TestMessageLevel.Informational:
                 EqtTrace.Info(e.Message);
 
-                if (EqtTrace.IsInfoEnabled)
+                // When forwarding output we need to allow Info messages that originate from this process (or more precisely from the IMessageLogger that we
+                // are observing, but we don't have an easy way to tell apart "output" and non-output info messages. So when output forwarding is enabled
+                // we forward any informational message. This is okay, because in worst case we will send few more messages forward that are not output.
+                // And that is fine, because any adapter has access to SendMessage(MessageLevel.Informational,...) which we don't filter anywhere (it is passed
+                // as a raw message and forwarded to VS), so any adapter can spam the Tests output in VS as it wants.
+                if (_forwardOutput || EqtTrace.IsInfoEnabled)
+                {
                     SendTestMessage(e.Level, e.Message);
+                }
                 break;
 
 
