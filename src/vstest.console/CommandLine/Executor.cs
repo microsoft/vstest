@@ -449,7 +449,6 @@ internal class Executor
         string assemblyVersionAndArchitecture = $"{assemblyVersion} ({_processHelper.GetCurrentProcessArchitecture().ToString().ToLowerInvariant()})";
         string commandLineBanner = string.Format(CultureInfo.CurrentCulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersionAndArchitecture);
         Output.WriteLine(commandLineBanner, OutputLevel.Information);
-        Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
         PrintWarningIfRunningEmulatedOnArm64();
         PrintWarningIfInvokedThroughDotnetVSTest(args);
         Output.WriteLine(string.Empty, OutputLevel.Information);
