@@ -86,7 +86,7 @@
       </trans-unit>
       <trans-unit id="MicrosoftCommandLineTitle">
         <source>VSTest version {0}</source>
-        <target state="needs-review-translation">Microsoft (R) Test Yürütmesi Komut Satırı Aracı Sürüm {0}</target>
+        <target state="new">VSTest version {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="EnableLoggersArgumentHelp">
