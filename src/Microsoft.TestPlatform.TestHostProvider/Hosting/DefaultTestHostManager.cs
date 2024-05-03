@@ -379,7 +379,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         _targetFramework = runConfiguration.TargetFramework;
         _testHostProcess = null;
 
-        Shared = !runConfiguration.DisableAppDomain;
+        Shared = !runConfiguration.DisableAppDomain && runConfiguration.EnableSharedTestHost;
         _hostExitedEventRaised = false;
 
         IsInitialized = true;
