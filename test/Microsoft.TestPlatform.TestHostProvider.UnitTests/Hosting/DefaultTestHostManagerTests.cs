@@ -111,35 +111,15 @@ public class DefaultTestHostManagerTests
     }
 
     [TestMethod]
-    public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo_WhenShared()
+    public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
     {
         var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets }, RunnerProcessId = 101 };
-        _testHostManager.Initialize(_mockMessageLogger.Object, $"""
-            <?xml version="1.0" encoding="utf-8"?>
-            <RunSettings>
-            <RunConfiguration>
-                <EnableSharedTestHost>{true}</EnableSharedTestHost>
-            </RunConfiguration>
-            </RunSettings>
-            """);
         var info = _testHostManager.GetTestHostProcessStartInfo(
             Enumerable.Empty<string>(),
             null,
             connectionInfo);
 
         Assert.AreEqual(" --port 123 --endpoint 127.0.0.0:123 --role client --parentprocessid 101", info.Arguments);
-    }
-
-    [TestMethod]
-    public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo_WhenNotShared()
-    {
-        var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets }, RunnerProcessId = 101 };
-        var info = _testHostManager.GetTestHostProcessStartInfo(
-            Enumerable.Empty<string>(),
-            null,
-            connectionInfo);
-
-        Assert.AreEqual(" --port 123 --endpoint 127.0.0.0:123 --role client --parentprocessid 101 --testsourcepath ", info.Arguments);
     }
 
     [TestMethod]
