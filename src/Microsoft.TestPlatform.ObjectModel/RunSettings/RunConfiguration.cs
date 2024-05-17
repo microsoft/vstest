@@ -95,7 +95,7 @@ public class RunConfiguration : TestRunSettings
         ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
         CaptureStandardOutput = !FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_STANDARD_OUTPUT_CAPTURING);
         ForwardStandardOutput = !FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_STANDARD_OUTPUT_FORWARDING);
-        EnableSharedTestHost = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_NOT_SHARING_NETFRAMEWORK_TESTHOST);
+        DisableSharedTestHost = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_SHARING_NETFRAMEWORK_TESTHOST);
     }
 
     /// <summary>
@@ -457,9 +457,9 @@ public class RunConfiguration : TestRunSettings
     public bool ForwardStandardOutput { get; private set; }
 
     /// <summary>
-    /// Enables sharing of .NET Framework testhosts.
+    /// Disables sharing of .NET Framework testhosts.
     /// </summary>
-    public bool EnableSharedTestHost { get; private set; }
+    public bool DisableSharedTestHost { get; private set; }
 
     /// <summary>
     /// Skips passing VisualStudio built in adapters to the project.
@@ -589,9 +589,9 @@ public class RunConfiguration : TestRunSettings
         forwardStandardOutput.InnerXml = ForwardStandardOutput.ToString();
         root.AppendChild(forwardStandardOutput);
 
-        XmlElement enableSharedTestHost = doc.CreateElement(nameof(EnableSharedTestHost));
-        enableSharedTestHost.InnerXml = EnableSharedTestHost.ToString();
-        root.AppendChild(enableSharedTestHost);
+        XmlElement disableSharedTesthost = doc.CreateElement(nameof(DisableSharedTestHost));
+        disableSharedTesthost.InnerXml = DisableSharedTestHost.ToString();
+        root.AppendChild(disableSharedTesthost);
 
         XmlElement skipDefaultAdapters = doc.CreateElement(nameof(SkipDefaultAdapters));
         skipDefaultAdapters.InnerXml = SkipDefaultAdapters.ToString();
@@ -995,7 +995,7 @@ public class RunConfiguration : TestRunSettings
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, boolValue, elementName));
                             }
 
-                            runConfiguration.EnableSharedTestHost = boolValue;
+                            runConfiguration.DisableSharedTestHost = boolValue;
                             break;
                         }
 
