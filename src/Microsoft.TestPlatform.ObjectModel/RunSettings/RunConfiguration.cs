@@ -983,7 +983,7 @@ public class RunConfiguration : TestRunSettings
                         runConfiguration.ForwardStandardOutput = bForwardStandardOutput;
                         break;
 
-                    case "EnableSharedTestHost":
+                    case nameof(DisableSharedTestHost):
                         {
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             string element = reader.ReadElementContentAsString();
@@ -999,7 +999,7 @@ public class RunConfiguration : TestRunSettings
                             break;
                         }
 
-                    case "SkipDefaultAdapters":
+                    case nameof(SkipDefaultAdapters):
                         {
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             string element = reader.ReadElementContentAsString();
