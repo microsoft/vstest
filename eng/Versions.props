@@ -11,6 +11,7 @@
     <VersionPrefix>17.10.0</VersionPrefix>
     <PreReleaseVersionLabel>release</PreReleaseVersionLabel>
   </PropertyGroup>
+
   <PropertyGroup Label="Arcade settings">
     <!-- Ensure we use xliff task tool - true is the default but we make it explicit here -->
     <UsingToolXliff>true</UsingToolXliff>
