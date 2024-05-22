@@ -51,7 +51,7 @@ parameters:
   type: object
   default:
   - name: netcore1espool-internal
-    image: 1es-ubuntu-2204-pt
+    image: 1es-ubuntu-2204
     os: linux
   - name: Azure Pipelines
     image: macOS-11
@@ -124,7 +124,7 @@ extends:
   parameters:
     pool:
       name: netcore1espool-internal
-      image: 1es-windows-2022-pt
+      image: 1es-windows-2022
       os: windows
     customBuildTags:
     - ES365AIMigrationTooling
@@ -148,7 +148,7 @@ extends:
             timeoutInMinutes: 120
             pool:
               name: netcore1espool-internal
-              demands: ImageOverride -equals 1es-windows-2022-pt
+              demands: ImageOverride -equals 1es-windows-2022
             steps:
             # This steps help to understand versions of .NET runtime installed on the machine,
             # which is useful to diagnose some governance issues.
@@ -250,7 +250,7 @@ extends:
                 - ${{ pool.os }}
             pool:
                 name: $(DncEngInternalBuildPool)
-                demands: ImageOverride -equals 1es-windows-2022-pt
+                demands: ImageOverride -equals 1es-windows-2022
                 os: windows
             steps:
               # The template job needs a log, otherwise it writes a warning. We can disable log uploading only for
