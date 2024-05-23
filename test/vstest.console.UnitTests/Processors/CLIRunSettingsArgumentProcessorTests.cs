@@ -308,7 +308,7 @@ public class CliRunSettingsArgumentProcessorTests
         runSettings.LoadSettingsXml(_defaultRunSettings);
         _settingsProvider.SetActiveRunSettings(runSettings);
 
-        var args = [];
+        var args = Array.Empty<string>();
         _executor.Initialize(args);
 
         Assert.IsFalse(_commandLineOptions.ArchitectureSpecified);
