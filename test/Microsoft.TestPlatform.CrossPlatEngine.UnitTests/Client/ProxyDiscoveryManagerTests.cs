@@ -621,7 +621,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _discoveryManager.DiscoverTests(localDiscoveryCriteria, eventHandler.Object);
 
         var lastChunk = trueIsEmptyFalseIsNull
-            ? []
+            ? Enumerable.Empty<TestCase>()
             : null;
 
         // Act
