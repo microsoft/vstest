@@ -71,7 +71,7 @@ internal sealed class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByR
                     attachmentSets,
                     progress,
                     new MessageLogger(this, nameof(ProcessAttachment)),
-                    _processAttachmentCts.Token);
+                    _processAttachmentCts.Token).ConfigureAwait(false);
 
         return JsonDataSerializer.Instance.Serialize(attachmentsResult.ToArray());
     }
