@@ -3,7 +3,6 @@
 
 using System.Text.RegularExpressions;
 
-using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Microsoft.TestPlatform.Build.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
