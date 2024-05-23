@@ -72,7 +72,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         var expectedStartInfo = new TestProcessStartInfo();
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
         _mockTestHostManager.Setup(
-                th => th.GetTestHostProcessStartInfo([], It.IsAny<Dictionary<string, string?>>(), It.IsAny<TestRunnerConnectionInfo>()))
+                th => th.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), It.IsAny<Dictionary<string, string?>>(), It.IsAny<TestRunnerConnectionInfo>()))
             .Returns(expectedStartInfo);
 
         _testOperationManager.SetupChannel([], DefaultRunSettings);
