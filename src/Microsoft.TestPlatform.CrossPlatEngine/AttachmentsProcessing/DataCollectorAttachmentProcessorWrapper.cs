@@ -56,7 +56,7 @@ internal sealed class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByR
 
     public Uri[]? GetExtensionUris() => _dataCollectorAttachmentProcessorInstance?.GetExtensionUris()?.ToArray();
 
-    public string ProcessAttachment(
+    public async Task<string> ProcessAttachment(
         string configurationElement,
         string attachments)
     {
@@ -66,15 +66,12 @@ internal sealed class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByR
         SynchronousProgress progress = new(Report);
         _processAttachmentCts = new CancellationTokenSource();
 
-        ICollection<AttachmentSet> attachmentsResult =
-            Task.Run(async () => await _dataCollectorAttachmentProcessorInstance!.ProcessAttachmentSetsAsync(
-            doc.DocumentElement,
-            attachmentSets,
-            progress,
-            new MessageLogger(this, nameof(ProcessAttachment)),
-            _processAttachmentCts.Token))
-            // We cannot marshal Task so we need to block the thread until the end of the processing
-            .ConfigureAwait(false).GetAwaiter().GetResult();
+        var attachmentsResult = await _dataCollectorAttachmentProcessorInstance!.ProcessAttachmentSetsAsync(
+                    doc.DocumentElement,
+                    attachmentSets,
+                    progress,
+                    new MessageLogger(this, nameof(ProcessAttachment)),
+                    _processAttachmentCts.Token);
 
         return JsonDataSerializer.Instance.Serialize(attachmentsResult.ToArray());
     }
