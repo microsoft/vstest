@@ -27,9 +27,6 @@ internal static class TypesToLoadUtilities
 
     private static IEnumerable<Type> GetTypesToLoad(Attribute attribute)
     {
-        if (attribute == null)
-            return [];
-
         var type = attribute.GetType();
         var typesProperty = type.GetProperty("Types");
 

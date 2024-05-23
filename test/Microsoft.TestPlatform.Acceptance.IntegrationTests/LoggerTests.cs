@@ -163,7 +163,7 @@ public class LoggerTests : AcceptanceTestBase
 
         InvokeVsTest(arguments);
 
-        string? outcomeValue = GetElementAtributeValueFromTrx(trxFilePath, "ResultSummary", "outcome");
+        string? outcomeValue = GetElementAttributeValueFromTrx(trxFilePath, "ResultSummary", "outcome");
 
         Assert.AreEqual("Failed", outcomeValue);
     }
@@ -186,7 +186,7 @@ public class LoggerTests : AcceptanceTestBase
 
         InvokeVsTest(arguments);
 
-        string? outcomeValue = GetElementAtributeValueFromTrx(trxFilePath, "ResultSummary", "outcome");
+        string? outcomeValue = GetElementAttributeValueFromTrx(trxFilePath, "ResultSummary", "outcome");
 
         Assert.AreEqual("Completed", outcomeValue);
     }
@@ -240,7 +240,7 @@ public class LoggerTests : AcceptanceTestBase
         }
     }
 
-    private static string? GetElementAtributeValueFromTrx(string trxFileName, string fieldName, string attributeName)
+    private static string? GetElementAttributeValueFromTrx(string trxFileName, string fieldName, string attributeName)
     {
         using FileStream file = File.OpenRead(trxFileName);
         using XmlReader reader = XmlReader.Create(file);
