@@ -278,10 +278,10 @@ internal class Converter
         if (customProperty != null)
         {
             var cateogryValues = (string[]?)testCase.GetPropertyValue(customProperty);
-            return cateogryValues != null ? cateogryValues.ToList() : Enumerable.Empty<string>().ToList();
+            return cateogryValues != null ? cateogryValues.ToList() : [].ToList();
         }
 
-        return Enumerable.Empty<string>().ToList();
+        return [].ToList();
     }
 
     /// <summary>

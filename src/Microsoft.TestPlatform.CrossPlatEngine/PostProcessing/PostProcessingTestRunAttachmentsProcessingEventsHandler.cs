@@ -50,7 +50,7 @@ internal class PostProcessingTestRunAttachmentsProcessingEventsHandler : ITestRu
 
     public void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet>? lastChunk)
     {
-        foreach (var attachment in lastChunk ?? Enumerable.Empty<AttachmentSet>())
+        foreach (var attachment in lastChunk ?? [])
         {
             _attachmentsSet.Add(attachment);
         }

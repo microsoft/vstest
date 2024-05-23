@@ -176,12 +176,12 @@ public static class RunSettingsUtilities
     {
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
 
-        IEnumerable<string> testAdaptersPaths = Enumerable.Empty<string>();
+        IEnumerable<string> testAdaptersPaths = [];
         if (runConfiguration != null)
         {
             if (runConfiguration.TestAdaptersPathsSet)
             {
-                testAdaptersPaths = runConfiguration.TestAdaptersPaths.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                testAdaptersPaths = runConfiguration.TestAdaptersPaths.Split([';'], StringSplitOptions.RemoveEmptyEntries);
             }
         }
 
