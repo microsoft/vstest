@@ -384,7 +384,7 @@ internal class DiscovererEnumerator
             }
 
             // Find the sources which this discoverer can look at.
-            var matchingSources = [];
+            var matchingSources = Enumerable.Empty<string>();
             var discovererFileExtensions = discoverer.Metadata.FileExtension;
             var discovererIsApplicableToFiles = discovererFileExtensions is not null;
             var discovererIsApplicableToDirectories = discoverer.Metadata.IsDirectoryBased;
