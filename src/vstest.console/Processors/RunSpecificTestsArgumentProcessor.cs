@@ -169,7 +169,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         }
 
         // by default all filters are not discovered on launch
-        _undiscoveredFilters = [.._selectedTestNames];
+        _undiscoveredFilters = new HashSet<string>(_selectedTestNames);;
     }
 
     /// <summary>
