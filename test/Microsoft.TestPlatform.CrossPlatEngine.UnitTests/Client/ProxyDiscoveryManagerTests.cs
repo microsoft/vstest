@@ -651,7 +651,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         });
 
         var lastChunk = trueIsEmptyFalseIsNull
-            ? []
+            ? Enumerable.Empty<TestCase>()
             : null;
 
         // Act
