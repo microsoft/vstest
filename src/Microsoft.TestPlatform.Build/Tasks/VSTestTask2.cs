@@ -59,7 +59,7 @@ public class VSTestTask2 : ToolTask, ITestTask
         // Unless user opted out, use UTF encoding, which we force in vstest.console.
         _disableUtf8ConsoleEncoding = Environment.GetEnvironmentVariable("VSTEST_DISABLE_UTF8_CONSOLE_ENCODING") == "1";
         LogStandardErrorAsError = false;
-        StandardOutputImportance = "Normal";
+        StandardOutputImportance = "High";
     }
 
     protected override void LogEventsFromTextOutput(string singleLine, MessageImportance messageImportance)
@@ -73,7 +73,7 @@ public class VSTestTask2 : ToolTask, ITestTask
             {
                 // Forward the output we receive as messages.
                 case "output-info":
-                    Log.LogMessage(MessageImportance.Low, data[0]);
+                    Log.LogMessage(MessageImportance.High, data[0]);
                     break;
                 case "output-warning":
                     Log.LogWarning(data[0]);
@@ -213,7 +213,7 @@ public class VSTestTask2 : ToolTask, ITestTask
 
             if (!StringUtils.IsNullOrWhiteSpace(singleLine))
             {
-                Log.LogMessage(MessageImportance.Low, singleLine);
+                Log.LogMessage(MessageImportance.High, singleLine + "          --interactive");
             }
         }
     }
