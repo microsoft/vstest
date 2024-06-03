@@ -2,6 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+# if NET6_0_OR_GREATER
+using System.Buffers;
+#endif
 using System.Text;
 
 namespace Microsoft.TestPlatform.AdapterUtilities;
@@ -150,11 +153,24 @@ public class TestIdProvider
             return _id;
         }
 
+#if NET6_0_OR_GREATER
+        var toGuid = ArrayPool<byte>.Shared.Rent(16);
+#else
         var toGuid = new byte[16];
-        Array.Copy(GetHash(), toGuid, 16);
-        _id = new Guid(toGuid);
+#endif
+        try
+        {
+            Array.Copy(GetHash(), toGuid, 16);
+            _id = new Guid(toGuid);
 
-        return _id;
+            return _id;
+        }
+        finally
+        {
+#if NET6_0_OR_GREATER
+            ArrayPool<byte>.Shared.Return(toGuid);
+#endif
+        }
     }
 
     /// <summary>
@@ -365,45 +381,60 @@ public class TestIdProvider
             }
 
             _streamSize += BlockBytes;
+#if NET6_0_OR_GREATER
+            var w = ArrayPool<uint>.Shared.Rent(80);
+            var wordBytes = ArrayPool<byte>.Shared.Rent(sizeof(uint));
+#else
             var w = new uint[80];
+            var wordBytes = new byte[sizeof(uint)];
+#endif
 
-            // Get W(0) .. W(15)
-            for (int t = 0; t <= 15; t++)
+            try
             {
-                var wordBytes = new byte[sizeof(uint)];
-                Buffer.BlockCopy(message, start + (t * sizeof(uint)), wordBytes, 0, sizeof(uint));
-                EnsureBigEndian(ref wordBytes);
+                // Get W(0) .. W(15)
+                for (int t = 0; t <= 15; t++)
+                {
+                    Buffer.BlockCopy(message, start + (t * sizeof(uint)), wordBytes, 0, sizeof(uint));
+                    EnsureBigEndian(ref wordBytes);
 
-                w[t] = BitConverter.ToUInt32(wordBytes, 0);
+                    w[t] = BitConverter.ToUInt32(wordBytes, 0);
+                }
+
+                // Calculate W(16) .. W(79)
+                for (int t = 16; t <= 79; t++)
+                {
+                    w[t] = S(w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16], 1);
+                }
+
+                uint a = _h[0],
+                    b = _h[1],
+                    c = _h[2],
+                    d = _h[3],
+                    e = _h[4];
+
+                for (int t = 0; t < 80; t++)
+                {
+                    var temp = S(a, 5) + F(t, b, c, d) + e + w[t] + K(t);
+                    e = d;
+                    d = c;
+                    c = S(b, 30);
+                    b = a;
+                    a = temp;
+                }
+
+                _h[0] += a;
+                _h[1] += b;
+                _h[2] += c;
+                _h[3] += d;
+                _h[4] += e;
             }
-
-            // Calculate W(16) .. W(79)
-            for (int t = 16; t <= 79; t++)
+            finally
             {
-                w[t] = S(w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16], 1);
+#if NET6_0_OR_GREATER
+                ArrayPool<byte>.Shared.Return(wordBytes);
+                ArrayPool<uint>.Shared.Return(w);
+#endif
             }
-
-            uint a = _h[0],
-                b = _h[1],
-                c = _h[2],
-                d = _h[3],
-                e = _h[4];
-
-            for (int t = 0; t < 80; t++)
-            {
-                var temp = S(a, 5) + F(t, b, c, d) + e + w[t] + K(t);
-                e = d;
-                d = c;
-                c = S(b, 30);
-                b = a;
-                a = temp;
-            }
-
-            _h[0] += a;
-            _h[1] += b;
-            _h[2] += c;
-            _h[3] += d;
-            _h[4] += e;
         }
     }
 }
