@@ -40,7 +40,7 @@ public class VSTestTask2 : ToolTask, ITestTask
     public string? VSTestBlameHangDumpType { get; set; }
     public string? VSTestBlameHangTimeout { get; set; }
     public ITaskItem? VSTestTraceDataCollectorDirectoryPath { get; set; }
-    public bool VSTestNoLogo { get; set; }
+    public bool VSTestNoLogo { get; set; } = true;
     public string? VSTestArtifactsProcessingMode { get; set; }
     public string? VSTestSessionCorrelationId { get; set; }
 
@@ -73,14 +73,30 @@ public class VSTestTask2 : ToolTask, ITestTask
             {
                 // Forward the output we receive as messages.
                 case "output-info":
-                    Log.LogMessage(MessageImportance.High, data[0]);
+                    if (data[0] != null)
+                    {
+                        LogMSBuildOutputMessage(data[0]!);
+                    }
                     break;
                 case "output-warning":
                     Log.LogWarning(data[0]);
                     break;
                 case "output-error":
-                    Log.LogError(data[0]);
-                    break;
+                    {
+                        var error = data[0];
+                        if (error != null && error.StartsWith("[xUnit.net", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Downgrade errors from xunit, because they will end up being duplicated on screen with assertion errors.
+                            // And we end up with more errors in summary which is hard to figure out for users.
+                            LogMSBuildOutputMessage(error);
+                        }
+                        else
+                        {
+                            Log.LogError(data[0]);
+                        }
+
+                        break;
+                    }
 
                 case "run-cancel":
                 case "run-abort":
@@ -210,9 +226,15 @@ public class VSTestTask2 : ToolTask, ITestTask
             // DO NOT call the base, it parses out the output, and if it sees "error" in any place it will log it as error
             // we don't want this, we only want to log errors from the text messages we receive that start error splitter.
             // base.LogEventsFromTextOutput(singleLine, messageImportance);
-            var message = new ExtendedBuildMessageEventArgs("TLTESTOUTPUT", singleLine, null, null, MessageImportance.High);
-            BuildEngine.LogMessageEvent(message);
+            LogMSBuildOutputMessage(singleLine);
         }
+    }
+
+    private void LogMSBuildOutputMessage(string singleLine)
+    {
+
+        var message = new ExtendedBuildMessageEventArgs("TLTESTOUTPUT", singleLine, null, null, MessageImportance.High);
+        BuildEngine.LogMessageEvent(message);
     }
 
     private bool TryGetMessage(string singleLine, out string name, out string?[] data)
