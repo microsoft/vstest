@@ -210,11 +210,8 @@ public class VSTestTask2 : ToolTask, ITestTask
             // DO NOT call the base, it parses out the output, and if it sees "error" in any place it will log it as error
             // we don't want this, we only want to log errors from the text messages we receive that start error splitter.
             // base.LogEventsFromTextOutput(singleLine, messageImportance);
-
-            if (!StringUtils.IsNullOrWhiteSpace(singleLine))
-            {
-                Log.LogMessage(MessageImportance.High, singleLine + "          --interactive");
-            }
+            var message = new ExtendedBuildMessageEventArgs("TLTESTOUTPUT", singleLine, null, null, MessageImportance.High);
+            BuildEngine.LogMessageEvent(message);
         }
     }
 
