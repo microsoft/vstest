@@ -49,8 +49,10 @@ public class VSTestTask2 : ToolTask, ITestTask
 
     private readonly string _messageSplitter = "||||";
     private readonly string[] _messageSplitterArray = new[] { "||||" };
+    private readonly string _ansiReset = "\x1b[39;49m";
 
     private readonly bool _disableUtf8ConsoleEncoding;
+    private readonly bool _canBePrependedWithAnsi;
 
     protected override string? ToolName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "dotnet.exe" : "dotnet";
 
@@ -58,6 +60,9 @@ public class VSTestTask2 : ToolTask, ITestTask
     {
         // Unless user opted out, use UTF encoding, which we force in vstest.console.
         _disableUtf8ConsoleEncoding = Environment.GetEnvironmentVariable("VSTEST_DISABLE_UTF8_CONSOLE_ENCODING") == "1";
+        var isPrependedWithAnsi = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION");
+        // On macOS and Linux the messages are prepended with ANSI reset sequence.
+        _canBePrependedWithAnsi = isPrependedWithAnsi?.ToLowerInvariant() == "true" || isPrependedWithAnsi == "1";
         LogStandardErrorAsError = false;
         StandardOutputImportance = "High";
     }
@@ -66,6 +71,17 @@ public class VSTestTask2 : ToolTask, ITestTask
     {
         var useTerminalLogger = true;
         Debug.WriteLine($"VSTESTTASK2: Received output {singleLine}, importance {messageImportance}");
+        bool wasPrependedWithAnsi = false;
+
+        if (_canBePrependedWithAnsi)
+        {
+            while (singleLine.StartsWith(_ansiReset))
+            {
+                wasPrependedWithAnsi = true;
+                singleLine = singleLine.Substring(_ansiReset.Length);
+            }
+        }
+
         if (TryGetMessage(singleLine, out string name, out string?[] data))
         {
             // See MSBuildLogger.cs for the messages produced.
@@ -75,7 +91,9 @@ public class VSTestTask2 : ToolTask, ITestTask
                 case "output-info":
                     if (data[0] != null)
                     {
-                        LogMSBuildOutputMessage(data[0]!);
+                        // This is console output was prepended with ANSI reset, add it back.
+                        string info = wasPrependedWithAnsi ? _ansiReset + data[0]! : data[0]!;
+                        LogMSBuildOutputMessage(info);
                     }
                     break;
                 case "output-warning":
