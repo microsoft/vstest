@@ -40,7 +40,7 @@ public class VSTestTask2 : ToolTask, ITestTask
     public string? VSTestBlameHangDumpType { get; set; }
     public string? VSTestBlameHangTimeout { get; set; }
     public ITaskItem? VSTestTraceDataCollectorDirectoryPath { get; set; }
-    public bool VSTestNoLogo { get; set; }
+    public bool VSTestNoLogo { get; set; } = true;
     public string? VSTestArtifactsProcessingMode { get; set; }
     public string? VSTestSessionCorrelationId { get; set; }
 
@@ -59,7 +59,7 @@ public class VSTestTask2 : ToolTask, ITestTask
         // Unless user opted out, use UTF encoding, which we force in vstest.console.
         _disableUtf8ConsoleEncoding = Environment.GetEnvironmentVariable("VSTEST_DISABLE_UTF8_CONSOLE_ENCODING") == "1";
         LogStandardErrorAsError = false;
-        StandardOutputImportance = "Normal";
+        StandardOutputImportance = "High";
     }
 
     protected override void LogEventsFromTextOutput(string singleLine, MessageImportance messageImportance)
@@ -73,14 +73,30 @@ public class VSTestTask2 : ToolTask, ITestTask
             {
                 // Forward the output we receive as messages.
                 case "output-info":
-                    Log.LogMessage(MessageImportance.Low, data[0]);
+                    if (data[0] != null)
+                    {
+                        LogMSBuildOutputMessage(data[0]!);
+                    }
                     break;
                 case "output-warning":
                     Log.LogWarning(data[0]);
                     break;
                 case "output-error":
-                    Log.LogError(data[0]);
-                    break;
+                    {
+                        var error = data[0];
+                        if (error != null && error.StartsWith("[xUnit.net", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Downgrade errors from xunit, because they will end up being duplicated on screen with assertion errors.
+                            // And we end up with more errors in summary which is hard to figure out for users.
+                            LogMSBuildOutputMessage(error);
+                        }
+                        else
+                        {
+                            Log.LogError(data[0]);
+                        }
+
+                        break;
+                    }
 
                 case "run-cancel":
                 case "run-abort":
@@ -210,12 +226,15 @@ public class VSTestTask2 : ToolTask, ITestTask
             // DO NOT call the base, it parses out the output, and if it sees "error" in any place it will log it as error
             // we don't want this, we only want to log errors from the text messages we receive that start error splitter.
             // base.LogEventsFromTextOutput(singleLine, messageImportance);
-
-            if (!StringUtils.IsNullOrWhiteSpace(singleLine))
-            {
-                Log.LogMessage(MessageImportance.Low, singleLine);
-            }
+            LogMSBuildOutputMessage(singleLine);
         }
+    }
+
+    private void LogMSBuildOutputMessage(string singleLine)
+    {
+
+        var message = new ExtendedBuildMessageEventArgs("TLTESTOUTPUT", singleLine, null, null, MessageImportance.High);
+        BuildEngine.LogMessageEvent(message);
     }
 
     private bool TryGetMessage(string singleLine, out string name, out string?[] data)
