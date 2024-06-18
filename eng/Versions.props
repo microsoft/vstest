@@ -66,12 +66,12 @@
     <MicrosoftCodeCoverageVersion>17.9.0</MicrosoftCodeCoverageVersion>
     <!-- These versions are used for running unit tests, and running acceptance tests. They are also used as the default version for projects
     in TestAssets.sln to allow running and debugging tests in that solution directly in VS without having to run them via AcceptanceTests. -->
-    <MSTestTestFrameworkVersion>3.3.1</MSTestTestFrameworkVersion>
-    <MSTestTestAdapterVersion>3.3.1</MSTestTestAdapterVersion>
+    <MSTestTestFrameworkVersion>3.4.3</MSTestTestFrameworkVersion>
+    <MSTestTestAdapterVersion>3.4.3</MSTestTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
-    <XUnitFrameworkVersion>2.4.2</XUnitFrameworkVersion>
-    <XUnitAdapterVersion>2.4.5</XUnitAdapterVersion>
-    <XUnitConsoleRunnerVersion>2.4.2</XUnitConsoleRunnerVersion>
+    <XUnitFrameworkVersion>2.8.1</XUnitFrameworkVersion>
+    <XUnitAdapterVersion>2.8.1</XUnitAdapterVersion>
+    <XUnitConsoleRunnerVersion>2.8.1</XUnitConsoleRunnerVersion>
     <NUnit3FrameworkVersion>3.14.0</NUnit3FrameworkVersion>
     <NUnit3AdapterVersion>3.17.0</NUnit3AdapterVersion>
     <NUnitConsoleRunnerVersion>3.16.3</NUnitConsoleRunnerVersion>
@@ -81,9 +81,9 @@
       These versions need to be "statically" readable because we read this file as xml in our build and tests.
     -->
     <!-- <MSTestFrameworkLatestVersion></MSTestFrameworkLatestVersion> is not here, because we don't build MSTest locally, so we don't have access to the latest version. -->
-    <MSTestFrameworkLatestPreviewVersion>[3.3.1]</MSTestFrameworkLatestPreviewVersion>
-    <MSTestFrameworkLatestStableVersion>[3.3.1]</MSTestFrameworkLatestStableVersion>
-    <MSTestFrameworkRecentStableVersion>[3.2.2]</MSTestFrameworkRecentStableVersion>
+    <MSTestFrameworkLatestPreviewVersion>[3.4.3]</MSTestFrameworkLatestPreviewVersion>
+    <MSTestFrameworkLatestStableVersion>[3.4.3]</MSTestFrameworkLatestStableVersion>
+    <MSTestFrameworkRecentStableVersion>[3.3.1]</MSTestFrameworkRecentStableVersion>
     <MSTestFrameworkMostDownloadedVersion>[2.2.10]</MSTestFrameworkMostDownloadedVersion>
     <MSTestFrameworkPreviousStableVersion>[2.2.10]</MSTestFrameworkPreviousStableVersion>
     <MSTestFrameworkLegacyStableVersion>[1.4.0]</MSTestFrameworkLegacyStableVersion>
@@ -91,9 +91,9 @@
     See Invoke-TestAssetsBuild in scripts/build.ps1. Exact versions are used to avoid Nuget substituting them by closest match, if we make a typo.
     These versions need to be "statically" readable because we read this file as xml in our build and tests. -->
     <!-- <VSTestConsoleLatestVersion></VSTestConsoleLatestVersion> is not here, NETTestSdkVersion is used instead, because that is the version of the locally built latest package.  -->
-    <VSTestConsoleLatestPreviewVersion>[17.10.0-release-24177-07]</VSTestConsoleLatestPreviewVersion>
-    <VSTestConsoleLatestStableVersion>[17.9.0]</VSTestConsoleLatestStableVersion>
-    <VSTestConsoleRecentStableVersion>[17.8.0]</VSTestConsoleRecentStableVersion>
+    <VSTestConsoleLatestPreviewVersion>[17.10.0]</VSTestConsoleLatestPreviewVersion>
+    <VSTestConsoleLatestStableVersion>[17.10.0]</VSTestConsoleLatestStableVersion>
+    <VSTestConsoleRecentStableVersion>[17.9.0]</VSTestConsoleRecentStableVersion>
     <VSTestConsoleMostDownloadedVersion>[17.6.2]</VSTestConsoleMostDownloadedVersion>
     <VSTestConsolePreviousStableVersion>[16.11.0]</VSTestConsolePreviousStableVersion>
     <VSTestConsoleLegacyStableVersion>[15.9.2]</VSTestConsoleLegacyStableVersion>
