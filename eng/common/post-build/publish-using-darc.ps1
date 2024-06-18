@@ -43,7 +43,6 @@ try {
   --azdev-pat $AzdoToken `
   --bar-uri $MaestroApiEndPoint `
   --password $MaestroToken `
-  --disable-interactive-auth `
 	@optionalParams
 
   if ($LastExitCode -ne 0) {
