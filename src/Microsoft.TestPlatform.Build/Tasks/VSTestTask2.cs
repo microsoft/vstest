@@ -111,8 +111,14 @@ public class VSTestTask2 : ToolTask, ITestTask
                     }
 
                 case "run-cancel":
+                    // There is other overload that takes just message, and params, specifying the name of the first parameter explicitly so I don't
+                    // accidentally use it, because that will throw error when message is null, which it always is (We provide that null as first parameter).
+                    Log.LogError(subcategory: null, "TESTRUNCANCEL", null, TestFileFullPath?.ItemSpec ?? string.Empty, 0, 0, 0, 0, data[0]);
+                    break;
                 case "run-abort":
-                    Log.LogError(data[0]);
+                    // There is other overload that takes just message, and params, specifying the name of the first parameter explicitly so I don't
+                    // accidentally use it, because that will throw error when message is null, which it always is (We provide that null as first parameter).
+                    Log.LogError(subcategory: null, "TESTRUNABORT", null, TestFileFullPath?.ItemSpec ?? string.Empty, 0, 0, 0, 0, data[0]);
                     break;
                 case "run-finish":
                     // 0 - Localized summary
@@ -222,7 +228,7 @@ public class VSTestTask2 : ToolTask, ITestTask
                         file ??= string.Empty;
 
                         // Report error to msbuild.
-                        Log.LogError(null, "VSTEST1", null, file ?? string.Empty, lineNumber, 0, 0, 0, fullErrorMessage, null);
+                        Log.LogError(null, "TESTERROR", null, file ?? string.Empty, lineNumber, 0, 0, 0, fullErrorMessage, null);
                     }
                     break;
                 default:
