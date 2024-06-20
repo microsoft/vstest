@@ -101,17 +101,11 @@ public class VSTestTask2 : ToolTask, ITestTask
                     break;
                 case "output-error":
                     {
+                        // Downgrade errors to info messages, xUnit outputs every assertion failure and it confuses users who see doubled error count.
+                        // Libraries write to error output, and don't expect tests to fail.
+                        // Logs are often written to error stream as well.
                         var error = data[0];
-                        if (error != null && error.StartsWith("[xUnit.net", StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Downgrade errors from xunit, because they will end up being duplicated on screen with assertion errors.
-                            // And we end up with more errors in summary which is hard to figure out for users.
-                            LogMSBuildOutputMessage(error);
-                        }
-                        else
-                        {
-                            Log.LogError(data[0]);
-                        }
+                        LogMSBuildOutputMessage(error);
 
                         break;
                     }
@@ -248,8 +242,13 @@ public class VSTestTask2 : ToolTask, ITestTask
         }
     }
 
-    private void LogMSBuildOutputMessage(string singleLine)
+    private void LogMSBuildOutputMessage(string? singleLine)
     {
+
+        if (singleLine == null)
+        {
+            return;
+        }
 
         var message = new ExtendedBuildMessageEventArgs("TLTESTOUTPUT", singleLine, null, null, MessageImportance.High);
         BuildEngine.LogMessageEvent(message);
