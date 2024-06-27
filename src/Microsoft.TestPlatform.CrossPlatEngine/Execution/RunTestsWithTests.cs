@@ -131,7 +131,7 @@ internal class RunTestsWithTests : BaseRunTests
             }
             else
             {
-                testList = new List<TestCase> { test };
+                testList = [test];
                 result.Add(executorUriExtensionTuple, testList);
             }
         }

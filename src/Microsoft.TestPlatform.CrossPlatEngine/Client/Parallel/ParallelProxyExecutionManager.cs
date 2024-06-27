@@ -261,7 +261,7 @@ internal sealed class ParallelProxyExecutionManager : IParallelProxyExecutionMan
                 if (!_isParallel && testhostProviderInfo.Shared)
                 {
                     // Create one big batch of testcases that will be single workload for single testhost.
-                    testCaseBatches = new List<TestCase[]> { group.SelectMany(w => sourceToTestCasesMap[w.Work]).ToArray() };
+                    testCaseBatches = [group.SelectMany(w => sourceToTestCasesMap[w.Work]).ToArray()];
                 }
                 else
                 {
@@ -319,7 +319,7 @@ internal sealed class ParallelProxyExecutionManager : IParallelProxyExecutionMan
                 if (!_isParallel && testhostProviderInfo.Shared)
                 {
                     // Create one big source batch that will be single workload for single testhost.
-                    sourceBatches = new List<string[]> { group.Select(w => w.Work).ToArray() };
+                    sourceBatches = [group.Select(w => w.Work).ToArray()];
                 }
                 else
                 {

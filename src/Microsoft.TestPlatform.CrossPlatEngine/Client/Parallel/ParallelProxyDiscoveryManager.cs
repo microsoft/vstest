@@ -222,7 +222,7 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
             if (!_isParallel && testhostProviderInfo.Shared)
             {
                 // Create one big source batch that will be single workload for single testhost.
-                sourceBatches = new List<string[]> { group.Select(w => w.Work).ToArray() };
+                sourceBatches = [group.Select(w => w.Work).ToArray()];
             }
             else
             {

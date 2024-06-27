@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
@@ -176,12 +175,12 @@ public static class RunSettingsUtilities
     {
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
 
-        IEnumerable<string> testAdaptersPaths = Enumerable.Empty<string>();
+        IEnumerable<string> testAdaptersPaths = [];
         if (runConfiguration != null)
         {
             if (runConfiguration.TestAdaptersPathsSet)
             {
-                testAdaptersPaths = runConfiguration.TestAdaptersPaths.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                testAdaptersPaths = runConfiguration.TestAdaptersPaths.Split([';'], StringSplitOptions.RemoveEmptyEntries);
             }
         }
 

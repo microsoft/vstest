@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 public static class FilterHelper
 {
     public const char EscapeCharacter = '\\';
-    private static readonly char[] SpecialCharacters = { '\\', '(', ')', '&', '|', '=', '!', '~' };
+    private static readonly char[] SpecialCharacters = ['\\', '(', ')', '&', '|', '=', '!', '~'];
     private static readonly HashSet<char> SpecialCharactersSet = new(SpecialCharacters);
 
     /// <summary>

@@ -55,7 +55,11 @@ public class InferRunSettingsHelper
     private const string LegacyElementsString = "Elements";
     private const string DeploymentAttributesString = "DeploymentAttributes";
     private const string ExecutionAttributesString = "ExecutionAttributes";
-    private static readonly List<string> ExecutionNodesPaths = new() { @"/RunSettings/LegacySettings/Execution/TestTypeSpecific/UnitTestRunConfig/AssemblyResolution", @"/RunSettings/LegacySettings/Execution/Timeouts", @"/RunSettings/LegacySettings/Execution/Hosts" };
+    private static readonly List<string> ExecutionNodesPaths =
+    [
+        @"/RunSettings/LegacySettings/Execution/TestTypeSpecific/UnitTestRunConfig/AssemblyResolution",
+        @"/RunSettings/LegacySettings/Execution/Timeouts", @"/RunSettings/LegacySettings/Execution/Hosts"
+    ];
 
     /// <summary>
     /// Make runsettings compatible with testhost of version 15.0.0-preview

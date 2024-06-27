@@ -283,7 +283,7 @@ internal class TestPlatform : ITestPlatform
         TestAdapterLoadingStrategy strategy = runConfiguration.TestAdapterLoadingStrategy;
 
         FileHelper fileHelper = new();
-        IEnumerable<string> defaultExtensionPaths = Enumerable.Empty<string>();
+        IEnumerable<string> defaultExtensionPaths = [];
 
         // Explicit adapter loading
         if (strategy.HasFlag(TestAdapterLoadingStrategy.Explicit))
@@ -354,7 +354,7 @@ internal class TestPlatform : ITestPlatform
     {
         if (!strategy.HasFlag(TestAdapterLoadingStrategy.Explicit))
         {
-            return Enumerable.Empty<string>();
+            return [];
         }
 
         if (fileHelper.Exists(path))
@@ -377,7 +377,7 @@ internal class TestPlatform : ITestPlatform
         }
 
         EqtTrace.Warning($"{nameof(TestPlatform)}.{nameof(ExpandAdaptersWithExplicitStrategy)} AdapterPath Not Found: {path}");
-        return Enumerable.Empty<string>();
+        return [];
     }
 
     private static IEnumerable<string> ExpandAdaptersWithDefaultStrategy(string path, IFileHelper fileHelper)
@@ -388,7 +388,7 @@ internal class TestPlatform : ITestPlatform
         {
             EqtTrace.Warning($"{nameof(TestPlatform)}.{nameof(ExpandAdaptersWithDefaultStrategy)} AdapterPath Not Found: {path}");
 
-            return Enumerable.Empty<string>();
+            return [];
         }
 
         return fileHelper.EnumerateFiles(

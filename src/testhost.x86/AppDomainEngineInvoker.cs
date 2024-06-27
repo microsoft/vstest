@@ -106,7 +106,7 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
             false,
             BindingFlags.Default,
             null,
-            new object?[] { CultureInfo.DefaultThreadCurrentUICulture?.Name, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) },
+            [CultureInfo.DefaultThreadCurrentUICulture?.Name, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)],
             null,
             null);
 
@@ -247,7 +247,7 @@ internal class CustomAssemblySetup : MarshalByRefObject
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CreateSpecificCulture(uiCulture);
         }
 
-        _resolverPaths = new string[] { testPlatformPath, Path.Combine(testPlatformPath, "Extensions") };
+        _resolverPaths = [testPlatformPath, Path.Combine(testPlatformPath, "Extensions")];
         _resolvedAssemblies = new Dictionary<string, Assembly?>();
         AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
     }
