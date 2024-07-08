@@ -194,9 +194,10 @@ function Verify-NugetPackageExe {
         throw "No exe files were found."
     }
 
-    $dumpBin =  Get-ChildItem -Recurse -Force -Filter dumpbin.exe -path "$env:ProgramFiles\Microsoft Visual Studio\2022\Enterprise" | Select-Object -First 1
+    # use wow programfiles because they always point to x64 programfiles where VS is installed
+    $dumpBin =  Get-ChildItem -Recurse -Force -Filter dumpbin.exe -path "$env:ProgramW6432\Microsoft Visual Studio\2022\Enterprise" | Select-Object -First 1
     if (-not $dumpBin) {
-        throw "Did not find dumpbin.exe in '$env:ProgramFiles\Microsoft Visual Studio\2022\Enterprise'."
+        throw "Did not find dumpbin.exe in '$env:ProgramW6432\Microsoft Visual Studio\2022\Enterprise'."
     }
 
     $corFlags = Get-ChildItem -Recurse -Force -Filter CorFlags.exe -path "${env:ProgramFiles(x86)}\Microsoft SDKs\Windows" | Select-Object -First 1
