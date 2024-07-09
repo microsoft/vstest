@@ -300,5 +300,6 @@ function Verify-NugetPackageVersion {
 
 $unzipNugetPackages = Verify-Nuget-Packages
 Start-sleep -Seconds 10
-Verify-NugetPackageExe -configuration $configuration -UnzipNugetPackages $unzipNugetPackages
+# skipped, it is hard to find the right dumpbin.exe and corflags tools on server
+# Verify-NugetPackageExe -configuration $configuration -UnzipNugetPackages $unzipNugetPackages
 Verify-NugetPackageVersion -configuration $configuration -UnzipNugetPackages $unzipNugetPackages
