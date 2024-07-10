@@ -69,9 +69,10 @@
     <MSTestTestFrameworkVersion>3.4.3</MSTestTestFrameworkVersion>
     <MSTestTestAdapterVersion>3.4.3</MSTestTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
-    <XUnitFrameworkVersion>2.8.1</XUnitFrameworkVersion>
-    <XUnitAdapterVersion>2.8.1</XUnitAdapterVersion>
-    <XUnitConsoleRunnerVersion>2.8.1</XUnitConsoleRunnerVersion>
+    <!-- This is the newest version of XUnit that still supports netcoreapp3.1 that we also use to run tests -->
+    <XUnitFrameworkVersion>2.4.2</XUnitFrameworkVersion>
+    <XUnitAdapterVersion>2.4.5</XUnitAdapterVersion>
+    <XUnitConsoleRunnerVersion>2.4.2</XUnitConsoleRunnerVersion>
     <NUnit3FrameworkVersion>3.14.0</NUnit3FrameworkVersion>
     <NUnit3AdapterVersion>3.17.0</NUnit3AdapterVersion>
     <NUnitConsoleRunnerVersion>3.16.3</NUnitConsoleRunnerVersion>
