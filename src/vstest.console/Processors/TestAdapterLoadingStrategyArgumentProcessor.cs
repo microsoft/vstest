@@ -195,7 +195,7 @@ internal class TestAdapterLoadingStrategyArgumentExecutor : IArgumentExecutor
 
     private void ValidateTestAdapterPaths(TestAdapterLoadingStrategy strategy)
     {
-        var testAdapterPaths = _commandLineOptions.TestAdapterPath ?? new string[0];
+        var testAdapterPaths = _commandLineOptions.TestAdapterPath ?? [];
         if (!_commandLineOptions.TestAdapterPathsSet)
         {
             testAdapterPaths = TestAdapterPathArgumentExecutor.SplitPaths(_runSettingsManager.QueryRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath)).Union(testAdapterPaths).Distinct().ToArray();

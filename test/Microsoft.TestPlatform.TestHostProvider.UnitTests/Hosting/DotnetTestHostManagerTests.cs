@@ -42,7 +42,7 @@ public class DotnetTestHostManagerTests
     private readonly Mock<IEnvironment> _mockEnvironment;
     private readonly Mock<IRunSettingsHelper> _mockRunsettingHelper;
     private readonly TestRunnerConnectionInfo _defaultConnectionInfo;
-    private readonly string[] _testSource = { "test.dll" };
+    private readonly string[] _testSource = ["test.dll"];
     private readonly string _defaultTestHostPath;
     private readonly TestProcessStartInfo _defaultTestProcessStartInfo;
     private readonly TestableDotnetTestHostManager _dotnetHostManager;
@@ -548,7 +548,7 @@ public class DotnetTestHostManagerTests
     public void GetTestPlatformExtensionsShouldReturnEmptySetIfSourceDirectoryDoesNotExist()
     {
         _mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
-        var extensions = _dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, Enumerable.Empty<string>());
+        var extensions = _dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, []);
 
         Assert.AreEqual(0, extensions.Count());
     }
@@ -558,7 +558,7 @@ public class DotnetTestHostManagerTests
     {
         _mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
         _mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.TestAdapter.dll" });
-        var extensions = _dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, Enumerable.Empty<string>());
+        var extensions = _dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, []);
 
         CollectionAssert.AreEqual(new[] { "foo.TestAdapter.dll" }, extensions.ToArray());
     }
@@ -569,7 +569,7 @@ public class DotnetTestHostManagerTests
         // Parent directory is empty since the input source is file "test.dll"
         _mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
         _mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.dll" });
-        var extensions = _dotnetHostManager.GetTestPlatformExtensions(_testSource, Enumerable.Empty<string>());
+        var extensions = _dotnetHostManager.GetTestPlatformExtensions(_testSource, []);
 
         Assert.AreEqual(0, extensions.Count());
     }
@@ -579,7 +579,7 @@ public class DotnetTestHostManagerTests
     {
         _mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
         _mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.dll" });
-        var extensions = _dotnetHostManager.GetTestPlatformExtensions(_testSource, new List<string> { "abc.dataollector.dll" });
+        var extensions = _dotnetHostManager.GetTestPlatformExtensions(_testSource, ["abc.dataollector.dll"]);
 
         Assert.AreEqual(0, extensions.Count());
     }

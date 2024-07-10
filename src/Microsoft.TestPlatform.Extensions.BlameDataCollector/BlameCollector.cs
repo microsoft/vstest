@@ -356,7 +356,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
                         && !string.Equals(attribute.Value, Constants.FalseConfigurationValue, StringComparison.OrdinalIgnoreCase))
                         || !bool.TryParse(attribute.Value, out _collectDumpAlways))
                     {
-                        _logger.LogWarning(_context.SessionDataCollectionContext, FormatBlameParameterValueIncorrectMessage(attribute, new[] { Constants.TrueConfigurationValue, Constants.FalseConfigurationValue }));
+                        _logger.LogWarning(_context.SessionDataCollectionContext, FormatBlameParameterValueIncorrectMessage(attribute, [Constants.TrueConfigurationValue, Constants.FalseConfigurationValue]));
                     }
 
                     break;
