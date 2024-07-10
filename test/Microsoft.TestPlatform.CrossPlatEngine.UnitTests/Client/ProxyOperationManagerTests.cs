@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -72,7 +71,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         var expectedStartInfo = new TestProcessStartInfo();
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
         _mockTestHostManager.Setup(
-                th => th.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), It.IsAny<Dictionary<string, string?>>(), It.IsAny<TestRunnerConnectionInfo>()))
+                th => th.GetTestHostProcessStartInfo(Array.Empty<string>(), It.IsAny<Dictionary<string, string?>>(), It.IsAny<TestRunnerConnectionInfo>()))
             .Returns(expectedStartInfo);
 
         _testOperationManager.SetupChannel([], DefaultRunSettings);
