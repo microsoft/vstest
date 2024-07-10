@@ -402,7 +402,7 @@ public class InferRunSettingsHelper
     /// <summary>
     /// Returns a dictionary of environment variables given in run settings
     /// </summary>
-    /// <param name="runsettingsXml">The run settings xml string</param>
+    /// <param name="runSettings">The run settings xml string</param>
     /// <returns>Environment Variables Dictionary</returns>
     public static Dictionary<string, string?>? GetEnvironmentVariables(string? runSettings)
     {

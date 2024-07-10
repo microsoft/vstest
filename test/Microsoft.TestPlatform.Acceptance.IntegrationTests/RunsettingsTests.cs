@@ -94,9 +94,6 @@ public class RunsettingsTests : AcceptanceTestBase
     /// <summary>
     /// Command line switches should have high precedence if runsetting file and command line switch specified
     /// </summary>
-    /// <param name="runnerFramework"></param>
-    /// <param name="targetFramework"></param>
-    /// <param name="targetRuntime"></param>
     [TestMethod]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]

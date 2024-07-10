@@ -90,6 +90,7 @@ public static class FakesUtilities
     /// </summary>
     /// <param name="runSettings">runsettings</param>
     /// <param name="sources">test sources</param>
+    /// <param name="framework">version of the framework</param>
     /// <returns>true if runSettings was modified; false otherwise.</returns>
     private static bool TryAddFakesDataCollectorSettings(
         XmlDocument runSettings,

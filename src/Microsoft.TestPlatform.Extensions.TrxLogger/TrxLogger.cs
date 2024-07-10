@@ -591,7 +591,7 @@ public class TrxLogger : ITestLoggerWithParameters
     /// <param name="parentExecutionId"></param>
     /// <param name="testType"></param>
     /// <param name="parentTestElement"></param>
-    /// <param name="rockSteadyTestCase"></param>
+    /// <param name="rockSteadyTestResult"></param>
     /// <returns>Trx test element</returns>
     private ITestElement GetOrCreateTestElement(Guid executionId, Guid parentExecutionId, TestType testType, ITestElement? parentTestElement, ObjectModel.TestResult rockSteadyTestResult)
     {

@@ -57,12 +57,13 @@ internal class InProcDataCollector : IInProcDataCollector
     /// </param>
     /// <param name="assemblyQualifiedName">
     /// </param>
-    /// <param name="interfaceTypeInfo">
+    /// <param name="interfaceType">
     /// </param>
     /// <param name="configXml">
     /// </param>
     /// <param name="assemblyLoadContext">
     /// </param>
+    /// <param name="testPluginCache"></param>
     internal InProcDataCollector(string codeBase, string assemblyQualifiedName, Type interfaceType, string? configXml, IAssemblyLoadContext assemblyLoadContext, TestPluginCache testPluginCache)
     {
         _configXml = configXml;

@@ -25,7 +25,7 @@ public class NetCoreRunnerAttribute : Attribute, ITestDataSource
     private readonly string _targetFrameworks;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSource"/> class.
+    /// Initializes a new instance of the <see cref="NetCoreRunnerAttribute"/> class.
     /// </summary>
     /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net462TargetFramework or alike values.</param>
     public NetCoreRunnerAttribute(string targetFrameworks = AcceptanceTestBase.NETFX462_NET50)

@@ -192,7 +192,6 @@ internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
     /// <summary>
     /// Updates with code coverage settings if not configured.
     /// </summary>
-    /// <param name="runSettingsDocument"> The run settings document. </param>
     private void UpdateWithCodeCoverageSettingsIfNotConfigured()
     {
         var runsettingsXml = _runSettingsManager.ActiveRunSettings?.SettingsXml;

@@ -15,7 +15,7 @@ public static class FilterHelper
     private static readonly HashSet<char> SpecialCharactersSet = new(SpecialCharacters);
 
     /// <summary>
-    /// Escapes a set of special characters for filter (%, (, ), &, |, =, !, ~) by replacing them with their escape sequences.
+    /// Escapes a set of special characters for filter (%, (, ), &amp;, |, =, !, ~) by replacing them with their escape sequences.
     /// </summary>
     /// <param name="str">The input string that contains the text to convert.</param>
     /// <returns>A string of characters with special characters converted to their escaped form.</returns>
