@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
+  <PropertyGroup>
+    <!-- Temporary workaround for Arcade issue in net9-preview5 -->
+    <_NetFrameworkHostedCompilersVersion Condition="'$(_NetFrameworkHostedCompilersVersion)' == ''">4.6.0</_NetFrameworkHostedCompilersVersion>
+  </PropertyGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 

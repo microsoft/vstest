@@ -13,11 +13,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- Temporary workaround for Arcade issue in net9-preview5 -->
-    <_NetFrameworkHostedCompilersVersion Condition="'$(_NetFrameworkHostedCompilersVersion)' == ''">4.11.0-3.24280.3</_NetFrameworkHostedCompilersVersion>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <!--
       This version is read by vsts-prebuild.ps1 and is a base for the current version, this should be updated at the start of
       new iteration to the goal number. This is also used to version the local packages. This version needs to be statically
