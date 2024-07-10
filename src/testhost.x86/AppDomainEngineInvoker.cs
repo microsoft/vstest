@@ -93,8 +93,7 @@ internal class AppDomainEngineInvoker<T> : IEngineInvoker where T : MarshalByRef
     /// <summary>
     /// Create the Engine Invoker in new AppDomain based on test source path
     /// </summary>
-    /// <param name="testSourcePath">Test Source to run/discover tests for</param>
-    /// <param name="mergedConfigFile">Merged config file if there is any merging of test config and test host config</param>
+    /// <param name="appDomain">The appdomain in which the invoker should be created.</param>
     /// <returns></returns>
     private static IEngineInvoker CreateInvokerInAppDomain(AppDomain appDomain)
     {

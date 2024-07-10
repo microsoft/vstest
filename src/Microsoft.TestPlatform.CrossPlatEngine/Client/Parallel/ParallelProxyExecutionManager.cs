@@ -418,7 +418,6 @@ internal sealed class ParallelProxyExecutionManager : IParallelProxyExecutionMan
     /// Triggers the execution for the next data object on the concurrent executor
     /// Each concurrent executor calls this method, once its completed working on previous data
     /// </summary>
-    /// <param name="proxyExecutionManager">Proxy execution manager instance.</param>
     /// <returns>True, if execution triggered</returns>
     private void StartTestRunOnConcurrentManager(
         IProxyExecutionManager proxyExecutionManager,

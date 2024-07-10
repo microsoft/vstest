@@ -28,7 +28,7 @@ internal class InProcessProxyExecutionManager : IProxyExecutionManager
     public bool IsInitialized { get; private set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="InProcessProxyexecutionManager"/> class.
+    /// Initializes a new instance of the <see cref="InProcessProxyExecutionManager"/> class.
     /// </summary>
     /// <param name="testHostManager">
     /// The test Host Manager.

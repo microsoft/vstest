@@ -231,6 +231,7 @@ internal class TestPlatform : ITestPlatform
     /// </summary>
     ///
     /// <param name="sources">The list of sources.</param>
+    /// <param name="strategy">Adapter loading strategy</param>
     private void AddLoggerAssembliesFromSource(IEnumerable<string> sources, TestAdapterLoadingStrategy strategy)
     {
         // Skip discovery unless we're using the default behavior, or NextToSource is specified.

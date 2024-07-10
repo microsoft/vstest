@@ -91,6 +91,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// <param name="fileHelper">
     /// Filehelper instance.
     /// </param>
+    /// <param name="processHelper">Process helper instance.</param>
     internal BlameCollector(
         IBlameReaderWriter blameReaderWriter,
         IProcessDumpUtility processDumpUtility,
