@@ -174,7 +174,7 @@ public class IntegrationTestBase
     /// <returns>Command line arguments string.</returns>
     public static string PrepareArguments(string testAssembly, string? testAdapterPath, string? runSettings,
         string framework, string? inIsolation = "", string? resultsDirectory = null)
-        => PrepareArguments(new string[] { testAssembly }, testAdapterPath, runSettings, framework, inIsolation, resultsDirectory);
+        => PrepareArguments([testAssembly], testAdapterPath, runSettings, framework, inIsolation, resultsDirectory);
 
 
     /// <summary>

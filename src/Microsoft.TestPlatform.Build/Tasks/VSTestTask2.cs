@@ -48,9 +48,11 @@ public class VSTestTask2 : ToolTask, ITestTask
     protected override Encoding StandardOutputEncoding => _disableUtf8ConsoleEncoding ? base.StandardOutputEncoding : Encoding.UTF8;
 
     private readonly string _messageSplitter = "||||";
-    private readonly string[] _messageSplitterArray = new[] { "||||" };
+    private readonly string[] _messageSplitterArray = ["||||"];
+    private readonly string _ansiReset = "\x1b[39;49m";
 
     private readonly bool _disableUtf8ConsoleEncoding;
+    private readonly bool _canBePrependedWithAnsi;
 
     protected override string? ToolName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "dotnet.exe" : "dotnet";
 
@@ -58,6 +60,9 @@ public class VSTestTask2 : ToolTask, ITestTask
     {
         // Unless user opted out, use UTF encoding, which we force in vstest.console.
         _disableUtf8ConsoleEncoding = Environment.GetEnvironmentVariable("VSTEST_DISABLE_UTF8_CONSOLE_ENCODING") == "1";
+        var isPrependedWithAnsi = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION");
+        // On macOS and Linux the messages are prepended with ANSI reset sequence.
+        _canBePrependedWithAnsi = isPrependedWithAnsi?.ToLowerInvariant() == "true" || isPrependedWithAnsi == "1";
         LogStandardErrorAsError = false;
         StandardOutputImportance = "High";
     }
@@ -66,6 +71,17 @@ public class VSTestTask2 : ToolTask, ITestTask
     {
         var useTerminalLogger = true;
         Debug.WriteLine($"VSTESTTASK2: Received output {singleLine}, importance {messageImportance}");
+        bool wasPrependedWithAnsi = false;
+
+        if (_canBePrependedWithAnsi)
+        {
+            while (singleLine.StartsWith(_ansiReset))
+            {
+                wasPrependedWithAnsi = true;
+                singleLine = singleLine.Substring(_ansiReset.Length);
+            }
+        }
+
         if (TryGetMessage(singleLine, out string name, out string?[] data))
         {
             // See MSBuildLogger.cs for the messages produced.
@@ -75,7 +91,9 @@ public class VSTestTask2 : ToolTask, ITestTask
                 case "output-info":
                     if (data[0] != null)
                     {
-                        LogMSBuildOutputMessage(data[0]!);
+                        // This is console output was prepended with ANSI reset, add it back.
+                        string info = wasPrependedWithAnsi ? _ansiReset + data[0]! : data[0]!;
+                        LogMSBuildOutputMessage(info);
                     }
                     break;
                 case "output-warning":
@@ -83,24 +101,24 @@ public class VSTestTask2 : ToolTask, ITestTask
                     break;
                 case "output-error":
                     {
+                        // Downgrade errors to info messages, xUnit outputs every assertion failure and it confuses users who see doubled error count.
+                        // Libraries write to error output, and don't expect tests to fail.
+                        // Logs are often written to error stream as well.
                         var error = data[0];
-                        if (error != null && error.StartsWith("[xUnit.net", StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Downgrade errors from xunit, because they will end up being duplicated on screen with assertion errors.
-                            // And we end up with more errors in summary which is hard to figure out for users.
-                            LogMSBuildOutputMessage(error);
-                        }
-                        else
-                        {
-                            Log.LogError(data[0]);
-                        }
+                        LogMSBuildOutputMessage(error);
 
                         break;
                     }
 
                 case "run-cancel":
+                    // There is other overload that takes just message, and params, specifying the name of the first parameter explicitly so I don't
+                    // accidentally use it, because that will throw error when message is null, which it always is (We provide that null as first parameter).
+                    Log.LogError(subcategory: null, "TESTRUNCANCEL", null, TestFileFullPath?.ItemSpec ?? string.Empty, 0, 0, 0, 0, data[0]);
+                    break;
                 case "run-abort":
-                    Log.LogError(data[0]);
+                    // There is other overload that takes just message, and params, specifying the name of the first parameter explicitly so I don't
+                    // accidentally use it, because that will throw error when message is null, which it always is (We provide that null as first parameter).
+                    Log.LogError(subcategory: null, "TESTRUNABORT", null, TestFileFullPath?.ItemSpec ?? string.Empty, 0, 0, 0, 0, data[0]);
                     break;
                 case "run-finish":
                     // 0 - Localized summary
@@ -210,7 +228,7 @@ public class VSTestTask2 : ToolTask, ITestTask
                         file ??= string.Empty;
 
                         // Report error to msbuild.
-                        Log.LogError(null, "VSTEST1", null, file ?? string.Empty, lineNumber, 0, 0, 0, fullErrorMessage, null);
+                        Log.LogError(null, "TESTERROR", null, file ?? string.Empty, lineNumber, 0, 0, 0, fullErrorMessage, null);
                     }
                     break;
                 default:
@@ -230,8 +248,13 @@ public class VSTestTask2 : ToolTask, ITestTask
         }
     }
 
-    private void LogMSBuildOutputMessage(string singleLine)
+    private void LogMSBuildOutputMessage(string? singleLine)
     {
+
+        if (singleLine == null)
+        {
+            return;
+        }
 
         var message = new ExtendedBuildMessageEventArgs("TLTESTOUTPUT", singleLine, null, null, MessageImportance.High);
         BuildEngine.LogMessageEvent(message);
@@ -248,7 +271,7 @@ public class VSTestTask2 : ToolTask, ITestTask
         }
 
         name = string.Empty;
-        data = Array.Empty<string>();
+        data = [];
         return false;
     }
 

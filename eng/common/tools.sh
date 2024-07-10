@@ -295,7 +295,7 @@ function with_retries {
 function GetDotNetInstallScript {
   local root=$1
   local install_script="$root/dotnet-install.sh"
-  local install_script_url="https://dotnet.microsoft.com/download/dotnet/scripts/$dotnetInstallScriptVersion/dotnet-install.sh"
+  local install_script_url="https://raw.githubusercontent.com/dotnet/install-scripts/main/src/dotnet-install.sh"
 
   if [[ ! -a "$install_script" ]]; then
     mkdir -p "$root"
@@ -347,14 +347,14 @@ function InitializeBuildTool {
   fi
 }
 
-# Set RestoreNoCache as a workaround for https://github.com/NuGet/Home/issues/3116
+# Set RestoreNoHttpCache as a workaround for https://github.com/NuGet/Home/issues/3116
 function GetNuGetPackageCachePath {
   if [[ -z ${NUGET_PACKAGES:-} ]]; then
     if [[ "$use_global_nuget_cache" == true ]]; then
-      export NUGET_PACKAGES="$HOME/.nuget/packages"
+      export NUGET_PACKAGES="$HOME/.nuget/packages/"
     else
-      export NUGET_PACKAGES="$repo_root/.packages"
-      export RESTORENOCACHE=true
+      export NUGET_PACKAGES="$repo_root/.packages/"
+      export RESTORENOHTTPCACHE=true
     fi
   fi
 

@@ -342,11 +342,11 @@ public class TrxLogger : ITestLoggerWithParameters
         helper.SaveIEnumerable(_entries.Values, rootElement, "TestEntries", ".", "TestEntry", parameters);
 
         // Save default categories
-        List<TestListCategory> categories = new()
-        {
+        List<TestListCategory> categories =
+        [
             TestListCategory.UncategorizedResults,
             TestListCategory.AllResults
-        };
+        ];
         helper.SaveList(categories, rootElement, "TestLists", ".", "TestList", parameters);
 
         // Save summary
@@ -357,7 +357,7 @@ public class TrxLogger : ITestLoggerWithParameters
 
         TestResultOutcome = ChangeTestOutcomeIfNecessary(TestResultOutcome);
 
-        List<string> errorMessages = new();
+        List<string> errorMessages = [];
         List<CollectorDataEntry> collectorEntries = _converter.ToCollectionEntries(e.AttachmentSets, LoggerTestRun, _testResultsDirPath);
         IList<string> resultFiles = _converter.ToResultFiles(e.AttachmentSets, LoggerTestRun, _testResultsDirPath, errorMessages);
 
