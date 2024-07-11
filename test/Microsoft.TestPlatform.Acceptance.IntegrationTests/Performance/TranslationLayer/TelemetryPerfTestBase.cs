@@ -24,7 +24,9 @@ public class TelemetryPerfTestBase : PerformanceTestBase
     public TelemetryPerfTestBase()
     {
         var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
+#pragma warning disable CS0618 // Type or member is obsolete
         telemetryConfiguration.InstrumentationKey = TelemetryInstrumentationKey;
+#pragma warning restore CS0618 // Type or member is obsolete
 
         _client = new TelemetryClient(telemetryConfiguration);
     }
@@ -32,8 +34,6 @@ public class TelemetryPerfTestBase : PerformanceTestBase
     /// <summary>
     /// Used for posting the telemetry to AppInsights
     /// </summary>
-    /// <param name="handlerMetrics"></param>
-    /// <param name="scenario"></param>
     public void PostTelemetry(IDictionary<string, object> handlerMetrics, PerfAnalyzer perfAnalyzer, string projectName, [CallerMemberName] string? scenario = null)
     {
         var properties = new Dictionary<string, string?>
@@ -112,8 +112,6 @@ public class TelemetryPerfTestBase : PerformanceTestBase
     /// <summary>
     /// Returns the full path to the test asset dll
     /// </summary>
-    /// <param name="dllDirectory">Name of the directory of the test dll</param>
-    /// <param name="name">Name of the test project without extension</param>
     /// <returns></returns>
     public string[] GetPerfAssetFullPath(string name, string framework = "net48")
     {

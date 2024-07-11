@@ -45,9 +45,10 @@ public class IntegrationTestBase
 
     protected readonly IntegrationTestEnvironment _testEnvironment;
 
-    private readonly string _testAdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
+    private readonly string _msTestPre3_0AdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
+    private readonly string _msTestAdapterRelativePath = @"mstest.testadapter\{0}\build\{1}".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _nUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build".Replace('\\', Path.DirectorySeparatorChar);
-    private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
+    private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\{1}".Replace('\\', Path.DirectorySeparatorChar);
 
     public enum UnitTestFramework
     {
@@ -99,8 +100,9 @@ public class IntegrationTestBase
     /// <param name="testAssemblies">List of test assemblies.</param>
     /// <param name="testAdapterPath">Path to test adapter.</param>
     /// <param name="runSettings">Text of run settings.</param>
-    /// <param name="framework"></param>
-    /// <param name="inIsolation"></param>
+    /// <param name="framework">Framework to use.</param>
+    /// <param name="inIsolation">If we should run in a separate process.</param>
+    /// <param name="resultsDirectory">The directory where results are stored.</param>
     /// <returns>Command line arguments string.</returns>
     public static string PrepareArguments(string[] testAssemblies, string? testAdapterPath, string? runSettings,
         string framework, string? inIsolation = "", string? resultsDirectory = null)
@@ -168,18 +170,20 @@ public class IntegrationTestBase
     /// <param name="testAssembly">Name of the test assembly.</param>
     /// <param name="testAdapterPath">Path to test adapter.</param>
     /// <param name="runSettings">Text of run settings.</param>
-    /// <param name="framework"></param>
-    /// <param name="inIsolation"></param>
+    /// <param name="framework">The framework to use.</param>
+    /// <param name="inIsolation">If we should run in separate process.</param>
+    /// <param name="resultsDirectory">The directory in which results will be stored.</param>
     /// <returns>Command line arguments string.</returns>
     public static string PrepareArguments(string testAssembly, string? testAdapterPath, string? runSettings,
         string framework, string? inIsolation = "", string? resultsDirectory = null)
-        => PrepareArguments(new string[] { testAssembly }, testAdapterPath, runSettings, framework, inIsolation, resultsDirectory);
+        => PrepareArguments([testAssembly], testAdapterPath, runSettings, framework, inIsolation, resultsDirectory);
 
 
     /// <summary>
     /// Invokes <c>vstest.console</c> with specified arguments.
     /// </summary>
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
+    /// <param name="environmentVariables">Environment variables to set to the started process.</param>
     public void InvokeVsTest(string? arguments, Dictionary<string, string?>? environmentVariables = null)
     {
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
@@ -191,6 +195,7 @@ public class IntegrationTestBase
     /// Invokes our local copy of dotnet that is patched with artifacts from the build with specified arguments.
     /// </summary>
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
+    /// <param name="environmentVariables">Environment variables to set to the started process.</param>
     public void InvokeDotnetTest(string arguments, Dictionary<string, string?>? environmentVariables = null)
     {
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
@@ -228,6 +233,7 @@ public class IntegrationTestBase
     /// <param name="testAdapterPath">Path to test adapters.</param>
     /// <param name="framework">Dotnet Framework of test assembly.</param>
     /// <param name="runSettings">Run settings for execution.</param>
+    /// <param name="environmentVariables">Environment variables to set to the started process.</param>
     public void InvokeVsTestForExecution(string testAssembly,
         string? testAdapterPath,
         string framework,
@@ -274,6 +280,8 @@ public class IntegrationTestBase
     /// <param name="testAssembly">A test assembly.</param>
     /// <param name="testAdapterPath">Path to test adapters.</param>
     /// <param name="runSettings">Run settings for execution.</param>
+    /// <param name="targetFramework">The target framework to use.</param>
+    /// <param name="environmentVariables">Environment variables to set to the started process.</param>
     public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "",
         Dictionary<string, string?>? environmentVariables = null)
     {
@@ -428,12 +436,12 @@ public class IntegrationTestBase
 
     public void StdOutputContains(string substring)
     {
-        Assert.IsTrue(_standardTestOutput.Contains(substring), $"StdOutput:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.IsTrue(_standardTestOutput.Contains(substring), $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void StdOutputDoesNotContains(string substring)
     {
-        Assert.IsFalse(_standardTestOutput.Contains(substring), $"StdOutput:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.IsFalse(_standardTestOutput.Contains(substring), $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Not expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void ExitCodeEquals(int exitCode)
@@ -594,7 +602,16 @@ public class IntegrationTestBase
 
         if (testFramework == UnitTestFramework.MSTest)
         {
-            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _testAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["MSTestTestAdapterVersion"]);
+            var version = IntegrationTestEnvironment.DependencyVersions["MSTestTestAdapterVersion"];
+            if (version.StartsWith("3"))
+            {
+                var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : _testEnvironment.TargetFramework;
+                adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, tfm);
+            }
+            else
+            {
+                adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestPre3_0AdapterRelativePath, version);
+            }
         }
         else if (testFramework == UnitTestFramework.NUnit)
         {
@@ -602,7 +619,8 @@ public class IntegrationTestBase
         }
         else if (testFramework == UnitTestFramework.XUnit)
         {
-            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"]);
+            var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "netcoreapp3.1";
+            adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"], tfm);
         }
 
         return _testEnvironment.GetNugetPackage(adapterRelativePath);
@@ -771,6 +789,7 @@ public class IntegrationTestBase
     /// <param name="stdOut"></param>
     /// <param name="stdError"></param>
     /// <param name="exitCode"></param>
+    /// <param name="environmentVariables">Environment variables to set to the started process.</param>
     private static void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode,
         Dictionary<string, string?>? environmentVariables = null)
     {

@@ -67,12 +67,15 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private ITestHostLauncher? _customTestHostLauncher;
     private Process? _testHostProcess;
     private StringBuilder? _testHostProcessStdError;
+    private StringBuilder? _testHostProcessStdOut;
     private bool _hostExitedEventRaised;
     private string _hostPackageVersion = "15.0.0";
     private Architecture _architecture;
     private Framework? _targetFramework;
     private bool _isVersionCheckRequired = true;
     private string? _dotnetHostPath;
+    private bool _captureOutput;
+    private protected TestHostManagerCallbacks? _testHostManagerCallbacks;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
@@ -169,15 +172,29 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private Action<object?, string?> ErrorReceivedCallback => (process, data) =>
     {
         TPDebug.Assert(_testHostProcessStdError is not null, "_testHostProcessStdError is null");
-        new TestHostManagerCallbacks(false, null).ErrorReceivedCallback(_testHostProcessStdError, data);
+        TPDebug.Assert(_testHostManagerCallbacks is not null, "Initialize must have been called before ExitCallBack");
+        _testHostManagerCallbacks.ErrorReceivedCallback(_testHostProcessStdError, data);
+    };
+
+    /// <summary>
+    /// Gets callback to read from process standard stream
+    /// </summary>
+    private Action<object?, string?> OutputReceivedCallback => (process, data) =>
+    {
+        TPDebug.Assert(_testHostProcessStdOut is not null, "LaunchTestHostAsync must have been called before OutputReceivedCallback");
+        TPDebug.Assert(_testHostManagerCallbacks is not null, "Initialize must have been called before OutputReceivedCallback");
+        _testHostManagerCallbacks.StandardOutputReceivedCallback(_testHostProcessStdOut, data);
     };
 
     /// <inheritdoc/>
     public void Initialize(IMessageLogger? logger, string runsettingsXml)
     {
         _hostExitedEventRaised = false;
-
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
+        _captureOutput = runConfiguration.CaptureStandardOutput;
+        var forwardOutput = runConfiguration.ForwardStandardOutput;
+        _testHostManagerCallbacks = new TestHostManagerCallbacks(forwardOutput, logger);
+
         _architecture = runConfiguration.TargetPlatform;
         _targetFramework = runConfiguration.TargetFramework;
         _dotnetHostPath = runConfiguration.DotnetHostPath;
@@ -298,7 +315,11 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                     var testHostNugetRoot = new DirectoryInfo(testHostPath).Parent!.Parent!.Parent!;
 
 #if DOTNET_BUILD_FROM_SOURCE
-                    var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "net6.0", folderName, exeName);
+                    var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "net8.0", folderName, exeName);
+                    if (!_fileHelper.Exists(testHostExeNugetPath))
+                    {
+                        testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "net9.0", folderName, exeName);
+                    }
 #else
                     var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "netcoreapp3.1", folderName, exeName);
 #endif
@@ -394,6 +415,11 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                         // 2) making sure we still make the project executable (and so we actually do get runtimeconfig unless the user tries hard to not make the test and EXE).
                         var suffix = _targetFramework.Version == "1.0.0.0" ? "latest" : $"{new Version(_targetFramework.Version).Major}.{new Version(_targetFramework.Version).Minor}";
                         var testhostRuntimeConfig = Path.Combine(Path.GetDirectoryName(testHostNextToRunner)!, $"testhost-{suffix}.runtimeconfig.json");
+                        if (!_fileHelper.Exists(testhostRuntimeConfig))
+                        {
+                            testhostRuntimeConfig = Path.Combine(Path.GetDirectoryName(testHostNextToRunner)!, $"testhost-latest.runtimeconfig.json");
+                        }
+
                         argsToAdd = " --runtimeconfig " + testhostRuntimeConfig.AddDoubleQuote();
                         args += argsToAdd;
                         EqtTrace.Verbose("DotnetTestHostmanager: Adding {0} in args", argsToAdd);
@@ -702,6 +728,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
     {
         _testHostProcessStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
+        _testHostProcessStdOut = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
 
         // We launch the test host process here if we're on the normal test running workflow.
         // If we're debugging and we have access to the newest version of the testhost launcher
@@ -718,6 +745,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
             cancellationToken.ThrowIfCancellationRequested();
 
+            var outputCallback = _captureOutput ? OutputReceivedCallback : null;
             _testHostProcess = _processHelper.LaunchProcess(
                 testHostStartInfo.FileName!,
                 testHostStartInfo.Arguments,
@@ -725,7 +753,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 testHostStartInfo.EnvironmentVariables,
                 ErrorReceivedCallback,
                 ExitCallBack,
-                null) as Process;
+                outputCallback) as Process;
         }
         else
         {

@@ -29,6 +29,7 @@ if you're interested in the architecture of a test logger.
 | Local, CI, CD | [JunitXml.TestLogger][junit.nuget] | [Junit Logger][] |
 | AppVeyor | [AppVeyor.TestLogger][appveyor.nuget] | [AppVeyor Logger][] |
 | Azure Pipelines | [AzurePipelines.TestLogger][azurepipelines.nuget] | [Azure Pipelines Logger][] |
+| GitHub Actions | [GitHubActionsTestLogger][githubactions.nuget] | [GitHub Actions Test Logger][] |
 | TeamCity | [TeamCity.VSTest.TestAdapter][teamcity.nuget] | [Teamcity Logger][] |
 
 [Trx Logger]: https://github.com/Microsoft/vstest/tree/main/src/Microsoft.TestPlatform.Extensions.TrxLogger
@@ -39,6 +40,7 @@ if you're interested in the architecture of a test logger.
 [Junit Logger]: https://github.com/spekt/junit.testlogger
 [AppVeyor Logger]: https://github.com/spekt/appveyor.testlogger
 [Azure Pipelines Logger]: https://github.com/daveaglick/AzurePipelines.TestLogger
+[GitHub Actions Test Logger]: https://github.com/Tyrrrz/GitHubActionsTestLogger
 [TeamCity Logger]: https://github.com/JetBrains/TeamCity.VSTest.TestAdapter
 
 [xunit.nuget]: https://www.nuget.org/packages/XunitXml.TestLogger
@@ -46,6 +48,7 @@ if you're interested in the architecture of a test logger.
 [junit.nuget]: https://www.nuget.org/packages/JUnitXml.TestLogger/
 [appveyor.nuget]: https://www.nuget.org/packages/AppVeyor.TestLogger
 [azurepipelines.nuget]: https://www.nuget.org/packages/AzurePipelines.TestLogger
+[githubactions.nuget]: https://www.nuget.org/packages/GitHubActionsTestLogger
 [teamcity.nuget]: https://www.nuget.org/packages/TeamCity.VSTest.TestAdapter
 
  Want to add your logger? Please send a PR with changes in this doc.
@@ -57,7 +60,9 @@ a zip file (for e.g. loggers for C++ etc.).
 
 If it's a NuGet package, the test logger assemblies should get copied to the
 build output directory. When looking for a test logger, vstest will look for
-them in the same directory as the test assemblies.
+them in the same directory as the test assemblies. In most cases this means that
+test projects reference either the project (same codebase) or NuGet package 
+with the logger.
 
 If the test logger is made available as a zip file, it should be extracted
 to one of the following locations:

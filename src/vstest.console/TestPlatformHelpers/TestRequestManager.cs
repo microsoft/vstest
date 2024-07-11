@@ -525,6 +525,13 @@ internal class TestRequestManager : ITestRequestManager
                 var testSessionStarted = _testPlatform.StartTestSession(requestData, criteria, eventsHandler, sourceToSourceDetailMap, new NullWarningLogger());
                 if (!testSessionStarted)
                 {
+                    // Note: We need to send back a TestSessionComplete event, so that the caller
+                    // completes a session start request.
+                    // StartTestSession will invoke the HandleStartTestSessionComplete event
+                    // if the test session is started successfully. However, if it is not started,
+                    // HandleStartTestSessionComplete will not send an event. That's why we need
+                    // to do it here.
+                    eventsHandler.HandleStartTestSessionComplete(new());
                     EqtTrace.Warning("TestRequestManager.StartTestSession: Unable to start test session.");
                 }
             }
@@ -703,7 +710,7 @@ internal class TestRequestManager : ITestRequestManager
         // After MULTI_TFM  sourceToArchitectureMap and sourceToFrameworkMap are the source of truth, and are propagated forward,
         // so when we want to revert to the older behavior we need to re-enable the check, and unify all the architecture and
         // framework entries to the same chosen value.
-        var disableMultiTfm = FeatureFlag.Instance.IsSet(FeatureFlag.DISABLE_MULTI_TFM_RUN);
+        var disableMultiTfm = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_MULTI_TFM_RUN);
 
         // Choose default architecture based on the framework.
         // For a run with mixed tfms enabled, or .NET "Core", the default platform architecture should be based on the process.
@@ -1271,7 +1278,6 @@ internal class TestRequestManager : ITestRequestManager
     /// This method either looks at runsettings directly when running as a server (DesignMode / IDE / via VSTestConsoleWrapper, or how you wanna call it)
     /// or uses the pre-parsed runsettings when in console mode.
     /// </summary>
-    /// <param name="navigator"></param>
     /// <returns></returns>
     private bool IsFrameworkSetByRunSettings(
         XPathNavigator navigator,
@@ -1307,7 +1313,6 @@ internal class TestRequestManager : ITestRequestManager
     /// This method either looks at runsettings directly when running as a server (DesignMode / IDE / via VSTestConsoleWrapper, or how you wanna call it)
     /// or uses the pre-parsed runsettings when in console mode.
     /// </summary>
-    /// <param name="navigator"></param>
     /// <returns></returns>
     private bool IsPlatformSetByRunSettings(
         XPathNavigator navigator, out Architecture chosenPlatform)
@@ -1503,23 +1508,21 @@ internal class TestRequestManager : ITestRequestManager
     private static List<string> GetSources(TestRunRequestPayload testRunRequestPayload)
     {
         // TODO: This should also use hashset to only return distinct sources.
-        List<string> sources = new();
-        if (testRunRequestPayload.Sources != null
-            && testRunRequestPayload.Sources.Count > 0)
+        if (testRunRequestPayload.Sources is { Count: > 0 })
         {
-            sources = testRunRequestPayload.Sources;
+            return testRunRequestPayload.Sources;
         }
-        else if (testRunRequestPayload.TestCases != null
-                 && testRunRequestPayload.TestCases.Count > 0)
+
+        if (testRunRequestPayload.TestCases is { Count: > 0 })
         {
-            ISet<string> sourcesSet = new HashSet<string>();
+            var sourcesSet = new HashSet<string>();
             foreach (var testCase in testRunRequestPayload.TestCases)
             {
                 sourcesSet.Add(testCase.Source);
             }
-            sources = sourcesSet.ToList();
+            return sourcesSet.ToList();
         }
-        return sources;
+        return [];
     }
 }
 
@@ -1560,6 +1563,36 @@ internal static class KnownPlatformSourceFilter
         "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll",
         "Microsoft.VisualStudio.TestPlatform.TestFramework.dll",
         "Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll",
+
+        // Testing platform
+        "Microsoft.Testing.Extensions.CodeCoverage.dll",
+        "Microsoft.Testing.Extensions.CodeCoverage.resources.dll",
+        "Microsoft.Testing.Extensions.CrashDump.dll",
+        "Microsoft.Testing.Extensions.CrashDump.resources.dll",
+        "Microsoft.Testing.Extensions.Experimental.dll",
+        "Microsoft.Testing.Extensions.HangDump.dll",
+        "Microsoft.Testing.Extensions.HangDump.resources.dll",
+        "Microsoft.Testing.Extensions.HotReload.dll",
+        "Microsoft.Testing.Extensions.HotReload.resources.dll",
+        "Microsoft.Testing.Extensions.Retry.dll",
+        "Microsoft.Testing.Extensions.Retry.resources.dll",
+        "Microsoft.Testing.Extensions.Telemetry.dll",
+        "Microsoft.Testing.Extensions.Telemetry.resources.dll",
+        "Microsoft.Testing.Extensions.TrxReport.Abstractions.dll",
+        "Microsoft.Testing.Extensions.TrxReport.dll",
+        "Microsoft.Testing.Extensions.TrxReport.resources.dll",
+        "Microsoft.Testing.Extensions.VSTestBridge.dll",
+        "Microsoft.Testing.Extensions.VSTestBridge.resources.dll",
+        "Microsoft.Testing.Internal.Framework.dll",
+        "Microsoft.Testing.Internal.Framework.SourceGeneration.dll",
+        "Microsoft.Testing.Internal.VersionSourceGeneration.dll",
+        "Microsoft.Testing.Platform.dll",
+        "Microsoft.Testing.Platform.Extensions.dll",
+        "Microsoft.Testing.Platform.Extensions.VSTestBridge.dll",
+        "Microsoft.Testing.Platform.MSBuild.dll",
+        "Microsoft.Testing.Platform.MSBuild.resources.dll",
+        "Microsoft.Testing.Platform.resources.dll",
+
         // For MSTest up to v3
         "Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll",
         "Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.resources.dll",
