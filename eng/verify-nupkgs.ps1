@@ -281,9 +281,10 @@ function Verify-NugetPackageVersion {
         $UnzipNugetPackages
     )
 
-    $exes = $UnzipNugetPackages | Get-ChildItem -Filter vstest.console.exe -Recurse -Force 
-    if (0 -eq @($exes).Length) { 
-        throw "No vstest.console.exe was found."
+    # look for vstest.console.dll because unified build for .NET does not produce vstest.console.exe
+    $exes = $UnzipNugetPackages | Get-ChildItem -Filter vstest.console.dll -Recurse -Force 
+    if (0 -eq @($exes).Length) {
+        throw "No vstest.console.dll files were found."
     }
 
     $exes | ForEach-Object {
