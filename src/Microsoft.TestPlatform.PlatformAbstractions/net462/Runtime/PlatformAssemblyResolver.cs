@@ -3,7 +3,6 @@
 
 #if NETFRAMEWORK || NETSTANDARD2_0
 
-using System;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;

@@ -4,7 +4,6 @@
 # if NETFRAMEWORK
 using System.Diagnostics;
 using System.Net;
-using System.Threading;
 
 using FluentAssertions;
 using FluentAssertions.Extensions;

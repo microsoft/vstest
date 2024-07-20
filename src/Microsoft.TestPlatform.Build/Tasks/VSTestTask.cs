@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Diagnostics;
-using System.Threading;
 
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 using Microsoft.TestPlatform.Build.Trace;
+
+using Task = Microsoft.Build.Utilities.Task;
 
 namespace Microsoft.TestPlatform.Build.Tasks;
 

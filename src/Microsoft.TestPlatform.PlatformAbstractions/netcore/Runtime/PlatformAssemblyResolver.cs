@@ -3,7 +3,6 @@
 
 #if NETCOREAPP
 
-using System;
 using System.Reflection;
 using System.Runtime.Loader;
 

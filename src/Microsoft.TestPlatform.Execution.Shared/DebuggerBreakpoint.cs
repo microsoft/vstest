@@ -5,12 +5,9 @@
 extern alias Abstraction;
 #endif
 
-using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 #if USE_EXTERN_ALIAS
 using Abstraction::Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;

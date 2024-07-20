@@ -3,14 +3,8 @@
 
 #if NETFRAMEWORK
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Pipes;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;

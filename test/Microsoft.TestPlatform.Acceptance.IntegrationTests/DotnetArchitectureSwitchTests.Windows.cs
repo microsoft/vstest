@@ -3,10 +3,7 @@
 
 #if !NETFRAMEWORK
 
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -56,7 +53,6 @@ public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
         File.WriteAllText(Path.Combine(TempDirectory.Path, "UnitTest1.cs"),
 @"
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace cfebbc5339cf4c22854e79824e938c74;
 

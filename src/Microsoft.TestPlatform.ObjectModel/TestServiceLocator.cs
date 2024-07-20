@@ -4,9 +4,6 @@
 // We don't want this in our shipped code. Build only for debug until I am able to remove it.
 #if DEBUG
 
-using System;
-using System.Collections.Generic;
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 #pragma warning disable RS0016 // Add public types and members to the declared API
 #pragma warning disable RS0037 // Enable tracking of nullability of reference types in the declared API

@@ -5,9 +5,6 @@
 extern alias Abstraction;
 #endif
 
-using System;
-using System.IO;
-
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 

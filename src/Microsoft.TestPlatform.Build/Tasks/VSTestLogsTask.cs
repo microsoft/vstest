@@ -1,10 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
+
+using Task = Microsoft.Build.Utilities.Task;
 
 namespace Microsoft.TestPlatform.Build.Tasks;
 public class VSTestLogsTask : Task

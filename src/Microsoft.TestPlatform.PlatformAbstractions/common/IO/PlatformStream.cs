@@ -3,8 +3,6 @@
 
 #if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0
 
-using System.IO;
-
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;

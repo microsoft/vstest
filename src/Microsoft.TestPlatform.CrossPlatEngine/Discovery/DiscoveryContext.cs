@@ -1,10 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -53,7 +50,7 @@ public class DiscoveryContext : IDiscoveryContext
             var validPropertiesSttring = supportedProperties == null ? string.Empty : string.Join(CrossPlatEngineResources.StringSeperator, supportedProperties.ToArray());
             var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.UnsupportedPropertiesInTestCaseFilter, invalidPropertiesString, validPropertiesSttring);
 
-            // For unsupported property don’t throw exception, just log the message. Later it is going to handle properly with TestCaseFilterExpression.MatchTestCase().
+            // For unsupported property donï¿½t throw exception, just log the message. Later it is going to handle properly with TestCaseFilterExpression.MatchTestCase().
             EqtTrace.Info(errorMessage);
         }
 

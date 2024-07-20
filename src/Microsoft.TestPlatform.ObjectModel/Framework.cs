@@ -6,7 +6,6 @@ using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 using System.Globalization;
 
 using NuGetClone.Frameworks;
-using System;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 

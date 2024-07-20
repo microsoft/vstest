@@ -1,8 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace NuGetClone.Frameworks
@@ -110,12 +108,12 @@ namespace NuGetClone.Frameworks
 
         /// <summary>
         /// The ascending order of frameworks should be based on the following ordered groups:
-        /// 
+        ///
         /// 1. Non-package-based frameworks in <see cref="IFrameworkMappings.NonPackageBasedFrameworkPrecedence"/>.
         /// 2. Other non-package-based frameworks.
         /// 3. Package-based frameworks in <see cref="IFrameworkMappings.PackageBasedFrameworkPrecedence"/>.
         /// 4. Other package-based frameworks.
-        /// 
+        ///
         /// For group #1 and #3, the order within the group is based on the order of the respective precedence list.
         /// For group #2 and #4, the order is the original order in the incoming list. This should later be made
         /// consistent between different input orderings by using the <see cref="NuGetFrameworkSorter"/>.

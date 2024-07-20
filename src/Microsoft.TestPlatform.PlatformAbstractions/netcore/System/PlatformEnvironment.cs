@@ -3,7 +3,6 @@
 
 #if NETCOREAPP
 
-using System;
 using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;

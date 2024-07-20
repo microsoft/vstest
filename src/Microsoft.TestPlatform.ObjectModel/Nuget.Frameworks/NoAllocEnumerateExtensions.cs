@@ -3,9 +3,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-
 namespace NuGetClone;
 
 internal static class NoAllocEnumerateExtensions

@@ -7,7 +7,6 @@
 
   <PropertyGroup>
     <Nullable>enable</Nullable>
-    <ImplicitUsings>true</ImplicitUsings>
     <TargetFrameworks>net6.0</TargetFrameworks>
     <OutputType Condition=" $(TargetFramework.StartsWith('net6')) ">Exe</OutputType>
     <OutputType>Exe</OutputType>

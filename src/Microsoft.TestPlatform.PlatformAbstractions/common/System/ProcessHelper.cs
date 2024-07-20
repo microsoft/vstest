@@ -3,15 +3,8 @@
 
 #if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Threading;
-#if !NET5_0_OR_GREATER
-using System.Threading.Tasks;
-#endif
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -88,7 +81,7 @@ public partial class ProcessHelper : IProcessHelper
 
             // When vstest.console is started in its own process in VisualStudio it is TestWindowStoreHost that starts it.
             // TestWindowStoreHost inherits environment variables from ServiceHost and DevEnv. Those env variables,
-            // contain multiple "internal" environment variables, and they also contain DOTNET_ROOT pointing to the 
+            // contain multiple "internal" environment variables, and they also contain DOTNET_ROOT pointing to the
             // .NET that is shipped with VisualStudio. So to work around this, vstest.console is given a set of environment
             // variables that has only variables that DevEnv was started with. So it gets a "clean" set of env variables.
             //

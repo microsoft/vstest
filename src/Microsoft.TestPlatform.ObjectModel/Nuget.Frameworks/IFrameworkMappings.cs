@@ -1,8 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System.Collections.Generic;
-
 namespace NuGetClone.Frameworks
 {
     /// <summary>
@@ -55,8 +53,8 @@ namespace NuGetClone.Frameworks
         IEnumerable<OneWayCompatibilityMappingEntry> CompatibilityMappings { get; }
 
         /// <summary>
-        /// Ordered list of framework identifiers. The first framework in the list will be preferred over other 
-        /// framework identifiers. This is enable better tie breaking in scenarios where legacy frameworks are 
+        /// Ordered list of framework identifiers. The first framework in the list will be preferred over other
+        /// framework identifiers. This is enable better tie breaking in scenarios where legacy frameworks are
         /// equivalently compatible to a new framework.
         /// Example: UAP10.0 &#8210;&gt; win81, wpa81
         /// </summary>

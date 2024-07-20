@@ -3,7 +3,6 @@
 
 extern alias Abstraction;
 
-using System;
 using System.Globalization;
 
 using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;

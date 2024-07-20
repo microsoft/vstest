@@ -35,6 +35,7 @@
 
   <!-- Language configuration -->
   <PropertyGroup>
+    <ImplicitUsings>true</ImplicitUsings>
     <!-- default to allowing all language features -->
     <LangVersion>preview</LangVersion>
     <!-- enable strict mode for Roslyn compiler -->

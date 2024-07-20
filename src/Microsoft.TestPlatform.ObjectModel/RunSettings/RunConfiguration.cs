@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Xml;
@@ -443,7 +442,7 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// When true, we capture standard output of child processes. When false the standard output is not captured and it will end up in command line.
     /// This makes the output visible to the user when running in vstest.console in-process. Such setup makes the behavior the same as in 17.6.3 and earlier.
-    /// 
+    ///
     /// The recommended way is to use this with ForwardStandardOutput=true to forward output as informational messages so the output is always visible in console and VS,
     /// unless the logging level is set to Warning or higher.
     ///

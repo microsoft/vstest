@@ -6,7 +6,6 @@
 
 #if NETCOREAPP
 
-using System.Collections.Generic;
 using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.TestHost;

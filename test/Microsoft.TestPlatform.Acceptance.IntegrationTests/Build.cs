@@ -1,12 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;

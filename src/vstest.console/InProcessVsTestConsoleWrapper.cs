@@ -3,13 +3,8 @@
 
 extern alias Abstraction;
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 using Abstraction::Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
@@ -49,7 +44,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <summary>
     /// Creates a new instance of <see cref="InProcessVsTestConsoleWrapper"/>.
     /// </summary>
-    /// 
+    ///
     /// <param name="consoleParameters">The console parameters.</param>
     public InProcessVsTestConsoleWrapper(ConsoleParameters consoleParameters)
         : this(

@@ -1,14 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -91,7 +86,7 @@ internal class Program
             Path.Combine(playground, "bin", "MSTest1", "Debug", "net472", "MSTest1.dll"),
             Path.Combine(playground, "bin", "MSTest2", "Debug", "net472", "MSTest2.dll"),
             // The built in .NET projects don't now work right now in Playground, there is some conflict with Arcade.
-            // But if you create one outside of Playground it will work. 
+            // But if you create one outside of Playground it will work.
             //Path.Combine(playground, "bin", "MSTest1", "Debug", "net7.0", "MSTest1.dll"),
         };
 

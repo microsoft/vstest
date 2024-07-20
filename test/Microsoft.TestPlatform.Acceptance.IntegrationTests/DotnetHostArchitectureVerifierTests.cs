@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -48,7 +44,6 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
         File.WriteAllText(Path.Combine(TempDirectory.Path, "UnitTest1.cs"),
 @"
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace cfebbc5339cf4c22854e79824e938c74;
 

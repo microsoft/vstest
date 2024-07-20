@@ -2,15 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #if NETFRAMEWORK
-using System.Collections.Generic;
-using System.IO;
-
-using System;
-using System.Linq;
 
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
+
 using System.Globalization;
 
 namespace Microsoft.TestPlatform.AcceptanceTests.Performance.PerfInstrumentation;

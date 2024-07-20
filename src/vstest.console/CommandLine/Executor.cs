@@ -3,13 +3,8 @@
 
 extern alias Abstraction;
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
