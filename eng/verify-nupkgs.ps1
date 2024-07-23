@@ -289,7 +289,7 @@ function Verify-NugetPackageVersion {
 
     $exes | ForEach-Object {
         if ($_.VersionInfo.ProductVersion.Contains("+")) {
-            throw "Some files contain '+' in the ProductVersion, this breaks DTAAgent in AzDO."
+            throw "$_ contains '+' in the ProductVersion $($_.VersionInfo.ProductVersion), this breaks DTAAgent in AzDO."
         }
         else {
             "$_ version $($_.VersionInfo.ProductVersion) is ok."
