@@ -4,12 +4,11 @@
     <TargetFrameworks>$(TargetFrameworks);net472;net5.0;net6.0;net7.0</TargetFrameworks>
     <Prefer32Bit>false</Prefer32Bit>
     <IsPackable>false</IsPackable>
+    <UseVSTest>true</UseVSTest>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MSTest.TestAdapter" Version="3.3.1" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.3.1" />
-    <PackageReference Include="coverlet.collector" Version="1.2.0" />
+    <PackageReference Include="MSTest" Version="3.4.3" />
   </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT' ">
     <Reference Include="System" />
