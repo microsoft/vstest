@@ -80,17 +80,10 @@ variables:
   # even when we don't use matrix.
   - name: _BuildConfig
     value: Release
-  - name: _PublishUsingPipelines
-    value: true
 
   - ${{ if eq(parameters.isRTM, True) }}:
     - name: _ReleaseVersionKind
       value: release
-    # do not publish final version to internal feeds, because there we want to have versions that 
-    # end with -release or -preview, but not versions without any suffix, because we cannot release
-    # multiple of those versions.
-    - name: _PublishUsingPipelines
-      value: false
 
   # Group gives access to $microsoft-symbol-server-pat and $symweb-symbol-server-pat
   - group: DotNet-Symbol-Server-Pats
@@ -112,7 +105,7 @@ variables:
     value: /p:DotNetSignType=$(_SignType)
       /p:TeamName=$(_TeamName)
       /p:DotNetFinalVersionKind=$(_ReleaseVersionKind)
-      /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
+      /p:DotNetPublishUsingPipelines=true
       /p:DotNetSymbolServerTokenMsdl=$(microsoft-symbol-server-pat)
       /p:DotNetSymbolServerTokenSymWeb=$(symweb-symbol-server-pat)
       /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
