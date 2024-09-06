@@ -41,7 +41,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' != '$(NetFrameworkMinimum)' ">
-    <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
+    <PackageReference Include="System.Security.Principal.Windows" Version="$(SystemSecurityPrincipalWindowsVersion)" />
   </ItemGroup>
 
   <ItemGroup>
