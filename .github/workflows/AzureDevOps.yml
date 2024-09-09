@@ -20,6 +20,7 @@ jobs:
   updateAzDO:
     if: github.event.label.name == 'sprint'
     runs-on: ubuntu-latest
+    environment: ado
     steps:
       - name: Login to Azure
         uses: azure/login@v2
