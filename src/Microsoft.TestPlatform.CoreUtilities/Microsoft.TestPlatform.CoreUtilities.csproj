@@ -16,7 +16,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == '$(NetCoreAppMinimum)' OR '$(TargetFramework)' == 'netstandard2.0'">
+  <ItemGroup Condition=" '$(TargetFramework)' != '$(NetFrameworkMinimum)' ">
     <!-- This dll is shipped in-box with the SDK since net6.0. And in-box with .NET Framework. -->
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
   </ItemGroup>
