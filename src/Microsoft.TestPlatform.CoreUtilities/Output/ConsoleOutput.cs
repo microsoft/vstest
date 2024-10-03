@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
@@ -12,8 +13,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 public class ConsoleOutput : IOutput
 {
     private static readonly object LockObject = new();
-    private static ConsoleOutput? s_consoleOutput;
-
     private readonly TextWriter _standardOutput;
     private readonly TextWriter _standardError;
 
@@ -29,22 +28,25 @@ public class ConsoleOutput : IOutput
     /// <summary>
     /// Gets the instance of <see cref="ConsoleOutput"/>.
     /// </summary>
+    [field: MaybeNull, AllowNull]
     public static ConsoleOutput Instance
     {
         get
         {
-            if (s_consoleOutput != null)
+            if (field != null)
             {
-                return s_consoleOutput;
+                return field;
             }
 
             lock (LockObject)
             {
-                s_consoleOutput ??= new ConsoleOutput();
+                field ??= new ConsoleOutput();
             }
 
-            return s_consoleOutput;
+            return field;
         }
+
+        private set;
     }
 
     /// <summary>
