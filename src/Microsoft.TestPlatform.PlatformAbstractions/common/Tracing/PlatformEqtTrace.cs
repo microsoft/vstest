@@ -84,6 +84,8 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
 
     private static readonly object LockObject = new();
 
+    private static TraceSource? s_traceSource;
+
     /// <summary>
     /// Specifies whether the trace is initialized or not
     /// </summary>
@@ -142,23 +144,20 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
     /// <summary>
     /// Gets a custom trace source. This doesn't pollute the default tracing for user applications.
     /// </summary>
-    [field: MaybeNull, AllowNull]
     private static TraceSource Source
     {
         get
         {
-            if (field == null)
+            if (s_traceSource == null)
             {
                 lock (LockObject)
                 {
-                    field ??= new TraceSource("TpTrace", SourceLevels.Off);
+                    s_traceSource ??= new TraceSource("TpTrace", SourceLevels.Off);
                 }
             }
 
-            return field;
+            return s_traceSource;
         }
-
-        set;
     }
 
     /// <inheritdoc/>
