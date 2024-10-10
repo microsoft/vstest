@@ -4,7 +4,7 @@
     "projectName": "DEVDIV",
     "areaPath": "DevDiv\\Testing Platforms\\VSTest",
     "iterationPath": "DevDiv",
-    "notificationAliases": [ "NETDevExpPrague@service.microsoft.com" ],
+    "notificationAliases": [ "dotnetdevexprague@microsoft.com" ],
     "repositoryName":"vstest",
     "codebaseName": "vstest"
 }
