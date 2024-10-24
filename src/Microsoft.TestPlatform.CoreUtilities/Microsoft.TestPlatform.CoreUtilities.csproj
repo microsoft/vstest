@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' != '$(NetFrameworkMinimum)' ">
-    <PackageReference Include="System.Diagnostics.FileVersionInfo" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Win32.Registry" Version="4.0.0" />
+    <!-- This dll is shipped in-box with the SDK since net6.0. And in-box with .NET Framework. -->
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
