@@ -23,6 +23,46 @@ public abstract class TestObject
     private static readonly CustomKeyValueConverter KeyValueConverter = new();
     private static readonly CustomStringArrayConverter StringArrayConverter = new();
 
+    // https://github.com/dotnet/runtime/blob/36bcc2c96045c6793dcfe3151c51a0597537917a/src/libraries/System.ComponentModel.TypeConverter/src/System/ComponentModel/ReflectTypeDescriptionProvider.cs#L154-L180
+    // TODO: Validate if some types are not needed and remove them.
+    private static readonly BooleanConverter BooleanConverter = new();
+    private static readonly ByteConverter ByteConverter = new();
+    private static readonly SByteConverter SByteConverter = new();
+    private static readonly CharConverter CharConverter = new();
+    private static readonly DoubleConverter DoubleConverter = new();
+    private static readonly StringConverter StringConverter = new();
+    private static readonly Int32Converter IntConverter = new();
+#if NET7_0_OR_GREATER
+    private static readonly Int128Converter Int128Converter = new();
+#endif
+    private static readonly Int16Converter Int16Converter = new();
+    private static readonly Int64Converter Int64Converter = new();
+    private static readonly SingleConverter SingleConverter = new();
+#if NET7_0_OR_GREATER
+    private static readonly HalfConverter HalfConverter = new();
+    private static readonly UInt128Converter UInt128Converter = new();
+#endif
+    private static readonly UInt16Converter UInt16Converter = new();
+    private static readonly UInt32Converter UInt32Converter = new();
+    private static readonly UInt64Converter UInt64Converter = new();
+    private static readonly TypeConverter TypeConverter = new();
+    private static readonly CultureInfoConverter CultureInfoConverter = new();
+#if NET7_0_OR_GREATER
+    private static readonly DateOnlyConverter DateOnlyConverter = new();
+#endif
+    private static readonly DateTimeConverter DateTimeConverter = new();
+    private static readonly DateTimeOffsetConverter DateTimeOffsetConverter = new();
+    private static readonly DecimalConverter DecimalConverter = new();
+#if NET7_0_OR_GREATER
+    private static readonly TimeOnlyConverter TimeOnlyConverter = new();
+#endif
+    private static readonly TimeSpanConverter TimeSpanConverter = new();
+    private static readonly GuidConverter GuidConverter = new();
+    private static readonly UriTypeConverter UriTypeConverter = new();
+#if NET7_0_OR_GREATER
+    private static readonly VersionConverter VersionConverter = new();
+#endif
+
     /// <summary>
     /// The store for all the properties registered.
     /// </summary>
@@ -239,6 +279,12 @@ public abstract class TestObject
     /// Convert passed in value from TestProperty's specified value type.
     /// </summary>
     /// <returns>Converted object</returns>
+#if NET7_0_OR_GREATER
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Awaiting more evidence that we need to take action. If this caused issues, we should still be able to special case some specific types instead of relying on TypeDescriptor")]
+#endif
     private static object? ConvertPropertyFrom<T>(TestProperty property, CultureInfo culture, object? value)
     {
         ValidateArg.NotNull(property, nameof(property));
@@ -265,6 +311,157 @@ public abstract class TestObject
             return StringArrayConverter.ConvertFrom(null, culture, (string?)value);
         }
 
+        // These are already handled by TypeDescriptor.GetConverter, but it's not trimmer safe and
+        // we want to make sure they are guaranteed to work.
+        if (valueType == typeof(bool))
+        {
+            return BooleanConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(byte))
+        {
+            return ByteConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(sbyte))
+        {
+            return SByteConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(char))
+        {
+            return CharConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(double))
+        {
+            return DoubleConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(string))
+        {
+            return StringConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(int))
+        {
+            return IntConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+#if NET7_0_OR_GREATER
+        if (valueType == typeof(Int128))
+        {
+            return Int128Converter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+#endif
+
+        if (valueType == typeof(short))
+        {
+            return Int16Converter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(long))
+        {
+            return Int64Converter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(float))
+        {
+            return SingleConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+#if NET7_0_OR_GREATER
+        if (valueType == typeof(Half))
+        {
+            return HalfConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(UInt128))
+        {
+            return UInt128Converter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+#endif
+
+        if (valueType == typeof(ushort))
+        {
+            return UInt16Converter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(uint))
+        {
+            return UInt32Converter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(ulong))
+        {
+            return UInt64Converter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(Type))
+        {
+            return TypeConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(CultureInfo))
+        {
+            return CultureInfoConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+#if NET7_0_OR_GREATER
+        if (valueType == typeof(DateOnly))
+        {
+            return DateOnlyConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+#endif
+
+        if (valueType == typeof(DateTime))
+        {
+            return DateTimeConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(DateTimeOffset))
+        {
+            return DateTimeOffsetConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(decimal))
+        {
+            return DecimalConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+#if NET7_0_OR_GREATER
+        if (valueType == typeof(TimeOnly))
+        {
+            return TimeOnlyConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+#endif
+
+        if (valueType == typeof(TimeSpan))
+        {
+            return TimeSpanConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(Guid))
+        {
+            return GuidConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+        if (valueType == typeof(Uri))
+        {
+            return UriTypeConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+
+#if NET7_0_OR_GREATER
+        if (valueType == typeof(Version))
+        {
+            return VersionConverter.ConvertFrom(null, culture, value ?? string.Empty);
+        }
+#endif
+
+        // TODO: Consider detecting that we are in source gen mode (or in NativeAOT mode) and avoid calling TypeDescriptor altogether?
+        // Each of the approaches has pros and cons.
+        // Ignoring this trimmer unfriendly code when in NativeAOT will help catch issues earlier, and have more deterministic behavior.
+        // Keeping this trimmer unfriendly code even in NativeAOT will allow us to still have the possibility to work in case we fall in this path.
         TPDebug.Assert(valueType is not null, "valueType is null");
         TypeConverter converter = TypeDescriptor.GetConverter(valueType);
         if (converter == null)
@@ -292,6 +489,9 @@ public abstract class TestObject
     /// </summary>
     /// <returns>Converted object</returns>
     [return: NotNullIfNotNull("value")]
+#if NET7_0_OR_GREATER
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+#endif
     private static T? ConvertPropertyTo<T>(TestProperty property, CultureInfo culture, object? value)
     {
         ValidateArg.NotNull(property, nameof(property));
