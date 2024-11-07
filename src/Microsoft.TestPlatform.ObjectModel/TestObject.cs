@@ -265,26 +265,7 @@ public abstract class TestObject
             return StringArrayConverter.ConvertFrom(null, culture, (string?)value);
         }
 
-        TPDebug.Assert(valueType is not null, "valueType is null");
-        TypeConverter converter = TypeDescriptor.GetConverter(valueType);
-        if (converter == null)
-        {
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.ConverterNotSupported, valueType.Name));
-        }
-
-        try
-        {
-            return converter.ConvertFrom(null, culture, value!);
-        }
-        catch (FormatException)
-        {
-            throw;
-        }
-        catch (Exception e)
-        {
-            // some type converters throw strange exceptions (e.g.: System.Exception by Int32Converter)
-            throw new FormatException(e.Message, e);
-        }
+        throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.ConverterNotSupported, valueType.Name));
     }
 
     /// <summary>
