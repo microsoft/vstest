@@ -10,8 +10,6 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
@@ -265,7 +263,7 @@ public abstract class TestObject
             return StringArrayConverter.ConvertFrom(null, culture, (string?)value);
         }
 
-        throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.ConverterNotSupported, valueType.Name));
+        throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.ConverterNotSupported, valueType?.Name));
     }
 
     /// <summary>
