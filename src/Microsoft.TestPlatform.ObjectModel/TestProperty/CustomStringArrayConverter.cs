@@ -5,14 +5,26 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-using System.Runtime.Serialization.Json;
 using System.Text;
+#if NET7_0_OR_GREATER
+using System.Text.Json.Serialization;
+#endif
+#if !NET7_0_OR_GREATER
+using System.Runtime.Serialization.Json;
+#endif
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-internal class CustomStringArrayConverter : TypeConverter
+internal partial class CustomStringArrayConverter : TypeConverter
 {
+#if NET7_0_OR_GREATER
+    [JsonSerializable(typeof(string[]))]
+    private partial class StringArraySerializerContext : JsonSerializerContext
+    {
+    }
+#else
     private readonly DataContractJsonSerializer _serializer = new(typeof(string[]));
+#endif
 
     /// <inheritdoc/>
     public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
@@ -36,7 +48,11 @@ internal class CustomStringArrayConverter : TypeConverter
         if (value is string data)
         {
             using var stream = new MemoryStream(Encoding.Unicode.GetBytes(data));
+#if NET7_0_OR_GREATER
+            var strings = System.Text.Json.JsonSerializer.Deserialize(stream, StringArraySerializerContext.Default.StringArray);
+#else
             var strings = _serializer.ReadObject(stream) as string[];
+#endif
             return strings;
         }
 

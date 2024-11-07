@@ -35,6 +35,9 @@ public class DiaSession : INavigationSession
     /// <param name="binaryPath">
     /// The binary path.
     /// </param>
+#if NET7_0_OR_GREATER
+    [RequiresUnreferencedCode("Uses CacheSymbols which is not trimmer friendly (specifically, the PortableSymbolReader impl)")]
+#endif
     public DiaSession(string binaryPath)
         : this(binaryPath, null)
     {
@@ -49,11 +52,17 @@ public class DiaSession : INavigationSession
     /// <param name="searchPath">
     /// search path.
     /// </param>
+#if NET7_0_OR_GREATER
+    [RequiresUnreferencedCode("Uses CacheSymbols which is not trimmer friendly (specifically, the PortableSymbolReader impl)")]
+#endif
     public DiaSession(string binaryPath, string? searchPath)
         : this(binaryPath, searchPath, GetSymbolReader(binaryPath))
     {
     }
 
+#if NET7_0_OR_GREATER
+    [RequiresUnreferencedCode("Uses CacheSymbols which is not trimmer friendly (specifically, the PortableSymbolReader impl)")]
+#endif
     internal DiaSession(string binaryPath, string? searchPath, ISymbolReader symbolReader)
     {
         _symbolReader = symbolReader;

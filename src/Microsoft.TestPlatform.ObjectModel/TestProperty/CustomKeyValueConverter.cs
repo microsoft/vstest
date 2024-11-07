@@ -8,16 +8,28 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+#if NET7_0_OR_GREATER
+using System.Text.Json.Serialization;
+#endif
+#if !NET7_0_OR_GREATER
 using System.Runtime.Serialization.Json;
+#endif
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 /// <summary>
 /// Converts a json representation of <see cref="KeyValuePair{String,String}"/> to an object.
 /// </summary>
-internal class CustomKeyValueConverter : TypeConverter
+internal partial class CustomKeyValueConverter : TypeConverter
 {
+#if NET7_0_OR_GREATER
+    [JsonSerializable(typeof(TraitObject[]))]
+    private partial class TraitObjectSerializerContext : JsonSerializerContext
+    {
+    }
+#else
     private readonly DataContractJsonSerializer _serializer = new(typeof(TraitObject[]));
+#endif
 
     /// <inheritdoc/>
     public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
@@ -44,7 +56,11 @@ internal class CustomKeyValueConverter : TypeConverter
 
             using var stream = new MemoryStream(Encoding.Unicode.GetBytes(data));
             // Converting Json data to array of KeyValuePairs with duplicate keys.
+#if NET7_0_OR_GREATER
+            var listOfTraitObjects = System.Text.Json.JsonSerializer.Deserialize(stream, TraitObjectSerializerContext.Default.TraitObjectArray);
+#else
             var listOfTraitObjects = _serializer.ReadObject(stream) as TraitObject[];
+#endif
             return listOfTraitObjects?.Select(trait => new KeyValuePair<string?, string?>(trait.Key, trait.Value)).ToArray() ?? [];
         }
 
