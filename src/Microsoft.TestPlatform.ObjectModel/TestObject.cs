@@ -279,12 +279,10 @@ public abstract class TestObject
     /// Convert passed in value from TestProperty's specified value type.
     /// </summary>
     /// <returns>Converted object</returns>
-#if NET7_0_OR_GREATER
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
         Justification = "Awaiting more evidence that we need to take action. If this caused issues, we should still be able to special case some specific types instead of relying on TypeDescriptor")]
-#endif
     private static object? ConvertPropertyFrom<T>(TestProperty property, CultureInfo culture, object? value)
     {
         ValidateArg.NotNull(property, nameof(property));
@@ -489,9 +487,7 @@ public abstract class TestObject
     /// </summary>
     /// <returns>Converted object</returns>
     [return: NotNullIfNotNull("value")]
-#if NET7_0_OR_GREATER
     [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
-#endif
     private static T? ConvertPropertyTo<T>(TestProperty property, CultureInfo culture, object? value)
     {
         ValidateArg.NotNull(property, nameof(property));

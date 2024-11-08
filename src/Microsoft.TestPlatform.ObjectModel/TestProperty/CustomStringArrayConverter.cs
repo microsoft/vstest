@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 internal partial class CustomStringArrayConverter : TypeConverter
 {
-#if NET7_0_OR_GREATER
+#if NET7_0_OR_GREATER // TODO: We actually don't yet produce net7.0 in the NuGet package.
     [JsonSerializable(typeof(string[]))]
     private partial class StringArraySerializerContext : JsonSerializerContext
     {

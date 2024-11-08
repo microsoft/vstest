@@ -21,9 +21,7 @@ public class TestProperty : IEquatable<TestProperty>
 
     private static bool DisableFastJson { get; set; } = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_FASTER_JSON_SERIALIZATION);
 
-#if NET7_0_OR_GREATER
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-#endif
     private Type _valueType;
 
     //public static Stopwatch
@@ -38,16 +36,12 @@ public class TestProperty : IEquatable<TestProperty>
         // Default constructor for Serialization.
     }
 
-#if NET7_0_OR_GREATER
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2072:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.",
         Justification = "Only problematic part is ValueType = valueType.FullName, but as we annotated valueType parameter, it should be good.")]
-#endif
     private TestProperty(string id, string label, string category, string description,
-#if NET7_0_OR_GREATER
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-#endif
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
         Type valueType,
         ValidateValueCallback? validateValueCallback, TestPropertyAttributes attributes)
     {
@@ -136,9 +130,7 @@ public class TestProperty : IEquatable<TestProperty>
     /// Gets or sets a string representation of the type for value.
     /// </summary>
     [DataMember]
-#if NET7_0_OR_GREATER
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-#endif
     public string ValueType { get; set; }
 
     #region IEquatable
@@ -174,9 +166,7 @@ public class TestProperty : IEquatable<TestProperty>
     /// </summary>
     /// <remarks>Only works for the valueType that is in the currently executing assembly or in Mscorlib.dll. The default valueType is of string valueType.</remarks>
     /// <returns>The valueType of the test property</returns>
-#if NET7_0_OR_GREATER
     [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-#endif
     public Type GetValueType()
     {
         _valueType ??= GetType(ValueType);
@@ -184,14 +174,10 @@ public class TestProperty : IEquatable<TestProperty>
         return _valueType;
     }
 
-#if NET7_0_OR_GREATER
     [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-#endif
     private Type GetType(
-#if NET7_0_OR_GREATER
         // TODO: Confirm if this is the right thing to do to avoid Type.GetType warning
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-#endif
         string typeName)
     {
         ValidateArg.NotNull(typeName, nameof(typeName));
@@ -280,13 +266,11 @@ public class TestProperty : IEquatable<TestProperty>
         return type;
     }
 
-#if NET7_0_OR_GREATER
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2057:Unrecognized value passed to the parameter of method. It's not possible to guarantee the availability of the target type.",
         Justification = "Only part incompatible with trimming is the Type.GetType call that does version replacement. It probably wouldn't cause trouble and is safe to suppress")]
     [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-#endif
     private static Type? GetTypeByReplacingVersion(string typeName)
     {
         // This line is extracted into a separate method to ensure the UnconditionalSuppressMessage applies to it exactly (i.e, avoid unintentionally hiding more warnings)
@@ -326,9 +310,7 @@ public class TestProperty : IEquatable<TestProperty>
     }
 
     public static TestProperty Register(string id, string label,
-#if NET7_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-#endif
         Type valueType,
         Type owner)
     {
@@ -341,9 +323,7 @@ public class TestProperty : IEquatable<TestProperty>
     }
 
     public static TestProperty Register(string id, string label,
-#if NET7_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-#endif
         Type valueType,
         TestPropertyAttributes attributes, Type owner)
     {
@@ -356,9 +336,7 @@ public class TestProperty : IEquatable<TestProperty>
     }
 
     public static TestProperty Register(string id, string label, string category, string description,
-#if NET7_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-#endif
         Type valueType,
         ValidateValueCallback? validateValueCallback, TestPropertyAttributes attributes, Type owner)
     {

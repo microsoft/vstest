@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 /// </summary>
 internal partial class CustomKeyValueConverter : TypeConverter
 {
-#if NET7_0_OR_GREATER
+#if NET7_0_OR_GREATER // TODO: We actually don't yet produce net7.0 in the NuGet package.
     [JsonSerializable(typeof(TraitObject[]))]
     private partial class TraitObjectSerializerContext : JsonSerializerContext
     {

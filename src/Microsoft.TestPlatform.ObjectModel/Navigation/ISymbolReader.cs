@@ -2,9 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-#if NET7_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
-#endif
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
@@ -22,10 +20,8 @@ internal interface ISymbolReader : IDisposable
     /// <param name="searchPath">
     /// search path.
     /// </param>
-#if NET7_0_OR_GREATER
     // NOTE: Not all implementations are trimmer unfriendly, but if one implementation is, we are required to add the attribute in the interface.
     [RequiresUnreferencedCode("Uses Assembly.Load which is not trimmer friendly")]
-#endif
     void CacheSymbols(string binaryPath, string? searchPath);
 
     /// <summary>

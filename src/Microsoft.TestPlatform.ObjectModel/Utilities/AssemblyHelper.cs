@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-#if NET7_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
-#endif
 #if NETFRAMEWORK
 using System.IO;
 #endif
@@ -325,12 +323,10 @@ public static class AssemblyHelper
     }
 #endif
 
-#if NET7_0_OR_GREATER
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
         Justification = "We don't care if the given attribute type is removed. If it's removed, then it's unused and we are going to return empty either way.")]
-#endif
     public static IEnumerable<Attribute> GetCustomAttributes(this Assembly assembly, string fullyQualifiedName)
     {
         ValidateArg.NotNull(assembly, nameof(assembly));

@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-#if NET7_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
-#endif
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -61,11 +59,9 @@ internal class FullSymbolReader : ISymbolReader
     /// <param name="searchPath">
     /// search path.
     /// </param>
-#if NET7_0_OR_GREATER
     // This is actually okay and doesn't need the attribute, but it must be added because it's there in the interface.
     // And it's in the interface because PortableSymbolReader implementation of CacheSymbols needs it.
     [RequiresUnreferencedCode("Uses Assembly.Load which is not trimmer friendly")]
-#endif
     public void CacheSymbols(string binaryPath, string? searchPath)
     {
         try
