@@ -149,7 +149,22 @@ public abstract class TestObject
 
         if (valueType != null && valueType.IsValueType)
         {
-            defaultValue = Activator.CreateInstance(valueType);
+            if (valueType == typeof(int))
+            {
+                defaultValue = 0;
+            }
+            else if (valueType == typeof(Guid))
+            {
+                defaultValue = new Guid();
+            }
+            else if (valueType == typeof(bool))
+            {
+                defaultValue = false;
+            }
+            else
+            {
+                throw new ArgumentException($"The type '{valueType}' is unexpected.");
+            }
         }
 
         return ProtectedGetPropertyValue(property, defaultValue);
