@@ -21,7 +21,6 @@ public class TestProperty : IEquatable<TestProperty>
 
     private static bool DisableFastJson { get; set; } = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_FASTER_JSON_SERIALIZATION);
 
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
     private Type _valueType;
 
     //public static Stopwatch
@@ -36,12 +35,7 @@ public class TestProperty : IEquatable<TestProperty>
         // Default constructor for Serialization.
     }
 
-    [UnconditionalSuppressMessage(
-        "Trimming",
-        "IL2072:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.",
-        Justification = "Only problematic part is ValueType = valueType.FullName, but as we annotated valueType parameter, it should be good.")]
     private TestProperty(string id, string label, string category, string description,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
         Type valueType,
         ValidateValueCallback? validateValueCallback, TestPropertyAttributes attributes)
     {
@@ -130,7 +124,6 @@ public class TestProperty : IEquatable<TestProperty>
     /// Gets or sets a string representation of the type for value.
     /// </summary>
     [DataMember]
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
     public string ValueType { get; set; }
 
     #region IEquatable
@@ -166,7 +159,6 @@ public class TestProperty : IEquatable<TestProperty>
     /// </summary>
     /// <remarks>Only works for the valueType that is in the currently executing assembly or in Mscorlib.dll. The default valueType is of string valueType.</remarks>
     /// <returns>The valueType of the test property</returns>
-    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
     public Type GetValueType()
     {
         _valueType ??= GetType(ValueType);
@@ -174,11 +166,7 @@ public class TestProperty : IEquatable<TestProperty>
         return _valueType;
     }
 
-    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
-    private Type GetType(
-        // TODO: Confirm if this is the right thing to do to avoid Type.GetType warning
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
-        string typeName)
+    private Type GetType(string typeName)
     {
         ValidateArg.NotNull(typeName, nameof(typeName));
 
@@ -191,8 +179,17 @@ public class TestProperty : IEquatable<TestProperty>
 
         try
         {
-            // This only works for the type is in the currently executing assembly or in Mscorlib.dll.
-            type = Type.GetType(typeName);
+            type = typeName switch
+            {
+                "System.String" => typeof(string),
+                "System.Int32" => typeof(int),
+                "System.String[]" => typeof(string[]),
+                "System.Guid" => typeof(Guid),
+                "System.Uri" => typeof(Uri),
+                "System.Boolean" => typeof(bool),
+                "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]" => typeof(KeyValuePair<string, string>[]),
+                _ => throw new ArgumentException($"The type name '{typeName}' is unexpected."),
+            };
 
             if (!DisableFastJson)
             {
@@ -202,9 +199,6 @@ public class TestProperty : IEquatable<TestProperty>
                     return type;
                 }
             }
-
-            // Try 2.0 version as discovery returns version of 4.0 for all cases
-            type ??= GetTypeByReplacingVersion(typeName);
 
             // For UAP the type namespace for System.Uri,System.TimeSpan and System.DateTimeOffset differs from the desktop version.
             if (type == null && typeName.StartsWith("System.Uri"))
@@ -266,17 +260,6 @@ public class TestProperty : IEquatable<TestProperty>
         return type;
     }
 
-    [UnconditionalSuppressMessage(
-        "Trimming",
-        "IL2057:Unrecognized value passed to the parameter of method. It's not possible to guarantee the availability of the target type.",
-        Justification = "Only part incompatible with trimming is the Type.GetType call that does version replacement. It probably wouldn't cause trouble and is safe to suppress")]
-    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
-    private static Type? GetTypeByReplacingVersion(string typeName)
-    {
-        // This line is extracted into a separate method to ensure the UnconditionalSuppressMessage applies to it exactly (i.e, avoid unintentionally hiding more warnings)
-        return Type.GetType(typeName.Replace("Version=4.0.0.0", "Version=2.0.0.0"));
-    }
-
     private static readonly Dictionary<string, KeyValuePair<TestProperty, HashSet<Type>>> Properties = new();
 
 #if FullCLR
@@ -310,7 +293,6 @@ public class TestProperty : IEquatable<TestProperty>
     }
 
     public static TestProperty Register(string id, string label,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
         Type valueType,
         Type owner)
     {
@@ -323,7 +305,6 @@ public class TestProperty : IEquatable<TestProperty>
     }
 
     public static TestProperty Register(string id, string label,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
         Type valueType,
         TestPropertyAttributes attributes, Type owner)
     {
@@ -336,7 +317,6 @@ public class TestProperty : IEquatable<TestProperty>
     }
 
     public static TestProperty Register(string id, string label, string category, string description,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
         Type valueType,
         ValidateValueCallback? validateValueCallback, TestPropertyAttributes attributes, Type owner)
     {
