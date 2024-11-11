@@ -309,167 +309,154 @@ public abstract class TestObject
             return StringArrayConverter.ConvertFrom(null, culture, (string?)value);
         }
 
-        // These are already handled by TypeDescriptor.GetConverter, but it's not trimmer safe and
-        // we want to make sure they are guaranteed to work.
-        if (valueType == typeof(bool))
-        {
-            return BooleanConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(byte))
-        {
-            return ByteConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(sbyte))
-        {
-            return SByteConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(char))
-        {
-            return CharConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(double))
-        {
-            return DoubleConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(string))
-        {
-            return StringConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(int))
-        {
-            return IntConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-#if NET7_0_OR_GREATER
-        if (valueType == typeof(Int128))
-        {
-            return Int128Converter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-#endif
-
-        if (valueType == typeof(short))
-        {
-            return Int16Converter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(long))
-        {
-            return Int64Converter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(float))
-        {
-            return SingleConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-#if NET7_0_OR_GREATER
-        if (valueType == typeof(Half))
-        {
-            return HalfConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(UInt128))
-        {
-            return UInt128Converter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-#endif
-
-        if (valueType == typeof(ushort))
-        {
-            return UInt16Converter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(uint))
-        {
-            return UInt32Converter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(ulong))
-        {
-            return UInt64Converter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(Type))
-        {
-            return TypeConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(CultureInfo))
-        {
-            return CultureInfoConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-#if NET7_0_OR_GREATER
-        if (valueType == typeof(DateOnly))
-        {
-            return DateOnlyConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-#endif
-
-        if (valueType == typeof(DateTime))
-        {
-            return DateTimeConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(DateTimeOffset))
-        {
-            return DateTimeOffsetConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(decimal))
-        {
-            return DecimalConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-#if NET7_0_OR_GREATER
-        if (valueType == typeof(TimeOnly))
-        {
-            return TimeOnlyConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-#endif
-
-        if (valueType == typeof(TimeSpan))
-        {
-            return TimeSpanConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(Guid))
-        {
-            return GuidConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-        if (valueType == typeof(Uri))
-        {
-            return UriTypeConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-
-#if NET7_0_OR_GREATER
-        if (valueType == typeof(Version))
-        {
-            return VersionConverter.ConvertFrom(null, culture, value ?? string.Empty);
-        }
-#endif
-
-        // TODO: Consider detecting that we are in source gen mode (or in NativeAOT mode) and avoid calling TypeDescriptor altogether?
-        // Each of the approaches has pros and cons.
-        // Ignoring this trimmer unfriendly code when in NativeAOT will help catch issues earlier, and have more deterministic behavior.
-        // Keeping this trimmer unfriendly code even in NativeAOT will allow us to still have the possibility to work in case we fall in this path.
-        TPDebug.Assert(valueType is not null, "valueType is null");
-        TypeConverter converter = TypeDescriptor.GetConverter(valueType);
-        if (converter == null)
-        {
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.ConverterNotSupported, valueType.Name));
-        }
-
         try
         {
-            return converter.ConvertFrom(null, culture, value!);
+            // These are already handled by TypeDescriptor.GetConverter, but it's not trimmer safe and
+            // we want to make sure they are guaranteed to work.
+            if (valueType == typeof(bool))
+            {
+                return BooleanConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(byte))
+            {
+                return ByteConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(sbyte))
+            {
+                return SByteConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(char))
+            {
+                return CharConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(double))
+            {
+                return DoubleConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(string))
+            {
+                return StringConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(int))
+            {
+                return IntConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+#if NET7_0_OR_GREATER
+            if (valueType == typeof(Int128))
+            {
+                return Int128Converter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+#endif
+
+            if (valueType == typeof(short))
+            {
+                return Int16Converter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(long))
+            {
+                return Int64Converter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(float))
+            {
+                return SingleConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+#if NET7_0_OR_GREATER
+            if (valueType == typeof(Half))
+            {
+                return HalfConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(UInt128))
+            {
+                return UInt128Converter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+#endif
+
+            if (valueType == typeof(ushort))
+            {
+                return UInt16Converter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(uint))
+            {
+                return UInt32Converter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(ulong))
+            {
+                return UInt64Converter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(Type))
+            {
+                return TypeConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(CultureInfo))
+            {
+                return CultureInfoConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+#if NET7_0_OR_GREATER
+            if (valueType == typeof(DateOnly))
+            {
+                return DateOnlyConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+#endif
+
+            if (valueType == typeof(DateTime))
+            {
+                return DateTimeConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(DateTimeOffset))
+            {
+                return DateTimeOffsetConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(decimal))
+            {
+                return DecimalConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+#if NET7_0_OR_GREATER
+            if (valueType == typeof(TimeOnly))
+            {
+                return TimeOnlyConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+#endif
+
+            if (valueType == typeof(TimeSpan))
+            {
+                return TimeSpanConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(Guid))
+            {
+                return GuidConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+            if (valueType == typeof(Uri))
+            {
+                return UriTypeConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+
+#if NET7_0_OR_GREATER
+            if (valueType == typeof(Version))
+            {
+                return VersionConverter.ConvertFrom(null, culture, value ?? string.Empty);
+            }
+#endif
         }
         catch (FormatException)
         {
@@ -480,6 +467,14 @@ public abstract class TestObject
             // some type converters throw strange exceptions (e.g.: System.Exception by Int32Converter)
             throw new FormatException(e.Message, e);
         }
+
+        // TODO: Consider detecting that we are in source gen mode (or in NativeAOT mode) and avoid calling TypeDescriptor altogether?
+        // Each of the approaches has pros and cons.
+        // Ignoring this trimmer unfriendly code when in NativeAOT will help catch issues earlier, and have more deterministic behavior.
+        // Keeping this trimmer unfriendly code even in NativeAOT will allow us to still have the possibility to work in case we fall in this path.
+        TPDebug.Assert(valueType is not null, "valueType is null");
+
+        throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.ConverterNotSupported, valueType.Name));
     }
 
     /// <summary>
