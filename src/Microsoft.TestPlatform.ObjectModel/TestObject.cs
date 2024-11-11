@@ -503,16 +503,156 @@ public abstract class TestObject
 
         var valueType = property.GetValueType();
 
-        TypeConverter converter = TypeDescriptor.GetConverter(valueType);
-
-        if (converter == null)
-        {
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.ConverterNotSupported, valueType.Name));
-        }
-
         try
         {
-            return (T?)converter.ConvertTo(null, culture, value, typeof(T))!;
+            // These are already handled by TypeDescriptor.GetConverter, but it's not trimmer safe and
+            // we want to make sure they are guaranteed to work.
+            if (valueType == typeof(bool))
+            {
+                return (T?)BooleanConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(byte))
+            {
+                return (T?)ByteConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(sbyte))
+            {
+                return (T?)SByteConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(char))
+            {
+                return (T?)CharConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(double))
+            {
+                return (T?)DoubleConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(string))
+            {
+                return (T?)StringConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(int))
+            {
+                return (T?)IntConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+#if NET7_0_OR_GREATER
+            if (valueType == typeof(Int128))
+            {
+                return (T?)Int128Converter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+#endif
+
+            if (valueType == typeof(short))
+            {
+                return (T?)Int16Converter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(long))
+            {
+                return (T?)Int64Converter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(float))
+            {
+                return (T?)SingleConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+#if NET7_0_OR_GREATER
+            if (valueType == typeof(Half))
+            {
+                return (T?)HalfConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(UInt128))
+            {
+                return (T?)UInt128Converter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+#endif
+
+            if (valueType == typeof(ushort))
+            {
+                return (T?)UInt16Converter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(uint))
+            {
+                return (T?)UInt32Converter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(ulong))
+            {
+                return (T?)UInt64Converter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(Type))
+            {
+                return (T?)TypeConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(CultureInfo))
+            {
+                return (T?)CultureInfoConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+#if NET7_0_OR_GREATER
+            if (valueType == typeof(DateOnly))
+            {
+                return (T?)DateOnlyConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+#endif
+
+            if (valueType == typeof(DateTime))
+            {
+                return (T?)DateTimeConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(DateTimeOffset))
+            {
+                return (T?)DateTimeOffsetConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(decimal))
+            {
+                return (T?)DecimalConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+#if NET7_0_OR_GREATER
+            if (valueType == typeof(TimeOnly))
+            {
+                return (T?)TimeOnlyConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+#endif
+
+            if (valueType == typeof(TimeSpan))
+            {
+                return (T?)TimeSpanConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(Guid))
+            {
+                return (T?)GuidConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+            if (valueType == typeof(Uri))
+            {
+                return (T?)UriTypeConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+
+#if NET7_0_OR_GREATER
+            if (valueType == typeof(Version))
+            {
+                return (T?)VersionConverter.ConvertTo(null, culture, value, typeof(T))!;
+            }
+#endif
+
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.ConverterNotSupported, valueType.Name));
         }
         catch (FormatException)
         {
