@@ -4,6 +4,9 @@
 using Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
 using System;
+#if NET5_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -230,6 +233,9 @@ public static partial class ManagedNameHelper
     /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in
     /// <see href="https://github.com/microsoft/vstest/blob/main/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
     /// </remarks>
+#if NET5_0_OR_GREATER
+    [RequiresUnreferencedCode("Types might be removed by trimming. If the type name is a string literal, consider using Type.GetType instead.")]
+#endif
     public static MethodBase GetMethod(Assembly assembly, string managedTypeName, string managedMethodName)
     {
         var parsedManagedTypeName = ReflectionHelpers.ParseEscapedString(managedTypeName);
@@ -258,7 +264,12 @@ public static partial class ManagedNameHelper
         return method;
     }
 
-    private static MethodInfo? FindMethod(Type type, string methodName, int methodArity, string[]? parameterTypes)
+    private static MethodInfo? FindMethod(
+#if NET5_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+        Type type,
+        string methodName, int methodArity, string[]? parameterTypes)
     {
         bool Filter(MemberInfo mbr, object? param)
         {
