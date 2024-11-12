@@ -19,7 +19,7 @@ function Verify-Nuget-Packages {
     $expectedNumOfFiles = @{
         "Microsoft.CodeCoverage"                      = 59;
         "Microsoft.NET.Test.Sdk"                      = 15;
-        "Microsoft.TestPlatform"                      = 608;
+        "Microsoft.TestPlatform"                      = 609;
         "Microsoft.TestPlatform.Build"                = 20;
         "Microsoft.TestPlatform.CLI"                  = 471;
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 34;
@@ -84,7 +84,7 @@ function Verify-Nuget-Packages {
             $packageKey = $packageBaseName.Replace([string]".$version", [string]"")
             Write-Host "Verifying package '$packageBaseName'."
 
-            $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir).Count
+            $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir | Where-Object { $_.Name -ne '.signature.p7s' }).Count
             if (-not $expectedNumOfFiles.ContainsKey($packageKey)) {
                 $errors += "Package '$packageKey' is not present in file expectedNumOfFiles table. Is that package known?"
                 continue
@@ -281,14 +281,15 @@ function Verify-NugetPackageVersion {
         $UnzipNugetPackages
     )
 
-    $exes = $UnzipNugetPackages | Get-ChildItem -Filter vstest.console.exe -Recurse -Force 
-    if (0 -eq @($exes).Length) { 
-        throw "No vstest.console.exe was found."
+    # look for vstest.console.dll because unified build for .NET does not produce vstest.console.exe
+    $exes = $UnzipNugetPackages | Get-ChildItem -Filter vstest.console.dll -Recurse -Force 
+    if (0 -eq @($exes).Length) {
+        throw "No vstest.console.dll files were found."
     }
 
     $exes | ForEach-Object {
         if ($_.VersionInfo.ProductVersion.Contains("+")) {
-            throw "Some files contain '+' in the ProductVersion, this breaks DTAAgent in AzDO."
+            throw "$_ contains '+' in the ProductVersion $($_.VersionInfo.ProductVersion), this breaks DTAAgent in AzDO."
         }
         else {
             "$_ version $($_.VersionInfo.ProductVersion) is ok."
