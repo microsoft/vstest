@@ -19,7 +19,7 @@ function Verify-Nuget-Packages {
     $expectedNumOfFiles = @{
         "Microsoft.CodeCoverage"                      = 59;
         "Microsoft.NET.Test.Sdk"                      = 15;
-        "Microsoft.TestPlatform"                      = 608;
+        "Microsoft.TestPlatform"                      = 609;
         "Microsoft.TestPlatform.Build"                = 20;
         "Microsoft.TestPlatform.CLI"                  = 471;
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 34;
@@ -84,7 +84,7 @@ function Verify-Nuget-Packages {
             $packageKey = $packageBaseName.Replace([string]".$version", [string]"")
             Write-Host "Verifying package '$packageBaseName'."
 
-            $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir).Count
+            $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir | Where-Object { $_.Name -ne '.signature.p7s' }).Count
             if (-not $expectedNumOfFiles.ContainsKey($packageKey)) {
                 $errors += "Package '$packageKey' is not present in file expectedNumOfFiles table. Is that package known?"
                 continue
