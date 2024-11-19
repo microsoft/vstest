@@ -61,15 +61,19 @@
 
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Composition" Version="$(SystemComponentModelCompositionVersion)" GeneratePathProperty="true" />
-    <PackageReference Include="System.Security.AccessControl" Version="$(SystemSecurityAccessControlVersion)" GeneratePathProperty="true" PrivateAssets="Runtime" />
-    <PackageReference Include="System.Security.Principal.Windows" Version="$(SystemSecurityPrincipalWindowsVersion)" GeneratePathProperty="true" PrivateAssets="All" />
     <PackageReference Include="Microsoft.CodeCoverage.IO" Version="$(MicrosoftCodeCoverageIOVersion)" GeneratePathProperty="true" Condition="'$(DotNetBuildSourceOnly)' != 'true'" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="$(MicrosoftExtensionsDependencyModelPackageVersion)" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="$(MicrosoftExtensionsFileSystemGlobbingVersion)" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Diagnostics.NETCore.Client" Version="$(MicrosoftDiagnosticsNETCoreClientVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Internal.Dia" Version="$(TestPlatformMSDiaVersion)" PrivateAssets="All" GeneratePathProperty="true" Condition="'$(TargetFramework)'=='net472'" />
-    <PackageReference Include="Microsoft.Win32.Registry" Version="$(MicrosoftWin32RegistryVersion)" GeneratePathProperty="true" PrivateAssets="Runtime" />
     <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" GeneratePathProperty="true" Condition="'$(TargetFramework)' != 'net472'" />
+  </ItemGroup>
+
+  <!-- Exclude packages that are already inbox in newer .NETCoreApp versions. -->
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp' or '$(TargetFramework)' == '$(NetCoreAppMinimum)'">
+    <PackageReference Include="Microsoft.Win32.Registry" Version="$(MicrosoftWin32RegistryVersion)" GeneratePathProperty="true" PrivateAssets="Runtime" />
+    <PackageReference Include="System.Security.AccessControl" Version="$(SystemSecurityAccessControlVersion)" GeneratePathProperty="true" PrivateAssets="Runtime" />
+    <PackageReference Include="System.Security.Principal.Windows" Version="$(SystemSecurityPrincipalWindowsVersion)" GeneratePathProperty="true" PrivateAssets="All" />
   </ItemGroup>
 
   <Target Name="CopyFiles" AfterTargets="Build">
@@ -82,10 +86,11 @@
       <SystemComponentModelComposition Include="$(PkgSystem_ComponentModel_Composition)\lib\netstandard2.0\**\*" />
       <MicrosoftDiagnosticsNETCoreClient Include="$(PkgMicrosoft_Diagnostics_NETCore_Client)\lib\netstandard2.0\**\*" />
       <MicrosoftInternalDia Include="$(PkgMicrosoft_Internal_Dia)\tools\net451\**\*" />
-      <SystemSecurityAccessControl Include="$(PkgSystem_Security_AccessControl)\runtimes\win\lib\netcoreapp2.0\*" />
-      <SystemSecurityPrincipalWindowsUnix Include="$(PkgSystem_Security_Principal_Windows)\runtimes\unix\lib\netcoreapp2.1\*" />
-      <SystemSecurityPrincipalWindowsWin Include="$(PkgSystem_Security_Principal_Windows)\runtimes\win\lib\netcoreapp2.1\*" />
-      <MicrosoftWin32Registry Include="$(PkgMicrosoft_Win32_Registry)\runtimes\win\lib\netstandard2.0\*" />
+
+      <SystemSecurityAccessControl Include="$(PkgSystem_Security_AccessControl)\runtimes\win\lib\netcoreapp2.0\*" Condition="'$(PkgSystem_Security_AccessControl)' != ''" />
+      <SystemSecurityPrincipalWindowsUnix Include="$(PkgSystem_Security_Principal_Windows)\runtimes\unix\lib\netcoreapp2.1\*" Condition="'$(PkgSystem_Security_Principal_Windows)' != ''" />
+      <SystemSecurityPrincipalWindowsWin Include="$(PkgSystem_Security_Principal_Windows)\runtimes\win\lib\netcoreapp2.1\*" Condition="'$(PkgSystem_Security_Principal_Windows)' != ''" />
+      <MicrosoftWin32Registry Include="$(PkgMicrosoft_Win32_Registry)\runtimes\win\lib\netstandard2.0\*" Condition="'$(PkgMicrosoft_Win32_Registry)' != ''" />
     </ItemGroup>
 
     <Copy SourceFiles="@(MicrosoftCodeCoverageIO)" DestinationFiles="$(OutDir)\Microsoft.CodeCoverage.IO\%(RecursiveDir)%(Filename)%(Extension)" Condition="'$(DotNetBuildSourceOnly)' != 'true'" />
@@ -95,10 +100,11 @@
     <Copy SourceFiles="@(SystemComponentModelComposition)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftDiagnosticsNETCoreClient)" DestinationFiles="$(OutDir)\Microsoft.Diagnostics.NETCore.Client\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftInternalDia)" DestinationFiles="$(OutDir)\Microsoft.Internal.Dia\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Copy SourceFiles="@(SystemSecurityAccessControl)" DestinationFiles="$(OutDir)\runtimes\win\lib\netcoreapp2.0\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Copy SourceFiles="@(SystemSecurityPrincipalWindowsUnix)" DestinationFiles="$(OutDir)\runtimes\unix\lib\netcoreapp2.1\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Copy SourceFiles="@(SystemSecurityPrincipalWindowsWin)" DestinationFiles="$(OutDir)\runtimes\win\lib\netcoreapp2.1\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Copy SourceFiles="@(MicrosoftWin32Registry)" DestinationFiles="$(OutDir)\runtimes\win\lib\netstandard2.0\%(RecursiveDir)%(Filename)%(Extension)" />
+
+    <Copy SourceFiles="@(SystemSecurityAccessControl)" DestinationFiles="$(OutDir)\runtimes\win\lib\netcoreapp2.0\%(RecursiveDir)%(Filename)%(Extension)" Condition="'@(SystemSecurityAccessControl)' != ''" />
+    <Copy SourceFiles="@(SystemSecurityPrincipalWindowsUnix)" DestinationFiles="$(OutDir)\runtimes\unix\lib\netcoreapp2.1\%(RecursiveDir)%(Filename)%(Extension)" Condition="'@(SystemSecurityPrincipalWindowsUnix)' != ''" />
+    <Copy SourceFiles="@(SystemSecurityPrincipalWindowsWin)" DestinationFiles="$(OutDir)\runtimes\win\lib\netcoreapp2.1\%(RecursiveDir)%(Filename)%(Extension)" Condition="'@(SystemSecurityPrincipalWindowsWin)' != ''" />
+    <Copy SourceFiles="@(MicrosoftWin32Registry)" DestinationFiles="$(OutDir)\runtimes\win\lib\netstandard2.0\%(RecursiveDir)%(Filename)%(Extension)" Condition="'@(MicrosoftWin32Registry)' != ''" />
   </Target>
 
 </Project>
