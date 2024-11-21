@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -93,6 +92,7 @@ public class TestObjectConverter : JsonConverter
     }
 }
 
+#if false
 /// TODO: This is not used now, but I was experimenting with this quite a bit for performance, leaving it here in case I was wrong
 /// and the serializer settings actually have signigicant impact on the speed.
 /// <summary>
@@ -195,3 +195,4 @@ internal class TestObjectConverter7 : JsonConverter
         public string? ValueType { get; set; }
     }
 }
+#endif

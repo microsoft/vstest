@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Reflection.PortableExecutable;
@@ -33,6 +34,7 @@ internal class PortableSymbolReader : ISymbolReader
     /// <param name="searchPath">
     /// The search path.
     /// </param>
+    [RequiresUnreferencedCode("Uses Assembly.Load which is not trimmer friendly")]
     public void CacheSymbols(string binaryPath, string? searchPath)
     {
         PopulateCacheForTypeAndMethodSymbols(binaryPath);
@@ -84,6 +86,7 @@ internal class PortableSymbolReader : ISymbolReader
     /// <param name="binaryPath">
     /// The binary path.
     /// </param>
+    [RequiresUnreferencedCode("Uses Assembly.Load which is not trimmer friendly")]
     private void PopulateCacheForTypeAndMethodSymbols(string binaryPath)
     {
         try

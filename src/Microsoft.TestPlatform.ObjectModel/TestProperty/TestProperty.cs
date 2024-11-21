@@ -35,7 +35,9 @@ public class TestProperty : IEquatable<TestProperty>
         // Default constructor for Serialization.
     }
 
-    private TestProperty(string id, string label, string category, string description, Type valueType, ValidateValueCallback? validateValueCallback, TestPropertyAttributes attributes)
+    private TestProperty(string id, string label, string category, string description,
+        Type valueType,
+        ValidateValueCallback? validateValueCallback, TestPropertyAttributes attributes)
     {
         ValidateArg.NotNullOrEmpty(id, nameof(id));
         ValidateArg.NotNull(label, nameof(label));
@@ -177,8 +179,17 @@ public class TestProperty : IEquatable<TestProperty>
 
         try
         {
-            // This only works for the type is in the currently executing assembly or in Mscorlib.dll.
-            type = Type.GetType(typeName);
+            type = typeName switch
+            {
+                "System.String" => typeof(string),
+                "System.Int32" => typeof(int),
+                "System.String[]" => typeof(string[]),
+                "System.Guid" => typeof(Guid),
+                "System.Uri" => typeof(Uri),
+                "System.Boolean" => typeof(bool),
+                "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]" => typeof(KeyValuePair<string, string>[]),
+                _ => throw new ArgumentException($"The type name '{typeName}' is unexpected."),
+            };
 
             if (!DisableFastJson)
             {
@@ -188,9 +199,6 @@ public class TestProperty : IEquatable<TestProperty>
                     return type;
                 }
             }
-
-            // Try 2.0 version as discovery returns version of 4.0 for all cases
-            type ??= Type.GetType(typeName.Replace("Version=4.0.0.0", "Version=2.0.0.0"));
 
             // For UAP the type namespace for System.Uri,System.TimeSpan and System.DateTimeOffset differs from the desktop version.
             if (type == null && typeName.StartsWith("System.Uri"))
@@ -284,7 +292,9 @@ public class TestProperty : IEquatable<TestProperty>
         return result;
     }
 
-    public static TestProperty Register(string id, string label, Type valueType, Type owner)
+    public static TestProperty Register(string id, string label,
+        Type valueType,
+        Type owner)
     {
         ValidateArg.NotNullOrEmpty(id, nameof(id));
         ValidateArg.NotNull(label, nameof(label));
@@ -294,7 +304,9 @@ public class TestProperty : IEquatable<TestProperty>
         return Register(id, label, string.Empty, string.Empty, valueType, null, TestPropertyAttributes.None, owner);
     }
 
-    public static TestProperty Register(string id, string label, Type valueType, TestPropertyAttributes attributes, Type owner)
+    public static TestProperty Register(string id, string label,
+        Type valueType,
+        TestPropertyAttributes attributes, Type owner)
     {
         ValidateArg.NotNullOrEmpty(id, nameof(id));
         ValidateArg.NotNull(label, nameof(label));
@@ -304,7 +316,9 @@ public class TestProperty : IEquatable<TestProperty>
         return Register(id, label, string.Empty, string.Empty, valueType, null, attributes, owner);
     }
 
-    public static TestProperty Register(string id, string label, string category, string description, Type valueType, ValidateValueCallback? validateValueCallback, TestPropertyAttributes attributes, Type owner)
+    public static TestProperty Register(string id, string label, string category, string description,
+        Type valueType,
+        ValidateValueCallback? validateValueCallback, TestPropertyAttributes attributes, Type owner)
     {
         ValidateArg.NotNullOrEmpty(id, nameof(id));
         ValidateArg.NotNull(label, nameof(label));

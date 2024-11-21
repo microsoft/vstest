@@ -44,6 +44,7 @@ public class DefaultTestPlatformContractResolver : DefaultContractResolver
     }
 }
 
+#if false
 /// TODO: This is not used now, but I was experimenting with this quite a bit for performance, leaving it here in case I was wrong
 /// and the serializer settings actually have signigicant impact on the speed.
 /// <summary>
@@ -81,3 +82,4 @@ internal class DefaultTestPlatformContractResolver7 : DefaultContractResolver
         return contract;
     }
 }
+#endif

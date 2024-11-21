@@ -62,7 +62,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\shared\DynamicallyAccessedMembersAttribute.cs" Link="DynamicallyAccessedMembersAttribute.cs" />
+    <Compile Include="..\..\shared\DynamicallyAccessedMemberTypes.cs" Link="DynamicallyAccessedMemberTypes.cs" />
     <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
+    <Compile Include="..\..\shared\RequiresUnreferencedCodeAttribute.cs" Link="RequiresUnreferencedCodeAttribute.cs" />
+    <Compile Include="..\..\shared\UnconditionalSuppressMessageAttribute.cs" Link="UnconditionalSuppressMessageAttribute.cs" />
   </ItemGroup>
 
   <ItemGroup>
