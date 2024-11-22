@@ -16,11 +16,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\datacollector\datacollector.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
-    <Reference Include="System.Runtime" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-
 </Project>

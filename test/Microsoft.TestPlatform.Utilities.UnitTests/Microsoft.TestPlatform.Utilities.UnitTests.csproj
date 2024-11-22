@@ -17,13 +17,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeCoverage.IO" Version="$(MicrosoftCodeCoverageIOVersion)" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
-    <Reference Include="System.Runtime" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Threading.Tasks" />
-  </ItemGroup>
   <ItemGroup>
     <None Update="TestFiles\**\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

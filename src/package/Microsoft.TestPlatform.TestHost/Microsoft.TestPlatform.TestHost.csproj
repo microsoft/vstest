@@ -48,7 +48,7 @@
   </Target>
 
   <ItemGroup>
-    <None Update="Microsoft.TestPlatform.TestHost.props" Condition=" '$(TargetFramework)' == '$(NetCoreAppMinimum)' ">
+    <None Update="Microsoft.TestPlatform.TestHost.props" Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)')) ">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
