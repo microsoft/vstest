@@ -3,11 +3,14 @@
 
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.TestHostRuntimeProvider</AssemblyName>
-    <TargetFrameworks>net7.0;net6.0;netstandard2.0;$(NetFrameworkMinimum)</TargetFrameworks>
+    <!--
+      This project is client that is used only by runners, and shipped only in runner packages.
+    -->
+    <TargetFrameworks>$(RunnerTargetFrameworks)</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
     <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
   </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == '$(NetFrameworkMinimum)' ">
+  <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)'))">
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Configuration" />

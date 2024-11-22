@@ -6,7 +6,7 @@ Param(
     [System.String] $Configuration = "Release",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("win7-x64", "win7-x86")]
+    [ValidateSet("win7-x64", "win-x86")]
     [Alias("r")]
     [System.String] $TargetRuntime = "win7-x64",
 

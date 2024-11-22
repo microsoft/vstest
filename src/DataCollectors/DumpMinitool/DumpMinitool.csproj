@@ -9,7 +9,7 @@
     -->
     <TargetFrameworks>$(NetFrameworkMinimum)</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <Prefer32Bit Condition="'$(TargetFramework)' == '$(NetFrameworkMinimum)'">false</Prefer32Bit>
+    <Prefer32Bit>false</Prefer32Bit>
     <OutputType>Exe</OutputType>
     <IsTestProject>false</IsTestProject>
     <RuntimeIdentifier Condition="'$(DotNetBuildSourceOnly)' != 'true'">win7-x64</RuntimeIdentifier>

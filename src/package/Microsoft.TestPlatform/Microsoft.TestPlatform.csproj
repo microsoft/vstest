@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(NetCoreAppMinimum);$(NetFrameworkMinimum);net47;net471;net472;net48</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkRunnerTargetFrameworks)</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
