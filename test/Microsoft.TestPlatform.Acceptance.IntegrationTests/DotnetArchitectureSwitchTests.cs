@@ -18,7 +18,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 // >= x64 6.0.2xx
 // x64 5.0.4xx for Mac
 // x64 3.1.4XX for Win
-// Manual test './tools/.../dotnet test ./test/Microsoft.TestPlatform.AcceptanceTests/bin/Debug/netcoreapp3.1/Microsoft.TestPlatform.AcceptanceTests.dll --testcasefilter:"DotnetArchitectureSwitchTests"'
+// Manual test './tools/.../dotnet test ./test/Microsoft.TestPlatform.AcceptanceTests/bin/Debug/net6.0/Microsoft.TestPlatform.AcceptanceTests.dll --testcasefilter:"DotnetArchitectureSwitchTests"'
 [TestClass]
 [Ignore("Manual tests(for now). Tests in this class need some .NET SDK global installations")]
 public class DotnetArchitectureSwitchTests : AcceptanceTestBase
@@ -298,8 +298,8 @@ public class DotnetArchitectureSwitchTests : AcceptanceTestBase
         $@"{Environment.ExpandEnvironmentVariables("%ProgramFiles%")}\dotnet\x64";
 
     private static string GetFrameworkVersionToForceToX64 => RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ?
-        "net5.0" :
-        "netcoreapp3.1";
+        "net9.0" :
+        "net6.0";
 
     private static string GetDefaultLocation => RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ?
         $"/usr/local/share/dotnet" :

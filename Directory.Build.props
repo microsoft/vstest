@@ -26,7 +26,7 @@
     <Version Condition="'$(Version)' == ''">$(TPVersionPrefix)-dev</Version>
     <!-- Override the AssemblyVersion as 15.0.0 since protocol depends on this version for serialization. This is also defined in build script. -->
     <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">15.0.0</AssemblyVersion>
-    <!-- Auto generating binding redirects breaks testhost when running under netcoreapp3.1 vstest.console as .NET Framework net462.  -->
+    <!-- Auto generating binding redirects breaks testhost when running under net6.0 vstest.console as .NET Framework net462.  -->
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <!-- But not autogenerating binding redirects also breaks build occasionally, so we tell MSBuild to unify assembly versions,
     without outputting binding redirectes. -->
@@ -52,7 +52,7 @@
   <PropertyGroup>
     <!-- Naming is based on dotnet/runtime one -->
     <NetFrameworkMinimum>net462</NetFrameworkMinimum>
-    <NetCoreAppMinimum>netcoreapp3.1</NetCoreAppMinimum>
+    <NetCoreAppMinimum>net6.0</NetCoreAppMinimum>
     <!--
       Arcade is making things hard to work with. This property is unset when its value is equal to NetMinimum.
       https://github.com/dotnet/arcade/blob/66c9c5397d599af40f2a94989241944f5a73442a/src/Microsoft.DotNet.Arcade.Sdk/tools/TargetFrameworkDefaults.props#L16-L18

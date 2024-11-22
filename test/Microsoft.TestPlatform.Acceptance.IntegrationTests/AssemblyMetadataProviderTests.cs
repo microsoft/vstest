@@ -55,7 +55,7 @@ public class AssemblyMetadataProviderTests : AcceptanceTestBase
 
     [TestMethod]
     [DataRow("net462")]
-    [DataRow("netcoreapp3.1")]
+    [DataRow("net6.0")]
     public void GetArchitectureShouldReturnCorrentArchForx64Assembly(string framework)
     {
         TestDotnetAssemblyArch("SimpleTestProject3", framework, Architecture.X64, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
@@ -63,7 +63,7 @@ public class AssemblyMetadataProviderTests : AcceptanceTestBase
 
     [TestMethod]
     [DataRow("net462")]
-    [DataRow("netcoreapp3.1")]
+    [DataRow("net6.0")]
     public void GetArchitectureShouldReturnCorrentArchForx86Assembly(string framework)
     {
         TestDotnetAssemblyArch("SimpleTestProjectx86", framework, Architecture.X86, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
@@ -71,7 +71,7 @@ public class AssemblyMetadataProviderTests : AcceptanceTestBase
 
     [TestMethod]
     [DataRow("net462")]
-    [DataRow("netcoreapp3.1")]
+    [DataRow("net6.0")]
     public void GetArchitectureShouldReturnCorrentArchForAnyCpuAssembly(string framework)
     {
         TestDotnetAssemblyArch("SimpleTestProject", framework, Architecture.AnyCPU, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
@@ -79,7 +79,7 @@ public class AssemblyMetadataProviderTests : AcceptanceTestBase
 
     [TestMethod]
     [DataRow("net462")]
-    [DataRow("netcoreapp3.1")]
+    [DataRow("net6.0")]
     public void GetArchitectureShouldReturnCorrentArchForArmAssembly(string framework)
     {
         TestDotnetAssemblyArch("SimpleTestProjectARM", framework, Architecture.ARM, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
@@ -108,7 +108,7 @@ public class AssemblyMetadataProviderTests : AcceptanceTestBase
 
     [TestMethod]
     [DataRow("net462")]
-    [DataRow("netcoreapp3.1")]
+    [DataRow("net6.0")]
     public void GetFrameWorkForDotNetAssembly(string framework)
     {
         var expectedElapsedTime = 5;

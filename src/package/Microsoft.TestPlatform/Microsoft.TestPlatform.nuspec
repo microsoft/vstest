@@ -544,10 +544,10 @@
     <file src="$TesthostRuntimeconfig$\testhost-8.0.runtimeconfig.json" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost-8.0.runtimeconfig.json" />
     <file src="$TesthostRuntimeconfig$\testhost-8.0.runtimeconfig.json" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost-9.0.runtimeconfig.json" />
     <file src="$TesthostRuntimeconfig$\testhost-latest.runtimeconfig.json" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost-latest.runtimeconfig.json" />
-    <file src="netcoreapp3.1\testhost.deps.json" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost.deps.json" />
-    <file src="netcoreapp3.1\testhost.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost.dll" />
+    <file src="net6.0\testhost.deps.json" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost.deps.json" />
+    <file src="net6.0\testhost.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost.dll" />
 
-    <file src="netcoreapp3.1\testhost.dll.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost.dll.config" />
+    <file src="net6.0\testhost.dll.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost.dll.config" />
     <file src="net472\Microsoft.Internal.TestPlatform.Extensions\Extensions\Cpp\arm64\dbghelp.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\arm64\dbghelp.dll" />
     <file src="net472\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net472\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" />

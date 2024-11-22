@@ -669,12 +669,12 @@ public class DotnetTestHostManagerTests
     // we can't put in a "default" value, and we don't have other way to determine if this provided value is the
     // runtime default or the actual value that user provided, so right now the default will use the latest, instead
     // or the more correct 1.0, it should be okay, as that version is not supported anymore anyway
-    [DataRow("netcoreapp3.1", "3.1", true)]
-    [DataRow("net5.0", "5.0", true)]
+    [DataRow("net6.0", "6.0", true)]
+    [DataRow("net9.0", "5.0", true)]
 
     // net6.0 is currently the latest released version, but it still has it's own runtime config, it is not the same as
     // "latest" which means the latest you have on system. So if you have only 5.0 SDK then net6.0 will fail because it can't find net6.0,
-    // but latest would use net5.0 because that is the latest one on your system.
+    // but latest would use net9.0 because that is the latest one on your system.
     [DataRow("net6.0", "6.0", true)]
     [DataRow("net6.0", "latest", false)]
     public void GetTestHostProcessStartInfoShouldIncludeTestHostPathNextToTestRunnerIfTesthostDllIsNoFoundAndDepsFileNotFoundWithTheCorrectTfm(string tfm, string suffix, bool runtimeConfigExists)

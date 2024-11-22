@@ -22,7 +22,7 @@ public class ProcessesInteractionTests : AcceptanceTestBase
         // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
         const string testAssetProjectName = "SimpleTestProjectMessedUpTargetFramework";
-        var assemblyPath = GetTestDllForFramework(testAssetProjectName + ".dll", Core31TargetFramework);
+        var assemblyPath = GetTestDllForFramework(testAssetProjectName + ".dll", Core60TargetFramework);
         UpdateRuntimeConfigJsonWithInvalidFramework(assemblyPath, testAssetProjectName);
 
         // Act

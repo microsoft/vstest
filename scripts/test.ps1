@@ -96,12 +96,12 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 $TPT_TargetFrameworkNet462 = "net462"
 $TPT_TargetFrameworkNet48 = "net48"
-$TPT_TargetFrameworkCore31 = "netcoreapp3.1"
-$TPT_TargetFrameworkNet60 = "net6.0"
+TPT_TargetFrameworkNet60 = "net6.0"
+$TPT_TargetFrameworkNet90 = "net9.0"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
-$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkNet48, $TPT_TargetFrameworkNet60)
+$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkNet48, $TPT_TargetFrameworkNet90)
 $Script:TPT_TargetFramework = $TargetFramework
 $Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_SkipProjects = @("_none_");
@@ -227,11 +227,11 @@ function Invoke-Test
                 $testFilter = "/testCaseFilter:`"$TPT_TestFilter`""
             }
 
-            if($fx -eq $TPT_TargetFrameworkNet60)
+            if($fx -eq $TPT_TargetFrameworkNet90)
             {
                 $vstestConsoleFileName = "vstest.console.dll"
                 $targetRunTime = ""
-                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkCore31 $targetRuntime) $vstestConsoleFileName
+                $vstestConsolePath = Join-Path (Get-PackageDirectory TPT_TargetFrameworkNet60 $targetRuntime) $vstestConsoleFileName
             }
             else
             {

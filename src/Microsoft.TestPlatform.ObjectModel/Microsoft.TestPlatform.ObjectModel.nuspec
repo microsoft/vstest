@@ -8,7 +8,7 @@
         <dependency id="System.Reflection.Metadata" version="[1.6.0, )" />
       </group>
 
-      <group targetFramework="netcoreapp3.1">
+      <group targetFramework="net6.0">
         <dependency id="System.Reflection.Metadata" version="[1.6.0, )" />
       </group>
 
@@ -67,16 +67,16 @@
     <file src="net462\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll"             target="lib\net462\zh-Hant" />
     <!-- /net462 -->
 
-    <!-- netcoreapp3.1 -->
-    <file src="netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netcoreapp3.1\" />
-    <file src="netcoreapp3.1\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\netcoreapp3.1\" />
-    <file src="netcoreapp3.1\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\netcoreapp3.1\" />
+    <!-- net6.0 -->
+    <file src="net6.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net6.0\" />
+    <file src="net6.0\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\net6.0\" />
+    <file src="net6.0\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\net6.0\" />
 
 
     <!-- Add localized resources -->
-    <file src="netcoreapp3.1\**\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"   exclude="**\TestHost*\**\*.*" target="lib\netcoreapp3.1\" />
-    <file src="netcoreapp3.1\**\Microsoft.TestPlatform.CoreUtilities.resources.dll"               exclude="**\TestHost*\**\*.*" target="lib\netcoreapp3.1\" />
-    <!-- /netcoreapp3.1 -->
+    <file src="net6.0\**\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"   exclude="**\TestHost*\**\*.*" target="lib\net6.0\" />
+    <file src="net6.0\**\Microsoft.TestPlatform.CoreUtilities.resources.dll"               exclude="**\TestHost*\**\*.*" target="lib\net6.0\" />
+    <!-- /net6.0 -->
 
     <!-- netstandard 2.0 -->
     <file src="netstandard2.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard2.0\" />

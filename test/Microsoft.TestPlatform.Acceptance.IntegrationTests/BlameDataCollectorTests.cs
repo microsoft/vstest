@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestCategory("Windows-Review")]
 public class BlameDataCollectorTests : AcceptanceTestBase
 {
-    public const string NETCOREANDFX = "net462;net472;netcoreapp3.1";
+    public const string NETCOREANDFX = "net462;net472;net6.0";
     public const string NET60 = "net6.0";
     private readonly string _procDumpPath;
 
@@ -131,9 +131,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreRunner("net462;net472;netcoreapp3.1;net6.0")]
+    [NetCoreRunner("net462;net472;net6.0;net9.0")]
     // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net462;net472;netcoreapp3.1;net6.0")]
+    // [NetFrameworkRunner("net462;net472;net6.0;net9.0")]
     public void HangDumpOnTimeout(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -154,9 +154,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     [TestMethod]
     // net6.0 does not support dump on exit
-    [NetCoreRunner("net462;net472;netcoreapp3.1")]
+    [NetCoreRunner("net462;net472;net6.0")]
     // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net462;net472;netcoreapp3.1")]
+    // [NetFrameworkRunner("net462;net472;net6.0")]
 
     public void CrashDumpWhenThereIsNoTimeout(RunnerInfo runnerInfo)
     {
@@ -178,9 +178,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     [TestMethod]
     // net6.0 does not support dump on exit
-    [NetCoreRunner("net462;net472;netcoreapp3.1")]
+    [NetCoreRunner("net462;net472;net6.0")]
     // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net462;net472;netcoreapp3.1")]
+    // [NetFrameworkRunner("net462;net472;net6.0")]
 
     public void CrashDumpOnExit(RunnerInfo runnerInfo)
     {
@@ -201,9 +201,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreRunner("net462;net472;netcoreapp3.1;net6.0")]
+    [NetCoreRunner("net462;net472;net6.0;net9.0")]
     // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net462;net472;netcoreapp3.1;net6.0")]
+    // [NetFrameworkRunner("net462;net472;net6.0;net9.0")]
     public void CrashDumpOnStackOverflow(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -239,9 +239,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreRunner("net462;net472;netcoreapp3.1;net6.0")]
+    [NetCoreRunner("net462;net472;net6.0;net9.0")]
     // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net462;net472;netcoreapp3.1;net6.0")]
+    // [NetFrameworkRunner("net462;net472;net6.0;net9.0")]
     public void HangDumpChildProcesses(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

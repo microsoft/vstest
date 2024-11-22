@@ -76,7 +76,7 @@ DOTNET_CLI_VERSION="latest"
 # Build configuration
 #
 TPB_Solution="TestPlatform.sln"
-TPB_TargetFrameworkCore="netcoreapp3.1"
+TPB_TargetFrameworkCore="net6.0"
 TPB_Configuration=$CONFIGURATION
 TPB_TargetRuntime=$TARGET_RUNTIME
 TPB_Verbose=$VERBOSE
