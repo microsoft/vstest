@@ -73,7 +73,7 @@
     <NetPortableTargetFrameworks>$(NetCoreAppMinimum)</NetPortableTargetFrameworks>
     <NetRunnerTargetFrameworks>$(NetSDKTargetFramworks);$(NetPortableTargetFrameworks)</NetRunnerTargetFrameworks>
     <!--
-      vstest.console.exe is shipped with VS, use the version of .NET Framework that VS requires to run (this might differ from the version is requires to install).
+      vstest.console.exe is shipped with VS, we can use the version of .NET Framework that VS requires to run (this might differ from the version is requires to install).
       https://learn.microsoft.com/en-us/visualstudio/releases/2022/system-requirements#additional-requirements-and-guidance
     -->
     <NetFrameworkRunnerTargetFrameworks>net48</NetFrameworkRunnerTargetFrameworks>

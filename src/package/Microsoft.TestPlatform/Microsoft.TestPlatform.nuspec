@@ -132,6 +132,8 @@
     <file src="net472\testhost.net472.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.exe.config" />
     <file src="net48\testhost.net48.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.exe" />
     <file src="net48\testhost.net48.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.exe.config" />
+    <file src="net481\testhost.net481.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net481.exe" />
+    <file src="net481\testhost.net481.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net481.exe.config" />
 
     <file src="net462\testhost.x86.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.x86.exe" />
     <file src="net462\testhost.x86.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.x86.exe.config" />
@@ -143,6 +145,8 @@
     <file src="net472\testhost.net472.x86.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.x86.exe.config" />
     <file src="net48\testhost.net48.x86.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.x86.exe" />
     <file src="net48\testhost.net48.x86.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.x86.exe.config" />
+    <file src="net481\testhost.net481.x86.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net481.x86.exe" />
+    <file src="net481\testhost.net481.x86.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net481.x86.exe.config" />
 
     <file src="net462\testhost.arm64.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.arm64.exe" />
     <file src="net462\testhost.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.arm64.exe.config" />
@@ -154,6 +158,8 @@
     <file src="net472\testhost.net472.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.arm64.exe.config" />
     <file src="net48\testhost.net48.arm64.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.arm64.exe" />
     <file src="net48\testhost.net48.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.arm64.exe.config" />
+    <file src="net481\testhost.net481.arm64.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net481.arm64.exe" />
+    <file src="net481\testhost.net481.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net481.arm64.exe.config" />
 
     <file src="net472\vstest.console.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\vstest.console.exe" />
     <file src="net472\vstest.console.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\vstest.console.exe.config" />
@@ -544,10 +550,10 @@
     <file src="$TesthostRuntimeconfig$\testhost-8.0.runtimeconfig.json" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost-8.0.runtimeconfig.json" />
     <file src="$TesthostRuntimeconfig$\testhost-8.0.runtimeconfig.json" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost-9.0.runtimeconfig.json" />
     <file src="$TesthostRuntimeconfig$\testhost-latest.runtimeconfig.json" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost-latest.runtimeconfig.json" />
-    <file src="net6.0\testhost.deps.json" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost.deps.json" />
-    <file src="net6.0\testhost.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost.dll" />
+    <file src="net8.0\testhost.deps.json" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost.deps.json" />
+    <file src="net8.0\testhost.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost.dll" />
 
-    <file src="net6.0\testhost.dll.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost.dll.config" />
+    <file src="net8.0\testhost.dll.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\testhost.dll.config" />
     <file src="net472\Microsoft.Internal.TestPlatform.Extensions\Extensions\Cpp\arm64\dbghelp.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\arm64\dbghelp.dll" />
     <file src="net472\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net472\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\TestHostNet\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
