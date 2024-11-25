@@ -51,6 +51,7 @@
     <MicrosoftVSTelemetryVersion>17.13.24</MicrosoftVSTelemetryVersion>
     <MicrosoftVSUtilitiesInternalVersion>16.3.90</MicrosoftVSUtilitiesInternalVersion>
     <MicrosoftVSSDKBuildToolsVersion>17.4.2124</MicrosoftVSSDKBuildToolsVersion>
+    <MicrosoftWin32RegistryVersion>5.0.0</MicrosoftWin32RegistryVersion>
     <NewtonsoftJsonVersion>13.0.3</NewtonsoftJsonVersion>
     <SystemCollectionsImmutableVersion>9.0.0</SystemCollectionsImmutableVersion>
     <SystemComponentModelCompositionVersion>9.0.0</SystemComponentModelCompositionVersion>
