@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(NetFrameworkRunnerTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkRunnerTargetFramework);$(TestHostAllTargetFrameworks)</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -41,14 +41,16 @@
     <NuspecProperty Include="TesthostRuntimeconfig=$(RepoRoot)temp\testhost" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!--
+    Runner dependencies are copied to the output package, and target only .NET Framework.
+  -->
+  <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkRunnerTargetFramework)'))">
     <ProjectReference Include="..\..\vstest.console\vstest.console.csproj" />
     <ProjectReference Include="..\..\vstest.console.arm64\vstest.console.arm64.csproj" />
-    <ProjectReference Include="..\..\testhost\testhost.csproj" />
-    <ProjectReference Include="..\..\testhost.x86\testhost.x86.csproj" />
-    <ProjectReference Include="..\..\testhost.arm64\testhost.arm64.csproj" />
+
     <ProjectReference Include="..\..\datacollector\datacollector.csproj" />
     <ProjectReference Include="..\..\datacollector.arm64\datacollector.arm64.csproj" />
+    
     <!-- We are forcing the reference here to .NET Framework project for both .NET and .NET Framework builds.
     This is because we are offloading the dumping to this tool on Windows, and we need this tool to run anywhere with any selected architecture, and using .NET Framework (or eventually .NET Native)
     prevents us from having to lookup the correct .NET runtime. -->
@@ -63,6 +65,15 @@
     <ProjectReference Include="..\..\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.PlatformAbstractions\Microsoft.TestPlatform.PlatformAbstractions.csproj" />
     <ProjectReference Include="..\..\SettingsMigrator\SettingsMigrator.csproj" />
+  </ItemGroup>
+
+  <!--
+    Testhost needs to be built for all versions of .NET Framework, and for the lowest supported version of .NET.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\testhost\testhost.csproj" />
+    <ProjectReference Include="..\..\testhost.x86\testhost.x86.csproj" />
+    <ProjectReference Include="..\..\testhost.arm64\testhost.arm64.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)')) ">

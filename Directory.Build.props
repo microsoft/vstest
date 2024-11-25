@@ -61,7 +61,11 @@
     -->
     <NetPrevious Condition=" $(NetPrevious) == '' ">$(NetMinimum)</NetPrevious>
 
-
+    <!--
+      vstest.console.exe is shipped with VS, we can use the version of .NET Framework that VS requires to run (this might differ from the version is requires to install).
+      https://learn.microsoft.com/en-us/visualstudio/releases/2022/system-requirements#additional-requirements-and-guidance
+    -->
+    <NetFrameworkRunnerTargetFramework>net48</NetFrameworkRunnerTargetFramework>
     <!--
       vstest.console.dll or datacollector.dll are shipped with .NET SDK, target the tfms into which we insert.
     -->
@@ -69,16 +73,12 @@
     <!--
       vstest.console.dll and datacollector.dll are shipped in TestPlatform.Portable package, that should support
       the oldest currently supported .NET, because we don't know with which runtime it will be used.
+      vstest.console.exe and datacollector.exe are shipped in there as well, choose the lowest version of
+      .NET Frameowork to support as well.
     -->
-    <NetPortableTargetFrameworks>$(NetCoreAppMinimum)</NetPortableTargetFrameworks>
+    <NetPortableTargetFrameworks>$(NetCoreAppMinimum);net48</NetPortableTargetFrameworks>
     <NetRunnerTargetFrameworks>$(NetSDKTargetFramworks);$(NetPortableTargetFrameworks)</NetRunnerTargetFrameworks>
-    <!--
-      vstest.console.exe is shipped with VS, we can use the version of .NET Framework that VS requires to run (this might differ from the version is requires to install).
-      https://learn.microsoft.com/en-us/visualstudio/releases/2022/system-requirements#additional-requirements-and-guidance
-    -->
-    <NetFrameworkRunnerTargetFrameworks>net48</NetFrameworkRunnerTargetFrameworks>
-    <RunnerTargetFrameworks>$(NetFrameworkRunnerTargetFrameworks);$(NetRunnerTargetFrameworks)</RunnerTargetFrameworks>
-
+    <RunnerTargetFrameworks>$(NetFrameworkRunnerTargetFramework);$(NetRunnerTargetFrameworks)</RunnerTargetFrameworks>
     
     <!--
       Bundled extensions are shipped together with vstest.console or datacollector, they need to target the same tfm.
@@ -100,6 +100,16 @@
       Currently that is net8 (until November 10, 2026) and .NET Framework 4.6.2 (until Jan 12, 2027).
     -->
     <TestHostMinimumTargetFrameworks>$(NetCoreAppMinimum);$(NetFrameworkMinimum)</TestHostMinimumTargetFrameworks>
+    <!--
+      Testhost needs to support every target framework from the minimum, and it also needs to build
+      all the .NET Framework target frameworks that are newer than the minimum, because we ship each of those
+      executables separately, and use it to load dlls into specific version of .NET Framework based on user
+      settings.
+
+      https://learn.microsoft.com/en-us/dotnet/standard/frameworks#supported-target-frameworks
+    -->
+    <TestHostAllTargetFrameworks>$(TestHostMinimumTargetFrameworks);net47;net471;net472;net48;net481</TestHostAllTargetFrameworks>
+    
     <!--
       Library that is loaded by others and by us. We don't know where it will run (e.b. TranslationLayer),
       we need to support all frameworks from minimum, and also netstandard2.0.

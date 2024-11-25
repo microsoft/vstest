@@ -6,7 +6,7 @@
     <!--
       Shipped with TestPlatform package.
     -->
-    <TargetFrameworks>$(NetFrameworkRunnerTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkRunnerTargetFramework)</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <IsTestProject>false</IsTestProject>

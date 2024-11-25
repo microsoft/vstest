@@ -10,15 +10,7 @@
 
   <PropertyGroup>
     <AssemblyName>testhost.arm64</AssemblyName>
-    <!--
-      Testhost needs to support every target framework from the minimum, and it also needs to build
-      all the .NET Framework target frameworks that are newer than the minimum, because we ship each of those
-      executables separately, and use it to load dlls into specific version of .NET Framework based on user
-      settings.
-
-      https://learn.microsoft.com/en-us/dotnet/standard/frameworks#supported-target-frameworks
-    -->
-    <TargetFrameworks>$(TestHostMinimumTargetFrameworks);net47;net471;net472;net48;net481</TargetFrameworks>
+    <TargetFrameworks>$(TestHostAllTargetFrameworks)</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <IsTestProject>false</IsTestProject>
     <ApplicationManifest>app.manifest</ApplicationManifest>

@@ -3,7 +3,12 @@
 
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger</AssemblyName>
-    <TargetFrameworks>$(ExtensionTargetFrameworks)</TargetFrameworks>
+    <!--
+      Targetting netstandard2.0 and also net462, because we already had explicit packaging of net462 libraries,
+      and this article recommends to provide net462 along netstandard2.0
+      https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/cross-platform-targeting#multi-targeting
+    -->
+    <TargetFrameworks>$(ExtensionTargetFrameworks);net462</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
