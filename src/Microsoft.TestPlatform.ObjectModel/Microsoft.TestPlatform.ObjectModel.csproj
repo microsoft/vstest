@@ -33,7 +33,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Reflection.Metadata" Version="1.6.0" />
+    <!-- net48 includes tuple, include it in previous versions. -->
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net48')) != true" />
+    <PackageReference Include="System.Reflection.Metadata" Version="$(SystemReflectionMetadataVersion)" />
   </ItemGroup>
 
   <ItemGroup>
