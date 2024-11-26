@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(NetSDKTargetFramworks)</TargetFrameworks>
+    <TargetFrameworks>$(NetSDKTargetFramwork);$(TestHostAllTargetFrameworks)</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -39,18 +39,22 @@
     <MSBuildWarningsAsMessages>NU1702</MSBuildWarningsAsMessages>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!-- runner and runner dependencies -->
+  <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetSDKTargetFramwork)'))">
     <ProjectReference Include="..\..\datacollector\datacollector.csproj" />
     <ProjectReference Include="..\..\datacollector.arm64\datacollector.arm64.csproj" />
-    <ProjectReference Include="..\..\testhost\testhost.csproj" />
-    <ProjectReference Include="..\..\testhost.x86\testhost.x86.csproj" />
-    <ProjectReference Include="..\..\testhost.arm64\testhost.arm64.csproj" />
     <ProjectReference Include="..\..\vstest.console\vstest.console.csproj" />
     <ProjectReference Include="..\..\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\Microsoft.TestPlatform.Extensions.EventLogCollector.csproj" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.Extensions.BlameDataCollector\Microsoft.TestPlatform.Extensions.BlameDataCollector.csproj" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.Extensions.TrxLogger\Microsoft.TestPlatform.Extensions.TrxLogger.csproj" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.Extensions.HtmlLogger\Microsoft.TestPlatform.Extensions.HtmlLogger.csproj" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\testhost\testhost.csproj" />
+    <ProjectReference Include="..\..\testhost.x86\testhost.x86.csproj" />
+    <ProjectReference Include="..\..\testhost.arm64\testhost.arm64.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(DotNetBuildSourceOnly)' != 'true'">
@@ -68,8 +72,8 @@
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="$(MicrosoftExtensionsDependencyModelPackageVersion)" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="$(MicrosoftExtensionsFileSystemGlobbingVersion)" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Diagnostics.NETCore.Client" Version="$(MicrosoftDiagnosticsNETCoreClientVersion)" PrivateAssets="All" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.Internal.Dia" Version="$(TestPlatformMSDiaVersion)" PrivateAssets="All" GeneratePathProperty="true" Condition="'$(TargetFramework)'=='net472'" />
-    <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" GeneratePathProperty="true" Condition="'$(TargetFramework)' != 'net472'" />
+    <PackageReference Include="Microsoft.Internal.Dia" Version="$(TestPlatformMSDiaVersion)" PrivateAssets="All" GeneratePathProperty="true" Condition="'$(TargetFramework)'=='$(NetFrameworkRunnerTargetFramework)'" />
+    <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" GeneratePathProperty="true" Condition="'$(TargetFramework)' != 'NetFrameworkRunnerTargetFramework'" />
   </ItemGroup>
 
   <Target Name="CopyFiles" AfterTargets="Build">

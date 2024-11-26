@@ -8,7 +8,7 @@
         <dependency id="System.Reflection.Metadata" version="[9.0.0, )" />
       </group>
 
-      <group targetFramework="net6.0">
+      <group targetFramework="net8.0">
         <dependency id="System.Reflection.Metadata" version="[9.0.0, )" />
       </group>
 
@@ -68,14 +68,14 @@
     <!-- /net462 -->
 
     <!-- net6.0 -->
-    <file src="net6.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net6.0\" />
-    <file src="net6.0\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\net6.0\" />
-    <file src="net6.0\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\net6.0\" />
+    <file src="net8.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net8.0\" />
+    <file src="net8.0\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\net8.0\" />
+    <file src="net8.0\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\net8.0\" />
 
 
     <!-- Add localized resources -->
-    <file src="net6.0\**\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"   exclude="**\TestHost*\**\*.*" target="lib\net6.0\" />
-    <file src="net6.0\**\Microsoft.TestPlatform.CoreUtilities.resources.dll"               exclude="**\TestHost*\**\*.*" target="lib\net6.0\" />
+    <file src="net8.0\**\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"   exclude="**\TestHost*\**\*.*" target="lib\net8.0\" />
+    <file src="net8.0\**\Microsoft.TestPlatform.CoreUtilities.resources.dll"               exclude="**\TestHost*\**\*.*" target="lib\net8.0\" />
     <!-- /net6.0 -->
 
     <!-- netstandard 2.0 -->
