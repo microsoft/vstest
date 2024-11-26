@@ -60,7 +60,7 @@
     <file src="net48\Microsoft.Internal.TestPlatform.Extensions\Microsoft.DiaSymReader.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.DiaSymReader.dll" />
     <file src="net48\Microsoft.Internal.TestPlatform.Extensions\Microsoft.DiaSymReader.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.DiaSymReader.dll" />
     <file src="net48\Microsoft.CodeCoverage.Instrumentation\*.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\" />
-    <file src="net462\Microsoft.Extensions.DependencyModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.Extensions.DependencyModel.dll" />
+    <file src="net48\Microsoft.Extensions.DependencyModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.Extensions.DependencyModel.dll" />
     <file src="net48\Microsoft.Extensions.FileSystemGlobbing\Microsoft.Extensions.FileSystemGlobbing.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.Extensions.FileSystemGlobbing.dll" />
     <file src="net48\Microsoft.IntelliTrace.Core.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.IntelliTrace.Core.dll" />
     <file src="net48\Microsoft.TestPlatform.CommunicationUtilities.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.TestPlatform.CommunicationUtilities.dll" />
@@ -118,9 +118,8 @@
     <file src="net48\Microsoft.VisualStudio.QualityTools\QTDCAgent32.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTDCAgent32.exe" />
     <file src="net48\Microsoft.VisualStudio.QualityTools\QTDCAgent32.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTDCAgent32.exe.Config" />
 
-    <file src="net462\System.Collections.Immutable.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Collections.Immutable.dll" />
-    <file src="net462\System.Reflection.Metadata.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Reflection.Metadata.dll" />
-    <file src="net462\System.Runtime.InteropServices.RuntimeInformation.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Runtime.InteropServices.RuntimeInformation.dll" />
+    <file src="net48\System.Collections.Immutable.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Collections.Immutable.dll" />
+    <file src="net48\System.Reflection.Metadata.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Reflection.Metadata.dll" />
 
     <file src="net462\testhost.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.exe" />
     <file src="net462\testhost.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.exe.config" />
@@ -128,8 +127,8 @@
     <file src="net47\testhost.net47.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net47.exe.config" />
     <file src="net471\testhost.net471.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net471.exe" />
     <file src="net471\testhost.net471.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net471.exe.config" />
-    <file src="net48\testhost.net472.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.exe" />
-    <file src="net48\testhost.net472.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.exe.config" />
+    <file src="net472\testhost.net472.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.exe" />
+    <file src="net472\testhost.net472.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.exe.config" />
     <file src="net48\testhost.net48.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.exe" />
     <file src="net48\testhost.net48.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.exe.config" />
     <file src="net481\testhost.net481.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net481.exe" />
@@ -141,8 +140,8 @@
     <file src="net47\testhost.net47.x86.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net47.x86.exe.config" />
     <file src="net471\testhost.net471.x86.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net471.x86.exe" />
     <file src="net471\testhost.net471.x86.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net471.x86.exe.config" />
-    <file src="net48\testhost.net472.x86.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.x86.exe" />
-    <file src="net48\testhost.net472.x86.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.x86.exe.config" />
+    <file src="net472\testhost.net472.x86.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.x86.exe" />
+    <file src="net472\testhost.net472.x86.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.x86.exe.config" />
     <file src="net48\testhost.net48.x86.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.x86.exe" />
     <file src="net48\testhost.net48.x86.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.x86.exe.config" />
     <file src="net481\testhost.net481.x86.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net481.x86.exe" />
@@ -154,8 +153,8 @@
     <file src="net47\testhost.net47.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net47.arm64.exe.config" />
     <file src="net471\testhost.net471.arm64.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net471.arm64.exe" />
     <file src="net471\testhost.net471.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net471.arm64.exe.config" />
-    <file src="net48\testhost.net472.arm64.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.arm64.exe" />
-    <file src="net48\testhost.net472.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.arm64.exe.config" />
+    <file src="net472\testhost.net472.arm64.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.arm64.exe" />
+    <file src="net472\testhost.net472.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net472.arm64.exe.config" />
     <file src="net48\testhost.net48.arm64.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.arm64.exe" />
     <file src="net48\testhost.net48.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net48.arm64.exe.config" />
     <file src="net481\testhost.net481.arm64.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.net481.arm64.exe" />

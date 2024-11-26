@@ -75,8 +75,12 @@
     <ProjectReference Include="..\..\testhost.x86\testhost.x86.csproj" />
     <ProjectReference Include="..\..\testhost.arm64\testhost.arm64.csproj" />
   </ItemGroup>
-
-  <ItemGroup Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)')) ">
+  
+  <!-- 
+    We copy files from these packages, we want to update them as much as we can, so we are using the runner TFM
+    which is most likely higher than what is the minimum supported .NET Framework.
+  -->
+  <ItemGroup Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkRunnerTargetFramework)')) ">
     <PackageReference Include="System.ComponentModel.Composition" Version="$(SystemComponentModelCompositionVersion)" GeneratePathProperty="true" />
     <PackageReference Include="System.Memory" Version="$(SystemMemoryVersion)" />
     <PackageReference Include="Microsoft.CodeCoverage.Instrumentation" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" GeneratePathProperty="true" />
