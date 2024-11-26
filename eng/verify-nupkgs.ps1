@@ -21,10 +21,10 @@ function Verify-Nuget-Packages {
         "Microsoft.NET.Test.Sdk"                      = 15;
         "Microsoft.TestPlatform"                      = 614;
         "Microsoft.TestPlatform.Build"                = 20;
-        "Microsoft.TestPlatform.CLI"                  = 475;
+        "Microsoft.TestPlatform.CLI"                  = 473;
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 34;
         "Microsoft.TestPlatform.ObjectModel"          = 92;
-        "Microsoft.TestPlatform.AdapterUtilities"     = 75;
+        "Microsoft.TestPlatform.AdapterUtilities"     = 61;
         "Microsoft.TestPlatform.Portable"             = 604;
         "Microsoft.TestPlatform.TestHost"             = 62;
         "Microsoft.TestPlatform.TranslationLayer"     = 122;
@@ -63,7 +63,7 @@ function Verify-Nuget-Packages {
 
 
     Write-Host "Found $(@($nugetPackages).Count) nuget packages:`n    $($nugetPackages.FullName -join "`n    ")"
-    Write-Host "Unzipping NuGet packages."
+    Write-Host "Unzipping NuGet packages to '$tmpDirectory'."
     $unzipNugetPackageDirs = @()
     foreach ($nugetPackage in $nugetPackages) {
         $unzipNugetPackageDir = Join-Path $tmpDirectory $nugetPackage.BaseName
