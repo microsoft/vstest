@@ -321,7 +321,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                         testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "net9.0", folderName, exeName);
                     }
 #else
-                    var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "net6.0", folderName, exeName);
+                    var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "net8.0", folderName, exeName);
 #endif
 
                     if (_fileHelper.Exists(testHostExeNugetPath))

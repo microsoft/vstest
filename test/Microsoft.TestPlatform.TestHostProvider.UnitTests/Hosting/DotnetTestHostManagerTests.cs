@@ -362,6 +362,9 @@ public class DotnetTestHostManagerTests
 
         var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
+
+        // If this starts failing after updating TFMs of packakges, the GetTestHostProcessStartInfo defines the default version
+        // to use in GetTestHostProcessStartInfo, change that to the lowest supported netcore version, and pass this test.
         StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\net8.0\\x64\\testhost.exe");
     }
 
@@ -432,6 +435,8 @@ public class DotnetTestHostManagerTests
 
         var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
+        // If this starts failing after updating TFMs of packakges, the GetTestHostProcessStartInfo defines the default version
+        // to use in GetTestHostProcessStartInfo, change that to the lowest supported netcore version, and pass this test.
         StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\net8.0\\x86\\testhost.x86.exe");
     }
 
@@ -669,14 +674,13 @@ public class DotnetTestHostManagerTests
     // we can't put in a "default" value, and we don't have other way to determine if this provided value is the
     // runtime default or the actual value that user provided, so right now the default will use the latest, instead
     // or the more correct 1.0, it should be okay, as that version is not supported anymore anyway
-    [DataRow("net6.0", "6.0", true)]
-    [DataRow("net9.0", "5.0", true)]
+    [DataRow("net8.0", "8.0", true)]
 
-    // net6.0 is currently the latest released version, but it still has it's own runtime config, it is not the same as
+    // net9.0 is currently the latest released version, but it still has it's own runtime config, it is not the same as
     // "latest" which means the latest you have on system. So if you have only 5.0 SDK then net6.0 will fail because it can't find net6.0,
     // but latest would use net9.0 because that is the latest one on your system.
-    [DataRow("net6.0", "6.0", true)]
-    [DataRow("net6.0", "latest", false)]
+    [DataRow("net9.0", "9.0", true)]
+    [DataRow("net9.0", "latest", false)]
     public void GetTestHostProcessStartInfoShouldIncludeTestHostPathNextToTestRunnerIfTesthostDllIsNoFoundAndDepsFileNotFoundWithTheCorrectTfm(string tfm, string suffix, bool runtimeConfigExists)
     {
         // Absolute path to the source directory

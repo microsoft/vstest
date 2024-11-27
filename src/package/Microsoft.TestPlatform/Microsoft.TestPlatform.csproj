@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(NetFrameworkRunnerTargetFramework);$(TestHostAllTargetFrameworks)</TargetFrameworks>
+    <!-- $(NetFrameworkRunnerTargetFramework); should be added here, but it causes duplicates in tfm names and nuget restore fails -->
+    <TargetFrameworks>$(TestHostAllTargetFrameworks)</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
