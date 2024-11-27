@@ -40,21 +40,12 @@
     <MicrosoftCodeAnalysisBannedApiAnalyzersVersion>3.3.4</MicrosoftCodeAnalysisBannedApiAnalyzersVersion>
     <MicrosoftCodeAnalysisPublicApiAnalyzersVersion>3.3.4</MicrosoftCodeAnalysisPublicApiAnalyzersVersion>
     <MicrosoftCodeCoverageIOVersion>17.7.0</MicrosoftCodeCoverageIOVersion>
-<<<<<<< HEAD
     <MicrosoftDiagnosticsNETCoreClientVersion>0.2.553101</MicrosoftDiagnosticsNETCoreClientVersion>
     <MicrosoftExtensionsDependencyModelPackageVersion>9.0.0</MicrosoftExtensionsDependencyModelPackageVersion>
     <MicrosoftExtensionsFileSystemGlobbingVersion>9.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
     <MicrosoftFakesVersion>17.12.0</MicrosoftFakesVersion>
     <MicrosoftInternalCodeCoverageVersion>17.13.0-preview.24557.5</MicrosoftInternalCodeCoverageVersion>
     <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>17.12.35519.223</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
-=======
-    <MicrosoftDiagnosticsNETCoreClientVersion>0.2.0-preview.24566.1</MicrosoftDiagnosticsNETCoreClientVersion>
-    <MicrosoftExtensionsDependencyModelPackageVersion>3.1.0</MicrosoftExtensionsDependencyModelPackageVersion>
-    <MicrosoftExtensionsFileSystemGlobbingVersion>2.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
-    <MicrosoftFakesVersion>17.9.0-beta.24058.4</MicrosoftFakesVersion>
-    <MicrosoftInternalCodeCoverageVersion>17.13.0-preview.24562.1</MicrosoftInternalCodeCoverageVersion>
-    <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>17.10.34924.118</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
->>>>>>> main
     <MicrosoftVisualStudioEnterpriseAspNetHelper>$(MicrosoftVisualStudioDiagnosticsUtilitiesVersion)</MicrosoftVisualStudioEnterpriseAspNetHelper>
     <MicrosoftVisualStudioInteropVersion>17.12.40418</MicrosoftVisualStudioInteropVersion>
     <MicrosoftVSTelemetryVersion>17.13.24</MicrosoftVSTelemetryVersion>
