@@ -119,7 +119,7 @@ public class MigratorTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(DirectoryNotFoundException))]
+    [ExpectedException(typeof(FileNotFoundException))]
     public void InvalidPathThrowsException()
     {
         string oldTestsettingsPath = @"X:\generatedRun,settings.runsettings";
