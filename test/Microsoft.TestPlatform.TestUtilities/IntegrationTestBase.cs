@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.TestUtilities;
 public class IntegrationTestBase
 {
     public const string DesktopRunnerFramework = "net462";
-    public const string CoreRunnerFramework = "net6.0";
+    public const string CoreRunnerFramework = "net8.0";
 
     private const string TotalTestsMessage = "Total tests: {0}";
     private const string PassedTestsMessage = " Passed: {0}";
@@ -619,7 +619,7 @@ public class IntegrationTestBase
         }
         else if (testFramework == UnitTestFramework.XUnit)
         {
-            var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "net6.0";
+            var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "net8.0";
             adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"], tfm);
         }
 
@@ -990,7 +990,7 @@ public class IntegrationTestBase
     }
 
     protected string GetDotnetRunnerPath() =>
-        _testEnvironment.VSTestConsoleInfo?.Path ?? Path.Combine(IntegrationTestEnvironment.PublishDirectory, $"Microsoft.TestPlatform.CLI.{IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}.nupkg", "contentFiles", "any", "net6.0", "vstest.console.dll");
+        _testEnvironment.VSTestConsoleInfo?.Path ?? Path.Combine(IntegrationTestEnvironment.PublishDirectory, $"Microsoft.TestPlatform.CLI.{IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}.nupkg", "contentFiles", "any", "net8.0", "vstest.console.dll");
 
     protected void StdOutHasNoWarnings()
     {

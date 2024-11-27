@@ -677,7 +677,7 @@ public class DotnetTestHostManagerTests
     [DataRow("net8.0", "8.0", true)]
 
     // net9.0 is currently the latest released version, but it still has it's own runtime config, it is not the same as
-    // "latest" which means the latest you have on system. So if you have only 5.0 SDK then net6.0 will fail because it can't find net6.0,
+    // "latest" which means the latest you have on system. So if you have only 5.0 SDK then net8.0 will fail because it can't find net8.0,
     // but latest would use net9.0 because that is the latest one on your system.
     [DataRow("net9.0", "9.0", true)]
     [DataRow("net9.0", "latest", false)]

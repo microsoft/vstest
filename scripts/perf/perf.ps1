@@ -11,7 +11,7 @@ Param(
     [System.String] $TargetRuntime = "win7-x64",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("net6.0", "net462")]
+    [ValidateSet("net9.0", "net462")]
     [Alias("f")]
     [System.String] $TargetFramework,
 
