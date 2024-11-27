@@ -302,7 +302,7 @@ public class DotnetTestHostManagerTests
         var testhostExePath = "testhost.exe";
         _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
         _mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(false);
-        _mockFileHelper.Setup(ph => ph.Exists("C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp3.1\\x64\\testhost.exe")).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists("C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\net8.0\\x64\\testhost.exe")).Returns(true);
         _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
         var sourcePath = Path.Combine(_temp, "test.dll");
 
@@ -362,7 +362,7 @@ public class DotnetTestHostManagerTests
 
         var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-        StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp3.1\\x64\\testhost.exe");
+        StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\net8.0\\x64\\testhost.exe");
     }
 
     [TestMethod]
@@ -372,7 +372,7 @@ public class DotnetTestHostManagerTests
         var testhostExePath = "testhost.x86.exe";
         _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>");
         _mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(false);
-        _mockFileHelper.Setup(ph => ph.Exists($"C:\\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost\\15.0.0-Dev{Path.DirectorySeparatorChar}build\\netcoreapp3.1\\x86\\testhost.x86.exe")).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists($"C:\\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost\\15.0.0-Dev{Path.DirectorySeparatorChar}build\\net8.0\\x86\\testhost.x86.exe")).Returns(true);
         _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
         var sourcePath = Path.Combine(_temp, "test.dll");
 
@@ -432,7 +432,7 @@ public class DotnetTestHostManagerTests
 
         var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
-        StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp3.1\\x86\\testhost.x86.exe");
+        StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\net8.0\\x86\\testhost.x86.exe");
     }
 
     [TestMethod]
@@ -632,7 +632,7 @@ public class DotnetTestHostManagerTests
         StringAssert.Contains(startInfo.Arguments, expectedTestHostPath);
     }
 
-    // TODO: This assembly was previously compiled as net472 and so it was skipped and only ran as netcoreapp3.1. This fails in test, but works in code that is not isolated in appdomain. Might be worth fixing because we get one null here, and another in DotnetTestHostManager.
+    // TODO: This assembly was previously compiled as net472 and so it was skipped and only ran as net8.0. This fails in test, but works in code that is not isolated in appdomain. Might be worth fixing because we get one null here, and another in DotnetTestHostManager.
     // Assembly.GetEntryAssembly().Location is null because of running in app domain.
 #if NET
     [TestMethod]
@@ -660,7 +660,7 @@ public class DotnetTestHostManagerTests
 
 #endif
 
-    // TODO: This assembly was previously compiled as net472 and so it was skipped and only ran as netcoreapp3.1. This fails in test, but works in code that is not isolated in appdomain. Might be worth fixing because we get one null here, and another in DotnetTestHostManager.
+    // TODO: This assembly was previously compiled as net472 and so it was skipped and only ran as net8.0. This fails in test, but works in code that is not isolated in appdomain. Might be worth fixing because we get one null here, and another in DotnetTestHostManager.
     // Assembly.GetEntryAssembly().Location is null because of running in app domain.
 #if NET
 

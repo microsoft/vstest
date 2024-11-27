@@ -76,7 +76,7 @@
       vstest.console.exe and datacollector.exe are shipped in there as well, choose the lowest version of
       .NET Frameowork to support as well.
     -->
-    <NetPortableTargetFrameworks>$(NetCoreAppMinimum);net48</NetPortableTargetFrameworks>
+    <NetPortableTargetFrameworks>$(NetCoreAppMinimum)</NetPortableTargetFrameworks>
     <NetRunnerTargetFrameworks>$(NetSDKTargetFramwork);$(NetPortableTargetFrameworks)</NetRunnerTargetFrameworks>
     <RunnerTargetFrameworks>$(NetFrameworkRunnerTargetFramework);$(NetRunnerTargetFrameworks)</RunnerTargetFrameworks>
     

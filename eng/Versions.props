@@ -29,6 +29,8 @@
         Because you will need to update Microsoft.TestPlatform.Build.UnitTests to build using that concrete .NET TFM, e.g. net8.0 for 17.8.3.
         Otherwise it will restore the netstandard2.0 *reference* library into test project bin, and the test project will fail
         with File not found error.
+
+        Could not load file or assembly 'Microsoft.Build.Utilities.Core...
     -->
     <MicrosoftBuildFrameworkPackageVersion>17.12.13</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildPackageVersion>$(MicrosoftBuildFrameworkPackageVersion)</MicrosoftBuildPackageVersion>
