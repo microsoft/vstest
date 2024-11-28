@@ -119,7 +119,9 @@ public class MigratorTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(FileNotFoundException))]
+    // On some systems this throws file not found, on some it throws directory not found,
+    // I don't know why and it does not matter for the test. As long as it throws.
+    [ExpectedException(typeof(IOException))]
     public void InvalidPathThrowsException()
     {
         string oldTestsettingsPath = @"X:\generatedRun,settings.runsettings";
