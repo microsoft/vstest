@@ -4,7 +4,7 @@
   <PropertyGroup>
     <TestProject>true</TestProject>
     <IsTestProject>true</IsTestProject>
-    <PlatformTarget>ARM</PlatformTarget>
+    <PlatformTarget>ARM64</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup>

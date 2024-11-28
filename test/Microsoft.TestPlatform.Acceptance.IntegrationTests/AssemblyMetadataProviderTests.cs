@@ -80,9 +80,9 @@ public class AssemblyMetadataProviderTests : AcceptanceTestBase
     [TestMethod]
     [DataRow("net462")]
     [DataRow("net8.0")]
-    public void GetArchitectureShouldReturnCorrentArchForArmAssembly(string framework)
+    public void GetArchitectureShouldReturnCorrentArchForArm64Assembly(string framework)
     {
-        TestDotnetAssemblyArch("SimpleTestProjectARM", framework, Architecture.ARM, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
+        TestDotnetAssemblyArch("SimpleTestProjectARM64", framework, Architecture.ARM64, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
     }
 
     [TestMethod]
@@ -126,7 +126,7 @@ public class AssemblyMetadataProviderTests : AcceptanceTestBase
         }
         else
         {
-            Assert.AreEqual(".NETCoreApp,Version=v3.1", actualFx.FullName);
+            Assert.AreEqual(".NETCoreApp,Version=v8.0", actualFx.FullName);
         }
 
         Console.WriteLine("Framework:{0}, {1}", framework, string.Format(CultureInfo.CurrentCulture, PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
