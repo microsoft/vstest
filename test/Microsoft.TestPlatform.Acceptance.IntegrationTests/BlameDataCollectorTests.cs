@@ -108,8 +108,10 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
+    // This tests .net runner and .net framework runner, together with .net framework testhost
     [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    // .NET does not support crash dump on exit
+    // [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorShouldOutputDumpFileWhenNoCrashOccursButCollectAlwaysIsEnabled(RunnerInfo runnerInfo)
     {
 
@@ -177,10 +179,10 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // net8.0 does not support dump on exit
-    [NetCoreRunner("net462;net472;net8.0")]
+    // .NET does not support dump on exit
+    [NetCoreRunner("net462;net472")]
     // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net462;net472;net8.0")]
+    // [NetFrameworkRunner("net462;net472")]
 
     public void CrashDumpOnExit(RunnerInfo runnerInfo)
     {
