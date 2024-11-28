@@ -605,7 +605,7 @@ public class IntegrationTestBase
             var version = IntegrationTestEnvironment.DependencyVersions["MSTestTestAdapterVersion"];
             if (version.StartsWith("3"))
             {
-                var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : _testEnvironment.TargetFramework;
+                var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "netcoreapp3.1";
                 adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, tfm);
             }
             else
@@ -619,7 +619,7 @@ public class IntegrationTestBase
         }
         else if (testFramework == UnitTestFramework.XUnit)
         {
-            var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "net8.0";
+            var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "netcoreapp3.1";
             adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _xUnitTestAdapterRelativePath, IntegrationTestEnvironment.DependencyVersions["XUnitAdapterVersion"], tfm);
         }
 

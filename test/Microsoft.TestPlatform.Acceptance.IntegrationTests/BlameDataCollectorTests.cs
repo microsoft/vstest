@@ -156,9 +156,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     [TestMethod]
     // net8.0 does not support dump on exit
-    [NetCoreRunner("net462;net472;net8.0")]
+    [NetCoreRunner("net462;net472")]
     // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net462;net472;net8.0")]
+    // [NetFrameworkRunner("net462;net472")]
 
     public void CrashDumpWhenThereIsNoTimeout(RunnerInfo runnerInfo)
     {

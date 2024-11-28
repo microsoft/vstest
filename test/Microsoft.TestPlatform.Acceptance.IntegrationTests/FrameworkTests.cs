@@ -90,7 +90,7 @@ public class FrameworkTests : AcceptanceTestBase
         // On Linux and Mac we execute only net8.0 tests, and even though we force .NET Framework, we end up running on mono
         // which is suprisingly able to run the .NET CoreApp 3.1 dll, so we still just see a warning and 1 completed test.
         var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
-        if (runnerInfo.TargetFramework.Contains("netcore") && isWindows)
+        if (runnerInfo.TargetFramework.Contains("net8") && isWindows)
         {
             StdOutputContains("No test is available");
         }
