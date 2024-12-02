@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.Extensions.EventLogCollector</AssemblyName>
-    <TargetFrameworks>$(BundledExtensionTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkRunnerTargetFramework)</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
     <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
   </PropertyGroup>

@@ -232,7 +232,7 @@ public class ExecutionTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var errorFirstLine =
-            runnerInfo.TargetFramework.StartsWith("netcoreapp")
+            !runnerInfo.TargetFramework.StartsWith("net4")
             ? "Test host standard error line: Unhandled exception. System.InvalidOperationException: Operation is not valid due to the current state of the object."
             : "Test host standard error line: Unhandled Exception: System.InvalidOperationException: Operation is not valid due to the current state of the object.";
         FileAssert.Contains(diagLogFilePath, errorFirstLine);

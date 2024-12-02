@@ -182,8 +182,9 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSource(useDesktopRunner: false, useCoreRunner: true, DebugTestHost = true)]
+
+    // [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

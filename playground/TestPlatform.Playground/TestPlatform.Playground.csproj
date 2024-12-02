@@ -24,7 +24,9 @@
     <ProjectReference Include="$(RepoRoot)src\DataCollectors\DumpMinitool.x86\DumpMinitool.x86.csproj" SetTargetFramework="TargetFramework=$(NetFrameworkMinimum)" />
     <ProjectReference Include="$(RepoRoot)src\DataCollectors\DumpMinitool.arm64\DumpMinitool.arm64.csproj" SetTargetFramework="TargetFramework=$(NetFrameworkMinimum)" />
 
-    <ProjectReference Include="$(RepoRoot)src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\Microsoft.TestPlatform.Extensions.EventLogCollector.csproj" />
+    <!-- Event log collector only works on .NET Framework, and so we build it only for that. -->
+    <ProjectReference Include="$(RepoRoot)src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\Microsoft.TestPlatform.Extensions.EventLogCollector.csproj"  SetTargetFramework="TargetFramework=$(NetFrameworkRunnerTargetFramework)"  />
+
     <ProjectReference Include="$(RepoRoot)src\datacollector\datacollector.csproj" />
     <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.Extensions.BlameDataCollector\Microsoft.TestPlatform.Extensions.BlameDataCollector.csproj" />
     <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />

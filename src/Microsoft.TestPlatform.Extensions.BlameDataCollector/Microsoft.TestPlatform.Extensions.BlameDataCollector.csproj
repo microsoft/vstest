@@ -19,7 +19,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.Extensions.BlameDataCollector</AssemblyName>
-    <TargetFrameworks>$(BundledExtensionTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>$(ExtensionTargetFrameworks)</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
     <!-- to copy the netcore.client dependency to bin folder on build -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>

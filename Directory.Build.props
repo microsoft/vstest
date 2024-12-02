@@ -81,13 +81,16 @@
     <RunnerTargetFrameworks>$(NetFrameworkRunnerTargetFramework);$(NetRunnerTargetFrameworks)</RunnerTargetFrameworks>
     
     <!--
-      Bundled extensions are shipped together with vstest.console or datacollector, they need to target the same tfm.
-      They don't need to target netstandard2.0 because we know where we will be loading them.
+      
     -->
     <BundledExtensionTargetFrameworks>$(RunnerTargetFrameworks)</BundledExtensionTargetFrameworks>
     <!--
       Extensions that are shipped as standalone packages need to be netstandard2.0, because we don't know on which runtime
       we will run.
+
+      This is the same for bundled extensions that are shipped together with vstest.console or datacollector. In ideal case
+      they would not need netstandard, but we load the same dll into .NET and .NET Framework datacollector.
+      So the need to target netstandard2.0 as well.
     -->
     <ExtensionTargetFrameworks>netstandard2.0</ExtensionTargetFrameworks>
 
