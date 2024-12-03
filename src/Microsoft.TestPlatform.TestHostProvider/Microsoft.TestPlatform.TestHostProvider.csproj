@@ -6,7 +6,7 @@
     <!--
       This project is client that is used only by runners, and shipped only in runner packages.
     -->
-    <TargetFrameworks>$(RunnerTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkRunnerTargetFramework);$(ExtensionTargetFrameworks)</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
     <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
   </PropertyGroup>

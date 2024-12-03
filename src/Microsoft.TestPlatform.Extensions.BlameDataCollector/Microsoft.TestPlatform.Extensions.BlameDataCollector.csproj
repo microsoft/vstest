@@ -19,7 +19,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.Extensions.BlameDataCollector</AssemblyName>
-    <TargetFrameworks>$(ExtensionTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkRunnerTargetFramework);$(ExtensionTargetFrameworks)</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
     <!-- to copy the netcore.client dependency to bin folder on build -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
