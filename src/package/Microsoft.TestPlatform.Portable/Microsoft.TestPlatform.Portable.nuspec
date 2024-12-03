@@ -50,7 +50,13 @@
 
     <file src="net48\Newtonsoft.Json.dll"	target="tools\net462\Newtonsoft.Json.dll" />
     <file src="net48\System.Collections.Immutable.dll"	target="tools\net462\System.Collections.Immutable.dll" />
+    
     <file src="net48\System.Reflection.Metadata.dll"	target="tools\net462\System.Reflection.Metadata.dll" />
+    <file src="net48\System.Memory.dll" target="tools\net462\System.Memory.dll" />
+    <file src="net48\System.Runtime.CompilerServices.Unsafe.dll" target="tools\net462\System.Runtime.CompilerServices.Unsafe.dll" />
+    <file src="net48\System.Numerics.Vectors.dll" target="tools\net462\System.Numerics.Vectors.dll" />
+    <file src="net48\System.Buffers.dll" target="tools\net462\System.Buffers.dll" />
+    
     <file src="net462\System.Runtime.InteropServices.RuntimeInformation.dll"	target="tools\net462\System.Runtime.InteropServices.RuntimeInformation.dll" />
     <file src="net462\testhost.exe"	target="tools\net462\testhost.exe" />
     <file src="net462\testhost.exe.config"	target="tools\net462\testhost.exe.config" />
