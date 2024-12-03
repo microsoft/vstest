@@ -11,6 +11,14 @@ Param(
     [string] $currentBranch
 )
 
+#####################################
+#######################################
+#$$$$$$$$$$$$$
+# remove before merge!!!
+return;
+########
+
+
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
