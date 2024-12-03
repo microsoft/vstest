@@ -121,10 +121,10 @@
     <!-- This is needed by System.Reflection.Metadata and its dependencies. -->
     <file src="net48\System.Reflection.Metadata.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Reflection.Metadata.dll" />
     <file src="net48\System.Collections.Immutable.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Collections.Immutable.dll" />
-    <!-- <file src="net48\System.Memory.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Memory.dll" />
+    <file src="net48\System.Memory.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Memory.dll" />
     <file src="net48\System.Runtime.CompilerServices.Unsafe.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Runtime.CompilerServices.Unsafe.dll" />
     <file src="net48\System.Numerics.Vectors.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Numerics.Vectors.dll" />
-    <file src="net48\System.Buffers.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Buffers.dll" />-->
+    <file src="net48\System.Buffers.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Buffers.dll" />
     <!-- end System.Reflection.Metadata -->
 
     <file src="net462\testhost.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\testhost.exe" />
