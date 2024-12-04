@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
@@ -51,10 +50,10 @@ public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
 
         foreach (var exceptionFilter in procDumpExceptionsList)
         {
-            procDumpArgument.Append(CultureInfo.InvariantCulture, $"-f {exceptionFilter} ");
+            procDumpArgument.Append($"-f {exceptionFilter} ");
         }
 
-        procDumpArgument.Append(CultureInfo.InvariantCulture, $"{processId} {filename}.dmp");
+        procDumpArgument.Append($"{processId} {filename}.dmp");
 
         var argument = procdumpArgumentsFromEnv.IsNullOrWhiteSpace()
             ? procDumpArgument.ToString()
@@ -80,7 +79,7 @@ public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
             procDumpArgument.Append(" -ma");
         }
 
-        procDumpArgument.Append(CultureInfo.InvariantCulture, $" {processId} {filename}.dmp");
+        procDumpArgument.Append($" {processId} {filename}.dmp");
         var argument = procDumpArgument.ToString();
 
         return argument;

@@ -179,9 +179,8 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // .NET does not support dump on exit
+    // .NET tfms do not support dump on exit, but runner does
     [NetCoreRunner("net462;net472")]
-    // should make no difference, keeping for easy debug
     // [NetFrameworkRunner("net462;net472")]
 
     public void CrashDumpOnExit(RunnerInfo runnerInfo)
