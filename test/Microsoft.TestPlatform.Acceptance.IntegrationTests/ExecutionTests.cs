@@ -202,7 +202,7 @@ public class ExecutionTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var errorMessage = "Process is terminated due to StackOverflowException.";
-        if (runnerInfo.TargetFramework.StartsWith("netcoreapp"))
+        if (!runnerInfo.TargetFramework.StartsWith("net4"))
         {
             errorMessage = "Test host process crashed : Stack overflow.";
         }
