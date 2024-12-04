@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
 
+#pragma warning disable CA1305
+
 public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
 {
     private readonly IEnvironmentVariableHelper _environmentVariableHelper;
@@ -85,3 +87,5 @@ public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
         return argument;
     }
 }
+
+#pragma warning restore CA1305
