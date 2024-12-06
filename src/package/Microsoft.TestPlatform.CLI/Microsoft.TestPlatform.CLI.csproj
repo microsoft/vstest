@@ -40,9 +40,13 @@
   </PropertyGroup>
 
   <!-- runner and runner dependencies -->
-  <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetSDKTargetFramework)'))">
+  <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetSDKTargetFramework)'))
+                        or '$(DotNetBuildSourceOnly)' == 'true'">
     <ProjectReference Include="..\..\vstest.console\vstest.console.csproj" />
-    <ProjectReference Include="..\..\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\Microsoft.TestPlatform.Extensions.EventLogCollector.csproj" SetTargetFramework="TargetFramework=$(NetFrameworkRunnerTargetFramework)"  />
+    <!-- EventLogCollector only works on Windows and .NET Framework. -->
+    <ProjectReference Include="..\..\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\Microsoft.TestPlatform.Extensions.EventLogCollector.csproj"
+                      SetTargetFramework="TargetFramework=$(NetFrameworkRunnerTargetFramework)"
+                      Condition="'$(DotNetBuildSourceOnly)' != 'true'" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.Extensions.BlameDataCollector\Microsoft.TestPlatform.Extensions.BlameDataCollector.csproj" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.Extensions.TrxLogger\Microsoft.TestPlatform.Extensions.TrxLogger.csproj" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.Extensions.HtmlLogger\Microsoft.TestPlatform.Extensions.HtmlLogger.csproj" />
@@ -51,7 +55,8 @@
 
   <!-- datacollectors are taken from both .NET and .NET Framework -->
   <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetSDKTargetFramework)'))
-              or $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkRunnerTargetFramework)'))">
+              or $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkRunnerTargetFramework)'))
+              or '$(DotNetBuildSourceOnly)' == 'true'">
     <ProjectReference Include="..\..\datacollector\datacollector.csproj" />
     <ProjectReference Include="..\..\datacollector.arm64\datacollector.arm64.csproj" />
   </ItemGroup>

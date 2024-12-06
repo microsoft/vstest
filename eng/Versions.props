@@ -32,7 +32,11 @@
 
         Could not load file or assembly 'Microsoft.Build.Utilities.Core...
     -->
-    <MicrosoftBuildFrameworkPackageVersion>17.12.13</MicrosoftBuildFrameworkPackageVersion>
+    <!-- 
+      Lot of these versions are not the latest present on nuget.org, we need to use versions that are present in SourceBuild to
+      avoid introducing pre-builts. https://github.com/dotnet/source-build-reference-packages/tree/main/src/referencePackages/src
+    -->
+    <MicrosoftBuildFrameworkPackageVersion>17.8.3</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildPackageVersion>$(MicrosoftBuildFrameworkPackageVersion)</MicrosoftBuildPackageVersion>
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildFrameworkPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>
     <MicrosoftBuildFrameworkReferenceOnly>$(MicrosoftBuildFrameworkPackageVersion)</MicrosoftBuildFrameworkReferenceOnly>
@@ -43,8 +47,8 @@
     <MicrosoftCodeAnalysisPublicApiAnalyzersVersion>3.3.4</MicrosoftCodeAnalysisPublicApiAnalyzersVersion>
     <MicrosoftCodeCoverageIOVersion>17.7.0</MicrosoftCodeCoverageIOVersion>
     <MicrosoftDiagnosticsNETCoreClientVersion>0.2.553101</MicrosoftDiagnosticsNETCoreClientVersion>
-    <MicrosoftExtensionsDependencyModelPackageVersion>9.0.0</MicrosoftExtensionsDependencyModelPackageVersion>
-    <MicrosoftExtensionsFileSystemGlobbingVersion>9.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
+    <MicrosoftExtensionsDependencyModelPackageVersion>6.0.0</MicrosoftExtensionsDependencyModelPackageVersion>
+    <MicrosoftExtensionsFileSystemGlobbingVersion>6.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
     <MicrosoftFakesVersion>17.12.0</MicrosoftFakesVersion>
     <MicrosoftInternalCodeCoverageVersion>17.13.0-preview.24557.5</MicrosoftInternalCodeCoverageVersion>
     <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>17.12.35519.223</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
@@ -55,11 +59,11 @@
     <MicrosoftVSSDKBuildToolsVersion>17.4.2124</MicrosoftVSSDKBuildToolsVersion>
     <MicrosoftWin32RegistryVersion>5.0.0</MicrosoftWin32RegistryVersion>
     <NewtonsoftJsonVersion>13.0.3</NewtonsoftJsonVersion>
-    <SystemCollectionsImmutableVersion>9.0.0</SystemCollectionsImmutableVersion>
-    <SystemComponentModelCompositionVersion>9.0.0</SystemComponentModelCompositionVersion>
+    <SystemCollectionsImmutableVersion>8.0.0</SystemCollectionsImmutableVersion>
+    <SystemComponentModelCompositionVersion>8.0.0</SystemComponentModelCompositionVersion>
     <SystemMemoryVersion>4.6.0</SystemMemoryVersion>
     <SystemNetHttpVersion>4.3.4</SystemNetHttpVersion>
-    <SystemReflectionMetadataVersion>9.0.0</SystemReflectionMetadataVersion>
+    <SystemReflectionMetadataVersion>8.0.0</SystemReflectionMetadataVersion>
     <SystemUriVersion>4.3.2</SystemUriVersion>
     <TestPlatformExternalsVersion>17.10.0-preview-2-34602-162</TestPlatformExternalsVersion>
     <MicrosoftInternalTestPlatformExtensions>17.10.0-preview-2-34602-162</MicrosoftInternalTestPlatformExtensions>
