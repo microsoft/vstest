@@ -28,9 +28,9 @@
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
     <!-- Necessary for source-build. This allows the live version of the package to be used by source-build. -->
-    <Dependency Name="System.ComponentModel.Composition" Version="4.5.0">
-      <Uri>https://github.com/dotnet/corefx</Uri>
-      <Sha>30ab651fcb4354552bd4891619a0bdd81e0ebdbf</Sha>
+    <Dependency Name="System.ComponentModel.Composition" Version="5.0.0">
+      <Uri>https://github.com/dotnet/runtime</Uri>
+      <Sha>cf258a14b70ad9069470a108f13765e0e5988f51</Sha>
     </Dependency>
     <!-- Necessary for source-build. This allows the live version of the package to be used by source-build. -->
     <Dependency Name="Microsoft.Extensions.DependencyModel" Version="3.0.0">
