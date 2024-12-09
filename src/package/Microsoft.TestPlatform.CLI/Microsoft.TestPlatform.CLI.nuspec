@@ -55,11 +55,6 @@
     <file src="netcoreapp3.1\vstest.console.deps.json" target="contentFiles\any\netcoreapp3.1" />
     <file src="netcoreapp3.1\vstest.console.runtimeconfig.json" target="contentFiles\any\netcoreapp3.1" />
 
-    <file src="netcoreapp3.1\runtimes\unix\lib\netcoreapp2.1\System.Security.Principal.Windows.dll" target="contentFiles\any\netcoreapp3.1\runtimes\unix\lib\netcoreapp2.1" />
-    <file src="netcoreapp3.1\runtimes\win\lib\netcoreapp2.0\System.Security.AccessControl.dll" target="contentFiles\any\netcoreapp3.1\runtimes\win\lib\netcoreapp2.0" />
-    <file src="netcoreapp3.1\runtimes\win\lib\netcoreapp2.1\System.Security.Principal.Windows.dll" target="contentFiles\any\netcoreapp3.1\runtimes\win\lib\netcoreapp2.1" />
-    <file src="netcoreapp3.1\runtimes\win\lib\netstandard2.0\Microsoft.Win32.Registry.dll" target="contentFiles\any\netcoreapp3.1\runtimes\win\lib\netstandard2.0" />
-
     <!-- Extensions -->
     <file src="netcoreapp3.1\DumpMinitool.exe" target="contentFiles\any\netcoreapp3.1\Extensions\dump" />
     <file src="netcoreapp3.1\DumpMinitool.exe.config" target="contentFiles\any\netcoreapp3.1\Extensions\dump" />

@@ -65,12 +65,6 @@
     <PackageReference Include="Microsoft.Internal.Dia" Version="$(TestPlatformMSDiaVersion)" PrivateAssets="All" GeneratePathProperty="true" />
   </ItemGroup>
 
-  <!-- Exclude packages that are already inbox in newer .NETCoreApp versions. -->
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'">
-    <PackageReference Include="System.Collections.Immutable" Version="$(SystemCollectionsImmutableVersion)" GeneratePathProperty="true"/>
-    <PackageReference Include="System.Reflection.Metadata" Version="$(SystemReflectionMetadataVersion)" GeneratePathProperty="true"/>
-  </ItemGroup>
-
   <Target Name="CopyFiles" AfterTargets="Build">
     <ItemGroup>
       <MicrosoftCodeCoverageIO Include="$(PkgMicrosoft_CodeCoverage_IO)\lib\netstandard2.0\**\*" />
@@ -78,9 +72,6 @@
       <MicrosoftExtensionsFileSystemGlobbing Include="$(PkgMicrosoft_Extensions_FileSystemGlobbing)\lib\netstandard2.0\*" />
       <NewtonsoftJson Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*" />
       <MicrosoftInternalDia Include="$(PkgMicrosoft_Internal_Dia)\tools\net451\**\*" />
-
-      <SystemCollectionsImmutable Include="$(PkgSystem_Collections_Immutable)\lib\netstandard2.0\*" Condition="'$(PkgSystem_Collections_Immutable)' != ''" />
-      <SystemReflectionMetadata Include="$(PkgSystem_Reflection_Metadata)\lib\netstandard2.0\*" Condition="'$(PkgSystem_Reflection_Metadata)' != ''" />
     </ItemGroup>
 
     <Copy SourceFiles="@(MicrosoftCodeCoverageIO)" DestinationFiles="$(OutDir)\Microsoft.CodeCoverage.IO\%(RecursiveDir)%(Filename)%(Extension)" />
@@ -88,8 +79,5 @@
     <Copy SourceFiles="@(MicrosoftExtensionsFileSystemGlobbing)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(NewtonsoftJson)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftInternalDia)" DestinationFiles="$(OutDir)\Microsoft.Internal.Dia\%(RecursiveDir)%(Filename)%(Extension)" />
-
-    <Copy SourceFiles="@(SystemCollectionsImmutable)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" Condition="'@(SystemCollectionsImmutable)' != ''" />
-    <Copy SourceFiles="@(SystemReflectionMetadata)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" Condition="'@(SystemReflectionMetadata)' != ''" />
   </Target>
 </Project>
