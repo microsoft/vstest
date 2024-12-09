@@ -70,7 +70,7 @@
   </ItemGroup>
 
   <!-- Exclude packages that are already inbox in newer .NETCoreApp versions. -->
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp' or '$(TargetFramework)' == '$(NetCoreAppMinimum)'">
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp' or '$(TargetFramework)' == 'netcoreapp3.1'">
     <PackageReference Include="Microsoft.Win32.Registry" Version="$(MicrosoftWin32RegistryVersion)" GeneratePathProperty="true" PrivateAssets="Runtime" />
     <PackageReference Include="System.Security.AccessControl" Version="$(SystemSecurityAccessControlVersion)" GeneratePathProperty="true" PrivateAssets="Runtime" />
     <PackageReference Include="System.Security.Principal.Windows" Version="$(SystemSecurityPrincipalWindowsVersion)" GeneratePathProperty="true" PrivateAssets="All" />
