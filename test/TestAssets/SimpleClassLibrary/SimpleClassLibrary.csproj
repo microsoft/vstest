@@ -3,8 +3,8 @@
     <TargetFrameworks>$(NetFrameworkMinimum);$(NetCoreAppMinimum)</TargetFrameworks>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Net.Http" Version="$(SystemNetHttpVersion)" />
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework">
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
 
   <PropertyGroup Condition="$(NetCoreAppTargetFramework) == 'true' and $(Configuration) == 'Debug'">
