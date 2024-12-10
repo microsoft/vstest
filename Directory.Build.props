@@ -50,6 +50,8 @@
 
   <!-- The TFMs to build and test against. -->
   <PropertyGroup>
+    <!-- Naming is based on dotnet/runtime one -->
+    <NetFrameworkMinimum>net462</NetFrameworkMinimum>
     <!-- When not building from source, hardcode the NetCurrent TFM value as it is hardcoded in a number of places, i.e. nuspec files. -->
     <NetCurrent Condition="'$(DotNetBuildSourceOnly)' != 'true'">net9.0</NetCurrent>
     <NetCoreAppMinimum>netcoreapp3.1</NetCoreAppMinimum>
