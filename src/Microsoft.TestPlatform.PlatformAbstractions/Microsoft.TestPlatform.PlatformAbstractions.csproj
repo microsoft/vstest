@@ -22,15 +22,11 @@
     <AdditionalFiles Include="PublicAPI\net\PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI\net\PublicAPI.Unshipped.txt" />
     <!-- Framework specific API -->
-    <AdditionalFiles Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)'))
-                                or '$(TargetFramework)' == 'netstandard2.0' "
-                     Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
-    <AdditionalFiles Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)'))
-                                or '$(TargetFramework)' == 'netstandard2.0' "
-                     Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
-    <!-- Framework specific API for Net6.0 and Net7.0 -->
-    <AdditionalFiles Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetCoreAppMinimum)')) " Include="PublicAPI/net6.0_and_net7.0/PublicAPI.Shipped.txt" />
-    <AdditionalFiles Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetCoreAppMinimum)')) " Include="PublicAPI/net6.0_and_net7.0/PublicAPI.Unshipped.txt" />
+    <AdditionalFiles Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)'))&#xD;&#xA;                                or '$(TargetFramework)' == 'netstandard2.0' " Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
+    <AdditionalFiles Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)'))&#xD;&#xA;                                or '$(TargetFramework)' == 'netstandard2.0' " Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
+    <!-- Framework specific API for net8.0+ -->
+    <AdditionalFiles Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetCoreAppMinimum)')) " Include="PublicAPI\net8.0\PublicAPI.Shipped.txt" />
+    <AdditionalFiles Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetCoreAppMinimum)')) " Include="PublicAPI\net8.0\PublicAPI.Unshipped.txt" />
   </ItemGroup>
 
   <ItemGroup>
