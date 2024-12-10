@@ -29,7 +29,7 @@
     </Dependency>
     <!-- Necessary for source-build. This allows the live version of the package to be used by source-build. -->
     <Dependency Name="System.ComponentModel.Composition" Version="4.5.0">
-      <Uri>https://github.com/dotnet/corefx</Uri>
+      <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>30ab651fcb4354552bd4891619a0bdd81e0ebdbf</Sha>
     </Dependency>
     <!-- Necessary for source-build. This allows the live version of the package to be used by source-build. -->
