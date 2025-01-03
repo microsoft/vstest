@@ -33,7 +33,7 @@ jobs:
         run: |
           # The resource ID for Azure DevOps is always 499b84ac-1321-427f-aa17-267ca6975798
           # https://learn.microsoft.com/azure/devops/integrate/get-started/authentication/service-principal-managed-identity
-          az account set -s $(secrets.ADO_SUBSCRIPTION_ID)
+          # az account set -s $(secrets.ADO_SUBSCRIPTION_ID)
           echo "ado_token=$(az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query "accessToken" --output tsv)" >> $GITHUB_ENV
       - uses: pavelhorak/github-actions-issue-to-work-item@main
         env:
