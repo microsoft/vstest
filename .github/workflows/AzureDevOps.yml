@@ -22,7 +22,7 @@ jobs:
   updateAzDO:
     if: github.event.label.name == 'sprint'
     runs-on: ubuntu-latest
-    environment: ado
+    environment: azurecloud
 
     steps:
       # Step 1: Login to Azure using federated identity
