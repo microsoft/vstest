@@ -25,11 +25,7 @@ jobs:
     environment: ado
 
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # Step 2: Login to Azure using federated identity
+      # Step 1: Login to Azure using federated identity
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -38,7 +34,7 @@ jobs:
           allow-no-subscriptions: true
           enable-debug-logs: true
 
-      # Step 3: Obtain Azure DevOps token
+      # Step 2: Obtain Azure DevOps token
       - name: Get Azure DevOps token
         id: get_ado_token
         run: |
@@ -46,7 +42,7 @@ jobs:
           ado_token=$(az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query "accessToken" --output tsv)
           echo "ado_token=${ado_token}" >> $GITHUB_ENV
 
-      # Step 4: Sync GitHub issue to Azure DevOps work item
+      # Step 3: Sync GitHub issue to Azure DevOps work item
       - name: Sync issue to Azure DevOps
         uses: pavelhorak/github-actions-issue-to-work-item@main
         env:
