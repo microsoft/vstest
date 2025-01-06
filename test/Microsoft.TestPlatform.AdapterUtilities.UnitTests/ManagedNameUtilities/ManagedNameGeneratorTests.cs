@@ -139,5 +139,4 @@ public class ManagedNameGeneratorTests
         Assert.AreEqual("Method0", managedMethodName);
     }
 
-
 }
