@@ -563,7 +563,7 @@ public static partial class ManagedNameHelper
         }
 
         if (c == '_'
-            // 'Digit' does not include letter numbers, which are valid identifiers as per docs https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/identifier-names'.
+            // 'Digit' does not include letter numbers, which are valid identifiers as per docs https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/identifier-names'.
             || char.IsLetterOrDigit(c) // Lu, Ll, Lt, Lm, Lo, or Nd
             )
         {
