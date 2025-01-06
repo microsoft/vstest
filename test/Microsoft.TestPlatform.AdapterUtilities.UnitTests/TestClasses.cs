@@ -144,7 +144,6 @@ namespace TestClasses
 }
 
 
-
 #pragma warning restore IDE0161 // Convert to file-scoped namespace
 #pragma warning restore IDE0060 // Remove unused parameter
 #pragma warning restore CA1822 // Mark members as static
