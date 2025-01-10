@@ -27,7 +27,6 @@
     "vs": {
       "version": "17.8.0"
     },
-    "xcopy-msbuild": "17.8.5",
     "vswhere": "2.2.7",
     "dotnet": "9.0.100"
   },
