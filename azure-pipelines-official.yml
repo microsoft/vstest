@@ -55,7 +55,7 @@ parameters:
     image: 1es-ubuntu-2204
     os: linux
   - name: Azure Pipelines
-    image: macOS-12
+    image: macos-14
     os: macOS
 
 variables:
