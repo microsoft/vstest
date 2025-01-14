@@ -270,6 +270,10 @@
       <VsixSourceItem Include="$(TestPlatformBinFolder)zh-Hant\Microsoft*.TestPlatform.Extensions.*.dll;$(TestPlatformBinFolder)zh-Hant\Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll">
         <VSIXSubPath>Extensions\zh-Hant</VSIXSubPath>
       </VsixSourceItem>
+
+      <VsixSourceItem Include="$(TestPlatformBinFolder)DumpMiniTool*">
+        <VSIXSubPath>Extensions\dump</VSIXSubPath>
+      </VsixSourceItem>
     </ItemGroup>
 
     <!-- Microsoft.VisualStudio.QualityTools.DataCollectors -->
