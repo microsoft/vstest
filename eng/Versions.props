@@ -44,14 +44,14 @@
     <MicrosoftExtensionsDependencyModelPackageVersion>3.1.0</MicrosoftExtensionsDependencyModelPackageVersion>
     <MicrosoftExtensionsFileSystemGlobbingVersion>2.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
     <MicrosoftFakesVersion>17.9.0-beta.24058.4</MicrosoftFakesVersion>
-    <MicrosoftInternalCodeCoverageVersion>17.14.0-preview.25059.1</MicrosoftInternalCodeCoverageVersion>
-    <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>17.10.34924.118</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
+    <MicrosoftInternalCodeCoverageVersion>17.14.0-preview.25067.3</MicrosoftInternalCodeCoverageVersion>
+    <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>17.13.35716.53</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
     <MicrosoftVisualStudioEnterpriseAspNetHelper>$(MicrosoftVisualStudioDiagnosticsUtilitiesVersion)</MicrosoftVisualStudioEnterpriseAspNetHelper>
     <MicrosoftVisualStudioInteropVersion>17.10.525-preview.1</MicrosoftVisualStudioInteropVersion>
     <MicrosoftVSTelemetryVersion>17.6.46</MicrosoftVSTelemetryVersion>
     <MicrosoftVSUtilitiesInternalVersion>16.3.42</MicrosoftVSUtilitiesInternalVersion>
     <MicrosoftVSSDKBuildToolsVersion>17.4.2124</MicrosoftVSSDKBuildToolsVersion>
-    <NewtonsoftJsonVersion>13.0.1</NewtonsoftJsonVersion>
+    <NewtonsoftJsonVersion>13.0.3</NewtonsoftJsonVersion>
     <NewtonsoftJsonVersion Condition="'$(DotNetBuildSourceOnly)' == 'true'">13.0.3</NewtonsoftJsonVersion>
     <SystemCollectionsImmutableVersion>1.5.0</SystemCollectionsImmutableVersion>
     <SystemComponentModelCompositionVersion>4.5.0</SystemComponentModelCompositionVersion>
