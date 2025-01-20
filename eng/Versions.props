@@ -45,7 +45,7 @@
     <MicrosoftExtensionsFileSystemGlobbingVersion>2.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
     <MicrosoftFakesVersion>17.9.0-beta.24058.4</MicrosoftFakesVersion>
     <MicrosoftInternalCodeCoverageVersion>17.14.0-preview.25067.3</MicrosoftInternalCodeCoverageVersion>
-    <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>17.10.34924.118</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
+    <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>17.13.35716.53</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
     <MicrosoftVisualStudioEnterpriseAspNetHelper>$(MicrosoftVisualStudioDiagnosticsUtilitiesVersion)</MicrosoftVisualStudioEnterpriseAspNetHelper>
     <MicrosoftVisualStudioInteropVersion>17.10.525-preview.1</MicrosoftVisualStudioInteropVersion>
     <MicrosoftVSTelemetryVersion>17.6.46</MicrosoftVSTelemetryVersion>
