@@ -327,7 +327,7 @@ public class DotnetTestHostManagerTests
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""13.0.1""
+                    ""Newtonsoft.Json"": ""13.0.3""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -400,7 +400,7 @@ public class DotnetTestHostManagerTests
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""13.0.1""
+                    ""Newtonsoft.Json"": ""13.0.3""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -744,7 +744,7 @@ public class DotnetTestHostManagerTests
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""13.0.1""
+                    ""Newtonsoft.Json"": ""13.0.3""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -809,7 +809,7 @@ public class DotnetTestHostManagerTests
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""13.0.1""
+                    ""Newtonsoft.Json"": ""13.0.3""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -877,7 +877,7 @@ public class DotnetTestHostManagerTests
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""13.0.1""
+                    ""Newtonsoft.Json"": ""13.0.3""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
