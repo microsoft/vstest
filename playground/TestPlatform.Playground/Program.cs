@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -89,7 +90,6 @@ internal class Program
 
         var sources = new[] {
             Path.Combine(playground, "bin", "MSTest1", "Debug", "net472", "MSTest1.dll"),
-            Path.Combine(playground, "bin", "MSTest2", "Debug", "net472", "MSTest2.dll"),
             // The built in .NET projects don't now work right now in Playground, there is some conflict with Arcade.
             // But if you create one outside of Playground it will work. 
             //Path.Combine(playground, "bin", "MSTest1", "Debug", "net7.0", "MSTest1.dll"),
@@ -142,7 +142,10 @@ internal class Program
         var discoveryHandler = new PlaygroundTestDiscoveryHandler(detailedOutput);
         var sw = Stopwatch.StartNew();
         // Discovery
-        r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        r.StartSession();
+        Console.WriteLine("started");
+        Task.Run(() => r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler));
+        Thread.Sleep(1000); r.AbortTestRun();
         var discoveryDuration = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery done in {discoveryDuration} ms");
         sw.Restart();
