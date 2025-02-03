@@ -28,6 +28,7 @@ public class FilePatternParser
     private readonly Matcher _matcher;
     private readonly IFileHelper _fileHelper;
     private readonly char[] _wildCardCharacters = ['*'];
+    private readonly char[] _directorySeparatorCharacters = [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar];
 
     public FilePatternParser()
         : this(new Matcher(), new FileHelper())
@@ -96,7 +97,7 @@ public class FilePatternParser
     {
         // Split the pattern based on first wild card character found.
         var splitOnWildCardIndex = filePattern.IndexOfAny(_wildCardCharacters);
-        var directorySeparatorIndex = filePattern.Substring(0, splitOnWildCardIndex).LastIndexOf(Path.DirectorySeparatorChar);
+        var directorySeparatorIndex = filePattern.Substring(0, splitOnWildCardIndex).LastIndexOfAny(_directorySeparatorCharacters);
 
         string searchDir = filePattern.Substring(0, directorySeparatorIndex);
         string pattern = filePattern.Substring(directorySeparatorIndex + 1);

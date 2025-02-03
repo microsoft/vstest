@@ -44,6 +44,18 @@ public class FilePatternParserTests
     }
 
     [TestMethod]
+    public void FilePatternParserShouldCorrectlySplitPatternAndDirectoryWithAlternateSeparator()
+    {
+        var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
+        _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
+        _filePatternParser.GetMatchingFiles(TranslatePath(@"C:/Users/vanidhi/Desktop/a/c/*bc.dll"));
+
+        // Assert
+        _mockMatcherHelper.Verify(x => x.AddInclude(TranslatePath(@"*bc.dll")));
+        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(TranslatePath(@"C:\Users\vanidhi\Desktop\a\c")))));
+    }
+
+    [TestMethod]
     public void FilePatternParserShouldCorrectlySplitWithArbitraryDirectoryDepth()
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
