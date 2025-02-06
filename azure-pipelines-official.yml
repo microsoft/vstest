@@ -55,7 +55,7 @@ parameters:
     image: 1es-ubuntu-2204
     os: linux
   - name: Azure Pipelines
-    image: macos-13
+    image: macos-14
     os: macOS
 
 variables:
@@ -123,9 +123,11 @@ extends:
     sdl:
       policheck:
         enabled: true
+      tsa:
+        enabled: true
     pool:
       name: $(DncEngInternalBuildPool)
-      image: 1es-windows-2022
+      image: windows.vs2022preview.amd64
       os: windows
     customBuildTags:
     - ES365AIMigrationTooling
@@ -149,7 +151,7 @@ extends:
             timeoutInMinutes: 120
             pool:
               name: $(DncEngInternalBuildPool)
-              image: 1es-windows-2022
+              image: windows.vs2022preview.amd64
               os: windows
             steps:
             # This steps help to understand versions of .NET runtime installed on the machine,
@@ -198,7 +200,7 @@ extends:
               inputs:
                 PathtoPublish: '$(Build.SourcesDirectory)/artifacts/VSSetup/Release'
                 ArtifactName: VSSetupArtifacts
-          
+
           - ${{ each pool in parameters.otherOsPools }}:
             - job: ${{ pool.os }}
               dependsOn: Windows
@@ -248,12 +250,12 @@ extends:
                   condition: failed()
 
           - job: Publish
-            dependsOn: 
+            dependsOn:
               - ${{ each pool in parameters.otherOsPools }}:
                 - ${{ pool.os }}
             pool:
                 name: $(DncEngInternalBuildPool)
-                image: 1es-windows-2022
+                image: windows.vs2022preview.amd64
                 os: windows
             steps:
               # The template job needs a log, otherwise it writes a warning. We can disable log uploading only for

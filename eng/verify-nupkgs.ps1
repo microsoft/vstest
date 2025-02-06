@@ -19,13 +19,13 @@ function Verify-Nuget-Packages {
     $expectedNumOfFiles = @{
         "Microsoft.CodeCoverage"                      = 59;
         "Microsoft.NET.Test.Sdk"                      = 15;
-        "Microsoft.TestPlatform"                      = 608;
+        "Microsoft.TestPlatform"                      = 619;
         "Microsoft.TestPlatform.Build"                = 20;
-        "Microsoft.TestPlatform.CLI"                  = 471;
+        "Microsoft.TestPlatform.CLI"                  = 481;
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 34;
         "Microsoft.TestPlatform.ObjectModel"          = 92;
-        "Microsoft.TestPlatform.AdapterUtilities"     = 75;
-        "Microsoft.TestPlatform.Portable"             = 592;
+        "Microsoft.TestPlatform.AdapterUtilities"     = 61;
+        "Microsoft.TestPlatform.Portable"             = 608;
         "Microsoft.TestPlatform.TestHost"             = 63;
         "Microsoft.TestPlatform.TranslationLayer"     = 122;
         "Microsoft.TestPlatform.Internal.Uwp"         = 38;
@@ -63,7 +63,7 @@ function Verify-Nuget-Packages {
 
 
     Write-Host "Found $(@($nugetPackages).Count) nuget packages:`n    $($nugetPackages.FullName -join "`n    ")"
-    Write-Host "Unzipping NuGet packages."
+    Write-Host "Unzipping NuGet packages to '$tmpDirectory'."
     $unzipNugetPackageDirs = @()
     foreach ($nugetPackage in $nugetPackages) {
         $unzipNugetPackageDir = Join-Path $tmpDirectory $nugetPackage.BaseName
@@ -84,7 +84,7 @@ function Verify-Nuget-Packages {
             $packageKey = $packageBaseName.Replace([string]".$version", [string]"")
             Write-Host "Verifying package '$packageBaseName'."
 
-            $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir).Count
+            $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir | Where-Object { $_.Name -ne '.signature.p7s' }).Count
             if (-not $expectedNumOfFiles.ContainsKey($packageKey)) {
                 $errors += "Package '$packageKey' is not present in file expectedNumOfFiles table. Is that package known?"
                 continue
