@@ -50,6 +50,7 @@
     <file src="netcoreapp3.1\testhost.x86.exe" target="build\netcoreapp3.1\x86\" />
 
     <file src="netcoreapp3.1\Microsoft.TestPlatform.TestHost.props" target="build\netcoreapp3.1\" />
+    <file src="netcoreapp3.1\Microsoft.TestPlatform.TestHost.targets" target="build\netcoreapp3.1\" />
 
 
     <!-- Add localized resources netcoreapp3.1 -->
