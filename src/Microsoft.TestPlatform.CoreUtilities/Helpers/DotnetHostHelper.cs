@@ -409,8 +409,14 @@ public class DotnetHostHelper : IDotnetHostHelper
             using var headerReader = _fileHelper.GetStream(path, FileMode.Open, FileAccess.Read);
             var magicBytes = new byte[4];
             var cpuInfoBytes = new byte[4];
-            headerReader.Read(magicBytes, 0, magicBytes.Length);
-            headerReader.Read(cpuInfoBytes, 0, cpuInfoBytes.Length);
+
+#if NET
+            headerReader.ReadExactly(magicBytes, 0, magicBytes.Length);
+            headerReader.ReadExactly(cpuInfoBytes, 0, cpuInfoBytes.Length);
+#else
+            ReadExist(headerReader, magicBytes, 0, magicBytes.Length);
+            ReadExist(headerReader, cpuInfoBytes, 0, cpuInfoBytes.Length);
+#endif
 
             var magic = BitConverter.ToUInt32(magicBytes, 0);
             var cpuInfo = BitConverter.ToUInt32(cpuInfoBytes, 0);
@@ -431,6 +437,20 @@ public class DotnetHostHelper : IDotnetHostHelper
         }
 
         return null;
+    }
+
+    private static void ReadExist(FileStream stream, byte[] buffer, int offset, int count)
+    {
+        while (count > 0)
+        {
+            int read = stream.Read(buffer, offset, count);
+            if (read <= 0)
+            {
+                throw new EndOfStreamException();
+            }
+            offset += read;
+            count -= read;
+        }
     }
 
     internal enum MacOsCpuType : uint
