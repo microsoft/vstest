@@ -439,7 +439,7 @@ public class DotnetHostHelper : IDotnetHostHelper
         return null;
     }
 
-    private static void ReadExist(FileStream stream, byte[] buffer, int offset, int count)
+    private static void ReadExist(Stream stream, byte[] buffer, int offset, int count)
     {
         while (count > 0)
         {
