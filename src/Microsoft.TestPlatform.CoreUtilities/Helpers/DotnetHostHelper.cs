@@ -410,13 +410,8 @@ public class DotnetHostHelper : IDotnetHostHelper
             var magicBytes = new byte[4];
             var cpuInfoBytes = new byte[4];
 
-#if NET
-            headerReader.ReadExactly(magicBytes, 0, magicBytes.Length);
-            headerReader.ReadExactly(cpuInfoBytes, 0, cpuInfoBytes.Length);
-#else
-            ReadExist(headerReader, magicBytes, 0, magicBytes.Length);
-            ReadExist(headerReader, cpuInfoBytes, 0, cpuInfoBytes.Length);
-#endif
+            ReadExactly(headerReader, magicBytes, 0, magicBytes.Length);
+            ReadExactly(headerReader, cpuInfoBytes, 0, cpuInfoBytes.Length);
 
             var magic = BitConverter.ToUInt32(magicBytes, 0);
             var cpuInfo = BitConverter.ToUInt32(cpuInfoBytes, 0);
@@ -439,8 +434,13 @@ public class DotnetHostHelper : IDotnetHostHelper
         return null;
     }
 
-#if !NET
-    private static void ReadExist(Stream stream, byte[] buffer, int offset, int count)
+#if NET
+    private static void ReadExactly(Stream stream, byte[] buffer, int offset, int count)
+    {
+        stream.ReadExactly(buffer, offset, count);
+    }
+#else
+    private static void ReadExactly(Stream stream, byte[] buffer, int offset, int count)
     {
         while (count > 0)
         {
