@@ -439,6 +439,7 @@ public class DotnetHostHelper : IDotnetHostHelper
         return null;
     }
 
+#if !NET
     private static void ReadExist(Stream stream, byte[] buffer, int offset, int count)
     {
         while (count > 0)
@@ -452,6 +453,7 @@ public class DotnetHostHelper : IDotnetHostHelper
             count -= read;
         }
     }
+#endif
 
     internal enum MacOsCpuType : uint
     {
