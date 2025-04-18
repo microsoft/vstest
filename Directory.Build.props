@@ -133,8 +133,6 @@
     <DebugType>embedded</DebugType>
     <!-- Default to all packages generating a corresponding symbol package -->
     <IncludeSymbols>true</IncludeSymbols>
-    <!-- Workaround for AD0001 in analyzers with .NET 9. See https://github.com/dotnet/arcade/issues/14311 -->
-    <BuildWithNetFrameworkHostedCompiler Condition="'$(MSBuildRuntimeType)' == 'Full'">true</BuildWithNetFrameworkHostedCompiler>
   </PropertyGroup>
 
   <!-- Sign config -->
