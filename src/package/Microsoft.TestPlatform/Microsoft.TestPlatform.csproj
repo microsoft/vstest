@@ -15,7 +15,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <IsPackable>true</IsPackable>
+    <!-- Don't produce this package when building from source or inside the VMR as it relies on a VS license. -->
+    <IsPackable Condition="'$(DotNetBuild)' != 'true'">true</IsPackable>
     <NuspecFile>Microsoft.TestPlatform.nuspec</NuspecFile>
     <NuspecBasePath>$(OutputPath)</NuspecBasePath>
     <PackageId>Microsoft.TestPlatform</PackageId>
@@ -33,9 +34,7 @@
     </PackageDescription>
     <!-- Override default license -->
     <PackageLicenseFile>LICENSE_VS.txt</PackageLicenseFile>
-    <!-- Use the MIT license when building from the VMR as the VS license is cloaked out. -->
-    <PackageLicenseFile Condition="'$(DotNetBuild)' == 'true'">LICENSE_MIT.txt</PackageLicenseFile>
-    <PackageLicenseFullPath>$(SrcPackageFolder)licenses/$(PackageLicenseFile)</PackageLicenseFullPath>
+    <PackageLicenseFullPath>$(SrcPackageFolder)licenses/LICENSE_VS.txt</PackageLicenseFullPath>
   </PropertyGroup>
 
   <ItemGroup Label="NuGet">
