@@ -7,6 +7,7 @@
     <SourceBuildManagedOnly>true</SourceBuildManagedOnly>
     <ReportPrebuiltUsage Condition="'$(DotNetBuildSourceOnly)' == 'true'">$(DotNetBuildOrchestrator)</ReportPrebuiltUsage>
     <SetUpSourceBuildIntermediateNupkgCache>false</SetUpSourceBuildIntermediateNupkgCache>
+    <CreateIntermediatePackage>false</CreateIntermediatePackage>
   </PropertyGroup>
 
 </Project>
