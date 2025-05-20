@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
-  <Source Uri="https://github.com/dotnet/dotnet" Mapping="vstest" Sha="86c2177121ebf8d49b372dd7232588ceaae6c7cb" BarId="266849" />
+  <Source Uri="https://github.com/dotnet/dotnet" Mapping="vstest" Sha="170498a9429a5553fe7ac0ec2341d19bbb97cbe8" BarId="268722" />
   <ProductDependencies>
     <Dependency Name="Microsoft.Internal.CodeCoverage" Version="17.14.3-preview.25164.1">
       <Uri>https://dev.azure.com/devdiv/DevDiv/_git/vs-code-coverage</Uri>
