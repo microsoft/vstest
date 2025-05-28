@@ -3,5 +3,6 @@
 
   <PropertyGroup>
     <ExcludeFromSourceOnlyBuild>true</ExcludeFromSourceOnlyBuild>
+    <EnableMSTestRunner>true</EnableMSTestRunner>
   </PropertyGroup>
 </Project>
