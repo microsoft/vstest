@@ -31,7 +31,7 @@
     <file src="netstandard2.0\Microsoft.NET.Test.Sdk.props" target="build\net8.0\" />
     <file src="netstandard2.0\Microsoft.NET.Test.Sdk.props" target="build\net462\" />
 
-    <!-- Add incompatibility warning, and add the props, in case user decides to ignore it. -->
+    <!-- Add incompatibility error, and add the props, in case user decides to ignore it. -->
     <file src="netstandard2.0\Microsoft.NET.Test.Sdk.props" target="buildMultiTargeting\netcoreapp2.0\" />
     <file src="netstandard2.0\Microsoft.NET.Test.Sdk.targets" target="buildMultiTargeting\netcoreapp2.0\" />
 
