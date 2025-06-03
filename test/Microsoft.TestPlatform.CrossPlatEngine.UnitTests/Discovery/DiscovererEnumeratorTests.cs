@@ -758,6 +758,7 @@ public class DiscovererEnumeratorTests
     }
 
     [FileExtension(".dll")]
+    [FileExtension(".exe")]
     [DefaultExecutorUri("discoverer://manageddlldiscoverer")]
     [Category("managed")]
     private class ManagedDllTestDiscoverer : DllTestDiscoverer
@@ -833,7 +834,7 @@ public class DiscovererEnumeratorTests
             var shouldTestDiscovered = false;
             foreach (var source in sources)
             {
-                if (source.Equals("native.dll") || source.Equals("managed.dll") || source.EndsWith("CrossPlatEngine.UnitTests.dll"))
+                if (source.Equals("native.dll") || source.Equals("managed.dll") || source.EndsWith("CrossPlatEngine.UnitTests.dll") || source.EndsWith("CrossPlatEngine.UnitTests.exe"))
                 {
                     shouldTestDiscovered = true;
                     break;
