@@ -782,6 +782,7 @@ public class DiscovererEnumeratorTests
     }
 
     [FileExtension(".dll")]
+    [FileExtension(".exe")]
     [DefaultExecutorUri("discoverer://nativedlldiscoverer")]
     [Category("native")]
     private class NativeDllTestDiscoverer : DllTestDiscoverer
