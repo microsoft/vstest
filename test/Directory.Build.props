@@ -11,4 +11,8 @@
     -->
     <UseMSTestRunner>true</UseMSTestRunner>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Condition="'$(IsTestProject)'=='true' AND '$(EnableMSTestRunner)'=='true'" Include="Microsoft.Testing.Extensions.TrxReport" Version="$(MicrosoftTestingPlatformVersion)" />
+  </ItemGroup>
 </Project>
