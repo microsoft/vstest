@@ -317,7 +317,7 @@ public sealed class DotnetHostHelperTest : IDisposable
     [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, "/usr/share/dotnet/x64", "", false, PlatformOperatingSystem.Unix, DotnetMuxerResolutionStrategy.DefaultInstallationLocation)]
     [DataRow(PlatformArchitecture.ARM64, PlatformArchitecture.X64, "/usr/share/dotnet", "", false, PlatformOperatingSystem.Unix, DotnetMuxerResolutionStrategy.DefaultInstallationLocation)]
     [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/share/dotnet", "", false, PlatformOperatingSystem.Unix, DotnetMuxerResolutionStrategy.DefaultInstallationLocation)]
-#pragma warning restores MSTEST0042
+#pragma warning restore MSTEST0042
     public void GetDotnetPathByArchitecture_DefaultInstallation_Unix(
         PlatformArchitecture targetArchitecture,
         PlatformArchitecture platformArchitecture,
