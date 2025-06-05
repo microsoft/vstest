@@ -224,8 +224,7 @@ HTML file will be `c:\tempDirectory\TestResults\relativeDir\logFile.html`.
 vstest.console.exe Tests.dll /logger:"html;LogFileName=c:\temp\logFile.html"
 ```
 
-HTML file will be "c:\temp\logFile.html".
-
+HTML file will be `c:\temp\logFile.html`.
 
 ## Related links
 
