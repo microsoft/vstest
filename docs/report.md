@@ -73,6 +73,7 @@ dotnet-cli, the path could be `/sdk/<version>/Extensions` directory.
 
 > [!NOTE]
 > **New in 15.1**
+>
 > In case of #2, user can specify the full path to the location using `/TestAdapterPath:<path>`
 > command line switch. Test platform will locate extensions from the provided
 > directory.
@@ -164,24 +165,31 @@ Trx logger is used to log test results into a Visual Studio Test Results File (T
 
 ```shell
 /logger:trx [;LogFileName=<Defaults to unique file name>]
+```
 
 Where `LogFileName` can be absolute or relative path. If the path is relative, it will be relative to the `TestResults` directory, created under current working directory.
-```
+
 
 #### Examples
 
-Suppose the current working directory is `c:\tempDirecory`.
+Suppose the current working directory is `c:\tempDirectory`.
 
 ```shell
-1) vstest.console.exe Tests.dll /logger:trx
-trx file will get generated in location "c:\tempDirecory\TestResults"
-
-2) vstest.console.exe Tests.dll /logger:"trx;LogFileName=relativeDir\logFile.txt"
-trx file will be "c:\tempDirecory\TestResults\relativeDir\logFile.txt"
-
-3) vstest.console.exe Tests.dll /logger:"trx;LogFileName=c:\temp\logFile.txt"
-trx file will be "c:\temp\logFile.txt"
+vstest.console.exe Tests.dll /logger:trx
 ```
+
+trx file will get generated in location `c:\tempDirectory\TestResults`.
+
+```shell
+vstest.console.exe Tests.dll /logger:"trx;LogFileName=relativeDir\logFile.txt"
+
+trx file will be `c:\tempDirectory\TestResults\relativeDir\logFile.txt`.
+
+```shell
+vstest.console.exe Tests.dll /logger:"trx;LogFileName=c:\temp\logFile.txt"
+```
+
+trx file will be `c:\temp\logFile.txt`.
 
 ### 3) Html logger
 
@@ -198,18 +206,26 @@ Where "LogFileName" can be absolute or relative path. If path is relative, it wi
 
 #### Examples
 
-Suppose the current working directory is `c:\tempDirecory`.
+Suppose the current working directory is `c:\tempDirectory`.
 
 ```shell
-1) vstest.console.exe Tests.dll /logger:html
-HTML file will get generated in location "c:\tempDirecory\TestResults"
-
-2) vstest.console.exe Tests.dll /logger:"html;LogFileName=relativeDir\logFile.html"
-HTML file will be "c:\tempDirecory\TestResults\relativeDir\logFile.html"
-
-3) vstest.console.exe Tests.dll /logger:"html;LogFileName=c:\temp\logFile.html"
-HTML file will be "c:\temp\logFile.html"
+vstest.console.exe Tests.dll /logger:html
 ```
+
+HTML file will get generated in location `c:\tempDirectory\TestResults`.
+
+```shell
+vstest.console.exe Tests.dll /logger:"html;LogFileName=relativeDir\logFile.html"
+```
+
+HTML file will be `c:\tempDirectory\TestResults\relativeDir\logFile.html`.
+
+```shell
+vstest.console.exe Tests.dll /logger:"html;LogFileName=c:\temp\logFile.html"
+```
+
+HTML file will be "c:\temp\logFile.html".
+
 
 ## Related links
 
