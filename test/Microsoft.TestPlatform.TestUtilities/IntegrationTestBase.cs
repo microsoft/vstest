@@ -196,7 +196,8 @@ public class IntegrationTestBase
     /// </summary>
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     /// <param name="environmentVariables">Environment variables to set to the started process.</param>
-    public void InvokeDotnetTest(string arguments, Dictionary<string, string?>? environmentVariables = null)
+    /// <param name="workingDirectory"></param>
+    public void InvokeDotnetTest(string arguments, Dictionary<string, string?>? environmentVariables = null, string? workingDirectory = null)
     {
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
 
@@ -222,7 +223,7 @@ public class IntegrationTestBase
         // https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestForwardingApp.cs#L30-L39
         debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
 
-        IntegrationTestBase.ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
+        IntegrationTestBase.ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables, workingDirectory);
         FormatStandardOutCome();
     }
 
@@ -790,8 +791,9 @@ public class IntegrationTestBase
     /// <param name="stdError"></param>
     /// <param name="exitCode"></param>
     /// <param name="environmentVariables">Environment variables to set to the started process.</param>
+    /// <param name="workingDirectory"></param>
     private static void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode,
-        Dictionary<string, string?>? environmentVariables = null)
+        Dictionary<string, string?>? environmentVariables = null, string? workingDirectory = null)
     {
         environmentVariables ??= new();
 
@@ -799,7 +801,7 @@ public class IntegrationTestBase
 
         var executablePath = OSUtils.IsWindows ? @"dotnet.exe" : @"dotnet";
         var patchedDotnetPath = Path.GetFullPath(Path.Combine(IntegrationTestEnvironment.RepoRootDirectory, "artifacts", "tmp", ".dotnet", executablePath));
-        ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
+        ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables, workingDirectory);
     }
 
     protected static void ExecuteApplication(string path, string? args, out string stdOut, out string stdError, out int exitCode,
@@ -855,6 +857,7 @@ public class IntegrationTestBase
 
         Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", process.StartInfo.FileName);
         Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", process.StartInfo.Arguments);
+        Console.WriteLine("IntegrationTestBase.Execute: WorkingDirectory = {0}", StringUtils.IsNullOrWhiteSpace(process.StartInfo.WorkingDirectory) ? $"(Current Directory) {Directory.GetCurrentDirectory()}" : process.StartInfo.WorkingDirectory);
 
         var stopwatch = new Stopwatch();
         stopwatch.Start();
