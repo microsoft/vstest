@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -46,30 +47,71 @@ internal class TestHostTraceListener : DefaultTraceListener
     private static DebugAssertException GetException(string? message)
     {
         var stack = new StackTrace(true);
-        var debugMethodFound = false;
-        var frameCount = 0;
-        MethodBase? method = null;
-        foreach (var f in stack.GetFrames())
+        var frames = stack.GetFrames();
+        
+        // Find the first frame that represents user code (not our listener or system internals)
+        MethodBase? userMethod = null;
+        int userFrameIndex = -1;
+        
+        for (int i = 0; i < frames.Length; i++)
         {
-            var m = f?.GetMethod();
-            var declaringType = m?.DeclaringType;
-            if (!debugMethodFound && (declaringType == typeof(Debug) || declaringType == typeof(Trace)))
+            var frame = frames[i];
+            var method = frame?.GetMethod();
+            var declaringType = method?.DeclaringType;
+            
+            if (declaringType == null) continue;
+            
+            // Skip our own trace listener methods
+            if (declaringType == typeof(TestHostTraceListener)) continue;
+            
+            // Skip system diagnostics internal methods
+            if (declaringType.Namespace?.StartsWith("System.Diagnostics") == true) continue;
+            
+            // This should be user code
+            userMethod = method;
+            userFrameIndex = i;
+            break;
+        }
+        
+        // Build stack trace from user code onwards
+        var stackTraceBuilder = new StringBuilder();
+        if (userFrameIndex >= 0)
+        {
+            for (int i = userFrameIndex; i < frames.Length; i++)
             {
-                method = m;
-                debugMethodFound = true;
-            }
-
-            if (debugMethodFound)
-            {
-                frameCount++;
+                var frame = frames[i];
+                var method = frame?.GetMethod();
+                var fileName = frame?.GetFileName();
+                var lineNumber = frame?.GetFileLineNumber();
+                
+                if (method != null)
+                {
+                    stackTraceBuilder.Append("   at ");
+                    stackTraceBuilder.Append(method.DeclaringType?.FullName);
+                    stackTraceBuilder.Append(".");
+                    stackTraceBuilder.Append(method.Name);
+                    stackTraceBuilder.Append("()");
+                    
+                    if (!string.IsNullOrEmpty(fileName) && lineNumber > 0)
+                    {
+                        stackTraceBuilder.Append(" in ");
+                        stackTraceBuilder.Append(fileName);
+                        stackTraceBuilder.Append(":line ");
+                        stackTraceBuilder.Append(lineNumber);
+                    }
+                    
+                    if (i < frames.Length - 1)
+                    {
+                        stackTraceBuilder.AppendLine();
+                    }
+                }
             }
         }
-
-        var stackTrace = string.Join(Environment.NewLine, stack.ToString().Split(Environment.NewLine).TakeLast(frameCount));
-        var methodName = method != null ? $"{method.DeclaringType?.Name}.{method.Name}" : "<method>";
+        
+        var methodName = userMethod != null ? $"{userMethod.DeclaringType?.Name}.{userMethod.Name}" : "<method>";
         var wholeMessage = $"Method {methodName} failed with '{message}', and was translated to {typeof(DebugAssertException).FullName} to avoid terminating the process hosting the test.";
 
-        return new DebugAssertException(wholeMessage, stackTrace);
+        return new DebugAssertException(wholeMessage, stackTraceBuilder.ToString());
     }
 }
 
