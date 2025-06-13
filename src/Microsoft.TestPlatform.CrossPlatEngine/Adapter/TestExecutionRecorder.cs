@@ -23,10 +23,11 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     private readonly ITestCaseEventsHandler? _testCaseEventsHandler;
 
     /// <summary>
-    /// Contains TestCase Ids for test cases that are in progress
+    /// Contains TestCase keys for test cases that are in progress
     /// Start has been recorded but End has not yet been recorded.
+    /// Uses a combination of TestCase.Id and DisplayName to handle data-driven tests with the same Id.
     /// </summary>
-    private readonly HashSet<Guid> _testCaseInProgressMap;
+    private readonly HashSet<string> _testCaseInProgressMap;
 
     private readonly object _testCaseInProgressSyncObject = new();
 
@@ -47,7 +48,7 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
         // 3. Test Case Result.
         // If that is not that case.
         // If Test Adapters don't send the events in the above order, Test Case Results are cached till the Test Case End event is received.
-        _testCaseInProgressMap = new HashSet<Guid>();
+        _testCaseInProgressMap = new HashSet<string>();
     }
 
     /// <summary>
@@ -75,10 +76,13 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
         {
             lock (_testCaseInProgressSyncObject)
             {
+                // Use a unique key that combines Id and DisplayName to handle data-driven tests
+                var testCaseKey = GetTestCaseKey(testCase);
+                
                 // Do not send TestCaseStart for a test in progress
-                if (!_testCaseInProgressMap.Contains(testCase.Id))
+                if (!_testCaseInProgressMap.Contains(testCaseKey))
                 {
-                    _testCaseInProgressMap.Add(testCase.Id);
+                    _testCaseInProgressMap.Add(testCaseKey);
                     _testCaseEventsHandler.SendTestCaseStart(testCase);
                 }
             }
@@ -129,14 +133,17 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
         {
             lock (_testCaseInProgressSyncObject)
             {
-                // TestCaseEnd must always be preceded by TestCaseStart for a given test case id
-                if (_testCaseInProgressMap.Contains(testCase.Id))
+                // Use a unique key that combines Id and DisplayName to handle data-driven tests
+                var testCaseKey = GetTestCaseKey(testCase);
+                
+                // TestCaseEnd must always be preceded by TestCaseStart for a given test case key
+                if (_testCaseInProgressMap.Contains(testCaseKey))
                 {
                     // Send test case end event to handler.
                     _testCaseEventsHandler.SendTestCaseEnd(testCase, outcome);
 
                     // Remove it from map so that we send only one TestCaseEnd for every TestCaseStart.
-                    _testCaseInProgressMap.Remove(testCase.Id);
+                    _testCaseInProgressMap.Remove(testCaseKey);
                 }
             }
         }
@@ -149,5 +156,19 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     public void RecordAttachments(IList<AttachmentSet> attachments)
     {
         _attachmentSets.AddRange(attachments);
+    }
+
+    /// <summary>
+    /// Creates a unique key for a test case that combines Id and DisplayName.
+    /// This is needed to handle data-driven tests that may have the same Id but different DisplayNames.
+    /// </summary>
+    /// <param name="testCase">The test case</param>
+    /// <returns>A unique key string for the test case</returns>
+    private static string GetTestCaseKey(TestCase testCase)
+    {
+        // Combine Id and DisplayName to create a unique key
+        // DisplayName is used because data-driven tests often have the same Id but different DisplayNames
+        var displayName = testCase.DisplayName ?? testCase.FullyQualifiedName;
+        return $"{testCase.Id}|{displayName}";
     }
 }

@@ -219,5 +219,46 @@ public class TestExecutionRecorderTests
         Assert.IsTrue(_testableTestRunCache.TestResultList.Contains(_testResult));
     }
 
+    [TestMethod]
+    public void TestExecutionRecorder_ShouldSendTestCaseStartAndEndForEachTestCaseEvenWithSameId()
+    {
+        // This test reproduces the issue where InProcDataCollector's TestCaseStart/TestCaseStop 
+        // methods are not called for some data-driven tests that have the same TestCase.Id
+        
+        var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
+        var testableTestRunCache = new TestableTestRunCache();
+        var testExecutionRecorder = new TestExecutionRecorder(mockTestCaseEventsHandler.Object, testableTestRunCache);
+        
+        // Create two test cases with the same ID but different display names (like data-driven tests)
+        var testCase1 = new TestCase("MyTest", new Uri("executor://test"), "test.dll")
+        {
+            DisplayName = "MyTest(param1)"
+        };
+        var testCase2 = new TestCase("MyTest", new Uri("executor://test"), "test.dll")
+        {
+            DisplayName = "MyTest(param2)"
+        };
+        
+        // Force the same ID (simulating data-driven tests that generate the same ID from method name)
+        var sharedId = Guid.NewGuid();
+        testCase1.Id = sharedId;
+        testCase2.Id = sharedId;
+        
+        // Act
+        testExecutionRecorder.RecordStart(testCase1);
+        testExecutionRecorder.RecordStart(testCase2);
+        testExecutionRecorder.RecordEnd(testCase1, TestOutcome.Passed);
+        testExecutionRecorder.RecordEnd(testCase2, TestOutcome.Passed);
+        
+        // Assert
+        // Both test cases should trigger start events (this currently fails)
+        mockTestCaseEventsHandler.Verify(x => x.SendTestCaseStart(testCase1), Times.Once);
+        mockTestCaseEventsHandler.Verify(x => x.SendTestCaseStart(testCase2), Times.Once);
+        
+        // Both test cases should trigger end events (this currently fails)
+        mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(testCase1, TestOutcome.Passed), Times.Once);
+        mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(testCase2, TestOutcome.Passed), Times.Once);
+    }
+
     #endregion
 }
