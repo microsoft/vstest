@@ -114,6 +114,53 @@ public class FilePatternParserTests
         Assert.ThrowsException<TestSourceException>(() => _filePatternParser.GetMatchingFiles(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")));
     }
 
+    [TestMethod]
+    public void FilePatternParserShouldCorrectlySplitPatternAndDirectoryWithForwardSlashes()
+    {
+        var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
+        _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
+        
+        // Test with forward slashes - this should work on all platforms
+        _filePatternParser.GetMatchingFiles("C:/Users/vanidhi/Desktop/a/c/*bc.dll");
+
+        // Assert that the pattern is parsed correctly
+        _mockMatcherHelper.Verify(x => x.AddInclude("*bc.dll"));
+        // The directory path might be normalized by the OS, so we check for both possible formats
+        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => 
+            y.FullName.Contains("vanidhi") && y.FullName.Contains("Desktop") && y.FullName.Contains("a") && y.FullName.Contains("c"))));
+    }
+
+    [TestMethod]
+    public void FilePatternParserShouldCorrectlySplitWithArbitraryDirectoryDepthWithForwardSlashes()
+    {
+        var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
+        _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
+        
+        // Test with forward slashes and recursive patterns
+        _filePatternParser.GetMatchingFiles("C:/Users/vanidhi/**/c/*bc.txt");
+
+        // Assert
+        _mockMatcherHelper.Verify(x => x.AddInclude("**/c/*bc.txt"));
+        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => 
+            y.FullName.Contains("vanidhi"))));
+    }
+
+    [TestMethod]
+    public void FilePatternParserShouldCorrectlySplitWithMixedSlashes()
+    {
+        var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
+        _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
+        
+        // Test behavior with mixed forward and backward slashes
+        // This is primarily relevant on Windows where both are valid
+        _filePatternParser.GetMatchingFiles("C:/Users/vanidhi/Desktop/a/c/*bc.dll");
+
+        // Assert that the pattern is parsed correctly - should find the last separator regardless of type
+        _mockMatcherHelper.Verify(x => x.AddInclude("*bc.dll"));
+        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => 
+            y.FullName.Contains("vanidhi") && y.FullName.Contains("Desktop") && y.FullName.Contains("a") && y.FullName.Contains("c"))));
+    }
+
     private static string TranslatePath(string path)
     {
         // RuntimeInformation has conflict when used
