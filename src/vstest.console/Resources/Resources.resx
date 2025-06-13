@@ -696,6 +696,7 @@
       You may also choose to override this default behaviour by some optional parameters:
       CollectAlways - To collect dump on exit even if there is no crash (true/false) 
       DumpType - To specify dump type (mini/full).
+      Note: Dump collection requires procdump.exe. Download it and ensure it's available on PATH or set PROCDUMP_PATH environment variable to the directory containing it.
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</value>
