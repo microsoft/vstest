@@ -96,7 +96,14 @@ public class FilePatternParser
     {
         // Split the pattern based on first wild card character found.
         var splitOnWildCardIndex = filePattern.IndexOfAny(_wildCardCharacters);
-        var directorySeparatorIndex = filePattern.Substring(0, splitOnWildCardIndex).LastIndexOf(Path.DirectorySeparatorChar);
+        var pathBeforeWildCard = filePattern.Substring(0, splitOnWildCardIndex);
+        
+        // Find the last directory separator (either \ or /) before the wildcard
+        // On Windows, both \ and / are valid directory separators
+        // On Unix-like systems, only / is typically valid, but this approach is safe for both
+        var directorySeparatorIndex = Math.Max(
+            pathBeforeWildCard.LastIndexOf(Path.DirectorySeparatorChar),
+            pathBeforeWildCard.LastIndexOf(Path.AltDirectorySeparatorChar));
 
         string searchDir = filePattern.Substring(0, directorySeparatorIndex);
         string pattern = filePattern.Substring(directorySeparatorIndex + 1);
