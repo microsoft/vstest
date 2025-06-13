@@ -89,7 +89,7 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
             Arguments = arguments,
             EnvironmentVariables = environmentVariables,
             FileName = filePath,
-            WorkingDirectory = workingDirectory
+            WorkingDirectory = workingDirectory ?? Environment.CurrentDirectory
         };
 
         return _testRunEventsHandler.LaunchProcessWithDebuggerAttached(processInfo);
