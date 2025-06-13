@@ -219,7 +219,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
             if (!e.IsAborted && !e.IsCanceled)
             {
                 var testsFoundInAnySource = e.TestRunStatistics != null && e.TestRunStatistics.ExecutedTests > 0;
-                s_numberOfExecutedTests = e.TestRunStatistics!.ExecutedTests;
+                s_numberOfExecutedTests = e.TestRunStatistics?.ExecutedTests ?? 0;
 
                 // Indicate the user to use test adapter path command if there are no tests found
                 if (!testsFoundInAnySource && !CommandLineOptions.Instance.TestAdapterPathsSet && _commandLineOptions.TestCaseFilterValue == null)

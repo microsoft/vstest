@@ -150,6 +150,18 @@ public class RunTestsArgumentProcessorTests
         return executor;
     }
 
+    private RunTestsArgumentExecutor GetExecutorWithMockSetup(ITestRequestManager testRequestManager, IRunSettingsProvider runSettingsProvider, IOutput output)
+    {
+        var executor = new RunTestsArgumentExecutor(
+            CommandLineOptions.Instance,
+            runSettingsProvider,
+            testRequestManager,
+            _artifactProcessingManager.Object,
+            output
+        );
+        return executor;
+    }
+
     [TestMethod]
     public void ExecutorExecuteShouldThrowTestPlatformException()
     {
@@ -243,6 +255,141 @@ public class RunTestsArgumentProcessorTests
         var result = RunRunArgumentProcessorExecuteWithMockSetup(mockTestRunRequest.Object);
 
         _mockTestPlatformEventSource.Verify(x => x.ExecutionRequestStop(), Times.Once);
+    }
+
+    [TestMethod]
+    public void ExecutorExecuteWithTreatNoTestsAsErrorTrueAndNoTestsExecutedShouldReturnFail()
+    {
+        // Arrange
+        var mockTestRunRequest = new Mock<ITestRunRequest>();
+        var mockTestPlatform = new Mock<ITestPlatform>();
+        var mockConsoleOutput = new Mock<IOutput>();
+
+        // Create mock test run statistics with 0 executed tests
+        var mockTestRunStats = new Mock<ITestRunStatistics>();
+        mockTestRunStats.Setup(s => s.ExecutedTests).Returns(0);
+
+        var completionArgs = new TestRunCompleteEventArgs(mockTestRunStats.Object, false, false, null, null, null, new TimeSpan());
+
+        // Set up the mock test run request to trigger the completion event when ExecuteAsync is called
+        mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Callback(() =>
+        {
+            // Trigger the OnRunCompletion event
+            mockTestRunRequest.Raise(r => r.OnRunCompletion += null, completionArgs);
+        });
+
+        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(mockTestRunRequest.Object);
+
+        ResetAndAddSourceToCommandLineOptions();
+        
+        // Set up run settings with TreatNoTestsAsError=true
+        var runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<RunSettings>
+  <RunConfiguration>
+    <TreatNoTestsAsError>true</TreatNoTestsAsError>
+  </RunConfiguration>
+</RunSettings>";
+        
+        var mockRunSettingsProvider = new Mock<IRunSettingsProvider>();
+        mockRunSettingsProvider.Setup(rs => rs.ActiveRunSettings.SettingsXml).Returns(runSettingsXml);
+
+        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
+        var executor = GetExecutorWithMockSetup(testRequestManager, mockRunSettingsProvider.Object, mockConsoleOutput.Object);
+
+        // Act & Assert
+        var result = executor.Execute();
+        
+        // Should return Fail because TreatNoTestsAsError=true and 0 tests executed
+        Assert.AreEqual(ArgumentProcessorResult.Fail, result);
+    }
+
+    [TestMethod]
+    public void ExecutorExecuteWithTreatNoTestsAsErrorTrueAndNullTestRunStatisticsShouldReturnFail()
+    {
+        // Arrange
+        var mockTestRunRequest = new Mock<ITestRunRequest>();
+        var mockTestPlatform = new Mock<ITestPlatform>();
+        var mockConsoleOutput = new Mock<IOutput>();
+
+        // Create TestRunCompleteEventArgs with null TestRunStatistics (simulating no tests discovered)
+        var completionArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, new TimeSpan());
+
+        // Set up the mock test run request to trigger the completion event when ExecuteAsync is called
+        mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Callback(() =>
+        {
+            // Trigger the OnRunCompletion event
+            mockTestRunRequest.Raise(r => r.OnRunCompletion += null, completionArgs);
+        });
+
+        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(mockTestRunRequest.Object);
+
+        ResetAndAddSourceToCommandLineOptions();
+        
+        // Set up run settings with TreatNoTestsAsError=true
+        var runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<RunSettings>
+  <RunConfiguration>
+    <TreatNoTestsAsError>true</TreatNoTestsAsError>
+  </RunConfiguration>
+</RunSettings>";
+        
+        var mockRunSettingsProvider = new Mock<IRunSettingsProvider>();
+        mockRunSettingsProvider.Setup(rs => rs.ActiveRunSettings.SettingsXml).Returns(runSettingsXml);
+
+        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
+        var executor = GetExecutorWithMockSetup(testRequestManager, mockRunSettingsProvider.Object, mockConsoleOutput.Object);
+
+        // Act & Assert
+        var result = executor.Execute();
+        
+        // Should return Fail because TreatNoTestsAsError=true and 0 tests executed (due to null TestRunStatistics)
+        Assert.AreEqual(ArgumentProcessorResult.Fail, result);
+    }
+
+    [TestMethod]
+    public void ExecutorExecuteWithTreatNoTestsAsErrorFalseAndNoTestsExecutedShouldReturnSuccess()
+    {
+        // Arrange
+        var mockTestRunRequest = new Mock<ITestRunRequest>();
+        var mockTestPlatform = new Mock<ITestPlatform>();
+        var mockConsoleOutput = new Mock<IOutput>();
+
+        // Create mock test run statistics with 0 executed tests
+        var mockTestRunStats = new Mock<ITestRunStatistics>();
+        mockTestRunStats.Setup(s => s.ExecutedTests).Returns(0);
+
+        var completionArgs = new TestRunCompleteEventArgs(mockTestRunStats.Object, false, false, null, null, null, new TimeSpan());
+
+        // Set up the mock test run request to trigger the completion event when ExecuteAsync is called
+        mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Callback(() =>
+        {
+            // Trigger the OnRunCompletion event
+            mockTestRunRequest.Raise(r => r.OnRunCompletion += null, completionArgs);
+        });
+
+        mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(mockTestRunRequest.Object);
+
+        ResetAndAddSourceToCommandLineOptions();
+        
+        // Set up run settings with TreatNoTestsAsError=false (default)
+        var runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<RunSettings>
+  <RunConfiguration>
+    <TreatNoTestsAsError>false</TreatNoTestsAsError>
+  </RunConfiguration>
+</RunSettings>";
+        
+        var mockRunSettingsProvider = new Mock<IRunSettingsProvider>();
+        mockRunSettingsProvider.Setup(rs => rs.ActiveRunSettings.SettingsXml).Returns(runSettingsXml);
+
+        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
+        var executor = GetExecutorWithMockSetup(testRequestManager, mockRunSettingsProvider.Object, mockConsoleOutput.Object);
+
+        // Act & Assert
+        var result = executor.Execute();
+        
+        // Should return Success because TreatNoTestsAsError=false
+        Assert.AreEqual(ArgumentProcessorResult.Success, result);
     }
 
     #endregion
