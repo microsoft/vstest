@@ -42,7 +42,7 @@ This document lists all environment variables that are understood and handled by
 - **Example**: `VSTEST_HOST_DEBUG=1`
 
 ### VSTEST_HOST_DEBUG_ATTACHVS
-- **Description**: Enables debugging of the testhost process and attempts to attach Visual Studio debugger.
+- **Description**: Enables debugging of the testhost process and attempts to attach Visual Studio debugger. Requires AttachVS tool (that can be built in this repo) on PATH.
 - **Values**: Set to any non-empty value to enable
 - **Example**: `VSTEST_HOST_DEBUG_ATTACHVS=1`
 
@@ -57,7 +57,7 @@ This document lists all environment variables that are understood and handled by
 - **Example**: `VSTEST_RUNNER_DEBUG=1`
 
 ### VSTEST_RUNNER_DEBUG_ATTACHVS
-- **Description**: Enables debugging of the test runner and attempts to attach Visual Studio debugger.
+- **Description**: Enables debugging of the test runner and attempts to attach Visual Studio debugger. Requires AttachVS tool (that can be built in this repo) on PATH.
 - **Values**: Set to any non-empty value to enable
 - **Example**: `VSTEST_RUNNER_DEBUG_ATTACHVS=1`
 
@@ -87,18 +87,18 @@ This document lists all environment variables that are understood and handled by
 - **Example**: `VSTEST_DUMPTOOL_DEBUG=1`
 
 ### VSTEST_DEBUG_ATTACHVS_PATH
-- **Description**: Specifies the path for Visual Studio debugger attachment.
+- **Description**: Specifies the path for AttachVS tool, when not found on PATH. AttachVS tool can be built from this repo.
 - **Example**: `VSTEST_DEBUG_ATTACHVS_PATH=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.exe`
 
 ### VSTEST_DEBUG_NOBP
-- **Description**: Disables breakpoints in debug scenarios.
+- **Description**: Disables breakpoints on executable entry points, to for more seemless debugging when using AttachVS.
 - **Values**: Set to "1" to disable breakpoints
 - **Example**: `VSTEST_DEBUG_NOBP=1`
 
 ## Crash Dump and Blame Collection Variables
 
 ### VSTEST_DUMP_PATH
-- **Description**: Overrides the default directory where crash dumps are stored.
+- **Description**: Overrides the default directory where crash dumps are stored. This disables automatic dump upload via attachments.
 - **Example**: `VSTEST_DUMP_PATH=C:\CrashDumps`
 
 ### VSTEST_DUMP_TEMP_PATH
