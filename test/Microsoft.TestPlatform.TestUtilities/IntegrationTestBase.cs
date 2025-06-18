@@ -199,6 +199,14 @@ public class IntegrationTestBase
     /// <param name="workingDirectory"></param>
     public void InvokeDotnetTest(string arguments, Dictionary<string, string?>? environmentVariables = null, string? workingDirectory = null)
     {
+        if (workingDirectory is not null && !File.Exists(Path.Combine(workingDirectory, "dotnet.config")))
+        {
+            File.WriteAllText(Path.Combine(workingDirectory, "dotnet.config"), """
+                [dotnet.test.runner]
+                name = "VSTest"
+                """);
+        }
+
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
 
         var vstestConsolePath = GetDotnetRunnerPath();
