@@ -98,7 +98,7 @@ public class FilePatternParser
         // Split the pattern based on first wild card character found.
         var splitOnWildCardIndex = filePattern.IndexOfAny(_wildCardCharacters);
         var pathBeforeWildCard = filePattern.Substring(0, splitOnWildCardIndex);
-        
+
         // Find the last directory separator before the wildcard
         // On Windows, we need to check both \ and / as both are valid
         // On Unix-like systems, only / is the directory separator
