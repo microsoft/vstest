@@ -122,13 +122,13 @@ public class FilePatternParserTests
         
         // Test with forward slashes - this should work on all platforms
         // This specifically tests the fix for issue #14993
-        _filePatternParser.GetMatchingFiles("C:/Users/vanidhi/Desktop/a/c/*bc.dll");
+        _filePatternParser.GetMatchingFiles("C:/Users/someUser/Desktop/a/c/*bc.dll");
 
         // Assert that the pattern is parsed correctly
         _mockMatcherHelper.Verify(x => x.AddInclude("*bc.dll"));
         // On Windows, the path may be normalized, so we verify the key components are present
         _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => 
-            y.FullName.Contains("vanidhi") && y.FullName.Contains("Desktop") && 
+            y.FullName.Contains("someUser") && y.FullName.Contains("Desktop") && 
             y.FullName.Contains("a") && y.FullName.EndsWith("c"))));
     }
 

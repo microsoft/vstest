@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Runtime.InteropServices;
 
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
@@ -98,12 +99,22 @@ public class FilePatternParser
         var splitOnWildCardIndex = filePattern.IndexOfAny(_wildCardCharacters);
         var pathBeforeWildCard = filePattern.Substring(0, splitOnWildCardIndex);
         
-        // Find the last directory separator (either \ or /) before the wildcard
-        // On Windows, both \ and / are valid directory separators
-        // On Unix-like systems, only / is typically valid, but this approach is safe for both
-        var directorySeparatorIndex = Math.Max(
-            pathBeforeWildCard.LastIndexOf(Path.DirectorySeparatorChar),
-            pathBeforeWildCard.LastIndexOf(Path.AltDirectorySeparatorChar));
+        // Find the last directory separator before the wildcard
+        // On Windows, we need to check both \ and / as both are valid
+        // On Unix-like systems, only / is the directory separator
+        int directorySeparatorIndex;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            // On Windows, check both separators and take the last one found
+            directorySeparatorIndex = Math.Max(
+                pathBeforeWildCard.LastIndexOf(Path.DirectorySeparatorChar),
+                pathBeforeWildCard.LastIndexOf(Path.AltDirectorySeparatorChar));
+        }
+        else
+        {
+            // On Unix-like systems, only use the forward slash
+            directorySeparatorIndex = pathBeforeWildCard.LastIndexOf(Path.DirectorySeparatorChar);
+        }
 
         string searchDir = filePattern.Substring(0, directorySeparatorIndex);
         string pattern = filePattern.Substring(directorySeparatorIndex + 1);
