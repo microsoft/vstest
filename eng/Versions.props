@@ -48,11 +48,11 @@
     <MicrosoftCodeAnalysisBannedApiAnalyzersVersion>3.3.4</MicrosoftCodeAnalysisBannedApiAnalyzersVersion>
     <MicrosoftCodeAnalysisPublicApiAnalyzersVersion>3.3.4</MicrosoftCodeAnalysisPublicApiAnalyzersVersion>
     <MicrosoftCodeCoverageIOVersion>17.7.0</MicrosoftCodeCoverageIOVersion>
-    <MicrosoftDiagnosticsNETCoreClientVersion>0.2.622001</MicrosoftDiagnosticsNETCoreClientVersion>
+    <MicrosoftDiagnosticsNETCoreClientVersion>0.2.631904</MicrosoftDiagnosticsNETCoreClientVersion>
     <MicrosoftExtensionsDependencyModelPackageVersion>6.0.2</MicrosoftExtensionsDependencyModelPackageVersion>
     <MicrosoftExtensionsFileSystemGlobbingVersion>6.0.0</MicrosoftExtensionsFileSystemGlobbingVersion>
     <MicrosoftFakesVersion>17.12.0</MicrosoftFakesVersion>
-    <MicrosoftInternalCodeCoverageVersion>17.14.3-preview.25164.1</MicrosoftInternalCodeCoverageVersion>
+    <MicrosoftInternalCodeCoverageVersion>17.15.0-preview.25324.1</MicrosoftInternalCodeCoverageVersion>
     <!--
       Make sure you are taking a version from a release branch (rel/d*) in VS. Otherwise there won't be symbols for the dlls in package,
       a and it will create a symcheck bug on re-insertion into VS.
@@ -84,8 +84,8 @@
     <MicrosoftCodeCoverageVersion>17.9.0</MicrosoftCodeCoverageVersion>
     <!-- These versions are used for running unit tests, and running acceptance tests. They are also used as the default version for projects
     in TestAssets.sln to allow running and debugging tests in that solution directly in VS without having to run them via AcceptanceTests. -->
-    <MSTestTestFrameworkVersion>3.9.2</MSTestTestFrameworkVersion>
-    <MSTestTestAdapterVersion>3.9.2</MSTestTestAdapterVersion>
+    <MSTestTestFrameworkVersion>3.9.3</MSTestTestFrameworkVersion>
+    <MSTestTestAdapterVersion>3.9.3</MSTestTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
     <XUnitFrameworkVersion>2.4.2</XUnitFrameworkVersion>
     <XUnitAdapterVersion>2.4.5</XUnitAdapterVersion>
@@ -99,8 +99,8 @@
       These versions need to be "statically" readable because we read this file as xml in our build and tests.
     -->
     <!-- <MSTestFrameworkLatestVersion></MSTestFrameworkLatestVersion> is not here, because we don't build MSTest locally, so we don't have access to the latest version. -->
-    <MSTestFrameworkLatestPreviewVersion>[3.4.3]</MSTestFrameworkLatestPreviewVersion>
-    <MSTestFrameworkLatestStableVersion>[3.4.3]</MSTestFrameworkLatestStableVersion>
+    <MSTestFrameworkLatestPreviewVersion>[3.9.3]</MSTestFrameworkLatestPreviewVersion>
+    <MSTestFrameworkLatestStableVersion>[3.9.3]</MSTestFrameworkLatestStableVersion>
     <MSTestFrameworkRecentStableVersion>[3.3.1]</MSTestFrameworkRecentStableVersion>
     <MSTestFrameworkMostDownloadedVersion>[2.2.10]</MSTestFrameworkMostDownloadedVersion>
     <MSTestFrameworkPreviousStableVersion>[2.2.10]</MSTestFrameworkPreviousStableVersion>
