@@ -436,8 +436,8 @@
     <file src="net48\Microsoft.VisualStudio.Utilities.Internal.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll" />
 
     <!-- CodeCoverage -->
-    <file src="net48\Microsoft.Internal.CodeCoverage\MS.TP\TestPlatform\**\*" target="tools\net462\Common7\IDE\Extensions\TestPlatform\" />
-    <file src="net48\Microsoft.Internal.CodeCoverage\MS.TP\Dynamic Code Coverage Tools\**\*" target="tools\net462\Team Tools\Dynamic Code Coverage Tools\" />
+    <file src="net48\Microsoft.Internal.CodeCoverage\TestPlatform\**\*" target="tools\net462\Common7\IDE\Extensions\TestPlatform\" />
+    <file src="net48\Microsoft.Internal.CodeCoverage\Dynamic Code Coverage Tools\**\*" target="tools\net462\Team Tools\Dynamic Code Coverage Tools\" />
 
     <!-- CUIT -->
     <file src="net48\Microsoft.VisualStudio.CUIT\Interop.UIAutomationClient.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Interop.UIAutomationClient.dll" />

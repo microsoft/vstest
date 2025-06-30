@@ -35,7 +35,6 @@
     <!-- Override default license -->
     <PackageLicenseFile>LICENSE_VS.txt</PackageLicenseFile>
     <PackageLicenseFullPath>$(SrcPackageFolder)licenses/LICENSE_VS.txt</PackageLicenseFullPath>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup Label="NuGet">
@@ -124,7 +123,7 @@
       <MicrosoftVisualStudioQualityToolsFiles Include="$(PkgMicrosoft_VisualStudio_QualityTools)\tools\net451\**\*"></MicrosoftVisualStudioQualityToolsFiles>
       <MicrosoftVisualStudioQualityToolsDataCollectorsFiles Include="$(PkgMicrosoft_VisualStudio_QualityTools_DataCollectors)\tools\net451\**\*"></MicrosoftVisualStudioQualityToolsDataCollectorsFiles>
       <MicrosoftInternalTestPlatformExtensionsFiles Include="$(PkgMicrosoft_Internal_TestPlatform_Extensions)\tools\net451\**\*"></MicrosoftInternalTestPlatformExtensionsFiles>
-      <MicrosoftInternalCodeCoverageFiles Include="$(PkgMicrosoft_Internal_CodeCoverage)\contentFiles\Microsoft.TestPlatform\**\*"></MicrosoftInternalCodeCoverageFiles>
+      <MicrosoftInternalCodeCoverageFiles Include="$(PkgMicrosoft_Internal_CodeCoverage)\contentFiles\MS.TP\**\*"></MicrosoftInternalCodeCoverageFiles>
       <MicrosoftVisualStudioCUITFiles Include="$(PkgMicrosoft_VisualStudio_CUIT)\tools\net451\**\*"></MicrosoftVisualStudioCUITFiles>
       <MicrosoftVSSDKBuildToolsFiles Include="$(PkgMicrosoft_VSSDK_BuildTools)\tools\vssdk\**\*"></MicrosoftVSSDKBuildToolsFiles>
       <MicrosoftQualityToolsTestingFakesTestRunnerHarnessFiles Include="$(PkgMicrosoft_QualityTools_Testing_Fakes_TestRunnerHarness)\contentFiles\**\*"></MicrosoftQualityToolsTestingFakesTestRunnerHarnessFiles>
