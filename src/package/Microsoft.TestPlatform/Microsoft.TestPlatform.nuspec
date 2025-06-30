@@ -58,7 +58,6 @@
     <file src="net48\Microsoft.VisualStudio.QualityTools\LegacyTypes.testtype" target="tools\net462\Common7\IDE\Extensions\TestPlatform\LegacyTypes.testtype" />
     <file src="net48\Microsoft.VisualStudio.QualityTools\ManualTests.testtype" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ManualTests.testtype" />
     <file src="net48\Microsoft.Internal.TestPlatform.Extensions\Microsoft.DiaSymReader.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.DiaSymReader.dll" />
-    <file src="net48\Microsoft.Internal.TestPlatform.Extensions\Microsoft.DiaSymReader.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.DiaSymReader.dll" />
     <file src="net48\Microsoft.Extensions.DependencyModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.Extensions.DependencyModel.dll" />
     <file src="net48\Microsoft.Extensions.FileSystemGlobbing\Microsoft.Extensions.FileSystemGlobbing.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.Extensions.FileSystemGlobbing.dll" />
     <file src="net48\Microsoft.IntelliTrace.Core.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.IntelliTrace.Core.dll" />
