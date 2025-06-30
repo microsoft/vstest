@@ -98,8 +98,7 @@
     <file src="net48\Microsoft.VisualStudio.TestPlatform.Client.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Client.dll" />
     <file src="net48\Microsoft.VisualStudio.TestPlatform.Common.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="net48\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-    <file src="net48\Microsoft.VisualStudio.QualityTools\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.sxs.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.sxs.manifest" />
-    <file src="net48\Microsoft.VisualStudio.QualityTools\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.sxs.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.sxs.manifest" />
+
     <file src="net48\Newtonsoft.Json.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Newtonsoft.Json.dll" />
     <file src="net48\Microsoft.VisualStudio.QualityTools\QTAgent.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent.exe" />
     <file src="net48\Microsoft.VisualStudio.QualityTools\QTAgent.exe.Config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\QTAgent.exe.Config" />
