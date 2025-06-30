@@ -46,7 +46,7 @@ public class IntegrationTestBase
     protected readonly IntegrationTestEnvironment _testEnvironment;
 
     private readonly string _msTestPre3_0AdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
-    private readonly string _msTestAdapterRelativePath = @"mstest.testadapter\{0}\build\{1}".Replace('\\', Path.DirectorySeparatorChar);
+    private readonly string _msTestAdapterRelativePath = @"mstest.testadapter\{0}\buildTransitive\{1}".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _nUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build".Replace('\\', Path.DirectorySeparatorChar);
     private readonly string _xUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\{1}".Replace('\\', Path.DirectorySeparatorChar);
 
