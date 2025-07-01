@@ -4,6 +4,7 @@
     <TestProject>true</TestProject>
     <IsTestProject>true</IsTestProject>
     <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
+    <TestRunnerAdditionalArguments>$(TestRunnerAdditionalArguments) --settings "$(MSBuildThisFileDirectory)\.runsettings"</TestRunnerAdditionalArguments>
   </PropertyGroup>
 
   <PropertyGroup>
