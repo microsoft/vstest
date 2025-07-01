@@ -53,7 +53,7 @@ public class InferRunSettingsHelperTests
         Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(xmlDocument, Architecture.X86, Framework.DefaultFramework, "temp");
 
         var exception = Assert.ThrowsExactly<XmlException>(action);
-        Assert.AreEqual("An error occurred while loading the settings.  Error: Invalid setting 'RunConfiguration'. Invalid value 'foo' specified for 'TargetPlatform'.", exception.Message);
+        Assert.AreEqual("An error occurred while loading the settings.  Error: Invalid setting 'RunConfiguration'. Invalid value 'foo' specified for 'TargetPlatform'..", exception.Message);
     }
 
     [TestMethod]
