@@ -13,12 +13,14 @@
 <Project InitialTargets="GenerateProgramFile" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!--
-    Output type for .NET Core test projects should be exe.
+    runtimeconfig.json is needed for .NET Core.
+    Historically, this was done by setting OutputType to Exe and generating a fake empty entry point.
+    We changed that to use GenerateRuntimeConfigurationFiles instead.
+    But we keep generating the empty entry point for backward compatibility reasons.
     https://devdiv.visualstudio.com/DevDiv/_workitems?id=375688&_a=edit
-    Note: we skip this for WinUI and UWP apps, as they must use 'WinExe'.
   -->
   <PropertyGroup>
-    <OutputType Condition="'$(UseWinUI)' != 'true' AND '$(UseUwpTools)' != 'true'">Exe</OutputType>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
   <PropertyGroup>
