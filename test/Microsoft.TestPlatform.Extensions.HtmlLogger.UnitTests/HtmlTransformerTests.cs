@@ -37,9 +37,8 @@ public class HtmlTransformerTests
         try
         {
             File.WriteAllText(xmlFile, xmlContent, Encoding.UTF8);
-            
+
             var transformer = new HtmlTransformer();
-            
             // This should not throw an exception, even with special characters
             try
             {
@@ -49,10 +48,10 @@ public class HtmlTransformerTests
             {
                 Assert.Fail($"HtmlTransformer.Transform should not throw an exception with special characters: {ex.Message}");
             }
-            
+
             // Verify that HTML file was created
             Assert.IsTrue(File.Exists(htmlFile), "HTML file should be created");
-            
+
             // Verify that HTML file has content
             var htmlContent = File.ReadAllText(htmlFile);
             Assert.IsFalse(string.IsNullOrEmpty(htmlContent), "HTML content should not be empty");
@@ -85,10 +84,10 @@ public class HtmlTransformerTests
         try
         {
             File.WriteAllText(xmlFile, xmlContent, Encoding.UTF8);
-            
+
             var transformer = new HtmlTransformer();
             transformer.Transform(xmlFile, htmlFile);
-            
+
             // Verify that HTML file was created and has content
             Assert.IsTrue(File.Exists(htmlFile), "HTML file should be created");
             var htmlContent = File.ReadAllText(htmlFile);
