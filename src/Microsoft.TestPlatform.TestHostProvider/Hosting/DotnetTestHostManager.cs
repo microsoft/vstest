@@ -552,13 +552,14 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 //    By setting our (hopefully more specific variable) we might overwrite what user specified, and in case of DOTNET_ROOT it is probably
                 //    preferable when we can set the DOTNET_ROOT_<ARCH> variable.
                 var testhostDllPath = Path.ChangeExtension(startInfo.FileName, ".dll");
-                var testhostVersionInfo = FileVersionInfo.GetVersionInfo(testhostDllPath);
-                if (testhostVersionInfo.ProductMajorPart >= 17 && testhostVersionInfo.ProductMinorPart >= 14)
+                // This file check is for unit tests, we expect the file to always be there. Otherwise testhost.exe would not be able to run.
+                var testhostVersionInfo = _fileHelper.Exists(testhostDllPath) ? FileVersionInfo.GetVersionInfo(testhostDllPath) : null;
+                if (testhostVersionInfo != null && testhostVersionInfo.ProductMajorPart >= 17 && testhostVersionInfo.ProductMinorPart >= 14)
                 {
                     // This is a new testhost that builds at least against net8 we should set the architecture specific DOTNET_ROOT_<ARCH>.
                     //
-                    // We ship testhost.exe, testhost.x86.exe and testhost.arm64.exe, if the architecture is different we won't find the testhost.exe and
-                    // won't reach this code, but let's write this in a generic way anyway, to avoid breaking if we add more variants of testhost.exe.
+                    // We ship just testhost.exe and testhost.x86.exe if the architecture is different we won't find the testhost*.exe and
+                    // won't reach this code, but let's write this in a generic way anyway, to avoid breaking if we add more variants of testhost*.exe.
                     var environmentVariableName = $"DOTNET_ROOT_{_architecture.ToString().ToUpperInvariant()}";
 
                     var existingDotnetRoot = _environmentVariableHelper.GetEnvironmentVariable(environmentVariableName);
