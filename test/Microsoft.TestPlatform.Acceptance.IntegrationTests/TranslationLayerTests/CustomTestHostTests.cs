@@ -141,6 +141,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TestCategory("Windows-Review")]
     [TestCategory("Feature")]
     [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM)]
+    // [RunnerCompatibilityDataSource("net8.0", "MostDownloaded", "net8.0")]
     public void RunAllTestsWithMixedTFMsWillProvideAdditionalInformationToTheDebugger(RunnerInfo runnerInfo)
     {
         // Arrange
