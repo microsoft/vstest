@@ -35,7 +35,6 @@ internal class Program
 
         var thisAssemblyPath = Assembly.GetEntryAssembly()!.Location;
         var here = Path.GetDirectoryName(thisAssemblyPath)!;
-        var playground = Path.GetFullPath(Path.Combine(here, "..", "..", "..", ".."));
 
         var console = Path.Combine(here, "vstest.console", "netfx", "vstest.console.exe");
 
@@ -88,8 +87,8 @@ internal class Program
             """;
 
         var sources = new[] {
-            Path.Combine(playground, "bin", "MSTest1", "Debug", "net472", "MSTest1.dll"),
-            Path.Combine(playground, "bin", "MSTest2", "Debug", "net472", "MSTest2.dll"),
+           @"S:\source\OldAndNewTestSdK\OldTestSdK\bin\Debug\net8.0\OldTestSdK.dll",
+            @"S:\source\OldAndNewTestSdK\NewTestSdk\bin\Debug\net9.0\NewTestSdk.dll",
             // The built in .NET projects don't now work right now in Playground, there is some conflict with Arcade.
             // But if you create one outside of Playground it will work. 
             //Path.Combine(playground, "bin", "MSTest1", "Debug", "net7.0", "MSTest1.dll"),
