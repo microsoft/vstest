@@ -494,7 +494,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
         args += " " + connectionInfo.ToCommandLineOptions();
 
-        // Create a additional probing path args with Nuget.Client
+        // Create a additional probing path args with Nuget.Clientl
         // args += "--additionalprobingpath xxx"
         // TODO this may be required in ASP.net, requires validation
 
