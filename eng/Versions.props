@@ -86,7 +86,6 @@
     in TestAssets.sln to allow running and debugging tests in that solution directly in VS without having to run them via AcceptanceTests. -->
     <MSTestTestFrameworkVersion>3.9.3</MSTestTestFrameworkVersion>
     <MSTestTestAdapterVersion>3.9.3</MSTestTestAdapterVersion>
-    <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
     <XUnitFrameworkVersion>2.4.2</XUnitFrameworkVersion>
     <XUnitAdapterVersion>2.4.5</XUnitAdapterVersion>
     <XUnitConsoleRunnerVersion>2.4.2</XUnitConsoleRunnerVersion>
