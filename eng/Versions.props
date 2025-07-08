@@ -79,6 +79,7 @@
   <PropertyGroup Label="VSTest test settings">
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
     <AwesomeAssertionsVersion>8.1.0</AwesomeAssertionsVersion>
+    <MicrosoftTestingPlatformVersion>1.7.2</MicrosoftTestingPlatformVersion>
     <MoqVersion>4.16.1</MoqVersion>
     <!-- For coverage use our own package on latest stable -->
     <MicrosoftCodeCoverageVersion>17.9.0</MicrosoftCodeCoverageVersion>
