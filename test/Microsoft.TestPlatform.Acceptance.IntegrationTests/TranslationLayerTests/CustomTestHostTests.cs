@@ -140,7 +140,8 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [TestCategory("Feature")]
-    [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM)]
+    // "Just row" used here because mstest does not cooperate with older versions of vstest.console correctly, so we test with just the latest version available..
+    [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM, JustRow = 0)]
     public void RunAllTestsWithMixedTFMsWillProvideAdditionalInformationToTheDebugger(RunnerInfo runnerInfo)
     {
         // Arrange
