@@ -136,6 +136,8 @@
     <TestRunnerName>MSTest</TestRunnerName>
     <!-- Skip windows only tests on non-windows systems. -->
     <TestRunnerAdditionalArguments Condition=" '$(OS)' != 'Windows_NT' ">$(TestRunnerAdditionalArguments) --filter "TestCategory!=Windows&amp;TestCategory!=Windows-Review"</TestRunnerAdditionalArguments>
+    <!-- Do not capture test output on CI to help community see errors -->
+    <TestCaptureOutput Condition=" '$(ContinuousIntegrationBuild)' == 'true' ">false</TestCaptureOutput>
   </PropertyGroup>
 
 </Project>
