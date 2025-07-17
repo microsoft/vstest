@@ -119,7 +119,7 @@ public class FilePatternParserTests
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
         _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-
+        
         // Test with forward slashes - this should work on all platforms
         // This specifically tests the fix for issue #14993
         _filePatternParser.GetMatchingFiles("C:/Users/someUser/Desktop/a/c/*bc.dll");
@@ -127,8 +127,8 @@ public class FilePatternParserTests
         // Assert that the pattern is parsed correctly
         _mockMatcherHelper.Verify(x => x.AddInclude("*bc.dll"));
         // On Windows, the path may be normalized, so we verify the key components are present
-        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y =>
-            y.FullName.Contains("someUser") && y.FullName.Contains("Desktop") &&
+        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => 
+            y.FullName.Contains("someUser") && y.FullName.Contains("Desktop") && 
             y.FullName.Contains("a") && y.FullName.EndsWith("c"))));
     }
 
@@ -137,13 +137,13 @@ public class FilePatternParserTests
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
         _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-
+        
         // Test with forward slashes and recursive patterns
         _filePatternParser.GetMatchingFiles("C:/Users/vanidhi/**/c/*bc.txt");
 
         // Assert
         _mockMatcherHelper.Verify(x => x.AddInclude("**/c/*bc.txt"));
-        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y =>
+        _mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => 
             y.FullName.Contains("vanidhi"))));
     }
 
@@ -152,7 +152,7 @@ public class FilePatternParserTests
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
         _mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-
+        
         // This is the specific case from the original bug report that was throwing ArgumentOutOfRangeException
         // Before the fix: System.ArgumentOutOfRangeException: length ('-1') must be a non-negative value
         _filePatternParser.GetMatchingFiles("C:/path/to/my/tests/*_Tests.dll");

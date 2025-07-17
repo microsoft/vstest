@@ -329,7 +329,7 @@ csharp_style_prefer_parameter_null_checking = false # not default, disabled as n
 #### .NET Formatting Rules ####
 
 # IDE0055: Fix formatting - Set the severity of all .NET and C# formatting rules (https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/formatting-rules)
-dotnet_diagnostic.IDE0055.severity = none # Nice formatting is great, but when copilot changes code we more than not end up with some extra whitespace.
+dotnet_diagnostic.IDE0055.severity = warning # ensure all formatting rules are enforced on build
 
 # IDE0057: Use range operator
 dotnet_diagnostic.IDE0057.severity = none # Range operator is not supported in some TFMs.
