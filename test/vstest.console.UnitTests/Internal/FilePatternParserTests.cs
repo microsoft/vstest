@@ -115,6 +115,8 @@ public class FilePatternParserTests
     }
 
     [TestMethod]
+    // only on windows because we don't translate the path to be valid linux / mac path
+    [OSCondition(OperatingSystems.Windows)]
     public void FilePatternParserShouldCorrectlySplitPatternAndDirectoryWithForwardSlashes()
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
@@ -133,6 +135,8 @@ public class FilePatternParserTests
     }
 
     [TestMethod]
+    // only on windows because we don't translate the path to be valid linux / mac path
+    [OSCondition(OperatingSystems.Windows)]
     public void FilePatternParserShouldCorrectlySplitWithArbitraryDirectoryDepthWithForwardSlashes()
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
@@ -148,6 +152,8 @@ public class FilePatternParserTests
     }
 
     [TestMethod]
+    // only on windows because we don't translate the path to be valid linux / mac path
+    [OSCondition(OperatingSystems.Windows)]
     public void FilePatternParserShouldHandleForwardSlashesWithoutThrowingException()
     {
         var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
