@@ -35,7 +35,6 @@
     <DependencyModelFolder>$(TestPlatformBinFolder)Microsoft.Extensions.DependencyModel\</DependencyModelFolder>
     <FileSystemGlobbingFolder>$(TestPlatformBinFolder)Microsoft.Extensions.FileSystemGlobbing\</FileSystemGlobbingFolder>
     <VSSDKBuildToolsFolder>$(TestPlatformBinFolder)Microsoft.VSSDK.BuildTools\</VSSDKBuildToolsFolder>
-    <QualityToolsDataCollectorsFolder>$(TestPlatformBinFolder)Microsoft.VisualStudio.QualityTools.DataCollectors\</QualityToolsDataCollectorsFolder>
     <InternalTestPlatformExtensionsFolder>$(TestPlatformBinFolder)Microsoft.Internal.TestPlatform.Extensions\</InternalTestPlatformExtensionsFolder>
   </PropertyGroup>
 
@@ -187,16 +186,13 @@
     <ItemGroup>
       <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Microsoft.DiaSymReader.dll" />
       <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Microsoft.IntelliTrace.Core.dll" />
-      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Extensions\VideoRecorder\*">
-        <VSIXSubPath>Extensions\VideoRecorder</VSIXSubPath>
-      </VsixSourceItem>
       <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Extensions\Microsoft.VisualStudio.TestTools.DataCollection.*.dll">
         <VSIXSubPath>Extensions</VSIXSubPath>
       </VsixSourceItem>
       <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.*.dll">
         <VSIXSubPath>Extensions</VSIXSubPath>
       </VsixSourceItem>
-      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.*.dll">
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.*.dll" Exclude="$(InternalTestPlatformExtensionsFolder)\**\*Web*.dll;$(InternalTestPlatformExtensionsFolder)\**\*Tmi*.dll;$(InternalTestPlatformExtensionsFolder)\**\*Video*.dll;">
         <VSIXSubPath>Extensions</VSIXSubPath>
       </VsixSourceItem>
     </ItemGroup>
@@ -270,7 +266,6 @@
       <VsixSourceItem Include="$(FileSystemGlobbingFolder)Microsoft.Extensions.FileSystemGlobbing.dll" />
       <VsixSourceItem Include="$(VSSDKBuildToolsFolder)System.Diagnostics.DiagnosticSource.dll" />
       <VsixSourceItem Include="$(VSSDKBuildToolsFolder)System.Runtime.CompilerServices.Unsafe.dll" />
-      <VsixSourceItem Include="$(VSQualityToolsFolder)*" Exclude="$(VSQualityToolsFolder)*.pdb" />
     </ItemGroup>
 
     <ItemGroup>
