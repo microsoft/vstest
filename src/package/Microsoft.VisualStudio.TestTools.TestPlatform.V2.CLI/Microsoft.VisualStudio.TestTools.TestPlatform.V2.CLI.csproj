@@ -32,7 +32,6 @@
     <TestPlatformBinFolder>$(ArtifactsBinDir)Microsoft.TestPlatform\$(Configuration)\$(NetFrameworkRunnerTargetFramework)\</TestPlatformBinFolder>
     <MsDiaFolder>$(TestPlatformBinFolder)Microsoft.Internal.Dia\</MsDiaFolder>
     <CodeCoverageIOFolder>$(TestPlatformBinFolder)Microsoft.CodeCoverage.IO\</CodeCoverageIOFolder>
-    <VSQualityToolsFolder>$(TestPlatformBinFolder)Microsoft.VisualStudio.QualityTools\</VSQualityToolsFolder>
     <DependencyModelFolder>$(TestPlatformBinFolder)Microsoft.Extensions.DependencyModel\</DependencyModelFolder>
     <FileSystemGlobbingFolder>$(TestPlatformBinFolder)Microsoft.Extensions.FileSystemGlobbing\</FileSystemGlobbingFolder>
     <VSSDKBuildToolsFolder>$(TestPlatformBinFolder)Microsoft.VSSDK.BuildTools\</VSSDKBuildToolsFolder>
@@ -263,20 +262,6 @@
 
       <VsixSourceItem Include="$(TestPlatformBinFolder)DumpMiniTool*">
         <VSIXSubPath>Extensions\dump</VSIXSubPath>
-      </VsixSourceItem>
-    </ItemGroup>
-
-    <!-- Microsoft.VisualStudio.QualityTools.DataCollectors -->
-    <ItemGroup>
-      <VsixSourceItem Include="$(QualityToolsDataCollectorsFolder)Microsoft.VisualStudio.QualityTools.DataCollectionAgentObject.dll" />
-      <VsixSourceItem Include="$(QualityToolsDataCollectorsFolder)Extensions\V1\x64\*">
-        <VSIXSubPath>Extensions\V1\x64</VSIXSubPath>
-      </VsixSourceItem>
-      <VsixSourceItem Include="$(QualityToolsDataCollectorsFolder)Extensions\V1\x86\*">
-        <VSIXSubPath>Extensions\V1\x86</VSIXSubPath>
-      </VsixSourceItem>
-      <VsixSourceItem Include="$(QualityToolsDataCollectorsFolder)Extensions\V1\*" Exclude="$(QualityToolsDataCollectorsFolder)Extensions\V1\*.pdb">
-        <VSIXSubPath>Extensions\V1</VSIXSubPath>
       </VsixSourceItem>
     </ItemGroup>
 
