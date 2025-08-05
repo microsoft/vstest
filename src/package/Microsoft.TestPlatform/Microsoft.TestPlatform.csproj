@@ -89,8 +89,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Diagnostics.Utilities" Version="$(MicrosoftVisualStudioDiagnosticsUtilitiesVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.VisualStudio.Enterprise.AspNetHelper" Version="$(MicrosoftVisualStudioEnterpriseAspNetHelper)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.VisualStudio.Interop" Version="$(MicrosoftVisualStudioInteropVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.QualityTools" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.VisualStudio.QualityTools.DataCollectors" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.VisualStudio.QualityTools" Version="$(TestPlatformQualityToolsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.VisualStudio.QualityTools.DataCollectors" Version="$(TestPlatformQualityToolsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions" Version="$(MicrosoftInternalTestPlatformExtensions)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.VisualStudio.TraceDataCollector" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" GeneratePathProperty="true" />
