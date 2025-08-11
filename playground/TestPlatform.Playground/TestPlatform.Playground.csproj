@@ -56,8 +56,8 @@
 
     <ItemGroup>
       <!-- .NET Framework console -->
-      <FileToCopy Include="$(SourcePath)bin\vstest.console\$(Configuration)\$(NetFrameworkMinimum)\win7-x64\**\*.*" SubFolder="netfx" />
-      <FileToCopy Include="$(SourcePath)bin\Microsoft.TestPlatform.TestHostProvider\$(Configuration)\$(NetFrameworkMinimum)\**\*.*" SubFolder="netfx\Extensions\" />
+      <FileToCopy Include="$(SourcePath)bin\vstest.console\$(Configuration)\$(NetFrameworkRunnerTargetFramework)\win7-x64\**\*.*" SubFolder="netfx" />
+      <FileToCopy Include="$(SourcePath)bin\Microsoft.TestPlatform.TestHostProvider\$(Configuration)\$(NetFrameworkRunnerTargetFramework)\**\*.*" SubFolder="netfx\Extensions\" />
 
       <!-- copy net462, net47, net471, net472, net48 and net481 testhosts -->
       <FileToCopy Include="$(SourcePath)bin\testhost.x86\$(Configuration)\$(NetFrameworkMinimum)\win-x86\**\*.*" SubFolder="netfx\TestHostNetFramework\" />
