@@ -214,7 +214,7 @@ public static class FakesUtilities
         public const string FriendlyName = "UnitTestIsolation";
 
         /// <summary>
-        /// Gets the URI of the data collector (V1, deprecated)
+        /// Gets the URI of the data collector (V1, deprecated and removed)
         /// </summary>
         public const string DataCollectorUriV1 = "datacollector://microsoft/unittestisolation/1.0";
 
