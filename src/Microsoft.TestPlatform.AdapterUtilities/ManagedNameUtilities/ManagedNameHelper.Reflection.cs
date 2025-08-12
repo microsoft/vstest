@@ -80,7 +80,7 @@ public static partial class ManagedNameHelper
     /// </remarks>
     public static void GetManagedName(MethodBase method, out string managedTypeName, out string managedMethodName, out string?[] hierarchyValues)
     {
-        if (!method.IsGenericMethod && ReflectionHelpers.GetReflectedType(method) is { } reflectedType && !ReflectionHelpers.IsGenericType(semanticType))
+        if (!method.IsGenericMethod && ReflectionHelpers.GetReflectedType(method) is { } semanticType && !ReflectionHelpers.IsGenericType(semanticType))
         {
             // We are dealing with non-generic method in non-generic type.
             // So, it doesn't matter what we pass as "useClosedTypes".
