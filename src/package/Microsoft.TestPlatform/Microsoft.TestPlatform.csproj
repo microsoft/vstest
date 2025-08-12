@@ -89,10 +89,12 @@
     <PackageReference Include="Microsoft.VisualStudio.Diagnostics.Utilities" Version="$(MicrosoftVisualStudioDiagnosticsUtilitiesVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.VisualStudio.Enterprise.AspNetHelper" Version="$(MicrosoftVisualStudioEnterpriseAspNetHelper)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.VisualStudio.Interop" Version="$(MicrosoftVisualStudioInteropVersion)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.QualityTools" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions" Version="$(MicrosoftInternalTestPlatformExtensions)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.VisualStudio.TraceDataCollector" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="$(MicrosoftVSSDKBuildToolsVersion)" PrivateAssets="All" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness" Version="$(MicrosoftFakesVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.VisualStudio.Telemetry" Version="$(MicrosoftVSTelemetryVersion)" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.VisualStudio.Utilities.Internal" Version="$(MicrosoftVSUtilitiesInternalVersion)" PrivateAssets="All" GeneratePathProperty="true" />
   </ItemGroup>
@@ -111,9 +113,11 @@
       <MicrosoftInternalDiaFiles Include="$(PkgMicrosoft_Internal_Dia)\tools\net451\**\*"></MicrosoftInternalDiaFiles>
       <MicrosoftInternalIntellitraceFiles Include="$(PkgMicrosoft_Internal_Intellitrace)\tools\net451\**\*"></MicrosoftInternalIntellitraceFiles>
       <MicrosoftInternalIntellitraceExtensionsFiles Include="$(PkgMicrosoft_Internal_Intellitrace_Extensions)\tools\net451\**\*"></MicrosoftInternalIntellitraceExtensionsFiles>
+      <MicrosoftVisualStudioQualityToolsFiles Include="$(PkgMicrosoft_VisualStudio_QualityTools)\tools\net451\**\*"></MicrosoftVisualStudioQualityToolsFiles>
       <MicrosoftInternalTestPlatformExtensionsFiles Include="$(PkgMicrosoft_Internal_TestPlatform_Extensions)\tools\net451\**\*"></MicrosoftInternalTestPlatformExtensionsFiles>
       <MicrosoftInternalCodeCoverageFiles Include="$(PkgMicrosoft_Internal_CodeCoverage)\contentFiles\MS.TP\**\*"></MicrosoftInternalCodeCoverageFiles>
       <MicrosoftVSSDKBuildToolsFiles Include="$(PkgMicrosoft_VSSDK_BuildTools)\tools\vssdk\**\*"></MicrosoftVSSDKBuildToolsFiles>
+      <MicrosoftQualityToolsTestingFakesTestRunnerHarnessFiles Include="$(PkgMicrosoft_QualityTools_Testing_Fakes_TestRunnerHarness)\contentFiles\**\*"></MicrosoftQualityToolsTestingFakesTestRunnerHarnessFiles>
       <MicrosoftInternalTestPlatformRemoteFiles Include="$(PkgMicrosoft_Internal_TestPlatform_Remote)\tools\netstandard\**\*"></MicrosoftInternalTestPlatformRemoteFiles>
       <MicrosoftVisualStudioTelemetryFiles Include="$(PkgMicrosoft_VisualStudio_Telemetry)\lib\net45\**\*"></MicrosoftVisualStudioTelemetryFiles>
       <MicrosoftVisualStudioUtilitiesInternalFiles Include="$(PkgMicrosoft_VisualStudio_Utilities_Internal)\lib\net45\**\*"></MicrosoftVisualStudioUtilitiesInternalFiles>
@@ -130,9 +134,11 @@
     <Copy SourceFiles="@(MicrosoftInternalDiaFiles)" DestinationFiles="$(OutDir)\Microsoft.Internal.Dia\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftInternalIntellitraceFiles)" DestinationFiles="$(OutDir)\Microsoft.Internal.Intellitrace\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftInternalIntellitraceExtensionsFiles)" DestinationFiles="$(OutDir)\Microsoft.Internal.Intellitrace.Extensions\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(MicrosoftVisualStudioQualityToolsFiles)" DestinationFiles="$(OutDir)\Microsoft.VisualStudio.QualityTools\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftInternalTestPlatformExtensionsFiles)" DestinationFiles="$(OutDir)\Microsoft.Internal.TestPlatform.Extensions\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftInternalCodeCoverageFiles)" DestinationFiles="$(OutDir)\Microsoft.Internal.CodeCoverage\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftVSSDKBuildToolsFiles)" DestinationFolder="$(OutDir)\Microsoft.VSSDK.BuildTools" />
+    <Copy SourceFiles="@(MicrosoftQualityToolsTestingFakesTestRunnerHarnessFiles)" DestinationFiles="$(OutDir)\Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftVisualStudioTelemetryFiles)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftVisualStudioUtilitiesInternalFiles)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" />
   </Target>

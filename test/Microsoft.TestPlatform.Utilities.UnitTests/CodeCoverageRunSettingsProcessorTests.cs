@@ -137,6 +137,7 @@ public class CodeCoverageRunSettingsProcessorTests
             @"         <ModulePath>.*microsoft.visualstudio.testplatform.*</ModulePath>",
             @"         <ModulePath>.*microsoft.visualstudio.testwindow.*</ModulePath>",
             @"         <ModulePath>.*microsoft.visualstudio.mstest.*</ModulePath>",
+            @"         <ModulePath>.*microsoft.visualstudio.qualitytools.*</ModulePath>",
             @"         <ModulePath>.*microsoft.vssdk.testhostadapter.*</ModulePath>",
             @"         <ModulePath>.*microsoft.vssdk.testhostframework.*</ModulePath>",
             @"         <ModulePath>.*qtagent32.*</ModulePath>",
