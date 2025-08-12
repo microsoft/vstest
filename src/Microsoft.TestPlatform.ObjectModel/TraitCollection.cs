@@ -63,7 +63,7 @@ public class TraitCollection : IEnumerable<Trait>
         return GetEnumerator();
     }
 
-    private Trait[] GetTraits()
+    private IEnumerable<Trait> GetTraits()
     {
         if (!_testObject.Properties.Contains(TraitsProperty))
         {
