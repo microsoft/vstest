@@ -307,7 +307,6 @@ public class RunsettingsTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [Ignore("Ignore until we have new host available with CUIT removed.")]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
@@ -354,7 +353,6 @@ public class RunsettingsTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [Ignore("Ignore until we have new host available with CUIT removed.")]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsWithDeploymentItem(RunnerInfo runnerInfo)
@@ -392,7 +390,6 @@ public class RunsettingsTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [Ignore("Ignore until we have new host available with CUIT removed.")]
     [TestCategory("Windows")]
     [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsTestTimeout(RunnerInfo runnerInfo)
@@ -420,7 +417,6 @@ public class RunsettingsTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [Ignore("Ignore until we have new host available with CUIT removed.")]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
     public void LegacySettingsAssemblyResolution(RunnerInfo runnerInfo)

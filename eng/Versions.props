@@ -54,8 +54,8 @@
       Make sure you are taking a version from a release branch (rel/d*) in VS. Otherwise there won't be symbols for the dlls in package,
       a and it will create a symcheck bug on re-insertion into VS.
     -->
-    <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>18.0.0-preview-1-10811-208</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
-    <MicrosoftVisualStudioEnterpriseAspNetHelper>$(MicrosoftVisualStudioDiagnosticsUtilitiesVersion)</MicrosoftVisualStudioEnterpriseAspNetHelper>
+    <MicrosoftVisualStudioDiagnosticsUtilitiesVersion>18.0.0-preview-1-10901-117</MicrosoftVisualStudioDiagnosticsUtilitiesVersion>
+    <MicrosoftVisualStudioEnterpriseAspNetHelper>18.0.0-preview-1-10903-019</MicrosoftVisualStudioEnterpriseAspNetHelper>
     <MicrosoftVisualStudioInteropVersion>17.13.39960</MicrosoftVisualStudioInteropVersion>
     <MicrosoftVSTelemetryVersion>17.13.24</MicrosoftVSTelemetryVersion>
     <MicrosoftVSUtilitiesInternalVersion>16.3.90</MicrosoftVSUtilitiesInternalVersion>
@@ -65,8 +65,9 @@
     <SystemCollectionsImmutableVersion>8.0.0</SystemCollectionsImmutableVersion>
     <SystemMemoryVersion>4.5.5</SystemMemoryVersion>
     <SystemReflectionMetadataVersion>8.0.0</SystemReflectionMetadataVersion>
-    <TestPlatformExternalsVersion>18.0.0-preview-1-10811-208</TestPlatformExternalsVersion>
-    <MicrosoftInternalTestPlatformExtensions>18.0.0-preview-1-10811-208</MicrosoftInternalTestPlatformExtensions>
+    <TestPlatformExternalsVersion>18.0.0-preview-1-10830-229</TestPlatformExternalsVersion>
+    <TestPlatformQualityToolsVersion>18.0.0-preview-1-10904-008</TestPlatformQualityToolsVersion>
+    <MicrosoftInternalTestPlatformExtensions>18.0.0-preview-1-10901-012</MicrosoftInternalTestPlatformExtensions>
     <TestPlatformMSDiaVersion>17.12.35519.223</TestPlatformMSDiaVersion>
     <SystemSecurityPrincipalWindowsVersion>5.0.0</SystemSecurityPrincipalWindowsVersion>
     <SystemRuntimeCompilerServicesUnsafeVersion>6.1.0</SystemRuntimeCompilerServicesUnsafeVersion>
