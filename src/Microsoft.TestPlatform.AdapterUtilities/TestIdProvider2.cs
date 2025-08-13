@@ -2,28 +2,26 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Security.Cryptography;
+using System.IO.Hashing;
 using System.Text;
 
 namespace Microsoft.TestPlatform.AdapterUtilities;
-
 /// <summary>
-/// Used to generate id for tests using SHA1.
+/// Used to generate id for tests.
 /// </summary>
-[Obsolete("TestIdProvider is deprecated and will soon be removed because it uses unsafe cryptographical hash SHA1 (for non-crypto purposes). Migrate to TestIdProvider2 that uses a non-cryptographical hash which is more appropriate for the task.")]
-public class TestIdProvider
+public class TestIdProvider2
 {
     private Guid _id = Guid.Empty;
     private byte[]? _hash;
 
-    private readonly SHA1 _sha;
+    private readonly XxHash128 _xxhash;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestIdProvider"/> class.
     /// </summary>
-    public TestIdProvider()
+    public TestIdProvider2()
     {
-        _sha = SHA1.Create();
+        _xxhash = new XxHash128();
     }
 
     /// <summary>
@@ -42,7 +40,7 @@ public class TestIdProvider
 
         var bytes = Encoding.Unicode.GetBytes(str);
 
-        _sha.TransformBlock(bytes, 0, bytes.Length, null, 0);
+        _xxhash.Append(bytes);
     }
 
     /// <summary>
@@ -64,7 +62,7 @@ public class TestIdProvider
             return;
         }
 
-        _sha.TransformBlock(bytes, 0, bytes.Length, null, 0);
+        _xxhash.Append(bytes);
     }
 
     /// <summary>
@@ -83,8 +81,7 @@ public class TestIdProvider
         }
 
         // Finalize the hash. We don't have any more data so we provide empty.
-        _sha.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-        _hash = _sha.Hash;
+        _hash = _xxhash.GetCurrentHash();
 
         return _hash!;
     }
