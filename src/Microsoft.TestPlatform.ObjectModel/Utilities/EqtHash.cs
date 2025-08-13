@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.IO.Hashing;
+using System.Security.Cryptography;
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
@@ -17,6 +19,8 @@ public static class EqtHash
     /// Calculates a hash of the string and copies the first 128 bits of the hash
     /// to a new Guid.
     /// </summary>
+    [Obsolete("GuidFromString is deprecated and will soon be removed because it uses unsafe cryptographical hash SHA1 (for non-crypto purposes). Migrate to GuidFromString2 that uses a non-cryptographical hash which is more appropriate for the task.")]
+
     public static Guid GuidFromString(string data)
     {
         TPDebug.Assert(data != null);
@@ -27,7 +31,8 @@ public static class EqtHash
         // Any algorithm or logic change must require a sign off from feature owners of above
         // Also, TPV2 and TPV1 must use same Algorithm until the time TPV1 is completely deleted to be on-par
         // If LUT or .Net core scenario uses TPV2 to discover, but if it uses TPV1 in Devenv, then there will be testcase matching issues
-        byte[] hash = Sha1Helper.ComputeSha1(System.Text.Encoding.Unicode.GetBytes(data));
+        using HashAlgorithm provider = SHA1.Create();
+        byte[] hash = provider.ComputeHash(System.Text.Encoding.Unicode.GetBytes(data));
 
         // Guid is always 16 bytes
         TPDebug.Assert(Guid.Empty.ToByteArray().Length == 16, "Expected Guid to be 16 bytes");
@@ -36,5 +41,28 @@ public static class EqtHash
         Array.Copy(hash, toGuid, 16);
 
         return new Guid(toGuid);
+    }
+
+    /// <summary>
+    /// Calculates a hash of the string and copies the first 128 bits of the hash
+    /// to a new Guid.
+    /// </summary>
+    public static Guid GuidFromString2(string data)
+    {
+        TPDebug.Assert(data != null);
+
+        byte[] hash = XxHash128.Hash(System.Text.Encoding.Unicode.GetBytes(data));
+
+        // Guid is always 16 bytes
+        TPDebug.Assert(Guid.Empty.ToByteArray().Length == 16, "Expected Guid to be 16 bytes");
+
+#if NET6_0_OR_GREATER
+        return new Guid(hash.AsSpan().Slice(0, 16));
+#else
+        // create from span?
+        var toGuid = new byte[16];
+        Array.Copy(hash, toGuid, 16);
+        return new Guid(toGuid);
+#endif
     }
 }
