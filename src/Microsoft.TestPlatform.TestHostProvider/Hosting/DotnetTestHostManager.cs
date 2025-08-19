@@ -581,7 +581,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                     // to avoid setting DOTNET_ROOT that points to x64 but is picked up by x86 host.
                     //
                     // Also avoid setting it if we are already getting it from the surrounding environment.
-                    var architectureFromEnv = (Architecture)Enum.Parse(typeof(Architecture), dotnetRootArchitecture, ignoreCase: true);
+                    var architectureFromEnv = (Architecture)Enum.Parse(typeof(Architecture), dotnetRootArchitecture!, ignoreCase: true);
                     if (architectureFromEnv == _architecture)
                     {
                         if (_architecture == Architecture.X86)
@@ -838,7 +838,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 var dotnetEnvVars = testHostStartInfo.EnvironmentVariables?
                     .Where(kvp => kvp.Key.StartsWith("DOTNET_", StringComparison.OrdinalIgnoreCase))
                     .Select(kvp => $"{kvp.Key}={kvp.Value}")
-                    .ToList();
+                    .ToArray() ?? Array.Empty<string>();
 
                 EqtTrace.Verbose($"DotnetTestHostManager: Starting process '{0}' with command line '{1}' and DOTNET environment: {string.Join(", ", dotnetEnvVars)} ", testHostStartInfo.FileName, testHostStartInfo.Arguments);
             }
