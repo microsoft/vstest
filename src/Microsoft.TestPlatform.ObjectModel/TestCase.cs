@@ -201,7 +201,7 @@ public sealed class TestCase : TestObject
         // If ManagedType and ManagedMethod properties are filled than TestId should be based on those.
         testcaseFullName += GetFullyQualifiedName();
 
-        return EqtHash.GuidFromString(testcaseFullName);
+        return EqtHash.GuidFromString2(testcaseFullName);
     }
 
     private void SetVariableAndResetId<T>(ref T variable, T value)

@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AdapterUtilities.UnitTests.TestIdProvider;
 
 [TestClass]
+[Obsolete("Testing obsolete api that we did not remove yet.")]
 public class CompatibilityTests
 {
     [TestMethod]
