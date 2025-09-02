@@ -29,7 +29,6 @@
     "vs": {
       "version": "17.8.0"
     },
-    "vswhere": "2.2.7",
     "dotnet": "10.0.100-rc.1.25411.109"
   },
   "msbuild-sdks": {
