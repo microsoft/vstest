@@ -50,6 +50,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.IO.Hashing" Version="9.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="NullableHelpers.tt">
       <LastGenOutput>NullableHelpers.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>
