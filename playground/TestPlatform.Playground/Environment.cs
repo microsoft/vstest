@@ -12,7 +12,7 @@ internal class EnvironmentVariables
         ["VSTEST_CONNECTION_TIMEOUT"] = "999",
         ["VSTEST_DEBUG_NOBP"] = "1",
         ["VSTEST_RUNNER_DEBUG_ATTACHVS"] = "0",
-        ["VSTEST_HOST_DEBUG_ATTACHVS"] = "0",
+        ["VSTEST_HOST_DEBUG_ATTACHVS"] = "1",
         ["VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS"] = "0",
     };
 

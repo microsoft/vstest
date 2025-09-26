@@ -56,7 +56,7 @@ internal class Program
                     -->
 
                     <!-- The settings below are what VS sends by default. -->
-                    <CollectSourceInformation>False</CollectSourceInformation>
+                    <CollectSourceInformation>true</CollectSourceInformation>
                     <DesignMode>True</DesignMode>
                 </RunConfiguration>
                 <BoostTestInternalSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -126,8 +126,8 @@ internal class Program
         var consoleOptions = new ConsoleParameters
         {
             EnvironmentVariables = EnvironmentVariables.Variables,
-            // LogFilePath = Path.Combine(here, "logs", "log.txt"),
-            // TraceLevel = TraceLevel.Verbose,
+            LogFilePath = Path.Combine(here, "logs", "log.txt"),
+            TraceLevel = TraceLevel.Verbose,
         };
         var options = new TestPlatformOptions
         {
