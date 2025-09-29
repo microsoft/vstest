@@ -132,7 +132,6 @@
     <Copy SourceFiles="@(SystemComponentModelComposition)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(SystemReflectionMetadataFiles)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftInternalDiaFiles)" DestinationFiles="$(OutDir)\Microsoft.Internal.Dia\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Copy SourceFiles="@(MicrosoftInternalDiaFiles)" DestinationFiles="$(OutDir)\Microsoft.Internal.Dia\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftInternalIntellitraceFiles)" DestinationFiles="$(OutDir)\Microsoft.Internal.Intellitrace\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftInternalIntellitraceExtensionsFiles)" DestinationFiles="$(OutDir)\Microsoft.Internal.Intellitrace.Extensions\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftVisualStudioQualityToolsFiles)" DestinationFiles="$(OutDir)\Microsoft.VisualStudio.QualityTools\%(RecursiveDir)%(Filename)%(Extension)" />
