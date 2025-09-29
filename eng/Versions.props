@@ -68,7 +68,6 @@
     <TestPlatformExternalsVersion>18.0.0-preview-1-10911-061</TestPlatformExternalsVersion>
     <MicrosoftInternalTestPlatformExtensions>18.0.0-preview-1-10911-061</MicrosoftInternalTestPlatformExtensions>
     <TestPlatformMSDiaVersion>18.0.11024.295</TestPlatformMSDiaVersion>
-    <VSRedistVCToolsVersion>1.0.11761944-18-0-20250613-01</VSRedistVCToolsVersion>
     <SystemSecurityPrincipalWindowsVersion>5.0.0</SystemSecurityPrincipalWindowsVersion>
     <SystemRuntimeCompilerServicesUnsafeVersion>6.1.0</SystemRuntimeCompilerServicesUnsafeVersion>
   </PropertyGroup>
