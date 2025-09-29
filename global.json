@@ -1,6 +1,6 @@
 {
   "sdk": {
-    "version": "10.0.100-rc.1.25420.111",
+    "version": "10.0.100-rtm.25476.104",
     "rollForward": "minor",
     "allowPrerelease": false,
     "architecture": "x64"
@@ -29,7 +29,7 @@
     "vs": {
       "version": "17.8.0"
     },
-    "dotnet": "10.0.100-rc.1.25420.111"
+    "dotnet": "10.0.100-rtm.25476.104"
   },
   "msbuild-sdks": {
     "Microsoft.DotNet.Arcade.Sdk": "11.0.0-beta.25477.2"
