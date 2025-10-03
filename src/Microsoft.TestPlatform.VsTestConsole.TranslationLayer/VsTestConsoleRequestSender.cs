@@ -132,10 +132,22 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
 
         _processExitCancellationTokenSource = new CancellationTokenSource();
 
-        // todo: report standard error on timeout
-        await Task.WhenAny(_communicationManager.AcceptClientAsync(), Task.Delay(clientConnectionTimeout)).ConfigureAwait(false);
+        _handShakeSuccessful = false;
+        _handShakeComplete.Reset();
 
-        await HandShakeWithVsTestConsoleAsync().ConfigureAwait(false);
+        try
+        {
+            // todo: report standard error on timeout
+            await Task.WhenAny(_communicationManager.AcceptClientAsync(), Task.Delay(clientConnectionTimeout)).ConfigureAwait(false);
+
+            await HandShakeWithVsTestConsoleAsync().ConfigureAwait(false);
+
+            _handShakeSuccessful = true;
+        }
+        finally
+        {
+            _handShakeComplete.Set();
+        }
     }
 
     /// <inheritdoc/>
