@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -20,7 +21,7 @@ namespace TestPlatform.Playground;
 
 internal class Program
 {
-    static void Main()
+    static async Task Main()
     {
         // This project references TranslationLayer, vstest.console, TestHostProvider, testhost and MSTest1 projects, to make sure
         // we build all the dependencies of that are used to run tests via VSTestConsoleWrapper. It then copies the components from
@@ -141,8 +142,9 @@ internal class Program
 #pragma warning restore CS0618 // Type or member is obsolete
         var discoveryHandler = new PlaygroundTestDiscoveryHandler(detailedOutput);
         var sw = Stopwatch.StartNew();
+
         // Discovery
-        r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        await r.DiscoverTestsAsync(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
         var discoveryDuration = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery done in {discoveryDuration} ms");
         sw.Restart();

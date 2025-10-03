@@ -120,36 +120,22 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         return waitSuccess && _handShakeSuccessful;
     }
 
+    public int StartServer()
+    {
+        return _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
+    }
+
     /// <inheritdoc/>
-    public async Task<int> InitializeCommunicationAsync(int clientConnectionTimeout)
+    public async Task InitializeCommunicationAsync(int clientConnectionTimeout)
     {
         EqtTrace.Info($"VsTestConsoleRequestSender.InitializeCommunicationAsync: Started with client connection timeout {clientConnectionTimeout} milliseconds.");
 
         _processExitCancellationTokenSource = new CancellationTokenSource();
-        _handShakeSuccessful = false;
-        _handShakeComplete.Reset();
-        int port = -1;
-        try
-        {
-            port = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
-            var timeoutSource = new CancellationTokenSource(clientConnectionTimeout);
-            await Task.Run(() =>
-                _communicationManager.AcceptClientAsync(), timeoutSource.Token).ConfigureAwait(false);
 
-            _handShakeSuccessful = await HandShakeWithVsTestConsoleAsync().ConfigureAwait(false);
-            _handShakeComplete.Set();
-        }
-        catch (Exception ex)
-        {
-            EqtTrace.Error(
-                "VsTestConsoleRequestSender.InitializeCommunicationAsync: Error initializing communication with VstestConsole: {0}",
-                ex);
-            _handShakeComplete.Set();
-        }
+        // todo: report standard error on timeout
+        await Task.WhenAny(_communicationManager.AcceptClientAsync(), Task.Delay(clientConnectionTimeout)).ConfigureAwait(false);
 
-        EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunicationAsync: Ended.");
-
-        return _handShakeSuccessful ? port : -1;
+        await HandShakeWithVsTestConsoleAsync().ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
