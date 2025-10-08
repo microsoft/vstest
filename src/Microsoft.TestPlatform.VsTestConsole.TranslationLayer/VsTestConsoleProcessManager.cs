@@ -160,10 +160,10 @@ internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
         _process!.EnableRaisingEvents = true;
         _process.Exited += Process_Exited;
 
-        _process.OutputDataReceived += Process_OutputDataReceived;
-        _process.ErrorDataReceived += Process_ErrorDataReceived;
-        _process.BeginOutputReadLine();
-        _process.BeginErrorReadLine();
+        // _process.OutputDataReceived += Process_OutputDataReceived;
+        // _process.ErrorDataReceived += Process_ErrorDataReceived;
+        // _process.BeginOutputReadLine();
+        // _process.BeginErrorReadLine();
         _processExitedEvent.Reset();
     }
 
