@@ -248,66 +248,67 @@ extends:
                     PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/Release'
                     ArtifactName: TestResults
                   condition: failed()
+          
+          - ${{ if eq(parameters.isRTM, False) }}:
+            - job: Publish
+              dependsOn:
+                - ${{ each pool in parameters.otherOsPools }}:
+                  - ${{ pool.os }}
+              pool:
+                  name: $(DncEngInternalBuildPool)
+                  image: windows.vs2022preview.amd64
+                  os: windows
+              steps:
+                # The template job needs a log, otherwise it writes a warning. We can disable log uploading only for
+                # the whole stage, which is not what we want to do. So we write an empty file instead.
+                - pwsh: 'New-Item -Type file -Force "$(Build.SourcesDirectory)/artifacts/log/Release/empty.log"'
+                  name: 'Add_empty_logfile'
+                # Download the built packages into local package source, as if we built them on this machine.
+                - task: DownloadPipelineArtifact@2
+                  displayName: Download Package Artifacts
+                  inputs:
+                    artifactName: PackageArtifacts
+                    targetPath: '$(Build.SourcesDirectory)/artifacts/packages/Release/Shipping'
 
-          - job: Publish
-            dependsOn:
-              - ${{ each pool in parameters.otherOsPools }}:
-                - ${{ pool.os }}
-            pool:
-                name: $(DncEngInternalBuildPool)
-                image: windows.vs2022preview.amd64
-                os: windows
-            steps:
-              # The template job needs a log, otherwise it writes a warning. We can disable log uploading only for
-              # the whole stage, which is not what we want to do. So we write an empty file instead.
-              - pwsh: 'New-Item -Type file -Force "$(Build.SourcesDirectory)/artifacts/log/Release/empty.log"'
-                name: 'Add_empty_logfile'
-              # Download the built packages into local package source, as if we built them on this machine.
-              - task: DownloadPipelineArtifact@2
-                displayName: Download Package Artifacts
-                inputs:
-                  artifactName: PackageArtifacts
-                  targetPath: '$(Build.SourcesDirectory)/artifacts/packages/Release/Shipping'
+                - task: DownloadPipelineArtifact@2
+                  displayName: Download VSSetup Artifacts
+                  inputs:
+                    artifactName: VSSetupArtifacts
+                    targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/Release'
 
-              - task: DownloadPipelineArtifact@2
-                displayName: Download VSSetup Artifacts
-                inputs:
-                  artifactName: VSSetupArtifacts
-                  targetPath: '$(Build.SourcesDirectory)/artifacts/VSSetup/Release'
+                - task: NuGetAuthenticate@1
+                  displayName: 'NuGet Authenticate to dotnet-tools and test-tools feeds'
 
-              - task: NuGetAuthenticate@1
-                displayName: 'NuGet Authenticate to dotnet-tools and test-tools feeds'
+                - task:  1ES.PublishNuget@1
+                  displayName: 'Publish NuGet packages to dotnet-tools feed'
+                  inputs:
+                    packageParentPath: '$(Build.SourcesDirectory)/artifacts/packages/Release'
+                    packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
+                    publishVstsFeed: 'public/dotnet-tools'
 
-              - task:  1ES.PublishNuget@1
-                displayName: 'Publish NuGet packages to dotnet-tools feed'
-                inputs:
-                  packageParentPath: '$(Build.SourcesDirectory)/artifacts/packages/Release'
-                  packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
-                  publishVstsFeed: 'public/dotnet-tools'
+                - task:  1ES.PublishNuget@1
+                  displayName: 'Publish NuGet packages to test-tools feed'
+                  inputs:
+                    packageParentPath: '$(Build.SourcesDirectory)/artifacts/packages/Release'
+                    packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
+                    publishVstsFeed: 'public/test-tools'
 
-              - task:  1ES.PublishNuget@1
-                displayName: 'Publish NuGet packages to test-tools feed'
-                inputs:
-                  packageParentPath: '$(Build.SourcesDirectory)/artifacts/packages/Release'
-                  packagesToPush: '$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.nupkg;!$(Build.SourcesDirectory)/artifacts/packages/Release/**/*.symbols.nupkg'
-                  publishVstsFeed: 'public/test-tools'
+                # Publishes setup VSIXes to a drop.
+                # Note: The insertion tool looks for the display name of this task in the logs.
+                - task: 1ES.MicroBuildVstsDrop@1
+                  displayName: Upload VSTS Drop
+                  inputs:
+                    dropName: $(VisualStudioDropName)
+                    dropFolder: 'artifacts\VSSetup\Release\Insertion'
+                    accessToken: $(_DevDivDropAccessToken)
+                  condition: succeeded()
 
-              # Publishes setup VSIXes to a drop.
-              # Note: The insertion tool looks for the display name of this task in the logs.
-              - task: 1ES.MicroBuildVstsDrop@1
-                displayName: Upload VSTS Drop
-                inputs:
-                  dropName: $(VisualStudioDropName)
-                  dropFolder: 'artifacts\VSSetup\Release\Insertion'
-                  accessToken: $(_DevDivDropAccessToken)
-                condition: succeeded()
-
-              - task: 1ES.PublishBuildArtifacts@1
-                displayName: Publish Artifact VSSetup
-                inputs:
-                  PathtoPublish: 'artifacts\VSSetup\Release'
-                  ArtifactName: 'VSSetup'
-                condition: succeeded()
+                - task: 1ES.PublishBuildArtifacts@1
+                  displayName: Publish Artifact VSSetup
+                  inputs:
+                    PathtoPublish: 'artifacts\VSSetup\Release'
+                    ArtifactName: 'VSSetup'
+                  condition: succeeded()
 
       - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
         - template: /eng/common/templates-official/job/onelocbuild.yml@self
