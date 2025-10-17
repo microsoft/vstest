@@ -718,4 +718,85 @@ public class InferRunSettingsHelper
         return !sourceFramework.Name.Equals(Framework.DefaultFramework.Name, StringComparison.OrdinalIgnoreCase)
                && !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
     }
+
+    public static bool UpdateCollectCoverageSettings(XmlDocument xmlDocument)
+    {
+        var root = xmlDocument.DocumentElement;
+
+        // TODO: is this good way to find the node, can users have different casing, can they have  uri="datacollector://Microsoft/CodeCoverage/2.0" or  assemblyQualifiedName="Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+        var dataCollectorNodes = root?.SelectNodes("DataCollectionRunSettings/DataCollectors/DataCollector");
+        if (dataCollectorNodes == null)
+        {
+            return false;
+        }
+        foreach (XmlNode dataCollectorNode in dataCollectorNodes)
+        {
+            var dataCollectorFound = false;
+            foreach (XmlAttribute attribute in dataCollectorNode.Attributes!)
+            {
+                if (attribute.Name.Equals("friendlyName", StringComparison.OrdinalIgnoreCase) &&
+                    attribute.Value.Equals("Code Coverage", StringComparison.OrdinalIgnoreCase))
+                {
+                    dataCollectorFound = true;
+                    break;
+                }
+
+                if (attribute.Name.Equals("uri", StringComparison.OrdinalIgnoreCase) &&
+                    attribute.Value.Equals(CodeCoverageCollectorUri, StringComparison.OrdinalIgnoreCase))
+                {
+                    dataCollectorFound = true;
+                    break;
+                }
+
+                if (attribute.Name.Equals("assemblyQualifiedName", StringComparison.OrdinalIgnoreCase) &&
+                    attribute.Value.IndexOf("Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    dataCollectorFound = true;
+                    break;
+                }
+            }
+
+            if (dataCollectorFound)
+            {
+                var coverageCollectorNode = dataCollectorNode;
+                // Code coverage settings are present, we should update them.
+
+                var dynamicNativeInstrumentationNode = coverageCollectorNode.SelectSingleNode("Configuration/CodeCoverage/EnableDynamicNativeInstrumentation");
+
+                if (dynamicNativeInstrumentationNode == null)
+                {
+                    // EnableDynamicNativeInstrumentation is not set explicitly, we should set it. Whole tree might not exist.
+
+                    var currentNode = coverageCollectorNode;
+                    var paths = "Configuration/CodeCoverage/EnableDynamicNativeInstrumentation".Split('/');
+                    foreach (var nodeName in paths)
+                    {
+                        var found = false;
+                        foreach (XmlNode childNode in currentNode.ChildNodes)
+                        {
+                            if (childNode.Name == nodeName)
+                            {
+                                currentNode = childNode;
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            var newNode = xmlDocument.CreateElement(nodeName);
+                            currentNode.AppendChild(newNode);
+                            currentNode = newNode;
+                        }
+                    }
+
+                    currentNode.InnerXml = "False";
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }
