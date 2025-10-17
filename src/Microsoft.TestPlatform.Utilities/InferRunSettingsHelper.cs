@@ -723,7 +723,6 @@ public class InferRunSettingsHelper
     {
         var root = xmlDocument.DocumentElement;
 
-        // TODO: is this good way to find the node, can users have different casing, can they have  uri="datacollector://Microsoft/CodeCoverage/2.0" or  assemblyQualifiedName="Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
         var dataCollectorNodes = root?.SelectNodes("DataCollectionRunSettings/DataCollectors/DataCollector");
         if (dataCollectorNodes == null)
         {
