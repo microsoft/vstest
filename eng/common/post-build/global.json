@@ -1,0 +1,9 @@
+{
+  "sdk": {
+    "version": "9.0.0",
+    "paths": [
+      ".dotnet",
+      "$host$"
+    ],
+    "rollForward": "major"
+}
