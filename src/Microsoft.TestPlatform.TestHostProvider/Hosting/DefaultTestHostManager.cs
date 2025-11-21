@@ -179,26 +179,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     {
         TPDebug.Assert(IsInitialized, "Initialize must have been called before GetTestHostProcessStartInfo");
 
-        string testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
-
-        var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).Assembly.Location);
         var argumentsString = " " + connectionInfo.ToCommandLineOptions();
-
-        TPDebug.Assert(currentWorkingDirectory is not null, "Current working directory must not be null.");
-
-        // check in current location for testhost exe
-        var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
-
-        var originalTestHostProcessName = testHostProcessName;
-
-        if (!_fileHelper.Exists(testhostProcessPath))
-        {
-            // We assume that we could not find testhost.exe in the root folder so we are going to lookup in the
-            // TestHostNetFramework folder (assuming we are currently running under .NET) or in dotnet SDK
-            // context.
-            testHostProcessName = Path.Combine("TestHostNetFramework", originalTestHostProcessName);
-            testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", testHostProcessName);
-        }
 
         if (_disableAppDomain)
         {
@@ -207,9 +188,51 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             argumentsString += " --testsourcepath " + sources.FirstOrDefault()?.AddDoubleQuote();
         }
 
-        EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Trying to use {0} from {1}", originalTestHostProcessName, testhostProcessPath);
+        string testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
+        string? testHostProcessPath = null;
+        string? currentWorkingDirectory = null;
+        bool isUsingTestHostFromNextToSource = false;
 
-        var launcherPath = testhostProcessPath;
+        if (!Shared)
+        {
+            // Test host is not shared, we must have gotten only one source and we can look for testhost next to it.
+            var sourcePath = sources.Single();
+            var sourceDirectory = Path.GetDirectoryName(sourcePath);
+            var testHostPath = Path.Combine(sourceDirectory!, testHostProcessName);
+
+            if (_fileHelper.Exists(testHostPath))
+            {
+                EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Using testhost from source directory: {0}", testHostPath);
+                testHostProcessPath = testHostPath;
+                currentWorkingDirectory = sourceDirectory;
+                isUsingTestHostFromNextToSource = true;
+            }
+        }
+
+        if (!isUsingTestHostFromNextToSource)
+        {
+            currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).Assembly.Location);
+            TPDebug.Assert(currentWorkingDirectory is not null, "Current working directory must not be null.");
+
+            // check in current location for testhost exe
+            var testHostPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+
+            if (!_fileHelper.Exists(testHostPath))
+            {
+                // We assume that we could not find testhost.exe in the root folder so we are going to lookup in the
+                // TestHostNetFramework folder (assuming we are currently running under .NET) or in dotnet SDK
+                // context.
+                var testhostInNetFrameworkFolderName = Path.Combine("TestHostNetFramework", testHostProcessName);
+                testHostProcessPath = Path.Combine(currentWorkingDirectory, "..", testhostInNetFrameworkFolderName);
+            }
+        }
+
+        TPDebug.Assert(testHostProcessPath is not null, "testHostProcessPath must not be null.");
+        TPDebug.Assert(currentWorkingDirectory is not null, "currentWorkingDirectory must not be null.");
+
+        EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Trying to use {0} from {1}", testHostProcessName, testHostProcessPath);
+
+        var launcherPath = testHostProcessPath;
         var processName = _processHelper.GetCurrentProcessFileName();
         if (processName is not null)
         {
@@ -217,7 +240,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
                 && !processName.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
             {
                 launcherPath = _dotnetHostHelper.GetMonoPath();
-                argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;
+                argumentsString = testHostProcessPath.AddDoubleQuote() + " " + argumentsString;
             }
             else
             {
@@ -225,11 +248,11 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
                 if (_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
                     && !(processName.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                         || processName.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
-                    && !File.Exists(testhostProcessPath))
+                    && !File.Exists(testHostProcessPath))
                 {
-                    testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", originalTestHostProcessName);
-                    EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Could not find {0} in previous location, now using {1}", originalTestHostProcessName, testhostProcessPath);
-                    launcherPath = testhostProcessPath;
+                    testHostProcessPath = Path.Combine(currentWorkingDirectory, "..", testHostProcessName);
+                    EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Could not find {0} in previous location, now using {1}", testHostProcessName, testHostProcessPath);
+                    launcherPath = testHostProcessPath;
                 }
             }
         }

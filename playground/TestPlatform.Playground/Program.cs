@@ -89,7 +89,7 @@ internal class Program
 
         var sources = new[] {
             Path.Combine(playground, "bin", "MSTest1", "Debug", "net48", "MSTest1.dll"),
-            Path.Combine(playground, "bin", "MSTest2", "Debug", "net48", "MSTest2.dll"),
+            // Path.Combine(playground, "bin", "MSTest2", "Debug", "net48", "MSTest2.dll"),
             // The built in .NET projects don't now work right now in Playground, there is some conflict with Arcade.
             // But if you create one outside of Playground it will work. 
             //Path.Combine(playground, "bin", "MSTest1", "Debug", "net7.0", "MSTest1.dll"),

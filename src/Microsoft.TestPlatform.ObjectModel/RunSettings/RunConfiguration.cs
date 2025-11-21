@@ -95,7 +95,7 @@ public class RunConfiguration : TestRunSettings
         ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
         CaptureStandardOutput = !FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_STANDARD_OUTPUT_CAPTURING);
         ForwardStandardOutput = !FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_STANDARD_OUTPUT_FORWARDING);
-        DisableSharedTestHost = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_SHARING_NETFRAMEWORK_TESTHOST);
+        DisableSharedTestHost = true; //todo: the flag need to be "deprecated" and replaced with other flag to re-enable this. This is breaking change in the default. FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_SHARING_NETFRAMEWORK_TESTHOST);
     }
 
     /// <summary>
