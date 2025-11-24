@@ -34,12 +34,8 @@ Param(
   [Parameter(ValueFromRemainingArguments=$true)][String[]]$properties
 )
 
-# Workaround for DOTNET_HOST_PATH not being set by older MSBuild
-if (-not $env:DOTNET_HOST_PATH) {
-    $env:DOTNET_HOST_PATH = [System.IO.Path]::GetFullPath((Join-Path (Join-Path (Join-Path $PSScriptRoot '..') '.dotnet') 'dotnet'))
-    if (-not (Test-Path $env:DOTNET_HOST_PATH)) {
-      $env:DOTNET_HOST_PATH = "$($env:DOTNET_HOST_PATH).exe"
-    }
-}
+# Add steps that need to happen before build here
 
+
+# Call the build script provided by Arcade
 & $PSScriptRoot/common/build.ps1 @PSBoundParameters
