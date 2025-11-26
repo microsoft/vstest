@@ -88,6 +88,9 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </summary>
     private string? _testResultsDirPath;
     private bool _warnOnFileOverwrite;
+    private string? _assemblyName;
+    private string? _targetFramework;
+    private string? _configuration;
 
 
     #region ITestLogger
@@ -264,6 +267,12 @@ public class TrxLogger : ITestLoggerWithParameters
         // Create test run
         if (LoggerTestRun == null)
             CreateTestRun();
+
+        // Capture assembly name and framework from first test for template replacement
+        if (_assemblyName == null && e.Result.TestCase.Source != null)
+        {
+            _assemblyName = Path.GetFileNameWithoutExtension(e.Result.TestCase.Source);
+        }
 
         // Convert skipped test to a log entry as that is the behavior of mstest.
         if (e.Result.Outcome == ObjectModel.TestOutcome.Skipped)
@@ -483,6 +492,85 @@ public class TrxLogger : ITestLoggerWithParameters
         }
     }
 
+    /// <summary>
+    /// Processes template placeholders in the file name pattern.
+    /// Supports multiple placeholders for dynamic file naming.
+    /// </summary>
+    /// <param name="pattern">The pattern with optional placeholders</param>
+    /// <returns>The processed pattern with placeholders replaced</returns>
+    /// <remarks>
+    /// Supported placeholders:
+    /// {assembly} - Test assembly name (e.g., "MyTests")
+    /// {framework} - Target framework (e.g., "net8.0", "netstandard2.1")
+    /// {date} - Current date in yyyyMMdd format (e.g., "20251125")
+    /// {time} - Current time in HHmmss format (e.g., "143022")
+    /// {machine} - Machine name
+    /// {user} - Username
+    /// {configuration} - Build configuration (e.g., "Debug", "Release")
+    /// </remarks>
+    private string ProcessTemplateReplacements(string pattern)
+    {
+        if (pattern.IsNullOrWhiteSpace())
+            return pattern;
+
+        var now = DateTime.Now;
+
+        // Define template replacements using tuples
+        var replacements = new[]
+        {
+            (Template: TrxLoggerConstants.AssemblyTemplate, Value: _assemblyName ?? "UnknownAssembly"),
+            (Template: TrxLoggerConstants.FrameworkTemplate, Value: _targetFramework ?? "UnknownFramework"),
+            (Template: TrxLoggerConstants.DateTemplate, Value: now.ToString("yyyyMMdd", CultureInfo.InvariantCulture)),
+            (Template: TrxLoggerConstants.TimeTemplate, Value: now.ToString("HHmmss", CultureInfo.InvariantCulture)),
+            (Template: TrxLoggerConstants.MachineTemplate, Value: Environment.MachineName),
+            (Template: TrxLoggerConstants.UserTemplate, Value: Environment.UserName),
+            (Template: TrxLoggerConstants.ConfigurationTemplate, Value: _configuration ?? "UnknownConfiguration")
+        };
+
+        string result = pattern;
+        foreach (var (template, value) in replacements)
+        {
+            // Case-insensitive replacement for compatibility with net462/netstandard2.0
+            // Use StringBuilder for efficient string replacement
+            int index = result.IndexOf(template, StringComparison.OrdinalIgnoreCase);
+
+            if (index < 0)
+            {
+                continue; // Template not found, skip to next
+            }
+
+            StringBuilder sb = new(result);
+            int searchStart = 0;
+
+            while (index >= 0)
+            {
+                sb.Remove(index, template.Length);
+                sb.Insert(index, value);
+
+                // Move search position past the replaced value
+                searchStart = index + value.Length;
+
+                if (searchStart >= sb.Length)
+                {
+                    break;
+                }
+
+                // Search in StringBuilder to avoid ToString() in loop
+                index = sb.ToString(searchStart, sb.Length - searchStart)
+                    .IndexOf(template, StringComparison.OrdinalIgnoreCase);
+
+                if (index >= 0)
+                {
+                    index += searchStart; // Adjust for substring offset
+                }
+            }
+
+            result = sb.ToString();
+        }
+
+        return result;
+    }
+
     private string AcquireTrxFileNamePath(out bool shouldOverwrite)
     {
         TPDebug.Assert(IsInitialized, "Logger is not initialized");
@@ -492,20 +580,41 @@ public class TrxLogger : ITestLoggerWithParameters
 
         if (_parametersDictionary is not null)
         {
+            // Capture target framework for template replacement
+            if (_targetFramework == null && _parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var fw) && fw != null)
+            {
+                _targetFramework = Framework.FromString(fw)?.ShortName ?? fw;
+            }
+
+            // Capture build configuration if available (common parameter passed by test runners)
+            if (_configuration == null && _parametersDictionary.TryGetValue("Configuration", out var config) && config != null)
+            {
+                _configuration = config;
+            }
+
             var isLogFileNameParameterExists = _parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string? logFileNameValue) && !logFileNameValue.IsNullOrWhiteSpace();
             var isLogFilePrefixParameterExists = _parametersDictionary.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string? logFilePrefixValue) && !logFilePrefixValue.IsNullOrWhiteSpace();
             if (isLogFilePrefixParameterExists)
             {
+                // Process template replacements
+                logFilePrefixValue = ProcessTemplateReplacements(logFilePrefixValue!);
+
                 if (_parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var framework) && framework != null)
                 {
                     framework = Framework.FromString(framework)?.ShortName ?? framework;
-                    logFilePrefixValue = logFilePrefixValue + "_" + framework;
+                    // Only append framework if not already in the template
+                    if (!logFilePrefixValue.Contains(framework, StringComparison.OrdinalIgnoreCase))
+                    {
+                        logFilePrefixValue = logFilePrefixValue + "_" + framework;
+                    }
                 }
 
                 filePath = _trxFileHelper.GetNextTimestampFileName(_testResultsDirPath, logFilePrefixValue + _trxFileExtension, "_yyyyMMddHHmmss");
             }
             else if (isLogFileNameParameterExists)
             {
+                // Process template replacements
+                logFileNameValue = ProcessTemplateReplacements(logFileNameValue!);
                 filePath = Path.Combine(_testResultsDirPath, logFileNameValue!);
                 shouldOverwrite = true;
             }

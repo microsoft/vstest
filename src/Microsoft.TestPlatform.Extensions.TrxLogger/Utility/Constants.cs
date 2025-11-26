@@ -81,6 +81,41 @@ internal static class Constants
     public static string WarnOnFileOverwrite = "WarnOnFileOverwrite";
 
     /// <summary>
+    /// Template placeholder for assembly name in log file name.
+    /// </summary>
+    public const string AssemblyTemplate = "{assembly}";
+
+    /// <summary>
+    /// Template placeholder for test framework in log file name.
+    /// </summary>
+    public const string FrameworkTemplate = "{framework}";
+
+    /// <summary>
+    /// Template placeholder for date in log file name (yyyyMMdd format).
+    /// </summary>
+    public const string DateTemplate = "{date}";
+
+    /// <summary>
+    /// Template placeholder for time in log file name (HHmmss format).
+    /// </summary>
+    public const string TimeTemplate = "{time}";
+
+    /// <summary>
+    /// Template placeholder for machine name in log file name.
+    /// </summary>
+    public const string MachineTemplate = "{machine}";
+
+    /// <summary>
+    /// Template placeholder for username in log file name.
+    /// </summary>
+    public const string UserTemplate = "{user}";
+
+    /// <summary>
+    /// Template placeholder for build configuration (Debug/Release) in log file name.
+    /// </summary>
+    public const string ConfigurationTemplate = "{configuration}";
+
+    /// <summary>
     /// Mstest adapter string
     /// </summary>
     public const string MstestAdapterString = "mstestadapter";
