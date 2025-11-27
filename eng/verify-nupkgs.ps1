@@ -19,8 +19,8 @@ function Verify-Nuget-Packages {
     $expectedNumOfFiles = @{
         "Microsoft.CodeCoverage"                      = 75
         "Microsoft.NET.Test.Sdk"                      = 25
-        "Microsoft.TestPlatform"                      = 537
-        "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI" = 380
+        "Microsoft.TestPlatform"                      = 542
+        "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI" = 388
         "Microsoft.TestPlatform.Build"                = 20
         "Microsoft.TestPlatform.CLI"                  = 480
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 34
@@ -186,6 +186,8 @@ function Verify-NugetPackageExe {
         "TestPlatform\SettingsMigrator.exe"            = "x86"
 
         "dump\DumpMinitool.exe"                        = "x86-64"
+
+        "VideoRecorder\VSTestVideoRecorder.exe"        = "x86"
     }
 
     $errs = @()
