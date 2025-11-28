@@ -868,6 +868,401 @@ public class TrxLoggerTests
         File.Delete(logger.TrxFile);
     }
 
+    #region Template Replacement Tests
+
+    [TestMethod]
+    public void LogFileNameWithAssemblyTemplateShouldBeReplaced()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "{assembly}_TestResults.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        var testCase = CreateTestCase("TestCase1");
+        testCase.Source = "MyTestAssembly.dll";
+        var result = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
+        result.Outcome = TestOutcome.Passed;
+
+        _testableTrxLogger.TestResultHandler(new object(), new TestResultEventArgs(result));
+
+        var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
+        _testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("MyTestAssembly_TestResults.trx"), $"Expected assembly name in file name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithFrameworkTemplateShouldBeReplaced()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "TestResults_{framework}.trx";
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v8.0";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("TestResults_net8.0.trx"), $"Expected framework in file name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithDateTemplateShouldBeReplaced()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "TestResults_{date}.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var today = DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains($"TestResults_{today}.trx"), $"Expected date in file name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithTimeTemplateShouldBeReplaced()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "TestResults_{time}.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        // Just verify time is in the format (6 digits)
+        var fileName = Path.GetFileNameWithoutExtension(_testableTrxLogger.TrxFile);
+        Assert.IsNotNull(fileName);
+        Assert.IsTrue(System.Text.RegularExpressions.Regex.IsMatch(fileName, @"TestResults_\d{6}"), $"Expected time in file name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithMachineTemplateShouldBeReplaced()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "TestResults_{machine}.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var machineName = Environment.MachineName;
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains($"TestResults_{machineName}.trx"), $"Expected machine name in file name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithUserTemplateShouldBeReplaced()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "TestResults_{user}.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var userName = Environment.UserName;
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains($"TestResults_{userName}.trx"), $"Expected user name in file name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithConfigurationTemplateShouldBeReplaced()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "TestResults_{configuration}.trx";
+        _parameters["Configuration"] = "Debug";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("TestResults_Debug.trx"), $"Expected configuration in file name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithMultipleTemplatesShouldBeReplaced()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "{assembly}_{framework}_{configuration}_TestResults.trx";
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v8.0";
+        _parameters["Configuration"] = "Release";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        var testCase = CreateTestCase("TestCase1");
+        testCase.Source = "MyTests.dll";
+        var result = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
+        result.Outcome = TestOutcome.Passed;
+
+        _testableTrxLogger.TestResultHandler(new object(), new TestResultEventArgs(result));
+
+        var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
+        _testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("MyTests_net8.0_Release_TestResults.trx"), $"Expected all templates replaced, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFilePrefixWithAssemblyTemplateShouldBeReplaced()
+    {
+        _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+        _parameters[TrxLoggerConstants.LogFilePrefixKey] = "{assembly}_results";
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v8.0";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        var testCase = CreateTestCase("TestCase1");
+        testCase.Source = "UnitTests.dll";
+        var result = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
+        result.Outcome = TestOutcome.Passed;
+
+        _testableTrxLogger.TestResultHandler(new object(), new TestResultEventArgs(result));
+
+        var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
+        _testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("UnitTests_results_net8.0"), $"Expected assembly name in prefix, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFilePrefixWithFrameworkTemplateDoesNotDuplicateFramework()
+    {
+        _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+        _parameters[TrxLoggerConstants.LogFilePrefixKey] = "results_{framework}";
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v8.0";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
+        var frameworkCount = System.Text.RegularExpressions.Regex.Matches(fileName!, "net8\\.0").Count;
+
+        Assert.AreEqual(1, frameworkCount, $"Framework should appear only once in file name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithCaseInsensitiveTemplateShouldBeReplaced()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "{ASSEMBLY}_{Framework}_TestResults.trx";
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v8.0";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        var testCase = CreateTestCase("TestCase1");
+        testCase.Source = "MyTests.dll";
+        var result = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
+        result.Outcome = TestOutcome.Passed;
+
+        _testableTrxLogger.TestResultHandler(new object(), new TestResultEventArgs(result));
+
+        var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
+        _testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("MyTests_net8.0_TestResults.trx"), $"Expected case-insensitive template replacement, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithUnknownAssemblyShouldUseDefault()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "{assembly}_TestResults.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        // Create test result without setting assembly name (no test result handler call)
+        var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
+        _testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("UnknownAssembly_TestResults.trx"), $"Expected default assembly name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithUnknownFrameworkShouldUseDefault()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "{framework}_TestResults.trx";
+        // Don't set TargetFramework parameter
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("UnknownFramework_TestResults.trx"), $"Expected default framework name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithUnknownConfigurationShouldUseDefault()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "{configuration}_TestResults.trx";
+        // Don't set Configuration parameter
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("UnknownConfiguration_TestResults.trx"), $"Expected default configuration name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithEmptyStringShouldReturnEmpty()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        // Should create default name instead
+        Assert.IsNotNull(_testableTrxLogger.TrxFile);
+    }
+
+    [TestMethod]
+    public void LogFilePrefixWithMultipleTemplatesShouldBeReplaced()
+    {
+        _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+        _parameters[TrxLoggerConstants.LogFilePrefixKey] = "{assembly}_{configuration}_{date}";
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v8.0";
+        _parameters["Configuration"] = "Debug";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        var testCase = CreateTestCase("TestCase1");
+        testCase.Source = "IntegrationTests.dll";
+        var result = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
+        result.Outcome = TestOutcome.Passed;
+
+        _testableTrxLogger.TestResultHandler(new object(), new TestResultEventArgs(result));
+
+        var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
+        _testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+
+        var today = DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains($"IntegrationTests_Debug_{today}_net8.0"), $"Expected all templates replaced in prefix, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithNetStandardFrameworkShouldBeHandled()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "TestResults_{framework}.trx";
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETStandard,Version=v2.1";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("TestResults_netstandard2.1.trx"), $"Expected netstandard framework in file name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithNet462FrameworkShouldBeHandled()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "TestResults_{framework}.trx";
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=v4.6.2";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("TestResults_net462.trx"), $"Expected net462 framework in file name, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithSpecialCharactersInAssemblyNameShouldBeHandled()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "{assembly}_TestResults.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        var testCase = CreateTestCase("TestCase1");
+        testCase.Source = "My.Test.Assembly.dll";
+        var result = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
+        result.Outcome = TestOutcome.Passed;
+
+        _testableTrxLogger.TestResultHandler(new object(), new TestResultEventArgs(result));
+
+        var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
+        _testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("My.Test.Assembly_TestResults.trx"), $"Expected assembly name with dots preserved, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithNoTemplatesShouldRemainUnchanged()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "SimpleTestResults.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("SimpleTestResults.trx"), $"Expected simple filename without templates, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithPartialTemplateMatchShouldNotReplace()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "TestResults_{assemblyx}.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        // {assemblyx} is not a valid template, should remain as-is
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains("{assemblyx}"), $"Expected invalid template to remain unchanged, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithRepeatedTemplateShouldReplaceAllOccurrences()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "{date}_{date}_TestResults.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var today = DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+        var expectedPattern = $"{today}_{today}_TestResults.trx";
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains(expectedPattern), $"Expected repeated template replaced, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithMixedCaseRepeatedTemplateShouldReplaceAll()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "{date}_{DATE}_TestResults.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var today = DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+        var expectedPattern = $"{today}_{today}_TestResults.trx";
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains(expectedPattern), $"Expected case-insensitive repeated template replaced, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFilePrefixWithOnlyFrameworkTemplateShouldNotDuplicate()
+    {
+        _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+        _parameters[TrxLoggerConstants.LogFilePrefixKey] = "{framework}";
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v8.0";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
+        var frameworkCount = System.Text.RegularExpressions.Regex.Matches(fileName!, "net8\\.0").Count;
+
+        Assert.AreEqual(1, frameworkCount, $"Framework should appear only once even when prefix is just framework template, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithAllTemplatesShouldReplaceAll()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "{assembly}_{framework}_{configuration}_{date}_{time}_{machine}_{user}.trx";
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v8.0";
+        _parameters["Configuration"] = "Release";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        var testCase = CreateTestCase("TestCase1");
+        testCase.Source = "AllTemplates.dll";
+        var result = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
+        result.Outcome = TestOutcome.Passed;
+
+        _testableTrxLogger.TestResultHandler(new object(), new TestResultEventArgs(result));
+
+        var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
+        _testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+
+        var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
+        Assert.IsTrue(fileName!.Contains("AllTemplates"), "Expected assembly name");
+        Assert.IsTrue(fileName.Contains("net8.0"), "Expected framework");
+        Assert.IsTrue(fileName.Contains("Release"), "Expected configuration");
+        Assert.IsTrue(fileName.Contains(DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture)), "Expected date");
+        Assert.IsTrue(fileName.Contains(Environment.MachineName), "Expected machine name");
+        Assert.IsTrue(fileName.Contains(Environment.UserName), "Expected user name");
+    }
+
+    [TestMethod]
+    public void LogFileNameWithBracesInStaticTextShouldBePreserved()
+    {
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "TestResults_{framework}_[{date}].trx";
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v8.0";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var today = DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+        Assert.IsTrue(_testableTrxLogger.TrxFile!.Contains($"TestResults_net8.0_[{today}].trx"), $"Expected braces in static text preserved, but got: {_testableTrxLogger.TrxFile}");
+    }
+
+    #endregion
+
     private void ValidateTestIdAndNameInTrx()
     {
         TestCase testCase = CreateTestCase("TestCase");
