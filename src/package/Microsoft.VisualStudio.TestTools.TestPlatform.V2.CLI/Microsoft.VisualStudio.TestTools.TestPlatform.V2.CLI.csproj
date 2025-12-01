@@ -188,13 +188,16 @@
     <ItemGroup>
       <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Microsoft.DiaSymReader.dll" />
       <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Microsoft.IntelliTrace.Core.dll" />
-      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Extensions\Microsoft.VisualStudio.TestTools.DataCollection.*.dll" Exclude="$(InternalTestPlatformExtensionsFolder)\**\*Media*.dll;$(InternalTestPlatformExtensionsFolder)\**\*Video*.dll;">
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Extensions\VideoRecorder\*">
+        <VSIXSubPath>Extensions\VideoRecorder</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Extensions\Microsoft.VisualStudio.TestTools.DataCollection.*.dll">
         <VSIXSubPath>Extensions</VSIXSubPath>
       </VsixSourceItem>
       <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.*.dll">
         <VSIXSubPath>Extensions</VSIXSubPath>
       </VsixSourceItem>
-      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.*.dll" Exclude="$(InternalTestPlatformExtensionsFolder)\**\*Web*.dll;$(InternalTestPlatformExtensionsFolder)\**\*Tmi*.dll;$(InternalTestPlatformExtensionsFolder)\**\*Video*.dll;">
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.*.dll" Exclude="$(InternalTestPlatformExtensionsFolder)\**\*Web*.dll;$(InternalTestPlatformExtensionsFolder)\**\*Tmi*.dll">
         <VSIXSubPath>Extensions</VSIXSubPath>
       </VsixSourceItem>
     </ItemGroup>
