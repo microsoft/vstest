@@ -146,6 +146,7 @@ public static partial class ManagedNameHelper
             // TODO: @Haplois, exception expects a message and not a param name.
             ?? throw new NotSupportedException(nameof(method));
 
+        managedTypeName = semanticType.FullName!;
         if (ReflectionHelpers.IsGenericType(semanticType) && !useClosedTypes)
         {
             // The type might have some of its generic parameters specified, so make
@@ -210,20 +211,20 @@ public static partial class ManagedNameHelper
         }
         var methodNameEndIndex = methodBuilder.Length;
 
-        managedTypeName = typeBuilder.ToString();
+        var escapedManagedTypeName = typeBuilder.ToString();
         managedMethodName = methodBuilder.ToString();
 
         hierarchyValues = new string[HierarchyConstants.Levels.TotalLevelCount];
         hierarchyValues[HierarchyConstants.Levels.TestGroupIndex] = managedMethodName.Substring(0, methodNameEndIndex);
         if (hierarchyPos[1] == hierarchyPos[0]) // No namespace
         {
-            hierarchyValues[HierarchyConstants.Levels.ClassIndex] = managedTypeName.Substring(0, hierarchyPos[2]);
+            hierarchyValues[HierarchyConstants.Levels.ClassIndex] = escapedManagedTypeName.Substring(0, hierarchyPos[2]);
             hierarchyValues[HierarchyConstants.Levels.NamespaceIndex] = null;
         }
         else
         {
-            hierarchyValues[HierarchyConstants.Levels.ClassIndex] = managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1);
-            hierarchyValues[HierarchyConstants.Levels.NamespaceIndex] = managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]);
+            hierarchyValues[HierarchyConstants.Levels.ClassIndex] = escapedManagedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1);
+            hierarchyValues[HierarchyConstants.Levels.NamespaceIndex] = escapedManagedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]);
         }
 
         var assembly = method.DeclaringType?.Assembly;
@@ -268,12 +269,11 @@ public static partial class ManagedNameHelper
     /// </remarks>
     public static MethodBase GetMethod(Assembly assembly, string managedTypeName, string managedMethodName)
     {
-        var parsedManagedTypeName = ReflectionHelpers.ParseEscapedString(managedTypeName);
-        var type = assembly.GetType(parsedManagedTypeName, throwOnError: false, ignoreCase: false);
+        var type = assembly.GetType(managedTypeName, throwOnError: false, ignoreCase: false);
 
         if (type == null)
         {
-            string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorTypeNotFound, parsedManagedTypeName);
+            string message = string.Format(CultureInfo.CurrentCulture, Resources.Resources.ErrorTypeNotFound, managedTypeName);
             throw new InvalidManagedNameException(message);
         }
 
