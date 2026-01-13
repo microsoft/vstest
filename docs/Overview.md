@@ -1,10 +1,10 @@
-# Test Platform messaging
+# Test Platform
 
-- [Test Platform messaging](#test-platform-messaging)
+- [Test Platform](#test-platform)
   - [What is TestPlatform?](#what-is-testplatform)
   - [How it works?](#how-it-works)
   - [Workflows](#workflows)
-  - [Specification](#specification)
+  - [Communication Protocol](#communication-protocol)
     - [Base Protocol](#base-protocol)
       - [Header Part](#header-part)
       - [Content Part](#content-part)
@@ -49,9 +49,15 @@
       - [TestExecution.StatsChange notification (Runner)](#testexecutionstatschange-notification-runner)
       - [TestExecution.StatsChange notification (Client)](#testexecutionstatschange-notification-client)
     - [Datacollection](#datacollection)
+  - [Extensibility](#extensibility)
+    - [DLL Extension points](#dll-extension-points)
+      - [Test Adapter](#test-adapter)
+      - [Test Logger](#test-logger)
+      - [Runtime Provider](#runtime-provider)
+    - [TranslationLayer extension points](#translationlayer-extension-points)
     - [.NET Implementation](#net-implementation)
       - [Architecture](#architecture)
-      - [Extension points](#extension-points)
+      
 
 ## What is TestPlatform?
 
@@ -128,7 +134,7 @@ The Run workflow described above is very common in command line tools, and proba
 - *TestSession* - starts a set of testhosts for given test sources, to make the ready to run.
 - *AttachmentProcessing* - processes a given set of attachments that were produced during a previous test run, e.g. merges code coverage files.
 
-## Specification
+## Communication Protocol
 
 ### Base Protocol
 
@@ -382,7 +388,7 @@ sequenceDiagram
 participant c as Client<br>(Visual Studio)
 participant r as Runner<br>(vstest.console.exe)
 c->>r:   Run vstest.console -port X
-r->>r:   Connect to port Y
+r->>r:   Connect to port X
 r->>c:   TestSession.Connected
 ```
 
@@ -590,7 +596,7 @@ public class DiscoveryCompletePayload
     // If true TotalCount is also set to -1.
     public bool IsAborted { get; set; }
 
-    // Telemetry metrics that are reported to client.
+    // Telemetry.
     public IDictionary<string, object>? Metrics { get; set; }
 
     // Sources which were fully discovered.
@@ -765,7 +771,7 @@ public class DiscoveryCompletePayload
     // If true TotalCount is also set to -1.
     public bool IsAborted { get; set; }
 
-    // Metrics.
+    // Telemetry.
     public IDictionary<string, object>? Metrics { get; set; }
 
     // Sources which were fully discovered.
@@ -1109,7 +1115,7 @@ public class TestRunCompleteEventArgs
     // Value is set to TimeSpan.Zero in case of any error.
     public TimeSpan ElapsedTimeInRunningTests { get; private set; }
 
-    // Metrics.
+    // Telemetry.
     public IDictionary<string, object>? Metrics { get; set; }
 
     // Extensions that were discovered in this run.
@@ -1230,10 +1236,10 @@ public class TestRunCriteriaWithTests
 
 public class TestExecutionContext
 {
-    // Gets or sets the frequency of run stats event.
+    // Gets or sets the batch size for sending test results.
     public long FrequencyOfRunStatsChangeEvent { get; set; }
 
-    // Gets or sets the timeout that triggers sending results regardless of cache size.
+    // Gets or sets the timeout that triggers sending results regardless of batch size.
     public TimeSpan RunStatsChangeEventTimeout { get; set; }
 
     // Gets or sets a value indicating whether execution is out of process.
@@ -1242,7 +1248,7 @@ public class TestExecutionContext
     // Gets or sets a value indicating whether testhost process should be kept running after test run completion.
     public bool KeepAlive { get; set; }
 
-    // Gets or sets a value indicating whether test case level events need to be sent or not.
+    // Gets or sets a value indicating whether test case level events need to be sent or not. TODO: what is it? Is there since first commit, no usages on grep.app.
     public bool AreTestCaseLevelEventsRequired { get; set; }
 
     // Gets or sets a value indicating whether execution is in debug mode.
@@ -1359,7 +1365,7 @@ public class TestRunCompleteEventArgs
     // Value is set to TimeSpan.Zero in case of any error.
     public TimeSpan ElapsedTimeInRunningTests { get; private set; }
 
-    // Metrics.
+    // Telemetry.
     public IDictionary<string, object>? Metrics { get; set; }
 
     // Extensions that were discovered in this run.
@@ -1718,10 +1724,30 @@ Same as above [TestExecution.StatsChange notification (Runner)](#testexecutionst
 
 ### Datacollection
 
+## Extensibility
+
+Test Platform offers multiple points for extensibility. These extensibility points allow test framework authors to integrate their test frameworks with VSTest by providing a test adapter. Similarly a dataCollector extension can be provided that observes the run, or a logger extension can be provided that can observe the run and logs (reports) on the tests that were executed.
+
+IDEs (and other clients) can integrate with VSTest using the TranslationLayer package, which manages communication between the client and the runner.
+
+
+### DLL Extension points
+
+Extensions are looked up by Reflection from the dlls provided to the run, based on a naming convention. Dlls named `*TestAdapter.dll`, `*TestLogger.dll`, `*Collector.dll`, `*RuntimeProvider.dll` are considered by the plugin loader. The types of extensions that each of those dlls can hold are **NOT** restricted to what the naming pattern suggests. A `TestAdapter.dll` can contain also different types of extensions.
+
+#### Test Adapter
+
+#### Test Logger
+
+#### Runtime Provider
+
+
+### TranslationLayer extension points
+
 TODO
 
 ### .NET Implementation
 
 #### Architecture
 
-#### Extension points
+
