@@ -243,7 +243,7 @@ The version is negotiated between the components at the beginning of every workf
 
 The server supports processing only a single request at a time. Unless the request is [Cancel](#cancel) or [Abort](#abort) request.
 
-All notifications are sent before as response is sent.
+All notifications are sent before a response is sent.
 
 #### Message documentation
 
@@ -286,7 +286,7 @@ The version is determined by choosing the highest common supported version. When
 
 The receiving side should remember the agreed value, and use it as the highest supported version for any downstream component. In the case above runner should send 6 to testhost, even though the runner supports versions up to 7.
 
-The request was introduced in TestPlatform version `16.0.0`. Runners before this version are not allowed. Testhosts before this version are allowed, the version of testhost if figured out by scanning the assembly, and the request is not sent to them. Version 0 is used for communication.
+The request was introduced in TestPlatform version `16.0.0`. Runners before this version are not allowed. Testhosts before this version are allowed, the version of testhost is figured out by scanning the assembly, and the request is not sent to them. Version 0 is used for communication.
 
 Versions:
 
@@ -590,7 +590,7 @@ public class DiscoveryCompletePayload
     // If true TotalCount is also set to -1.
     public bool IsAborted { get; set; }
 
-    // Metrics.
+    // Telemetry metrics that are reported to client.
     public IDictionary<string, object>? Metrics { get; set; }
 
     // Sources which were fully discovered.
@@ -710,11 +710,12 @@ public class DiscoveryCriteria
 
     
     // Discovered test event will be raised after discovering at minimum this number of tests, 
-    // or when DiscoveredTestEventTimeout is passed.
+    // or when DiscoveredTestEventTimeout is passed. This helps batching the results, making communication between processes faster.
     public long FrequencyOfDiscoveredTestsEvent { get; private set; }
 
     // Discovered test event will be raised after this much time since last test
-    // when FrequencyOfDiscoveredTestsEvent is passed.
+    // when FrequencyOfDiscoveredTestsEvent is passed. This helps sending the batches more frequently, 
+    // when the batch is large, but there is small amount of tests, or the discovery is slow. Giving more frequent feedback to user.
     public TimeSpan DiscoveredTestEventTimeout { get; private set; }
 
     // Run settings for the discovery.
