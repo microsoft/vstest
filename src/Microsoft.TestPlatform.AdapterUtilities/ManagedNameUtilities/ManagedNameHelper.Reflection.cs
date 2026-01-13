@@ -146,7 +146,6 @@ public static partial class ManagedNameHelper
             // TODO: @Haplois, exception expects a message and not a param name.
             ?? throw new NotSupportedException(nameof(method));
 
-        managedTypeName = semanticType.FullName!;
         if (ReflectionHelpers.IsGenericType(semanticType) && !useClosedTypes)
         {
             // The type might have some of its generic parameters specified, so make
@@ -160,6 +159,8 @@ public static partial class ManagedNameHelper
             var methodHandle = ReflectionHelpers.GetMethodHandle(method);
             method = MethodBase.GetMethodFromHandle(methodHandle, semanticType.TypeHandle)!;
         }
+
+        managedTypeName = semanticType.FullName!;
 
         if (method.IsGenericMethod && !useClosedTypes)
         {
