@@ -1843,6 +1843,10 @@ public class Perfy : ITestDiscoverer, ITestExecutor
 
 Additional information can be sourced from the context parameters that contain the run configuration. Additional information can be reported to the platform by using the `IMessageLogger` which is provided to discovery, and from which `IFrameworkHandle` also derives.
 
+`ITestExecutor2` provides additional methods `ShouldAttachToTestHost` that return true or false. When false is returned, the debugger does not attache to the testhost process. This is used when execution is delegated to a sub-process, e.g. a .py file is provided, the run is routed via .NET Framework testhost, but eventually delegated to python executable. In that case the adapter returns false from the callback to avoid attaching Visual Studio to testhost.exe.
+
+The instance of `IFrameworkHandle` provided to the extension point, can be upcast to `IFrameworkHandle2` to use additional capabilities that allow attaching debugger to child processes. The attaching assumes that the child process uses the same TFM as the current process.
+
 Additional example of a toy test framework and adapter can be found in <https://github.com/nohwnd/Intent/tree/master/Intent.TestAdapter>. Or in the respective implementations of MSTest, NUnit, XUnit and similar.
 
 #### Test Logger
