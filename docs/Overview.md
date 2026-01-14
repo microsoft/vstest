@@ -51,6 +51,7 @@
     - [Datacollection](#datacollection)
   - [Extensibility](#extensibility)
     - [DLL Extension points](#dll-extension-points)
+      - [ObjectModel](#objectmodel)
       - [Test Adapter](#test-adapter)
       - [Test Logger](#test-logger)
       - [Runtime Provider](#runtime-provider)
@@ -1733,9 +1734,116 @@ IDEs (and other clients) can integrate with VSTest using the TranslationLayer pa
 
 ### DLL Extension points
 
-Extensions are looked up by Reflection from the dlls provided to the run, based on a naming convention. Dlls named `*TestAdapter.dll`, `*TestLogger.dll`, `*Collector.dll`, `*RuntimeProvider.dll` are considered by the plugin loader. The types of extensions that each of those dlls can hold are **NOT** restricted to what the naming pattern suggests. A `TestAdapter.dll` can contain also different types of extensions.
+Extensions are looked up by Reflection from the dlls provided to the run, based on a naming convention. Dlls named `*TestAdapter.dll`, `*TestLogger.dll`, `*Collector.dll`, `*RuntimeProvider.dll` are considered by the plugin loader.
+
+The extensions should target netstandard2.0, and not have any dll dependencies. The no-dependency rule is more lose for the TestAdapter extension point, because the tests target the framework that they will eventually run as. While the other extensions (data collector, and logger)  get loaded into a process that might not align with the project target framework, e.g. in case where .NET Core project is ran from Visual Studio, where vstest.console.exe is using .NET Framework, and datacollector.exe is also using .NET Framework.
+
+#### ObjectModel
+
+ObjectModel is Test platform dll that holds all types and abstractions needed for extensibility. It is often used as reference dll and it is not typically shipped together with the extension. The runner / testhost / datacollector provides its own version of ObjectModel.
+
+```xml
+<PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="18.0.0" PrivateAssets="All" />
+```
+
+This reference uses `PrivateAssets="All"` to avoid copying the dll into the output folder.
 
 #### Test Adapter
+
+Test adapter is the most used extension point that allows you to write your own test framework integration. This extension point is used by MSTest, NUnit, XUnit.net and other, to implement a `test adapter`, an adaptation layer that communicates with the particular test framework.
+
+The test adapter implements two interfaces: `ITestExecutor` or `ITestExecutor2` and `ITestDiscoverer`, both need to be implemented.
+
+The class implementing the discoverer has to  be decorated with `DefaultExecutorUri`, that links it to the executor for which this discoverer discovers tests.
+
+Optionally the discoverer can be decorated with additional attributes:
+- `FileExtensionAttribute` to filter the sources which it is able to inspect typically .exe and .dll are specified, but test frameworks don't have to limit themselves to just that.
+- `CategoryAttribute` to specify `managed` or `native` assembly type. This only applies to adapters that specify .exe or .dll file extensions. https://github.com/microsoft/vstest/blob/main/docs/RFCs/0020-Improving-Logic-To-Pass-Sources-To-Adapters.md
+- `DirectoryBasedTestDiscovererAttribute` - specifies a discoverer that is able to handle directories, rather than files. Currently used by PythonPyTestAdapter. Does not work in commandline - providing directory fails validation, but works via TranslationLayer.
+
+The class implementing the executor has to be decorated with `ExtensionUriAttribute`, specifying the name of the executor in Uri form. Such as `executor://mstestadapter/v2`. There is no specified schema or validation, but using `executor://<test adapter name>/<version>` is the norm. This is used for identification in telemetry, for logging and reporting, and for linking to the discoverer.
+
+An example of a test adapter:
+
+```cs
+[ExtensionUri(Id)]
+[DefaultExecutorUri(Id)]
+public class Perfy : ITestDiscoverer, ITestExecutor
+{
+    public const string Id = "executor://ExampleTestAdapter/v1";
+    public static readonly Uri Uri = new Uri(Id);
+
+    public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext context,
+        IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+    {
+        // Sources are the files (one ore more) to be discovered, typically those are dlls that we need to inspect for tests. But can be any file.
+        // The test framework somehow finds the tests, and will report them back by creating a TestCase object and reporting it to the sink.
+        var tests = ...
+
+        foreach (var test in tests)
+        {
+            // TestCase sends back at least: 
+            // - test case name, this should be unique, but stable across multiple discoveries and runs
+            // - uri of the executor.
+            // - the source (dll) in which the test case was found.
+            // It can also populate the additional information on the object, such as in which code file and on which line the test case is defined.
+            var tc = new TestCase(test.Name, Uri, source);
+
+            // Send test case sends it to local cache, which batches the updates and sends them to the runner.
+            discoverySink.SendTestCase(tc);
+        }
+    }
+
+    public void Cancel()
+    {
+        // Cancel the work that is happening. This is called "asynchronously", during running or discovering tests.
+    }
+
+    public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+    {
+        // Runs all tests specified in the collection of tests, those tests are typically discovered by discovery, sent to IDE. 
+        // And then the IDE sends them back to a new instance of the the test runner.
+        // The test framework will do internal discovery of the tests (for MSTest that means scanning all methods in classes to find the ones decorated with [TestMethod]),
+        // finding the names of those tests, and filtering them down to the provided list.
+        // This method is used primarily by IDEs such as Visual Studio.
+
+        // Ultimately is does not differ much from RunTests below. See that for details.
+    }
+
+    public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+    {
+        // The test framework inspects all the sources (files / dlls) that are provided, and finds all tests in them.
+        // It runs all tests, and when they finish it reports each testcase, and test result. These results are batched and sent to the runner.
+        // Typically this callback would be injected into the framework, so results can be sent as soon as the test finishes. For simplicity we
+        // show pseudo-code with synchronous loop.
+
+        foreach (var source in sources)
+        {
+            // In MSTest this means finding all methods decorated with [TestMethod], and returning an object with test information, and the related method.
+            var tests = testFramework.FindTests(source);
+
+            foreach (var test in tests) 
+            {
+                var tc = new TestCase(test.Name, Uri, source);
+                // Notify datacollectors that test started
+                frameworkHandle.RecordStart(test);
+                TestOutcome result = testFramework.RunTest(test);
+                // Notify datacollectors that test ended
+                frameworkHandle.RecordEnd(test, result);
+
+                frameworkHandle.RecordResult(new TestResult(tc)
+                {
+                    Outcome = result; // e.g. Passed
+                });
+            }
+        }
+    }
+}
+```
+
+Additional information can be sourced from the context parameters that contain the run configuration. Additional information can be reported to the platform by using the `IMessageLogger` which is provided to discovery, and from which `IFrameworkHandle` also derives.
+
+Additional example of a toy test framework and adapter can be found in <https://github.com/nohwnd/Intent/tree/master/Intent.TestAdapter>. Or in the respective implementations of MSTest, NUnit, XUnit and similar.
 
 #### Test Logger
 
