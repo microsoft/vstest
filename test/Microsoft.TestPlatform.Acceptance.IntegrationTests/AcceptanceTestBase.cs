@@ -156,6 +156,8 @@ public class AcceptanceTestBase : IntegrationTestBase
                 Directory.CreateDirectory(Path.Combine(TempDirectory.Path, "eng"));
                 File.Copy(Path.Combine(root, "eng", "Versions.props"),
                      Path.Combine(TempDirectory.Path, "eng", "Versions.props"));
+                File.Copy(Path.Combine(root, "eng", "Version.Details.props"),
+                    Path.Combine(TempDirectory.Path, "eng", "Version.Details.props"));
 
                 // Copy NuGet.config
                 var nugetContent = File.ReadAllText(Path.Combine(root, "NuGet.config"))
