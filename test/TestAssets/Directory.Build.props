@@ -25,6 +25,7 @@
     <!-- Naming is based on dotnet/runtime one -->
     <NetFrameworkMinimum>net462</NetFrameworkMinimum>
     <NetCoreAppMinimum>net8.0</NetCoreAppMinimum>
+    <NetCoreAppStable>net10.0</NetCoreAppStable>
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
 
