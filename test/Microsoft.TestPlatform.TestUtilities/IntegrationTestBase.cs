@@ -1002,7 +1002,7 @@ public class IntegrationTestBase
     }
 
     protected string GetDotnetRunnerPath() =>
-        _testEnvironment.VSTestConsoleInfo?.Path ?? Path.Combine(IntegrationTestEnvironment.PublishDirectory, $"Microsoft.TestPlatform.CLI.{IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}.nupkg", "contentFiles", "any", "net9.0", "vstest.console.dll");
+        _testEnvironment.VSTestConsoleInfo?.Path ?? Path.Combine(IntegrationTestEnvironment.PublishDirectory, $"Microsoft.TestPlatform.CLI.{IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}.nupkg", "contentFiles", "any", "net10.0", "vstest.console.dll");
 
     protected void StdOutHasNoWarnings()
     {
