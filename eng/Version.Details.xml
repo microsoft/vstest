@@ -6,7 +6,7 @@
       <Uri>https://dev.azure.com/devdiv/DevDiv/_git/vs-code-coverage</Uri>
       <Sha>957aa737e42290c129a620df7129f03189743dd1</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Diagnostics.NETCore.Client" Version="0.2.0-preview.25479.115" Pinned="true">
+    <Dependency Name="Microsoft.Diagnostics.NETCore.Client" Version="0.2.0-preview.25479.115">
       <Uri>https://github.com/dotnet/dotnet</Uri>
       <Sha>e72b5bbe719d747036ce9c36582a205df9f1c361</Sha>
     </Dependency>
