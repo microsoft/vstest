@@ -828,8 +828,10 @@ public class IntegrationTestBase
 
         var executableName = Path.GetFileName(path);
 
+        var line = new string('=', 150);
         using var process = new Process();
-        Console.WriteLine($"IntegrationTestBase.Execute: Starting {executableName}");
+        Console.WriteLine();
+        Console.WriteLine($"IntegrationTestBase.Execute: {line} Starting {executableName} {line}");
         process.StartInfo.FileName = path;
         process.StartInfo.Arguments = args;
         process.StartInfo.UseShellExecute = false;
@@ -864,9 +866,8 @@ public class IntegrationTestBase
         process.OutputDataReceived += (sender, eventArgs) => stdoutBuffer.AppendLine(eventArgs.Data);
         process.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.AppendLine(eventArgs.Data);
 
-        Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", process.StartInfo.FileName);
-        Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", process.StartInfo.Arguments);
         Console.WriteLine("IntegrationTestBase.Execute: WorkingDirectory = {0}", StringUtils.IsNullOrWhiteSpace(process.StartInfo.WorkingDirectory) ? $"(Current Directory) {Directory.GetCurrentDirectory()}" : process.StartInfo.WorkingDirectory);
+        Console.WriteLine($"IntegrationTestBase.Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments}");
 
         var stopwatch = new Stopwatch();
         stopwatch.Start();
@@ -894,9 +895,9 @@ public class IntegrationTestBase
         stdOut = stdoutBuffer.ToString();
         exitCode = process.ExitCode;
 
-        Console.WriteLine("IntegrationTestBase.Execute: stdError = {0}", stdError);
-        Console.WriteLine("IntegrationTestBase.Execute: stdOut = {0}", stdOut);
-        Console.WriteLine($"IntegrationTestBase.Execute: Stopped {executableName}. Exit code = {0}", exitCode);
+        Console.WriteLine("IntegrationTestBase.Execute: stdError = {0}", StringUtils.IsNullOrWhiteSpace(stdError) ? null : stdError);
+        Console.WriteLine("IntegrationTestBase.Execute: stdOut = {0}", StringUtils.IsNullOrWhiteSpace(stdOut) ? null : stdOut);
+        Console.WriteLine($"IntegrationTestBase.Execute: {line} Stopped {executableName}. Exit code = {exitCode} {line}");
     }
 
     private void FormatStandardOutCome()
