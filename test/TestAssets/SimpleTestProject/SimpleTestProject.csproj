@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <AssemblyName>SimpleTestProject</AssemblyName>
-    <TargetFrameworks>$(TestProjectTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>$(NetFrameworkMinimum);$(NetCoreAppMinimum)</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
