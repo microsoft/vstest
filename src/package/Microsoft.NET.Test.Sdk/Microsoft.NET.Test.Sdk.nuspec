@@ -10,7 +10,7 @@
       </group>
 
       <group targetFramework="net462">
-        <!-- TestHost gets shipped with vstest.console -->
+        <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
         <dependency id="Microsoft.CodeCoverage" version="$Version$" />
       </group>
 

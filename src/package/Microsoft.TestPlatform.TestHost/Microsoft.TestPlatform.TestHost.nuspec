@@ -9,7 +9,10 @@
         <dependency id="Newtonsoft.Json" version="$NewtonsoftJsonVersion$"/>
       </group>
 
-      <group targetFramework="net462"></group>
+      <group targetFramework="net462">
+        <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
+        <dependency id="Newtonsoft.Json" version="$NewtonsoftJsonVersion$"/>
+      </group>
     </dependencies>
   </metadata>
 
@@ -19,8 +22,20 @@
     <!-- Add a third party notice file -->
     <file src="$SrcPackageFolder$ThirdPartyNotices.txt" target="" />
 
+    <file src="net462\build\**" target="build" />
+
     <!-- net462 -->
-    <file src="net8.0\_._" target="lib\net462\" />
+    <file src="net462\Microsoft.VisualStudio.TestPlatform.*.dll" target="lib\net462\" />
+    <file src="net462\Microsoft.TestPlatform.*.dll" exclude="net462\**\Microsoft.TestPlatform.TestHost.dll" target="lib\net462\" />
+
+    <file src="net462\x86\msdia140.dll" target="lib\net462\x86\" />
+    <file src="net462\x64\msdia140.dll" target="lib\net462\x64\" />
+
+    <file src="net462\testhost.exe" target="build\net462\x64\" />
+    <file src="net462\testhost.exe.config" target="build\net462\x64\" />
+
+    <file src="net462\testhost.x86.exe" target="build\net462\x86\" />
+    <file src="net462\testhost.x86.exe.config" target="build\net462\x86\" />
 
     <!-- net8.0 -->
     <file src="net8.0\Microsoft.VisualStudio.TestPlatform.*.dll" target="lib\net8.0\" />
@@ -48,10 +63,6 @@
 
     <file src="net8.0\testhost.x86.dll" target="build\net8.0\x86\" />
     <file src="net8.0\testhost.x86.exe" target="build\net8.0\x86\" />
-
-    <file src="net8.0\Microsoft.TestPlatform.TestHost.props" target="build\net8.0\" />
-    <file src="net8.0\Microsoft.TestPlatform.TestHost.targets" target="build\net8.0\" />
-
 
     <!-- Add localized resources net8.0 -->
     <file src="net8.0\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net8.0\cs" />
@@ -95,5 +106,48 @@
     <file src="net8.0\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net8.0\tr" />
     <file src="net8.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net8.0\zh-Hans" />
     <file src="net8.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net8.0\zh-Hant" />
+
+    <!-- Add localized resources net462 -->
+    <file src="net462\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\cs" />
+    <file src="net462\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\de" />
+    <file src="net462\es\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\es" />
+    <file src="net462\fr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\fr" />
+    <file src="net462\it\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\it" />
+    <file src="net462\ja\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\ja" />
+    <file src="net462\ko\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\ko" />
+    <file src="net462\pl\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\pl" />
+    <file src="net462\pt-BR\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\pt-BR" />
+    <file src="net462\ru\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\ru" />
+    <file src="net462\tr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\tr" />
+    <file src="net462\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\zh-Hans" />
+    <file src="net462\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net462\zh-Hant" />
+
+    <file src="net462\cs\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\cs" />
+    <file src="net462\de\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\de" />
+    <file src="net462\es\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\es" />
+    <file src="net462\fr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\fr" />
+    <file src="net462\it\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\it" />
+    <file src="net462\ja\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\ja" />
+    <file src="net462\ko\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\ko" />
+    <file src="net462\pl\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\pl" />
+    <file src="net462\pt-BR\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\pt-BR" />
+    <file src="net462\ru\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\ru" />
+    <file src="net462\tr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\tr" />
+    <file src="net462\zh-Hans\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\zh-Hans" />
+    <file src="net462\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\net462\zh-Hant" />
+
+    <file src="net462\cs\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\cs" />
+    <file src="net462\de\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\de" />
+    <file src="net462\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\es" />
+    <file src="net462\fr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\fr" />
+    <file src="net462\it\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\it" />
+    <file src="net462\ja\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\ja" />
+    <file src="net462\ko\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\ko" />
+    <file src="net462\pl\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\pl" />
+    <file src="net462\pt-BR\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\pt-BR" />
+    <file src="net462\ru\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\ru" />
+    <file src="net462\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\tr" />
+    <file src="net462\zh-Hans\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\zh-Hans" />
+    <file src="net462\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net462\zh-Hant" />
   </files>
 </package>
