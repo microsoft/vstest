@@ -35,7 +35,7 @@ public class Build : IntegrationTestBase
         SetDotnetEnvironment();
         Debug.WriteLine($"Setting dotnet environment took: {sw.ElapsedMilliseconds} ms");
         sw.Restart();
-        BuildTestAssetsAndUnzipPackages();
+        UnzipExecutablePackagesCleanPackageCacheBuildTestAssets();
         Debug.WriteLine($"Building test assets and unzipping packages took: {sw.ElapsedMilliseconds} ms");
         sw.Restart();
         BuildTestAssetsCompatibility();
@@ -359,7 +359,7 @@ public class Build : IntegrationTestBase
         }
     }
 
-    private static void BuildTestAssetsAndUnzipPackages()
+    private static void UnzipExecutablePackagesCleanPackageCacheBuildTestAssets()
     {
         var testAssets = Path.GetFullPath(Path.Combine(Root, "test", "TestAssets", "TestAssets.sln"));
 
@@ -367,21 +367,10 @@ public class Build : IntegrationTestBase
         var nugetFeeds = GetNugetSourceParameters(Root);
         var netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
 
-        ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -p:PackageVersion={netTestSdkVersion} "{testAssets}" """);
-        ExecuteApplication2(Dotnet, $"""build "{testAssets}" --configuration {IntegrationTestEnvironment.BuildConfiguration} --no-restore""");
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            // Build special project written in IL.
-            // This project is used on Windows only Tests. On non-Windows the build fails with: "IlasmToolPath must be set in order to build ilproj's outside of Windows.".
-            var cilProject = Path.Combine(Root, "test", "TestAssets", "CILProject", "CILProject.proj");
-            var binPath = Path.Combine(Root, "artifacts", "bin", "TestAssets", "CILProject", IntegrationTestEnvironment.BuildConfiguration, "net462");
-            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" "{cilProject}" """);
-            ExecuteApplication2(Dotnet, $"""build "{cilProject}" --configuration {IntegrationTestEnvironment.BuildConfiguration} --no-restore --output {binPath}""");
-        }
-
+        // Extract locally built packages that have our tools (like vstest.console.exe) into tmp directory,
+        // so we can use them to run tests.
         var packagesToExtract = new[]
-        {
+{
             $"Microsoft.TestPlatform.{netTestSdkVersion}.nupkg",
             $"Microsoft.TestPlatform.CLI.{netTestSdkVersion}.nupkg",
             $"Microsoft.TestPlatform.Build.{netTestSdkVersion}.nupkg",
@@ -389,6 +378,7 @@ public class Build : IntegrationTestBase
             $"Microsoft.TestPlatform.Portable.{netTestSdkVersion}.nupkg",
         };
 
+        var packagesAreNew = false;
         foreach (var packageName in packagesToExtract)
         {
             var packagePath = Path.Combine(IntegrationTestEnvironment.LocalPackageSource, packageName);
@@ -404,6 +394,9 @@ public class Build : IntegrationTestBase
                 }
             }
 
+            // I any package is new we will clean the package cache before restore and build.
+            packagesAreNew |= true;
+
             if (Directory.Exists(unzipPath))
             {
                 Directory.Delete(unzipPath, recursive: true);
@@ -411,6 +404,38 @@ public class Build : IntegrationTestBase
 
             ZipFile.ExtractToDirectory(packagePath, unzipPath);
             File.WriteAllText(cacheMarkerPath, File.GetLastWriteTimeUtc(packagePath).ToString(CultureInfo.InvariantCulture));
+        }
+
+        if (packagesAreNew)
+        {
+            CleanNugetCache(nugetCache);
+        }
+
+        ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -p:PackageVersion={netTestSdkVersion} "{testAssets}" """);
+        ExecuteApplication2(Dotnet, $"""build "{testAssets}" --configuration {IntegrationTestEnvironment.BuildConfiguration} --no-restore""");
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            // Build special project written in IL.
+            // This project is used on Windows only Tests. On non-Windows the build fails with: "IlasmToolPath must be set in order to build ilproj's outside of Windows.".
+            var cilProject = Path.Combine(Root, "test", "TestAssets", "CILProject", "CILProject.proj");
+            var binPath = Path.Combine(Root, "artifacts", "bin", "TestAssets", "CILProject", IntegrationTestEnvironment.BuildConfiguration, "net462");
+            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" "{cilProject}" """);
+            ExecuteApplication2(Dotnet, $"""build "{cilProject}" --configuration {IntegrationTestEnvironment.BuildConfiguration} --no-restore --output {binPath}""");
+        }
+    }
+
+    private static void CleanNugetCache(string nugetCache)
+    {
+        foreach (var packageDir in Directory.GetDirectories(nugetCache))
+        {
+            foreach (var versionDir in Directory.GetDirectories(packageDir))
+            {
+                if (versionDir.EndsWith("-dev") || versionDir.EndsWith("-ci"))
+                {
+                    Directory.Delete(versionDir, recursive: true);
+                }
+            }
         }
     }
 }
