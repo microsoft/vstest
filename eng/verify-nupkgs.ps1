@@ -28,7 +28,7 @@ function Verify-Nuget-Packages {
         "Microsoft.TestPlatform.AdapterUtilities"     = 61
         "Microsoft.TestPlatform.Portable"             = 608
         "Microsoft.TestPlatform.TestHost"             = 63
-        "Microsoft.TestPlatform.TranslationLayer"     = 122
+        "Microsoft.TestPlatform.TranslationLayer"     = 174
         "Microsoft.TestPlatform.Internal.Uwp"         = 38
     }
 
