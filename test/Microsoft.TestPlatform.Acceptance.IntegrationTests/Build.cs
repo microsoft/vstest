@@ -16,6 +16,8 @@ using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Newtonsoft.Json;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace Microsoft.TestPlatform.Acceptance.IntegrationTests;
 
@@ -29,10 +31,18 @@ public class Build : IntegrationTestBase
     [AssemblyInitialize]
     public static void AssemblyInitialize(TestContext _)
     {
+        var sw = Stopwatch.StartNew();
         SetDotnetEnvironment();
+        Debug.WriteLine($"Setting dotnet environment took: {sw.ElapsedMilliseconds} ms");
+        sw.Restart();
         BuildTestAssetsAndUnzipPackages();
+        Debug.WriteLine($"Building test assets and unzipping packages took: {sw.ElapsedMilliseconds} ms");
+        sw.Restart();
         BuildTestAssetsCompatibility();
+        Debug.WriteLine($"Building test assets compatibility matrix took: {sw.ElapsedMilliseconds} ms");
+        sw.Restart();
         CopyAndPatchDotnet();
+        Debug.WriteLine($"Copying and patching dotnet took: {sw.ElapsedMilliseconds} ms");
     }
 
     private static void SetDotnetEnvironment()
@@ -50,13 +60,22 @@ public class Build : IntegrationTestBase
     {
         var patchedDotnetDir = Path.GetFullPath(Path.Combine(Root, "artifacts", "tmp", ".dotnet"));
 
-        // Copy dotnet.
-        DirectoryUtils.CopyDirectory(new DirectoryInfo(DotnetDir), new DirectoryInfo(patchedDotnetDir));
+        var dotnetExe = OSUtils.IsWindows ? "dotnet.exe" : "dotnet";
+        var originalDotnetExePath = Path.Combine(DotnetDir, dotnetExe);
+        var patchedDotnetExePath = Path.Combine(patchedDotnetDir, dotnetExe);
 
-        // Copy target file and build task dll into it.
-        var netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
-        var packageName = $"Microsoft.TestPlatform.Build.{netTestSdkVersion}.nupkg";
-        var packagePath = Path.GetFullPath(Path.Combine(IntegrationTestEnvironment.PublishDirectory, packageName));
+        // It is not necessary to copy whole dotnet folder before each test run
+        // we just need to make sure the build files are updated automatically,
+        // so dotnet test tests reflect what is in our local build targets.
+        bool skipCopy = File.Exists(originalDotnetExePath)
+            && File.Exists(patchedDotnetExePath)
+            && File.GetLastWriteTime(originalDotnetExePath) == File.GetLastWriteTime(patchedDotnetExePath);
+
+        if (!skipCopy)
+        {
+            // Copy .dotnet
+            DirectoryUtils.CopyDirectory(new DirectoryInfo(DotnetDir), new DirectoryInfo(patchedDotnetDir));
+        }
 
         // e.g. artifacts\tmp\.dotnet\sdk\
         var sdkDirectory = Path.Combine(patchedDotnetDir, "sdk");
@@ -72,6 +91,13 @@ public class Build : IntegrationTestBase
         }
 
         var dotnetSdkDirectory = dotnetSdkDirectories.Single();
+
+        // Copy target file and build task dll into it.
+        // This updates the definition for running dotnet test from what we have built locally.
+        var netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
+        var packageName = $"Microsoft.TestPlatform.Build.{netTestSdkVersion}.nupkg";
+        var packagePath = Path.GetFullPath(Path.Combine(IntegrationTestEnvironment.PublishDirectory, packageName));
+
         DirectoryUtils.CopyDirectory(Path.Combine(packagePath, "lib", "netstandard2.0"), dotnetSdkDirectory);
         DirectoryUtils.CopyDirectory(Path.Combine(packagePath, "runtimes", "any", "native"), dotnetSdkDirectory);
     }
@@ -367,12 +393,24 @@ public class Build : IntegrationTestBase
         {
             var packagePath = Path.Combine(IntegrationTestEnvironment.LocalPackageSource, packageName);
             var unzipPath = Path.Combine(IntegrationTestEnvironment.PublishDirectory, packageName);
+
+            var cacheMarkerPath = Path.Combine(unzipPath, packageName + ".cache");
+            if (File.Exists(cacheMarkerPath))
+            {
+                if (File.ReadAllText(cacheMarkerPath) == File.GetLastWriteTimeUtc(packagePath).ToString(CultureInfo.InvariantCulture))
+                {
+                    // Already extracted and using the latest built packages.
+                    continue;
+                }
+            }
+
             if (Directory.Exists(unzipPath))
             {
                 Directory.Delete(unzipPath, recursive: true);
             }
 
             ZipFile.ExtractToDirectory(packagePath, unzipPath);
+            File.WriteAllText(cacheMarkerPath, File.GetLastWriteTimeUtc(packagePath).ToString(CultureInfo.InvariantCulture));
         }
     }
 }
