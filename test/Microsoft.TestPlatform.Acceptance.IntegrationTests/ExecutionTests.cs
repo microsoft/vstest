@@ -21,7 +21,7 @@ public class ExecutionTests : AcceptanceTestBase
     //TODO: It looks like the first 3 tests would be useful to multiply by all 3 test frameworks, should we make the test even more generic, or duplicate them?
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [MSTestCompatibilityDataSource(InProcess = true)]
+    [MSTestCompatibilityDataSource(InProcess = true, JustRow = 24, DebugVSTestConsole = true)]
     public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

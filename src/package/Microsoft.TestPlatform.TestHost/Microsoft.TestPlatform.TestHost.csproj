@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(TestHostMinimumTargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>$(TestHostAllTargetFrameworks)</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>

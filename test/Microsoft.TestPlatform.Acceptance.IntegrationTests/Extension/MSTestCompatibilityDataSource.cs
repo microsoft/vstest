@@ -35,6 +35,7 @@ public class MSTestCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
     public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
     public bool DebugStopAtEntrypoint { get; set; }
+    public int JustRow { get; set; }
 
     /// <summary>
     /// Add run for in-process using the selected .NET Framework runners, and and all selected adapters.
@@ -71,6 +72,8 @@ public class MSTestCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
         _builder.DebugVSTestConsole = DebugVSTestConsole;
         _builder.DebugTestHost = DebugTestHost;
         _builder.DebugStopAtEntrypoint = DebugStopAtEntrypoint;
+
+        _builder.JustRow = JustRow;
 
         var data = _builder.CreateData();
         data.ForEach(AddData);

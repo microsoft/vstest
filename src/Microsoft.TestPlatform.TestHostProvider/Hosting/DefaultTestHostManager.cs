@@ -211,6 +211,12 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         if (!isUsingTestHostFromNextToSource)
         {
+            var a = true;
+            if (a)
+            {
+                // This is for acceptance tests only, to see how much breaks with the new approach.
+                throw new NotSupportedException("You cannot use built-in testhost!!!!");
+            }
             currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).Assembly.Location);
             TPDebug.Assert(currentWorkingDirectory is not null, "Current working directory must not be null.");
 

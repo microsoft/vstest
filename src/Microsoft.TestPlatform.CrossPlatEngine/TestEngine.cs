@@ -628,6 +628,21 @@ public class TestEngine : ITestEngine
             return false;
         }
 
+        // TODO: this disables in-process so we can see testhost next to runner used from console, but in reality we should somehow opt-into this,
+        // possibly by depracating multiple test frameworks in a process, and adding a static preference (assembly level attribute) of the test framework
+        // or something similar. This would also allow us to distingush c++ tests mstestv1 tests etc.
+        //
+        // also is there impact on dotnet test? we don't run in-proc when we are in design mode (so we never run in-proc under VS), and under dotnet test we might run in-proc, but there is 1 proc per project
+        // so no impact on perf as we are not saving anything assuming that "testhost" would replace vstest.console, and we would still have 1 process per project.
+        //
+        // So the only impact here is on vstest.console.exe runs in console, where there is a chance that we will run multiple projects, we are not in design mode, and there is common process for all projects.
+        // so there we just need to keep working as is.
+        var a = true;
+        if (a)
+        {
+            return false;
+        }
+
         // Return true if
         // 1) Not running in parallel;
         // 2) Data collector is not enabled;

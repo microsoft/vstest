@@ -33,9 +33,28 @@
 
     <file src="net462\testhost.exe" target="build\net462\x64\" />
     <file src="net462\testhost.exe.config" target="build\net462\x64\" />
-
     <file src="net462\testhost.x86.exe" target="build\net462\x86\" />
     <file src="net462\testhost.x86.exe.config" target="build\net462\x86\" />
+    <file src="net47\testhost.net47.exe" target="build\net462\x64\" />
+    <file src="net47\testhost.net47.exe.config" target="build\net462\x64\" />
+    <file src="net47\testhost.net47.x86.exe" target="build\net462\x86\" />
+    <file src="net47\testhost.net47.x86.exe.config" target="build\net462\x86\" />
+    <file src="net471\testhost.net471.exe" target="build\net462\x64\" />
+    <file src="net471\testhost.net471.exe.config" target="build\net462\x64\" />
+    <file src="net471\testhost.net471.x86.exe" target="build\net462\x86\" />
+    <file src="net471\testhost.net471.x86.exe.config" target="build\net462\x86\" />
+    <file src="net472\testhost.net472.exe" target="build\net462\x64\" />
+    <file src="net472\testhost.net472.exe.config" target="build\net462\x64\" />
+    <file src="net472\testhost.net472.x86.exe" target="build\net462\x86\" />
+    <file src="net472\testhost.net472.x86.exe.config" target="build\net462\x86\" />
+    <file src="net48\testhost.net48.exe" target="build\net462\x64\" />
+    <file src="net48\testhost.net48.exe.config" target="build\net462\x64\" />
+    <file src="net48\testhost.net48.x86.exe" target="build\net462\x86\" />
+    <file src="net48\testhost.net48.x86.exe.config" target="build\net462\x86\" />
+    <file src="net481\testhost.net481.exe" target="build\net462\x64\" />
+    <file src="net481\testhost.net481.exe.config" target="build\net462\x64\" />
+    <file src="net481\testhost.net481.x86.exe" target="build\net462\x86\" />
+    <file src="net481\testhost.net481.x86.exe.config" target="build\net462\x86\" />
 
     <!-- net8.0 -->
     <file src="net8.0\Microsoft.VisualStudio.TestPlatform.*.dll" target="lib\net8.0\" />

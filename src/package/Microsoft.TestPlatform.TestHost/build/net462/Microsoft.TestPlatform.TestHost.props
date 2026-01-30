@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Condition=" ('$(Platform)' == 'x86' OR '$(PlatformTarget)' == 'x86') AND '$(OS)' == 'Windows_NT'">
+  <!-- x86: when Platform OR PlatformTarget is x86 -->
+  <ItemGroup Condition=" ( '$(Platform)' == 'x86' OR '$(PlatformTarget)' == 'x86' ) AND '$(OS)' == 'Windows_NT' ">
+    <!-- Base -->
     <Content Include="$(MSBuildThisFileDirectory)x86\testhost.x86.exe">
       <Link>testhost.x86.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -11,8 +13,73 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </Content>
+
+    <!-- .NET 4.7 -->
+    <Content Include="$(MSBuildThisFileDirectory)x86\testhost.net47.x86.exe">
+      <Link>testhost.net47.x86.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)x86\testhost.net47.x86.exe.config">
+      <Link>testhost.net47.x86.exe.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+
+    <!-- .NET 4.7.1 -->
+    <Content Include="$(MSBuildThisFileDirectory)x86\testhost.net471.x86.exe">
+      <Link>testhost.net471.x86.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)x86\testhost.net471.x86.exe.config">
+      <Link>testhost.net471.x86.exe.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+
+    <!-- .NET 4.7.2 -->
+    <Content Include="$(MSBuildThisFileDirectory)x86\testhost.net472.x86.exe">
+      <Link>testhost.net472.x86.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)x86\testhost.net472.x86.exe.config">
+      <Link>testhost.net472.x86.exe.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+
+    <!-- .NET 4.8 -->
+    <Content Include="$(MSBuildThisFileDirectory)x86\testhost.net48.x86.exe">
+      <Link>testhost.net48.x86.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)x86\testhost.net48.x86.exe.config">
+      <Link>testhost.net48.x86.exe.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+
+    <!-- .NET 4.8.1 -->
+    <Content Include="$(MSBuildThisFileDirectory)x86\testhost.net481.x86.exe">
+      <Link>testhost.net481.x86.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)x86\testhost.net481.x86.exe.config">
+      <Link>testhost.net481.x86.exe.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
   </ItemGroup>
-  <ItemGroup Condition=" ('$(Platform)'!= 'x86' AND '$(PlatformTarget)' != 'x86') AND '$(OS)' == 'Windows_NT'" >
+
+ 
+
+  <!-- x64 / non-x86, non-ARM64: default bucket -->
+  <ItemGroup Condition=" ( '$(Platform)' != 'x86' AND '$(PlatformTarget)' != 'x86' AND '$(Platform)' != 'arm64' AND '$(PlatformTarget)' != 'arm64' ) AND '$(OS)' == 'Windows_NT' ">
+    <!-- Base -->
     <Content Include="$(MSBuildThisFileDirectory)x64\testhost.exe">
       <Link>testhost.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -20,6 +87,66 @@
     </Content>
     <Content Include="$(MSBuildThisFileDirectory)x64\testhost.exe.config">
       <Link>testhost.exe.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+
+    <!-- .NET 4.7 -->
+    <Content Include="$(MSBuildThisFileDirectory)x64\testhost.net47.exe">
+      <Link>testhost.net47.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)x64\testhost.net47.exe.config">
+      <Link>testhost.net47.exe.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+
+    <!-- .NET 4.7.1 -->
+    <Content Include="$(MSBuildThisFileDirectory)x64\testhost.net471.exe">
+      <Link>testhost.net471.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)x64\testhost.net471.exe.config">
+      <Link>testhost.net471.exe.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+
+    <!-- .NET 4.7.2 -->
+    <Content Include="$(MSBuildThisFileDirectory)x64\testhost.net472.exe">
+      <Link>testhost.net472.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)x64\testhost.net472.exe.config">
+      <Link>testhost.net472.exe.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+
+    <!-- .NET 4.8 -->
+    <Content Include="$(MSBuildThisFileDirectory)x64\testhost.net48.exe">
+      <Link>testhost.net48.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)x64\testhost.net48.exe.config">
+      <Link>testhost.net48.exe.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+
+    <!-- .NET 4.8.1 -->
+    <Content Include="$(MSBuildThisFileDirectory)x64\testhost.net481.exe">
+      <Link>testhost.net481.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)x64\testhost.net481.exe.config">
+      <Link>testhost.net481.exe.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </Content>
