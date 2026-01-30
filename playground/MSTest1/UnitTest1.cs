@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MSTest1;
@@ -35,7 +37,7 @@ public class UnitTest1
     [TestMethod]
     public void TestMethod5()
     {
-        // Thread.Sleep(1000);
+        Thread.Sleep(10000);
     }
 
     [TestMethod]

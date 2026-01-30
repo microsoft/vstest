@@ -16,6 +16,8 @@ using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Newtonsoft.Json;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace Microsoft.TestPlatform.Acceptance.IntegrationTests;
 
@@ -29,10 +31,18 @@ public class Build : IntegrationTestBase
     [AssemblyInitialize]
     public static void AssemblyInitialize(TestContext _)
     {
+        var sw = Stopwatch.StartNew();
         SetDotnetEnvironment();
-        BuildTestAssetsAndUnzipPackages();
+        Debug.WriteLine($"Setting dotnet environment took: {sw.ElapsedMilliseconds} ms");
+        sw.Restart();
+        UnzipExecutablePackagesCleanPackageCacheBuildTestAssets();
+        Debug.WriteLine($"Building test assets and unzipping packages took: {sw.ElapsedMilliseconds} ms");
+        sw.Restart();
         BuildTestAssetsCompatibility();
+        Debug.WriteLine($"Building test assets compatibility matrix took: {sw.ElapsedMilliseconds} ms");
+        sw.Restart();
         CopyAndPatchDotnet();
+        Debug.WriteLine($"Copying and patching dotnet took: {sw.ElapsedMilliseconds} ms");
     }
 
     private static void SetDotnetEnvironment()
@@ -50,13 +60,22 @@ public class Build : IntegrationTestBase
     {
         var patchedDotnetDir = Path.GetFullPath(Path.Combine(Root, "artifacts", "tmp", ".dotnet"));
 
-        // Copy dotnet.
-        DirectoryUtils.CopyDirectory(new DirectoryInfo(DotnetDir), new DirectoryInfo(patchedDotnetDir));
+        var dotnetExe = OSUtils.IsWindows ? "dotnet.exe" : "dotnet";
+        var originalDotnetExePath = Path.Combine(DotnetDir, dotnetExe);
+        var patchedDotnetExePath = Path.Combine(patchedDotnetDir, dotnetExe);
 
-        // Copy target file and build task dll into it.
-        var netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
-        var packageName = $"Microsoft.TestPlatform.Build.{netTestSdkVersion}.nupkg";
-        var packagePath = Path.GetFullPath(Path.Combine(IntegrationTestEnvironment.PublishDirectory, packageName));
+        // It is not necessary to copy whole dotnet folder before each test run
+        // we just need to make sure the build files are updated automatically,
+        // so dotnet test tests reflect what is in our local build targets.
+        bool skipCopy = File.Exists(originalDotnetExePath)
+            && File.Exists(patchedDotnetExePath)
+            && File.GetLastWriteTime(originalDotnetExePath) == File.GetLastWriteTime(patchedDotnetExePath);
+
+        if (!skipCopy)
+        {
+            // Copy .dotnet
+            DirectoryUtils.CopyDirectory(new DirectoryInfo(DotnetDir), new DirectoryInfo(patchedDotnetDir));
+        }
 
         // e.g. artifacts\tmp\.dotnet\sdk\
         var sdkDirectory = Path.Combine(patchedDotnetDir, "sdk");
@@ -72,6 +91,13 @@ public class Build : IntegrationTestBase
         }
 
         var dotnetSdkDirectory = dotnetSdkDirectories.Single();
+
+        // Copy target file and build task dll into it.
+        // This updates the definition for running dotnet test from what we have built locally.
+        var netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
+        var packageName = $"Microsoft.TestPlatform.Build.{netTestSdkVersion}.nupkg";
+        var packagePath = Path.GetFullPath(Path.Combine(IntegrationTestEnvironment.PublishDirectory, packageName));
+
         DirectoryUtils.CopyDirectory(Path.Combine(packagePath, "lib", "netstandard2.0"), dotnetSdkDirectory);
         DirectoryUtils.CopyDirectory(Path.Combine(packagePath, "runtimes", "any", "native"), dotnetSdkDirectory);
     }
@@ -333,13 +359,57 @@ public class Build : IntegrationTestBase
         }
     }
 
-    private static void BuildTestAssetsAndUnzipPackages()
+    private static void UnzipExecutablePackagesCleanPackageCacheBuildTestAssets()
     {
         var testAssets = Path.GetFullPath(Path.Combine(Root, "test", "TestAssets", "TestAssets.sln"));
 
         var nugetCache = Path.GetFullPath(Path.Combine(Root, ".packages"));
         var nugetFeeds = GetNugetSourceParameters(Root);
         var netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
+
+        // Extract locally built packages that have our tools (like vstest.console.exe) into tmp directory,
+        // so we can use them to run tests.
+        var packagesToExtract = new[]
+{
+            $"Microsoft.TestPlatform.{netTestSdkVersion}.nupkg",
+            $"Microsoft.TestPlatform.CLI.{netTestSdkVersion}.nupkg",
+            $"Microsoft.TestPlatform.Build.{netTestSdkVersion}.nupkg",
+            $"Microsoft.CodeCoverage.{netTestSdkVersion}.nupkg",
+            $"Microsoft.TestPlatform.Portable.{netTestSdkVersion}.nupkg",
+        };
+
+        var packagesAreNew = false;
+        foreach (var packageName in packagesToExtract)
+        {
+            var packagePath = Path.Combine(IntegrationTestEnvironment.LocalPackageSource, packageName);
+            var unzipPath = Path.Combine(IntegrationTestEnvironment.PublishDirectory, packageName);
+
+            var cacheMarkerPath = Path.Combine(unzipPath, packageName + ".cache");
+            if (File.Exists(cacheMarkerPath))
+            {
+                if (File.ReadAllText(cacheMarkerPath) == File.GetLastWriteTimeUtc(packagePath).ToString(CultureInfo.InvariantCulture))
+                {
+                    // Already extracted and using the latest built packages.
+                    continue;
+                }
+            }
+
+            // I any package is new we will clean the package cache before restore and build.
+            packagesAreNew |= true;
+
+            if (Directory.Exists(unzipPath))
+            {
+                Directory.Delete(unzipPath, recursive: true);
+            }
+
+            ZipFile.ExtractToDirectory(packagePath, unzipPath);
+            File.WriteAllText(cacheMarkerPath, File.GetLastWriteTimeUtc(packagePath).ToString(CultureInfo.InvariantCulture));
+        }
+
+        if (packagesAreNew)
+        {
+            CleanNugetCache(nugetCache);
+        }
 
         ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -p:PackageVersion={netTestSdkVersion} "{testAssets}" """);
         ExecuteApplication2(Dotnet, $"""build "{testAssets}" --configuration {IntegrationTestEnvironment.BuildConfiguration} --no-restore""");
@@ -353,26 +423,19 @@ public class Build : IntegrationTestBase
             ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" "{cilProject}" """);
             ExecuteApplication2(Dotnet, $"""build "{cilProject}" --configuration {IntegrationTestEnvironment.BuildConfiguration} --no-restore --output {binPath}""");
         }
+    }
 
-        var packagesToExtract = new[]
+    private static void CleanNugetCache(string nugetCache)
+    {
+        foreach (var packageDir in Directory.GetDirectories(nugetCache))
         {
-            $"Microsoft.TestPlatform.{netTestSdkVersion}.nupkg",
-            $"Microsoft.TestPlatform.CLI.{netTestSdkVersion}.nupkg",
-            $"Microsoft.TestPlatform.Build.{netTestSdkVersion}.nupkg",
-            $"Microsoft.CodeCoverage.{netTestSdkVersion}.nupkg",
-            $"Microsoft.TestPlatform.Portable.{netTestSdkVersion}.nupkg",
-        };
-
-        foreach (var packageName in packagesToExtract)
-        {
-            var packagePath = Path.Combine(IntegrationTestEnvironment.LocalPackageSource, packageName);
-            var unzipPath = Path.Combine(IntegrationTestEnvironment.PublishDirectory, packageName);
-            if (Directory.Exists(unzipPath))
+            foreach (var versionDir in Directory.GetDirectories(packageDir))
             {
-                Directory.Delete(unzipPath, recursive: true);
+                if (versionDir.EndsWith("-dev") || versionDir.EndsWith("-ci"))
+                {
+                    Directory.Delete(versionDir, recursive: true);
+                }
             }
-
-            ZipFile.ExtractToDirectory(packagePath, unzipPath);
         }
     }
 }
