@@ -31,4 +31,9 @@ internal class FakeAssemblyMetadataProvider : IAssemblyMetadataProvider
         var file = FakeFileHelper.GetFakeFile<FakeTestDllFile>(filePath);
         return file.FrameworkName;
     }
+
+    public bool HasRunAsExe(string filePath)
+    {
+        return false;
+    }
 }

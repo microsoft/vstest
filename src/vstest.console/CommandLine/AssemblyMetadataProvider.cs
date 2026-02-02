@@ -92,6 +92,23 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
         return archType;
     }
 
+    /// <inheritdoc />
+    public bool HasRunAsExe(string filePath)
+    {
+        try
+        {
+            using var assemblyStream = _fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read);
+            var result = GetRunAsExeFromAssemblyMetadata(assemblyStream);
+            EqtTrace.Info("AssemblyMetadataProvider.HasRunAsExe: RunAsExe:'{0}' for source: '{1}'", result, filePath);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Warning("AssemblyMetadataProvider.HasRunAsExe: failed to determine RunAsExe exception: {0} for assembly: {1}", ex, filePath);
+            return false;
+        }
+    }
+
     private Architecture GetArchitectureFromAssemblyMetadata(string path)
     {
         Architecture arch = Architecture.AnyCPU;
@@ -153,6 +170,25 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
         }
 
         return frameworkName;
+    }
+
+    private static bool GetRunAsExeFromAssemblyMetadata(Stream assemblyStream)
+    {
+#pragma warning disable IDE0063 // Use simple 'using' statement
+        using (var peReader = new PEReader(assemblyStream))
+        {
+            var metadataReader = peReader.GetMetadataReader();
+
+            foreach (var customAttributeHandle in metadataReader.CustomAttributes)
+            {
+                var attr = metadataReader.GetCustomAttribute(customAttributeHandle);
+                var _ = Encoding.UTF8.GetString(metadataReader.GetBlobBytes(attr.Value));
+                return false;
+            }
+        }
+#pragma warning restore IDE0063 // Use simple 'using' statement
+
+        return false;
     }
 
     private Architecture MapToArchitecture(ProcessorArchitecture processorArchitecture, string assemblyPath)

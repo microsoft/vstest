@@ -231,4 +231,40 @@ internal class InferHelper
         return extType != null && (extType.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||
                                    extType.Equals(".exe", StringComparison.OrdinalIgnoreCase));
     }
+
+    internal void DetectRunAsExe(IList<string>? sources, out IDictionary<string, ExecutionPreference> sourceToRunAsExeMap)
+    {
+        sourceToRunAsExeMap = new Dictionary<string, ExecutionPreference>();
+
+        if (sources == null || sources.Count == 0)
+            return;
+
+        DetermineRunAsExe(sources, out sourceToRunAsExeMap);
+    }
+
+    private void DetermineRunAsExe(IEnumerable<string?> sources, out IDictionary<string, ExecutionPreference> sourceToRunAsExeMap)
+    {
+        sourceToRunAsExeMap = new Dictionary<string, ExecutionPreference>();
+
+        foreach (var source in sources)
+        {
+            if (source is null)
+            {
+                continue;
+            }
+
+            ExecutionPreference preference;
+            if (IsDllOrExe(source))
+            {
+                preference = _assemblyMetadataProvider.HasRunAsExe(source) ? ExecutionPreference.RunAsExe
+                    : ExecutionPreference.Default;
+            }
+            else
+            {
+                preference = ExecutionPreference.Default;
+            }
+
+            sourceToRunAsExeMap.Add(source, preference);
+        }
+    }
 }

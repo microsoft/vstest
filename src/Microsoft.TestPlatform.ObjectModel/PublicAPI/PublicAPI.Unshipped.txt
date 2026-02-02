@@ -1,10 +1,16 @@
 ﻿#nullable enable
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITelemetryEventsHandler
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITelemetryEventsHandler.HandleTelemetryEvent(Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent! telemetryEvent) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ExcutionPreference.RunAsExe = 1 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ExcutionPreference
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ITelemetryInitializer
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ITelemetryInitializer.Initialize(Microsoft.VisualStudio.TestPlatform.ObjectModel.ITelemetryReporter! telemetryReporter) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ITelemetryReporter
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ITelemetryReporter.Report(Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent! telemetryEvent) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.RunAsExeAttribute
+Microsoft.VisualStudio.TestPlatform.ObjectModel.RunAsExeAttribute.RunAsExeAttribute() -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.Architecture.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture?
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.RunAsExe.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference?
 Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent
 Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.Name.get -> string!
 Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.Properties.get -> System.Collections.Generic.IDictionary<string!, object!>!

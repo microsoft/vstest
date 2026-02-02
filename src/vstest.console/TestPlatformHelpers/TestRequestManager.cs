@@ -200,7 +200,8 @@ internal class TestRequestManager : ITestRequestManager
                         isDiscovery: true,
                         out string updatedRunsettings,
                         out IDictionary<string, Architecture> sourceToArchitectureMap,
-                        out IDictionary<string, Framework> sourceToFrameworkMap))
+                        out IDictionary<string, Framework> sourceToFrameworkMap,
+                        out IDictionary<string, ExecutionPreference> sourceToRunAsExeMap))
                 {
                     runsettings = updatedRunsettings;
                 }
@@ -210,6 +211,7 @@ internal class TestRequestManager : ITestRequestManager
                     Source = source,
                     Architecture = sourceToArchitectureMap[source],
                     Framework = sourceToFrameworkMap[source],
+                    RunAsExe = sourceToRunAsExeMap[source]
                 }).ToDictionary(k => k.Source!);
 
                 var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
@@ -318,7 +320,8 @@ internal class TestRequestManager : ITestRequestManager
                 isDiscovery: false,
                 out string updatedRunsettings,
                 out IDictionary<string, Architecture> sourceToArchitectureMap,
-                out IDictionary<string, Framework> sourceToFrameworkMap))
+                out IDictionary<string, Framework> sourceToFrameworkMap,
+                out IDictionary<string, ExecutionPreference> sourceToRunAsExeMap))
         {
             runsettings = updatedRunsettings;
         }
@@ -328,6 +331,7 @@ internal class TestRequestManager : ITestRequestManager
             Source = source,
             Architecture = sourceToArchitectureMap[source!],
             Framework = sourceToFrameworkMap[source!],
+            RunAsExe = sourceToRunAsExeMap[source!]
         }).ToDictionary(k => k.Source!);
 
         if (InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(runsettings))
@@ -485,7 +489,8 @@ internal class TestRequestManager : ITestRequestManager
                 isDiscovery: false,
                 out string updatedRunsettings,
                 out IDictionary<string, Architecture> sourceToArchitectureMap,
-                out IDictionary<string, Framework> sourceToFrameworkMap))
+                out IDictionary<string, Framework> sourceToFrameworkMap,
+                out IDictionary<string, ExecutionPreference> sourceToRunAsExeMap))
         {
             payload.RunSettings = updatedRunsettings;
         }
@@ -495,6 +500,7 @@ internal class TestRequestManager : ITestRequestManager
             Source = source,
             Architecture = sourceToArchitectureMap[source],
             Framework = sourceToFrameworkMap[source],
+            RunAsExe = sourceToRunAsExeMap[source]
         }).ToDictionary(k => k.Source!);
 
         if (InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(payload.RunSettings))
@@ -697,7 +703,8 @@ internal class TestRequestManager : ITestRequestManager
         bool isDiscovery,
         out string updatedRunSettingsXml,
         out IDictionary<string, Architecture> sourceToArchitectureMap,
-        out IDictionary<string, Framework> sourceToFrameworkMap)
+        out IDictionary<string, Framework> sourceToFrameworkMap,
+        out IDictionary<string, ExecutionPreference> sourceToRunAsExeMap)
     {
         bool settingsUpdated = false;
         updatedRunSettingsXml = runsettingsXml ?? throw new ArgumentNullException(nameof(runsettingsXml));
@@ -714,6 +721,7 @@ internal class TestRequestManager : ITestRequestManager
         var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml)
                                 ?? new LoggerRunSettings();
 
+        _inferHelper.DetectRunAsExe(sources, out sourceToRunAsExeMap);
 
         // True when runsettings don't set target framework. False when runsettings force target framework
         // in both cases the sourceToFrameworkMap is populated with the real frameworks as we inferred them
