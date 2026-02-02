@@ -87,7 +87,7 @@ internal class Program
             """;
 
         var sources = new[] {
-            @"S:\t\TestProject155\TestProject155\bin\Debug\net481\TestProject155.dll"
+            @"S:\t\TestProject155\TestProject155\bin\Debug\net481\TestProject155.exe"
             // Path.Combine(playground, "bin", "MSTest2", "Debug", "net48", "MSTest2.dll"),
             // The built in .NET projects don't now work right now in Playground, there is some conflict with Arcade.
             // But if you create one outside of Playground it will work. 

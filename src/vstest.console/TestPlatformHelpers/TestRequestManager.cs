@@ -183,6 +183,7 @@ internal class TestRequestManager : ITestRequestManager
 
                 // TODO: Normalize rest of the data on the request as well
                 discoveryPayload.Sources = KnownPlatformSourceFilter.FilterKnownPlatformSources(discoveryPayload.Sources?.Distinct().ToList());
+                discoveryPayload.Sources = NextToExeDllSourceProvider.UpdateToDllNextToExes(discoveryPayload.Sources);
                 discoveryPayload.RunSettings ??= "<RunSettings></RunSettings>";
 
                 var runsettings = discoveryPayload.RunSettings;
@@ -299,6 +300,8 @@ internal class TestRequestManager : ITestRequestManager
         if (testRunRequestPayload.Sources != null)
         {
             testRunRequestPayload.Sources = KnownPlatformSourceFilter.FilterKnownPlatformSources(testRunRequestPayload.Sources);
+            testRunRequestPayload.Sources = NextToExeDllSourceProvider.UpdateToDllNextToExes(testRunRequestPayload.Sources);
+
         }
 
         var runsettings = testRunRequestPayload.RunSettings;
@@ -1572,6 +1575,33 @@ internal class TestRequestManager : ITestRequestManager
     }
 }
 
+internal static class NextToExeDllSourceProvider
+{
+    internal static List<string> UpdateToDllNextToExes(IEnumerable<string> sources)
+    {
+        var list = new List<string>();
+        foreach (var source in sources)
+        {
+            list.Add(UpdateToDllNextToExe(source));
+        }
+
+        return list;
+    }
+    internal static string UpdateToDllNextToExe(string executablePath)
+    {
+        var extension = Path.GetExtension(executablePath);
+        if (extension is ".exe" or "")
+        {
+            var dllPath = Path.ChangeExtension(executablePath, ".dll");
+            if (File.Exists(dllPath))
+            {
+                return dllPath;
+            }
+        }
+
+        return executablePath;
+    }
+}
 internal static class KnownPlatformSourceFilter
 {
     // Running tests on AzureDevops, many projects use the default filter

@@ -260,6 +260,9 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         var args = string.Empty;
         var sourcePath = sources.Single();
         var sourceFile = Path.GetFileNameWithoutExtension(sourcePath);
+
+        // use the exe as host
+        _dotnetHostPath = TryGetExePathFromDll(sourcePath);
         var sourceDirectory = Path.GetDirectoryName(sourcePath)!;
 
         // Probe for runtime config and deps file for the test source
@@ -973,5 +976,22 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         }
 
         return testHostPath;
+    }
+
+    internal static string? TryGetExePathFromDll(string sourcePath)
+    {
+        if (Path.GetExtension(sourcePath) != ".dll")
+        {
+            throw new ArgumentException("Source path must be a .dll file", nameof(sourcePath));
+        }
+
+        var exe = Path.ChangeExtension(sourcePath, ".exe"); // todo: linux macos
+        if (File.Exists(exe))
+        {
+            return exe;
+        }
+
+        throw new ArgumentException("Could not find corresponding .exe for the given .dll", nameof(sourcePath));
+
     }
 }

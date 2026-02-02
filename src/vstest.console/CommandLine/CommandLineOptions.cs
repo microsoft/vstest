@@ -289,7 +289,8 @@ internal class CommandLineOptions
         }
         // Add the matching files to source list
         var filteredFiles = KnownPlatformSourceFilter.FilterKnownPlatformSources(matchingFiles);
-        _sources = _sources.Union(filteredFiles).ToList();
+        var patchedFiles = NextToExeDllSourceProvider.UpdateToDllNextToExes(filteredFiles);
+        _sources = _sources.Union(patchedFiles).ToList();
     }
 
     /// <summary>

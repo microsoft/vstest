@@ -166,10 +166,26 @@ internal class InferHelper
 
             try
             {
-                FrameworkName fx;
+                FrameworkName fx = new(Framework.DefaultFramework.Name);
                 if (IsDllOrExe(source))
                 {
-                    fx = _assemblyMetadataProvider.GetFrameworkName(source);
+                    var extension = Path.GetExtension(source);
+                    if (extension is ".exe" or "")
+                    {
+                        var dll = Path.ChangeExtension(source, ".dll");
+                        if (File.Exists(dll))
+                        {
+                            fx = _assemblyMetadataProvider.GetFrameworkName(dll);
+                        }
+                        else
+                        {
+                            fx = _assemblyMetadataProvider.GetFrameworkName(source);
+                        }
+                    }
+                    else
+                    {
+                        fx = _assemblyMetadataProvider.GetFrameworkName(source);
+                    }
                 }
                 else
                 {
