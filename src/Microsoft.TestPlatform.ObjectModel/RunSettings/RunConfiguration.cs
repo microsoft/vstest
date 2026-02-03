@@ -95,7 +95,8 @@ public class RunConfiguration : TestRunSettings
         ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
         CaptureStandardOutput = !FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_STANDARD_OUTPUT_CAPTURING);
         ForwardStandardOutput = !FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_STANDARD_OUTPUT_FORWARDING);
-        DisableSharedTestHost = true; //todo: the flag need to be "deprecated" and replaced with other flag to re-enable this. This is breaking change in the default. FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_SHARING_NETFRAMEWORK_TESTHOST);
+        DisableSharedTestHost = true;
+        //todo: the flag need to be "deprecated" and replaced with other flag to re-enable this. This is breaking change in the default. FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_SHARING_NETFRAMEWORK_TESTHOST);
     }
 
     /// <summary>
@@ -466,6 +467,8 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public bool SkipDefaultAdapters { get; private set; }
 
+    public ExecutionPreference ExecutionPreference { get; private set; } = ExecutionPreference.Default;
+
     /// <inheritdoc/>
     public override XmlElement ToXml()
     {
@@ -758,33 +761,34 @@ public class RunConfiguration : TestRunSettings
                         break;
 
                     case "TargetPlatform":
-                        XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                        Architecture archType;
-                        string value = reader.ReadElementContentAsString();
-                        try
                         {
-                            archType = (Architecture)Enum.Parse(typeof(Architecture), value, true);
-                            // Ensure that the parsed value is actually in the enum, and that Default or AnyCpu are not provided.
-                            if (!Enum.IsDefined(typeof(Architecture), archType) || Architecture.Default == archType || Architecture.AnyCPU == archType)
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            Architecture archType;
+                            string value = reader.ReadElementContentAsString();
+                            try
                             {
-                                throw new SettingsException(
-                                    string.Format(
-                                        CultureInfo.CurrentCulture,
-                                        Resources.Resources.InvalidSettingsIncorrectValue,
-                                        Constants.RunConfigurationSettingsName,
-                                        value,
-                                        elementName));
+                                archType = (Architecture)Enum.Parse(typeof(Architecture), value, true);
+                                // Ensure that the parsed value is actually in the enum, and that Default or AnyCpu are not provided.
+                                if (!Enum.IsDefined(typeof(Architecture), archType) || Architecture.Default == archType || Architecture.AnyCPU == archType)
+                                {
+                                    throw new SettingsException(
+                                        string.Format(
+                                            CultureInfo.CurrentCulture,
+                                            Resources.Resources.InvalidSettingsIncorrectValue,
+                                            Constants.RunConfigurationSettingsName,
+                                            value,
+                                            elementName));
+                                }
                             }
-                        }
-                        catch (ArgumentException)
-                        {
-                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
-                                Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
-                        }
+                            catch (ArgumentException)
+                            {
+                                throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                            }
 
-                        runConfiguration.TargetPlatform = archType;
-                        break;
-
+                            runConfiguration.TargetPlatform = archType;
+                            break;
+                        }
                     case nameof(DefaultPlatform):
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         Architecture defaultArchType;
@@ -814,72 +818,75 @@ public class RunConfiguration : TestRunSettings
                         break;
 
                     case "TargetFrameworkVersion":
-                        XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                        Framework? frameworkType;
-                        value = reader.ReadElementContentAsString();
-                        try
                         {
-                            frameworkType = Framework.FromString(value);
-
-                            if (frameworkType == null)
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            Framework? frameworkType;
+                            var value = reader.ReadElementContentAsString();
+                            try
                             {
-                                throw new SettingsException(
-                                    string.Format(
-                                        CultureInfo.CurrentCulture,
-                                        Resources.Resources.InvalidSettingsIncorrectValue,
-                                        Constants.RunConfigurationSettingsName,
-                                        value,
-                                        elementName));
+                                frameworkType = Framework.FromString(value);
+
+                                if (frameworkType == null)
+                                {
+                                    throw new SettingsException(
+                                        string.Format(
+                                            CultureInfo.CurrentCulture,
+                                            Resources.Resources.InvalidSettingsIncorrectValue,
+                                            Constants.RunConfigurationSettingsName,
+                                            value,
+                                            elementName));
+                                }
                             }
-                        }
-                        catch (ArgumentException)
-                        {
-                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
-                                Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
-                        }
+                            catch (ArgumentException)
+                            {
+                                throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                            }
 
-                        runConfiguration.TargetFramework = frameworkType;
-                        break;
-
+                            runConfiguration.TargetFramework = frameworkType;
+                            break;
+                        }
                     case "TestAdaptersPaths":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         runConfiguration.TestAdaptersPaths = reader.ReadElementContentAsString();
                         break;
 
                     case "TestAdapterLoadingStrategy":
-                        XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                        value = reader.ReadElementContentAsString();
-                        runConfiguration.TestAdapterLoadingStrategy = Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy)
-                            ? loadingStrategy
-                            : throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                        {
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            var value = reader.ReadElementContentAsString();
+                            runConfiguration.TestAdapterLoadingStrategy = Enum.TryParse<TestAdapterLoadingStrategy>(value, out var loadingStrategy)
+                                ? loadingStrategy
+                                : throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                        Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
 
-                        break;
-
+                            break;
+                        }
                     case "TreatTestAdapterErrorsAsWarnings":
-                        XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                        bool treatTestAdapterErrorsAsWarnings;
-
-                        value = reader.ReadElementContentAsString();
-
-                        try
                         {
-                            treatTestAdapterErrorsAsWarnings = bool.Parse(value);
-                        }
-                        catch (ArgumentException)
-                        {
-                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
-                                Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
-                        }
-                        catch (FormatException)
-                        {
-                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
-                                Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
-                        }
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            bool treatTestAdapterErrorsAsWarnings;
 
-                        runConfiguration.TreatTestAdapterErrorsAsWarnings = treatTestAdapterErrorsAsWarnings;
-                        break;
+                            var value = reader.ReadElementContentAsString();
 
+                            try
+                            {
+                                treatTestAdapterErrorsAsWarnings = bool.Parse(value);
+                            }
+                            catch (ArgumentException)
+                            {
+                                throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                            }
+                            catch (FormatException)
+                            {
+                                throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                            }
+
+                            runConfiguration.TreatTestAdapterErrorsAsWarnings = treatTestAdapterErrorsAsWarnings;
+                            break;
+                        }
                     case "SolutionDirectory":
                         XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                         string? solutionDirectory = reader.ReadElementContentAsString();
@@ -1015,6 +1022,35 @@ public class RunConfiguration : TestRunSettings
                             break;
                         }
 
+                    case "ExecutionPreference":
+                        {
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            ExecutionPreference executionPreference;
+                            string value = reader.ReadElementContentAsString();
+                            try
+                            {
+                                executionPreference = (ExecutionPreference)Enum.Parse(typeof(ExecutionPreference), value, true);
+                                // Ensure that the parsed value is actually in the enum, and that Default or AnyCpu are not provided.
+                                if (!Enum.IsDefined(typeof(ExecutionPreference), executionPreference))
+                                {
+                                    throw new SettingsException(
+                                        string.Format(
+                                            CultureInfo.CurrentCulture,
+                                            Resources.Resources.InvalidSettingsIncorrectValue,
+                                            Constants.RunConfigurationSettingsName,
+                                            value,
+                                            elementName));
+                                }
+                            }
+                            catch (ArgumentException)
+                            {
+                                throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                            }
+
+                            runConfiguration.ExecutionPreference = executionPreference;
+                            break;
+                        }
                     default:
                         // Ignore a runsettings element that we don't understand. It could occur in the case
                         // the test runner is of a newer version, but the test host is of an earlier version.

@@ -63,6 +63,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private Framework? _targetFramework;
     private ITestHostLauncher? _customTestHostLauncher;
     private Process? _testHostProcess;
+    private bool _runAsExe;
     private StringBuilder? _testHostProcessStdError;
     private StringBuilder? _testHostProcessStdOut;
     private IMessageLogger? _messageLogger;
@@ -188,10 +189,30 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             argumentsString += " --testsourcepath " + sources.FirstOrDefault()?.AddDoubleQuote();
         }
 
-        string testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
         string? testHostProcessPath = null;
         string? currentWorkingDirectory = null;
         bool isUsingTestHostFromNextToSource = false;
+
+        string testHostProcessName;
+
+        if (_runAsExe)
+        {
+            if (Shared)
+            {
+                throw new NotSupportedException("Cannot run a shared testhost as exe.");
+            }
+
+            if (!_disableAppDomain)
+            {
+                throw new NotSupportedException("Cannot run a testhost as exe when appdomains are enabled.");
+            }
+
+            testHostProcessName = Path.GetFileName(Path.ChangeExtension(sources.Single(), ".exe"));
+        }
+        else
+        {
+            testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
+        }
 
         if (!Shared)
         {
@@ -421,6 +442,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         _architecture = runConfiguration.TargetPlatform;
         _targetFramework = runConfiguration.TargetFramework;
         _testHostProcess = null;
+        _runAsExe = runConfiguration.ExecutionPreference == ExecutionPreference.RunAsExe;
 
         _disableAppDomain = runConfiguration.DisableAppDomain;
         // If appdomains are disabled the host cannot be shared, because sharing means loading multiple assemblies

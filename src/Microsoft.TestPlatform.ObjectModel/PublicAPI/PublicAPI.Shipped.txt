@@ -672,7 +672,7 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.SettingsNameAttribute
 Microsoft.VisualStudio.TestPlatform.ObjectModel.SettingsNameAttribute.SettingsName.get -> string!
 Microsoft.VisualStudio.TestPlatform.ObjectModel.SettingsNameAttribute.SettingsNameAttribute(string! settingsName) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail
-Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.Architecture.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.Architecture.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture?
 Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.Framework.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Framework?
 Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.Source.get -> string?
 Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.SourceDetail() -> void

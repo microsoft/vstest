@@ -248,19 +248,19 @@ internal class InferHelper
                                    extType.Equals(".exe", StringComparison.OrdinalIgnoreCase));
     }
 
-    internal void DetectRunAsExe(IList<string>? sources, out IDictionary<string, ExecutionPreference> sourceToRunAsExeMap)
+    internal void DetectRunAsExe(IList<string>? sources, out IDictionary<string, ExecutionPreference> sourceToExecutionPreferenceMap)
     {
-        sourceToRunAsExeMap = new Dictionary<string, ExecutionPreference>();
+        sourceToExecutionPreferenceMap = new Dictionary<string, ExecutionPreference>();
 
         if (sources == null || sources.Count == 0)
             return;
 
-        DetermineRunAsExe(sources, out sourceToRunAsExeMap);
+        DetermineRunAsExe(sources, out sourceToExecutionPreferenceMap);
     }
 
-    private void DetermineRunAsExe(IEnumerable<string?> sources, out IDictionary<string, ExecutionPreference> sourceToRunAsExeMap)
+    private void DetermineRunAsExe(IEnumerable<string?> sources, out IDictionary<string, ExecutionPreference> sourceToExecutionPreferenceMap)
     {
-        sourceToRunAsExeMap = new Dictionary<string, ExecutionPreference>();
+        sourceToExecutionPreferenceMap = new Dictionary<string, ExecutionPreference>();
 
         foreach (var source in sources)
         {
@@ -280,7 +280,7 @@ internal class InferHelper
                 preference = ExecutionPreference.Default;
             }
 
-            sourceToRunAsExeMap.Add(source, preference);
+            sourceToExecutionPreferenceMap.Add(source, preference);
         }
     }
 }

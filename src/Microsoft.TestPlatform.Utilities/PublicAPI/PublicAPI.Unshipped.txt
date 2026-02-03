@@ -1,1 +1,4 @@
 #nullable enable
+static Microsoft.VisualStudio.TestPlatform.Utilities.InferRunSettingsHelper.UpdateExecutionPreference(System.Xml.XmlDocument! runSettingsDocument, string! executionPreference, bool overwrite = false) -> void
+static Microsoft.VisualStudio.TestPlatform.Utilities.InferRunSettingsHelper.UpdateDisableAppDomain(System.Xml.XmlDocument! runSettingsDocument, string! value, bool overwrite = false) -> void
+

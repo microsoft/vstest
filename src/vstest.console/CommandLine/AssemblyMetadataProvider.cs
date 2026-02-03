@@ -182,8 +182,42 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
             foreach (var customAttributeHandle in metadataReader.CustomAttributes)
             {
                 var attr = metadataReader.GetCustomAttribute(customAttributeHandle);
-                var _ = Encoding.UTF8.GetString(metadataReader.GetBlobBytes(attr.Value));
-                return false;
+
+                // Display the attribute type full name
+                StringHandle? typeNameHandle = null;
+                if (attr.Constructor.Kind == HandleKind.MethodDefinition)
+                {
+                    MethodDefinition methodDefinition = metadataReader.GetMethodDefinition((MethodDefinitionHandle)attr.Constructor);
+                    TypeDefinition typeDefinition = metadataReader.GetTypeDefinition(methodDefinition.GetDeclaringType());
+                    typeNameHandle = typeDefinition.Name;
+                }
+                else if (attr.Constructor.Kind == HandleKind.MemberReference)
+                {
+                    MemberReference mref = metadataReader.GetMemberReference((MemberReferenceHandle)attr.Constructor);
+
+                    if (mref.Parent.Kind == HandleKind.TypeReference)
+                    {
+                        TypeReference tref = metadataReader.GetTypeReference((TypeReferenceHandle)mref.Parent);
+                        typeNameHandle = tref.Name;
+                    }
+                    else if (mref.Parent.Kind == HandleKind.TypeDefinition)
+                    {
+                        TypeDefinition tdef = metadataReader.GetTypeDefinition((TypeDefinitionHandle)mref.Parent);
+                        typeNameHandle = tdef.Name;
+                    }
+                }
+
+                if (typeNameHandle == null)
+                {
+                    continue;
+                }
+
+                var typeName = metadataReader.GetString(typeNameHandle.Value);
+
+                if (string.Equals(typeName, "RunAsExeAttribute", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
             }
         }
 #pragma warning restore IDE0063 // Use simple 'using' statement
