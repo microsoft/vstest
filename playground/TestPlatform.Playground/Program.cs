@@ -59,7 +59,7 @@ internal class Program
 
                     <!-- The settings below are what VS sends by default. -->
                     <CollectSourceInformation>true</CollectSourceInformation>
-
+                    <DesignMode>True</DesignMode>
                 </RunConfiguration>
                 <BoostTestInternalSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                     <VSProcessId>999999</VSProcessId>
@@ -91,7 +91,7 @@ internal class Program
 
         var sources = new[] {
             Path.Combine(playground, "bin", "MSTest1", "Debug", "net48", "MSTest1.dll"),
-            // Path.Combine(playground, "bin", "MSTest2", "Debug", "net48", "MSTest2.dll"),
+            Path.Combine(playground, "bin", "MSTest2", "Debug", "net48", "MSTest2.dll"),
             // The built in .NET projects don't now work right now in Playground, there is some conflict with Arcade.
             // But if you create one outside of Playground it will work. 
             //Path.Combine(playground, "bin", "MSTest1", "Debug", "net7.0", "MSTest1.dll"),
@@ -100,24 +100,28 @@ internal class Program
         //// Console mode
         //// Uncomment if providing command line parameters is easier for you
         //// than converting them to settings, or when you debug command line scenario specifically.
-        var settingsFile = Path.GetTempFileName();
-        try
-        {
-            File.WriteAllText(settingsFile, sourceSettings);
-            var processStartInfo = new ProcessStartInfo
-            {
-                FileName = console,
-                Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile} --logger:trx;LogFileName=my.trx;WarnOnFileOverwrite=false",
-                UseShellExecute = false,
-            };
-            EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
-            var process = Process.Start(processStartInfo);
-            process!.WaitForExit();
-        }
-        finally
-        {
-            try { File.Delete(settingsFile); } catch { }
-        }
+        //var settingsFile = Path.GetTempFileName();
+        //try
+        //{
+        //    File.WriteAllText(settingsFile, sourceSettings);
+        //    var processStartInfo = new ProcessStartInfo
+        //    {
+        //        FileName = console,
+        //        Arguments = $"{string.Join(" ", sources)} --settings:{settingsFile} --logger:trx;LogFileName=my.trx;WarnOnFileOverwrite=false",
+        //        UseShellExecute = false,
+        //    };
+        //    EnvironmentVariables.Variables.ToList().ForEach(processStartInfo.Environment.Add);
+        //    var process = Process.Start(processStartInfo);
+        //    process.WaitForExit();
+        //    if (process.ExitCode != 0)
+        //    {
+        //        throw new Exception($"Process failed with {process.ExitCode}");
+        //    }
+        //}
+        //finally
+        //{
+        //    try { File.Delete(settingsFile); } catch { }
+        //}
 
         // design mode
         var detailedOutput = true;
