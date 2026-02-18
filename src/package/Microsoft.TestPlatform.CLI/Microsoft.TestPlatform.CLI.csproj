@@ -31,13 +31,13 @@
     <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
     <!-- NU5100: No dlls in lib folder -->
     <NoWarn>$(NoWarn);NU5100</NoWarn>
+    <!-- NU1510: PackageReference will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary. -->
+    <NoWarn>$(NoWarn);NU1510</NoWarn>
     <!--
       Sometimes NU1702 is not suppressed correctly, so force reducing severity of the warning.
       See https://github.com/NuGet/Home/issues/9147
     -->
     <MSBuildWarningsAsMessages>NU1702</MSBuildWarningsAsMessages>
-    <!-- PackageReference will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary. -->
-    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);NU1510</MSBuildWarningsAsMessages>
   </PropertyGroup>
 
   <!-- runner and runner dependencies -->
