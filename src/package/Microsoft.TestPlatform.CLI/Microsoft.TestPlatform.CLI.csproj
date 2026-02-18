@@ -36,6 +36,8 @@
       See https://github.com/NuGet/Home/issues/9147
     -->
     <MSBuildWarningsAsMessages>NU1702</MSBuildWarningsAsMessages>
+    <!-- PackageReference will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary. -->
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);NU1510</MSBuildWarningsAsMessages>
   </PropertyGroup>
 
   <!-- runner and runner dependencies -->
