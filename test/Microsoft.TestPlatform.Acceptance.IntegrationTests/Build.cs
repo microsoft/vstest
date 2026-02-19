@@ -439,7 +439,10 @@ public class Build : IntegrationTestBase
         // the obj to force re-build in the next steps.
 
         var objPath = Path.Combine(Root, "artifacts", "obj", "TestAssets");
-        Directory.Delete(objPath, recursive: true);
+        if (Directory.Exists(objPath))
+        {
+            Directory.Delete(objPath, recursive: true);
+        }
 
         // Then clean all -dev and -ci packages from the cache to force updating from local source.
         foreach (var packageDir in Directory.GetDirectories(nugetCache))
