@@ -375,13 +375,17 @@ public class Build : IntegrationTestBase
             ZipFile.ExtractToDirectory(packagePath, unzipPath);
         }
 
-        var vsixPath = IntegrationTestEnvironment.LocalVsixInsertion;
-        var vsixUnzipPath = Path.Combine(IntegrationTestEnvironment.PublishDirectory, Path.GetFileName(vsixPath));
-        if (Directory.Exists(vsixUnzipPath))
+        // Unzip VSIX so we can test with it on Windows.
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            Directory.Delete(vsixUnzipPath, recursive: true);
-        }
+            var vsixPath = IntegrationTestEnvironment.LocalVsixInsertion;
+            var vsixUnzipPath = Path.Combine(IntegrationTestEnvironment.PublishDirectory, Path.GetFileName(vsixPath));
+            if (Directory.Exists(vsixUnzipPath))
+            {
+                Directory.Delete(vsixUnzipPath, recursive: true);
+            }
 
-        ZipFile.ExtractToDirectory(vsixPath, vsixUnzipPath);
+            ZipFile.ExtractToDirectory(vsixPath, vsixUnzipPath);
+        }
     }
 }
