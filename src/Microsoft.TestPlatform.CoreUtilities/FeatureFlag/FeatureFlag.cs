@@ -78,9 +78,6 @@ internal partial class FeatureFlag : IFeatureFlag
     // Disable turning dynamic code coverage for native code to OFF by default. Setting this to 1 will skip adding the setting.
     public const string VSTEST_DISABLE_DYNAMICNATIVE_CODECOVERAGE_DEFAULT_SETTING = nameof(VSTEST_DISABLE_DYNAMICNATIVE_CODECOVERAGE_DEFAULT_SETTING);
 
-    // Disable fixed answer file parsing in case we broke something more. The original issue had no info on what the code that introduced the bug was trying to fix.
-    public const string VSTEST_DISABLE_ANSWERFILE_PARSING_FIX = nameof(VSTEST_DISABLE_ANSWERFILE_PARSING_FIX);
-
 
 
     [Obsolete("Only use this in tests.")]
