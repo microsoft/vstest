@@ -374,5 +374,14 @@ public class Build : IntegrationTestBase
 
             ZipFile.ExtractToDirectory(packagePath, unzipPath);
         }
+
+        var vsixPath = IntegrationTestEnvironment.LocalVsixInsertion;
+        var vsixUnzipPath = Path.Combine(IntegrationTestEnvironment.PublishDirectory, Path.GetFileName(vsixPath));
+        if (Directory.Exists(vsixUnzipPath))
+        {
+            Directory.Delete(vsixUnzipPath, recursive: true);
+        }
+
+        ZipFile.ExtractToDirectory(vsixPath, vsixUnzipPath);
     }
 }
