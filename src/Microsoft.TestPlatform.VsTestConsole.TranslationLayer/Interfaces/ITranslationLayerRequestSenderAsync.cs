@@ -17,6 +17,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 /// </summary>
 internal interface ITranslationLayerRequestSenderAsync : IDisposable
 {
+
+    int StartServer();
+
     /// <summary>
     /// Asynchronous equivalent of <see cref="
     ///     ITranslationLayerRequestSender.InitializeCommunication"/>
@@ -24,7 +27,7 @@ internal interface ITranslationLayerRequestSenderAsync : IDisposable
     ///     ITranslationLayerRequestSender.WaitForRequestHandlerConnection(
     ///     int)"/>.
     /// </summary>
-    Task<int> InitializeCommunicationAsync(int clientConnectionTimeout);
+    Task InitializeCommunicationAsync(int clientConnectionTimeout);
 
     /// <summary>
     /// Asynchronous equivalent of ITranslationLayerRequestSender.DiscoverTests/>.

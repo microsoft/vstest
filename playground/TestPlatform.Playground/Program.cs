@@ -9,6 +9,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+#pragma warning disable IDE0005 // Using directive is unnecessary.
+using System.Threading.Tasks;
+#pragma warning restore IDE0005 // Using directive is unnecessary.
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -20,7 +23,7 @@ namespace TestPlatform.Playground;
 
 internal class Program
 {
-    static void Main()
+    static async Task Main()
     {
         // This project references TranslationLayer, vstest.console, TestHostProvider, testhost and MSTest1 projects, to make sure
         // we build all the dependencies of that are used to run tests via VSTestConsoleWrapper. It then copies the components from
@@ -143,15 +146,17 @@ internal class Program
 #pragma warning restore CS0618 // Type or member is obsolete
         var discoveryHandler = new PlaygroundTestDiscoveryHandler(detailedOutput);
         var sw = Stopwatch.StartNew();
+
         // Discovery
-        r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        await r.DiscoverTestsAsync(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
+        // r.DiscoverTests(sources, sourceSettings, options, sessionHandler.TestSessionInfo, discoveryHandler);
         var discoveryDuration = sw.ElapsedMilliseconds;
         Console.WriteLine($"Discovery done in {discoveryDuration} ms");
         sw.Restart();
         // Run with test cases and custom testhost launcher
         //r.RunTestsWithCustomTestHost(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput), new DebuggerTestHostLauncher());
         //// Run with test cases and without custom testhost launcher
-        r.RunTests(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
+        await r.RunTestsAsync(discoveryHandler.TestCases, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput));
         //// Run with sources and custom testhost launcher and debugging
         //r.RunTestsWithCustomTestHost(sources, sourceSettings, options, sessionHandler.TestSessionInfo, new TestRunHandler(detailedOutput), new DebuggerTestHostLauncher());
         //// Run with sources
