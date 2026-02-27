@@ -6,7 +6,7 @@ This file should be imported by eng/Versions.props
 <Project>
   <PropertyGroup>
     <!-- _git/vs-code-coverage dependencies -->
-    <MicrosoftInternalCodeCoveragePackageVersion>18.5.0-preview.26120.1</MicrosoftInternalCodeCoveragePackageVersion>
+    <MicrosoftInternalCodeCoveragePackageVersion>18.5.1</MicrosoftInternalCodeCoveragePackageVersion>
     <!-- dotnet/dotnet dependencies -->
     <MicrosoftDiagnosticsNETCoreClientPackageVersion>0.2.0-preview.26124.102</MicrosoftDiagnosticsNETCoreClientPackageVersion>
     <!-- dotnet/runtime dependencies -->
