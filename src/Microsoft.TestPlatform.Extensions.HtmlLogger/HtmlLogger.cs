@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -305,10 +304,9 @@ public class HtmlLogger : ITestLoggerWithParameters
     {
         try
         {
-            var fileName = string.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}_{3}",
+            var fileName = string.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}",
                 Environment.GetEnvironmentVariable("UserName"), Environment.MachineName,
-                FormatDateTimeForRunName(DateTime.Now),
-                Process.GetCurrentProcess().Id);
+                FormatDateTimeForRunName(DateTime.Now));
 
             XmlFilePath = GenerateUniqueFilePath(fileName, HtmlLoggerConstants.XmlFileExtension);
 
@@ -369,7 +367,7 @@ public class HtmlLogger : ITestLoggerWithParameters
 
     private static string FormatDateTimeForRunName(DateTime timeStamp)
     {
-        return timeStamp.ToString("yyyyMMdd_HHmmss", DateTimeFormatInfo.InvariantInfo);
+        return timeStamp.ToString("yyyyMMdd_HHmmssfff", DateTimeFormatInfo.InvariantInfo);
     }
 
     /// <summary>

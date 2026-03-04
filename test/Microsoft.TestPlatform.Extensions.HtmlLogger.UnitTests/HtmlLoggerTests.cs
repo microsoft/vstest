@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -593,23 +592,32 @@ public class HtmlLoggerTests
     }
 
     [TestMethod]
-    public void XmlFilePathShouldContainProcessIdForCrossProcessUniqueness()
+    public void XmlFilePathShouldContainMillisecondTimestampForCrossProcessUniqueness()
     {
         // Verifies fix for https://github.com/microsoft/vstest/issues/15404
-        // The temp XML file name should include the process ID to avoid collisions
-        // when multiple vstest processes run in parallel.
+        // The temp XML file name should use millisecond-precision timestamps to avoid
+        // collisions when multiple vstest processes run in parallel.
         _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite))
             .Returns(new Mock<Stream>().Object);
 
         _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
-#pragma warning disable CA1837 // Use Environment.ProcessId - not available on net48
-        var pid = System.Diagnostics.Process.GetCurrentProcess().Id.ToString(CultureInfo.InvariantCulture);
-#pragma warning restore CA1837
         Assert.IsNotNull(_htmlLogger.XmlFilePath);
-        Assert.IsTrue(
-            _htmlLogger.XmlFilePath.Contains($"_{pid}"),
-            $"XmlFilePath should contain process ID '{pid}' for cross-process uniqueness, but was: '{_htmlLogger.XmlFilePath}'");
+        // The filename should match the pattern with milliseconds: yyyyMMdd_HHmmssfff
+        // e.g., TestResult_user_MACHINE_20260304_153012345.xml
+        // The time part (HHmmssfff) should be 9 chars; previously it was 6 chars (HHmmss).
+        var fileName = Path.GetFileNameWithoutExtension(_htmlLogger.XmlFilePath);
+        var parts = fileName.Split('_');
+        // The last part is the time portion, possibly with an iteration suffix like [7]
+        var timePart = parts[parts.Length - 1];
+        var bracketIdx = timePart.IndexOf('[');
+        if (bracketIdx >= 0)
+        {
+            timePart = timePart.Substring(0, bracketIdx);
+        }
+
+        Assert.AreEqual(9, timePart.Length,
+            $"Time portion of timestamp should be 9 chars (HHmmssfff) but was '{timePart}' (length {timePart.Length}) in path: '{_htmlLogger.XmlFilePath}'");
     }
 
     private static TestCase CreateTestCase(string testCaseName)

@@ -104,3 +104,11 @@ The codebase enforces strict code analysis rules as errors:
 - **CA1305**: Always provide `IFormatProvider` (e.g., `CultureInfo.InvariantCulture`) for `ToString()` calls.
 - **CA1837**: Use `Environment.ProcessId` instead of `Process.GetCurrentProcess().Id` (net5.0+ only; suppress for net48 targets).
 - Source projects target `netstandard2.0`/`net462` — many modern APIs are unavailable. Always check TFM compatibility.
+
+## Task Completion Jingle
+
+When you finish a task (right before calling `task_complete`), play a short celebratory jingle so the user knows you're done:
+
+```powershell
+[console]::beep(500,300); [console]::beep(600,300); [console]::beep(700,300); [console]::beep(600,300); [console]::beep(800,500)
+```
