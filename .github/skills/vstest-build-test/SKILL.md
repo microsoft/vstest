@@ -143,3 +143,26 @@ After building with `--pack` / `-pack`, validate vstest.console changes by unzip
 - If build fails asking for .NET 4.6 targeting pack, install it from [Microsoft Downloads](https://www.microsoft.com/download/details.aspx?id=48136)
 - Enable verbose diagnostics: see `docs/diagnose.md`
 - For debugging, add `Debugger.Launch` at process entry points (testhost.exe, vstest.console.exe)
+
+## Logger-Specific Notes
+
+### TRX Logger (`src/Microsoft.TestPlatform.Extensions.TrxLogger/`)
+
+- **Key files:** `TrxLogger.cs` (main), `Utility/Converter.cs` (attachment handling), `Utility/TrxFileHelper.cs` (path utils)
+- **Flow:** `TestRunCompleteHandler` → compose XML DOM → `ReserveTrxFilePath` → `AdjustRunDeploymentRootForTrxSubdirectory` → `PopulateTrxFile`
+- **Test helper:** `TestableTrxLogger` overrides `PopulateTrxFile` to capture TRX file path. Call `MakeTestRunComplete()` to trigger the full flow.
+- **Important:** Targets netstandard2.0 — use `TrxFileHelper.MakePathRelative()` instead of `Path.GetRelativePath()`
+
+### HTML Logger (`src/Microsoft.TestPlatform.Extensions.HtmlLogger/`)
+
+- **Key files:** `HtmlLogger.cs` (main), `HtmlTransformer.cs` (XSLT)
+- **Flow:** `TestRunCompleteHandler` → `PopulateHtmlFile` → create temp XML → serialize → XSLT to HTML → delete XML
+- **Temp XML naming:** `TestResult_{user}_{machine}_{timestamp}_{pid}.xml` — PID ensures cross-process uniqueness
+- **File creation:** Uses `FileMode.CreateNew` for atomic creation with retry on collision
+- **Tests:** Mock `IFileHelper`, `IHtmlTransformer`, and `XmlObjectSerializer`
+
+### Analyzer Pitfalls
+
+- **CA1305:** Always provide `IFormatProvider` (e.g., `CultureInfo.InvariantCulture`) for `ToString()` calls
+- **CA1837:** Use `Environment.ProcessId` on net5.0+; suppress with `#pragma warning disable CA1837` for net48 targets
+- Source targets `netstandard2.0` — many modern APIs (`Path.GetRelativePath`, `Environment.ProcessId`) are NOT available
