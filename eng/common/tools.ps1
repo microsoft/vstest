@@ -747,6 +747,7 @@ function ExitWithExitCode([int] $exitCode) {
   if ($ci -and $prepareMachine) {
     Stop-Processes
   }
+  Write-Host "exiting with exit code: $exitCode"
   exit $exitCode
 }
 

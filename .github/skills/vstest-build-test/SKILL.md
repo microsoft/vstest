@@ -101,9 +101,9 @@ Use `-p` to filter by assembly name pattern:
 ./test.sh -p datacollector    # Data collector tests
 ./test.sh -p smoke            # Smoke tests
 
-# Windows
-./test.cmd -p htmllogger
-./test.cmd -p smoke
+# Windows (-p is ambiguous in PowerShell; use -projects)
+./test.cmd -projects htmllogger
+./test.cmd -projects smoke
 ```
 
 ### Specific Test by Name

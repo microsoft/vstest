@@ -39,3 +39,5 @@ Param(
 
 # Call the build script provided by Arcade
 & $PSScriptRoot/common/build.ps1 @PSBoundParameters
+# Forward exit code of the parent script
+exit $LastExitCode
