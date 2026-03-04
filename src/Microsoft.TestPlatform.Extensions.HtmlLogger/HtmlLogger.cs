@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -33,7 +34,6 @@ public class HtmlLogger : ITestLoggerWithParameters
     private readonly IFileHelper _fileHelper;
     private readonly XmlObjectSerializer _xmlSerializer;
     private readonly IHtmlTransformer _htmlTransformer;
-    private static readonly object FileCreateLockObject = new();
     private Dictionary<string, string?>? _parametersDictionary;
 
     public HtmlLogger()
@@ -305,9 +305,10 @@ public class HtmlLogger : ITestLoggerWithParameters
     {
         try
         {
-            var fileName = string.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}",
+            var fileName = string.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}_{3}",
                 Environment.GetEnvironmentVariable("UserName"), Environment.MachineName,
-                FormatDateTimeForRunName(DateTime.Now));
+                FormatDateTimeForRunName(DateTime.Now),
+                Process.GetCurrentProcess().Id);
 
             XmlFilePath = GenerateUniqueFilePath(fileName, HtmlLoggerConstants.XmlFileExtension);
 
@@ -345,18 +346,21 @@ public class HtmlLogger : ITestLoggerWithParameters
 
     private string GenerateUniqueFilePath(string fileName, string fileExtension)
     {
-        string fullFilePath;
         for (short i = 0; i < short.MaxValue; i++)
         {
             var fileNameWithIter = i == 0 ? fileName : Path.GetFileNameWithoutExtension(fileName) + $"[{i}]";
-            fullFilePath = Path.Combine(TestResultsDirPath!, $"TestResult_{fileNameWithIter}.{fileExtension}");
-            lock (FileCreateLockObject)
+            var fullFilePath = Path.Combine(TestResultsDirPath!, $"TestResult_{fileNameWithIter}.{fileExtension}");
+
+            try
             {
-                if (!File.Exists(fullFilePath))
-                {
-                    using var _ = File.Create(fullFilePath);
-                    return fullFilePath;
-                }
+                // Use FileMode.CreateNew for atomic "create if not exists" to avoid
+                // cross-process race conditions when multiple vstest processes run in parallel.
+                using var _ = new FileStream(fullFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+                return fullFilePath;
+            }
+            catch (IOException)
+            {
+                // File already exists (another process created it), try next iteration.
             }
         }
 

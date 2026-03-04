@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -589,6 +590,26 @@ public class HtmlLoggerTests
 
         Assert.AreEqual(0, _htmlLogger.TestRunDetails!.Summary!.TotalTests);
         Assert.AreEqual(0, _htmlLogger.TestRunDetails.Summary.PassPercentage);
+    }
+
+    [TestMethod]
+    public void XmlFilePathShouldContainProcessIdForCrossProcessUniqueness()
+    {
+        // Verifies fix for https://github.com/microsoft/vstest/issues/15404
+        // The temp XML file name should include the process ID to avoid collisions
+        // when multiple vstest processes run in parallel.
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            .Returns(new Mock<Stream>().Object);
+
+        _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
+
+#pragma warning disable CA1837 // Use Environment.ProcessId - not available on net48
+        var pid = System.Diagnostics.Process.GetCurrentProcess().Id.ToString(CultureInfo.InvariantCulture);
+#pragma warning restore CA1837
+        Assert.IsNotNull(_htmlLogger.XmlFilePath);
+        Assert.IsTrue(
+            _htmlLogger.XmlFilePath.Contains($"_{pid}"),
+            $"XmlFilePath should contain process ID '{pid}' for cross-process uniqueness, but was: '{_htmlLogger.XmlFilePath}'");
     }
 
     private static TestCase CreateTestCase(string testCaseName)
