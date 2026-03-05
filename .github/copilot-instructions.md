@@ -95,7 +95,7 @@ dotnet test test/<TestProjectName>/<TestProjectName>.csproj --no-build -f net9.0
 
 - **`HtmlLogger.cs`** — Main logger. Creates temp XML, transforms to HTML via XSLT, deletes XML.
 - **`HtmlTransformer.cs`** — XSLT transformation from XML to HTML.
-- Temp XML filenames include PID for cross-process uniqueness. File creation uses `FileMode.CreateNew` for atomicity.
+- Temp XML filenames use millisecond-precision timestamps for cross-process uniqueness. File creation uses `FileMode.CreateNew` for atomicity.
 - Tests mock `IFileHelper`, `IHtmlTransformer`, and `XmlObjectSerializer`.
 
 ## Analyzer Rules
