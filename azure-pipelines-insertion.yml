@@ -1,8 +1,17 @@
 parameters:
+  - name: 'ComponentBranchName'
+    default: 'main'
+  - name: 'CreateDraftPR'
+    default: 'false'
+  - name: 'OptionalTitlePrefix'
+    default: '[Auto Insertion]'
+  - name: 'VisualStudioBranchName'
+    default: 'main'
 
 variables:
+- group: DotNet-Roslyn-Insertion-Variables
 - template: /eng/common/templates-official/variables/pool-providers.yml@self
-- name: thisRequiredValueSentinel
+- name: RequiredValueSentinel
   value: 'REQUIRED'
 - name: DefaultValueSentinel
   value: '(default)'
@@ -34,6 +43,18 @@ variables:
   value: '(default)'
 - name: ComponentGitHubRepoName
   value: '(default)'
+- name: SpecificBuildNumber
+  value: '(default)'
+- name: AutoComplete
+  value: 'true'
+- name: ComponentBranchName
+  value: '${{ parameters.ComponentBranchName }}'
+- name: CreateDraftPR
+  value: '${{ parameters.CreateDraftPR }}'
+- name: OptionalTitlePrefix
+  value: '${{ parameters.OptionalTitlePrefix }}'
+- name: VisualStudioBranchName
+  value: '${{ parameters.VisualStudioBranchName }}'
 
 trigger: none
 
