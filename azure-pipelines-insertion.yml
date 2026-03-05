@@ -59,7 +59,8 @@ variables:
 trigger: none
 
 schedules:
-  - cron: 0 0 * * *
+  // insert at 1am on monday, wednesday and friday
+  - cron: 0 1 * * 1,3,5
     displayName: Daily midnight insertion to VS
     branches:
       include:
@@ -88,8 +89,8 @@ jobs:
       # Path is like .\RIT\tools\net472\OneOffInsertion.ps1, the TFM can change as the
       # tools gets updated, so we look for it with a wildcard, and use the first one found
       $script = Get-ChildItem .\RIT\tools\*\OneOffInsertion.ps1 | Select-Object -First 1 -ExpandProperty FullName
-      # Add dotnet dev ex prague (from devdiv) as reviewer. To get the user guid, make PR search with createdBy (in the target organization => devdiv), and you will get the guid in URL. https://dev.azure.com/dnceng/internal/_git/dotnet-roslyn-tools?path=/src/RoslynInsertionTool/RoslynInsertionTool.Commandline/RoslynInsertionToolCommandline.cs&version=GBmain&_a=contents&line=277&lineStyle=plain&lineEnd=278&lineStartColumn=1&lineEndColumn=1
-      $team = "c45bc753-8bc8-47dd-b329-ba642a1285de"
+      # Add VS Interactive experiences team (from devdiv) as reviewer. To get the user guid, make PR search with createdBy (in the target organization => devdiv), and you will get the guid in URL.  OR https://dev.azure.com/devdiv/_apis/teams?$mine=true 
+      $team = "10a2f33b-3b3d-47a9-a22f-6bb09247bb63"
   
       "Found tool: '$script'"
       $params = @{
