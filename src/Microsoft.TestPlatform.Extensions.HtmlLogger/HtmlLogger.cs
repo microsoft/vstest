@@ -356,7 +356,7 @@ public class HtmlLogger : ITestLoggerWithParameters
                 using var _ = new FileStream(fullFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
                 return fullFilePath;
             }
-            catch (IOException)
+            catch (IOException) when (File.Exists(fullFilePath))
             {
                 // File already exists (another process created it), try next iteration.
             }
