@@ -164,5 +164,5 @@ After building with `--pack` / `-pack`, validate vstest.console changes by unzip
 ### Analyzer Pitfalls
 
 - **CA1305:** Always provide `IFormatProvider` (e.g., `CultureInfo.InvariantCulture`) for `ToString()` calls
-- **CA1837:** Use `Environment.ProcessId` on net5.0+; suppress with `#pragma warning disable CA1837` for net48 targets
-- Source targets `netstandard2.0` — many modern APIs (`Path.GetRelativePath`, `Environment.ProcessId`) are NOT available
+- **CA1837 (Environment.ProcessId):** Prefer `Environment.ProcessId` on net5.0+; for this repo (targeting `netstandard2.0`), continue using the existing PID retrieval (e.g., `Process.GetCurrentProcess().Id`) and suppress CA1837 with a brief justification comment.
+- Source targets `netstandard2.0` — many modern APIs (`Path.GetRelativePath`, `Environment.ProcessId`) are NOT available here; plan any migrations accordingly.
