@@ -92,7 +92,37 @@ jobs:
       $team = "c45bc753-8bc8-47dd-b329-ba642a1285de"
   
       "Found tool: '$script'"
-      & $script -userName "dn-bot@microsoft.com" -password "$(dn-bot-devdiv-build-e-code-full-release-e-packaging-r)" -componentUserName "dn-bot@microsoft.com" -componentPassword "$(dn-bot-dnceng-build-e-code-full-release-e-packaging-r)" -requiredValueSentinel "$(RequiredValueSentinel)" -defaultValueSentinel "$(DefaultValueSentinel)" -buildQueueName "$(BuildQueueName)" -componentAzdoUri "$(ComponentAzdoUri)" -componentProjectName "$(ComponentProjectName)" -componentBranchName "$(ComponentBranchName)" -componentName "$(ComponentName)" -dropPath "$(DropPath)" -insertCore "$(InsertCore)" -insertDevDiv "$(InsertDevDiv)" -insertToolset "$(InsertToolset)" -queueValidation "$(QueueValidation)" -specificBuild "$(SpecificBuildNumber)" -updateAssemblyVersions "$(UpdateAssemblyVersions)" -updateCoreXTLibraries "$(UpdateCoreXTLibraries)" -visualStudioBranchName "$(VisualStudioBranchName)" -titlePrefix "$(OptionalTitlePrefix)" -insertionCount "$(InsertionCount)" -writePullRequest "$(System.DefaultWorkingDirectory)\prid.txt" -autoComplete "$(AutoComplete)" -createDraftPR "$(CreateDraftPR)" -cherryPick "$(CherryPick)" -componentGitHubRepoName "$(ComponentGitHubRepoName)" -reviewerGuid $team
+      $params = @{
+        userName               = "dn-bot@microsoft.com"
+        password               = "$(dn-bot-devdiv-build-e-code-full-release-e-packaging-r)"
+        componentUserName      = "dn-bot@microsoft.com"
+        componentPassword      = "$(dn-bot-dnceng-build-e-code-full-release-e-packaging-r)"
+        requiredValueSentinel  = "$(RequiredValueSentinel)"
+        defaultValueSentinel   = "$(DefaultValueSentinel)"
+        buildQueueName         = "$(BuildQueueName)"
+        componentAzdoUri       = "$(ComponentAzdoUri)"
+        componentProjectName   = "$(ComponentProjectName)"
+        componentBranchName    = "$(ComponentBranchName)"
+        componentName          = "$(ComponentName)"
+        dropPath               = "$(DropPath)"
+        insertCore             = "$(InsertCore)"
+        insertDevDiv           = "$(InsertDevDiv)"
+        insertToolset          = "$(InsertToolset)"
+        queueValidation        = "$(QueueValidation)"
+        specificBuild          = "$(SpecificBuildNumber)"
+        updateAssemblyVersions = "$(UpdateAssemblyVersions)"
+        updateCoreXTLibraries  = "$(UpdateCoreXTLibraries)"
+        visualStudioBranchName = "$(VisualStudioBranchName)"
+        titlePrefix            = "$(OptionalTitlePrefix)"
+        insertionCount         = "$(InsertionCount)"
+        writePullRequest       = "$(System.DefaultWorkingDirectory)\prid.txt"
+        autoComplete           = "$(AutoComplete)"
+        createDraftPR          = "$(CreateDraftPR)"
+        cherryPick             = "$(CherryPick)"
+        componentGitHubRepoName = "$(ComponentGitHubRepoName)"
+        reviewerGuid           = $team
+      }
+      & $script @params
     workingDirectory: '$(System.DefaultWorkingDirectory)\'
     displayName: 'Run OneOffInsertion.ps1'
 
