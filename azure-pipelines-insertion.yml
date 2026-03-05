@@ -1,0 +1,79 @@
+parameters:
+
+variables:
+- template: /eng/common/templates-official/variables/pool-providers.yml@self
+- name: thisRequiredValueSentinel
+  value: 'REQUIRED'
+- name: DefaultValueSentinel
+  value: '(default)'
+- name: BuildQueueName
+  value: 'microsoft-vstest'
+- name: ComponentAzdoUri
+  value: 'https://dnceng.visualstudio.com/DefaultCollection'
+- name: ComponentProjectName
+  value: 'internal'
+- name: ComponentName
+  value: 'VS Test Platform'
+- name: DropPath
+  value: '/dp=microsoft-vstest/VSSetupArtifacts'
+- name: InsertCore
+  value: 'false'
+- name: InsertDevDiv
+  value: 'false'
+- name: InsertToolset
+  value: 'false'
+- name: QueueValidation
+  value: '(default)'
+- name: UpdateAssemblyVersions
+  value: '(default)'
+- name: UpdateCoreXTLibraries
+  value: 'false'
+- name: InsertionCount
+  value: '1'
+- name: CherryPick
+  value: '(default)'
+- name: ComponentGitHubRepoName
+  value: '(default)'
+
+trigger: none
+
+schedules:
+  - cron: 0 0 * * *
+    displayName: Daily midnight insertion to VS
+    branches:
+      include:
+      - main
+    always: true
+
+jobs:
+- job: insert
+  displayName: Insert
+  pool:
+    name: $(DncEngInternalBuildPool)
+    demands: ImageOverride -equals windows.vs2026preview.scout.amd64
+  timeoutInMinutes: 90
+
+  steps:
+
+  - task: NuGetCommand@2
+    displayName: 'Install RIT from Azure Artifacts'
+    inputs:
+      command: custom
+      arguments: 'install RoslynTools.VisualStudioInsertionTool -PreRelease -Source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json'
+
+  - powershell: |
+      mv RoslynTools.VisualStudioInsertionTool.* RIT
+        
+      # Path is like .\RIT\tools\net472\OneOffInsertion.ps1, the TFM can change as the
+      # tools gets updated, so we look for it with a wildcard, and use the first one found
+      $script = Get-ChildItem .\RIT\tools\*\OneOffInsertion.ps1 | Select-Object -First 1 -ExpandProperty FullName
+      # Add dotnet dev ex prague (from devdiv) as reviewer. To get the user guid, make PR search with createdBy (in the target organization => devdiv), and you will get the guid in URL. https://dev.azure.com/dnceng/internal/_git/dotnet-roslyn-tools?path=/src/RoslynInsertionTool/RoslynInsertionTool.Commandline/RoslynInsertionToolCommandline.cs&version=GBmain&_a=contents&line=277&lineStyle=plain&lineEnd=278&lineStartColumn=1&lineEndColumn=1
+      $team = "c45bc753-8bc8-47dd-b329-ba642a1285de"
+  
+      "Found tool: '$script'"
+      & $script -userName "dn-bot@microsoft.com" -password "$(dn-bot-devdiv-build-e-code-full-release-e-packaging-r)" -componentUserName "dn-bot@microsoft.com" -componentPassword "$(dn-bot-dnceng-build-e-code-full-release-e-packaging-r)" -requiredValueSentinel "$(RequiredValueSentinel)" -defaultValueSentinel "$(DefaultValueSentinel)" -buildQueueName "$(BuildQueueName)" -componentAzdoUri "$(ComponentAzdoUri)" -componentProjectName "$(ComponentProjectName)" -componentBranchName "$(ComponentBranchName)" -componentName "$(ComponentName)" -dropPath "$(DropPath)" -insertCore "$(InsertCore)" -insertDevDiv "$(InsertDevDiv)" -insertToolset "$(InsertToolset)" -queueValidation "$(QueueValidation)" -specificBuild "$(SpecificBuildNumber)" -updateAssemblyVersions "$(UpdateAssemblyVersions)" -updateCoreXTLibraries "$(UpdateCoreXTLibraries)" -visualStudioBranchName "$(VisualStudioBranchName)" -titlePrefix "$(OptionalTitlePrefix)" -insertionCount "$(InsertionCount)" -writePullRequest "$(System.DefaultWorkingDirectory)\prid.txt" -autoComplete "$(AutoComplete)" -createDraftPR "$(CreateDraftPR)" -cherryPick "$(CherryPick)" -componentGitHubRepoName "$(ComponentGitHubRepoName)" -reviewerGuid $team
+    workingDirectory: '$(System.DefaultWorkingDirectory)\'
+    displayName: 'Run OneOffInsertion.ps1'
+
+  - script: 'echo. && echo. && type "$(System.DefaultWorkingDirectory)\prid.txt" && echo. && echo.'
+    displayName: 'Report PR URL'
