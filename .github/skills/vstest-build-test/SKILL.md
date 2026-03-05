@@ -157,7 +157,7 @@ After building with `--pack` / `-pack`, validate vstest.console changes by unzip
 
 - **Key files:** `HtmlLogger.cs` (main), `HtmlTransformer.cs` (XSLT)
 - **Flow:** `TestRunCompleteHandler` → `PopulateHtmlFile` → create temp XML → serialize → XSLT to HTML → delete XML
-- **Temp XML naming:** `TestResult_{user}_{machine}_{timestamp}_{pid}.xml` — PID ensures cross-process uniqueness
+- **Temp XML naming:** `TestResult_{user}_{machine}_{timestamp}.xml` — timestamp has millisecond precision; on collisions a `[n]` suffix is appended
 - **File creation:** Uses `FileMode.CreateNew` for atomic creation with retry on collision
 - **Tests:** Mock `IFileHelper`, `IHtmlTransformer`, and `XmlObjectSerializer`
 
