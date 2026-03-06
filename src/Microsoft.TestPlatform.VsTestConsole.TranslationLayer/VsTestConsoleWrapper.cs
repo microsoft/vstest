@@ -659,7 +659,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
         var timeout = EnvironmentHelper.GetConnectionTimeout();
         // Start communication
-        var port = await _requestSender.InitializeCommunicationAsync(timeout * 1000).ConfigureAwait(false);
+        var port = _requestSender.StartServer();
 
         if (port > 0)
         {
@@ -681,6 +681,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
             _requestSender.Close();
             throw new TransationLayerException("Error hosting communication channel and connecting to console");
         }
+
+        await _requestSender.InitializeCommunicationAsync(timeout * 1000).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
