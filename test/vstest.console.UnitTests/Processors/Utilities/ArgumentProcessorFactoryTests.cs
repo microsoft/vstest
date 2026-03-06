@@ -168,7 +168,7 @@ public class ArgumentProcessorFactoryTests
         foreach (var processor in allProcessors)
         {
             var instance = Activator.CreateInstance(processor) as IArgumentProcessor;
-            Assert.IsNotNull(instance, "Unable to instantiate processor: {0}", processor);
+            Assert.IsNotNull(instance, $"Unable to instantiate processor: {processor}");
 
             var specialProcessor = instance.Metadata.Value.IsSpecialCommand;
             if ((specialCommandFilter && specialProcessor) || (!specialCommandFilter && !specialProcessor))

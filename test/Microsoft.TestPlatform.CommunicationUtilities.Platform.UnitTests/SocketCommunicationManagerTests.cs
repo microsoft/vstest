@@ -115,7 +115,7 @@ public class SocketCommunicationManagerTests : IDisposable
 
         _communicationManager.StopServer();
 
-        Assert.ThrowsException<AggregateException>(() => _tcpClient.ConnectAsync(IPAddress.Loopback, port).Wait());
+        Assert.ThrowsExactly<AggregateException>(() => _tcpClient.ConnectAsync(IPAddress.Loopback, port).Wait());
     }
 
     #endregion
@@ -169,7 +169,7 @@ public class SocketCommunicationManagerTests : IDisposable
         _communicationManager.StopClient();
 
         // Attempt to write on client socket should throw since it should have disconnected.
-        Assert.ThrowsException<SocketException>(() => WriteOnSocket(client.Client));
+        Assert.ThrowsExactly<SocketException>(() => WriteOnSocket(client.Client));
     }
 
     #endregion
@@ -300,8 +300,6 @@ public class SocketCommunicationManagerTests : IDisposable
         }
 
         clientThread.Join();
-
-        Assert.IsTrue(true);
     }
 
     [TestMethod]

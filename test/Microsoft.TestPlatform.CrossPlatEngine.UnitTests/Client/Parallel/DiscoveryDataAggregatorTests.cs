@@ -235,7 +235,7 @@ public class DiscoveryDataAggregatorTests
         Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out _));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(DiscoveryStatus.FullyDiscovered)]
     [DataRow(DiscoveryStatus.PartiallyDiscovered)]
     [DataRow(DiscoveryStatus.NotDiscovered)]
@@ -253,7 +253,7 @@ public class DiscoveryDataAggregatorTests
         Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(DiscoveryStatus.FullyDiscovered)]
     [DataRow(DiscoveryStatus.PartiallyDiscovered)]
     [DataRow(DiscoveryStatus.NotDiscovered)]
@@ -273,7 +273,7 @@ public class DiscoveryDataAggregatorTests
         CollectionAssert.AreEquivalent(new[] { "a", "b" }, dataAggregator.GetSourcesWithStatus(discoveryStatus));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(DiscoveryStatus.FullyDiscovered)]
     [DataRow(DiscoveryStatus.PartiallyDiscovered)]
     public void MarkSourcesWithStatusWhenSourceAddedAndStatusDifferentFromNotDiscoveredLogsWarning(DiscoveryStatus discoveryStatus)
@@ -288,7 +288,7 @@ public class DiscoveryDataAggregatorTests
         CollectionAssert.AreEquivalent(new[] { "a" }, dataAggregator.GetSourcesWithStatus(discoveryStatus));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(DiscoveryStatus.NotDiscovered)]
     [DataRow(DiscoveryStatus.PartiallyDiscovered)]
     public void MarkSourcesWithStatusWhenSourceStatusWasFullyDiscoveredAndIsDowngradedLogsWarning(DiscoveryStatus discoveryStatus)
@@ -356,7 +356,7 @@ public class DiscoveryDataAggregatorTests
         CollectionAssert.AreEquivalent(new[] { "b" }, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(DiscoveryStatus.FullyDiscovered)]
     [DataRow(DiscoveryStatus.PartiallyDiscovered)]
     [DataRow(DiscoveryStatus.NotDiscovered)]

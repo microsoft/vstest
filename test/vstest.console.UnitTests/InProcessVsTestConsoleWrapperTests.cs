@@ -87,7 +87,7 @@ public class InProcessVsTestConsoleWrapperTests
     {
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(-1);
 
-        Assert.ThrowsException<TransationLayerException>(() =>
+        Assert.ThrowsExactly<TransationLayerException>(() =>
             new InProcessVsTestConsoleWrapper(
                 new ConsoleParameters(),
                 _mockEnvironmentVariableHelper.Object,

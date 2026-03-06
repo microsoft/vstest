@@ -100,7 +100,7 @@ public class SerialTestRunDecoratorTests : AcceptanceTestBase
         // Act
         var testDll = GetAssetFullPath("SerializeTestRunTestProject.dll");
         _vstestConsoleWrapper.RunTests(new string[] { testDll }, _runsettings, _runEventHandler);
-        _ = Assert.ThrowsException<InvalidOperationException>(_runEventHandler.EnsureSuccess);
+        _ = Assert.ThrowsExactly<InvalidOperationException>(_runEventHandler.EnsureSuccess);
 
         StringBuilder builder = new();
         foreach (string? error in _runEventHandler.Errors)

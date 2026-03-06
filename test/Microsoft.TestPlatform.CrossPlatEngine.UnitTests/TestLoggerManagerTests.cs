@@ -257,7 +257,7 @@ public class TestLoggerManagerTests
     public void AddLoggerShouldNotThrowExceptionIfUriIsNull()
     {
         var testLoggerManager = new DummyTestLoggerManager();
-        Assert.ThrowsException<ArgumentNullException>(
+        Assert.ThrowsExactly<ArgumentNullException>(
             () => testLoggerManager.InitializeLoggerByUri(null!, null));
     }
 
@@ -320,7 +320,7 @@ public class TestLoggerManagerTests
         var testLoggerManager = new DummyTestLoggerManager();
         testLoggerManager.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(
+        Assert.ThrowsExactly<ObjectDisposedException>(
             () => testLoggerManager.InitializeLoggerByUri(new Uri("some://uri"), null));
     }
 
@@ -330,7 +330,7 @@ public class TestLoggerManagerTests
     {
         var testLoggerManager = new DummyTestLoggerManager();
         testLoggerManager.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(
+        Assert.ThrowsExactly<ObjectDisposedException>(
             () => testLoggerManager.EnableLogging());
     }
 
@@ -706,7 +706,7 @@ public class TestLoggerManagerTests
 
         var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
 
-        Assert.ThrowsException<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
+        Assert.ThrowsExactly<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
         Assert.AreEqual(0, ValidLoggerWithParameters.Counter);
     }
 
@@ -733,7 +733,7 @@ public class TestLoggerManagerTests
 
         var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
 
-        Assert.ThrowsException<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
+        Assert.ThrowsExactly<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
         Assert.AreEqual(0, InvalidLogger.Counter);
     }
 
@@ -758,7 +758,7 @@ public class TestLoggerManagerTests
                 </RunSettings>";
 
         var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
-        Assert.ThrowsException<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
+        Assert.ThrowsExactly<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
         Assert.AreEqual(0, ValidLoggerWithParameters.Counter);
     }
 
@@ -785,7 +785,7 @@ public class TestLoggerManagerTests
 
         var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
 
-        Assert.ThrowsException<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
+        Assert.ThrowsExactly<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
         Assert.AreEqual(0, ValidLoggerWithParameters.Counter);
     }
 
@@ -876,7 +876,7 @@ public class TestLoggerManagerTests
 
         var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
 
-        Assert.ThrowsException<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
+        Assert.ThrowsExactly<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
     }
 
     [TestMethod]
@@ -902,7 +902,7 @@ public class TestLoggerManagerTests
 
         var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
         testLoggerManager.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() => testLoggerManager.Initialize(settingsXml));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => testLoggerManager.Initialize(settingsXml));
     }
 
     [TestMethod]
@@ -1424,7 +1424,7 @@ public class TestLoggerManagerTests
 
         var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
 
-        Assert.ThrowsException<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
+        Assert.ThrowsExactly<InvalidLoggerException>(() => testLoggerManager.Initialize(settingsXml));
         Assert.AreEqual(0, ValidLoggerWithParameters.Counter);
     }
 

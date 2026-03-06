@@ -178,7 +178,7 @@ public class EnableDiagArgumentProcessorTests
 
     private void EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(string argument, string exceptionMessage)
     {
-        var e = Assert.ThrowsException<CommandLineException>(() => _diagProcessor.Executor!.Value.Initialize(argument));
+        var e = Assert.ThrowsExactly<CommandLineException>(() => _diagProcessor.Executor!.Value.Initialize(argument));
         StringAssert.Contains(e.Message, exceptionMessage);
     }
 }

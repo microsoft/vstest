@@ -67,7 +67,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
     {
         _mockDataCollectionManager.Setup(x => x.Initialize()).Throws<Exception>();
 
-        Assert.ThrowsException<Exception>(() => _proxyExecutionManager.Initialize(false));
+        Assert.ThrowsExactly<Exception>(() => _proxyExecutionManager.Initialize(false));
     }
 
     [TestMethod]
@@ -75,7 +75,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
     {
         _mockDataCollectionManager.Setup(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
 
-        Assert.ThrowsException<Exception>(() => _proxyExecutionManager.Initialize(false));
+        Assert.ThrowsExactly<Exception>(() => _proxyExecutionManager.Initialize(false));
 
         _mockDataCollectionManager.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
         _mockDataCollectionManager.Verify(dc => dc.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
