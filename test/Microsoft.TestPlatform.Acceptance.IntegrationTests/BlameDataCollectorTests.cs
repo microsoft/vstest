@@ -22,6 +22,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 // this whole thing is complicated and depends on versions of OS and the target runtime
 // keeping this for later
 [TestCategory("Windows-Review")]
+[TestCategory("aaa")]
+[TestCategory("Windows-Skip-NETFXTFM")]
 public class BlameDataCollectorTests : AcceptanceTestBase
 {
     public const string NETCOREANDFX = "net462;net472;net8.0";
@@ -41,6 +43,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [TestCategory("aaa")]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]

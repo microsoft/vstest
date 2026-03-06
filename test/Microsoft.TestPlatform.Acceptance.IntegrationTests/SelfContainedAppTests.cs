@@ -13,6 +13,7 @@ public class SelfContainedAppTests : AcceptanceTestBase
 {
     [TestMethod]
     [TestCategory("Windows-Review")]
+    [TestCategory("Windows-Skip-NETFXTFM")]
     [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void RunningApplicationThatIsBuiltAsSelfContainedWillNotFailToFindHostpolicyDll(RunnerInfo runnerInfo)
     {

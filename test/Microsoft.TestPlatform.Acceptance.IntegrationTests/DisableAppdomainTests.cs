@@ -12,6 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows")]
+[TestCategory("Windows-Skip-NETFXTFM")]
 public class DisableAppdomainTests : AcceptanceTestBase
 {
     [TestMethod]

@@ -14,6 +14,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 // monitoring the processes does not work correctly
 [TestCategory("Windows-Review")]
+[TestCategory("Windows-Skip-NETFXTFM")]
 public class RunsettingsTests : AcceptanceTestBase
 {
     #region Runsettings precedence tests

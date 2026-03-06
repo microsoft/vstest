@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
+[TestCategory("Windows-Skip-NETFXTFM")]
 public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
 {
     [TestMethod]
