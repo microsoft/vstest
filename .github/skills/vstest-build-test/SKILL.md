@@ -110,7 +110,7 @@ Use `-p` to filter by assembly name pattern:
 
 ```bash
 # Windows
-./test.cmd -bl -c release /p:TestRunnerAdditionalArguments="'--filter TestName'" -Integration
+./test.cmd -bl -c release /p:TestRunnerAdditionalArguments="'--filter TestName'" -f net48 -Integration
 
 # Linux / macOS
 ./test.sh -bl -c release /p:TestRunnerAdditionalArguments="'--filter TestName'" --integrationTest
