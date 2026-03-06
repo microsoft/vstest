@@ -247,6 +247,6 @@ internal static class TestTaskUtils
     internal static string? ResolveDotnetPath()
     {
         var dotnetHostPath = Environment.GetEnvironmentVariable("DOTNET_HOST_PATH");
-        return Path.GetFullPath(dotnetHostPath);
+        return string.IsNullOrEmpty(dotnetHostPath) ? null : Path.GetFullPath(dotnetHostPath);
     }
 }
