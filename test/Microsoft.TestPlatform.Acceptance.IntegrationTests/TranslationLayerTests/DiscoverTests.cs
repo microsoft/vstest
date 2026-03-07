@@ -201,11 +201,11 @@ public class DiscoverTests : AcceptanceTestBase
         // Release builds optimize code, hence line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
         {
-            Assert.AreEqual(25, testCase.First().LineNumber);
+            Assert.AreEqual(22, testCase.First().LineNumber);
         }
         else
         {
-            Assert.AreEqual(24, testCase.First().LineNumber);
+            Assert.AreEqual(21, testCase.First().LineNumber);
         }
     }
 

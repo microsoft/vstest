@@ -32,7 +32,7 @@ internal interface IProcessManager
     event EventHandler ProcessExited;
 
     /// <summary>
-    /// Process that we manage, or managed, useful for reporting to corellate log messages when the process no longer lives.
+    /// Process that we manage, or managed, useful for reporting to correlate log messages when the process no longer lives.
     /// </summary>
-    int ProcessId { get; set; }
+    int ProcessId { get; }
 }
