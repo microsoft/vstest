@@ -43,10 +43,10 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
 
         _runEventHandler = new RunEventHandler();
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var sources = new List<string> { GetAssetFullPath("MSTestProject1.dll") };
 
-        vstestConsoleWrapper.RunTests(
+        _vstestConsoleWrapper.RunTests(
             sources,
             GetDefaultRunSettings(),
             new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=MSTestProject1.UnitTest1.PassingTest" },

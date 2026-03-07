@@ -717,7 +717,7 @@ public class IntegrationTestBase
                 File.Create(logFilePath).Close();
             }
 
-            Console.WriteLine($"Logging diagnostics in {logFilePath}");
+            Console.WriteLine($"Logging diagnostics in {Path.GetDirectoryName(logFilePath)}");
             consoleParameters.LogFilePath = logFilePath;
         }
 

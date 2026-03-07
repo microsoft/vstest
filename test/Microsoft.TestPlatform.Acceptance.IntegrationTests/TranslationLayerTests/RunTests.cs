@@ -50,9 +50,9 @@ public class RunTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        vstestConsoleWrapper.RunTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler);
+        _vstestConsoleWrapper.RunTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler);
 
         // Assert
         Assert.AreEqual(6, runEventHandler.TestResults.Count);
@@ -69,7 +69,7 @@ public class RunTests : AcceptanceTestBase
         // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
         var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETFX);
         var incompatibleDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETCORE);
@@ -77,7 +77,7 @@ public class RunTests : AcceptanceTestBase
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
         var runsettingsXml = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-        vstestConsoleWrapper.RunTests(new[] { compatibleDll, incompatibleDll }, runsettingsXml, runEventHandler);
+        _vstestConsoleWrapper.RunTests(new[] { compatibleDll, incompatibleDll }, runsettingsXml, runEventHandler);
 
         // Assert
         runEventHandler.TestResults.Should().HaveCount(3, "we failed to run those tests because they are not compatible.");
@@ -92,7 +92,7 @@ public class RunTests : AcceptanceTestBase
         // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
         var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETFX);
         var netDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETCORE);
@@ -100,7 +100,7 @@ public class RunTests : AcceptanceTestBase
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
         var runsettingsXml = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-        vstestConsoleWrapper.RunTests(new[] { netFrameworkDll, netDll }, runsettingsXml, runEventHandler);
+        _vstestConsoleWrapper.RunTests(new[] { netFrameworkDll, netDll }, runsettingsXml, runEventHandler);
 
         // Assert
         runEventHandler.Errors.Should().BeEmpty();

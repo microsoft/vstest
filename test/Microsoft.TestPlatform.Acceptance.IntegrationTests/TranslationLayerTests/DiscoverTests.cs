@@ -53,8 +53,8 @@ public class DiscoverTests : AcceptanceTestBase
         _discoveryEventHandler = new DiscoveryEventHandler();
         _discoveryEventHandler2 = new DiscoveryEventHandler2();
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        vstestConsoleWrapper.DiscoverTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), _discoveryEventHandler);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper.DiscoverTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), _discoveryEventHandler);
 
         // Assert.
         Assert.AreEqual(6, _discoveryEventHandler.DiscoveredTestCases.Count);
@@ -71,8 +71,8 @@ public class DiscoverTests : AcceptanceTestBase
         _discoveryEventHandler = new DiscoveryEventHandler();
         _discoveryEventHandler2 = new DiscoveryEventHandler2();
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        vstestConsoleWrapper.DiscoverTests(
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper.DiscoverTests(
             GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"),
             GetDefaultRunSettings(),
             new TestPlatformOptions() { CollectMetrics = false },
