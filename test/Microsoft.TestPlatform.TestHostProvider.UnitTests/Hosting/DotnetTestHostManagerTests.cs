@@ -113,7 +113,7 @@ public class DotnetTestHostManagerTests
     {
         Action action = () => _dotnetHostManager.GetTestHostProcessStartInfo(null!, null, _defaultConnectionInfo);
 
-        Assert.ThrowsException<ArgumentNullException>(action);
+        Assert.ThrowsExactly<ArgumentNullException>(action);
     }
 
     [TestMethod]
@@ -122,7 +122,7 @@ public class DotnetTestHostManagerTests
         var sources = new[] { "test1.dll", "test2.dll" };
         Action action = () => _dotnetHostManager.GetTestHostProcessStartInfo(sources, null, _defaultConnectionInfo);
 
-        Assert.ThrowsException<InvalidOperationException>(action);
+        Assert.ThrowsExactly<InvalidOperationException>(action);
     }
 
     [TestMethod]
@@ -480,7 +480,7 @@ public class DotnetTestHostManagerTests
         CancellationTokenSource cancellationTokenSource = new();
         cancellationTokenSource.Cancel();
 
-        Assert.ThrowsException<OperationCanceledException>(() => _dotnetHostManager.LaunchTestHostAsync(startInfo, cancellationTokenSource.Token).Wait());
+        Assert.ThrowsExactly<OperationCanceledException>(() => _dotnetHostManager.LaunchTestHostAsync(startInfo, cancellationTokenSource.Token).Wait());
     }
 
     [TestMethod]
@@ -534,7 +534,7 @@ public class DotnetTestHostManagerTests
 
         Action action = () => GetDefaultStartInfo();
 
-        Assert.ThrowsException<TestPlatformException>(action);
+        Assert.ThrowsExactly<TestPlatformException>(action);
     }
 
     [TestMethod]

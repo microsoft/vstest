@@ -342,14 +342,16 @@ public class IntegrationTestBase
                 @"\d+",
                 @"\d+",
                 @"\d+");
-            StringAssert.DoesNotMatch(
-                _standardTestOutput,
-                new Regex(summaryStatus),
+            var errorSummary = string.Format(CultureInfo.InvariantCulture,
                 "Excepted: There should not be test summary{2}Actual: {0}{2}Standard Error: {1}{2}Arguments: {3}{2}",
                 _standardTestOutput,
                 _standardTestError,
                 Environment.NewLine,
                 _arguments);
+            StringAssert.DoesNotMatch(
+                _standardTestOutput,
+                new Regex(summaryStatus), errorSummary)
+               ;
         }
         else
         {
@@ -369,14 +371,16 @@ public class IntegrationTestBase
                 summaryStatus += string.Format(CultureInfo.CurrentCulture, SkippedTestsMessage, skipped);
             }
 
-            Assert.IsTrue(
-                _standardTestOutput.Contains(summaryStatus),
-                "The Test summary does not match.{3}Expected summary: {1}{3}Test Output: {0}{3}Standard Error: {2}{3}Arguments: {4}{3}",
+            var errorSummary = string.Format(CultureInfo.InvariantCulture, "The Test summary does not match.{3}Expected summary: {1}{3}Test Output: {0}{3}Standard Error: {2}{3}Arguments: {4}{3}",
                 _standardTestOutput,
                 summaryStatus,
                 _standardTestError,
                 Environment.NewLine,
                 _arguments);
+            Assert.IsTrue(
+                _standardTestOutput.Contains(summaryStatus),
+                errorSummary
+                );
         }
     }
 
@@ -393,14 +397,15 @@ public class IntegrationTestBase
         if (totalTestCount == 0)
         {
             // No test should be found/run
-            StringAssert.DoesNotMatch(
-                _standardTestOutput,
-                new Regex("Total tests\\:"),
-                "Excepted: There should not be test summary{2}Actual: {0}{2}Standard Error: {1}{2}Arguments: {3}{2}",
+            var errorSummary = string.Format(CultureInfo.InvariantCulture, "Excepted: There should not be test summary{2}Actual: {0}{2}Standard Error: {1}{2}Arguments: {3}{2}",
                 _standardTestOutput,
                 _standardTestError,
                 Environment.NewLine,
                 _arguments);
+            StringAssert.DoesNotMatch(
+                _standardTestOutput,
+                new Regex("Total tests\\:"),
+                errorSummary);
         }
         else
         {
@@ -420,30 +425,31 @@ public class IntegrationTestBase
                 summaryStatus += $" Skipped: {skipped}.";
             }
 
-            Assert.IsTrue(
-                _standardTestOutput.Contains(summaryStatus),
-                "The Test summary does not match.{3}Expected summary: {1}{3}Test Output: {0}{3}Standard Error: {2}{3}Arguments: {4}{3}",
+            var errorSummary = String.Format(CultureInfo.InvariantCulture, "The Test summary does not match.{3}Expected summary: {1}{3}Test Output: {0}{3}Standard Error: {2}{3}Arguments: {4}{3}",
                 _standardTestOutput,
                 summaryStatus,
                 _standardTestError,
                 Environment.NewLine,
                 _arguments);
+            Assert.IsTrue(
+                _standardTestOutput.Contains(summaryStatus),
+                errorSummary);
         }
     }
 
     public void StdErrorContains(string substring)
     {
-        Assert.IsTrue(_standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", _standardTestError, substring);
+        Assert.IsTrue(_standardTestError.Contains(substring), $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
     }
 
     public void StdErrorRegexIsMatch(string pattern)
     {
-        Assert.IsTrue(Regex.IsMatch(_standardTestError, pattern), "StdErrorOutput - [{0}] did not contain expected pattern '{1}'", _standardTestError, pattern);
+        Assert.IsTrue(Regex.IsMatch(_standardTestError, pattern), $"StdErrorOutput - [{_standardTestError}] did not contain expected pattern '{pattern}'");
     }
 
     public void StdErrorDoesNotContains(string substring)
     {
-        Assert.IsFalse(_standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", _standardTestError, substring);
+        Assert.IsFalse(_standardTestError.Contains(substring), $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
     }
 
     public void StdOutputContains(string substring)
@@ -615,7 +621,12 @@ public class IntegrationTestBase
         if (testFramework == UnitTestFramework.MSTest)
         {
             var version = IntegrationTestEnvironment.DependencyVersions["MSTestTestAdapterVersion"];
-            if (version.StartsWith("3"))
+            if (version.StartsWith("4"))
+            {
+                var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "net9.0";
+                adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, tfm);
+            }
+            else if (version.StartsWith("3"))
             {
                 var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "netcoreapp3.1";
                 adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, tfm);
@@ -671,7 +682,7 @@ public class IntegrationTestBase
         }
         else
         {
-            Assert.Fail("Unknown Runner framework - [{0}]", _testEnvironment.RunnerFramework);
+            Assert.Fail($"Unknown Runner framework - [{_testEnvironment.RunnerFramework}]");
         }
 
         Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: \"{0}\"", consoleRunnerPath);
@@ -711,7 +722,7 @@ public class IntegrationTestBase
                 File.Create(logFilePath).Close();
             }
 
-            Console.WriteLine($"Logging diagnostics in {logFilePath}");
+            Console.WriteLine($"Logging diagnostics in {Path.GetDirectoryName(logFilePath)}");
             consoleParameters.LogFilePath = logFilePath;
         }
 

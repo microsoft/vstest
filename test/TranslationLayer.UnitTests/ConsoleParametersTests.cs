@@ -33,6 +33,6 @@ public class ConsoleParametersTests
     public void TraceLevelShouldHaveVerboseAsDefaultValue()
     {
         var consoleParameters = new ConsoleParameters(new FileHelper());
-        Assert.AreEqual(consoleParameters.TraceLevel, TraceLevel.Verbose);
+        Assert.AreEqual(TraceLevel.Verbose, consoleParameters.TraceLevel);
     }
 }
