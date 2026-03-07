@@ -621,7 +621,12 @@ public class IntegrationTestBase
         if (testFramework == UnitTestFramework.MSTest)
         {
             var version = IntegrationTestEnvironment.DependencyVersions["MSTestTestAdapterVersion"];
-            if (version.StartsWith("3"))
+            if (version.StartsWith("4"))
+            {
+                var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "net9.0";
+                adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, tfm);
+            }
+            else if (version.StartsWith("3"))
             {
                 var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "netcoreapp3.1";
                 adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, tfm);
