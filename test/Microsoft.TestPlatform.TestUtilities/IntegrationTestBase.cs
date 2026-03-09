@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -262,6 +263,8 @@ public class IntegrationTestBase
 
         if (_testEnvironment.DebugInfo != null)
         {
+            environmentVariables["VSTEST_DEBUG_ATTACHVS_PATH"] =
+                Path.Combine(Path.GetDirectoryName(Assembly.GetCallingAssembly().Location)!, "AttachVS.exe");
             if (_testEnvironment.DebugInfo.DebugVSTestConsole)
             {
                 environmentVariables["VSTEST_RUNNER_DEBUG_ATTACHVS"] = "1";
