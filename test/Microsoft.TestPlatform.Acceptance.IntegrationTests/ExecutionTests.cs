@@ -184,13 +184,6 @@ public class ExecutionTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        if (IntegrationTestEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
-        {
-            // On release, x64 builds, recursive calls may be replaced with loops (tail call optimization)
-            Assert.Inconclusive("On StackOverflowException testhost not exited in release configuration.");
-            return;
-        }
-
         var diagLogFilePath = Path.Combine(TempDirectory.Path, $"std_error_log_{Guid.NewGuid()}.txt");
         File.Delete(diagLogFilePath);
 
