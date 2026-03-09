@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
-[TestCategory("Windows-Skip-NETFXTFM")]
+[SkipIntegrationTestOnNetCondition]
 public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 {
     [TestMethod]

@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// Running dotnet test + csproj and using MSBuild for the output.
 /// </summary>
 [TestClass]
-[TestCategory("Windows-Skip-NETFXTFM")]
+[SkipIntegrationTestOnNetCondition]
 public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
 {
     [TestMethod]

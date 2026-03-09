@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
-[TestCategory("Windows-Skip-NETFXTFM")]
+[SkipIntegrationTestOnNetCondition]
 public class DotnetTestTests : AcceptanceTestBase
 {
     private static string GetFinalVersion(string version)

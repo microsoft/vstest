@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 // On Linux/Mac we don't download the same .NET SDK bundles
 [TestCategory("Windows-Review")]
-[TestCategory("Windows-Skip-NETFXTFM")]
+[SkipIntegrationTestOnNetCondition]
 public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
 {
     [TestMethod]

@@ -8,7 +8,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 // this is tested only on .NET Framework
 [TestCategory("Windows-Review")]
-[TestCategory("Windows-Skip-NETFXTFM")]
+[SkipIntegrationTestOnNetCondition]
 public class ListExtensionsTests : AcceptanceTestBase
 {
     [TestMethod]
