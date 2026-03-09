@@ -212,7 +212,7 @@ public class IntegrationTestBase
             File.WriteAllText(Path.Combine(workingDirectory, "global.json"), """
                 {
                   "test": {
-                    "runner": "vstest",
+                    "runner": "vstest"
                     }
                 }
                 """);
