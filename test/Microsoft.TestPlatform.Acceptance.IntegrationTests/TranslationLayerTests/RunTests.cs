@@ -191,9 +191,8 @@ public class RunTests : AcceptanceTestBase
             ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.*"
             : $"The active test run was aborted. Reason: Test host process crashed : Stack overflow.*";
 
-        _runEventHandler.Errors.Should().HaveCount(1);
-        var error = _runEventHandler.Errors[0];
-        error.Should().Match(errorMessage);
+        _runEventHandler.Errors.Should().ContainSingle()
+            .Which.Should().Match(errorMessage);
     }
 
     [TestMethod]
