@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
-[SkipIntegrationTestOnNetCondition]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class BlameDataCollectorTests : AcceptanceTestBase
 {
     public const string NETCOREANDFX = "net462;net472;net8.0";
@@ -40,7 +40,6 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("aaa")]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]

@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
-[SkipIntegrationTestOnNetCondition]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 {
     [TestMethod]

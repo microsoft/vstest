@@ -22,7 +22,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests.DataCollectorAttachmentsProcessorsFactoryTests;
 
 [TestClass]
-[SkipIntegrationTestOnNetCondition]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class DataCollectorAttachmentsProcessorsFactoryTests : AcceptanceTestBase
 {
     private readonly DataCollectorAttachmentsProcessorsFactory _dataCollectorAttachmentsProcessorsFactory = new();

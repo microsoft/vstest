@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
-[SkipIntegrationTestOnNetCondition]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class PortableNugetPackageTests : AcceptanceTestBase
 {
     private static string s_portablePackageFolder = string.Empty;

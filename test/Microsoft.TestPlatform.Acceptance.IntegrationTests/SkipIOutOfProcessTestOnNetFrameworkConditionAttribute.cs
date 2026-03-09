@@ -7,13 +7,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
-public class SkipIntegrationTestOnNetConditionAttribute : ConditionBaseAttribute
+public class SkipIOutOfProcessTestOnNetFrameworkConditionAttribute : ConditionBaseAttribute
 {
     private readonly bool _include;
 
-    public SkipIntegrationTestOnNetConditionAttribute() : base(ConditionMode.Include)
+    public SkipIOutOfProcessTestOnNetFrameworkConditionAttribute() : base(ConditionMode.Include)
     {
-        _include = RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework");
+        _include = !RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework");
         IgnoreMessage = "Test was skipped to avoid duplication of the same out-of-process tests between .NET and .NET Framework.";
     }
 

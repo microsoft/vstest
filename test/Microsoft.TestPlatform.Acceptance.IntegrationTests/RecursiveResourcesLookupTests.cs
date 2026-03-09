@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
-[SkipIntegrationTestOnNetCondition]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class RecursiveResourcesLookupTests : AcceptanceTestBase
 {
     [TestMethod]

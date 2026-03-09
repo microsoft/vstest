@@ -45,7 +45,7 @@ internal struct TestParameters
 [TestClass]
 //Code coverage only supported on windows (based on the message in output)
 [TestCategory("Windows-Review")]
-[SkipIntegrationTestOnNetCondition]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 {
     [TestMethod]

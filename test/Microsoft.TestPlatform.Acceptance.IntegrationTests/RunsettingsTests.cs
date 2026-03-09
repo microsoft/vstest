@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 // monitoring the processes does not work correctly
 [TestCategory("Windows-Review")]
-[SkipIntegrationTestOnNetCondition]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class RunsettingsTests : AcceptanceTestBase
 {
     #region Runsettings precedence tests
