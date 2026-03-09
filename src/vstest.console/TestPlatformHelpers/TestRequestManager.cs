@@ -1638,6 +1638,12 @@ internal static class KnownPlatformSourceFilter
         "Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll",
         "Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll",
         "Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll",
+
+        // For MSTest v4
+        "MSTest.TestAdapter.dll",
+        "MSTest.TestFramework.dll",
+        "MSTest.TestFramework.Extensions.dll",
+        "MSTestAdapter.PlatformServices.dll",
     }, StringComparer.OrdinalIgnoreCase);
 
 

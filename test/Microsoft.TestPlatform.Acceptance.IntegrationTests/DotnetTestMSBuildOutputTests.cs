@@ -37,7 +37,7 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
 
         StdOutputContains("TESTERROR");
         StdOutputContains("FailingTest (");
-        StdOutputContains("): Error Message: Assert.AreEqual failed. Expected:<ğğğ𦮙我們剛才從𓋴𓅓𓏏𓇏𓇌𓀀>. Actual:<not the same>.");
+        StdOutputContains("Expected: \"ğğğ𦮙我們剛才從𓋴𓅓𓏏𓇏𓇌𓀀\"");
         StdOutputContains("at TerminalLoggerUnitTests.UnitTest1.FailingTest() in");
         // We are sending those as low prio messages, they won't show up on screen but will be in binlog.
         //StdOutputContains("passed PassingTest");

@@ -78,7 +78,7 @@ public class BlameCollectorTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfDataCollectionLoggerIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _blameDataCollector.Initialize(
+        Assert.ThrowsExactly<ArgumentNullException>(() => _blameDataCollector.Initialize(
             _configurationElement,
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,

@@ -17,7 +17,7 @@ public class JobQueueTests
     public void ConstructorThrowsWhenNullProcessHandlerIsProvided()
     {
         JobQueue<string>? jobQueue = null;
-        Assert.ThrowsException<ArgumentNullException>(() => jobQueue = new JobQueue<string>(null!, "dp", int.MaxValue, int.MaxValue, false, (message) => { }));
+        Assert.ThrowsExactly<ArgumentNullException>(() => jobQueue = new JobQueue<string>(null!, "dp", int.MaxValue, int.MaxValue, false, (message) => { }));
 
         if (jobQueue != null)
         {
@@ -29,9 +29,9 @@ public class JobQueueTests
     public void ThrowsWhenNullEmptyOrWhiteSpaceDisplayNameIsProvided()
     {
         JobQueue<string>? jobQueue = null;
-        Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), null!, int.MaxValue, int.MaxValue, false, (message) => { }));
-        Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "", int.MaxValue, int.MaxValue, false, (message) => { }));
-        Assert.ThrowsException<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "    ", int.MaxValue, int.MaxValue, false, (message) => { }));
+        Assert.ThrowsExactly<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), null!, int.MaxValue, int.MaxValue, false, (message) => { }));
+        Assert.ThrowsExactly<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "", int.MaxValue, int.MaxValue, false, (message) => { }));
+        Assert.ThrowsExactly<ArgumentException>(() => jobQueue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "    ", int.MaxValue, int.MaxValue, false, (message) => { }));
 
         if (jobQueue != null)
         {
@@ -86,7 +86,7 @@ public class JobQueueTests
         var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { });
         queue.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => queue.QueueJob("dp", 0));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => queue.QueueJob("dp", 0));
     }
 
     [TestMethod]
@@ -95,7 +95,7 @@ public class JobQueueTests
         var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { });
         queue.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => queue.Resume());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => queue.Resume());
     }
 
     [TestMethod]
@@ -104,7 +104,7 @@ public class JobQueueTests
         var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { });
         queue.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => queue.Pause());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => queue.Pause());
     }
 
     [TestMethod]
@@ -113,7 +113,7 @@ public class JobQueueTests
         var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { });
         queue.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => queue.Flush());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => queue.Flush());
     }
 
     [TestMethod]
@@ -155,7 +155,7 @@ public class JobQueueTests
         using var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { });
         queue.Pause();
 
-        Assert.ThrowsException<InvalidOperationException>(() => queue.Dispose());
+        Assert.ThrowsExactly<InvalidOperationException>(() => queue.Dispose());
 
         queue.Resume();
     }

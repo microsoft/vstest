@@ -132,8 +132,8 @@ public class SettingsProviderExtensionManagerTests
         };
         var spm = new TestableSettingsProviderManager(extensions, unfilteredExtensions, new Mock<IMessageLogger>().Object);
 
-        Assert.ThrowsException<ArgumentException>(() => spm.GetSettingsProvider(null!));
-        Assert.ThrowsException<ArgumentException>(() => spm.GetSettingsProvider(string.Empty));
+        Assert.ThrowsExactly<ArgumentException>(() => spm.GetSettingsProvider(null!));
+        Assert.ThrowsExactly<ArgumentException>(() => spm.GetSettingsProvider(string.Empty));
     }
 
     [TestMethod]

@@ -65,7 +65,7 @@ public class TrxLoggerTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfEventsIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(
+        Assert.ThrowsExactly<ArgumentNullException>(
             () => _testableTrxLogger.Initialize(null!, _parameters));
     }
 
@@ -79,7 +79,7 @@ public class TrxLoggerTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfTestRunDirectoryIsEmptyOrNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(
+        Assert.ThrowsExactly<ArgumentNullException>(
             () =>
             {
                 var events = new Mock<TestLoggerEvents>();
@@ -99,13 +99,13 @@ public class TrxLoggerTests
     public void InitializeShouldThrowExceptionIfParametersAreEmpty()
     {
         var events = new Mock<TestLoggerEvents>();
-        Assert.ThrowsException<ArgumentException>(() => _testableTrxLogger.Initialize(events.Object, new Dictionary<string, string?>()));
+        Assert.ThrowsExactly<ArgumentException>(() => _testableTrxLogger.Initialize(events.Object, new Dictionary<string, string?>()));
     }
 
     [TestMethod]
     public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _testableTrxLogger.TestMessageHandler(new object(), default!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => _testableTrxLogger.TestMessageHandler(new object(), default!));
     }
 
     [TestMethod]
@@ -533,7 +533,7 @@ public class TrxLoggerTests
 
         _testableTrxLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
-        Assert.AreEqual(_testableTrxLogger.TestResultOutcome, TrxLoggerObjectModel.TestOutcome.Failed);
+        Assert.AreEqual(TrxLoggerObjectModel.TestOutcome.Failed, _testableTrxLogger.TestResultOutcome);
     }
 
     [TestMethod]
@@ -854,7 +854,7 @@ public class TrxLoggerTests
         _parameters[TrxLoggerConstants.LogFilePrefixKey] = trxPrefix;
         _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
 
-        Assert.ThrowsException<ArgumentException>(() => _testableTrxLogger.Initialize(_events.Object, _parameters));
+        Assert.ThrowsExactly<ArgumentException>(() => _testableTrxLogger.Initialize(_events.Object, _parameters));
     }
 
     [TestMethod]

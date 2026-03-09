@@ -284,7 +284,7 @@ public class TestResultSerializationTests
         // only checked for version 2
         var version = int.MaxValue;
 
-        Assert.ThrowsException<NotSupportedException>(() => Serialize(TestResult, version));
+        Assert.ThrowsExactly<NotSupportedException>(() => Serialize(TestResult, version));
     }
 
     #endregion

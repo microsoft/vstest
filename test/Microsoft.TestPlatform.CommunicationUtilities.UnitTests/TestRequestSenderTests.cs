@@ -63,12 +63,6 @@ public class TestRequestSenderTests
         _testRunCriteriaWithSources = new TestRunCriteriaWithSources(new Dictionary<string, IEnumerable<string>>(), "runsettings", null, null!);
     }
 
-    [TestCleanup]
-    public void Cleanup()
-    {
-        Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, string.Empty);
-    }
-
     [TestMethod]
     public void InitializeCommunicationShouldHostServerAndAcceptClient()
     {
@@ -203,7 +197,7 @@ public class TestRequestSenderTests
         _mockChannel.Verify(mockChannel => mockChannel.Send(MessageType.CancelTestRun), Times.Never);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("")]
     [DataRow(" ")]
     [DataRow(null)]
@@ -263,7 +257,7 @@ public class TestRequestSenderTests
         SetupRaiseMessageReceivedOnCheckVersion();
         SetupFakeCommunicationChannel();
 
-        Assert.ThrowsException<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost());
+        Assert.ThrowsExactly<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost());
     }
 
     [TestMethod]
@@ -273,17 +267,19 @@ public class TestRequestSenderTests
         SetupRaiseMessageReceivedOnCheckVersion();
         SetupFakeCommunicationChannel();
 
-        Assert.ThrowsException<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost());
+        Assert.ThrowsExactly<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost());
     }
 
     [TestMethod]
+    [DoNotParallelize]
     public void CheckVersionWithTestHostShouldThrowIfProtocolNegotiationTimeouts()
     {
+        // Make sure to use do-not parallelize because you set non-default value to the env variable.
         Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "0");
 
         SetupFakeCommunicationChannel();
 
-        var message = Assert.ThrowsException<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost()).Message;
+        var message = Assert.ThrowsExactly<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost()).Message;
 
         Assert.AreEqual(message, TimoutErrorMessage);
     }

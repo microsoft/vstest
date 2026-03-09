@@ -2552,7 +2552,7 @@ public class VsTestConsoleRequestSenderTests
                 MessageType.CustomTestHostLaunchCallback,
                 It.IsAny<CustomHostLaunchAckPayload>(),
                 _protocolVersion))
-            .Callback((string messageType, object payload, int version) => Assert.AreEqual(((CustomHostLaunchAckPayload)payload).HostProcessId, TesthostPid));
+            .Callback((string messageType, object payload, int version) => Assert.AreEqual(TesthostPid, ((CustomHostLaunchAckPayload)payload).HostProcessId));
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Message?>(launchMessage))
             .Callback(reconfigureAction);
@@ -2627,7 +2627,7 @@ public class VsTestConsoleRequestSenderTests
                 MessageType.CustomTestHostLaunchCallback,
                 It.IsAny<CustomHostLaunchAckPayload>(),
                 _protocolVersion))
-            .Callback((string messageType, object payload, int version) => Assert.AreEqual(((CustomHostLaunchAckPayload)payload).HostProcessId, TesthostPid));
+            .Callback((string messageType, object payload, int version) => Assert.AreEqual(TesthostPid, ((CustomHostLaunchAckPayload)payload).HostProcessId));
         _mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Message?>(launchMessage))
             .Callback(reconfigureAction);

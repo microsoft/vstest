@@ -203,7 +203,7 @@ public class XmlRunSettingsUtilitiesTests
                      </TestRunParameters>
                 </RunSettings>";
 
-        Assert.ThrowsException<SettingsException>(() => XmlRunSettingsUtilities.GetTestRunParameters(settingsXml));
+        Assert.ThrowsExactly<SettingsException>(() => XmlRunSettingsUtilities.GetTestRunParameters(settingsXml));
     }
 
     [TestMethod]
@@ -223,7 +223,7 @@ public class XmlRunSettingsUtilitiesTests
                      </TestRunParameters>
                 </RunSettings>";
 
-        Assert.ThrowsException<SettingsException>(() => XmlRunSettingsUtilities.GetTestRunParameters(settingsXml));
+        Assert.ThrowsExactly<SettingsException>(() => XmlRunSettingsUtilities.GetTestRunParameters(settingsXml));
     }
 
     [TestMethod]
@@ -281,7 +281,7 @@ public class XmlRunSettingsUtilitiesTests
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-        Assert.ThrowsException<SettingsException>(
+        Assert.ThrowsExactly<SettingsException>(
             () => XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(settingsXml));
     }
     #endregion
@@ -1174,7 +1174,7 @@ public class XmlRunSettingsUtilitiesTests
     [TestMethod]
     public void GetDataCollectionRunSettingsShouldThrowOnMalformedDataCollectorSettings()
     {
-        Assert.ThrowsException<SettingsException>(() => XmlRunSettingsUtilities.GetDataCollectionRunSettings(_runSettingsXmlWithIncorrectDataCollectorSettings));
+        Assert.ThrowsExactly<SettingsException>(() => XmlRunSettingsUtilities.GetDataCollectionRunSettings(_runSettingsXmlWithIncorrectDataCollectorSettings));
     }
 
     #endregion
