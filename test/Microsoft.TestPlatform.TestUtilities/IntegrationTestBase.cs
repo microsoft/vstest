@@ -202,12 +202,27 @@ public class IntegrationTestBase
     /// <param name="workingDirectory"></param>
     public void InvokeDotnetTest(string arguments, Dictionary<string, string?>? environmentVariables = null, string? workingDirectory = null)
     {
-        if (workingDirectory is not null && !File.Exists(Path.Combine(workingDirectory, "dotnet.config")))
+        string globalJsonPath = Path.Combine(workingDirectory!, "global.json");
+        if (workingDirectory is not null && !File.Exists(globalJsonPath))
         {
-            File.WriteAllText(Path.Combine(workingDirectory, "dotnet.config"), """
-                [dotnet.test.runner]
-                name = "VSTest"
+            // Add global.json to the working directory, to ensure we use vstest to run tests,
+            // global.json is resolved from the working directory, and its parents, so this just makes sure we enforce vstest,
+            // even though we use TestingPlatform to run unit tests.
+            File.WriteAllText(Path.Combine(workingDirectory, "global.json"), """
+                {
+                  "test": {
+                    "runner": "vstest",
+                    }
+                }
                 """);
+        }
+        else
+        {
+            string globalJsonText = File.ReadAllText(globalJsonPath);
+            if (!globalJsonText.Contains("\"runner\": \"vstest\""))
+            {
+                throw new InvalidOperationException($"Custom global.json in path '{globalJsonPath}' does not specify test runner as VSTest.\nContent:\n{globalJsonText}");
+            }
         }
 
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
