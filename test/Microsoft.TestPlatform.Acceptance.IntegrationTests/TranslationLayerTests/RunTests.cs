@@ -187,12 +187,12 @@ public class RunTests : AcceptanceTestBase
             new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
             _runEventHandler);
 
-        var errorMessage = runnerInfo.TargetFramework == "net462"
+        var errorMessagePattern = runnerInfo.TargetFramework.StartsWith("net4")
             ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.*"
             : $"The active test run was aborted. Reason: Test host process crashed : Stack overflow.*";
 
         _runEventHandler.Errors.Should().ContainSingle()
-            .Which.Should().Match(errorMessage);
+            .Which.Should().Match(errorMessagePattern);
     }
 
     [TestMethod]
