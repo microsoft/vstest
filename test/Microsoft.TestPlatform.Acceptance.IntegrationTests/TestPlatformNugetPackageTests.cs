@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
+[TestCategory("Windows-Skip-NETFXTFM")]
 public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
 {
     private static string s_nugetPackageFolder = string.Empty;

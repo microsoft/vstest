@@ -20,6 +20,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
+[TestCategory("Windows-Skip-NETFXTFM")]
 public class PostProcessingTests : AcceptanceTestBase
 {
     [TestMethod]
