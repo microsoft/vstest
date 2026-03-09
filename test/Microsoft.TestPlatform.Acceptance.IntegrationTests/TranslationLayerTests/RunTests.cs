@@ -10,7 +10,6 @@ using System.Threading;
 
 using FluentAssertions;
 
-using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -180,13 +179,6 @@ public class RunTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
-
-        if (IntegrationTestEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
-        {
-            // On release, x64 builds, recursive calls may be replaced with loops (tail call optimization)
-            Assert.Inconclusive("On StackOverflowException testhost not exited in release configuration.");
-            return;
-        }
 
         var source = new[] { GetAssetFullPath("SimpleTestProject3.dll") };
 
