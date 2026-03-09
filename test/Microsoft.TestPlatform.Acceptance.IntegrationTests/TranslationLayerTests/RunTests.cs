@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -10,7 +9,6 @@ using System.Threading;
 
 using FluentAssertions;
 
-using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -181,13 +179,6 @@ public class RunTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
-        if (IntegrationTestEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
-        {
-            // On release, x64 builds, recursive calls may be replaced with loops (tail call optimization)
-            Assert.Inconclusive("On StackOverflowException testhost not exited in release configuration.");
-            return;
-        }
-
         var source = new[] { GetAssetFullPath("SimpleTestProject3.dll") };
 
         _vstestConsoleWrapper.RunTests(
@@ -196,11 +187,12 @@ public class RunTests : AcceptanceTestBase
             new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
             _runEventHandler);
 
-        var errorMessage = runnerInfo.TargetFramework == "net462"
-            ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.{Environment.NewLine}"
-            : $"The active test run was aborted. Reason: Test host process crashed : Stack overflow.{Environment.NewLine}";
+        var errorMessagePattern = runnerInfo.TargetFramework.StartsWith("net4")
+            ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.*"
+            : $"The active test run was aborted. Reason: Test host process crashed : Stack overflow.*";
 
-        _runEventHandler.Errors.Should().Contain(errorMessage);
+        _runEventHandler.Errors.Should().ContainSingle()
+            .Which.Should().Match(errorMessagePattern);
     }
 
     [TestMethod]
