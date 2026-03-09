@@ -222,7 +222,7 @@ The `NetCoreRunnerAttribute` and `NetFrameworkRunnerAttribute` attributes (and o
 
 > **Note:** `DebugStopAtEntrypoint = false` (the default) sets `VSTEST_DEBUG_NOBP=1`, which skips the entry-point breakpoint to go directly to your breakpoints. Set `DebugStopAtEntrypoint = true` if you want to explore and are not sure where to put your breakpoint.
 
-> **Note:** `AttachVS` looks for a running Visual Studio instance. Make sure you are running the integration test from within Visual Studio (not from the CLI) for the automatic attach to work. If you do run from commandline it will try to find VS instance using the AttachVS heuristic (look for parent process that is VS, look for the instance of VS that was started first).
+> **Note:** `AttachVS` looks for a running Visual Studio instance. Make sure you are running the integration test from within Visual Studio (not from the CLI) for the automatic attach to work. If you do run from the command line it will try to find VS instance using the AttachVS heuristic (look for parent process that is VS, look for the instance of VS that was started first).
 
 ## Diagnostics
 
