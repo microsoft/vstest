@@ -213,7 +213,7 @@ public class IntegrationTestBase
                 {
                   "test": {
                     "runner": "vstest"
-                    }
+                  }
                 }
                 """);
         }
