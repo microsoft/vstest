@@ -86,10 +86,10 @@ internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     #region Internal Methods
 
     /// <summary>
-    /// Clones the instance and makes the URI in the clone absolute using the specified base directory
+    /// Clones the instance and makes the URI in the clone relative using the specified base directory
     /// </summary>
-    /// <param name="baseDirectory">The base directory to use to make the URI absolute</param>
-    /// <returns>A clone of the instance, with the URI made absolute</returns>
+    /// <param name="baseDirectory">The base directory to use to make the URI relative</param>
+    /// <returns>A clone of the instance, with the URI made relative</returns>
     internal UriDataAttachment CloneWithRelativePath(string baseDirectory)
     {
         TPDebug.Assert(!baseDirectory.IsNullOrEmpty(), "'baseDirectory' is null or empty");
