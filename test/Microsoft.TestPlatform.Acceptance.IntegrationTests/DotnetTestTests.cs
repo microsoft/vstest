@@ -27,7 +27,7 @@ public class DotnetTestTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("SimpleTestProject.csproj");
-        InvokeDotnetTest($@"{projectPath} -tl:off /p:VSTestNoLogo=false --logger:""Console;Verbosity=normal"" /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}", workingDirectory: Path.GetDirectoryName(projectPath));
+        InvokeDotnetTest($@"{projectPath} --no-build -tl:off /p:VSTestNoLogo=false --logger:""Console;Verbosity=normal""", workingDirectory: Path.GetDirectoryName(projectPath));
 
         // ensure our dev version is used
         StdOutputContains(GetFinalVersion(IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion));
@@ -44,7 +44,7 @@ public class DotnetTestTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPath = GetAssetFullPath("SimpleTestProject.dll");
-        InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal""", workingDirectory: Path.GetDirectoryName(assemblyPath));
+        InvokeDotnetTest($@"{assemblyPath} --no-build --logger:""Console;Verbosity=normal""", workingDirectory: Path.GetDirectoryName(assemblyPath));
 
         // ensure our dev version is used
         StdOutputContains(GetFinalVersion(IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion));
@@ -61,7 +61,7 @@ public class DotnetTestTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("ParametrizedTestProject.csproj");
-        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" -tl:off /p:VSTestNoLogo=false /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion} -- TestRunParameters.Parameter(name =\""weburl\"", value=\""http://localhost//def\"")", workingDirectory: Path.GetDirectoryName(projectPath));
+        InvokeDotnetTest($@"{projectPath} --no-build --logger:""Console;Verbosity=normal"" -tl:off /p:VSTestNoLogo=false -- TestRunParameters.Parameter(name =\""weburl\"", value=\""http://localhost//def\"")", workingDirectory: Path.GetDirectoryName(projectPath));
 
         // ensure our dev version is used
         StdOutputContains(GetFinalVersion(IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion));
@@ -78,7 +78,7 @@ public class DotnetTestTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPath = GetAssetFullPath("ParametrizedTestProject.dll");
-        InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name=\""weburl\"", value=\""http://localhost//def\"")", workingDirectory: Path.GetDirectoryName(assemblyPath));
+        InvokeDotnetTest($@"{assemblyPath} --no-build --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name=\""weburl\"", value=\""http://localhost//def\"")", workingDirectory: Path.GetDirectoryName(assemblyPath));
 
         ValidateSummaryStatus(1, 0, 0);
         ExitCodeEquals(0);
@@ -96,7 +96,7 @@ public class DotnetTestTests : AcceptanceTestBase
         string assemblyRelativePath = @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\x64\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
         var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
 
-        InvokeDotnetTest($@"{assemblyAbsolutePath} --logger:""Console;Verbosity=normal"" --diag:c:\temp\logscpp\", workingDirectory: Path.GetDirectoryName(assemblyAbsolutePath));
+        InvokeDotnetTest($@"{assemblyAbsolutePath} --no-build --logger:""Console;Verbosity=normal"" --diag:c:\temp\logscpp\", workingDirectory: Path.GetDirectoryName(assemblyAbsolutePath));
 
         ValidateSummaryStatus(1, 1, 0);
         ExitCodeEquals(1);
@@ -111,7 +111,7 @@ public class DotnetTestTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPath = GetAssetFullPath("OutputtingTestProject.dll");
-        InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal"" ", workingDirectory: Path.GetDirectoryName(assemblyPath));
+        InvokeDotnetTest($@"{assemblyPath} --no-build --logger:""Console;Verbosity=normal""", workingDirectory: Path.GetDirectoryName(assemblyPath));
 
         StdOutputContains("MY OUTPUT FROM TEST");
 
