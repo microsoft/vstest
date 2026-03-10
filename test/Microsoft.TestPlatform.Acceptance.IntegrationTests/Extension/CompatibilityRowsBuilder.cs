@@ -183,6 +183,17 @@ public class CompatibilityRowsBuilder
             allRows[i].Index = i;
         }
 
+        foreach (var r in allRows)
+        {
+            var hasLatest = r.VSTestConsoleInfo!.VersionType!.Split(',').Any(a => a.Trim() == "Latest")
+                || r.TestHostInfo!.VersionType!.Split(',').Any(a => a.Trim() == "Latest")
+                || r.AdapterInfo!.VersionType!.Split(',').Any(a => a.Trim() == "Latest");
+            if (!hasLatest)
+            {
+                throw new InvalidOperationException($"Row {r.ToString()} does not have any version marked as Latest. You are testing only versions that were already shipped.");
+            }
+        }
+
         return JustRow == null ? allRows : [allRows[JustRow.Value]];
     }
 
