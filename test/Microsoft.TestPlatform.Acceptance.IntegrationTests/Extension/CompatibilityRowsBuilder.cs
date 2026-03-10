@@ -261,6 +261,11 @@ public class CompatibilityRowsBuilder
     private void AddRow(List<RunnerInfo> dataRows, string batch,
         string runnerVersion, string runnerFramework, string hostVersion, string hostFramework, string adapterVersion, string adapter, bool inIsolation)
     {
+        if (adapter != AcceptanceTestBase.MSTEST)
+        {
+            throw new NotSupportedException($"Adapter {adapter} is not supported. Only {AcceptanceTestBase.MSTEST} is supported.");
+        }
+
         RunnerInfo runnerInfo = GetRunnerInfo(batch, runnerFramework, hostFramework, inIsolation);
         runnerInfo.DebugInfo = GetDebugInfo();
         runnerInfo.VSTestConsoleInfo = GetVSTestConsoleInfo(runnerVersion, runnerInfo);
