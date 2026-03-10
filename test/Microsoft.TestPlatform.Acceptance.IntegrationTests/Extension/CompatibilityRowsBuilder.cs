@@ -7,9 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 
-using NuGet.Versioning;
-
 using Microsoft.TestPlatform.TestUtilities;
+
+using NuGet.Versioning;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -17,18 +17,19 @@ public class CompatibilityRowsBuilder
 {
     private static XmlDocument? s_depsXml;
     private readonly string[] _runnerFrameworks;
-    private readonly string[] _runnerVersions;
     private readonly string[] _hostFrameworks;
-    private readonly string[] _adapterVersions;
     private readonly string[] _adapters;
-    private readonly string[] _hostVersions;
 
-    public CompatibilityRowsBuilder(string runnerFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
-        string runnerVersions = AcceptanceTestBase.LATEST_TO_LEGACY,
-        string hostFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
-        string hostVersions = AcceptanceTestBase.LATEST_TO_LEGACY,
-        string adapterVersions = AcceptanceTestBase.LATESTPREVIEW_TO_LEGACY,
-        string adapters = AcceptanceTestBase.MSTEST)
+    private readonly string[] _runnerVersions;
+    private readonly string[] _hostVersions;
+    private readonly string[] _adapterVersions;
+
+    public CompatibilityRowsBuilder(string runnerVersions,
+        string runnerFrameworks,
+        string hostVersions,
+        string hostFrameworks,
+        string adapterVersions,
+        string adapters)
     {
         _runnerFrameworks = runnerFrameworks.Split(';');
         _runnerVersions = runnerVersions.Split(';');
@@ -41,13 +42,9 @@ public class CompatibilityRowsBuilder
     /// <summary>
     /// Add run for in-process using the selected .NET Framework runners, and and all selected adapters.
     /// </summary>
-    public bool WithInProcess { get; set; } = true;
-    public bool WithEveryVersionOfRunner { get; set; } = true;
-    public bool WithEveryVersionOfHost { get; set; } = true;
-    public bool WithEveryVersionOfAdapter { get; set; } = true;
-    public bool WithOlderConfigurations { get; set; } = true;
+    public bool WithInProcess { get; set; }
     // Add runner from VSIX to check the shipment we make into VisualStudio.
-    public bool WithVSIXRunner { get; set; } = true;
+    public bool WithVSIXRunner { get; set; }
 
     public string? BeforeRunnerFeature { get; set; }
     public string? AfterRunnerFeature { get; set; }
@@ -66,23 +63,13 @@ public class CompatibilityRowsBuilder
     {
         var dataRows = new List<RunnerInfo>();
 
-        if (WithEveryVersionOfRunner)
-            AddEveryVersionOfRunner(dataRows);
-
-        if (WithEveryVersionOfHost)
-            AddEveryVersionOfHost(dataRows);
-
-        if (WithEveryVersionOfAdapter)
-            AddEveryVersionOfAdapter(dataRows);
-
-        if (WithOlderConfigurations)
-            AddOlderConfigurations(dataRows);
+        AddRows(dataRows);
 
         if (WithInProcess)
             AddInProcess(dataRows);
 
         if (WithVSIXRunner)
-            AddVsix(dataRows);
+            AddVsix(dataRows, WithInProcess);
 
         var minVersion = ParseAndPatchSemanticVersion("0.0.0-alpha.1");
         var maxVersion = ParseAndPatchSemanticVersion("9999.0.0");
@@ -145,9 +132,44 @@ public class CompatibilityRowsBuilder
             && r.TestHostInfo != null && isInRange(ParseAndPatchSemanticVersion(r.TestHostInfo.Version), beforeTestHostVersion, afterTestHostVersion)
             && r.AdapterInfo != null && isInRange(ParseAndPatchSemanticVersion(r.AdapterInfo.Version), beforeAdapterVersion, afterAdapterVersion)).ToList();
 
-        // We use ToString to determine which values are unique. Not great solution, but works better than using records.
+        // Figure out the distinct rows, and shrink the values, so if we have multiple rows that use the same versions and same setup, and only differ in how the version types
+        // are called (e.g. Latest and LatestStable have the same version), then we get just single row, with description for both.
+        // like RunMultipleTestAssemblies1 (Row: 0, Matrix, Runner = net10.0, TargetFramework = net462, InIsolation,  vstest.console = 18.6.0-dev [Latest],  Testhost = 18.6.0-dev [Latest],  MSTest = 3.9.3 [LatestPreview, LatestStable])
         var distinctRows = new Dictionary<string, RunnerInfo>();
-        rows.ForEach(r => distinctRows[r.ToString()] = r);
+        foreach (var r in rows)
+        {
+            var key = $"{r.Batch}|{r.RunnerFramework}|{r.VSTestConsoleInfo!.Version}|{r.TargetFramework}|{r.TestHostInfo!.Version}|{r.InIsolationValue}|{r.AdapterInfo!.Name}|{r.AdapterInfo.Version}";
+            if (distinctRows.TryGetValue(key, out var value))
+            {
+                if (value.VSTestConsoleInfo!.Version == r.VSTestConsoleInfo.Version)
+                {
+                    value.VSTestConsoleInfo.VersionType += $",{r.VSTestConsoleInfo.VersionType}";
+                }
+
+                if (value.TestHostInfo!.Version == r.TestHostInfo.Version)
+                {
+                    value.TestHostInfo.VersionType += $",{r.TestHostInfo.VersionType}";
+                }
+
+                if (r.AdapterInfo!.Version == value.AdapterInfo!.Version)
+                {
+                    value.AdapterInfo.VersionType += $",{r.AdapterInfo.VersionType}";
+                }
+            }
+            else
+            {
+                distinctRows.Add(key, r);
+            }
+        }
+
+        // We added all the version types together (would have been better to have this property as array originally, but that would complicate other code), now deduplicate the names to make it less confusing for user.
+        // Latest, Latest, Latest, LatestPreview -> Latest, LatestPreview
+        foreach (var r in distinctRows.Values)
+        {
+            r.VSTestConsoleInfo!.VersionType = string.Join(", ", r.VSTestConsoleInfo!.VersionType!.Split(',').Distinct());
+            r.TestHostInfo!.VersionType = string.Join(", ", r.TestHostInfo!.VersionType!.Split(',').Distinct());
+            r.AdapterInfo!.VersionType = string.Join(", ", r.AdapterInfo!.VersionType!.Split(',').Distinct());
+        }
 
         if (distinctRows.Count == 0)
         {
@@ -172,6 +194,33 @@ public class CompatibilityRowsBuilder
         return SemanticVersion.Parse(v?.TrimStart('v'));
     }
 
+    private void AddRows(List<RunnerInfo> dataRows)
+    {
+        foreach (var runnerVersion in _runnerVersions)
+        {
+            foreach (var runnerFramework in _runnerFrameworks)
+            {
+                foreach (var hostFramework in _hostFrameworks)
+                {
+                    var isNetFramework = hostFramework.StartsWith("net4");
+                    // .NET Framework testhost ships with the runner, and the version from the
+                    // runner directory is always selected, otherwise select the newest version from _hostFrameworks.
+                    var hostVersions = isNetFramework ? [runnerVersion] : _hostVersions;
+                    foreach (var hostVersion in hostVersions)
+                    {
+                        foreach (var adapterVersion in _adapterVersions)
+                        {
+                            foreach (var adapter in _adapters)
+                            {
+                                AddRow(dataRows, "Matrix", runnerVersion, runnerFramework, hostVersion, hostFramework, adapterVersion, adapter, inIsolation: true);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void AddInProcess(List<RunnerInfo> dataRows)
     {
         foreach (var runnerFramework in _runnerFrameworks)
@@ -187,118 +236,35 @@ public class CompatibilityRowsBuilder
                 {
                     foreach (var adapterVersion in _adapterVersions)
                     {
-                        AddRow(dataRows, "In process", runnerVersion, runnerFramework, runnerVersion, runnerFramework, adapterVersion, inIsolation: false);
+                        AddRow(dataRows, "In process", runnerVersion, runnerFramework, runnerVersion, runnerFramework, adapterVersion, adapter, inIsolation: false);
                     }
                 }
             }
         }
     }
 
-    private void AddVsix(List<RunnerInfo> dataRows)
+    private void AddVsix(List<RunnerInfo> dataRows, bool inProcess)
     {
+        // Runs outside of process, test both tfms of testhost.
         foreach (var hostFramework in _hostFrameworks)
         {
-            AddRow(dataRows, "VSIX", AcceptanceTestBase.LATESTVSIX, AcceptanceTestBase.DEFAULT_RUNNER_NETFX, AcceptanceTestBase.LATEST, hostFramework, AcceptanceTestBase.LATESTSTABLE, inIsolation: true);
-            AddRow(dataRows, "VSIX", AcceptanceTestBase.LATESTVSIX, AcceptanceTestBase.DEFAULT_RUNNER_NETFX, AcceptanceTestBase.LATEST, hostFramework, AcceptanceTestBase.LATESTSTABLE, inIsolation: false);
+            AddRow(dataRows, "VSIX", AcceptanceTestBase.LATESTVSIX, AcceptanceTestBase.DEFAULT_RUNNER_NETFX, AcceptanceTestBase.LATEST, hostFramework, AcceptanceTestBase.LATESTSTABLE, AcceptanceTestBase.MSTEST, inIsolation: true);
         }
-    }
 
-    private void AddOlderConfigurations(List<RunnerInfo> dataRows)
-    {
-        // Older configurations where the runner, host and adapter version are the same.
-        // We already added the row where all are newest when adding combination with all runners.
-        foreach (var runnerVersion in _runnerVersions)
+        if (inProcess)
         {
-            foreach (var runnerFramework in _runnerFrameworks)
-            {
-                foreach (var hostFramework in _hostFrameworks)
-                {
-                    var isNetFramework = hostFramework.StartsWith("net4");
-                    var hostVersion = runnerVersion;
-                    foreach (var _ in _adapters)
-                    {
-                        var adapterVersion = _adapterVersions[0];
-                        AddRow(dataRows, "Older", runnerVersion, runnerFramework, hostVersion, hostFramework, adapterVersion, inIsolation: true);
-                    }
-                }
-            }
-        }
-    }
-
-    private void AddEveryVersionOfAdapter(List<RunnerInfo> dataRows)
-    {
-        var runnerVersion = _runnerVersions[0];
-        foreach (var runnerFramework in _runnerFrameworks)
-        {
-            foreach (var hostFramework in _hostFrameworks)
-            {
-                var isNetFramework = hostFramework.StartsWith("net4");
-                // .NET Framework testhost ships with the runner, and the version from the
-                // runner directory is always selected, otherwise select the newest version from _hostFrameworks.
-                var hostVersion = isNetFramework ? runnerVersion : _hostVersions[0];
-                foreach (var adapter in _adapters)
-                {
-                    foreach (var adapterVersion in _adapterVersions)
-                    {
-                        AddRow(dataRows, "Every adapter", runnerVersion, runnerFramework, hostVersion, hostFramework, adapterVersion, inIsolation: true);
-                    }
-                }
-            }
-        }
-    }
-
-    private void AddEveryVersionOfHost(List<RunnerInfo> dataRows)
-    {
-        var runnerVersion = _runnerVersions[0];
-
-        foreach (var runnerFramework in _runnerFrameworks)
-        {
-            foreach (var hostFramework in _hostFrameworks)
-            {
-                var isNetFramework = hostFramework.StartsWith("net4");
-                // .NET Framework testhost ships with the runner, and the version from the
-                // runner directory is always the same as the runner. There are no variations
-                // so we just need to add host versions for .NET testhosts.
-                var hostVersions = isNetFramework ? [] : _hostVersions.ToArray();
-                foreach (var hostVersion in hostVersions)
-                {
-                    foreach (var _ in _adapters)
-                    {
-                        // use the newest
-                        var adapterVersion = _adapterVersions[0];
-                        AddRow(dataRows, "Every host", runnerVersion, runnerFramework, hostVersion, hostFramework, adapterVersion, inIsolation: true);
-                    }
-                }
-            }
-        }
-    }
-
-    private void AddEveryVersionOfRunner(List<RunnerInfo> dataRows)
-    {
-        foreach (var runnerVersion in _runnerVersions)
-        {
-            foreach (var runnerFramework in _runnerFrameworks)
-            {
-                foreach (var hostFramework in _hostFrameworks)
-                {
-                    var isNetFramework = hostFramework.StartsWith("net4");
-                    // .NET Framework testhost ships with the runner, and the version from the
-                    // runner directory is always selected, otherwise select the newest version from _hostFrameworks.
-                    var hostVersion = isNetFramework ? runnerVersion : _hostVersions[0];
-                    foreach (var _ in _adapters)
-                    {
-                        // use the newest
-                        var adapterVersion = _adapterVersions[0];
-                        AddRow(dataRows, "Every runner", runnerVersion, runnerFramework, hostVersion, hostFramework, adapterVersion, inIsolation: true);
-                    }
-                }
-            }
+            // Runs in process. We specify the testhost, but it has no impact.
+            AddRow(dataRows, "VSIX", AcceptanceTestBase.LATESTVSIX, AcceptanceTestBase.DEFAULT_RUNNER_NETFX, AcceptanceTestBase.LATEST, AcceptanceTestBase.DEFAULT_HOST_NETFX, AcceptanceTestBase.LATESTSTABLE, AcceptanceTestBase.MSTEST, inIsolation: false);
         }
     }
 
     private void AddRow(List<RunnerInfo> dataRows, string batch,
-        string runnerVersion, string runnerFramework, string hostVersion, string hostFramework, string adapterVersion, bool inIsolation)
+        string runnerVersion, string runnerFramework, string hostVersion, string hostFramework, string adapterVersion, string adapter, bool inIsolation)
     {
+        if (adapter != AcceptanceTestBase.MSTEST)
+        {
+            throw new NotSupportedException($"Adapter {adapter} is not supported.");
+        }
         RunnerInfo runnerInfo = GetRunnerInfo(batch, runnerFramework, hostFramework, inIsolation);
         runnerInfo.DebugInfo = GetDebugInfo();
         runnerInfo.VSTestConsoleInfo = GetVSTestConsoleInfo(runnerVersion, runnerInfo);

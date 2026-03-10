@@ -22,8 +22,8 @@ public class ExecutionTests : AcceptanceTestBase
     //TODO: It looks like the first 3 tests would be useful to multiply by all 3 test frameworks, should we make the test even more generic, or duplicate them?
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [MSTestCompatibilityDataSource(InProcess = true)]
-    public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
+    [MSTestCompatibilityDataSource()]
+    public void RunMultipleTestAssemblies1(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
@@ -32,23 +32,6 @@ public class ExecutionTests : AcceptanceTestBase
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
         ValidateSummaryStatus(2, 2, 2);
-        ExitCodeEquals(1); // failing tests
-        StdErrHasTestRunFailedMessageButNoOtherError();
-        StdOutHasNoWarnings();
-    }
-
-    [TestMethod]
-    [TestCategory("Windows-Review")]
-    [TestPlatformCompatibilityDataSource]
-    public void RunTestsFromMultipleMSTestAssemblies(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        var assemblyPaths = BuildMultipleAssemblyPath("MSTestProject1.dll", "MSTestProject2.dll");
-
-        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
-
-        ValidateSummaryStatus(passed: 2, failed: 2, skipped: 2);
         ExitCodeEquals(1); // failing tests
         StdErrHasTestRunFailedMessageButNoOtherError();
         StdOutHasNoWarnings();
