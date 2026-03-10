@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class ResultsDirectoryTests : AcceptanceTestBase
 {
     [TestMethod]

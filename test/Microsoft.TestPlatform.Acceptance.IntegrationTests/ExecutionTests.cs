@@ -16,6 +16,7 @@ using FluentAssertions;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class ExecutionTests : AcceptanceTestBase
 {
     //TODO: It looks like the first 3 tests would be useful to multiply by all 3 test frameworks, should we make the test even more generic, or duplicate them?

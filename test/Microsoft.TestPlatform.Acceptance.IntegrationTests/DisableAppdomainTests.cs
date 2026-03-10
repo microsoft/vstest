@@ -12,6 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows")]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class DisableAppdomainTests : AcceptanceTestBase
 {
     [TestMethod]

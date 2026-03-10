@@ -10,6 +10,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class DebugAssertTests : AcceptanceTestBase
 {
     [TestMethod]
+    [SkipIOutOfProcessTestOnNetFrameworkCondition]
     // this is core only, there is nothing we can do about TPDebug.Assert crashing the process on framework
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)

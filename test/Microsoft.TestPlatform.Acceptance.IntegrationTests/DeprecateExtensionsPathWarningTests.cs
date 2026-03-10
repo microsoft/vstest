@@ -11,6 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
+// TODO: but where are some tests? :D
 public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
 {
     private readonly IList<string> _adapterDependencies;
