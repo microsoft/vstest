@@ -145,9 +145,8 @@ internal class CollectorDataEntry : IXmlTestStore
     /// Clones the instance and attachments, with file paths in file attachments absolute or relative as specified
     /// </summary>
     /// <param name="resultsDirectory">The results directory to use to make paths in the data attachments relative or absolute</param>
-    /// <param name="useAbsolutePaths">True to use absolute paths in this instance, false to use relative paths</param>
     /// <returns>A clone of the instance containing cloned attachments with file paths made absolute or relative</returns>
-    internal CollectorDataEntry Clone(string resultsDirectory, bool useAbsolutePaths)
+    internal CollectorDataEntry CloneWithRelativePath(string resultsDirectory)
     {
         TPDebug.Assert(!resultsDirectory.IsNullOrEmpty(), "'resultsDirectory' is null or empty");
         TPDebug.Assert(resultsDirectory == resultsDirectory.Trim(), "'resultsDirectory' contains whitespace at the ends");
@@ -161,7 +160,7 @@ internal class CollectorDataEntry : IXmlTestStore
 
             if (attachment is UriDataAttachment uriDataAttachment)
             {
-                collector._attachments.Add(uriDataAttachment.Clone(resultsDirectory, useAbsolutePaths));
+                collector._attachments.Add(uriDataAttachment.CloneWithRelativePath(resultsDirectory));
             }
             else
             {
