@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
@@ -25,7 +25,7 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
 
         var projectPath = GetIsolatedTestAsset("TerminalLoggerTestProject.csproj");
         // Forcing terminal logger so we can see the output when it is redirected
-        InvokeDotnetTest($@"{projectPath} --no-build -tl:on", workingDirectory: Path.GetDirectoryName(projectPath));
+        InvokeDotnetTest($@"{projectPath} --no-restore --no-build -tl:on", workingDirectory: Path.GetDirectoryName(projectPath));
 
         // The output:
         // Determining projects to restore...
@@ -54,7 +54,7 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("TerminalLoggerTestProject.csproj");
-        InvokeDotnetTest($@"{projectPath} --no-build -nodereuse:false /p:VsTestUseMSBuildOutput=false", workingDirectory: Path.GetDirectoryName(projectPath));
+        InvokeDotnetTest($@"{projectPath} --no-restore --no-build -nodereuse:false /p:VsTestUseMSBuildOutput=false", workingDirectory: Path.GetDirectoryName(projectPath));
 
         // Check that we see the summary that is printed from the console logger, meaning the new output is disabled.
         StdOutputContains("Failed! - Failed: 1, Passed: 1, Skipped: 1, Total: 3, Duration:");
@@ -74,7 +74,7 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("TerminalLoggerTestProject.csproj");
-        InvokeDotnetTest($@"{projectPath} --no-build -nodereuse:false", environmentVariables: new Dictionary<string, string?> { ["MSBUILDENSURESTDOUTFORTASKPROCESSES"] = "1" }, workingDirectory: Path.GetDirectoryName(projectPath));
+        InvokeDotnetTest($@"{projectPath} --no-restore --no-build -nodereuse:false", environmentVariables: new Dictionary<string, string?> { ["MSBUILDENSURESTDOUTFORTASKPROCESSES"] = "1" }, workingDirectory: Path.GetDirectoryName(projectPath));
 
         // Check that we see the summary that is printed from the console logger, meaning the new output is disabled.
         StdOutputContains("Failed! - Failed: 1, Passed: 1, Skipped: 1, Total: 3, Duration:");
