@@ -10,6 +10,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// versions from <see cref="AcceptanceTestBase.LATEST_TO_LEGACY"/> together with the latest host
 /// and default adapter configuration. If the selected filters (features, debug options, or row
 /// restrictions) result in no valid configuration, the underlying compatibility builder throws an exception.
+/// </summary>
 public class WrapperCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
 {
     private readonly CompatibilityRowsBuilder _builder;
