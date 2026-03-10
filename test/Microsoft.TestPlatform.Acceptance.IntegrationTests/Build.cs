@@ -35,13 +35,13 @@ public class Build : IntegrationTestBase
         // Mostly just want to avoid using the same mutex across two clones of this repo.
         var mutexName = "VSTest Acceptance Tests build " + IntegrationTestEnvironment.RepoRootDirectory!.Replace('\\', '-').Replace('/', '-').Replace(':', '-');
 
-        var buildMutex = new Mutex(initiallyOwned: true, mutexName, out bool createdNew);
-        Debug.WriteLine($"is mutex new: {createdNew}, name: {mutexName}");
-        if (createdNew)
+        using var buildMutex = new Mutex(initiallyOwned: true, mutexName, out bool createdNew);
+        try
         {
-            // We are the first one of the parallel runs to do this. Build the projects and setup everything.
-            try
+            Debug.WriteLine($"is mutex new: {createdNew}, name: {mutexName}");
+            if (createdNew)
             {
+                // We are the first one of the parallel runs to do this. Build the projects and setup everything.
                 Debug.WriteLine("Starting to build.");
                 var sw = Stopwatch.StartNew();
                 SetDotnetEnvironment();
@@ -63,22 +63,22 @@ public class Build : IntegrationTestBase
                 CopyAndPatchDotnet();
                 Debug.WriteLine($"Copying and patching dotnet took: {sw.ElapsedMilliseconds} ms");
             }
-            finally
+            else
             {
-                buildMutex.ReleaseMutex();
+                // Build is already in progress. Wait for it to finish.
+                var minutes = 15;
+                Debug.WriteLine("Other project is building, waiting for mutex to release.");
+                var gotOne = buildMutex.WaitOne(TimeSpan.FromMinutes(minutes));
+                if (!gotOne)
+                {
+                    throw new TimeoutException($"Timed out after {minutes} minutes, waiting for the other project to finish building. Mutex name: '{mutexName}'");
+                }
+                Debug.WriteLine("Other project is done building, I can start running tests now.");
             }
         }
-        else
+        finally
         {
-            // Build is already in progress. Wait for it to finish.
-            var minutes = 15;
-            Debug.WriteLine("Other project is building, waiting for mutex to release.");
-            var gotOne = buildMutex.WaitOne(TimeSpan.FromMinutes(minutes));
-            if (!gotOne)
-            {
-                throw new TimeoutException($"Timed out after {minutes} minutes, waiting for the other project to finish building. Mutex name: '{mutexName}'");
-            }
-            Debug.WriteLine("Other project is done building, I can start running tests now.");
+            buildMutex.ReleaseMutex();
         }
     }
 
