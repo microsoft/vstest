@@ -40,7 +40,7 @@ public class CompatibilityRowsBuilder
     }
 
     /// <summary>
-    /// Add run for in-process using the selected .NET Framework runners, and and all selected adapters.
+    /// Add run for in-process using the selected .NET Framework runners, and all selected adapters.
     /// </summary>
     public bool WithInProcess { get; set; }
     // Add runner from VSIX to check the shipment we make into VisualStudio.
