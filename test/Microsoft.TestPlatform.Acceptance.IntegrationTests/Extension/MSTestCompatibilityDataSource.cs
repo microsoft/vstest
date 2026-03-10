@@ -15,7 +15,7 @@ public class MSTestCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
     public MSTestCompatibilityDataSource()
     {
         // 1 runner version and 1 testhost version
-        // This tests diferent mstest versions against our latest runner and testhost.
+        // This tests different mstest versions against our latest runner and testhost.
 
         _builder = new CompatibilityRowsBuilder(
             // runner, use just .NET, because the adapter runs in the testhost, and we will add InProcess and VSIX, that will test running with the Runner.

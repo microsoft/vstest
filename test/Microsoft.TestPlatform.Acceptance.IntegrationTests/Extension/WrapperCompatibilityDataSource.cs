@@ -6,10 +6,10 @@ using System.Reflection;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 /// <summary>
-/// A data source that provides every version of runner. Use for testing features specific to VSTestConsoleWrapper.
-/// 
-/// When that adds up to no configuration exception is thrown.
-/// </summary>
+/// A data source that provides compatibility rows for VSTestConsoleWrapper, using all runner
+/// versions from <see cref="AcceptanceTestBase.LATEST_TO_LEGACY"/> together with the latest host
+/// and default adapter configuration. If the selected filters (features, debug options, or row
+/// restrictions) result in no valid configuration, the underlying compatibility builder throws an exception.
 public class WrapperCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
 {
     private readonly CompatibilityRowsBuilder _builder;

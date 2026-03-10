@@ -23,7 +23,7 @@ public class ExecutionTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [MSTestCompatibilityDataSource()]
-    public void RunMultipleTestAssemblies1(RunnerInfo runnerInfo)
+    public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
