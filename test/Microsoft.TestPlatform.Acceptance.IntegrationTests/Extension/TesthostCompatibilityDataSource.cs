@@ -15,22 +15,18 @@ public class TestHostCompatibilityDataSource : TestDataSourceAttribute<RunnerInf
     private readonly CompatibilityRowsBuilder _builder;
 
     public TestHostCompatibilityDataSource(
-        string runnerFrameworks = AcceptanceTestBase.DEFAULT_RUNNER_NETFX_AND_NET,
         string hostFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
         string hostVersions = AcceptanceTestBase.LATEST_TO_LEGACY)
     {
-        // TODO: We actually don't generate values to use different translation layers, because we don't have a good way to do
-        // that right now. Translation layer is loaded directly into the acceptance test, and so we don't have easy way to substitute it.
-
         _builder = new CompatibilityRowsBuilder(
-            runnerFrameworks,
-            // runner versions
+            // runner
             AcceptanceTestBase.LATEST,
-            hostFrameworks,
+            AcceptanceTestBase.DEFAULT_RUNNER_NET,
+            // host
             hostVersions,
-            // adapter versions
-            AcceptanceTestBase.LATESTSTABLE,
+            hostFrameworks,
             // adapter
+            AcceptanceTestBase.LATESTSTABLE,
             AcceptanceTestBase.MSTEST);
 
         // Do not generate the data rows here, properties (e.g. DebugVSTestConsole) are not populated until after constructor is done.
@@ -46,13 +42,6 @@ public class TestHostCompatibilityDataSource : TestDataSourceAttribute<RunnerInf
 
     public override void CreateData(MethodInfo methodInfo)
     {
-        _builder.WithEveryVersionOfRunner = false;
-        _builder.WithEveryVersionOfHost = true;
-        _builder.WithEveryVersionOfAdapter = false;
-        _builder.WithOlderConfigurations = false;
-        _builder.WithInProcess = false;
-        _builder.WithVSIXRunner = false;
-
         _builder.BeforeTestHostFeature = BeforeFeature;
         _builder.AfterTestHostFeature = AfterFeature;
 
