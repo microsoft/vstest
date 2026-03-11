@@ -214,11 +214,16 @@ public class CompatibilityRowsBuilder
                 foreach (var hostFramework in _hostFrameworks)
                 {
                     var isNetFramework = hostFramework.StartsWith("net4");
-                    // .NET Framework testhost ships with the runner, and the version from the
-                    // runner directory is always selected, otherwise select the newest version from _hostFrameworks.
-                    var hostVersions = isNetFramework ? [runnerVersion] : _hostVersions;
-                    foreach (var hostVersion in hostVersions)
+
+                    foreach (var hostVersion in _hostVersions)
                     {
+                        if (isNetFramework && runnerVersion != hostVersion)
+                        {
+                            // For .NET Framework, runner and host versions must be the same,
+                            // becase ship them in one package, and we will select the testhost from vstest.console package.
+                            continue;
+                        }
+
                         foreach (var adapterVersion in _adapterVersions)
                         {
                             foreach (var adapter in _adapters)
