@@ -52,6 +52,7 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string DEFAULT_RUNNER_NETFX_AND_NET = "net48;net10.0";
     public const string DEFAULT_RUNNER_NET = "net10.0";
     public const string LATEST_TO_LEGACY = "Latest;LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
+    public const string LATEST_TO_RECENT_STABLE = "Latest;LatestPreview;LatestStable;RecentStable";
     public const string LATESTPREVIEW_TO_LEGACY = "LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
     public const string LATEST = "Latest";
     // "Special" version for runner, to take the latest from VSIX we don't ship any other component that way, so we need separate value to control it.
