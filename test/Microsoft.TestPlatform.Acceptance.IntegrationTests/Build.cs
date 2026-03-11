@@ -11,6 +11,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Xml.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -31,25 +32,54 @@ public class Build : IntegrationTestBase
     [AssemblyInitialize]
     public static void AssemblyInitialize(TestContext _)
     {
-        var sw = Stopwatch.StartNew();
-        SetDotnetEnvironment();
-        Debug.WriteLine($"Setting dotnet environment took: {sw.ElapsedMilliseconds} ms");
-        sw.Restart();
+        // Mostly just want to avoid using the same mutex across two clones of this repo.
+        var mutexName = "VSTest Acceptance Tests build " + IntegrationTestEnvironment.RepoRootDirectory!.Replace('\\', '-').Replace('/', '-').Replace(':', '-');
 
-        var nugetCache = Path.GetFullPath(Path.Combine(Root, ".packages"));
-        var packagesAreNew = UnzipExecutablePackages();
-        if (packagesAreNew)
+        using var buildMutex = new Mutex(initiallyOwned: true, mutexName, out bool createdNew);
+        try
         {
-            CleanNugetCacheAndProjects(nugetCache);
+            Debug.WriteLine($"is mutex new: {createdNew}, name: {mutexName}");
+            if (createdNew)
+            {
+                // We are the first one of the parallel runs to do this. Build the projects and setup everything.
+                Debug.WriteLine("Starting to build.");
+                var sw = Stopwatch.StartNew();
+                SetDotnetEnvironment();
+                Debug.WriteLine($"Setting dotnet environment took: {sw.ElapsedMilliseconds} ms");
+                sw.Restart();
+
+                var nugetCache = Path.GetFullPath(Path.Combine(Root, ".packages"));
+                var packagesAreNew = UnzipExecutablePackages();
+                if (packagesAreNew)
+                {
+                    CleanNugetCacheAndProjects(nugetCache);
+                }
+                Debug.WriteLine($"Building test assets and unzipping packages took: {sw.ElapsedMilliseconds} ms");
+                sw.Restart();
+                BuildTestAssets(nugetCache);
+                BuildTestAssetsCompatibility(nugetCache);
+                Debug.WriteLine($"Building test assets compatibility matrix took: {sw.ElapsedMilliseconds} ms");
+                sw.Restart();
+                CopyAndPatchDotnet();
+                Debug.WriteLine($"Copying and patching dotnet took: {sw.ElapsedMilliseconds} ms");
+            }
+            else
+            {
+                // Build is already in progress. Wait for it to finish.
+                var minutes = 15;
+                Debug.WriteLine("Other project is building, waiting for mutex to release.");
+                var gotOne = buildMutex.WaitOne(TimeSpan.FromMinutes(minutes));
+                if (!gotOne)
+                {
+                    throw new TimeoutException($"Timed out after {minutes} minutes, waiting for the other project to finish building. Mutex name: '{mutexName}'");
+                }
+                Debug.WriteLine("Other project is done building, I can start running tests now.");
+            }
         }
-        Debug.WriteLine($"Building test assets and unzipping packages took: {sw.ElapsedMilliseconds} ms");
-        sw.Restart();
-        BuildTestAssets(nugetCache);
-        BuildTestAssetsCompatibility(nugetCache);
-        Debug.WriteLine($"Building test assets compatibility matrix took: {sw.ElapsedMilliseconds} ms");
-        sw.Restart();
-        CopyAndPatchDotnet();
-        Debug.WriteLine($"Copying and patching dotnet took: {sw.ElapsedMilliseconds} ms");
+        finally
+        {
+            buildMutex.ReleaseMutex();
+        }
     }
 
     private static void BuildTestAssets(string nugetCache)
