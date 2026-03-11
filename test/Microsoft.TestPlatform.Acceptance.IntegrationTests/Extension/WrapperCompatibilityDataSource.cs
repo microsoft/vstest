@@ -6,26 +6,26 @@ using System.Reflection;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 /// <summary>
-/// Test MSTest adapter compatibility with .NET and .NET Framework testhost, and running in vstest.console process.
+/// A data source that provides compatibility rows for VSTestConsoleWrapper, using all runner
+/// versions from <see cref="AcceptanceTestBase.LATEST_TO_LEGACY"/> together with the latest host
+/// and default adapter configuration. If the selected filters (features, debug options, or row
+/// restrictions) result in no valid configuration, the underlying compatibility builder throws an exception.
 /// </summary>
-public class MSTestCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
+public class WrapperCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
 {
     private readonly CompatibilityRowsBuilder _builder;
 
-    public MSTestCompatibilityDataSource()
+    public WrapperCompatibilityDataSource()
     {
-        // 1 runner version and 1 testhost version
-        // This tests different mstest versions against our latest runner and testhost.
-
         _builder = new CompatibilityRowsBuilder(
-            // runner, use just .NET, because the adapter runs in the testhost, and we will add InProcess and VSIX, that will test running with the Runner.
-            AcceptanceTestBase.LATEST,
-            AcceptanceTestBase.DEFAULT_RUNNER_NET,
+            // runner
+            AcceptanceTestBase.LATEST_TO_LEGACY,
+            AcceptanceTestBase.DEFAULT_RUNNER_NETFX_AND_NET,
             // host
             AcceptanceTestBase.LATEST,
-            AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
+            AcceptanceTestBase.DEFAULT_HOST_NET,
             // adapter
-            AcceptanceTestBase.LATESTPREVIEW_TO_LEGACY,
+            AcceptanceTestBase.LATESTSTABLE,
             AcceptanceTestBase.MSTEST);
 
         // Do not generate the data rows here, properties (e.g. DebugVSTestConsole) are not populated until after constructor is done.
@@ -35,26 +35,27 @@ public class MSTestCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
     public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
     public bool DebugStopAtEntrypoint { get; set; }
+    public int JustRow { get; set; } = -1;
 
-    public string? BeforeRunnerFeature { get; set; }
-    public string? AfterRunnerFeature { get; set; }
+    public string? BeforeFeature { get; set; }
+    public string? AfterFeature { get; set; }
 
-    public string? BeforeTestHostFeature { get; set; }
-    public string? AfterTestHostFeature { get; set; }
+    //public string? BeforeTestHostFeature { get; set; }
+    //public string? AfterTestHostFeature { get; set; }
 
     public string? BeforeAdapterFeature { get; set; }
     public string? AfterAdapterFeature { get; set; }
 
     public override void CreateData(MethodInfo methodInfo)
     {
-        _builder.WithInProcess = true;
         _builder.WithVSIXRunner = true;
+        _builder.WithInProcess = false;
 
-        _builder.BeforeRunnerFeature = BeforeRunnerFeature;
-        _builder.AfterRunnerFeature = AfterRunnerFeature;
+        _builder.BeforeRunnerFeature = BeforeFeature;
+        _builder.AfterRunnerFeature = AfterFeature;
 
-        _builder.BeforeTestHostFeature = BeforeTestHostFeature;
-        _builder.AfterTestHostFeature = AfterTestHostFeature;
+        //_builder.BeforeTestHostFeature = BeforeTestHostFeature;
+        //_builder.AfterTestHostFeature = AfterTestHostFeature;
 
         _builder.BeforeAdapterFeature = BeforeAdapterFeature;
         _builder.AfterAdapterFeature = AfterAdapterFeature;
@@ -64,7 +65,10 @@ public class MSTestCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
         _builder.DebugTestHost = DebugTestHost;
         _builder.DebugStopAtEntrypoint = DebugStopAtEntrypoint;
 
+        _builder.JustRow = JustRow < 0 ? null : JustRow;
+
         var data = _builder.CreateData();
         data.ForEach(AddData);
     }
 }
+
