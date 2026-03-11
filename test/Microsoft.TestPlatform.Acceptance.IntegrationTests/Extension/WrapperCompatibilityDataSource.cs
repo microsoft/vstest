@@ -6,10 +6,11 @@ using System.Reflection;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 /// <summary>
-/// A data source that provides compatibility rows for VSTestConsoleWrapper, using all runner
-/// versions from <see cref="AcceptanceTestBase.LATEST_TO_LEGACY"/> together with the latest host
-/// and default adapter configuration. If the selected filters (features, debug options, or row
-/// restrictions) result in no valid configuration, the underlying compatibility builder throws an exception.
+/// A data source that checks compatibility of changes in VSTestConsoleWrapper with different versions of vstest.console.
+/// We are testing with all versions of vstest.console, because the wrapper should (ideally) keep backwards compatibility for all shipped
+/// versions of vstest.console.
+/// We also add VSIX to test that the shipment into VS works.
+/// This does NOT test  compatibility of changes in vstest.console, with older versions of the wrapper.
 /// </summary>
 public class WrapperCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
 {

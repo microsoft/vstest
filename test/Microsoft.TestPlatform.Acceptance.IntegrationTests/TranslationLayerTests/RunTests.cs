@@ -83,7 +83,7 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [TestHostCompatibilityDataSource]
+    [RunnerCompatibilityDataSource]
     [WrapperCompatibilityDataSource(AfterFeature = Features.MULTI_TFM)]
     public void RunAllTestsWithMixedTFMsWillRunTestsFromAllProvidedDllEvenWhenTheyMixTFMs(RunnerInfo runnerInfo)
     {

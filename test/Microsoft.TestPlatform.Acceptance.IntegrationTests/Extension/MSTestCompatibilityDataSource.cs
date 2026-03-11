@@ -6,7 +6,7 @@ using System.Reflection;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 /// <summary>
-/// Test MSTest adapter compatibility with .NET and .NET Framework testhost, and running in vstest.console process.
+/// Test compatibility of vstest.console and testhost with different MSTest versions.
 /// </summary>
 public class MSTestCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
 {
