@@ -3,7 +3,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-// Class level just because we want the tests to run in predicatable order.
+// Class level just because we want the tests to run in predictable order.
 [assembly: Parallelize(Scope = ExecutionScope.ClassLevel, Workers = 0)]
 
 namespace MSTestProject2;
