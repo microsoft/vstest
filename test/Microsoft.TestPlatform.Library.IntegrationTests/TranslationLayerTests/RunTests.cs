@@ -42,7 +42,6 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Smoke")]
     [TestCategory("Windows-Review")]
     [WrapperCompatibilityDataSource]
     public void RunAllTests(RunnerInfo runnerInfo)
@@ -84,6 +83,7 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
+    [TestCategory("Smoke")]
     [RunnerCompatibilityDataSource]
     [WrapperCompatibilityDataSource(AfterFeature = Features.MULTI_TFM)]
     public void RunAllTestsWithMixedTFMsWillRunTestsFromAllProvidedDllEvenWhenTheyMixTFMs(RunnerInfo runnerInfo)

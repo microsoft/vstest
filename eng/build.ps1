@@ -1,4 +1,4 @@
-[CmdletBinding(PositionalBinding=$false)]
+[CmdletBinding(PositionalBinding = $false)]
 Param(
   [string][Alias('c')]$configuration = "Debug",
   [string]$platform = $null,
@@ -37,7 +37,7 @@ Param(
   [switch] $excludePrereleaseVS,
   [switch] $nativeToolsOnMachine,
   [switch] $help,
-  [Parameter(ValueFromRemainingArguments=$true)][String[]]$properties
+  [Parameter(ValueFromRemainingArguments = $true)][String[]]$properties
 )
 
 # Add steps that need to happen before build here
@@ -81,7 +81,11 @@ if ($compatibilityTest) {
   $filters += "TestCategory=Compatibility"
 }
 else {
-  $filters += "TestCategory!=Compatibility"
+  if (-not $smokeTest) {
+    # It is too easy to put Smoke category on test that is a compatibility test by mistake, in fact compatibility tests are 
+    # the best candidates for smoke tests, if we only reduce the run to the latest version. Because they test common scenarios.
+    $filters += "TestCategory!=Compatibility"
+  }
 }
 
 if ($performanceTest) {

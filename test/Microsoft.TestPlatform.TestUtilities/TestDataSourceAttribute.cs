@@ -16,7 +16,7 @@ public abstract class TestDataSourceAttribute<T1> : Attribute, ITestDataSource w
 
     public abstract void CreateData(MethodInfo methodInfo);
 
-    public void AddData(T1 value1)
+    public void AddData(TestDataRow<T1> value1)
     {
         _data.Add([value1]);
     }
