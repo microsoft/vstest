@@ -15,7 +15,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class DiscoveryTests : AcceptanceTestBase
 {
     [TestMethod]
@@ -35,6 +34,7 @@ public class DiscoveryTests : AcceptanceTestBase
     [TestMethod]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
+    [TestCategory("Smoke")]
     public void MultipleSourcesDiscoverAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

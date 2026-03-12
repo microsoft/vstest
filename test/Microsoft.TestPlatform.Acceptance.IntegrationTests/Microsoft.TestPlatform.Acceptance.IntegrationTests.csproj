@@ -33,10 +33,6 @@
     <PackageReference Include="Procdump" Version="0.0.1" />
     <PackageReference Include="Microsoft.CodeCoverage.Core" Version="$(MicrosoftInternalCodeCoverageVersion)" />
   </ItemGroup>
-  <ItemGroup Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)')) ">
-    <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(MicrosoftInternalCodeCoverageVersion)" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0-preview2-26406-04" />
-  </ItemGroup>
   <ItemGroup>
     <Folder Include="Performance\" />
   </ItemGroup>

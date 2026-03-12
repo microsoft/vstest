@@ -13,7 +13,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// Running dotnet test + csproj and using MSBuild for the output.
 /// </summary>
 [TestClass]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
 {
     [TestMethod]

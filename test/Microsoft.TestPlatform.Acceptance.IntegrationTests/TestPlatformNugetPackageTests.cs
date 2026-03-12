@@ -10,7 +10,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
 {
     private static string s_nugetPackageFolder = string.Empty;

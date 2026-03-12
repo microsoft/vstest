@@ -8,7 +8,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
 {
     [TestMethod]

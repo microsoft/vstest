@@ -8,7 +8,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 // this is tested only on .NET Framework
 [TestCategory("Windows-Review")]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class ListExtensionsTests : AcceptanceTestBase
 {
     [TestMethod]

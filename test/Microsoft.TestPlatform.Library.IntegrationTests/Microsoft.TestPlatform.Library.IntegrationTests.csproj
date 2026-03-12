@@ -43,9 +43,6 @@
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0-preview2-26406-04" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Performance\" />
-  </ItemGroup>
-  <ItemGroup>
     <!--
       Always reference Dia package even if it contains only tools for net451, we then use a content
       include with copy to output to ensure tests are working correctly for the different TFMs.

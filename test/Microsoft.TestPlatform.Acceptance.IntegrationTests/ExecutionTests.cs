@@ -16,7 +16,6 @@ using FluentAssertions;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class ExecutionTests : AcceptanceTestBase
 {
     //TODO: It looks like the first 3 tests would be useful to multiply by all 3 test frameworks, should we make the test even more generic, or duplicate them?
@@ -58,6 +57,25 @@ public class ExecutionTests : AcceptanceTestBase
     [TestCategory("Windows-Review")]
     [RunnerCompatibilityDataSource]
     public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations2(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPaths = BuildMultipleAssemblyPath("MSTestProject1.dll", "MSTestProject2.dll");
+
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
+
+        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
+
+        ValidateSummaryStatus(2, 2, 2);
+        ExitCodeEquals(1); // failing tests
+    }
+
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [TestCategory("Smoke")]
+    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetCoreTargetFrameworkDataSource]
+    public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations3(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 

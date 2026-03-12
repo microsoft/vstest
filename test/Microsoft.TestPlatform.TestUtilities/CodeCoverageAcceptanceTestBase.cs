@@ -10,7 +10,7 @@ using System.Xml;
 using Microsoft.CodeCoverage.Core;
 using Microsoft.CodeCoverage.Core.Reports.Coverage;
 using Microsoft.TestPlatform.TestUtilities;
-
+using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
@@ -66,7 +66,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
         Assert.IsTrue(deploymentElements.Count == 1,
             "None or more than one Deployment tags found in trx file:{0}", trxFilePath);
         var deploymentDir = deploymentElements[0]!.Attributes!.GetNamedItem("runDeploymentRoot")?.Value;
-        Assert.IsTrue(string.IsNullOrEmpty(deploymentDir) == false,
+        Assert.IsTrue(StringUtils.IsNullOrEmpty(deploymentDir) == false,
             "runDeploymentRoot attribute not found in trx file:{0}", trxFilePath);
         var collectors = doc.GetElementsByTagName("Collector");
 
@@ -81,7 +81,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
             }
         }
 
-        Assert.IsTrue(string.IsNullOrEmpty(fileName) == false, "Coverage file name not found in trx file: {0}",
+        Assert.IsTrue(StringUtils.IsNullOrEmpty(fileName) == false, "Coverage file name not found in trx file: {0}",
             trxFilePath);
         return Path.Combine(resultsDirectory, deploymentDir, "In", fileName);
     }

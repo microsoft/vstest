@@ -18,7 +18,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
 {
     [TestMethod]

@@ -42,6 +42,7 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [TestCategory("Smoke")]
     [TestCategory("Windows-Review")]
     [WrapperCompatibilityDataSource]
     public void RunAllTests(RunnerInfo runnerInfo)

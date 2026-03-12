@@ -13,7 +13,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class TelemetryTests : AcceptanceTestBase
 {
     private const string TELEMETRY_OPTEDIN = "VSTEST_TELEMETRY_OPTEDIN";
