@@ -10,6 +10,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net9.0;net48</TargetFrameworks>
+    <!-- Restore packages to the local test assets cache so integration tests can find them at a known path. -->
+    <RestorePackagesPath>$(RepoRoot)artifacts\.packages\</RestorePackagesPath>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="TestAssets\**" />
@@ -53,7 +55,7 @@
       'x86' and 'amd64' subfolders but the logic of the code is to look into 'x86', 'x64' or 'arm64'.
     -->
     <PackageReference Include="Microsoft.Internal.Dia" Version="$(TestPlatformMSDiaVersion)" PrivateAssets="all" />
-    <Content Include="..\..\.packages\microsoft.internal.dia\$(TestPlatformMSDiaVersion)\tools\net451\**\*">
+    <Content Include="$(RestorePackagesPath)microsoft.internal.dia\$(TestPlatformMSDiaVersion)\tools\net451\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

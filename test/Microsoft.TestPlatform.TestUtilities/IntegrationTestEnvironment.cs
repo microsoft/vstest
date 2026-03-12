@@ -29,6 +29,13 @@ public class IntegrationTestEnvironment
     public static string ArtifactsTempDirectory { get; } = Path.Combine(RepoRootDirectory, "artifacts", "tmp", BuildConfiguration);
 
     public static string LocalPackageSource { get; } = Path.Combine(RepoRootDirectory, "artifacts", "packages", BuildConfiguration, "Shipping").TrimEnd(Path.DirectorySeparatorChar);
+
+    /// <summary>
+    /// Gets the local NuGet cache directory used by test assets.
+    /// Test assets are restored into this directory by Build.cs via <c>dotnet restore --packages</c>.
+    /// </summary>
+    public static string TestAssetsNuGetCacheDirectory { get; } = Path.Combine(RepoRootDirectory, "artifacts", ".packages");
+
     public static string LocalVsixInsertion { get; } = Path.Combine(RepoRootDirectory, "artifacts", "VSSetup", BuildConfiguration, "Insertion", "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.vsix");
     public static string LatestLocallyBuiltNugetVersion { get; } = GetLatestLocallyBuiltPackageVersion();
 
@@ -63,7 +70,7 @@ public class IntegrationTestEnvironment
 
         // There is an assumption that integration tests will always run from a source enlistment.
         // Need to remove this assumption when we move to a CDP.
-        PackageDirectory = Path.Combine(RepoRootDirectory, @".packages");
+        PackageDirectory = TestAssetsNuGetCacheDirectory;
         TestArtifactsDirectory = Path.Combine(RepoRootDirectory, "artifacts", "testArtifacts");
         RunnerFramework = "net48";
     }

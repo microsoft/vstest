@@ -169,8 +169,8 @@ public class AcceptanceTestBase : IntegrationTestBase
 
                 // Copy NuGet.config
                 var nugetContent = File.ReadAllText(Path.Combine(root, "NuGet.config"))
-                    // and make packages folder point to vstest packages folder
-                    .Replace("\".packages\"", "\"" + Path.Combine(root, ".packages") + "\"")
+                    // Point packages folder to vstest's local .packages cache used by test assets.
+                    .Replace("</config>", $"""<add key="globalPackagesFolder" value="{IntegrationTestEnvironment.TestAssetsNuGetCacheDirectory}" /></config>""")
                     // and add local package source
                     .Replace("</packageSources>", $"""<add key="localy-built-packages" value="{IntegrationTestEnvironment.LocalPackageSource}" /></packageSources>""");
                 File.WriteAllText(Path.Combine(TempDirectory.Path, "NuGet.config"), nugetContent);
