@@ -103,7 +103,7 @@
     <MSTestFrameworkRecentStableVersion>[4.0.2]</MSTestFrameworkRecentStableVersion>
     <MSTestFrameworkMostDownloadedVersion>[2.2.10]</MSTestFrameworkMostDownloadedVersion>
     <MSTestFrameworkPreviousStableVersion>[3.11.1]</MSTestFrameworkPreviousStableVersion>
-    <MSTestFrameworkLegacyStableVersion>[2.2.10]</MSTestFrameworkLegacyStableVersion>
+    <MSTestFrameworkLegacyStableVersion>[1.4.0]</MSTestFrameworkLegacyStableVersion>
     <!-- Versions that are used to restore previous versions of console, translation layer, and test.sdk for compatibility tests.
     See Invoke-TestAssetsBuild in scripts/build.ps1. Exact versions are used to avoid Nuget substituting them by closest match, if we make a typo.
     These versions need to be "statically" readable because we read this file as xml in our build and tests. -->
