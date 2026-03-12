@@ -33,7 +33,6 @@ public class HtmlLogger : ITestLoggerWithParameters
     private readonly IFileHelper _fileHelper;
     private readonly XmlObjectSerializer _xmlSerializer;
     private readonly IHtmlTransformer _htmlTransformer;
-    private static readonly object FileCreateLockObject = new();
     private Dictionary<string, string?>? _parametersDictionary;
 
     public HtmlLogger()
@@ -345,18 +344,21 @@ public class HtmlLogger : ITestLoggerWithParameters
 
     private string GenerateUniqueFilePath(string fileName, string fileExtension)
     {
-        string fullFilePath;
         for (short i = 0; i < short.MaxValue; i++)
         {
             var fileNameWithIter = i == 0 ? fileName : Path.GetFileNameWithoutExtension(fileName) + $"[{i}]";
-            fullFilePath = Path.Combine(TestResultsDirPath!, $"TestResult_{fileNameWithIter}.{fileExtension}");
-            lock (FileCreateLockObject)
+            var fullFilePath = Path.Combine(TestResultsDirPath!, $"TestResult_{fileNameWithIter}.{fileExtension}");
+
+            try
             {
-                if (!File.Exists(fullFilePath))
-                {
-                    using var _ = File.Create(fullFilePath);
-                    return fullFilePath;
-                }
+                // Use FileMode.CreateNew for atomic "create if not exists" to avoid
+                // cross-process race conditions when multiple vstest processes run in parallel.
+                using var _ = new FileStream(fullFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+                return fullFilePath;
+            }
+            catch (IOException) when (File.Exists(fullFilePath))
+            {
+                // File already exists (another process created it), try next iteration.
             }
         }
 
@@ -365,7 +367,7 @@ public class HtmlLogger : ITestLoggerWithParameters
 
     private static string FormatDateTimeForRunName(DateTime timeStamp)
     {
-        return timeStamp.ToString("yyyyMMdd_HHmmss", DateTimeFormatInfo.InvariantInfo);
+        return timeStamp.ToString("yyyyMMdd_HHmmssfff", DateTimeFormatInfo.InvariantInfo);
     }
 
     /// <summary>
