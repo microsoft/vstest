@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "TestPlatform.Playground": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ThreadPool_ForceMinWorkerThreads": "1",
+        "DOTNET_ThreadPool_ForceMaxWorkerThreads": "1"
+      }
+    }
+  }
+}
