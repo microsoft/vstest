@@ -44,7 +44,7 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource]
+    [WrapperCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -53,8 +53,8 @@ public class DiscoverTests : AcceptanceTestBase
         _discoveryEventHandler = new DiscoveryEventHandler();
         _discoveryEventHandler2 = new DiscoveryEventHandler2();
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        vstestConsoleWrapper.DiscoverTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), _discoveryEventHandler);
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper.DiscoverTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), _discoveryEventHandler);
 
         // Assert.
         Assert.AreEqual(6, _discoveryEventHandler.DiscoveredTestCases.Count);
@@ -62,7 +62,7 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource]
+    [WrapperCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -71,8 +71,8 @@ public class DiscoverTests : AcceptanceTestBase
         _discoveryEventHandler = new DiscoveryEventHandler();
         _discoveryEventHandler2 = new DiscoveryEventHandler2();
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
-        vstestConsoleWrapper.DiscoverTests(
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper.DiscoverTests(
             GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"),
             GetDefaultRunSettings(),
             new TestPlatformOptions() { CollectMetrics = false },
@@ -201,11 +201,11 @@ public class DiscoverTests : AcceptanceTestBase
         // Release builds optimize code, hence line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
         {
-            Assert.AreEqual(25, testCase.First().LineNumber);
+            Assert.AreEqual(22, testCase.First().LineNumber);
         }
         else
         {
-            Assert.AreEqual(24, testCase.First().LineNumber);
+            Assert.AreEqual(21, testCase.First().LineNumber);
         }
     }
 

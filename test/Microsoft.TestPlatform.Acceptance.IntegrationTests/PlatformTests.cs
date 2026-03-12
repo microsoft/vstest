@@ -9,6 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 // monitoring the processes does not work correctly
 [TestCategory("Windows-Review")]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class PlatformTests : AcceptanceTestBase
 {
     /// <summary>

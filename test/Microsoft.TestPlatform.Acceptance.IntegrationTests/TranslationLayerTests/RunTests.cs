@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -10,7 +9,6 @@ using System.Threading;
 
 using FluentAssertions;
 
-using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -45,14 +43,14 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource]
+    [WrapperCompatibilityDataSource]
     public void RunAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        vstestConsoleWrapper.RunTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler);
+        _vstestConsoleWrapper.RunTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler);
 
         // Assert
         Assert.AreEqual(6, runEventHandler.TestResults.Count);
@@ -63,13 +61,13 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource(BeforeFeature = Features.MULTI_TFM)]
+    [WrapperCompatibilityDataSource(BeforeFeature = Features.MULTI_TFM)]
     public void RunAllTestsWithMixedTFMsWillFailToRunTestsFromTheIncompatibleTFMDll(RunnerInfo runnerInfo)
     {
         // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
         var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETFX);
         var incompatibleDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETCORE);
@@ -77,7 +75,7 @@ public class RunTests : AcceptanceTestBase
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
         var runsettingsXml = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-        vstestConsoleWrapper.RunTests(new[] { compatibleDll, incompatibleDll }, runsettingsXml, runEventHandler);
+        _vstestConsoleWrapper.RunTests(new[] { compatibleDll, incompatibleDll }, runsettingsXml, runEventHandler);
 
         // Assert
         runEventHandler.TestResults.Should().HaveCount(3, "we failed to run those tests because they are not compatible.");
@@ -85,14 +83,14 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [TestHostCompatibilityDataSource]
-    [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM)]
+    [RunnerCompatibilityDataSource]
+    [WrapperCompatibilityDataSource(AfterFeature = Features.MULTI_TFM)]
     public void RunAllTestsWithMixedTFMsWillRunTestsFromAllProvidedDllEvenWhenTheyMixTFMs(RunnerInfo runnerInfo)
     {
         // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
         var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETFX);
         var netDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETCORE);
@@ -100,7 +98,7 @@ public class RunTests : AcceptanceTestBase
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
         var runsettingsXml = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-        vstestConsoleWrapper.RunTests(new[] { netFrameworkDll, netDll }, runsettingsXml, runEventHandler);
+        _vstestConsoleWrapper.RunTests(new[] { netFrameworkDll, netDll }, runsettingsXml, runEventHandler);
 
         // Assert
         runEventHandler.Errors.Should().BeEmpty();
@@ -181,13 +179,6 @@ public class RunTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
-        if (IntegrationTestEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
-        {
-            // On release, x64 builds, recursive calls may be replaced with loops (tail call optimization)
-            Assert.Inconclusive("On StackOverflowException testhost not exited in release configuration.");
-            return;
-        }
-
         var source = new[] { GetAssetFullPath("SimpleTestProject3.dll") };
 
         _vstestConsoleWrapper.RunTests(
@@ -196,11 +187,12 @@ public class RunTests : AcceptanceTestBase
             new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
             _runEventHandler);
 
-        var errorMessage = runnerInfo.TargetFramework == "net462"
-            ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.{Environment.NewLine}"
-            : $"The active test run was aborted. Reason: Test host process crashed : Stack overflow.{Environment.NewLine}";
+        var errorMessagePattern = runnerInfo.TargetFramework.StartsWith("net4")
+            ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.*"
+            : $"The active test run was aborted. Reason: Test host process crashed : Stack overflow.*";
 
-        _runEventHandler.Errors.Should().Contain(errorMessage);
+        _runEventHandler.Errors.Should().ContainSingle()
+            .Which.Should().Match(errorMessagePattern);
     }
 
     [TestMethod]

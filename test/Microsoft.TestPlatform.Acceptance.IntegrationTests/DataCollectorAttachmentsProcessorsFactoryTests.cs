@@ -22,6 +22,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests.DataCollectorAttachmentsProcessorsFactoryTests;
 
 [TestClass]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class DataCollectorAttachmentsProcessorsFactoryTests : AcceptanceTestBase
 {
     private readonly DataCollectorAttachmentsProcessorsFactory _dataCollectorAttachmentsProcessorsFactory = new();
@@ -63,7 +64,7 @@ public class DataCollectorAttachmentsProcessorsFactoryTests : AcceptanceTestBase
         Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[2].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(true)]
     [DataRow(false)]
     public void Create_EmptyOrNullInvokedDataCollector_ShouldReturnCodeCoverageDataAttachmentsHandler(bool empty)

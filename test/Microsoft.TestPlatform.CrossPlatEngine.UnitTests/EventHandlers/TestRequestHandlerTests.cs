@@ -534,11 +534,11 @@ public class TestableTestRequestHandler : TestRequestHandler
 
     private static void OnLaunchAdapterProcessWithDebuggerAttachedAckReceived(Message message)
     {
-        Assert.AreEqual(message.MessageType, MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback);
+        Assert.AreEqual(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, message.MessageType);
     }
 
     private static void OnAttachDebuggerAckRecieved(Message message)
     {
-        Assert.AreEqual(message.MessageType, MessageType.AttachDebuggerCallback);
+        Assert.AreEqual(MessageType.AttachDebuggerCallback, message.MessageType);
     }
 }

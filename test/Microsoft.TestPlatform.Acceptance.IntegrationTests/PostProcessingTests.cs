@@ -20,6 +20,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class PostProcessingTests : AcceptanceTestBase
 {
     [TestMethod]
@@ -44,19 +45,19 @@ public class PostProcessingTests : AcceptanceTestBase
         {
             string projectFolder = Path.Combine(TempDirectory.Path, i.ToString(CultureInfo.InvariantCulture));
             ExecuteApplication(GetConsoleRunnerPath(), $"new mstest -o {projectFolder}", out string stdOut, out string stdError, out int exitCode);
-            Assert.AreEqual(exitCode, 0);
+            Assert.AreEqual(0, exitCode);
             ExecuteApplication(GetConsoleRunnerPath(), $"build {projectFolder} -c release", out stdOut, out stdError, out exitCode);
-            Assert.AreEqual(exitCode, 0);
+            Assert.AreEqual(0, exitCode);
 
             string testContainer = Directory.GetFiles(Path.Combine(projectFolder, "bin"), $"{i}.dll", SearchOption.AllDirectories).Single();
 
             ExecuteVsTestConsole($"{testContainer} --Collect:\"SampleDataCollector\" --TestAdapterPath:\"{extensionsPath}\" --ResultsDirectory:\"{Path.GetDirectoryName(testContainer)}\" --Settings:\"{runSettings}\" --ArtifactsProcessingMode-Collect --TestSessionCorrelationId:\"{correlationSessionId}\" --Diag:\"{TempDirectory.Path + '/'}\"", out stdOut, out stdError, out exitCode);
-            Assert.AreEqual(exitCode, 0);
+            Assert.AreEqual(0, exitCode);
         });
 
         // Post process artifacts
         ExecuteVsTestConsole($"--ArtifactsProcessingMode-PostProcess --TestSessionCorrelationId:\"{correlationSessionId}\" --Diag:\"{TempDirectory.Path + "/mergeLog/"}\"", out string stdOut, out string stdError, out int exitCode);
-        Assert.AreEqual(exitCode, 0);
+        Assert.AreEqual(0, exitCode);
 
         using StringReader reader = new(stdOut);
         Assert.AreEqual(string.Empty, reader.ReadLine().Trim());

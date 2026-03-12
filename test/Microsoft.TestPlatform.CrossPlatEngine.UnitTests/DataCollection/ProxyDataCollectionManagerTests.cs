@@ -70,7 +70,7 @@ public class ProxyDataCollectionManagerTests
     {
         _mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-        var message = Assert.ThrowsException<TestPlatformException>(() => _proxyDataCollectionManager.Initialize()).Message;
+        var message = Assert.ThrowsExactly<TestPlatformException>(() => _proxyDataCollectionManager.Initialize()).Message;
         Assert.AreEqual(message, TimoutErrorMessage);
     }
 

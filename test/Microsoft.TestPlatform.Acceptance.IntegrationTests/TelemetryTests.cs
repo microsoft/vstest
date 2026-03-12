@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class TelemetryTests : AcceptanceTestBase
 {
     private const string TELEMETRY_OPTEDIN = "VSTEST_TELEMETRY_OPTEDIN";
@@ -85,7 +86,7 @@ public class TelemetryTests : AcceptanceTestBase
     {
         if (!Directory.Exists(tempDirectory.Path))
         {
-            Assert.Fail("Could not find the telemetry logs folder at {0}", tempDirectory.Path);
+            Assert.Fail($"Could not find the telemetry logs folder at {tempDirectory.Path}");
         }
 
         bool isValid = false;

@@ -34,7 +34,7 @@ public class CustomTestHostTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER_FLOW)]
+    [WrapperCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER_FLOW)]
     // This does not work with testhosts that are earlier than when the feature was introduced,
     // when latest runner is used, because the latest runner does not downgrade the messages when
     // older testhost launcher is used.
@@ -63,8 +63,7 @@ public class CustomTestHostTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    // [RunnerCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER_FLOW)]
-    [TestHostCompatibilityDataSource(DEFAULT_RUNNER_NETFX, DEFAULT_RUNNER_NETCORE, "LegacyStable", BeforeFeature = Features.ATTACH_DEBUGGER_FLOW, DebugVSTestConsole = true)]
+    [WrapperCompatibilityDataSource(BeforeFeature = Features.ATTACH_DEBUGGER_FLOW)]
     [Ignore("This is not working for any testhost prior 16.7.0 where the change was introduced. The launch testhost flow was replaced with AttachDebugger in runner, and the new callback to AttachDebugger happens in testhost."
         + "But any testhost prior 16.7.0 where the change was introduced does not know to call back AttachDebugger, and the call never happens.")]
     // You can confirm that the functionality broke between runner and testhost, past this point by using newer runners, against older testhosts.
@@ -93,7 +92,7 @@ public class CustomTestHostTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource(AfterFeature = Features.ATTACH_DEBUGGER_FLOW)]
+    [WrapperCompatibilityDataSource(AfterFeature = Features.ATTACH_DEBUGGER_FLOW)]
     // [TestHostCompatibilityDataSource(AfterFeature = Features.ATTACH_DEBUGGER_FLOW)]
     public void RunTestsWithCustomTestHostLauncherAttachesToDebuggerUsingTheProvidedLauncher(RunnerInfo runnerInfo)
     {
@@ -120,7 +119,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     [Ignore("This is not working. The compatibility code only checks the protocol version (in handler), which is dictated by testhost. "
         + "It sees 6 but does not realize that the provided CustomTesthostLauncher is not supporting the new feature, it ends up calling back to EditoAttachDebugger" +
         "in translation layer, and that just silently skips the call.")]
-    [RunnerCompatibilityDataSource(AfterFeature = Features.ATTACH_DEBUGGER_FLOW)]
+    [WrapperCompatibilityDataSource(AfterFeature = Features.ATTACH_DEBUGGER_FLOW)]
     [TestHostCompatibilityDataSource(AfterFeature = Features.ATTACH_DEBUGGER_FLOW)]
     public void RunTestsWithCustomTestHostLauncherUsesLaunchWhenGivenAnOutdatedITestHostLauncher(RunnerInfo runnerInfo)
     {
@@ -144,13 +143,13 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TestCategory("Windows-Review")]
     [TestCategory("Feature")]
     // "Just row" used here because mstest does not cooperate with older versions of vstest.console correctly, so we test with just the latest version available..
-    [RunnerCompatibilityDataSource(AfterFeature = Features.MULTI_TFM, JustRow = 0)]
+    [WrapperCompatibilityDataSource(AfterFeature = Features.MULTI_TFM, JustRow = 0)]
     public void RunAllTestsWithMixedTFMsWillProvideAdditionalInformationToTheDebugger(RunnerInfo runnerInfo)
     {
         // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
         var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETFX);
         var netDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETCORE);
@@ -159,7 +158,7 @@ public class CustomTestHostTests : AcceptanceTestBase
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
         var runsettingsXml = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-        vstestConsoleWrapper.RunTestsWithCustomTestHost(new[] { netFrameworkDll, netDll }, runsettingsXml, runEventHandler, testHostLauncher);
+        _vstestConsoleWrapper.RunTestsWithCustomTestHost(new[] { netFrameworkDll, netDll }, runsettingsXml, runEventHandler, testHostLauncher);
 
         // Assert
         if (runEventHandler.Errors.Any())
@@ -196,13 +195,13 @@ public class CustomTestHostTests : AcceptanceTestBase
     [TestCategory("BackwardCompatibilityWithRunner")]
     // "Just row" used here because mstest does not cooperate with older versions of vstest.console correctly, so we test with just the single version available
     // before the multi tfm feature.
-    [RunnerCompatibilityDataSource(BeforeFeature = Features.MULTI_TFM, JustRow = 0)]
+    [WrapperCompatibilityDataSource(BeforeFeature = Features.MULTI_TFM, JustRow = 0)]
     public void RunAllTestsCallsBackToTestHostLauncherV3EvenWhenRunnerDoesNotSupportMultiTfmOrTheNewAttachDebugger2MessageYet(RunnerInfo runnerInfo)
     {
         // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
         var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETFX);
         var netDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETCORE);
@@ -211,7 +210,7 @@ public class CustomTestHostTests : AcceptanceTestBase
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
         var runsettingsXml = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-        vstestConsoleWrapper.RunTestsWithCustomTestHost(new[] { netFrameworkDll, netDll }, runsettingsXml, runEventHandler, testHostLauncher);
+        _vstestConsoleWrapper.RunTestsWithCustomTestHost(new[] { netFrameworkDll, netDll }, runsettingsXml, runEventHandler, testHostLauncher);
 
         // Assert
         runEventHandler.Errors.Should().BeEmpty();

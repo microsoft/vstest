@@ -19,9 +19,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
-// this whole thing is complicated and depends on versions of OS and the target runtime
-// keeping this for later
 [TestCategory("Windows-Review")]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class BlameDataCollectorTests : AcceptanceTestBase
 {
     public const string NETCOREANDFX = "net462;net472;net8.0";

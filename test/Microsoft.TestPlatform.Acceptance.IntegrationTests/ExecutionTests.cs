@@ -16,12 +16,13 @@ using FluentAssertions;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
+[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class ExecutionTests : AcceptanceTestBase
 {
     //TODO: It looks like the first 3 tests would be useful to multiply by all 3 test frameworks, should we make the test even more generic, or duplicate them?
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [MSTestCompatibilityDataSource(InProcess = true)]
+    [MSTestCompatibilityDataSource]
     public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -31,23 +32,6 @@ public class ExecutionTests : AcceptanceTestBase
         InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
 
         ValidateSummaryStatus(2, 2, 2);
-        ExitCodeEquals(1); // failing tests
-        StdErrHasTestRunFailedMessageButNoOtherError();
-        StdOutHasNoWarnings();
-    }
-
-    [TestMethod]
-    [TestCategory("Windows-Review")]
-    [TestPlatformCompatibilityDataSource]
-    public void RunTestsFromMultipleMSTestAssemblies(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        var assemblyPaths = BuildMultipleAssemblyPath("MSTestProject1.dll", "MSTestProject2.dll");
-
-        InvokeVsTestForExecution(assemblyPaths, testAdapterPath: null, FrameworkArgValue, string.Empty);
-
-        ValidateSummaryStatus(passed: 2, failed: 2, skipped: 2);
         ExitCodeEquals(1); // failing tests
         StdErrHasTestRunFailedMessageButNoOtherError();
         StdOutHasNoWarnings();
@@ -183,13 +167,6 @@ public class ExecutionTests : AcceptanceTestBase
     public void StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        if (IntegrationTestEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
-        {
-            // On release, x64 builds, recursive calls may be replaced with loops (tail call optimization)
-            Assert.Inconclusive("On StackOverflowException testhost not exited in release configuration.");
-            return;
-        }
 
         var diagLogFilePath = Path.Combine(TempDirectory.Path, $"std_error_log_{Guid.NewGuid()}.txt");
         File.Delete(diagLogFilePath);
@@ -445,6 +422,8 @@ public class ExecutionTests : AcceptanceTestBase
         // Because of this in typical run we get a lot of dlls that we are sure don't have tests, like Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
         // or testhost.dll. Those dlls are built for net8.0 tfm, so theoretically they should be tests, but attempting to run them fails to find runtimeconfig.json
         // or deps.json, and fails the run.
+        //
+        // IF THIS TEST FAILS ADD THE DLL TO KnownPlatformSources.
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var testAssemblyPath = _testEnvironment.GetTestAsset("SimpleTestProject.dll");
@@ -469,6 +448,8 @@ public class ExecutionTests : AcceptanceTestBase
         // Because of this in typical run we get a lot of dlls that we are sure don't have tests, like Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
         // or testhost.dll. Those dlls are built for net8.0 tfm, so theoretically they should be tests, but attempting to run them fails to find runtimeconfig.json
         // or deps.json, and fails the run.
+        //
+        // IF THIS TEST FAILS ADD THE DLL TO KnownPlatformSources.
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var testAssemblyPath = _testEnvironment.GetTestAsset("NUTestProject.dll");
@@ -492,6 +473,8 @@ public class ExecutionTests : AcceptanceTestBase
         // Because of this in typical run we get a lot of dlls that we are sure don't have tests, like Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
         // or testhost.dll. Those dlls are built for net8.0 tfm, so theoretically they should be tests, but attempting to run them fails to find runtimeconfig.json
         // or deps.json, and fails the run.
+        //
+        // IF THIS TEST FAILS ADD THE DLL TO KnownPlatformSources.
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var testAssemblyPath = _testEnvironment.GetTestAsset("SimpleTestProject.dll");

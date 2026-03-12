@@ -5,27 +5,27 @@ using System.Reflection;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
+/// <summary>
+/// Test compatibility of vstest.console and testhost with different MSTest versions.
+/// </summary>
 public class MSTestCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
 {
     private readonly CompatibilityRowsBuilder _builder;
 
-    public MSTestCompatibilityDataSource(
-        string runnerFrameworks = AcceptanceTestBase.DEFAULT_RUNNER_NETFX_AND_NET,
-        string hostFrameworks = AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
-        string adapterVersions = AcceptanceTestBase.LATESTPREVIEW_TO_LEGACY)
+    public MSTestCompatibilityDataSource()
     {
-        // TODO: We actually don't generate values to use different translation layers, because we don't have a good way to do
-        // that right now. Translation layer is loaded directly into the acceptance test, and so we don't have easy way to substitute it.
+        // 1 runner version and 1 testhost version
+        // This tests different mstest versions against our latest runner and testhost.
 
         _builder = new CompatibilityRowsBuilder(
-            runnerFrameworks,
-            // runner versions
-            AcceptanceTestBase.LATEST_TO_LEGACY,
-            hostFrameworks,
-            // host versions
-            AcceptanceTestBase.LATEST_TO_LEGACY,
-            adapterVersions,
-            // adapters
+            // runner, use just .NET, because the adapter runs in the testhost, and we will add InProcess and VSIX, that will test running with the Runner.
+            AcceptanceTestBase.LATEST,
+            AcceptanceTestBase.DEFAULT_RUNNER_NET,
+            // host
+            AcceptanceTestBase.LATEST,
+            AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
+            // adapter
+            AcceptanceTestBase.LATESTPREVIEW_TO_LEGACY,
             AcceptanceTestBase.MSTEST);
 
         // Do not generate the data rows here, properties (e.g. DebugVSTestConsole) are not populated until after constructor is done.
@@ -35,11 +35,6 @@ public class MSTestCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
     public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
     public bool DebugStopAtEntrypoint { get; set; }
-
-    /// <summary>
-    /// Add run for in-process using the selected .NET Framework runners, and and all selected adapters.
-    /// </summary>
-    public bool InProcess { get; set; }
 
     public string? BeforeRunnerFeature { get; set; }
     public string? AfterRunnerFeature { get; set; }
@@ -52,12 +47,8 @@ public class MSTestCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
 
     public override void CreateData(MethodInfo methodInfo)
     {
-        _builder.WithEveryVersionOfRunner = false;
-        _builder.WithEveryVersionOfHost = false;
-        _builder.WithEveryVersionOfAdapter = true;
-        _builder.WithOlderConfigurations = false;
-        _builder.WithVSIXRunner = false;
-        _builder.WithInProcess = InProcess;
+        _builder.WithInProcess = true;
+        _builder.WithVSIXRunner = true;
 
         _builder.BeforeRunnerFeature = BeforeRunnerFeature;
         _builder.AfterRunnerFeature = AfterRunnerFeature;
