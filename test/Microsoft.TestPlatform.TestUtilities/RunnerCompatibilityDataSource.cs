@@ -6,25 +6,27 @@ using System.Reflection;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 /// <summary>
-/// A data source that checks compatibility of changes in VSTestConsoleWrapper with different versions of vstest.console.
-/// We are testing with all versions of vstest.console, because the wrapper should (ideally) keep backwards compatibility for all shipped
-/// versions of vstest.console.
-/// We also add VSIX to test that the shipment into VS works.
-/// This does NOT test  compatibility of changes in vstest.console, with older versions of the wrapper.
+/// A data source that checks compatibility of changes in vstest.console with different versions of testhost. It also adds in-process mode and runner from VSIX.
+/// We are testing with all versions of testhost, because we want to make sure that even project with very old Microsoft.NET.Test.Sdk is able to be opened and used
+/// in Visual Studio.
+/// We test with VSIX and in-process to avoid duplicating tests only because they need runner from a different place.
+/// Use for testing changes specific to vstest.console. Or for interaction between runner and testhost.
+/// 
+/// When that adds up to no configuration exception is thrown.
 /// </summary>
-public class WrapperCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
+public class RunnerCompatibilityDataSource : CompatibilityDataSourceAttribute
 {
     private readonly CompatibilityRowsBuilder _builder;
 
-    public WrapperCompatibilityDataSource()
+    public RunnerCompatibilityDataSource()
     {
         _builder = new CompatibilityRowsBuilder(
             // runner
-            AcceptanceTestBase.LATEST_TO_LEGACY,
+            AcceptanceTestBase.LATEST,
             AcceptanceTestBase.DEFAULT_RUNNER_NETFX_AND_NET,
             // host
-            AcceptanceTestBase.LATEST,
-            AcceptanceTestBase.DEFAULT_HOST_NET,
+            AcceptanceTestBase.LATEST_TO_LEGACY,
+            AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
             // adapter
             AcceptanceTestBase.LATESTSTABLE,
             AcceptanceTestBase.MSTEST);
@@ -50,7 +52,7 @@ public class WrapperCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo
     public override void CreateData(MethodInfo methodInfo)
     {
         _builder.WithVSIXRunner = true;
-        _builder.WithInProcess = false;
+        _builder.WithInProcess = true;
 
         _builder.BeforeRunnerFeature = BeforeFeature;
         _builder.AfterRunnerFeature = AfterFeature;
@@ -72,4 +74,3 @@ public class WrapperCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo
         data.ForEach(AddData);
     }
 }
-

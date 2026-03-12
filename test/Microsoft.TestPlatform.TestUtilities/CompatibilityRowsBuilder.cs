@@ -8,6 +8,7 @@ using System.Linq;
 using System.Xml;
 
 using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using NuGet.Versioning;
 
@@ -59,7 +60,7 @@ public class CompatibilityRowsBuilder
     public bool DebugStopAtEntrypoint { get; set; }
     public int? JustRow { get; internal set; }
 
-    public List<RunnerInfo> CreateData()
+    public List<TestDataRow<RunnerInfo>> CreateData()
     {
         var dataRows = new List<RunnerInfo>();
 
@@ -194,7 +195,11 @@ public class CompatibilityRowsBuilder
             }
         }
 
-        return JustRow == null ? allRows : [allRows[JustRow.Value]];
+        var selectedRows = JustRow == null ? allRows : [allRows[JustRow.Value]];
+        return [.. selectedRows.Select(r => new TestDataRow<RunnerInfo>(r)
+        {
+            TestCategories = ["Compatibility"],
+        })];
     }
 
     private static SemanticVersion ParseAndPatchSemanticVersion(string? version)

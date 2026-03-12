@@ -9,8 +9,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net9.0</TargetFrameworks>
+    <TargetFrameworks>net9.0;net48</TargetFrameworks>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="TestAssets\**" />
+    <None Remove="TestAssets\**" />
+  </ItemGroup>
   <ItemGroup>
     <None Remove="BannedSymbols.txt" />
   </ItemGroup>
@@ -31,6 +35,7 @@
     <PackageReference Include="Microsoft.TestPlatform.TestAsset.NativeCPP" Version="2.0.0" />
     <PackageReference Include="Microsoft.TestPlatform.QTools.Assets" Version="2.0.0" />
     <PackageReference Include="Procdump" Version="0.0.1" />
+    <PackageReference Include="NuGet.Versioning" Version="6.1.0" />
     <PackageReference Include="Microsoft.CodeCoverage.Core" Version="$(MicrosoftInternalCodeCoverageVersion)" />
   </ItemGroup>
   <ItemGroup Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)')) ">

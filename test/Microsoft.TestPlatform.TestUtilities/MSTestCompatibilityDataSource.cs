@@ -6,29 +6,26 @@ using System.Reflection;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 /// <summary>
-/// A data source that checks compatibility of changes in vstest.console with different versions of testhost. It also adds in-process mode and runner from VSIX.
-/// We are testing with all versions of testhost, because we want to make sure that even project with very old Microsoft.NET.Test.Sdk is able to be opened and used
-/// in Visual Studio.
-/// We test with VSIX and in-process to avoid duplicating tests only because they need runner from a different place.
-/// Use for testing changes specific to vstest.console. Or for interaction between runner and testhost.
-/// 
-/// When that adds up to no configuration exception is thrown.
+/// Test compatibility of vstest.console and testhost with different MSTest versions.
 /// </summary>
-public class RunnerCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
+public class MSTestCompatibilityDataSource : CompatibilityDataSourceAttribute
 {
     private readonly CompatibilityRowsBuilder _builder;
 
-    public RunnerCompatibilityDataSource()
+    public MSTestCompatibilityDataSource()
     {
+        // 1 runner version and 1 testhost version
+        // This tests different mstest versions against our latest runner and testhost.
+
         _builder = new CompatibilityRowsBuilder(
-            // runner
+            // runner, use just .NET, because the adapter runs in the testhost, and we will add InProcess and VSIX, that will test running with the Runner.
             AcceptanceTestBase.LATEST,
-            AcceptanceTestBase.DEFAULT_RUNNER_NETFX_AND_NET,
+            AcceptanceTestBase.DEFAULT_RUNNER_NET,
             // host
-            AcceptanceTestBase.LATEST_TO_LEGACY,
+            AcceptanceTestBase.LATEST,
             AcceptanceTestBase.DEFAULT_HOST_NETFX_AND_NET,
             // adapter
-            AcceptanceTestBase.LATESTSTABLE,
+            AcceptanceTestBase.LATESTPREVIEW_TO_LEGACY,
             AcceptanceTestBase.MSTEST);
 
         // Do not generate the data rows here, properties (e.g. DebugVSTestConsole) are not populated until after constructor is done.
@@ -38,27 +35,26 @@ public class RunnerCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
     public bool DebugTestHost { get; set; }
     public bool DebugDataCollector { get; set; }
     public bool DebugStopAtEntrypoint { get; set; }
-    public int JustRow { get; set; } = -1;
 
-    public string? BeforeFeature { get; set; }
-    public string? AfterFeature { get; set; }
+    public string? BeforeRunnerFeature { get; set; }
+    public string? AfterRunnerFeature { get; set; }
 
-    //public string? BeforeTestHostFeature { get; set; }
-    //public string? AfterTestHostFeature { get; set; }
+    public string? BeforeTestHostFeature { get; set; }
+    public string? AfterTestHostFeature { get; set; }
 
     public string? BeforeAdapterFeature { get; set; }
     public string? AfterAdapterFeature { get; set; }
 
     public override void CreateData(MethodInfo methodInfo)
     {
-        _builder.WithVSIXRunner = true;
         _builder.WithInProcess = true;
+        _builder.WithVSIXRunner = true;
 
-        _builder.BeforeRunnerFeature = BeforeFeature;
-        _builder.AfterRunnerFeature = AfterFeature;
+        _builder.BeforeRunnerFeature = BeforeRunnerFeature;
+        _builder.AfterRunnerFeature = AfterRunnerFeature;
 
-        //_builder.BeforeTestHostFeature = BeforeTestHostFeature;
-        //_builder.AfterTestHostFeature = AfterTestHostFeature;
+        _builder.BeforeTestHostFeature = BeforeTestHostFeature;
+        _builder.AfterTestHostFeature = AfterTestHostFeature;
 
         _builder.BeforeAdapterFeature = BeforeAdapterFeature;
         _builder.AfterAdapterFeature = AfterAdapterFeature;
@@ -67,8 +63,6 @@ public class RunnerCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
         _builder.DebugVSTestConsole = DebugVSTestConsole;
         _builder.DebugTestHost = DebugTestHost;
         _builder.DebugStopAtEntrypoint = DebugStopAtEntrypoint;
-
-        _builder.JustRow = JustRow < 0 ? null : JustRow;
 
         var data = _builder.CreateData();
         data.ForEach(AddData);

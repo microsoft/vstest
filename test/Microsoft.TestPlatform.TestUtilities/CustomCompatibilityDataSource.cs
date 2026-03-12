@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// A data source that provides a custom mix of runners, hosts and mstest adapter. You can control everything,
 /// so be careful how many tests you generate. This is meant to be used for experimentation, and only when <see cref="WrapperCompatibilityDataSource"/>, <see cref="RunnerCompatibilityDataSource"/>, <see cref="TestHostCompatibilityDataSource"/> or <see cref="MSTestCompatibilityDataSource"/> do not fit the need.
 /// </summary>
-public class CustomCompatibilityDataSource : TestDataSourceAttribute<RunnerInfo>
+public class CustomCompatibilityDataSource : CompatibilityDataSourceAttribute
 {
     private readonly CompatibilityRowsBuilder _builder;
 

@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestPlatform.Common;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -53,7 +54,7 @@ public class RunnerInfo
             Batch != null ? $"{Batch}" : null,
             $"Runner = {RunnerFramework}",
             $"TargetFramework = {TargetFramework}",
-            string.IsNullOrEmpty(InIsolationValue) ? "InProcess" : "InIsolation",
+            StringUtils.IsNullOrEmpty(InIsolationValue) ? "InProcess" : "InIsolation",
             VSTestConsoleInfo?.ToString(),
             TestHostInfo == null ? null : string.Join(",", TestHostInfo),
             AdapterInfo == null ? null : string.Join(",", AdapterInfo)
