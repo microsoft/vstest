@@ -57,6 +57,8 @@ public class Build : IntegrationTestBase
                 Debug.WriteLine($"Building test assets and unzipping packages took: {sw.ElapsedMilliseconds} ms");
                 sw.Restart();
                 BuildTestAssets(nugetCache);
+                Debug.WriteLine($"Building test assets took: {sw.ElapsedMilliseconds} ms");
+                sw.Restart();
                 BuildTestAssetsCompatibility(nugetCache);
                 Debug.WriteLine($"Building test assets compatibility matrix took: {sw.ElapsedMilliseconds} ms");
                 sw.Restart();
@@ -228,12 +230,14 @@ public class Build : IntegrationTestBase
             var netTestSdkVersionDir = netTestSdkVersion.TrimStart('[').TrimEnd(']');
             if (Directory.Exists(Path.Combine(nugetCache, "microsoft.testplatform", netTestSdkVersionDir)) && Directory.Exists(Path.Combine(nugetCache, "microsoft.testplatform.cli", netTestSdkVersionDir)))
             {
+                Debug.WriteLine($"Version {netTestSdkVersion} of TestPlatform and TestPlatform.CLI is already in the cache, skipping restore.");
                 continue;
             }
 
             // We restore this project to download TestPlatform and TestPlatform.CLI nugets, into our package cache.
             // Using nuget.exe install errors out in various weird ways.
             var tools = Path.Combine(Root, "test", "TestAssets", "Tools", "Tools.csproj");
+            Debug.WriteLine($"Restoring {tools} for {netTestSdkVersion}");
             ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" "{tools}" -p:PackageVersion={netTestSdkVersionDir} """);
         }
 
@@ -253,13 +257,14 @@ public class Build : IntegrationTestBase
         if (cacheIdText == currentCacheId)
         {
             // Project cache is up-to-date, just rebuilding solution.
-            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" "{generatedSln}" """);
             ExecuteApplication2(Dotnet, $"build {generatedSln} --no-restore --configuration {IntegrationTestEnvironment.BuildConfiguration} -v:minimal");
             rebuild = false;
+            Debug.WriteLine("Test assets compatibility matrix is up to date, skipping regeneration.");
         }
 
         if (rebuild)
         {
+            Debug.WriteLine("Generating test assets compatibility matrix.");
             if (Directory.Exists(generated))
             {
                 Directory.Delete(generated, recursive: true);
