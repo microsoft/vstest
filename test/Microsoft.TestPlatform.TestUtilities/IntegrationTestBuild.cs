@@ -29,6 +29,9 @@ public class IntegrationTestBuild : IntegrationTestBase
 
     public static void BuildTestAssetsForIntegrationTests(TestContext context)
     {
+        // This is common setup that should happen even when build will not run.
+        SetDotnetEnvironment();
+
         var skipBuild = GetTestParameter(context, "SkipIntegrationTestBuild");
         if (skipBuild)
         {
@@ -49,9 +52,6 @@ public class IntegrationTestBuild : IntegrationTestBase
                 // We are the first one of the parallel runs to do this. Build the projects and setup everything.
                 Debug.WriteLine("Starting to build.");
                 var sw = Stopwatch.StartNew();
-                SetDotnetEnvironment();
-                Debug.WriteLine($"Setting dotnet environment took: {sw.ElapsedMilliseconds} ms");
-                sw.Restart();
 
                 var nugetCache = Path.GetFullPath(Path.Combine(Root, ".packages"));
                 var packagesAreNew = UnzipExecutablePackages();

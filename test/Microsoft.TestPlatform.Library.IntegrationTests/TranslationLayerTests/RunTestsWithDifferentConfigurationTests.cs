@@ -103,10 +103,10 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     // Uses testsettings, which is a concept that is more likely on .NET Framework because it comes from TPv0, so run on .NET Framework testhost.
     // TODO: remove this test? we deprecated testsettings. 
     [NetFullTargetFrameworkDataSource]
+    [Ignore("we don't support test settings anymore")]
     public void RunTestsWithTestSettingsInTpv2(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, NetFramework, Message);
         Setup();
 
         var testsettingsFile = Path.Combine(TempDirectory.Path, "tempsettings.testsettings");
@@ -134,12 +134,12 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     // Uses testsettings, which is a concept that is more likely on .NET Framework because it comes from TPv0, so run on .NET Framework testhost.
-    // TODO: remove this test? we deprecated and removed tpv0, check if we can also remove some test asset.. 
+    // TODO: remove this test? we deprecated and removed tpv0, check if we can also remove some test asset..
+    [Ignore("we don't ship tpv0 anymore it ignores test settings and falls up to tpv2")]
     [NetFullTargetFrameworkDataSource]
     public void RunTestsWithTestSettingsInTpv0(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, NetFramework, Message);
         Setup();
 
         var testSettingsXml = """

@@ -43,7 +43,7 @@ public class DisableAppdomainTests : AcceptanceTestBase
     {
         if (runnerInfo.IsNetRunner)
         {
-            Assert.Inconclusive("This test is not meant for .netcore.");
+            Assert.Fail("This test is not meant for .netcore.");
             return;
         }
 

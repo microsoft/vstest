@@ -258,7 +258,8 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorAeDebuggerShouldCollectDump(RunnerInfo runnerInfo)
     {
-        if (!IsAdministrator())
+        // For convenience skip locally, but never skip in CI. If this cannot pass in CI we are not testing it at all.
+        if (!IsCI && !IsAdministrator())
         {
             Assert.Inconclusive("User is not administrator, cannot setup the debugger, and cannot check the functionality.");
         }
