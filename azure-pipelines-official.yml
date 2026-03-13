@@ -194,10 +194,21 @@ extends:
                   -configuration Release
                   -ci
                   -nobl
+                name: Test
+                displayName: Unit Test
+                env:
+                  DOTNET_ROOT: $(Build.SourcesDirectory)/.dotnet
+              # -ci is allowing to import some environment variables and some required configurations
+              # -nobl avoid overwriting binlog of the main Build
+              - script: Test.cmd
+                  -configuration Release
+                  -ci
+                  -nobl
                   -integrationTest
                   -compatibilityTest
-                name: Test
-                displayName: Test
+                  -performanceTest
+                name: IntegrationTest
+                displayName: Integration Test
                 env:
                   DOTNET_ROOT: $(Build.SourcesDirectory)/.dotnet
 
