@@ -48,7 +48,7 @@ public class Build : IntegrationTestBase
                 Debug.WriteLine($"Setting dotnet environment took: {sw.ElapsedMilliseconds} ms");
                 sw.Restart();
 
-                var nugetCache = Path.GetFullPath(Path.Combine(Root, ".packages"));
+                var nugetCache = IntegrationTestEnvironment.TestAssetsNuGetCacheDirectory;
                 var packagesAreNew = UnzipExecutablePackages();
                 if (packagesAreNew)
                 {
@@ -475,13 +475,16 @@ public class Build : IntegrationTestBase
         }
 
         // Then clean all -dev and -ci packages from the cache to force updating from local source.
-        foreach (var packageDir in Directory.GetDirectories(nugetCache))
+        if (Directory.Exists(nugetCache))
         {
-            foreach (var versionDir in Directory.GetDirectories(packageDir))
+            foreach (var packageDir in Directory.GetDirectories(nugetCache))
             {
-                if (versionDir.EndsWith("-dev") || versionDir.EndsWith("-ci"))
+                foreach (var versionDir in Directory.GetDirectories(packageDir))
                 {
-                    Directory.Delete(versionDir, recursive: true);
+                    if (versionDir.EndsWith("-dev") || versionDir.EndsWith("-ci"))
+                    {
+                        Directory.Delete(versionDir, recursive: true);
+                    }
                 }
             }
         }

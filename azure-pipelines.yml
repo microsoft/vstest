@@ -54,11 +54,7 @@ variables:
     value: ' '
   - name: _ReleaseVersionKind
     value: ''
-  # Arcade is using global cache of nugets in non-windows build
-  # under some circumstances, but we don't respect that in our code and try to find them
-  # in .packages. Force the location of packages to that folder.
-  - name: NUGET_PACKAGES
-    value: '$(Build.SourcesDirectory)/.packages/'
+
 
 stages:
 
