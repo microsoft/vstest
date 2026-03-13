@@ -21,7 +21,7 @@ Param(
   [switch] $compatibilityTest,
   # Skip the build when running multiple categories from the integration tests. This is useful mostly in CI where we want to split the runs to different jobs, but
   # they all fall back to the same project and initialization.
-  [switch] $skipIngegrationTestBuild,
+  [switch] $skipIntegrationTestBuild,
   [switch] $sign,
   [switch] $pack,
   [switch] $publish,
@@ -61,7 +61,7 @@ if ($filter) {
   $filters += $filter
 }
 
-if ([System.Environment]::OSVersion.Platform -like "Win*") {
+if ([System.Environment]::OSVersion.Platform -notlike "Win*") {
   $filters += "TestCategory!=Windows&TestCategory!=Windows-Review"
 }
 
@@ -119,7 +119,7 @@ if ($integrationTest -or $performanceTest -or $compatibilityTest -or $smokeTest)
 }
 
 if ($filters.Count -gt 0 -or $testParameters.Count -gt 0) {
-  # We have to double escape, otherwise the filter is passed as string with & in it and interpreted directly as a separate comand to run.
+  # We have to double escape, otherwise the filter is passed as string with & in it and interpreted directly as a separate command to run.
   $filterString = "--filter \`"$($filters -join '&')\`""
   $testParameterString = ($testParameters.GetEnumerator() | ForEach-Object { "--test-parameter $($_.Key)=$($_.Value)" }) -join ' '
   
