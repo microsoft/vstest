@@ -195,7 +195,7 @@ extends:
                   -ci
                   -nobl
                   -integrationTest
-                  -performanceTest
+                  -compatibilityTest
                 name: Test
                 displayName: Test
                 env:
