@@ -76,7 +76,7 @@ else {
   # $filters += "TestCategory!=Smoke"
 }
 
-if ($compatibiliytyTestBuild) {
+if ($compatibilityTestBuild) {
   $testParameters['CompatibilityTestBuild'] = $true
 }
 
