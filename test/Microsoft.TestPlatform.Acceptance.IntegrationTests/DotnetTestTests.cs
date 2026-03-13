@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class DotnetTestTests : AcceptanceTestBase
 {
     private static string GetFinalVersion(string version)
@@ -22,6 +21,7 @@ public class DotnetTestTests : AcceptanceTestBase
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestCategory("Smoke")]
     public void RunDotnetTestWithCsproj(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

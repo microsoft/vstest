@@ -207,7 +207,7 @@ public class IntegrationTestEnvironment
             assetPath = Path.Combine(RepoRootDirectory, "artifacts", "bin", "TestAssets", $"{simpleAssetName}--{versionsHash}", BuildConfiguration, targetFramework, $"{simpleAssetName}--{versionsHash}.dll");
         }
 
-        Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: \"{0}\". Most likely changed the name or target framework of the project.", assetPath);
+        Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: \"{0}\". Compatibility test assets are not built automatically anymore in AssemblyInitialize. You need to changed the name or target framework of the project.", assetPath);
 
         // If you are thinking about wrapping the path in double quotes here,
         // then don't. File.Exist cannot handle quoted paths, and we use it in a lot of places.

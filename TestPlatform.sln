@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31519.33
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11605.296
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ED0C35EB-7F31-4841-A24F-8EB708FFA959}"
 EndProject
@@ -199,6 +199,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Acceptance.IntegrationTests", "test\Microsoft.TestPlatform.Acceptance.IntegrationTests\Microsoft.TestPlatform.Acceptance.IntegrationTests.csproj", "{450D5371-32A1-4667-987E-40D75F035233}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.CommunicationUtilities.Platform.UnitTests", "test\Microsoft.TestPlatform.CommunicationUtilities.Platform.UnitTests\Microsoft.TestPlatform.CommunicationUtilities.Platform.UnitTests.csproj", "{E602AB2B-048F-4317-8A6B-A225C00173FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.Library.IntegrationTests", "test\Microsoft.TestPlatform.Library.IntegrationTests\Microsoft.TestPlatform.Library.IntegrationTests.csproj", "{E01BC153-8BE9-95E9-723E-2788114A37B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -470,6 +472,10 @@ Global
 		{E602AB2B-048F-4317-8A6B-A225C00173FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E602AB2B-048F-4317-8A6B-A225C00173FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E602AB2B-048F-4317-8A6B-A225C00173FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E01BC153-8BE9-95E9-723E-2788114A37B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E01BC153-8BE9-95E9-723E-2788114A37B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E01BC153-8BE9-95E9-723E-2788114A37B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E01BC153-8BE9-95E9-723E-2788114A37B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -552,6 +558,7 @@ Global
 		{4454139C-174A-4DD8-8E76-657D9F03BA09} = {D27E1CB4-C641-4C6C-A140-EF5F6215AE29}
 		{450D5371-32A1-4667-987E-40D75F035233} = {46250E12-4CF1-4051-B4A7-80C8C06E0068}
 		{E602AB2B-048F-4317-8A6B-A225C00173FA} = {376C19DE-31E2-4FF6-88FC-0D0D6233C999}
+		{E01BC153-8BE9-95E9-723E-2788114A37B6} = {46250E12-4CF1-4051-B4A7-80C8C06E0068}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0541B30C-FF51-4E28-B172-83F5F3934BCD}

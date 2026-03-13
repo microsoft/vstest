@@ -20,11 +20,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class BlameDataCollectorTests : AcceptanceTestBase
 {
     public const string NETCOREANDFX = "net462;net472;net8.0";
-    public const string NET60 = "net8.0";
+    public const string NET80 = "net8.0";
     private readonly string _procDumpPath;
 
     public BlameDataCollectorTests()
@@ -41,7 +40,6 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorShouldGiveCorrectTestCaseName(RunnerInfo runnerInfo)
     {
@@ -58,15 +56,15 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void BlameDataCollectorShouldOutputDumpFile(RunnerInfo runnerInfo)
     {
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = GetAssetFullPath("SimpleTestProject3.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
-        arguments = string.Concat(arguments, $" /Blame:CollectDump");
+        arguments = string.Concat(arguments, $" /Blame:CollectDump;DumpType=mini");
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
 
@@ -82,15 +80,14 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void BlameDataCollectorShouldNotOutputDumpFileWhenNoCrashOccurs(RunnerInfo runnerInfo)
     {
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = GetAssetFullPath("SimpleTestProject.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
-        arguments = string.Concat(arguments, $" /Blame:CollectDump");
+        arguments = string.Concat(arguments, $" /Blame:CollectDump;DumpType=mini");
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
 
@@ -106,17 +103,15 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    // This tests .net runner and .net framework runner, together with .net framework testhost
+    // This tests .net runner and .net framework runner, together with .net framework testhost.
     [NetFullTargetFrameworkDataSource]
-    // .NET does not support crash dump on exit
-    // [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorShouldOutputDumpFileWhenNoCrashOccursButCollectAlwaysIsEnabled(RunnerInfo runnerInfo)
     {
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = GetAssetFullPath("SimpleTestProject.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
-        arguments = string.Concat(arguments, $" /Blame:CollectDump;CollectAlways=True");
+        arguments = string.Concat(arguments, $" /Blame:CollectDump;DumpType=mini;CollectAlways=True");
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
 
@@ -131,16 +126,14 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreRunner("net462;net472;net8.0;net9.0")]
-    // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net462;net472;net8.0;net9.0")]
+    [NetCoreRunner("net48;net10.0")]
     public void HangDumpOnTimeout(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = GetAssetFullPath("timeout.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
-        arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=full;TestTimeout=3s"" /Diag:{TempDirectory.Path}/log.txt");
+        arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=mini;TestTimeout=3s"" /Diag:{TempDirectory.Path}/log.txt");
 
         var env = new Dictionary<string, string?>
         {
@@ -153,10 +146,8 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // net8.0 does not support dump on exit
-    [NetCoreRunner("net462;net472")]
-    // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net462;net472")]
+    // .NET testhost does not support dump on exit
+    [NetFullTargetFrameworkDataSource]
 
     public void CrashDumpWhenThereIsNoTimeout(RunnerInfo runnerInfo)
     {
@@ -164,7 +155,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         var assemblyPaths = GetAssetFullPath("timeout.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
-        arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full;CollectAlways=true;CollectHangDump""");
+        arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=mini;CollectAlways=true;CollectHangDump""");
 
         var env = new Dictionary<string, string?>
         {
@@ -178,8 +169,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     [TestMethod]
     // .NET tfms do not support dump on exit, but runner does
-    [NetCoreRunner("net462;net472")]
-    // [NetFrameworkRunner("net462;net472")]
+    [NetFullTargetFrameworkDataSource]
 
     public void CrashDumpOnExit(RunnerInfo runnerInfo)
     {
@@ -187,7 +177,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         var assemblyPaths = GetAssetFullPath("timeout.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
-        arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full;CollectAlways=true""");
+        arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=mini;CollectAlways=true""");
 
         var env = new Dictionary<string, string?>
         {
@@ -200,16 +190,14 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreRunner("net462;net472;net8.0;net9.0")]
-    // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net462;net472;net8.0;net9.0")]
+    [NetCoreRunner("net48;net10.0")]
     public void CrashDumpOnStackOverflow(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = GetAssetFullPath("crash.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
-        arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full""");
+        arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=mini""");
 
         var env = new Dictionary<string, string?>
         {
@@ -222,32 +210,29 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreRunner(NET60)]
-    // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner(NET50)]
+    [NetCoreRunner(NET80)]
     public void CrashDumpChildProcesses(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = GetAssetFullPath("child-crash.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
-        arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full""");
+        arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=mini""");
         InvokeVsTest(arguments);
 
         ValidateDump(2);
     }
 
     [TestMethod]
-    [NetCoreRunner("net462;net472;net8.0;net9.0")]
-    // should make no difference, keeping for easy debug
-    // [NetFrameworkRunner("net462;net472;net8.0;net9.0")]
+    //TODO: we use minidump but the test for .NET Core still takes 30+ seconds? Even though the report says the dump was written in <1s per each. Why?
+    [NetCoreRunner("net48;net10.0")]
     public void HangDumpChildProcesses(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = GetAssetFullPath("child-hang.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
-        arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=full;TestTimeout=15s""");
+        arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=mini;TestTimeout=5s""");
         InvokeVsTest(arguments);
 
         ValidateDump(2);
@@ -259,7 +244,8 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorAeDebuggerShouldCollectDump(RunnerInfo runnerInfo)
     {
-        if (!IsAdministrator())
+        // For convenience skip locally, but never skip in CI. If this cannot pass in CI we are not testing it at all.
+        if (!IsCI && !IsAdministrator())
         {
             Assert.Inconclusive("User is not administrator, cannot setup the debugger, and cannot check the functionality.");
         }

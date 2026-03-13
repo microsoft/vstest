@@ -103,6 +103,18 @@ stages:
             /p:SourceBranchName=$(Build.SourceBranchName)
           name: Build
           displayName: Build
+        
+        # -ci is allowing to import some environment variables and some required configurations
+        # -nobl avoid overwriting binlog of the main Build
+        - script: Test.cmd
+            -configuration $(_BuildConfig)
+            -ci
+            -nobl
+            /bl:$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)/UnitTest.binlog
+          name: Test
+          displayName: Unit Test
+          env:
+            DOTNET_ROOT: $(Build.SourcesDirectory)/.dotnet
 
         # -ci is allowing to import some environment variables and some required configurations
         # -nobl avoid overwriting binlog of the main Build
@@ -111,10 +123,9 @@ stages:
             -ci
             -nobl
             -integrationTest
-            -performanceTest
-            /bl:$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)/Test.binlog
-          name: Test
-          displayName: Test
+            /bl:$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)/IntegrationTest.binlog
+          name: IntegrationTest
+          displayName: Integration Test
           env:
             DOTNET_ROOT: $(Build.SourcesDirectory)/.dotnet
 

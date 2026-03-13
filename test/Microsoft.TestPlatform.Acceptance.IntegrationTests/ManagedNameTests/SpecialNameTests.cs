@@ -5,9 +5,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-using Microsoft.TestPlatform.AcceptanceTests;
 using Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
-
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.Acceptance.IntegrationTests.ManagedNameTests;
