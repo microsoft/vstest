@@ -110,7 +110,7 @@ stages:
             -configuration $(_BuildConfig)
             -ci
             -nobl
-            /bl:$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)/Test.binlog
+            /bl:$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)/UnitTest.binlog
           name: Test
           displayName: Unit Test
           env:
@@ -123,7 +123,7 @@ stages:
             -ci
             -nobl
             -integrationTest
-            /bl:$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)/Test.binlog
+            /bl:$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)/IntegrationTest.binlog
           name: IntegrationTest
           displayName: Integration Test
           env:
