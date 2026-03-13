@@ -62,33 +62,25 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [WrapperCompatibilityDataSource(BeforeFeature = Features.MULTI_TFM)]
-    [TestCategory("Smoke")]
     [NetCoreTargetFrameworkDataSource]
-    public void RunAllTestsWithMixedTFMsWillFailToRunTestsFromTheIncompatibleTFMDll(RunnerInfo runnerInfo)
+    [TestCategory("Smoke")]
+    public void RunAllTestsFromDlls(RunnerInfo runnerInfo)
     {
-        // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        var compatibleDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETFX);
-        var incompatibleDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETCORE);
-
-        // Act
-        // We have no preference around what TFM is used. It will be autodetected.
-        var runsettingsXml = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-        _vstestConsoleWrapper.RunTests(new[] { compatibleDll, incompatibleDll }, runsettingsXml, runEventHandler);
+        _vstestConsoleWrapper.RunTests([GetAssetFullPath("SimpleTestProject.dll"), GetAssetFullPath("SimpleTestProject2.dll")], GetDefaultRunSettings(), runEventHandler);
 
         // Assert
-        runEventHandler.TestResults.Should().HaveCount(3, "we failed to run those tests because they are not compatible.");
+        Assert.AreEqual(6, runEventHandler.TestResults.Count);
+        Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
     }
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [TestCategory("Smoke")]
-    [RunnerCompatibilityDataSource]
     [WrapperCompatibilityDataSource(AfterFeature = Features.MULTI_TFM)]
     public void RunAllTestsWithMixedTFMsWillRunTestsFromAllProvidedDllEvenWhenTheyMixTFMs(RunnerInfo runnerInfo)
     {
@@ -112,24 +104,22 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [NetCoreTargetFrameworkDataSource]
-    [DoNotParallelize]
     public void EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
     {
-        var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;
-
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), _runEventHandler);
-        _vstestConsoleWrapper?.EndSession();
+        // TODO: this is ugly and it could be useful for the consumer of wrapper to actually know what process they are using, so publishing this would be better
+        var processManager = (_vstestConsoleWrapper).GetType().GetField("_vstestConsoleProcessManager", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(_vstestConsoleWrapper)!;
+        var processId = (int)processManager.GetType().GetProperty("ProcessId", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)!.GetValue(processManager)!;
+        var consoleProcess = Process.GetProcessById(processId);
+        Assert.IsFalse(consoleProcess.HasExited, "vstest.console process did not exit");
 
-        // Assert
-        // TODO: This still works reliably, but it is accidental. Correctly we should look at our "tree" of processes
-        // but there is no such thing on Windows. We can still replicate it quite well. There is code for it in blame
-        // hang collector.
-        Assert.AreEqual(numOfProcesses, Process.GetProcessesByName("vstest.console").Length);
-
+        _vstestConsoleWrapper!.EndSession();
         _vstestConsoleWrapper = null;
+
+        Assert.IsTrue(consoleProcess.HasExited, "vstest.console did not start");
     }
 
     [TestMethod]

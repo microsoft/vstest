@@ -417,11 +417,8 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
     [TestMethod]
     [NetCoreTargetFrameworkDataSource]
-    [DoNotParallelize]
     public async Task EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
     {
-        var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;
-
         SetTestEnvironment(_testEnvironment, runnerInfo);
         Setup();
 
@@ -435,13 +432,18 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         await _vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(_runEventHandler.Attachments, _runEventHandler.InvokedDataCollectors, GetCodeCoverageRunSettings(1), true, true, _testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
+        // TODO: this is ugly and it could be useful for the consumer of wrapper to actually know what process they are using, so publishing this would be better
+        var processManager = (_vstestConsoleWrapper).GetType().GetField("_vstestConsoleProcessManager", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(_vstestConsoleWrapper)!;
+        var processId = (int)processManager.GetType().GetProperty("ProcessId", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)!.GetValue(processManager)!;
+        var consoleProcess = Process.GetProcessById(processId);
+        Assert.IsFalse(consoleProcess.HasExited, $"vstest.console process did not start");
+
         // act
-        _vstestConsoleWrapper?.EndSession();
+        _vstestConsoleWrapper!.EndSession();
+        _vstestConsoleWrapper = null;
 
         // Assert
-        Assert.AreEqual(numOfProcesses, Process.GetProcessesByName("vstest.console").Length);
-
-        _vstestConsoleWrapper = null;
+        Assert.IsTrue(consoleProcess.HasExited, "vstest.console process did not exit");
     }
 
     private IList<string> GetTestAssemblies()

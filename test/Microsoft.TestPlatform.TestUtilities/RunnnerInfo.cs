@@ -5,8 +5,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-using Microsoft.VisualStudio.TestPlatform.Common;
-
 namespace Microsoft.TestPlatform.TestUtilities;
 
 [Serializable] // Type should be serializable to allow the tree-view behavior of test discovery in Test Explorer
@@ -53,7 +51,7 @@ public class RunnerInfo
             Batch != null ? $"{Batch}" : null,
             $"Runner = {RunnerFramework}",
             $"TargetFramework = {TargetFramework}",
-            StringUtils.IsNullOrEmpty(InIsolationValue) ? "InProcess" : "InIsolation",
+            InIsolationValue == AcceptanceTestBase.InIsolation ? "InIsolation" : "InProcess",
             VSTestConsoleInfo?.ToString(),
             TestHostInfo == null ? null : string.Join(",", TestHostInfo),
             AdapterInfo == null ? null : string.Join(",", AdapterInfo)

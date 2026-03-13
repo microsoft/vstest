@@ -22,6 +22,7 @@ Param(
   # Skip the build when running multiple categories from the integration tests. This is useful mostly in CI where we want to split the runs to different jobs, but
   # they all fall back to the same project and initialization.
   [switch] $skipIntegrationTestBuild,
+  [switch] $compatibilityTestBuild,
   [switch] $sign,
   [switch] $pack,
   [switch] $publish,
@@ -75,6 +76,10 @@ else {
   # $filters += "TestCategory!=Smoke"
 }
 
+if ($compatibiliytyTestBuild) {
+  $testParameters['CompatibilityTestBuild'] = $true
+}
+
 if ($compatibilityTest) {
   $testParameters['BuildCompatibility'] = $true
   if (-not $integrationTest) {
@@ -108,6 +113,7 @@ $null = $PSBoundParameters.Remove("smokeTest")
 $null = $PSBoundParameters.Remove("compatibilityTest")
 $null = $PSBoundParameters.Remove("performanceTest")
 $null = $PSBoundParameters.Remove("skipIntegrationTestBuild")
+$null = $PSBoundParameters.Remove("compatibilityTestBuild")
 
 if ($integrationTest -or $performanceTest -or $compatibilityTest -or $smokeTest) {
   # Rest of the infra knows nothing about or additional categories for tests. They simply consider them
