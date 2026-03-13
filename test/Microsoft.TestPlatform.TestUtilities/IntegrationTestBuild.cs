@@ -38,7 +38,7 @@ public class IntegrationTestBuild : IntegrationTestBase
             Debug.WriteLine("SkipIntegrationBuild parameter is true, skipping build.");
         }
 
-        var buildCompatibility = GetTestParameter(context, "BuildCompatiblity");
+        var buildCompatibility = GetTestParameter(context, "BuildCompatibility");
 
         // Mostly just want to avoid using the same mutex across two clones of this repo.
         var mutexName = "VSTest Acceptance Tests build " + IntegrationTestEnvironment.RepoRootDirectory!.Replace('\\', '-').Replace('/', '-').Replace(':', '-');
