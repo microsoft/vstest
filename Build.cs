@@ -1,10 +1,15 @@
 ﻿
-[TestClass]
-public class Build : IntegrationTestBase
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace BuildTests
 {
-    [AssemblyInitialize]
-    public static void AssemblyInitialize(TestContext testContext)
+    [TestClass]
+    public class Build : IntegrationTestBase
     {
-        IntegrationTestBuild.BuildTestAssetsForIntegrationTests(testContext);
+        [AssemblyInitialize]
+        public static void AssemblyInitialize(TestContext testContext)
+        {
+            IntegrationTestBuild.BuildTestAssetsForIntegrationTests(testContext);
+        }
     }
 }

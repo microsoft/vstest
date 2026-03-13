@@ -21,7 +21,7 @@ Param(
   [switch] $compatibilityTest,
   # Skip the build when running multiple categories from the integration tests. This is useful mostly in CI where we want to split the runs to different jobs, but
   # they all fall back to the same project and initialization.
-  [switch] $skipIngegrationTestBuild,
+  [switch] $skipIntegrationTestBuild,
   [switch] $sign,
   [switch] $pack,
   [switch] $publish,
