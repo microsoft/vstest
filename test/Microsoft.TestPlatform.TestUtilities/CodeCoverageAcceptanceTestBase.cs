@@ -9,11 +9,10 @@ using System.Xml;
 
 using Microsoft.CodeCoverage.Core;
 using Microsoft.CodeCoverage.Core.Reports.Coverage;
-using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.TestUtilities;
 
 public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
 {

@@ -5,10 +5,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.TestUtilities;
 
 [Serializable] // Type should be serializable to allow the tree-view behavior of test discovery in Test Explorer
 public class RunnerInfo

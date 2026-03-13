@@ -7,7 +7,7 @@ using System.IO;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.Library.IntegrationTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]

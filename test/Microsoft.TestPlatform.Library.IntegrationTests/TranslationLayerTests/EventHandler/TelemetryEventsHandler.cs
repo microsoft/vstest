@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
+namespace Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.EventHandler;
 
 internal class TelemetryEventsHandler : ITelemetryEventsHandler
 {

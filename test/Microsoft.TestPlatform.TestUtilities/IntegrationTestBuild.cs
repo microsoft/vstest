@@ -14,13 +14,12 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Linq;
 
-using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Newtonsoft.Json;
 
-namespace Microsoft.TestPlatform.Acceptance.IntegrationTests;
+namespace Microsoft.TestPlatform.TestUtilities;
 
 public class IntegrationTestBuild : IntegrationTestBase
 {

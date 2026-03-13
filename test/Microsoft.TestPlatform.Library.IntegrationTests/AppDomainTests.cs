@@ -13,7 +13,7 @@ using System.Reflection;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.Library.IntegrationTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
@@ -21,6 +21,7 @@ public class AppDomainTests : AcceptanceTestBase
 {
     [TestMethod]
     [TestCategory("Windows-Review")]
+    // AppDomains are .NET Framework only, run in .NET Framework runner and
     [NetFullTargetFrameworkDataSource]
     public void RunTestExecutionWithDisableAppDomain(RunnerInfo runnerInfo)
     {

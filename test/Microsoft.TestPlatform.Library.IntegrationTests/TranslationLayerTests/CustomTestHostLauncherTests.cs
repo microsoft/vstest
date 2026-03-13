@@ -11,18 +11,20 @@ using System.Threading;
 
 using FluentAssertions;
 
+using Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.EventHandler;
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
+namespace Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests;
 
 /// <summary>
 /// The Run Tests using VsTestConsoleWrapper API's
 /// </summary>
 [TestClass]
-public class CustomTestHostTests : AcceptanceTestBase
+public class CustomTestHostLauncherTests : AcceptanceTestBase
 {
     private IVsTestConsoleWrapper? _vstestConsoleWrapper;
 

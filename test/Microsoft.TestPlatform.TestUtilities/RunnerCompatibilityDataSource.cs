@@ -3,7 +3,7 @@
 
 using System.Reflection;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.TestUtilities;
 
 /// <summary>
 /// A data source that checks compatibility of changes in vstest.console with different versions of testhost. It also adds in-process mode and runner from VSIX.

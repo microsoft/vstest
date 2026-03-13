@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
+namespace Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.EventHandler;
 
 /// <inheritdoc />
 public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProcessingEventsHandler

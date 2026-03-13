@@ -6,11 +6,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 
-using Microsoft.TestPlatform.TestUtilities;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.TestUtilities;
 
 /// <summary>
 /// Runs tests using the dotnet vstest.console.dll built against .NET 6.0.

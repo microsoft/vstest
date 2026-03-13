@@ -7,12 +7,11 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 
-using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using NuGet.Versioning;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.TestUtilities;
 
 public class CompatibilityRowsBuilder
 {

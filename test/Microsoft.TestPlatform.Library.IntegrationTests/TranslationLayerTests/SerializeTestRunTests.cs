@@ -7,13 +7,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
+using Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.EventHandler;
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
+namespace Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests;
 
 [TestClass]
+// TODO: this comment seems inaccurate and would mean all our linux and macos tests are broken?
 // We need to dogfood the package built in this repo *-dev and we pack tha tp only on windows
 [TestCategory("Windows-Review")]
 public class SerialTestRunDecoratorTests : AcceptanceTestBase
@@ -46,8 +49,9 @@ public class SerialTestRunDecoratorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
-    [NetFullTargetFrameworkDataSource]
+    // This is testhost concept, try it on combination of testhosts, and .NET Runner.
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
     public void DiscoverTestsAndRunTestsSequentially(RunnerInfo runnerInfo)
     {
         // Arrange
@@ -67,8 +71,9 @@ public class SerialTestRunDecoratorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
-    [NetFullTargetFrameworkDataSource]
+    // This is testhost concept, try it on combination of testhosts, and .NET Runner.
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
     public void DiscoverTestsAndRunTestsSequentially_DisabledByFeatureFlag(RunnerInfo runnerInfo)
     {
         // Arrange

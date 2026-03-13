@@ -5,9 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-using Microsoft.TestPlatform.TestUtilities;
-
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.TestUtilities;
 
 public class AcceptanceTestBase : IntegrationTestBase
 {

@@ -6,11 +6,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 
-using Microsoft.TestPlatform.TestUtilities;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.TestUtilities;
 
 /// <summary>
 /// The attribute defining runner framework and target framework for net462.

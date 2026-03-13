@@ -43,9 +43,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vstest.console", "src\vstest.console\vstest.console.csproj", "{10B6ADE1-F808-4612-801D-4452F5B52242}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{46250E12-4CF1-4051-B4A7-80C8C06E0068}"
-	ProjectSection(SolutionItems) = preProject
-		Build.cs = Build.cs
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Loggers", "Loggers", "{020E15EA-731F-4667-95AF-226671E0C3AE}"
 EndProject

@@ -7,7 +7,7 @@ using System.Reflection;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.TestUtilities;
 
 [AttributeUsage(AttributeTargets.Method)]
 public abstract class TestDataSourceAttribute<T1> : Attribute, ITestDataSource where T1 : notnull

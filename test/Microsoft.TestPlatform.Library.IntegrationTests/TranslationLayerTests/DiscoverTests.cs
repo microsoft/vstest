@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 using FluentAssertions;
 
+using Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.EventHandler;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -19,7 +20,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
+namespace Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests;
 
 [TestClass]
 public class DiscoverTests : AcceptanceTestBase
@@ -84,7 +85,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
+    [TestCategory("Smoke")]
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
     {
@@ -103,7 +104,6 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingEventHandler2AndBatchSize(RunnerInfo runnerInfo)
     {
@@ -133,7 +133,6 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingEventHandler1AndBatchSize(RunnerInfo runnerInfo)
     {
@@ -163,7 +162,6 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [NetCoreTargetFrameworkDataSource]
-    [NetFullTargetFrameworkDataSource]
     public void DiscoverTestUsingEventHandler2ShouldContainAllSourcesAsFullyDiscovered(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -182,8 +180,11 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    // Normally we test on two runner, against single .NET Testhost, but because source navigation happens in testhost
+    // it is better to test against both desktop and core runners to make sure source navigation discovery works in both scenarios.
+    // We run .NET Runner -> .NET Testhost and .NET Framework Runner -> .NET Frameworks Testhost.
+    [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -210,7 +211,6 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     [Ignore("Flaky on CI")]
     public async Task CancelTestDiscovery(RunnerInfo runnerInfo)

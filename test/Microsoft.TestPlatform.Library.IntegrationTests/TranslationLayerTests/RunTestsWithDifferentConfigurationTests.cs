@@ -7,13 +7,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+using Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.EventHandler;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
+namespace Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests;
 
 /// <summary>
 /// The Run Tests using VsTestConsoleWrapper API's
@@ -44,7 +45,6 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithTestAdapterPath(RunnerInfo runnerInfo)
     {
@@ -67,7 +67,6 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
     {
@@ -101,7 +100,9 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource()]
+    // Uses testsettings, which is a concept that is more likely on .NET Framework because it comes from TPv0, so run on .NET Framework testhost.
+    // TODO: remove this test? we deprecated testsettings. 
+    [NetFullTargetFrameworkDataSource]
     public void RunTestsWithTestSettingsInTpv2(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -132,7 +133,9 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource()]
+    // Uses testsettings, which is a concept that is more likely on .NET Framework because it comes from TPv0, so run on .NET Framework testhost.
+    // TODO: remove this test? we deprecated and removed tpv0, check if we can also remove some test asset.. 
+    [NetFullTargetFrameworkDataSource]
     public void RunTestsWithTestSettingsInTpv0(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -195,7 +198,6 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithX64Source(RunnerInfo runnerInfo)
     {

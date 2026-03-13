@@ -7,8 +7,6 @@ using System.IO;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
-
-using TestPlatform.TestUtilities;
 using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using FluentAssertions;

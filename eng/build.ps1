@@ -46,6 +46,18 @@ if ($properties -like "*TestRunnerAdditionalArguments*--filter*") {
   throw "Use --filter instead of passing filter as an additional argument to TestRunnerAdditionalArguments."
 }
 
+if ($smokeTest -and $integrationTest) {
+  throw "Cannot specify both smoke and integration tests. Smoke tests are a subset of integration tests, so specifying both is redundant and will run all integration tests."
+}
+
+if ($compatibilityTest -and $integrationTest) {
+  throw "Cannot specify both compatibility and integration tests. Compatibility tests additional tests on top of integration tests, you probably don't want to run both at the same time."
+}
+
+if ($performanceTest -and $integrationTest) {
+  throw "Cannot specify both performance and integration tests. Performance tests additional tests on top of integration tests, you probably don't want to run both at the same time."
+}
+
 $filters = @()
 # This translates to properties on test context, the only way MSTest allows us to pass info dynamically to AssemblyInitialize
 $testParameters = @{}
@@ -57,16 +69,8 @@ if ($filter) {
   $filters += $filter
 }
 
-if ($smokeTest -and $integrationTest) {
-  throw "Cannot specify both smoke and integration tests. Smoke tests are a subset of integration tests, so specifying both is redundant and will run all integration tests."
-}
-
-if ($compatibilityTest -and $integrationTest) {
-  throw "Cannot specify both compatibility and integration tests. Compatibility tests additional tests on top of integration tests, you probably don't want to run both at the same time."
-}
-
-if ($performanceTest -and $integrationTest) {
-  throw "Cannot specify both performance and integration tests. Performance tests additional tests on top of integration tests, you probably don't want to run both at the same time."
+if ([System.Environment]::OSVersion.Platform -like "Win*") {
+  $filters += "TestCategory!=Windows&TestCategory!=Windows-Review"
 }
 
 if ($smokeTest) {
@@ -81,11 +85,7 @@ if ($compatibilityTest) {
   $filters += "TestCategory=Compatibility"
 }
 else {
-  if (-not $smokeTest) {
-    # It is too easy to put Smoke category on test that is a compatibility test by mistake, in fact compatibility tests are 
-    # the best candidates for smoke tests, if we only reduce the run to the latest version. Because they test common scenarios.
-    $filters += "TestCategory!=Compatibility"
-  }
+  $filters += "TestCategory!=Compatibility"
 }
 
 if ($performanceTest) {
@@ -114,7 +114,6 @@ if ($filters.Count -gt 0 -or $testParameters.Count -gt 0) {
   $PSBoundParameters['properties'] += "/p:TestRunnerAdditionalArguments=$filterString $testParameterString"
 }
 
-Write-Host ($PSBoundParameters | fl -force  * | out-string)
 # Call the build script provided by Arcade
 & $PSScriptRoot/common/build.ps1 @PSBoundParameters
 

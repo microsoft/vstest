@@ -4,10 +4,11 @@
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.Library.IntegrationTests;
 
 [TestClass]
 public class MetadataReaderHelperTests : AcceptanceTestBase

@@ -3,7 +3,7 @@
 
 using System.Reflection;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.TestUtilities;
 
 /// <summary>
 /// Test compatibility of vstest.console and testhost with different MSTest versions.

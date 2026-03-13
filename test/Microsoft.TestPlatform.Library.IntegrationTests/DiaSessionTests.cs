@@ -8,7 +8,7 @@ using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.Library.IntegrationTests;
 
 [TestClass]
 public class DiaSessionTests : AcceptanceTestBase

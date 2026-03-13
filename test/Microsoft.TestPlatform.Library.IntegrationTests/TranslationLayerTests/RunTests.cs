@@ -9,6 +9,8 @@ using System.Threading;
 
 using FluentAssertions;
 
+using Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.EventHandler;
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -17,7 +19,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
+namespace Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests;
 
 /// <summary>
 /// The Run Tests using VsTestConsoleWrapper API's
@@ -62,6 +64,8 @@ public class RunTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [WrapperCompatibilityDataSource(BeforeFeature = Features.MULTI_TFM)]
+    [TestCategory("Smoke")]
+    [NetCoreTargetFrameworkDataSource]
     public void RunAllTestsWithMixedTFMsWillFailToRunTestsFromTheIncompatibleTFMDll(RunnerInfo runnerInfo)
     {
         // Arrange
@@ -107,7 +111,6 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     [DoNotParallelize]
     public void EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
@@ -130,7 +133,6 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithTelemetryOptedIn(RunnerInfo runnerInfo)
     {
@@ -154,7 +156,6 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithTelemetryOptedOut(RunnerInfo runnerInfo)
     {
@@ -173,8 +174,9 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    // This is testing the behavior of crash in testhost, run on different testhost, and just .NET runner.
+    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunTestsShouldThrowOnStackOverflowException(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -198,8 +200,8 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
+    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

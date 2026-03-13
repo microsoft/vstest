@@ -3,7 +3,7 @@
 
 using System.Reflection;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.TestUtilities;
 
 /// <summary>
 /// A data source that checks compatibility of changes in VSTestConsoleWrapper with different versions of vstest.console.

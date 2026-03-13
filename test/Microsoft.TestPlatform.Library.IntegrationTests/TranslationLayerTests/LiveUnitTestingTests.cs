@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
+using Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.EventHandler;
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests;
+namespace Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests;
 
 [TestClass]
 public class LiveUnitTestingTests : AcceptanceTestBase
@@ -34,8 +36,8 @@ public class LiveUnitTestingTests : AcceptanceTestBase
 
 
     [TestMethod]
+    // Touches appdomain settings, preferring .NET Framework testhost here.
     [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingLiveUnitTesting(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -59,8 +61,8 @@ public class LiveUnitTestingTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // Touches appdomain settings, preferring .NET Framework testhost here.
     [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithLiveUnitTesting(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

@@ -3,7 +3,7 @@
 
 using System.Reflection;
 
-namespace Microsoft.TestPlatform.AcceptanceTests;
+namespace Microsoft.TestPlatform.TestUtilities;
 
 /// <summary>
 /// A data source that provides a custom mix of runners, hosts and mstest adapter. You can control everything,
