@@ -680,6 +680,8 @@ public class DotnetTestHostManagerTests
     // but latest would use net9.0 because that is the latest one on your system.
     [DataRow("net9.0", "9.0", true)]
     [DataRow("net9.0", "latest", false)]
+    [DataRow("net10.0", "10.0", true)]
+    [DataRow("net10.0", "latest", false)]
     public void GetTestHostProcessStartInfoShouldIncludeTestHostPathNextToTestRunnerIfTesthostDllIsNoFoundAndDepsFileNotFoundWithTheCorrectTfm(string tfm, string suffix, bool runtimeConfigExists)
     {
         // Absolute path to the source directory

@@ -21,6 +21,7 @@
   <ItemGroup Label="NuGet">
     <NuspecProperty Include="NewtonsoftJsonVersion=$(NewtonsoftJsonVersion)" />
     <NuspecProperty Include="SrcPackageFolder=$(SrcPackageFolder)" />
+    <NuspecProperty Include="TesthostRuntimeconfig=$(RepoRoot)temp\testhost" />
   </ItemGroup>
 
   <ItemGroup>

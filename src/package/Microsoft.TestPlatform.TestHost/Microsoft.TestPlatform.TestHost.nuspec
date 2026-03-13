@@ -45,9 +45,11 @@
     -->
     <file src="net8.0\testhost.dll" target="build\net8.0\x64\" />
     <file src="net8.0\testhost.exe" target="build\net8.0\x64\" />
+    <file src="$TesthostRuntimeconfig$\testhost.runtimeconfig.json" target="build\net8.0\x64\" />
 
     <file src="net8.0\testhost.x86.dll" target="build\net8.0\x86\" />
     <file src="net8.0\testhost.x86.exe" target="build\net8.0\x86\" />
+    <file src="$TesthostRuntimeconfig$\testhost.runtimeconfig.json" target="build\net8.0\x86\testhost.x86.runtimeconfig.json" />
 
     <file src="net8.0\Microsoft.TestPlatform.TestHost.props" target="build\net8.0\" />
     <file src="net8.0\Microsoft.TestPlatform.TestHost.targets" target="build\net8.0\" />
