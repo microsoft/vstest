@@ -61,7 +61,7 @@ if ($filter) {
   $filters += $filter
 }
 
-if ([System.Environment]::OSVersion.Platform -like "Win*") {
+if ([System.Environment]::OSVersion.Platform -notlike "Win*") {
   $filters += "TestCategory!=Windows&TestCategory!=Windows-Review"
 }
 
