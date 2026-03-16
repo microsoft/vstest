@@ -36,6 +36,7 @@ public class IntegrationTestBuild : IntegrationTestBase
         if (skipBuild)
         {
             Debug.WriteLine("SkipIntegrationBuild parameter is true, skipping build.");
+            return;
         }
 
         var buildCompatibility = GetTestParameter(context, "BuildCompatibility");

@@ -185,7 +185,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     /// </summary>
     [TestMethod]
     [TestCategory("Windows-Review")]
-    // todo: remove we don't support tmi anomore, and remove the test settings
+    // todo: remove we don't support tmi anymore, and remove the test settings
     [Ignore("Temporary ignoring, because of incomplete interop work for legacy TP")]
     [NetFullTargetFrameworkDataSource]
     public void DiscoverTmiTestsWithOnlyPropertyValue(RunnerInfo runnerInfo)

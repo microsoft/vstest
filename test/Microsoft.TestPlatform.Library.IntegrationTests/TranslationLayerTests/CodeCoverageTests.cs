@@ -436,7 +436,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         var processManager = (_vstestConsoleWrapper).GetType().GetField("_vstestConsoleProcessManager", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(_vstestConsoleWrapper)!;
         var processId = (int)processManager.GetType().GetProperty("ProcessId", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)!.GetValue(processManager)!;
         var consoleProcess = Process.GetProcessById(processId);
-        Assert.IsFalse(consoleProcess.HasExited, $"vstest.console process did not start");
+        Assert.IsFalse(consoleProcess.HasExited, $"vstest.console should be running");
 
         // act
         _vstestConsoleWrapper!.EndSession();
