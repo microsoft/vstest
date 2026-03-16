@@ -46,6 +46,12 @@ public class IntegrationTestEnvironment
     /// </summary>
     public static string ExtensionsDirectory { get; } = Path.Combine(PublishDirectory, $"Microsoft.TestPlatform.{IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}.nupkg", "tools", "net462", "Common7", "IDE", "Extensions", "TestPlatform", "Extensions");
 
+    /// <summary>
+    /// Gets the local NuGet cache directory used by test assets.
+    /// Test assets are restored into this directory by *Build.cs via <c>dotnet restore --packages</c>.
+    /// </summary>
+    public static string TestAssetsNuGetCacheDirectory { get; } = Path.Combine(RepoRootDirectory, "artifacts", ".packages");
+
     private static Dictionary<string, string>? s_dependencyVersions;
 
     private string? _targetRuntime;
@@ -63,7 +69,7 @@ public class IntegrationTestEnvironment
 
         // There is an assumption that integration tests will always run from a source enlistment.
         // Need to remove this assumption when we move to a CDP.
-        PackageDirectory = Path.Combine(RepoRootDirectory, @".packages");
+        PackageDirectory = TestAssetsNuGetCacheDirectory;
         TestArtifactsDirectory = Path.Combine(RepoRootDirectory, "artifacts", "testArtifacts");
         RunnerFramework = "net48";
     }

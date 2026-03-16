@@ -19,6 +19,7 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -786,10 +787,14 @@ public class IntegrationTestBase
             }
         }
 
-        if (environmentVariables.Count > 0)
+        if (!environmentVariables.ContainsKey(EnvironmentHelper.VstestConnectionTimeout))
         {
-            // This clears all variables, so we copy all environment variables, and add the debug ones to them.
-            consoleParameters.EnvironmentVariables = environmentVariables;
+            // Reduce timeout to 5 seconds (from the default 90 seconds), when user does not want to debug (attaching takes time and happens in entrypoint)
+            // and if the test is not explicitly setting the timeout. This makes tests fail faster when there is systemic problem with starting vstest.console.
+            if (_testEnvironment.DebugInfo == null || _testEnvironment.DebugInfo.DebugVSTestConsole == false)
+            {
+                environmentVariables[EnvironmentHelper.VstestConnectionTimeout] = "5";
+            }
         }
 
         var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, consoleParameters);

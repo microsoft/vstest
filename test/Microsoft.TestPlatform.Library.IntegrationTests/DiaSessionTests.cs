@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.Library.IntegrationTests;
 
 [TestClass]
+// TODO: these tests potentially not test anything useful that we would not test in other tests? Replace them with integration tests that have portable and full symbols test file, and that collect source info, unless we have such tests already. Right now we test just portable symbol reader it seems.
 public class DiaSessionTests : AcceptanceTestBase
 {
     public static string? GetAndSetTargetFrameWork(IntegrationTestEnvironment testEnvironment)
