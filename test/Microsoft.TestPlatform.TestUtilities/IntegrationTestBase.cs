@@ -71,6 +71,13 @@ public class IntegrationTestBase
         IsCI = IntegrationTestEnvironment.IsCI;
     }
 
+    [TestInitialize]
+    public void IntegrationTestBaseSetup()
+    {
+        // Write test name so we know what the temp folder is for.
+        File.WriteAllText(Path.Combine(TempDirectory.Path, "testName.txt"), $"{TestContext?.FullyQualifiedTestClassName}.{TestContext?.TestName}");
+    }
+
     public string StdOut => _standardTestOutput;
     public string StdOutWithWhiteSpace { get; private set; } = string.Empty;
 

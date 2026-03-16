@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Newtonsoft.Json.Linq;
@@ -18,7 +19,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
 {
     [TestMethod]

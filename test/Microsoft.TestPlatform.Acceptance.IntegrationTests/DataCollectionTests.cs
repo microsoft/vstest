@@ -17,7 +17,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class DataCollectionTests : AcceptanceTestBase
 {
     [TestMethod]

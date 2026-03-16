@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
@@ -8,7 +9,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 // this is tested only on .NET Framework
 [TestCategory("Windows-Review")]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class ListExtensionsTests : AcceptanceTestBase
 {
     [TestMethod]

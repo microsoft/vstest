@@ -12,7 +12,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
-[SkipIOutOfProcessTestOnNetFrameworkCondition]
 public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 {
     [TestMethod]
@@ -70,13 +69,14 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
+    // TODO: remove the test, we deprecated and removed web test, and check if we can remove the test asset as well.
     [NetFullTargetFrameworkDataSource]
     [Ignore("After the bump of TestPlatformRemoteExternalsVersion to 17.6 it doesn't work anymore, it's a test for the legacy platform and fails for wrong Microsoft.VisualStudio.Telemetry version.")]
     public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
     {
         if (!IsCI)
         {
-            Assert.Inconclusive("This works on server but not locally, because locally it grabs old dll from GAC, but has version 10.0.0 as the one in our package.");
+            Assert.Inconclusive("This works in CI but not locally, because locally it grabs old dll from GAC, but has version 10.0.0 as the one in our package.");
         }
 
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -129,6 +129,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
+    // Todo: remove, and remove test asset as well
     [Ignore("Test expects .NETFramework,Version=v4.5.2 support but the minimum one is .NETFramework,Version=v4.6.2")]
     public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
     {
