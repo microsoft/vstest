@@ -186,6 +186,44 @@ follows:
 > /src/vstest/artifacts/Debug/net46/win7-x64/vstest.console.exe /?
 ```
 
+## Debugging Integration Tests
+
+Integration tests (in `test/Microsoft.TestPlatform.AcceptanceTests`) run vstest.console and testhost as separate processes. You can attach Visual Studio to those processes automatically by using the `DebugInfo` properties on the test data source attributes.
+
+### Using DebugInfo properties on test attributes
+
+The `NetCoreRunnerAttribute` and `NetFrameworkRunnerAttribute` attributes (and other data source attributes like `CompatibilityRowsBuilder`) expose the following boolean properties:
+
+| Property | What it debugs | Environment variable set |
+|---|---|---|
+| `DebugVSTestConsole = true` | vstest.console (the runner) | `VSTEST_RUNNER_DEBUG_ATTACHVS=1` |
+| `DebugTestHost = true` | testhost (the test process) | `VSTEST_HOST_DEBUG_ATTACHVS=1` |
+| `DebugDataCollector = true` | data collector process | `VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS=1` |
+| `DebugStopAtEntrypoint = true` | keeps entry point breakpoints | (when `false`, sets `VSTEST_DEBUG_NOBP=1`) |
+
+### Step-by-step: attaching VS to an integration test
+
+1. Open the solution in Visual Studio.
+2. Find the integration test method you want to debug, for example:
+
+    ```csharp
+    [TestMethod]
+    [NetCoreRunner(AcceptanceTestBase.NET9, DebugVSTestConsole = true)]
+    public void MyTest(RunnerInfo runnerInfo)
+    {
+        // ...
+    }
+    ```
+
+3. Set breakpoints in the vstest source code corresponding to what you are debugging (e.g. inside `vstest.console`, `testhost`, or the `datacollector` project).
+4. Run that specific test case from the Test Explorer in Visual Studio.
+5. The test infrastructure automatically builds `AttachVS.exe` (from `src/AttachVS`) and sets `VSTEST_DEBUG_ATTACHVS_PATH` to point to it. When vstest.console starts, it will invoke `AttachVS.exe`, which attaches the running Visual Studio instance to the launched process.
+6. Your breakpoints in the vstest source code will be hit.
+
+> **Note:** `DebugStopAtEntrypoint = false` (the default) sets `VSTEST_DEBUG_NOBP=1`, which skips the entry-point breakpoint to go directly to your breakpoints. Set `DebugStopAtEntrypoint = true` if you want to explore and are not sure where to put your breakpoint.
+
+> **Note:** `AttachVS` looks for a running Visual Studio instance. Make sure you are running the integration test from within Visual Studio (not from the CLI) for the automatic attach to work. If you do run from the command line it will try to find VS instance using the AttachVS heuristic (look for parent process that is VS, look for the instance of VS that was started first).
+
 ## Diagnostics
 
 Try to isolate the failure scenario. In the best case it's just a command line

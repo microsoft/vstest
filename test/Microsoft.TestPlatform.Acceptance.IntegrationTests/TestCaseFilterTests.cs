@@ -158,15 +158,11 @@ public class TestCaseFilterTests : AcceptanceTestBase
     /// </summary>
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
+    // MSTest v1 tests from dlls are only supported in .NET Framework runner, in and outside of VS
+    // via Microsoft.VisualStudio.TestPlatform.Extensions.VSTestIntegration.dll
+    [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
     public void DiscoverMstestV1TestsWithAndOperatorTrait(RunnerInfo runnerInfo)
     {
-        if (runnerInfo.IsNetRunner)
-        {
-            Assert.Inconclusive("Mstest v1 tests not supported with .NET Core runner.");
-            return;
-        }
-
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(
@@ -189,6 +185,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     /// </summary>
     [TestMethod]
     [TestCategory("Windows-Review")]
+    // todo: remove we don't support tmi anomore, and remove the test settings
     [Ignore("Temporary ignoring, because of incomplete interop work for legacy TP")]
     [NetFullTargetFrameworkDataSource]
     public void DiscoverTmiTestsWithOnlyPropertyValue(RunnerInfo runnerInfo)

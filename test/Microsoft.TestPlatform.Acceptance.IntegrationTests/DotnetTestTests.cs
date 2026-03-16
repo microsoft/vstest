@@ -21,6 +21,7 @@ public class DotnetTestTests : AcceptanceTestBase
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestCategory("Smoke")]
     public void RunDotnetTestWithCsproj(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

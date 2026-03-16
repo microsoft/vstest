@@ -47,6 +47,10 @@ parameters:
   displayName: "Skip tests"
   type: boolean
   default: False
+- name: codeQLForce
+  displayName: "Try collecting CodeQL before default CodeQL cadence"
+  type: boolean
+  default: False
 
 - name: otherOsPools
   type: object
@@ -84,6 +88,13 @@ variables:
   - ${{ if eq(parameters.isRTM, True) }}:
     - name: _ReleaseVersionKind
       value: release
+
+  # Set to 0 to force CodeQL scan without waiting 72 from last attempt (even if it failed).
+  # This is only a hint for the tool, it might reject to run it if it already has up to date data.
+  # See the Starting Code QL step for details.
+  - ${{ if eq(parameters.codeQLForce, True) }}:
+    - name: Codeql.Cadence 
+      value: 0
 
   # Group gives access to $microsoft-symbol-server-pat and $symweb-symbol-server-pat
   - group: DotNet-Symbol-Server-Pats
@@ -183,10 +194,21 @@ extends:
                   -configuration Release
                   -ci
                   -nobl
-                  -integrationTest
-                  -performanceTest
                 name: Test
-                displayName: Test
+                displayName: Unit Test
+                env:
+                  DOTNET_ROOT: $(Build.SourcesDirectory)/.dotnet
+              # -ci is allowing to import some environment variables and some required configurations
+              # -nobl avoid overwriting binlog of the main Build
+              - script: Test.cmd
+                  -configuration Release
+                  -ci
+                  -nobl
+                  -integrationTest
+                  -compatibilityTest
+                  -performanceTest
+                name: IntegrationTest
+                displayName: Integration Test
                 env:
                   DOTNET_ROOT: $(Build.SourcesDirectory)/.dotnet
 
@@ -198,6 +220,13 @@ extends:
                   PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/Release'
                   ArtifactName: TestResults
                 condition: failed()
+              
+              # Remove generated test projects from the compatibility matrix because they use older versions of our packages
+              # and some of them use dependencies that are now vulnerable.
+              # We don't depend on those vulnerable versions anymore, but need to keep restoring them to ensure backwards compatibility.
+              - pwsh: |
+                  Remove-Item -Path $(Build.SourcesDirectory)/artifacts/tmp/GeneratedTestAssets -Recurse -Force
+                displayName: Remove artifacts/tmp/GeneratedTestAssets
 
             - task: 1ES.PublishBuildArtifacts@1
               displayName: 'Publish VSSetup'
@@ -243,6 +272,15 @@ extends:
                     --performanceTest
                   name: Test
                   displayName: Test
+                  env:
+                    DOTNET_ROOT: $(Build.SourcesDirectory)/.dotnet
+                
+                # Remove generated test projects from the compatibility matrix because they use older versions of our packages
+                # and some of them use dependencies that are now vulnerable.
+                # We don't depend on those vulnerable versions anymore, but need to keep restoring them to ensure backwards compatibility.
+                - pwsh: |
+                    Remove-Item -Path $(Build.SourcesDirectory)/artifacts/tmp/GeneratedTestAssets -Recurse -Force
+                  displayName: Remove artifacts/tmp/GeneratedTestAssets
 
                 # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
                 # through the console or trx

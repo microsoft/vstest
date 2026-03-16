@@ -60,7 +60,7 @@ public class DataCollectionManagerTests
     [TestMethod]
     public void InitializeDataCollectorsShouldThrowExceptionIfSettingsXmlIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(null!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(null!));
     }
 
     [TestMethod]
@@ -142,14 +142,14 @@ public class DataCollectionManagerTests
     public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsEmpty()
     {
         var dataCollectorSettingsWithEmptyUri = string.Format(CultureInfo.InvariantCulture, _defaultRunSettings, string.Format(CultureInfo.InvariantCulture, _defaultDataCollectionSettings, _friendlyName, string.Empty, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).Assembly.Location, string.Empty));
-        Assert.ThrowsException<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithEmptyUri));
+        Assert.ThrowsExactly<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithEmptyUri));
     }
 
     [TestMethod]
     public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsEmptyAndUriIsCorrect()
     {
         var dataCollectorSettingsWithEmptyFriendlyName = string.Format(CultureInfo.InvariantCulture, _defaultRunSettings, string.Format(CultureInfo.InvariantCulture, _defaultDataCollectionSettings, _friendlyName, string.Empty, _mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).Assembly.Location, string.Empty));
-        Assert.ThrowsException<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithEmptyFriendlyName));
+        Assert.ThrowsExactly<ArgumentNullException>(() => _dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithEmptyFriendlyName));
     }
 
     [TestMethod]

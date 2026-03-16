@@ -610,7 +610,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
             _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(true)]
     [DataRow(false)]
     public void HandleDiscoveryCompleteWhenAbortedNoPastDiscoveryAndNoLastCunkNotifiesWithCorrectDiscovery(bool trueIsEmptyFalseIsNull)
@@ -635,7 +635,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         Assert.AreEqual(0, _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(true)]
     [DataRow(false)]
     public void HandleDiscoveryCompleteWhenAbortedPastDiscoveryAndNoLastCunkNotifiesWithCorrectDiscovery(bool trueIsEmptyFalseIsNull)

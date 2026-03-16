@@ -242,7 +242,7 @@ public class RunConfigurationTests
 
     [DataRow(true)]
     [DataRow(false)]
-    [DataTestMethod]
+    [TestMethod]
     public void RunConfigurationShouldReadValueForDesignMode(bool designModeValue)
     {
         string settingsXml = string.Format(
@@ -285,7 +285,7 @@ public class RunConfigurationTests
 
     [DataRow(true)]
     [DataRow(false)]
-    [DataTestMethod]
+    [TestMethod]
     public void RunConfigurationShouldReadValueForCollectSourceInformation(bool val)
     {
         string settingsXml = string.Format(
@@ -318,7 +318,7 @@ public class RunConfigurationTests
         Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(true)]
     [DataRow(false)]
     public void RunConfigurationToXmlShouldProvideCollectSourceInformationSameAsDesignMode(bool val)

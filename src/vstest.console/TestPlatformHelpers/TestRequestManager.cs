@@ -888,6 +888,8 @@ internal class TestRequestManager : ITestRequestManager
                     return Architecture.Ppc64le;
                 case PlatformArchitecture.RiscV64:
                     return Architecture.RiscV64;
+                case PlatformArchitecture.LoongArch64:
+                    return Architecture.LoongArch64;
                 default:
                     EqtTrace.Error($"TestRequestManager.TranslateToArchitecture: Unhandled architecture '{targetArchitecture}'.");
                     break;
@@ -1636,6 +1638,12 @@ internal static class KnownPlatformSourceFilter
         "Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll",
         "Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll",
         "Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.resources.dll",
+
+        // For MSTest v4
+        "MSTest.TestAdapter.dll",
+        "MSTest.TestFramework.dll",
+        "MSTest.TestFramework.Extensions.dll",
+        "MSTestAdapter.PlatformServices.dll",
     }, StringComparer.OrdinalIgnoreCase);
 
 
