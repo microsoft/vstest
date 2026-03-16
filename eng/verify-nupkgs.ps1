@@ -19,13 +19,8 @@ function Verify-Nuget-Packages {
     $expectedNumOfFiles = @{
         "Microsoft.CodeCoverage"                      = 75
         "Microsoft.NET.Test.Sdk"                      = 25
-<<<<<<< video-recorder
-        "Microsoft.TestPlatform"                      = 542
+        "Microsoft.TestPlatform"                      = 544
         "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI" = 388
-=======
-        "Microsoft.TestPlatform"                      = 539
-        "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI" = 380
->>>>>>> main
         "Microsoft.TestPlatform.Build"                = 20
         "Microsoft.TestPlatform.CLI"                  = 482
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 34
