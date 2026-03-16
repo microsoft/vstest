@@ -129,7 +129,7 @@ if ($filters.Count -gt 0 -or $testParameters.Count -gt 0) {
   $filterString = "--filter \`"$($filters -join '&')\`""
   $testParameterString = ($testParameters.GetEnumerator() | ForEach-Object { "--test-parameter $($_.Key)=$($_.Value)" }) -join ' '
   
-  $PSBoundParameters['properties'] += "/p:TestRunnerAdditionalArguments=$filterString $testParameterString"
+  $PSBoundParameters['properties'] += "/p:TestRunnerExternalArguments=$filterString $testParameterString"
   Write-Host "Running tests with filter: $filterString and additional parameters: $testParameterString"
 }
 
