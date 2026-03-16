@@ -797,6 +797,12 @@ public class IntegrationTestBase
             }
         }
 
+        if (environmentVariables.Count > 0)
+        {
+            // This clears all variables, so we copy all environment variables, and add the debug ones to them.
+            consoleParameters.EnvironmentVariables = environmentVariables;
+        }
+
         var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, consoleParameters);
         vstestConsoleWrapper.StartSession();
 
