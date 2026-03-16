@@ -134,6 +134,8 @@
   <!-- Test config -->
   <PropertyGroup>
     <TestRunnerName>MSTest</TestRunnerName>
+    <!-- Skip windows only tests on non-windows systems. -->
+    <TestRunnerAdditionalArguments Condition=" '$(OS)' != 'Windows_NT' ">$(TestRunnerAdditionalArguments) --filter "TestCategory!=Windows&amp;TestCategory!=Windows-Review"</TestRunnerAdditionalArguments>
     <!-- Allow us to see errors instead of capturing everything into files. -->
     <TestCaptureOutput>false</TestCaptureOutput>
   </PropertyGroup>
