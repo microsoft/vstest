@@ -68,7 +68,7 @@ public class IntegrationTestBuild : IntegrationTestBase
                 }
                 else
                 {
-                    Debug.WriteLine("BuildCompatiblity parameter is false, skipping build.");
+                    Debug.WriteLine("BuildCompatibility parameter is false, skipping build.");
                 }
                 Debug.WriteLine($"Building test assets compatibility matrix took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
                 CopyAndPatchDotnet();
