@@ -129,8 +129,10 @@ if ($filters.Count -gt 0 -or $testParameters.Count -gt 0) {
   $filterString = "--filter \`"$($filters -join '&')\`""
   $testParameterString = ($testParameters.GetEnumerator() | ForEach-Object { "--test-parameter $($_.Key)=$($_.Value)" }) -join ' '
   
+  if (-not $PSBoundParameters.ContainsKey('properties')) {
+    $PSBoundParameters['properties'] = @()
+  }
   $PSBoundParameters['properties'] += "/p:TestRunnerExternalArguments=$filterString $testParameterString"
-  Write-Host "Running tests with filter: $filterString and additional parameters: $testParameterString"
 }
 
 # Call the build script provided by Arcade
