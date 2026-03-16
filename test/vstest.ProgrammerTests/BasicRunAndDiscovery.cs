@@ -4,9 +4,12 @@
 using System.Diagnostics.CodeAnalysis;
 
 using FluentAssertions;
+
 using Intent;
+
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
 using vstest.ProgrammerTests.Fakes;
 
 #pragma warning disable IDE1006 // Naming Styles

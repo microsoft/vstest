@@ -5,13 +5,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 using FluentAssertions;
+
 using Intent;
+
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+
 using vstest.ProgrammerTests.Fakes;
 
 namespace vstest.ProgrammerTests;
