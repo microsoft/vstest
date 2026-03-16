@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.Common;
@@ -69,7 +70,11 @@ public class IntegrationTestEnvironment
 
         // There is an assumption that integration tests will always run from a source enlistment.
         // Need to remove this assumption when we move to a CDP.
-        PackageDirectory = TestAssetsNuGetCacheDirectory;
+        LocalPackageDirectory = TestAssetsNuGetCacheDirectory;
+        GlobalPackageDirectory = Environment.GetEnvironmentVariable("NUGET_PACKAGES")
+            ?? (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages")
+            : Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? "", ".nuget", "packages"));
         TestArtifactsDirectory = Path.Combine(RepoRootDirectory, "artifacts", "testArtifacts");
         RunnerFramework = "net48";
     }
@@ -93,9 +98,14 @@ public class IntegrationTestEnvironment
         => s_dependencyVersions ??= GetDependencies(RepoRootDirectory);
 
     /// <summary>
-    /// Gets the nuget packages directory for enlistment.
+    /// Gets the local nuget packages directory for integration tests.
     /// </summary>
-    public string PackageDirectory { get; }
+    public string LocalPackageDirectory { get; }
+
+    /// <summary>
+    /// Gets the global nuget packages directory.
+    /// </summary>
+    public string GlobalPackageDirectory { get; }
 
     /// <summary>
     /// Gets the target framework.
@@ -242,7 +252,7 @@ public class IntegrationTestEnvironment
     /// <remarks>GetNugetPackage("foobar") will return a path to packages\foobar.</remarks>
     public string GetNugetPackage(string packageSuffix)
     {
-        var packagePath = Path.Combine(PackageDirectory, packageSuffix);
+        var packagePath = Path.Combine(LocalPackageDirectory, packageSuffix);
 
         Assert.IsTrue(Directory.Exists(packagePath), "GetNugetPackage: Directory not found: {0}.", packagePath);
 

@@ -28,7 +28,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     public BlameDataCollectorTests()
     {
-        _procDumpPath = Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin");
+        _procDumpPath = Path.Combine(_testEnvironment.LocalPackageDirectory, @"procdump\0.0.1\bin");
         var procDumpExePath = Path.Combine(_procDumpPath, "procdump.exe");
         if (!File.Exists(procDumpExePath))
         {
