@@ -64,7 +64,7 @@ public class TargetFrameworkTestHostDemultiplexer : AcceptanceTestBase
         {
             // Times out sometimes in CI with the 5 second timeout we normally use to get faster failure feedback.
             // Probably because we start many testhosts here and the server is slow and busy.
-            [EnvironmentHelper.VstestConnectionTimeout] = "20",
+            [EnvironmentHelper.VstestConnectionTimeout] = "90",
             ["VSTEST_LOGFOLDER"] = TempDirectory.Path,
         };
         Setup(environmentVariables);
