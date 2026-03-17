@@ -17,17 +17,17 @@ public class RunEventHandler : ITestRunEventsHandler
     /// <summary>
     /// Gets the test results.
     /// </summary>
-    public List<TestResult> TestResults { get; private set; }
+    public ConcurrentList<TestResult> TestResults { get; private set; }
 
     /// <summary>
     /// Gets the attachments.
     /// </summary>
-    public List<AttachmentSet> Attachments { get; private set; }
+    public ConcurrentList<AttachmentSet> Attachments { get; private set; }
 
     /// <summary>
     /// Gets the list of the invoked data collectors.
     /// </summary>
-    public List<InvokedDataCollector> InvokedDataCollectors { get; private set; }
+    public ConcurrentList<InvokedDataCollector> InvokedDataCollectors { get; private set; }
 
     /// <summary>
     /// Gets the metrics.
@@ -39,7 +39,7 @@ public class RunEventHandler : ITestRunEventsHandler
     /// </summary>
     public string? LogMessage { get; private set; }
 
-    public List<string?> Errors { get; set; }
+    public ConcurrentList<string?> Errors { get; set; }
 
     /// <summary>
     /// Gets the test message level.
@@ -48,10 +48,10 @@ public class RunEventHandler : ITestRunEventsHandler
 
     public RunEventHandler()
     {
-        TestResults = new List<TestResult>();
-        Errors = new List<string?>();
-        Attachments = new List<AttachmentSet>();
-        InvokedDataCollectors = new List<InvokedDataCollector>();
+        TestResults = new ConcurrentList<TestResult>();
+        Errors = new ConcurrentList<string?>();
+        Attachments = new ConcurrentList<AttachmentSet>();
+        InvokedDataCollectors = new ConcurrentList<InvokedDataCollector>();
     }
 
     public void EnsureSuccess()

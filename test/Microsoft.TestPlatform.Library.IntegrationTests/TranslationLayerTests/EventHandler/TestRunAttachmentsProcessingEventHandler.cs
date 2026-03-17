@@ -15,18 +15,18 @@ namespace Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.
 /// <inheritdoc />
 public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProcessingEventsHandler
 {
-    public List<AttachmentSet> Attachments { get; private set; }
+    public ConcurrentList<AttachmentSet> Attachments { get; private set; }
 
     public TestRunAttachmentsProcessingCompleteEventArgs? CompleteArgs { get; private set; }
 
-    public List<TestRunAttachmentsProcessingProgressEventArgs> ProgressArgs { get; private set; }
+    public ConcurrentList<TestRunAttachmentsProcessingProgressEventArgs> ProgressArgs { get; private set; }
 
     /// <summary>
     /// Gets the log message.
     /// </summary>
     public string? LogMessage { get; private set; }
 
-    public List<string?> Errors { get; set; }
+    public ConcurrentList<string?> Errors { get; set; }
 
     /// <summary>
     /// Gets the test message level.
@@ -36,8 +36,8 @@ public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProce
     public TestRunAttachmentsProcessingEventHandler()
     {
         Errors = new();
-        Attachments = new List<AttachmentSet>();
-        ProgressArgs = new List<TestRunAttachmentsProcessingProgressEventArgs>();
+        Attachments = new ConcurrentList<AttachmentSet>();
+        ProgressArgs = new ConcurrentList<TestRunAttachmentsProcessingProgressEventArgs>();
     }
 
     public void EnsureSuccess()
