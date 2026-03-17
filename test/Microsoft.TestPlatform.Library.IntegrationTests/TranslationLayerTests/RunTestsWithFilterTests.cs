@@ -55,7 +55,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count);
+        Assert.AreEqual(1, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
         Assert.AreEqual(TestOutcome.Passed, _runEventHandler.TestResults.First().Outcome);
     }
 
@@ -76,8 +76,8 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
+        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
     }
 }

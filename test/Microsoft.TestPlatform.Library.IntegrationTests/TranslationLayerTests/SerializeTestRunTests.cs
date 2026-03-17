@@ -113,7 +113,7 @@ public class SerialTestRunDecoratorTests : AcceptanceTestBase
             builder.AppendLine(error);
         }
 
-        Assert.IsTrue(_runEventHandler.Errors.Count > 0);
+        Assert.IsTrue(_runEventHandler.Errors.Count > 0, _runEventHandler.ToString());
         Assert.IsTrue(_runEventHandler.Errors.Contains(VisualStudio.TestPlatform.Common.Resources.Resources.SerialTestRunInvalidScenario), $"Error messages\n:{builder}");
     }
 }

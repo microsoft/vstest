@@ -49,10 +49,10 @@ public class RunSelectedTests : AcceptanceTestBase
         _vstestConsoleWrapper.RunTests(testCases, GetDefaultRunSettings(), _runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+        Assert.AreEqual(6, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped), _runEventHandler.ToString());
     }
 
     [TestMethod]
@@ -72,7 +72,7 @@ public class RunSelectedTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count);
+        Assert.AreEqual(6, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
         Assert.IsTrue(_runEventHandler.Metrics!.ContainsKey(TelemetryDataConstants.TargetDevice));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetFramework));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOS));

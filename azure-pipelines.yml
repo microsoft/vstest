@@ -132,6 +132,12 @@ stages:
             PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
             ArtifactName: TestResults
           condition: failed()
+        
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Logs'
+          inputs:
+            PathtoPublish: '$(AGENT_TEMPDIRECTORY)/vstest'
+            ArtifactName: Logs
 
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Shipping Packages'
@@ -140,7 +146,7 @@ stages:
             ArtifactName: PackageArtifacts
 
         - task: PublishBuildArtifacts@1
-          displayName: 'Publish NonShippping Packages'
+          displayName: 'Publish NonShipping Packages'
           inputs:
             PathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/NonShipping'
             ArtifactName: PackageArtifacts

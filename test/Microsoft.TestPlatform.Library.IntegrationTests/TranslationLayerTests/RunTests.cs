@@ -136,7 +136,7 @@ public class RunTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count);
+        Assert.AreEqual(6, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
         Assert.IsTrue(_runEventHandler.Metrics!.ContainsKey(TelemetryDataConstants.TargetDevice));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetFramework));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOS));
@@ -159,8 +159,8 @@ public class RunTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(0, _runEventHandler.Metrics!.Count);
+        Assert.AreEqual(6, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.AreEqual(0, _runEventHandler.Metrics!.Count, _runEventHandler.ToString());
     }
 
     [TestMethod]
