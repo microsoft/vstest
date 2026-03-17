@@ -62,7 +62,7 @@ Additional tests that can be run locally, but typically you would run just the o
 * Performance tests - run test.cmd -performanceTest
 
 > ⚠️Smoke, Integration, Compatibility and Performance tests do use the build packages that are produced by running `build.cmd -pack`, if you touch the production code (in src, e.g. in vstest.console) you should re-build before running these tests.
-> If you however just touched the integration test code, or test assets (in test/TestAssets) you can re-run the tests directly, the test assets will automatically re-build.
+> If you however touched just the integration test code, or test assets (in test/TestAssets) you can do `./build.cmd` for faster build (without -pack), or run the tests from IDE directly. The test assets will automatically re-build, but since you did not re-pack, there is no reason to fully clean and restore the dev packages, making it much faster to startup the integration tests.
 
 ### Running a specific test
 
