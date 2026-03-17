@@ -95,35 +95,33 @@ public class IntegrationTestBase
     [TestCleanup]
     public void IntegrationTestBaseTestCleanup()
     {
-        if (TestContext?.CurrentTestOutcome is UnitTestOutcome.Failed or UnitTestOutcome.Aborted)
-        {
-            foreach (var attachment in _attachments)
-            {
-                if (Directory.Exists(attachment))
-                {
-                    foreach (var file in Directory.EnumerateFiles(attachment, "*.*", SearchOption.AllDirectories))
-                    {
-                        if (Path.GetExtension(file) is ".txt" or ".log")
-                        {
-                            Console.WriteLine($"Attached File: {file}\n{File.ReadAllText(file)}\n\n");
-                        }
-                    }
-                }
-
-                if (File.Exists(attachment) && Path.GetExtension(attachment) is ".txt" or ".log")
-                {
-                    Console.WriteLine($"Attached File: {attachment}\n{File.ReadAllText(attachment)}\n\n");
-                }
-            }
-        }
-
-        // In CI always delete the results, because we have limited disk space there.
-        //
-        // Locally delete the directory only when the test succeeded, so we can look
-        // at results and logs of failed tests.
-        if (IsCI || TestContext?.CurrentTestOutcome == UnitTestOutcome.Passed)
+        // Delete the files only when test passes, so we can upload the attachments. They need to survive till the end of run.
+        if (TestContext?.CurrentTestOutcome is not (UnitTestOutcome.Failed or UnitTestOutcome.Aborted))
         {
             TempDirectory.Dispose();
+            return;
+        }
+
+        // Attach / print files that are of interest.
+        foreach (var attachment in _attachments)
+        {
+            if (Directory.Exists(attachment))
+            {
+                foreach (var file in Directory.EnumerateFiles(attachment, "*.*", SearchOption.AllDirectories))
+                {
+                    TestContext.AddResultFile(file);
+                    if (Path.GetExtension(file) is ".txt" or ".log")
+                    {
+                        Console.WriteLine($"Attached File: {file}\n{File.ReadAllText(file)}\n\n");
+                    }
+                }
+            }
+
+            if (File.Exists(attachment) && Path.GetExtension(attachment) is ".txt" or ".log")
+            {
+                TestContext.AddResultFile(attachment);
+                Console.WriteLine($"Attached File: {attachment}\n{File.ReadAllText(attachment)}\n\n");
+            }
         }
     }
 
