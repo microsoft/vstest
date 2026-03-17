@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,6 +24,7 @@ public class NetFullTargetFrameworkDataSourceAttribute : Attribute, ITestDataSou
     private readonly bool _inProcess;
     private readonly bool _useDesktopRunner;
     private readonly bool _useCoreRunner;
+    private readonly bool _useVsixRunner;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NetFullTargetFrameworkDataSourceAttribute"/> class.
@@ -31,12 +33,15 @@ public class NetFullTargetFrameworkDataSourceAttribute : Attribute, ITestDataSou
     /// <param name="inProcess">Run tests in process</param>
     /// <param name="useDesktopRunner">To run tests with desktop runner(vstest.console.exe)</param>
     /// <param name="useCoreRunner">To run tests with core runner(dotnet vstest.console.dll)</param>
-    public NetFullTargetFrameworkDataSourceAttribute(bool inIsolation = true, bool inProcess = false, bool useDesktopRunner = true, bool useCoreRunner = true)
+    /// <param name="useVsixRunner">To run tests with runner from VSIX.</param>
+    public NetFullTargetFrameworkDataSourceAttribute(bool inIsolation = true, bool inProcess = false, bool useDesktopRunner = true, bool useCoreRunner = true, bool useVsixRunner = false)
     {
         _inIsolation = inIsolation;
         _inProcess = inProcess;
         _useDesktopRunner = useDesktopRunner;
         _useCoreRunner = useCoreRunner;
+        _useVsixRunner = useVsixRunner;
+        _useVsixRunner = useVsixRunner;
     }
 
     public bool DebugVSTestConsole { get; set; }
@@ -92,6 +97,29 @@ public class NetFullTargetFrameworkDataSourceAttribute : Attribute, ITestDataSou
                 {
                     RunnerFramework = IntegrationTestBase.DesktopRunnerFramework,
                     TargetFramework = AcceptanceTestBase.DesktopTargetFramework,
+                    InIsolationValue = null
+                };
+                runnerInfo.DebugInfo = new DebugInfo
+                {
+                    DebugVSTestConsole = DebugVSTestConsole,
+                    DebugTestHost = DebugTestHost,
+                    DebugDataCollector = DebugDataCollector,
+                    DebugStopAtEntrypoint = DebugStopAtEntrypoint,
+                };
+                dataRows.Add([runnerInfo]);
+            }
+
+            if (_useVsixRunner)
+            {
+                var runnerInfo = new RunnerInfo
+                {
+                    RunnerFramework = IntegrationTestBase.DesktopRunnerFramework,
+                    TargetFramework = AcceptanceTestBase.DesktopTargetFramework,
+                    VSTestConsoleInfo = new VSTestConsoleInfo
+                    {
+                        Version = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion,
+                        Path = Path.Combine(IntegrationTestEnvironment.PublishDirectory, Path.GetFileName(IntegrationTestEnvironment.LocalVsixInsertion), "vstest.console.exe"),
+                    },
                     InIsolationValue = null
                 };
                 runnerInfo.DebugInfo = new DebugInfo
