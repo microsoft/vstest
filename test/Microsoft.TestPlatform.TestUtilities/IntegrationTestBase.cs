@@ -1036,7 +1036,8 @@ public class IntegrationTestBase
     /// Counts the number of logs following the '*.host.*' pattern in the given folder.
     /// </summary>
     protected static int CountTestHostLogs(string diagLogsDir)
-        => Directory.GetFiles(diagLogsDir, "*.host.*").Length;
+        // We put the files in logs subfolder or TMP.
+        => Directory.GetFiles(diagLogsDir, "*.host.*", SearchOption.AllDirectories).Length;
 
     protected static void AssertExpectedNumberOfHostProcesses(int expectedNumOfProcessCreated, string diagLogsDir, IEnumerable<string> testHostProcessNames,
         string? arguments = null, string? runnerPath = null)
