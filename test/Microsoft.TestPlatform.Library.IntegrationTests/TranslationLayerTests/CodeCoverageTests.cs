@@ -16,6 +16,7 @@ using Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.Even
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -33,9 +34,9 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     private TestRunAttachmentsProcessingEventHandler? _testRunAttachmentsProcessingEventHandler;
 
     [MemberNotNull(nameof(_vstestConsoleWrapper), nameof(_testRunAttachmentsProcessingEventHandler), nameof(_runEventHandler), nameof(_telemetryEventsHandler))]
-    private void Setup()
+    private void Setup(Dictionary<string, string?>? environmentVariables = null)
     {
-        _vstestConsoleWrapper = GetVsTestConsoleWrapper();
+        _vstestConsoleWrapper = GetVsTestConsoleWrapper(environmentVariables);
         _runEventHandler = new RunEventHandler();
         _testRunAttachmentsProcessingEventHandler = new TestRunAttachmentsProcessingEventHandler();
         _telemetryEventsHandler = new TelemetryEventsHandler();
@@ -299,7 +300,11 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
         // arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
+        Setup(environmentVariables: new Dictionary<string, string?>
+        {
+            // Override timeout this fails in CI.
+            [EnvironmentHelper.VstestConnectionTimeout] = "90",
+        });
 
         _vstestConsoleWrapper.RunTests(GetTestAssemblies().Take(1), GetCodeCoverageRunSettings(1, outputFormat: "Coverage"),
             null, null, _runEventHandler, _telemetryEventsHandler);
