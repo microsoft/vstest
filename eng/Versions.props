@@ -62,7 +62,12 @@
     <MicrosoftVisualStudioInteropVersion>17.13.39960</MicrosoftVisualStudioInteropVersion>
     <MicrosoftVSTelemetryVersion>17.13.24</MicrosoftVSTelemetryVersion>
     <MicrosoftVSUtilitiesInternalVersion>16.3.90</MicrosoftVSUtilitiesInternalVersion>
-    <MicrosoftVSSDKBuildToolsVersion>17.14.2119</MicrosoftVSSDKBuildToolsVersion>
+    <!--
+      Do NOT rename this to the name without underscores, this is property name used by both
+      arcade and the package, which will re-assign the variable from its props file, and this leads
+      to infinite loop of failed restores. See: https://github.com/dotnet/arcade/issues/16228
+    -->
+    <_MicrosoftVSSDKBuildToolsVersion_>17.14.2119</_MicrosoftVSSDKBuildToolsVersion_>
     <MicrosoftWin32RegistryVersion>5.0.0</MicrosoftWin32RegistryVersion>
     <NewtonsoftJsonVersion>13.0.3</NewtonsoftJsonVersion>
     <SystemCollectionsImmutableVersion>9.0.11</SystemCollectionsImmutableVersion>
