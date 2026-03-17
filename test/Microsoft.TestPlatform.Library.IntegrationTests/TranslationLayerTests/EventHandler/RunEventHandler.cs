@@ -114,4 +114,15 @@ public class RunEventHandler : ITestRunEventsHandler
         // No op
         return -1;
     }
+
+    public override string ToString()
+    {
+        return $"""
+        TestResults: {TestResults.Count}
+          {string.Join("\n  ", TestResults?.Select(t => t.DisplayName + " " + t.Outcome) ?? [])}
+        Errors: {Errors.Count}
+        {string.Join("\n  ", Errors ?? [])}
+        
+        """;
+    }
 }
