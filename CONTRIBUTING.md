@@ -19,7 +19,7 @@ You can use any editor paired with dotnet SDK to develop VSTest.
 
 If you're planning to use **Visual Studio** as development environment, install `VS 2026` with .NET Desktop development workload.
 
-### Linux / MacOS requirements
+### Linux / macOS requirements
 
 You can use any editor paired with dotnet SDK to develop VSTest.
 
@@ -62,7 +62,7 @@ Additional tests that can be run locally, but typically you would run just the o
 * Performance tests - run test.cmd -performanceTest
 
 > ⚠️Smoke, Integration, Compatibility and Performance tests do use the build packages that are produced by running `build.cmd -pack`, if you touch the production code (in src, e.g. in vstest.console) you should re-build before running these tests.
-> If you however just touched the integration test code, or test assets (in tst/TestAssets) you can re-run the tests directly, the test assets will automatically re-build.
+> If you however just touched the integration test code, or test assets (in test/TestAssets) you can re-run the tests directly, the test assets will automatically re-build.
 
 ### Running a specific test
 
