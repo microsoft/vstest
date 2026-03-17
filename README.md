@@ -61,7 +61,6 @@ NOTE: When adding a new public API, always add it directly to the `PublicAPI.Shi
 VSTest can be built from within Visual Studio or from the CLI.
 
 - [Building with Visual Studio](./docs/contribute.md#building-with-visual-studio)
-- [Building with CLI, CI, Editors](./docs/contribute.md#building-with-cli-ci-editors)
 
 ## Microsoft Open Source Code of Conduct
 

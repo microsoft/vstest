@@ -25,7 +25,7 @@ You can use any editor paired with dotnet SDK to develop VSTest.
 
 ## Build
 
-Run ./build.cmd or ./build.sh to install the required .NET SDK into `.dotnet` directory, and to build and restore dependencies. After that you can use Visual Studio and build normally.
+On Windows, run `build.cmd` (or `.\build.cmd` in PowerShell); on Linux/macOS, run `./build.sh` to install the required .NET SDK into the `.dotnet` directory and to build and restore dependencies. After that you can use Visual Studio and build normally.
 
 ### Building with Visual Studio
 
