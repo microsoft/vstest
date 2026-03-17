@@ -19,7 +19,6 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -44,7 +43,7 @@ public class IntegrationTestBase
     private int _runnerExitCode = -1;
 
     private string? _arguments = string.Empty;
-
+    private readonly List<string> _attachments = new();
     protected readonly IntegrationTestEnvironment _testEnvironment;
 
     private readonly string _msTestPre3_0AdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
@@ -94,8 +93,30 @@ public class IntegrationTestBase
     public bool IsCI { get; }
 
     [TestCleanup]
-    public void TempDirectoryCleanup()
+    public void IntegrationTestBaseTestCleanup()
     {
+        if (TestContext?.CurrentTestOutcome is UnitTestOutcome.Failed or UnitTestOutcome.Aborted)
+        {
+            foreach (var attachment in _attachments)
+            {
+                if (Directory.Exists(attachment))
+                {
+                    foreach (var file in Directory.EnumerateFiles(attachment, "*.*", SearchOption.AllDirectories))
+                    {
+                        if (Path.GetExtension(file) is ".txt" or ".log")
+                        {
+                            Console.WriteLine($"Attached File: {file}\n{File.ReadAllText(file)}\n\n");
+                        }
+                    }
+                }
+
+                if (File.Exists(attachment) && Path.GetExtension(attachment) is ".txt" or ".log")
+                {
+                    Console.WriteLine($"Attached File: {attachment}\n{File.ReadAllText(attachment)}\n\n");
+                }
+            }
+        }
+
         // In CI always delete the results, because we have limited disk space there.
         //
         // Locally delete the directory only when the test succeeded, so we can look
@@ -742,13 +763,21 @@ public class IntegrationTestBase
             }
 
             // Directory is already unique so there is no need to have a unique file name.
-            var logFilePath = Path.Combine(TempDirectory.Path, "log.txt");
+            var logDirectory = Path.Combine(TempDirectory.Path, "logs");
+            var logFilePath = Path.Combine(logDirectory, "log.txt");
+            if (!Directory.Exists(logDirectory))
+            {
+                Directory.CreateDirectory(logDirectory);
+            }
+
+            _attachments.Add(logDirectory);
+
             if (!File.Exists(logFilePath))
             {
                 File.Create(logFilePath).Close();
             }
 
-            Console.WriteLine($"Logging diagnostics in {Path.GetDirectoryName(logFilePath)}");
+            Console.WriteLine($"Logging diagnostics in {logDirectory}");
             consoleParameters.LogFilePath = logFilePath;
         }
 
@@ -784,16 +813,6 @@ public class IntegrationTestBase
             foreach (var pair in debugEnvironmentVariables)
             {
                 environmentVariables[pair.Key] = pair.Value;
-            }
-        }
-
-        if (!environmentVariables.ContainsKey(EnvironmentHelper.VstestConnectionTimeout))
-        {
-            // Reduce timeout to 5 seconds (from the default 90 seconds), when user does not want to debug (attaching takes time and happens in entrypoint)
-            // and if the test is not explicitly setting the timeout. This makes tests fail faster when there is systemic problem with starting vstest.console.
-            if (_testEnvironment.DebugInfo == null || _testEnvironment.DebugInfo.DebugVSTestConsole == false)
-            {
-                environmentVariables[EnvironmentHelper.VstestConnectionTimeout] = "5";
             }
         }
 
