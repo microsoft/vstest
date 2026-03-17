@@ -9,7 +9,7 @@ Clone the repository to a local directory. Rest of this article assumes
 `C:\source\vstest` as the location where you cloned the repo.
 
 ```shell
-> cd C:\source\vstest
+> cd C:\source
 > git clone https://github.com/Microsoft/vstest.git
 ```
 
@@ -52,14 +52,14 @@ Or `build.cmd -pack` to also produce nuget packages.
 
 There are following sets of tests that you would run locally to validate your changes:
 
-* Unit tests - run Test.cmd
-* Smoke tests - run Test.cmd -smokeTest
+* Unit tests - run test.cmd
+* Smoke tests - run test.cmd -smokeTest
 
 Additional tests that can be run locally, but typically you would run just the ones related to changes, and rely on PR build to validate the complete change:
 
-* Integration tests - run Test.cmd -integrationTest
-* Compatibility tests - run Test.cmd -compatibilityTest
-* Performance tests - run Test.cmd -performanceTest
+* Integration tests - run test.cmd -integrationTest
+* Compatibility tests - run test.cmd -compatibilityTest
+* Performance tests - run test.cmd -performanceTest
 
 > ⚠️Smoke, Integration, Compatibility and Performance tests do use the build packages that are produced by running `build.cmd -pack`, if you touch the production code (in src, e.g. in vstest.console) you should re-build before running these tests.
 > If you however just touched the integration test code, or test assets (in tst/TestAssets) you can re-run the tests directly, the test assets will automatically re-build.
@@ -69,14 +69,14 @@ Additional tests that can be run locally, but typically you would run just the o
 With integration tests you typically want to run all integration tests that affect a particular component, for example when changing blame data collector you want to run all tests for blame. This can be done by providing a parameter `-filter` to the test run, providing part of the test name, or providing a more complete filter using [MSTest filter syntax](https://learn.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests?pivots=mstest)
 
 ```
-./build.cmd -integrationTest -filter blame
+Test.cmd -integrationTest -filter blame
 ```
 
 ## Using the development packages
 
 The nuget packages produced by `./build.cmd -pack` are stored in `C:\source\vstest\artifacts\packages\<configuration>\Shipping`, and the VSIX in `C:\source\vstest\artifacts\VSSetup\Debug\Insertion\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.vsix`.
 
-You can use those packages if your own test projects to test your changes, by importing them via a local nuget source defined in nuget.config.
+You can use those packages in your own test projects to test your changes, by importing them via a local nuget source defined in nuget.config.
 
 - Microsoft.TestPlatform - ships vstest.console.exe to nuget, and is used in CI runs
 - Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.vsix - ships vstest.console.exe into Visual Studio, is used by Test Explorer, and in CI runs from hosted AzDO images
