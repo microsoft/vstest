@@ -27,7 +27,7 @@ public class ProcessesInteractionTests : AcceptanceTestBase
         UpdateRuntimeConfigJsonWithInvalidFramework(assemblyPath, testAssetProjectName);
 
         // Act
-        InvokeVsTest(assemblyPath);
+        InvokeVsTest(assemblyPath, collectDiagnosticLogs: true);
 
         // Assert
         ExitCodeEquals(1);
