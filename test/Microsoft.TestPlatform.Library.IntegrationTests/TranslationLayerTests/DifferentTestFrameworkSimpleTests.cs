@@ -60,9 +60,9 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
             _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("PassTestMethod1"));
 
         // Assert
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
+        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
 
         // Release builds optimize code, hence line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
@@ -103,9 +103,9 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
             _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("xUnitTestProject.Class1.PassTestMethod1"));
 
         // Assert
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(2, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
+        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
 
         // Release builds optimize code, hence line numbers are different.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
@@ -144,8 +144,8 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         var testCase = _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("TestMethod1"));
 
         // Assert
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count);
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        Assert.AreEqual(0, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(1, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
+        Assert.AreEqual(0, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
     }
 }

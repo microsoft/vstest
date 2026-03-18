@@ -93,7 +93,7 @@ public class AssemblyMetadataProviderTests : AcceptanceTestBase
     {
         var expectedElapsedTime = 5;
         var platformPath = platform.Equals("x64") ? platform : string.Empty;
-        var assemblyPath = $@"{_testEnvironment.PackageDirectory}/microsoft.testplatform.testasset.nativecpp/2.0.0/"
+        var assemblyPath = $@"{_testEnvironment.GlobalPackageDirectory}/microsoft.testplatform.testasset.nativecpp/2.0.0/"
                            + $@"contentFiles/any/any/{platformPath}/Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
         LoadAssemblyIntoMemory(assemblyPath);
         var stopWatch = Stopwatch.StartNew();
@@ -140,7 +140,7 @@ public class AssemblyMetadataProviderTests : AcceptanceTestBase
     public void GetFrameworkForNativeDll()
     {
         var expectedElapsedTime = 5;
-        var assemblyPath = $@"{_testEnvironment.PackageDirectory}/microsoft.testplatform.testasset.nativecpp/2.0.0/contentFiles/any/any/Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
+        var assemblyPath = $@"{_testEnvironment.GlobalPackageDirectory}/microsoft.testplatform.testasset.nativecpp/2.0.0/contentFiles/any/any/Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
         LoadAssemblyIntoMemory(assemblyPath);
         var stopWatch = Stopwatch.StartNew();
         var fx = _assemblyMetadataProvider.GetFrameworkName(assemblyPath);

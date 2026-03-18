@@ -104,7 +104,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         string assemblyRelativePath =
             @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\WebTest1.webtest";
 
-        var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
+        var assemblyAbsolutePath = Path.Combine(_testEnvironment.GlobalPackageDirectory, assemblyRelativePath);
         using var resultsDirectory = TempDirectory;
         var arguments = PrepareArguments(
             assemblyAbsolutePath,
@@ -146,7 +146,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         }
 
         string assemblyRelativePath = @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\BingWebTest.dll";
-        var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
+        var assemblyAbsolutePath = Path.Combine(_testEnvironment.GlobalPackageDirectory, assemblyRelativePath);
         var arguments = PrepareArguments(
             assemblyAbsolutePath,
             string.Empty,
@@ -195,7 +195,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
             ? string.Format(CultureInfo.CurrentCulture, assemblyRelativePathFormat, platform)
             : string.Format(CultureInfo.CurrentCulture, assemblyRelativePathFormat, "");
-        var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
+        var assemblyAbsolutePath = Path.Combine(_testEnvironment.GlobalPackageDirectory, assemblyRelativePath);
         var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, FrameworkArgValue, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
 
         InvokeVsTest(arguments);

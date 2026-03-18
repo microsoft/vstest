@@ -74,7 +74,7 @@ public class DataCollectorAttachmentProcessor : AcceptanceTestBase
         Directory.Delete(extensionPath, true);
 
         // Ensure we ran the extension.
-        using var logFile = new FileStream(Path.Combine(TempDirectory.Path, "log.txt"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var logFile = new FileStream(Path.Combine(TempDirectory.Path, "logs", "log.txt"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var streamReader = new StreamReader(logFile);
         string logFileContent = streamReader.ReadToEnd();
         Assert.IsTrue(Regex.IsMatch(logFileContent, $@"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor 'AttachmentProcessorDataCollector\.SampleDataCollectorAttachmentProcessor, AttachmentProcessorDataCollector, Version=.*, Culture=neutral, PublicKeyToken=null' from file '{extensionPath.Replace(@"\", @"\\")}\\AttachmentProcessorDataCollector.dll' added to the 'run list'"));

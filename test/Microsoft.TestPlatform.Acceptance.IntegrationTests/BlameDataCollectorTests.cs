@@ -28,13 +28,13 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
     public BlameDataCollectorTests()
     {
-        _procDumpPath = Path.Combine(_testEnvironment.PackageDirectory, @"procdump\0.0.1\bin");
+        _procDumpPath = Path.Combine(_testEnvironment.LocalPackageDirectory, @"procdump\0.0.1\bin");
         var procDumpExePath = Path.Combine(_procDumpPath, "procdump.exe");
         if (!File.Exists(procDumpExePath))
         {
             throw new InvalidOperationException($"Procdump path {procDumpExePath} does not exist. "
                 + "It is possible that antivirus deleted it from your nuget cache. "
-                + "Delete the whole procdump folder in your nuget cache, and run build, or restore");
+                + "Delete the whole procdump folder in your nuget cache, and run tests again.");
         }
     }
 

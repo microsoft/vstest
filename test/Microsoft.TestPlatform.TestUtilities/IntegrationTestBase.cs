@@ -43,7 +43,7 @@ public class IntegrationTestBase
     private int _runnerExitCode = -1;
 
     private string? _arguments = string.Empty;
-
+    private readonly List<string> _attachments = new();
     protected readonly IntegrationTestEnvironment _testEnvironment;
 
     private readonly string _msTestPre3_0AdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
@@ -93,15 +93,35 @@ public class IntegrationTestBase
     public bool IsCI { get; }
 
     [TestCleanup]
-    public void TempDirectoryCleanup()
+    public void IntegrationTestBaseTestCleanup()
     {
-        // In CI always delete the results, because we have limited disk space there.
-        //
-        // Locally delete the directory only when the test succeeded, so we can look
-        // at results and logs of failed tests.
-        if (IsCI || TestContext?.CurrentTestOutcome == UnitTestOutcome.Passed)
+        // Delete the files only when test passes, so we can upload the attachments. They need to survive till the end of run.
+        if (TestContext?.CurrentTestOutcome is not (UnitTestOutcome.Failed or UnitTestOutcome.Aborted))
         {
             TempDirectory.Dispose();
+            return;
+        }
+
+        // Attach / print files that are of interest.
+        foreach (var attachment in _attachments)
+        {
+            if (Directory.Exists(attachment))
+            {
+                foreach (var file in Directory.EnumerateFiles(attachment, "*.*", SearchOption.AllDirectories))
+                {
+                    TestContext.AddResultFile(file);
+                    if (Path.GetExtension(file) is ".txt" or ".log")
+                    {
+                        Console.WriteLine($"Attached File: {file}\n{File.ReadAllText(file)}\n\n");
+                    }
+                }
+            }
+
+            if (File.Exists(attachment) && Path.GetExtension(attachment) is ".txt" or ".log")
+            {
+                TestContext.AddResultFile(attachment);
+                Console.WriteLine($"Attached File: {attachment}\n{File.ReadAllText(attachment)}\n\n");
+            }
         }
     }
 
@@ -741,13 +761,21 @@ public class IntegrationTestBase
             }
 
             // Directory is already unique so there is no need to have a unique file name.
-            var logFilePath = Path.Combine(TempDirectory.Path, "log.txt");
+            var logDirectory = Path.Combine(TempDirectory.Path, "logs");
+            var logFilePath = Path.Combine(logDirectory, "log.txt");
+            if (!Directory.Exists(logDirectory))
+            {
+                Directory.CreateDirectory(logDirectory);
+            }
+
+            _attachments.Add(logDirectory);
+
             if (!File.Exists(logFilePath))
             {
                 File.Create(logFilePath).Close();
             }
 
-            Console.WriteLine($"Logging diagnostics in {Path.GetDirectoryName(logFilePath)}");
+            Console.WriteLine($"Logging diagnostics in {logDirectory}");
             consoleParameters.LogFilePath = logFilePath;
         }
 
@@ -1006,7 +1034,8 @@ public class IntegrationTestBase
     /// Counts the number of logs following the '*.host.*' pattern in the given folder.
     /// </summary>
     protected static int CountTestHostLogs(string diagLogsDir)
-        => Directory.GetFiles(diagLogsDir, "*.host.*").Length;
+        // We put the files in logs subfolder or TMP.
+        => Directory.GetFiles(diagLogsDir, "*.host.*", SearchOption.AllDirectories).Length;
 
     protected static void AssertExpectedNumberOfHostProcesses(int expectedNumOfProcessCreated, string diagLogsDir, IEnumerable<string> testHostProcessNames,
         string? arguments = null, string? runnerPath = null)

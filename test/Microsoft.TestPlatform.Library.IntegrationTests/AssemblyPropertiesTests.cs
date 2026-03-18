@@ -32,7 +32,7 @@ public class AssemblyPropertiesTests : AcceptanceTestBase
     [TestMethod]
     public void GetAssemblyTypeForNativeDll()
     {
-        var assemblyPath = $@"{_testEnvironment.PackageDirectory}/microsoft.testplatform.testasset.nativecpp/2.0.0/contentFiles/any/any/Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
+        var assemblyPath = $@"{_testEnvironment.GlobalPackageDirectory}/microsoft.testplatform.testasset.nativecpp/2.0.0/contentFiles/any/any/Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
         var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
         Assert.AreEqual(AssemblyType.Native, assemblyType);
@@ -60,7 +60,7 @@ public class AssemblyPropertiesTests : AcceptanceTestBase
     [TestMethod]
     public void GetAssemblyTypeForNativeExe()
     {
-        var assemblyPath = $@"{_testEnvironment.PackageDirectory}/microsoft.testplatform.testasset.nativecpp/2.0.0/contentFiles/any/any/Microsoft.TestPlatform.TestAsset.ConsoleNativeApp.exe";
+        var assemblyPath = $@"{_testEnvironment.GlobalPackageDirectory}/microsoft.testplatform.testasset.nativecpp/2.0.0/contentFiles/any/any/Microsoft.TestPlatform.TestAsset.ConsoleNativeApp.exe";
         var assemblyType = _assemblyProperties.GetAssemblyType(assemblyPath);
 
         Assert.AreEqual(AssemblyType.Native, assemblyType);

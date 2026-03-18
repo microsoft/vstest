@@ -394,10 +394,10 @@ public class CompatibilityRowsBuilder
             Path = vstestConsolePath,
         };
 
-        string GetToolsPath(string fwkVersion) => Path.Combine(IntegrationTestEnvironment.RepoRootDirectory, ".packages",
+        string GetToolsPath(string fwkVersion) => Path.Combine(IntegrationTestEnvironment.TestAssetsNuGetCacheDirectory,
             packageName, version, "tools", fwkVersion, "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe");
 
-        string GetContentFilesPath(string fwkVersion) => Path.Combine(IntegrationTestEnvironment.RepoRootDirectory, ".packages",
+        string GetContentFilesPath(string fwkVersion) => Path.Combine(IntegrationTestEnvironment.TestAssetsNuGetCacheDirectory,
             packageName, version, "contentFiles", "any", fwkVersion, "vstest.console.dll");
     }
 

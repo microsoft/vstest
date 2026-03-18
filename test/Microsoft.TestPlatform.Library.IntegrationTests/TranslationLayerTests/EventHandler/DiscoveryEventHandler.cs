@@ -128,16 +128,16 @@ public class DiscoveryEventHandlerForBatchSize : ITestDiscoveryEventsHandler2, I
     /// <summary>
     /// Gets the batch size.
     /// </summary>
-    public List<int> Batches { get; } = new List<int>();
+    public ConcurrentList<int> Batches { get; } = new ConcurrentList<int>();
 
     /// <summary>
     /// Gets the discovered test cases.
     /// </summary>
-    public List<TestCase> DiscoveredTestCases { get; }
+    public ConcurrentList<TestCase> DiscoveredTestCases { get; }
 
     public DiscoveryEventHandlerForBatchSize()
     {
-        DiscoveredTestCases = new List<TestCase>();
+        DiscoveredTestCases = new ConcurrentList<TestCase>();
     }
 
     public void HandleRawMessage(string rawMessage)

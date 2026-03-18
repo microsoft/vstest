@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.EventHandler;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -59,7 +60,13 @@ public class TargetFrameworkTestHostDemultiplexer : AcceptanceTestBase
     {
         // Arrange
         SetTestEnvironment(_testEnvironment, runnerInfo);
-        Dictionary<string, string?>? environmentVariables = new() { { "VSTEST_LOGFOLDER", TempDirectory.Path } };
+        Dictionary<string, string?>? environmentVariables = new()
+        {
+            // Times out sometimes in CI with the 5 second timeout we normally use to get faster failure feedback.
+            // Probably because we start many testhosts here and the server is slow and busy.
+            [EnvironmentHelper.VstestConnectionTimeout] = "90",
+            ["VSTEST_LOGFOLDER"] = TempDirectory.Path,
+        };
         Setup(environmentVariables);
         string runsettings = $"""
 <RunSettings>
