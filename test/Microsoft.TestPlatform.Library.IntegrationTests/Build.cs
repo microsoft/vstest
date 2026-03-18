@@ -12,6 +12,14 @@ public class Build : IntegrationTestBase
     [AssemblyInitialize]
     public static void AssemblyInitialize(TestContext testContext)
     {
+        // Increase the ThreadPool minimum threads to avoid starvation during parallel test
+        // execution. Each test class spawns vstest.console and testhost processes via the
+        // TranslationLayer — the socket-based communication blocks ThreadPool threads during
+        // connection setup, causing starvation with the default MinThreads.
+        var additionalThreadsCount = System.Environment.ProcessorCount * 4;
+        System.Threading.ThreadPool.GetMinThreads(out var workerThreads, out var completionPortThreads);
+        System.Threading.ThreadPool.SetMinThreads(workerThreads + additionalThreadsCount, completionPortThreads + additionalThreadsCount);
+
         IntegrationTestBuild.BuildTestAssetsForIntegrationTests(testContext);
     }
 }
