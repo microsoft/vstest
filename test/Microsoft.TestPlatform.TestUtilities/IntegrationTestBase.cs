@@ -215,15 +215,9 @@ public class IntegrationTestBase
     /// </summary>
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     /// <param name="environmentVariables">Environment variables to set to the started process.</param>
-    /// <param name="collectDiagnosticLogs">Adds --diag parameter and attaches diag logs to output.</param>
-    public void InvokeVsTest(string? arguments, Dictionary<string, string?>? environmentVariables = null, bool collectDiagnosticLogs = false)
+    public void InvokeVsTest(string? arguments, Dictionary<string, string?>? environmentVariables = null)
     {
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
-        if (collectDiagnosticLogs && (arguments == null || !arguments.Contains("diag")))
-        {
-            arguments = string.Concat(arguments ?? string.Empty, " --diag:", Path.Combine(TempDirectory.Path, "logs", "log.txt").AddDoubleQuote());
-            _attachments.Add(Path.Combine(TempDirectory.Path, "logs"));
-        }
         ExecuteVsTestConsole(arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
         FormatStandardOutCome();
     }
