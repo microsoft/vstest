@@ -5,6 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -454,5 +457,79 @@ public class ParallelRunDataAggregatorTests
 
         var runMetrics = aggregator.GetAggregatedRunDataMetrics();
         Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out _));
+    }
+
+    [TestMethod]
+    public void AggregateAndGetAggregatedRunStatsShouldBeThreadSafe()
+    {
+        var aggregator = new ParallelRunDataAggregator(Constants.EmptyRunSettings);
+
+        const int threadCount = 10;
+        const int iterationsPerThread = 100;
+        var barrier = new Barrier(threadCount + 1);
+
+        // Start threads that call Aggregate concurrently
+        var aggregateTasks = Enumerable.Range(0, threadCount).Select(_ => Task.Run(() =>
+        {
+            barrier.SignalAndWait();
+            for (int i = 0; i < iterationsPerThread; i++)
+            {
+                var stats = new Dictionary<TestOutcome, long>
+                {
+                    { TestOutcome.Passed, 1 },
+                };
+                aggregator.Aggregate(new TestRunStatistics(1, stats), null, null, TimeSpan.Zero, false, false, null, null, null, null);
+            }
+        })).ToArray();
+
+        // Also start a reader thread that calls GetAggregatedRunStats concurrently
+        var readerTask = Task.Run(() =>
+        {
+            barrier.SignalAndWait();
+            for (int i = 0; i < iterationsPerThread; i++)
+            {
+                // This must not throw InvalidOperationException due to collection modification
+                var runStats = aggregator.GetAggregatedRunStats();
+                Assert.IsTrue(runStats.ExecutedTests >= 0, "Executed tests count should be non-negative");
+            }
+        });
+
+        Task.WaitAll(aggregateTasks.Append(readerTask).ToArray());
+
+        var finalStats = aggregator.GetAggregatedRunStats();
+        Assert.AreEqual(threadCount * iterationsPerThread, finalStats.ExecutedTests,
+            "All test results should be aggregated without data loss");
+        Assert.AreEqual(threadCount * iterationsPerThread, finalStats.Stats![TestOutcome.Passed],
+            "All passed test counts should be aggregated correctly");
+    }
+
+    [TestMethod]
+    public void AggregateRunDataMetricsShouldBeThreadSafe()
+    {
+        var aggregator = new ParallelRunDataAggregator(Constants.EmptyRunSettings);
+
+        const int threadCount = 10;
+        const int iterationsPerThread = 100;
+        var barrier = new Barrier(threadCount);
+
+        var tasks = Enumerable.Range(0, threadCount).Select(_ => Task.Run(() =>
+        {
+            barrier.SignalAndWait();
+            for (int i = 0; i < iterationsPerThread; i++)
+            {
+                var dict = new Dictionary<string, object>
+                {
+                    { TelemetryDataConstants.TotalTestsRanByAdapter, 1 }
+                };
+                aggregator.AggregateRunDataMetrics(dict);
+            }
+        })).ToArray();
+
+        Task.WaitAll(tasks);
+
+        var runMetrics = aggregator.GetAggregatedRunDataMetrics();
+        Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsRanByAdapter, out var value));
+        Assert.AreEqual((double)(threadCount * iterationsPerThread), Convert.ToDouble(value, CultureInfo.InvariantCulture),
+            "All metrics should be aggregated without lost updates");
     }
 }
