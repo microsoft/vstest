@@ -134,6 +134,56 @@ public class MigratorTests
         Assert.Throws<IOException>(() => _migrator.Migrate(oldTestsettingsPath, _newRunsettingsPath));
     }
 
+    [TestMethod]
+    public void RunSettingsWithDtdShouldThrowXmlException()
+    {
+        var xxeRunSettingsPath = Path.Combine(Path.GetTempPath(), "xxe_test.runsettings");
+        try
+        {
+            var xxeContent = "<?xml version=\"1.0\"?>\n" +
+                             "<!DOCTYPE foo [\n" +
+                             "  <!ENTITY xxe \"test\">\n" +
+                             "]>\n" +
+                             "<RunSettings><MSTest><SettingsFile>&xxe;</SettingsFile></MSTest></RunSettings>";
+            File.WriteAllText(xxeRunSettingsPath, xxeContent);
+
+            Assert.ThrowsExactly<XmlException>(() => _migrator.Migrate(xxeRunSettingsPath, _newRunsettingsPath),
+                "DTD processing should be prohibited to prevent XXE attacks");
+        }
+        finally
+        {
+            if (File.Exists(xxeRunSettingsPath))
+            {
+                File.Delete(xxeRunSettingsPath);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void TestSettingsWithDtdShouldThrowXmlException()
+    {
+        var xxeTestSettingsPath = Path.Combine(Path.GetTempPath(), "xxe_test.testsettings");
+        try
+        {
+            var xxeContent = "<?xml version=\"1.0\"?>\n" +
+                             "<!DOCTYPE foo [\n" +
+                             "  <!ENTITY xxe \"test\">\n" +
+                             "]>\n" +
+                             "<TestSettings><Execution></Execution></TestSettings>";
+            File.WriteAllText(xxeTestSettingsPath, xxeContent);
+
+            Assert.ThrowsExactly<XmlException>(() => _migrator.Migrate(xxeTestSettingsPath, _newRunsettingsPath),
+                "DTD processing should be prohibited to prevent XXE attacks");
+        }
+        finally
+        {
+            if (File.Exists(xxeTestSettingsPath))
+            {
+                File.Delete(xxeTestSettingsPath);
+            }
+        }
+    }
+
     private static void Validate(string newRunsettingsPath)
     {
         Assert.IsTrue(File.Exists(newRunsettingsPath), "Run settings should be generated.");
