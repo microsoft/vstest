@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -739,6 +740,56 @@ public class BlameCollectorTests
         }
 
         return outernode;
+    }
+
+    /// <summary>
+    /// Concurrent test case start and end events should not corrupt internal state
+    /// </summary>
+    [TestMethod]
+    public void ConcurrentTestCaseStartAndEndEventsShouldNotCorruptState()
+    {
+        // Initializing Blame Data Collector
+        _blameDataCollector.Initialize(
+            _configurationElement,
+            _mockDataColectionEvents.Object,
+            _mockDataCollectionSink.Object,
+            _mockLogger.Object,
+            _context);
+
+        const int threadCount = 10;
+        var barrier = new Barrier(threadCount);
+        var tasks = new List<Task>();
+        var allTestCases = new List<TestCase>();
+
+        for (int t = 0; t < threadCount; t++)
+        {
+            var task = Task.Run(() =>
+            {
+                barrier.SignalAndWait();
+                for (int i = 0; i < 50; i++)
+                {
+                    var testcase = new TestCase($"TestProject.UnitTest.TestMethod{Guid.NewGuid()}", new Uri("test:/abc"), "abc.dll");
+                    lock (allTestCases)
+                    {
+                        allTestCases.Add(testcase);
+                    }
+
+                    _mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testcase));
+                    _mockDataColectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testcase, TestOutcome.Passed));
+                }
+            });
+            tasks.Add(task);
+        }
+
+        // This must not throw due to concurrent collection modifications
+        Task.WaitAll(tasks.ToArray());
+
+        // Raise session end - all tests completed so no sequence file should be written
+        _mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(_dataCollectionContext));
+        _mockBlameReaderWriter.Verify(
+            x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()),
+            Times.Never,
+            "No sequence file should be written when all tests complete");
     }
 
     /// <summary>
