@@ -115,6 +115,11 @@ public class IntegrationTestEnvironment
     public string? TargetFramework { get; set; }
 
     /// <summary>
+    /// Is targeting .NET Framework testhost?
+    /// </summary>
+    public bool IsNetFrameworkTarget => TargetFramework!.StartsWith("net4", StringComparison.InvariantCultureIgnoreCase);
+
+    /// <summary>
     /// Gets the target runtime.
     /// Supported values = <c>win7-x64</c>.
     /// </summary>
