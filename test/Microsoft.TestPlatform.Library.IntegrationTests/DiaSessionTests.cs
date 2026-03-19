@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -38,8 +39,15 @@ public class DiaSessionTests : AcceptanceTestBase
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName!.Replace("\\", "/"), @"\SimpleClassLibrary\Class1.cs".Replace("\\", "/"));
 
-        ValidateMinLineNumber(11, diaNavigationData.MinLineNumber);
-        Assert.AreEqual(13, diaNavigationData.MaxLineNumber, "Incorrect max line number");
+        // Derive expected line numbers from the source file so the test is resilient to code moving around.
+        var sourceFile = Path.Combine(_testEnvironment.TestAssetsPath, "SimpleClassLibrary", "Class1.cs");
+        var (bodyStart, bodyEnd) = FindMethodBodyRange(sourceFile, "PassingTest");
+        // In Debug, PDB min line points to opening brace. In Release, it points to first executable statement.
+        var expectedMin = IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase)
+            ? bodyStart + 1
+            : bodyStart;
+        Assert.AreEqual(expectedMin, diaNavigationData.MinLineNumber, "Incorrect min line number");
+        Assert.AreEqual(bodyEnd, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
     }
@@ -56,8 +64,13 @@ public class DiaSessionTests : AcceptanceTestBase
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName!.Replace("\\", "/"), @"\SimpleClassLibrary\Class1.cs".Replace("\\", "/"));
 
-        ValidateMinLineNumber(16, diaNavigationData.MinLineNumber);
-        Assert.AreEqual(18, diaNavigationData.MaxLineNumber, "Incorrect max line number");
+        var sourceFile = Path.Combine(_testEnvironment.TestAssetsPath, "SimpleClassLibrary", "Class1.cs");
+        var (bodyStart, bodyEnd) = FindMethodBodyRange(sourceFile, "AsyncTestMethod");
+        var expectedMin = IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase)
+            ? bodyStart + 1
+            : bodyStart;
+        Assert.AreEqual(expectedMin, diaNavigationData.MinLineNumber, "Incorrect min line number");
+        Assert.AreEqual(bodyEnd, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
     }
@@ -76,7 +89,18 @@ public class DiaSessionTests : AcceptanceTestBase
 
         // Weird why DiaSession is now returning the first overloaded method
         // as compared to before when it used to return second method
-        ValidateLineNumbers(diaNavigationData.MinLineNumber, diaNavigationData.MaxLineNumber);
+        var sourceFile = Path.Combine(_testEnvironment.TestAssetsPath, "SimpleClassLibrary", "Class1.cs");
+        var (bodyStart, bodyEnd) = FindMethodBodyRange(sourceFile, "OverLoadedMethod");
+        if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+        {
+            // Release builds for empty methods have min == max (closing brace is the only sequence point).
+            Assert.AreEqual(diaNavigationData.MinLineNumber, diaNavigationData.MaxLineNumber, "Incorrect min line number");
+        }
+        else
+        {
+            Assert.AreEqual(bodyStart, diaNavigationData.MinLineNumber, "Incorrect min line number");
+            Assert.AreEqual(bodyEnd, diaNavigationData.MaxLineNumber, "Incorrect max line number");
+        }
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
     }
@@ -114,48 +138,57 @@ public class DiaSessionTests : AcceptanceTestBase
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName!.Replace("\\", "/"), @"\SimpleClassLibrary\HugeMethodSet.cs".Replace("\\", "/"));
-        ValidateMinLineNumber(9, diaNavigationData.MinLineNumber);
-        Assert.AreEqual(10, diaNavigationData.MaxLineNumber);
+
+        var sourceFile = Path.Combine(_testEnvironment.TestAssetsPath, "SimpleClassLibrary", "HugeMethodSet.cs");
+        var (bodyStart, bodyEnd) = FindMethodBodyRange(sourceFile, "MSTest_D1_01");
+        var expectedMin = IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase)
+            ? bodyStart + 1
+            : bodyStart;
+        Assert.AreEqual(expectedMin, diaNavigationData.MinLineNumber, "Incorrect min line number");
+        Assert.AreEqual(bodyEnd, diaNavigationData.MaxLineNumber, "Incorrect max line number");
+
         var expectedTime = 150;
         Assert.IsTrue(watch.Elapsed.Milliseconds < expectedTime, $"DiaSession Perf test Actual time:{watch.Elapsed.Milliseconds} ms Expected time:{expectedTime} ms");
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
     }
 
-    private static void ValidateLineNumbers(int min, int max)
+    /// <summary>
+    /// Finds the 1-based line numbers of the opening brace and closing brace of a method body.
+    /// </summary>
+    private static (int BodyStart, int BodyEnd) FindMethodBodyRange(string sourceFile, string methodName)
     {
-        // Release builds optimize code, hence min line numbers are different.
-        if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+        var lines = File.ReadAllLines(sourceFile);
+        for (int i = 0; i < lines.Length; i++)
         {
-            Assert.AreEqual(min, max, "Incorrect min line number");
-        }
-        else
-        {
-            if (max == 22)
+            if (lines[i].Contains($" {methodName}("))
             {
-                Assert.AreEqual(min + 1, max, "Incorrect min line number");
-            }
-            else if (max == 26)
-            {
-                Assert.AreEqual(min + 1, max, "Incorrect min line number");
-            }
-            else
-            {
-                Assert.Fail($"Incorrect min/max line number. Expected Max to be 22 or 26. And Min to be 21 or 25. But Min was {min}, and Max was {max}.");
-            }
-        }
-    }
+                int braceDepth = 0;
+                int bodyStart = -1;
+                for (int j = i; j < lines.Length; j++)
+                {
+                    if (lines[j].Contains("{"))
+                    {
+                        if (bodyStart == -1)
+                        {
+                            bodyStart = j + 1; // 1-based
+                        }
 
-    private static void ValidateMinLineNumber(int expected, int actual)
-    {
-        // Release builds optimize code, hence min line numbers are different.
-        if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-        {
-            Assert.AreEqual(expected + 1, actual, "Incorrect min line number");
+                        braceDepth++;
+                    }
+
+                    if (lines[j].Contains("}"))
+                    {
+                        braceDepth--;
+                        if (braceDepth == 0)
+                        {
+                            return (bodyStart, j + 1); // 1-based
+                        }
+                    }
+                }
+            }
         }
-        else
-        {
-            Assert.AreEqual(expected, actual, "Incorrect min line number");
-        }
+
+        throw new InvalidOperationException($"Could not find method '{methodName}' in '{sourceFile}'.");
     }
 }

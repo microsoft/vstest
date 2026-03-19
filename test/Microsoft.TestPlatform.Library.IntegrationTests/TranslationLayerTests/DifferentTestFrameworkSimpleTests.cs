@@ -64,15 +64,17 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
 
-        // Release builds optimize code, hence line numbers are different.
+        // Derive expected line number from source so the test is resilient to code moving around.
+        var expectedLine = FindMethodBodyStartLine(
+            Path.Combine(_testEnvironment.TestAssetsPath, "NUTestProject", "Class1.cs"),
+            "PassTestMethod1");
+        // In Release, PDB sequence points start at first executable statement, not the opening brace.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
         {
-            Assert.AreEqual(14, testCase.First().TestCase.LineNumber);
+            expectedLine++;
         }
-        else
-        {
-            Assert.AreEqual(13, testCase.First().TestCase.LineNumber);
-        }
+
+        Assert.AreEqual(expectedLine, testCase.First().TestCase.LineNumber);
     }
 
     [TestMethod]
@@ -107,15 +109,17 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
 
-        // Release builds optimize code, hence line numbers are different.
+        // Derive expected line number from source so the test is resilient to code moving around.
+        var expectedLine = FindMethodBodyStartLine(
+            Path.Combine(_testEnvironment.TestAssetsPath, "XUTestProject", "Class1.cs"),
+            "PassTestMethod1");
+        // In Release, PDB sequence points start at first executable statement, not the opening brace.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
         {
-            Assert.AreEqual(15, testCase.First().TestCase.LineNumber);
+            expectedLine++;
         }
-        else
-        {
-            Assert.AreEqual(14, testCase.First().TestCase.LineNumber);
-        }
+
+        Assert.AreEqual(expectedLine, testCase.First().TestCase.LineNumber);
     }
 
     [TestMethod]
@@ -147,5 +151,29 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         Assert.AreEqual(1, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         Assert.AreEqual(0, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
+    }
+
+    /// <summary>
+    /// Finds the 1-based line number of the opening brace '{' after a method declaration.
+    /// </summary>
+    private static int FindMethodBodyStartLine(string sourceFile, string methodName)
+    {
+        var lines = File.ReadAllLines(sourceFile);
+        for (int i = 0; i < lines.Length; i++)
+        {
+            if (lines[i].Contains($"void {methodName}"))
+            {
+                // Find the opening brace after the method declaration.
+                for (int j = i; j < lines.Length; j++)
+                {
+                    if (lines[j].Contains('{'))
+                    {
+                        return j + 1; // 1-based
+                    }
+                }
+            }
+        }
+
+        throw new InvalidOperationException($"Could not find method '{methodName}' in '{sourceFile}'.");
     }
 }
