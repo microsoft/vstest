@@ -231,7 +231,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         var assemblyPaths = GetAssetFullPath("child-hang.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
-        arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=mini;TestTimeout=5s"" /Diag:""S:\p\vstest\artifacts\tmp\logs\log.txt""");
+        arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=mini;TestTimeout=5s""");
         InvokeVsTest(arguments);
 
         ValidateDump(2);

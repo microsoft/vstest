@@ -22,7 +22,7 @@ internal class NetClientHangDumper : IHangDumper
         var process = Process.GetProcessById(processId);
         // There is 30s timeout hardcoded for the NetClient, so if we try to connect to a non-net process it will take 30s to timeout.
         // https://github.com/dotnet/diagnostics/blob/main/src/Microsoft.Diagnostics.NETCore.Client/DiagnosticsIpc/IpcClient.cs#L15
-        // We run this in parallel so it okay, but we are never interested in dumping the native helper proceses of Windows, nor we can dump them.
+        // We run this in parallel so it okay, but we are never interested in dumping the native helper processes of Windows, nor we can dump them.
         var processTree = process.GetProcessTree().Where(p => p.Process?.ProcessName is not null and not "conhost" and not "WerFault" and not "createdump").ToList();
 
         if (EqtTrace.IsVerboseEnabled)
