@@ -125,15 +125,20 @@ if ($integrationTest -or $performanceTest -or $compatibilityTest -or $smokeTest)
 }
 
 if ($filters.Count -gt 0 -or $testParameters.Count -gt 0) {
-  # We have to double escape, otherwise the filter is passed as string with & in it and interpreted directly as a separate command to run.
-  # Ignoring exit code 8 which means no tests found, otherwise we will fail the build when we run with a filter that doesn't match any test in a project, which is common when we have multiple projects and some of them don't have certain categories of tests. https://github.com/microsoft/testfx/issues/7457
-  $filterString = "--filter \`"$($filters -join '&')\`" -ignore-exit-code 8"
+  if ($filters.Count -gt 0) {
+    
+    # We have to double escape by '\"', otherwise the filter is passed as string with & in it and interpreted directly as a separate command to run.
+    # Ignoring exit code 8 which means no tests found, otherwise we will fail the build when we run with a filter that doesn't match any test in a project, which is common when we have multiple projects and some of them don't have certain categories of tests. https://github.com/microsoft/testfx/issues/7457
+    $filterString = "--filter \`"$($filters -join '&')\`""
+    $filterParameters = "$filterString --ignore-exit-code 8"
+  }
+
   $testParameterString = ($testParameters.GetEnumerator() | ForEach-Object { "--test-parameter $($_.Key)=$($_.Value)" }) -join ' '
   
   if (-not $PSBoundParameters.ContainsKey('properties')) {
     $PSBoundParameters['properties'] = @()
   }
-  $PSBoundParameters['properties'] += "/p:TestRunnerExternalArguments=$filterString $testParameterString"
+  $PSBoundParameters['properties'] += "/p:TestRunnerExternalArguments=$filterParameters $testParameterString"
 }
 
 # Call the build script provided by Arcade
