@@ -224,7 +224,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreRunner("net10.0")]
+    [NetCoreRunner("net48;net10.0")]
     public void HangDumpChildProcesses(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
