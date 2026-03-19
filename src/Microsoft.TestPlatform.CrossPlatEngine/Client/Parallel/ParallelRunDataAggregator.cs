@@ -74,23 +74,20 @@ internal class ParallelRunDataAggregator
     {
         var testOutcomeMap = new Dictionary<TestOutcome, long>();
         long totalTests = 0;
-        lock (_dataUpdateSyncObject)
+        if (_testRunStatsList.Count > 0)
         {
-            if (_testRunStatsList.Count > 0)
+            foreach (var runStats in _testRunStatsList)
             {
-                foreach (var runStats in _testRunStatsList)
+                // TODO: we get nullref here if the stats are empty.
+                foreach (var outcome in runStats.Stats!.Keys)
                 {
-                    // TODO: we get nullref here if the stats are empty.
-                    foreach (var outcome in runStats.Stats!.Keys)
+                    if (!testOutcomeMap.ContainsKey(outcome))
                     {
-                        if (!testOutcomeMap.ContainsKey(outcome))
-                        {
-                            testOutcomeMap.Add(outcome, 0);
-                        }
-                        testOutcomeMap[outcome] += runStats.Stats[outcome];
+                        testOutcomeMap.Add(outcome, 0);
                     }
-                    totalTests += runStats.ExecutedTests;
+                    testOutcomeMap[outcome] += runStats.Stats[outcome];
                 }
+                totalTests += runStats.ExecutedTests;
             }
         }
 
@@ -201,9 +198,9 @@ internal class ParallelRunDataAggregator
                 var newValue = Convert.ToDouble(metric.Value, CultureInfo.InvariantCulture);
 
                 _metricsAggregator.AddOrUpdate(
-                    metric.Key,
-                    newValue,
-                    (_, oldValue) => newValue + Convert.ToDouble(oldValue, CultureInfo.InvariantCulture));
+                                    metric.Key,
+                                    newValue,
+                                    (_, oldValue) => newValue + Convert.ToDouble(oldValue, CultureInfo.InvariantCulture));
             }
         }
     }

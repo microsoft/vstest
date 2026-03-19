@@ -96,9 +96,8 @@ public class Migrator
         string? testSettingsPath = null;
         using XmlTextReader reader = new(oldRunSettingsPath);
         reader.Namespaces = false;
-        reader.DtdProcessing = DtdProcessing.Prohibit;
 
-        var runSettingsXmlDoc = new XmlDocument() { XmlResolver = null };
+        var runSettingsXmlDoc = new XmlDocument();
         runSettingsXmlDoc.Load(reader);
         var root = runSettingsXmlDoc.DocumentElement;
 
@@ -214,9 +213,8 @@ public class Migrator
         using (XmlTextReader reader = new(testSettingsPath))
         {
             reader.Namespaces = false;
-            reader.DtdProcessing = DtdProcessing.Prohibit;
 
-            var testSettingsXmlDoc = new XmlDocument() { XmlResolver = null };
+            var testSettingsXmlDoc = new XmlDocument();
             testSettingsXmlDoc.Load(reader);
             var testSettingsRoot = testSettingsXmlDoc.DocumentElement!;
 

@@ -353,8 +353,7 @@ public class BlameCollectorTests
                          y[blameTestObject1.Id].FullyQualifiedName == "TestProject.UnitTest.TestMethod1" && y[blameTestObject2.Id].FullyQualifiedName == "TestProject.UnitTest.TestMethod2" &&
                          y[blameTestObject1.Id].Source == "abc.dll" && y[blameTestObject2.Id].Source == "abc.dll" &&
                          y[blameTestObject1.Id].DisplayName == "TestMethod1" && y[blameTestObject2.Id].DisplayName == "TestMethod2"),
-                It.IsAny<string>()),
-            Times.Once);
+                It.IsAny<string>()), Times.Once);
     }
 
     /// <summary>

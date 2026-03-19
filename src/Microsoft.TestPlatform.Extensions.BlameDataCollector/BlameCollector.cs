@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -38,14 +39,12 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     private DataCollectionEvents? _events;
     private DataCollectionLogger? _logger;
     private readonly IProcessDumpUtility _processDumpUtility;
-    private List<Guid>? _testSequence;
-    private Dictionary<Guid, BlameTestObject>? _testObjectDictionary;
-    private readonly object _testSequenceLock = new();
+    private ConcurrentQueue<Guid>? _testSequence;
+    private ConcurrentDictionary<Guid, BlameTestObject>? _testObjectDictionary;
     private readonly IBlameReaderWriter _blameReaderWriter;
     private readonly IFileHelper _fileHelper;
     private readonly IProcessHelper _processHelper;
     private XmlElement? _configurationElement;
-    private int _testStartCount;
     private int _testEndCount;
     private bool _collectProcessDumpOnCrash;
     private bool _collectProcessDumpOnHang;
@@ -138,8 +137,8 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         _dataCollectionSink = dataSink;
         _context = environmentContext;
         _configurationElement = configurationElement;
-        _testSequence = new List<Guid>();
-        _testObjectDictionary = new Dictionary<Guid, BlameTestObject>();
+        _testSequence = new ConcurrentQueue<Guid>();
+        _testObjectDictionary = new ConcurrentDictionary<Guid, BlameTestObject>();
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         // Subscribing to events
@@ -462,17 +461,11 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         TPDebug.Assert(e.TestElement is not null, "e.TestElement is null");
         var blameTestObject = new BlameTestObject(e.TestElement);
 
-        lock (_testSequenceLock)
-        {
-            // Add guid to list of test sequence to maintain the order.
-            _testSequence.Add(blameTestObject.Id);
+        // Add guid to ordered collection of test sequence to maintain the order.
+        _testSequence.Enqueue(blameTestObject.Id);
 
-            // Add the test object to the dictionary.
-            _testObjectDictionary.Add(blameTestObject.Id, blameTestObject);
-        }
-
-        // Increment test start count.
-        Interlocked.Increment(ref _testStartCount);
+        // Add the test object to the dictionary.
+        _testObjectDictionary.TryAdd(blameTestObject.Id, blameTestObject);
     }
 
     /// <summary>
@@ -491,13 +484,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
 
         // Update the test object in the dictionary as the test has completed.
         TPDebug.Assert(e.TestElement is not null, "e.TestElement is null");
-        lock (_testSequenceLock)
-        {
-            if (_testObjectDictionary.ContainsKey(e.TestElement.Id))
-            {
-                _testObjectDictionary[e.TestElement.Id].IsCompleted = true;
-            }
-        }
+        _testObjectDictionary[e.TestElement.Id].IsCompleted = true;
     }
 
     /// <summary>
@@ -517,19 +504,16 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             // If the last test crashes, it will not invoke a test case end and therefore
             // In case of crash testStartCount will be greater than testEndCount and we need to write the sequence
             // And send the attachment. This won't indicate failure if there are 0 tests in the assembly, or when it fails in setup.
-            var processCrashedWhenRunningTests = Volatile.Read(ref _testStartCount) > Volatile.Read(ref _testEndCount);
+            var processCrashedWhenRunningTests = _testSequence.Count > _testEndCount;
             if (processCrashedWhenRunningTests)
             {
                 var filepath = Path.Combine(GetTempDirectory(), Constants.AttachmentFileName + "_" + _attachmentGuid);
 
                 List<Guid> testSequenceCopy;
                 Dictionary<Guid, BlameTestObject> testObjectDictionaryCopy;
-                lock (_testSequenceLock)
-                {
-                    testSequenceCopy = new List<Guid>(_testSequence);
-                    testObjectDictionaryCopy = new Dictionary<Guid, BlameTestObject>(_testObjectDictionary);
-                }
 
+                testSequenceCopy = [.. _testSequence];
+                testObjectDictionaryCopy = new Dictionary<Guid, BlameTestObject>(_testObjectDictionary);
                 filepath = _blameReaderWriter.WriteTestSequence(testSequenceCopy, testObjectDictionaryCopy, filepath);
                 var fti = new FileTransferInformation(_context.SessionDataCollectionContext, filepath, true);
                 _dataCollectionSink.SendFileAsync(fti);
