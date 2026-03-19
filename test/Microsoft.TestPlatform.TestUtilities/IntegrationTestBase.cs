@@ -102,7 +102,7 @@ public class IntegrationTestBase
             return;
         }
 
-        // Attach / print files that are of interest.
+        // Attach files that are of interest.
         foreach (var attachment in _attachments)
         {
             if (Directory.Exists(attachment))
@@ -110,17 +110,12 @@ public class IntegrationTestBase
                 foreach (var file in Directory.EnumerateFiles(attachment, "*.*", SearchOption.AllDirectories))
                 {
                     TestContext.AddResultFile(file);
-                    if (Path.GetExtension(file) is ".txt" or ".log")
-                    {
-                        Console.WriteLine($"Attached File: {file}\n{File.ReadAllText(file)}\n\n");
-                    }
                 }
             }
 
-            if (File.Exists(attachment) && Path.GetExtension(attachment) is ".txt" or ".log")
+            if (File.Exists(attachment))
             {
                 TestContext.AddResultFile(attachment);
-                Console.WriteLine($"Attached File: {attachment}\n{File.ReadAllText(attachment)}\n\n");
             }
         }
     }
