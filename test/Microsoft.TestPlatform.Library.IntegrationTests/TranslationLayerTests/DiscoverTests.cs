@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -199,16 +200,30 @@ public class DiscoverTests : AcceptanceTestBase
         var testCase =
             _discoveryEventHandler.DiscoveredTestCases.Where(dt => dt.FullyQualifiedName.Equals("SampleUnitTestProject.UnitTest1.PassingTest"));
 
-        // Release builds optimize code, hence line numbers are different.
-        if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+        // Derive the expected line number from the source file so the test doesn't break when code moves around.
+        var sourceFile = Path.Combine(_testEnvironment.TestAssetsPath, "SimpleTestProject", "UnitTest1.cs");
+        var lines = File.ReadAllLines(sourceFile);
+        int expectedLineNumber = -1;
+        for (int i = 0; i < lines.Length; i++)
         {
-            Assert.AreEqual(22, testCase.First().LineNumber);
+            if (lines[i].Contains("public void PassingTest"))
+            {
+                // Source navigation points to the [TestMethod] attribute line, not the method declaration.
+                for (int j = i - 1; j >= 0; j--)
+                {
+                    if (lines[j].Contains("[TestMethod]"))
+                    {
+                        expectedLineNumber = j + 1; // 1-based line number
+                        break;
+                    }
+                }
+
+                break;
+            }
         }
-        else
-        {
-            // TODO: I changed this because it differs in .net testhost, is this condition still needed?
-            Assert.AreEqual(22, testCase.First().LineNumber);
-        }
+
+        Assert.IsTrue(expectedLineNumber > 0, "Could not find [TestMethod] attribute for PassingTest in the source file.");
+        Assert.AreEqual(expectedLineNumber, testCase.First().LineNumber);
     }
 
     [TestMethod]
