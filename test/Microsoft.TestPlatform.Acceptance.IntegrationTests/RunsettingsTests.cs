@@ -510,7 +510,7 @@ public class RunsettingsTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectName = "ProjectFileRunSettingsTestProject.csproj";
-        var projectPath = GetIsolatedTestAsset(projectName);
+        var projectPath = GetIsolatedTestAsset(projectName, runnerInfo.TargetFramework);
         InvokeDotnetTest($@"{projectPath} /p:VSTestUseMSBuildOutput=false --logger:""Console;Verbosity=normal"" /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}", workingDirectory: Path.GetDirectoryName(projectPath));
         ValidateSummaryStatus(0, 1, 0);
 

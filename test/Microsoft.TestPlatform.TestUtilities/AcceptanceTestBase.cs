@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.TestPlatform.TestUtilities;
 
@@ -137,7 +138,7 @@ public class AcceptanceTestBase : IntegrationTestBase
         return runSettingsXml;
     }
 
-    protected string GetIsolatedTestAsset(string assetName)
+    protected string GetIsolatedTestAsset(string assetName, string targetFramework)
     {
         var projectPath = GetProjectFullPath(assetName);
 
@@ -147,6 +148,13 @@ public class AcceptanceTestBase : IntegrationTestBase
 
             if (file.Extension.Equals(".csproj", StringComparison.OrdinalIgnoreCase))
             {
+                // Build just for the given tfm
+                var projFile = Path.Combine(TempDirectory.Path, Path.GetFileName(file.FullName));
+                var csprojContent = File.ReadAllText(projFile);
+                csprojContent = Regex.Replace(csprojContent, "<TargetFramework>.*?</TargetFramework>", $"<TargetFramework>{targetFramework}</TargetFramework>");
+                csprojContent = Regex.Replace(csprojContent, "<TargetFrameworks>.*?</TargetFrameworks>", $"<TargetFramework>{targetFramework}</TargetFramework>");
+                File.WriteAllText(projFile, csprojContent);
+
                 string root = IntegrationTestEnvironment.RepoRootDirectory;
                 var testAssetsRoot = Path.GetFullPath(Path.Combine(root, "test", "TestAssets"));
 
