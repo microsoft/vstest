@@ -25,21 +25,16 @@
     <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.Extensions.HtmlLogger\Microsoft.TestPlatform.Extensions.HtmlLogger.csproj" />
     <ProjectReference Include="$(RepoRoot)test\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />
-    <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.AdapterUtilities\Microsoft.TestPlatform.AdapterUtilities.csproj" />
     <ProjectReference Include="$(RepoRoot)src\vstest.console\vstest.console.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AwesomeAssertions" Version="$(AwesomeAssertionsVersion)" />
     <PackageReference Include="Microsoft.TestPlatform.TestAsset.NativeCPP" Version="2.0.0" />
-    <PackageReference Include="Microsoft.TestPlatform.QTools.Assets" Version="2.0.0" />
-    <PackageReference Include="NuGet.Versioning" Version="6.1.0" />
     <PackageReference Include="Microsoft.CodeCoverage.Core" Version="$(MicrosoftInternalCodeCoverageVersion)" />
   </ItemGroup>
   <ItemGroup Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)')) ">
     <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(MicrosoftInternalCodeCoverageVersion)" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0-preview2-26406-04" />
   </ItemGroup>
   <ItemGroup>
     <!--
