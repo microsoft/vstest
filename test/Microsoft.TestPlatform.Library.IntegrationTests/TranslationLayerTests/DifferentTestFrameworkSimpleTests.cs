@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -64,15 +63,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
 
-        // Release builds optimize code, hence line numbers are different.
-        if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-        {
-            Assert.AreEqual(14, testCase.First().TestCase.LineNumber);
-        }
-        else
-        {
-            Assert.AreEqual(13, testCase.First().TestCase.LineNumber);
-        }
+        LineNumberAssert.AssertIsWithinMethod(testCase.First().TestCase.CodeFilePath, "PassTestMethod1", testCase.First().TestCase.LineNumber);
     }
 
     [TestMethod]
@@ -107,15 +98,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
 
-        // Release builds optimize code, hence line numbers are different.
-        if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-        {
-            Assert.AreEqual(15, testCase.First().TestCase.LineNumber);
-        }
-        else
-        {
-            Assert.AreEqual(14, testCase.First().TestCase.LineNumber);
-        }
+        LineNumberAssert.AssertIsWithinMethod(testCase.First().TestCase.CodeFilePath, "PassTestMethod1", testCase.First().TestCase.LineNumber);
     }
 
     [TestMethod]

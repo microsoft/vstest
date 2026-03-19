@@ -199,16 +199,7 @@ public class DiscoverTests : AcceptanceTestBase
         var testCase =
             _discoveryEventHandler.DiscoveredTestCases.Where(dt => dt.FullyQualifiedName.Equals("SampleUnitTestProject.UnitTest1.PassingTest"));
 
-        // Release builds optimize code, hence line numbers are different.
-        if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-        {
-            Assert.AreEqual(22, testCase.First().LineNumber);
-        }
-        else
-        {
-            // TODO: I changed this because it differs in .net testhost, is this condition still needed?
-            Assert.AreEqual(22, testCase.First().LineNumber);
-        }
+        LineNumberAssert.AssertIsWithinMethod(testCase.First().CodeFilePath, "PassingTest", testCase.First().LineNumber);
     }
 
     [TestMethod]
