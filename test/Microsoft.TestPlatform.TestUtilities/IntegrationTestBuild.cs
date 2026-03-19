@@ -60,18 +60,18 @@ public class IntegrationTestBuild : IntegrationTestBase
                 {
                     CleanNugetCacheAndProjects(nugetCache);
                 }
-                Debug.WriteLine($"Building test assets and unzipping packages took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
+                Debug.WriteLine($"Unzipping packages took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
                 BuildTestAssets(nugetCache);
+                Debug.WriteLine($"Building test assets took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
                 if (buildCompatibility)
                 {
-                    Debug.WriteLine($"Building test assets took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
                     BuildTestAssetsCompatibility(nugetCache);
+                    Debug.WriteLine($"Building compatibility test assets took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
                 }
                 else
                 {
                     Debug.WriteLine("BuildCompatibility parameter is false, skipping build.");
                 }
-                Debug.WriteLine($"Building test assets compatibility matrix took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
                 CopyAndPatchDotnet();
                 Debug.WriteLine($"Copying and patching dotnet took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
             }

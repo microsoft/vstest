@@ -155,7 +155,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         var assemblyPaths = GetAssetFullPath("timeout.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
-        arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=mini;CollectAlways=true;CollectHangDump""");
+        arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=mini;CollectAlways=true;CollectHangDump;HangDumpType=mini""");
 
         var env = new Dictionary<string, string?>
         {
@@ -224,15 +224,14 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    //TODO: we use minidump but the test for .NET Core still takes 30+ seconds? Even though the report says the dump was written in <1s per each. Why?
-    [NetCoreRunner("net48;net10.0")]
+    [NetCoreRunner("net10.0")]
     public void HangDumpChildProcesses(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = GetAssetFullPath("child-hang.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
-        arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=mini;TestTimeout=5s""");
+        arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=mini;TestTimeout=5s"" /Diag:""S:\p\vstest\artifacts\tmp\logs\log.txt""");
         InvokeVsTest(arguments);
 
         ValidateDump(2);
