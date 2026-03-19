@@ -3,5 +3,6 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-// Enable IAP at class level with as many threads as possible based on CPU and core count.
-[assembly: Parallelize(Workers = 0, Scope = ExecutionScope.ClassLevel)]
+// Enable IAP at method level with as many threads as possible based on CPU and core count.
+// Method level is safe because integration tests offload work to child processes (vstest.console, testhost).
+[assembly: Parallelize(Workers = 0, Scope = ExecutionScope.MethodLevel)]
