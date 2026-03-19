@@ -73,11 +73,7 @@ public static class LineNumberAssert
 
             for (int j = i; j < lines.Length; j++)
             {
-                foreach (char c in lines[j])
-                {
-                    if (c == '{') { depth++; foundBody = true; }
-                    else if (c == '}') depth--;
-                }
+                CountBraces(lines[j], ref depth, ref foundBody);
 
                 if (foundBody && depth == 0)
                 {
@@ -126,5 +122,55 @@ public static class LineNumberAssert
     {
         var trimmed = line.TrimStart();
         return trimmed.StartsWith("[", StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Counts unescaped braces in <paramref name="line"/>, ignoring those inside
+    /// string literals, character literals, and single-line comments.
+    /// </summary>
+    private static void CountBraces(string line, ref int depth, ref bool foundBody)
+    {
+        bool inString = false;
+        bool inChar = false;
+
+        for (int i = 0; i < line.Length; i++)
+        {
+            char c = line[i];
+
+            // Detect start of a line comment; stop processing the rest of the line.
+            if (!inString && !inChar && c == '/' && i + 1 < line.Length && line[i + 1] == '/')
+                break;
+
+            if (!inChar && c == '"')
+            {
+                // Handle verbatim strings @"..." - still treat as toggling inString.
+                if (!inString)
+                {
+                    inString = true;
+                }
+                else
+                {
+                    // Check for escaped quote inside string ("").
+                    if (i + 1 < line.Length && line[i + 1] == '"')
+                        i++; // skip the second quote of an escaped pair
+                    else
+                        inString = false;
+                }
+
+                continue;
+            }
+
+            if (!inString && c == '\'')
+            {
+                inChar = !inChar;
+                continue;
+            }
+
+            if (!inString && !inChar)
+            {
+                if (c == '{') { depth++; foundBody = true; }
+                else if (c == '}') depth--;
+            }
+        }
     }
 }
