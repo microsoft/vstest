@@ -7,6 +7,8 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -912,6 +914,40 @@ public class TrxLoggerTests
         }
 
         return null;
+    }
+
+    [TestMethod]
+    public void TestResultHandlerCountersShouldBeThreadSafe()
+    {
+        const int threadCount = 10;
+        const int testsPerThread = 100;
+        var barrier = new Barrier(threadCount);
+
+        var tasks = Enumerable.Range(0, threadCount).Select(t => Task.Run(() =>
+        {
+            barrier.SignalAndWait();
+            for (int i = 0; i < testsPerThread; i++)
+            {
+                var testCase = CreateTestCase($"Test_{t}_{i}");
+                var result = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)
+                {
+                    Outcome = t % 2 == 0 ? TestOutcome.Passed : TestOutcome.Failed
+                };
+                _testableTrxLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result).Object);
+            }
+        })).ToArray();
+
+        Task.WaitAll(tasks);
+
+        Assert.AreEqual(threadCount * testsPerThread, _testableTrxLogger.TotalTestCount,
+            "Total test count should be exact under concurrent updates");
+
+        int expectedPassed = (threadCount / 2) * testsPerThread;
+        int expectedFailed = (threadCount / 2) * testsPerThread;
+        Assert.AreEqual(expectedPassed, _testableTrxLogger.PassedTestCount,
+            "Passed test count should be exact under concurrent updates");
+        Assert.AreEqual(expectedFailed, _testableTrxLogger.FailedTestCount,
+            "Failed test count should be exact under concurrent updates");
     }
 
     private static TestCase CreateTestCase(string testCaseName)
