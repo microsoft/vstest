@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -56,23 +55,16 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
             GetDefaultRunSettings(),
             _runEventHandler);
 
-        var testCase =
-            _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("PassTestMethod1"));
+        var testResult = _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("PassTestMethod1")).First();
+        StringAssert.EndsWith(testResult.TestCase.FullyQualifiedName, "PassTestMethod1");
 
         // Assert
         Assert.AreEqual(2, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
 
-        // Release builds optimize code, hence line numbers are different.
-        if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-        {
-            Assert.AreEqual(14, testCase.First().TestCase.LineNumber);
-        }
-        else
-        {
-            Assert.AreEqual(13, testCase.First().TestCase.LineNumber);
-        }
+        var nunitSourceFile = SourceAssert.FindSourceFile("NUTestProject.dll", "PassTestMethod1");
+        SourceAssert.LineIsAtMethodBodyStart(nunitSourceFile, "PassTestMethod1", testResult.TestCase.LineNumber);
     }
 
     [TestMethod]
@@ -99,23 +91,16 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
             </RunSettings>",
             _runEventHandler);
 
-        var testCase =
-            _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("xUnitTestProject.Class1.PassTestMethod1"));
+        var testResult = _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("xUnitTestProject.Class1.PassTestMethod1")).First();
+        StringAssert.EndsWith(testResult.TestCase.FullyQualifiedName, "PassTestMethod1");
 
         // Assert
         Assert.AreEqual(2, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
 
-        // Release builds optimize code, hence line numbers are different.
-        if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-        {
-            Assert.AreEqual(15, testCase.First().TestCase.LineNumber);
-        }
-        else
-        {
-            Assert.AreEqual(14, testCase.First().TestCase.LineNumber);
-        }
+        var xunitSourceFile = SourceAssert.FindSourceFile("XUTestProject.dll", "PassTestMethod1");
+        SourceAssert.LineIsAtMethodBodyStart(xunitSourceFile, "PassTestMethod1", testResult.TestCase.LineNumber);
     }
 
     [TestMethod]
