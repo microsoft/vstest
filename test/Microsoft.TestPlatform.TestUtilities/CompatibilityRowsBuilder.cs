@@ -178,7 +178,7 @@ public class CompatibilityRowsBuilder
                 + $"Runner version range: [{afterRunnerVersion}, {beforeRunnerVersion}), "
                 + $"TestHost version range: [{afterTestHostVersion}, {beforeTestHostVersion}), "
                 + $"Adapter version range: [{afterAdapterVersion}, {beforeAdapterVersion}). "
-                + $"Total candidate rows before filtering: {dataRows.Count}, after version filtering: {rows.Count}.");
+                + $"Total candidate rows before filtering: {dataRows.Count}, after version filtering: {rows.Count}, after deduping: {distinctRows.Count}.");
         }
 
         var allRows = distinctRows.Values.ToList();
