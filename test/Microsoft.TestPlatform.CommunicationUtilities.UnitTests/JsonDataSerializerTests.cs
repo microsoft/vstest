@@ -42,16 +42,34 @@ public class JsonDataSerializerTests
         classWithSelfReferencingLoop.InfiniteReference!.InfiniteReference = classWithSelfReferencingLoop;
 
         string serializedPayload = _jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop, version);
-        if (version <= 1)
+
+        bool useNewtonsoft = (Environment.GetEnvironmentVariable("VSTEST_USE_NEWTONSOFT_JSON_SERIALIZER")?.Trim() ?? "0") != "0";
+        if (useNewtonsoft)
         {
-            // System.Text.Json with ReferenceHandler.IgnoreCycles writes null for circular references
-            // (Newtonsoft.Json wrote {} for empty objects)
-            Assert.AreEqual("""{"MessageType":"dummy","Payload":{"InfiniteReference":{"InfiniteReference":null}}}""", serializedPayload);
+            // Newtonsoft.Json with ReferenceLoopHandling.Ignore omits the circular property entirely,
+            // producing only one nesting level before the empty object.
+            if (version <= 1)
+            {
+                Assert.AreEqual("""{"MessageType":"dummy","Payload":{"InfiniteReference":{}}}""", serializedPayload);
+            }
+            else
+            {
+                var expected = "{\"Version\":" + version + ",\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteReference\":{}}}";
+                Assert.AreEqual(expected, serializedPayload);
+            }
         }
         else
         {
-            var expected = $$$$"""{"Version":{{{{version}}}},"MessageType":"dummy","Payload":{"InfiniteReference":{"InfiniteReference":null}}}""";
-            Assert.AreEqual(expected, serializedPayload);
+            // System.Text.Json with ReferenceHandler.IgnoreCycles writes null for circular references
+            if (version <= 1)
+            {
+                Assert.AreEqual("""{"MessageType":"dummy","Payload":{"InfiniteReference":{"InfiniteReference":null}}}""", serializedPayload);
+            }
+            else
+            {
+                var expected = $$$$"""{"Version":{{{{version}}}},"MessageType":"dummy","Payload":{"InfiniteReference":{"InfiniteReference":null}}}""";
+                Assert.AreEqual(expected, serializedPayload);
+            }
         }
     }
 

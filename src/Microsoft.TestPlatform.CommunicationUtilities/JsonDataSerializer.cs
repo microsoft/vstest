@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -21,6 +21,9 @@ public class JsonDataSerializer : IDataSerializer
     private static JsonDataSerializer? s_instance;
 
     private static readonly bool DisableFastJson = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_FASTER_JSON_SERIALIZATION);
+    private static readonly bool UseNewtonsoftFallback = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_USE_NEWTONSOFT_JSON_SERIALIZER);
+    private static readonly LegacyNewtonsoftJsonDataSerializer? NewtonsoftFallback = UseNewtonsoftFallback
+        ? new LegacyNewtonsoftJsonDataSerializer() : null;
 
     private static readonly JsonSerializerOptions PayloadOptionsV1; // payload options for version <= 1
     private static readonly JsonSerializerOptions PayloadOptionsV2; // payload options for version >= 2
@@ -173,6 +176,11 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>A <see cref="Message"/> instance.</returns>
     public Message DeserializeMessage(string rawMessage)
     {
+        if (NewtonsoftFallback is not null)
+        {
+            return NewtonsoftFallback.DeserializeMessage(rawMessage);
+        }
+
         if (DisableFastJson)
         {
             // PERF: This is slow, we deserialize the message, and the payload into JsonElement just to get the header. We then
@@ -210,6 +218,11 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>The deserialized payload.</returns>
     public T? DeserializePayload<T>(Message? message)
     {
+        if (NewtonsoftFallback is not null)
+        {
+            return NewtonsoftFallback.DeserializePayload<T>(message);
+        }
+
         if (message is null)
         {
             return default;
@@ -382,6 +395,11 @@ public class JsonDataSerializer : IDataSerializer
     [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public T? Deserialize<T>(string json, int version = 1)
     {
+        if (NewtonsoftFallback is not null)
+        {
+            return NewtonsoftFallback.Deserialize<T>(json, version);
+        }
+
         var options = GetPayloadOptions(version);
         return Deserialize<T>(options, json);
     }
@@ -393,6 +411,11 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializeMessage(string? messageType)
     {
+        if (NewtonsoftFallback is not null)
+        {
+            return NewtonsoftFallback.SerializeMessage(messageType);
+        }
+
         return Serialize(DefaultOptions, new Message { MessageType = messageType });
     }
 
@@ -404,6 +427,11 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializePayload(string? messageType, object? payload)
     {
+        if (NewtonsoftFallback is not null)
+        {
+            return NewtonsoftFallback.SerializePayload(messageType, payload);
+        }
+
         return SerializePayload(messageType, payload, 1);
     }
 
@@ -416,6 +444,11 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializePayload(string? messageType, object? payload, int version)
     {
+        if (NewtonsoftFallback is not null)
+        {
+            return NewtonsoftFallback.SerializePayload(messageType, payload, version);
+        }
+
         var payloadOptions = GetPayloadOptions(version);
         // Fast json is only equivalent to the serialization that is used for protocol version 2 and upwards (or more precisely for the paths that use PayloadOptionsV2)
         // so when we resolved the old options we should use non-fast path.
@@ -446,6 +479,11 @@ public class JsonDataSerializer : IDataSerializer
     [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public string Serialize<T>(T data, int version = 1)
     {
+        if (NewtonsoftFallback is not null)
+        {
+            return NewtonsoftFallback.Serialize(data, version);
+        }
+
         var options = GetPayloadOptions(version);
         return Serialize(options, data);
     }
@@ -454,6 +492,11 @@ public class JsonDataSerializer : IDataSerializer
     [return: NotNullIfNotNull("obj")]
     public T? Clone<T>(T? obj)
     {
+        if (NewtonsoftFallback is not null)
+        {
+            return NewtonsoftFallback.Clone(obj);
+        }
+
         if (obj is null)
         {
             return default;
