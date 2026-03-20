@@ -54,7 +54,7 @@ public class RunSettingsTests
 
         var expectedRunSettings = "<RunSettings>" + Environment.NewLine
                                                   + "</RunSettings>";
-        StringAssert.Contains(runSettings.SettingsXml, expectedRunSettings);
+        Assert.Contains(expectedRunSettings, runSettings.SettingsXml!);
     }
 
     [TestMethod]

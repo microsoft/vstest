@@ -101,7 +101,7 @@ public class FilePatternParserTests
 
         // Assert
         _mockFileHelper.Verify(x => x.Exists(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")));
-        Assert.IsTrue(matchingFiles.Contains(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")));
+        Assert.Contains(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"), matchingFiles);
     }
 
     [TestMethod]

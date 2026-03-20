@@ -52,7 +52,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
         string coverageData = module.CoverageBuffer.Length == 0 ? module.LineCoverage : module.BlockCoverage;
         var coverage = double.Parse(coverageData, CultureInfo.InvariantCulture);
         Console.WriteLine($"Checking coverage for {module.Name}. Expected at least: {expectedCoverage}. Result: {coverage}");
-        Assert.IsTrue(coverage > expectedCoverage, $"Coverage check failed for {module.Name}. Expected at least: {expectedCoverage}. Found: {coverage}");
+        Assert.IsGreaterThan(coverage, expectedCoverage, $"Coverage check failed for {module.Name}. Expected at least: {expectedCoverage}. Found: {coverage}");
     }
 
     protected static string GetCoverageFileNameFromTrx(string trxFilePath, string resultsDirectory)
@@ -62,10 +62,10 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
         using var trxStream = new FileStream(trxFilePath, FileMode.Open, FileAccess.Read);
         doc.Load(trxStream);
         var deploymentElements = doc.GetElementsByTagName("Deployment");
-        Assert.IsTrue(deploymentElements.Count == 1,
+        Assert.HasCount(1, deploymentElements,
             "None or more than one Deployment tags found in trx file:{0}", trxFilePath);
         var deploymentDir = deploymentElements[0]!.Attributes!.GetNamedItem("runDeploymentRoot")?.Value;
-        Assert.IsTrue(StringUtils.IsNullOrEmpty(deploymentDir) == false,
+        Assert.IsFalse(StringUtils.IsNullOrEmpty(deploymentDir),
             "runDeploymentRoot attribute not found in trx file:{0}", trxFilePath);
         var collectors = doc.GetElementsByTagName("Collector");
 
@@ -80,7 +80,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
             }
         }
 
-        Assert.IsTrue(StringUtils.IsNullOrEmpty(fileName) == false, "Coverage file name not found in trx file: {0}",
+        Assert.IsFalse(StringUtils.IsNullOrEmpty(fileName), "Coverage file name not found in trx file: {0}",
             trxFilePath);
         return Path.Combine(resultsDirectory, deploymentDir, "In", fileName);
     }

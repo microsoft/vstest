@@ -93,7 +93,7 @@ public class MigratorTests
         Assert.IsNotNull(root);
         var dataCollectorNode = root.SelectNodes(@"/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
         Assert.IsNotNull(dataCollectorNode);
-        Assert.AreEqual(2, dataCollectorNode.Count, "Data collector is missing");
+        Assert.HasCount(2, dataCollectorNode, "Data collector is missing");
     }
 
     [TestMethod]

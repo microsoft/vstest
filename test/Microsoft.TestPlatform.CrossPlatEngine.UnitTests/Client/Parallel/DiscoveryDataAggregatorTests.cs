@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -57,7 +57,7 @@ public class DiscoveryDataAggregatorTests
         aggregator.AggregateMetrics(null);
 
         var runMetrics = aggregator.GetMetrics();
-        Assert.AreEqual(0, runMetrics.Count);
+        Assert.IsEmpty(runMetrics);
     }
 
     [TestMethod]
@@ -161,7 +161,7 @@ public class DiscoveryDataAggregatorTests
         aggregator.AggregateMetrics(new Dictionary<string, object>());
         var runMetrics = aggregator.GetMetrics();
 
-        Assert.AreEqual(0, runMetrics.Count);
+        Assert.IsEmpty(runMetrics);
     }
 
     [TestMethod]
@@ -172,7 +172,7 @@ public class DiscoveryDataAggregatorTests
         aggregator.AggregateMetrics(null);
         var runMetrics = aggregator.GetMetrics();
 
-        Assert.AreEqual(0, runMetrics.Count);
+        Assert.IsEmpty(runMetrics);
     }
 
     [TestMethod]
@@ -248,9 +248,9 @@ public class DiscoveryDataAggregatorTests
         dataAggregator.MarkSourcesWithStatus(null, discoveryStatus);
 
         // Assert
-        Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered).Count);
-        Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered).Count);
-        Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered).Count);
+        Assert.IsEmpty(dataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        Assert.IsEmpty(dataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        Assert.IsEmpty(dataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
     }
 
     [TestMethod]
@@ -264,7 +264,7 @@ public class DiscoveryDataAggregatorTests
         var sources = new[] { "a", null, "b" };
 
         // Sanity check
-        Assert.AreEqual(0, dataAggregator.GetSourcesWithStatus(discoveryStatus).Count);
+        Assert.IsEmpty(dataAggregator.GetSourcesWithStatus(discoveryStatus));
 
         // Act
         dataAggregator.MarkSourcesWithStatus(sources, discoveryStatus);
@@ -363,7 +363,7 @@ public class DiscoveryDataAggregatorTests
     public void GetSourcesWithStatusWhenEmptyDictionaryReturnsEmptyList(DiscoveryStatus discoveryStatus)
     {
         var instanceSources = new DiscoveryDataAggregator().GetSourcesWithStatus(discoveryStatus);
-        Assert.AreEqual(0, instanceSources.Count);
+        Assert.IsEmpty(instanceSources);
     }
 
     [TestMethod]
@@ -423,6 +423,6 @@ public class DiscoveryDataAggregatorTests
         System.Threading.Tasks.Parallel.For(0, 100, _ => concurrentBag.Add(dataAggregator.TryAggregateIsMessageSent()));
 
         // Assert
-        Assert.AreEqual(1, concurrentBag.Count(b => b));
+        Assert.ContainsSingle(concurrentBag.Where(b => b));
     }
 }

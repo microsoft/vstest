@@ -445,7 +445,7 @@ public class ProxyTestSessionManagerTests
                 testSessionCriteria.RunSettings),
             mockProxyOperationManager.Object);
 
-        Assert.AreEqual(true, proxyManager.EnqueueProxy(mockProxyOperationManager.Object.Id));
+        Assert.IsTrue(proxyManager.EnqueueProxy(mockProxyOperationManager.Object.Id));
 
         // Call to DequeueProxy succeeds when called with the same runsettings as before.
         Assert.AreEqual(proxyManager.DequeueProxy(

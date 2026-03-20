@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
@@ -60,7 +60,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.HasCount(6, _runEventHandler.TestResults, _runEventHandler.ToString());
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped), _runEventHandler.ToString());
@@ -91,7 +91,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
 
         // Assert
         _runEventHandler.EnsureSuccess();
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.HasCount(6, _runEventHandler.TestResults, _runEventHandler.ToString());
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped), _runEventHandler.ToString());
@@ -125,10 +125,10 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(5, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.HasCount(5, _runEventHandler.TestResults, _runEventHandler.ToString());
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped), _runEventHandler.ToString());
+        Assert.ContainsSingle(_runEventHandler.TestResults.Where(t => t.Outcome == TestOutcome.Skipped), _runEventHandler.ToString());
     }
 
     [TestMethod]
@@ -192,7 +192,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
 
         // Assert
         // Ensure that we are trying to run via tpv0 and failing because that is no longer allowed.
-        StringAssert.Contains(StdErrWithWhiteSpace, "An exception occurred while invoking executor 'executor://mstestadapter/v1': MSTest v1 run was offloaded to legacy TestPlatform runner");
+        Assert.Contains("An exception occurred while invoking executor 'executor://mstestadapter/v1': MSTest v1 run was offloaded to legacy TestPlatform runner", StdErrWithWhiteSpace);
 
         ExitCodeEquals(1); // failing tests
     }
@@ -220,8 +220,8 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
+        Assert.ContainsSingle(_runEventHandler.TestResults, _runEventHandler.ToString());
+        Assert.ContainsSingle(_runEventHandler.TestResults.Where(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, _logsDir.Path, testhostProcessNames);
     }
 

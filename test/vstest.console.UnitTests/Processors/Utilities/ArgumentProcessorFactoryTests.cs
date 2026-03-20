@@ -70,11 +70,8 @@ public class ArgumentProcessorFactoryTests
         var command = "--";
 
         ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
-        Action action = () => factory.CreateArgumentProcessor(command, null!);
-
-        ExceptionUtilities.ThrowsException<ArgumentException>(
-            action,
-            "Cannot be null or empty", "argument");
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => factory.CreateArgumentProcessor(command, null!));
+        Assert.Contains("Cannot be null or empty", ex.Message);
     }
 
     [TestMethod]

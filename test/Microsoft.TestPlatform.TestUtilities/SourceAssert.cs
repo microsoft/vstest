@@ -28,10 +28,10 @@ public static class SourceAssert
     {
         var lines = File.ReadAllLines(sourceFilePath);
         var bodyStarts = SourceNavigationParser.FindMethodBodyStartLines(lines, methodName);
-        Assert.IsTrue(bodyStarts.Count > 0, $"Method '{methodName}' not found in '{sourceFilePath}'.");
+        Assert.IsNotEmpty(bodyStarts, $"Method '{methodName}' not found in '{sourceFilePath}'.");
 
-        Assert.IsTrue(
-            bodyStarts.Any(bodyStart => actualLineNumber == bodyStart || actualLineNumber == bodyStart + 1),
+        Assert.Contains(
+            bodyStart => actualLineNumber == bodyStart || actualLineNumber == bodyStart + 1, bodyStarts,
             message ?? $"Line {actualLineNumber} is not at the body start of method '{methodName}' in '{Path.GetFileName(sourceFilePath)}'."
                      + $" Expected one of: {string.Join(", ", bodyStarts.SelectMany(b => new[] { b, b + 1 }).Distinct().OrderBy(x => x))}");
     }
@@ -46,12 +46,12 @@ public static class SourceAssert
     {
         var lines = File.ReadAllLines(sourceFilePath);
         var locations = SourceNavigationParser.FindMethodLocations(lines, methodName);
-        Assert.IsTrue(locations.Count > 0, $"Method '{methodName}' not found in '{sourceFilePath}'.");
+        Assert.IsNotEmpty(locations, $"Method '{methodName}' not found in '{sourceFilePath}'.");
 
         // Allow from a few lines before the signature (to cover attributes like [TestMethod]) through body start + 1.
         const int attributeMargin = 5;
-        Assert.IsTrue(
-            locations.Any(loc => actualLineNumber >= loc.SignatureLine - attributeMargin && actualLineNumber <= loc.BodyStartLine + 1),
+        Assert.Contains(
+            loc => actualLineNumber >= loc.SignatureLine - attributeMargin && actualLineNumber <= loc.BodyStartLine + 1, locations,
             message ?? $"Line {actualLineNumber} is not within any overload of method '{methodName}' in '{Path.GetFileName(sourceFilePath)}'."
                      + $" Method ranges: {string.Join(", ", locations.Select(loc => $"[{loc.SignatureLine - attributeMargin}-{loc.BodyStartLine + 1}]"))}");
     }
