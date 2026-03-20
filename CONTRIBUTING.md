@@ -5,56 +5,13 @@ platform.
 
 ## Prerequisites
 
-Fork [microsoft/vstest](https://github.com/microsoft/vstest) on GitHub, then clone your fork to a local directory. Rest of this article assumes `C:\p\vstest` as the location where you cloned the repo.
+Clone the repository to a local directory. Rest of this article assumes
+`C:\source\vstest` as the location where you cloned the repo.
 
 ```shell
-> cd C:\p
-> git clone https://github.com/<your-github-username>/vstest.git
+> cd C:\source
+> git clone https://github.com/Microsoft/vstest.git
 ```
-
-### Keeping up to date with upstream
-
-Add the upstream remote so you can regularly pull in changes from the main repository:
-
-```shell
-> cd C:\p\vstest
-> git remote add upstream https://github.com/microsoft/vstest.git
-```
-
-To update your local `main` branch with the latest upstream changes:
-
-```shell
-> git fetch upstream
-> git checkout main
-> git merge upstream/main
-```
-
-### Working on multiple things at the same time with git worktrees
-
-Instead of juggling branches on a single checkout, use [git worktrees](https://git-scm.com/docs/git-worktree) to have multiple branches checked out simultaneously, each in its own directory under `C:\p\vstest-tree\`.
-
-Set up these global git aliases once:
-
-```shell
-> git config --global alias.wta '!f() { mkdir -p "$(git rev-parse --show-toplevel)/../vstest-tree" 2>/dev/null; git worktree add -b "$1" "../vstest-tree/$1"; }; f'
-> git config --global alias.wtr '!f() { git worktree remove "../vstest-tree/$1"; }; f'
-> git config --global alias.wtl '!f() { git worktree list; }; f'
-```
-
-Then use them:
-
-```shell
-# Create a new worktree for a branch (checkout appears at C:\p\vstest-tree\<branch>)
-> git wta my-feature-branch
-
-# List all active worktrees
-> git wtl
-
-# Remove a worktree when done
-> git wtr my-feature-branch
-```
-
-Each worktree is a full independent checkout sharing the same `.git` store — no stashing needed when switching contexts.
 
 ### Windows requirements
 
