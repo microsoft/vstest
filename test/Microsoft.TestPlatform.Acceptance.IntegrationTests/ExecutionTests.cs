@@ -191,7 +191,7 @@ public class ExecutionTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var errorMessage = "Process is terminated due to StackOverflowException.";
-        if (!runnerInfo.TargetFramework.StartsWith("net4"))
+        if (runnerInfo.IsNetTarget)
         {
             errorMessage = "Test host process crashed : Stack overflow.";
         }
@@ -221,7 +221,7 @@ public class ExecutionTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var errorFirstLine =
-            !runnerInfo.TargetFramework.StartsWith("net4")
+            runnerInfo.IsNetTarget
             ? "Test host standard error line: Unhandled exception. System.InvalidOperationException: Operation is not valid due to the current state of the object."
             : "Test host standard error line: Unhandled Exception: System.InvalidOperationException: Operation is not valid due to the current state of the object.";
         FileAssert.Contains(diagLogFilePath, errorFirstLine);
