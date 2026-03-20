@@ -135,6 +135,7 @@ public class DiaSessionTests : AcceptanceTestBase
         var diaSession = new DiaSession(assemblyPath);
         DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.HugeMethodSet", "MSTest_D1_01");
         watch.Stop();
+        var diaElapsedMilliseconds = watch.ElapsedMilliseconds;
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
         StringAssert.EndsWith(diaNavigationData.FileName!.Replace("\\", "/"), @"\SimpleClassLibrary\HugeMethodSet.cs".Replace("\\", "/"));
@@ -148,7 +149,7 @@ public class DiaSessionTests : AcceptanceTestBase
         Assert.AreEqual(bodyEnd, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
         var expectedTime = 150;
-        Assert.IsTrue(watch.Elapsed.Milliseconds < expectedTime, $"DiaSession Perf test Actual time:{watch.Elapsed.Milliseconds} ms Expected time:{expectedTime} ms");
+        Assert.IsTrue(diaElapsedMilliseconds < expectedTime, $"DiaSession Perf test Actual time:{diaElapsedMilliseconds} ms Expected time:{expectedTime} ms");
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
     }
@@ -167,22 +168,25 @@ public class DiaSessionTests : AcceptanceTestBase
                 int bodyStart = -1;
                 for (int j = i; j < lines.Length; j++)
                 {
-                    if (lines[j].Contains("{"))
+                    var line = lines[j];
+                    foreach (var ch in line)
                     {
-                        if (bodyStart == -1)
+                        if (ch == '{')
                         {
-                            bodyStart = j + 1; // 1-based
+                            if (bodyStart == -1)
+                            {
+                                bodyStart = j + 1; // 1-based
+                            }
+
+                            braceDepth++;
                         }
-
-                        braceDepth++;
-                    }
-
-                    if (lines[j].Contains("}"))
-                    {
-                        braceDepth--;
-                        if (braceDepth == 0)
+                        else if (ch == '}')
                         {
-                            return (bodyStart, j + 1); // 1-based
+                            braceDepth--;
+                            if (braceDepth == 0)
+                            {
+                                return (bodyStart, j + 1); // 1-based
+                            }
                         }
                     }
                 }

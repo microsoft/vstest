@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.EventHandler;
 using Microsoft.TestPlatform.TestUtilities;
@@ -39,6 +40,36 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     }
 
 
+    private static int FindFirstExecutableLine(string filePath, int methodBodyOpeningBraceLine)
+    {
+        // methodBodyOpeningBraceLine is 1-based. Start scanning from the next line.
+        var lines = File.ReadAllLines(filePath);
+        for (int i = methodBodyOpeningBraceLine; i < lines.Length; i++)
+        {
+            var trimmed = lines[i].Trim();
+
+            if (trimmed.Length == 0)
+            {
+                continue;
+            }
+
+            if (trimmed.StartsWith("//", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            if (trimmed.StartsWith("#", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            return i + 1; // Convert 0-based index to 1-based line number.
+        }
+
+        // Fallback to the original opening brace line if no executable line is found.
+        return methodBodyOpeningBraceLine;
+    }
+
     [TestMethod]
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithNunitAdapter(RunnerInfo runnerInfo)
@@ -65,13 +96,14 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
 
         // Derive expected line number from source so the test is resilient to code moving around.
+        var sourceFilePath = Path.Combine(_testEnvironment.TestAssetsPath, "NUTestProject", "Class1.cs");
         var expectedLine = FindMethodBodyStartLine(
-            Path.Combine(_testEnvironment.TestAssetsPath, "NUTestProject", "Class1.cs"),
+            sourceFilePath,
             "PassTestMethod1");
-        // In Release, PDB sequence points start at first executable statement, not the opening brace.
+        // In Release, PDB sequence points start at the first executable statement, not the opening brace.
         if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
         {
-            expectedLine++;
+            expectedLine = FindFirstExecutableLine(sourceFilePath, expectedLine);
         }
 
         Assert.AreEqual(expectedLine, testCase.First().TestCase.LineNumber);
@@ -159,9 +191,17 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     private static int FindMethodBodyStartLine(string sourceFile, string methodName)
     {
         var lines = File.ReadAllLines(sourceFile);
+        var pattern = $@"(?<!\.)\b{Regex.Escape(methodName)}\s*\(";
+
         for (int i = 0; i < lines.Length; i++)
         {
-            if (lines[i].Contains($"void {methodName}"))
+            var trimmedLine = lines[i].TrimStart();
+            if (trimmedLine.StartsWith("//", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            if (Regex.IsMatch(lines[i], pattern))
             {
                 // Find the opening brace after the method declaration.
                 for (int j = i; j < lines.Length; j++)
