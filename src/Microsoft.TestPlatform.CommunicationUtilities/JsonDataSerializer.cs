@@ -3,15 +3,13 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
@@ -24,92 +22,111 @@ public class JsonDataSerializer : IDataSerializer
 
     private static readonly bool DisableFastJson = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_FASTER_JSON_SERIALIZATION);
 
-    private static readonly JsonSerializer PayloadSerializerV1; // payload serializer for version <= 1
-    private static readonly JsonSerializer PayloadSerializerV2; // payload serializer for version >= 2
-    private static readonly JsonSerializer FastSerializer;
-    private static readonly JsonSerializerSettings FastJsonSettings; // serializer settings for faster json
-    private static readonly JsonSerializerSettings JsonSettings; // serializer settings for serializer v1, which should use to deserialize message headers
-    private static readonly JsonSerializer Serializer; // generic serializer
+    private static readonly JsonSerializerOptions PayloadOptionsV1; // payload options for version <= 1
+    private static readonly JsonSerializerOptions PayloadOptionsV2; // payload options for version >= 2
+    private static readonly JsonSerializerOptions FastOptions; // options for faster json
+    private static readonly JsonSerializerOptions DefaultOptions; // generic options
 
     static JsonDataSerializer()
     {
-
-        var jsonSettings = new JsonSerializerSettings
+        DefaultOptions = new JsonSerializerOptions
         {
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            DateParseHandling = DateParseHandling.DateTimeOffset,
-            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-            TypeNameHandling = TypeNameHandling.None,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            MissingMemberHandling = MissingMemberHandling.Ignore,
-            NullValueHandling = NullValueHandling.Include,
-            DefaultValueHandling = DefaultValueHandling.Include,
-            ObjectCreationHandling = ObjectCreationHandling.Auto,
-            PreserveReferencesHandling = PreserveReferencesHandling.None,
-            ConstructorHandling = ConstructorHandling.Default,
-            MetadataPropertyHandling = MetadataPropertyHandling.Default,
-            Formatting = Formatting.None,
-            FloatParseHandling = FloatParseHandling.Double,
-            FloatFormatHandling = FloatFormatHandling.String,
-            StringEscapeHandling = StringEscapeHandling.Default,
-            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-            Culture = CultureInfo.InvariantCulture,
-            CheckAdditionalContent = false,
-            DateFormatString = @"yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK",
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
             MaxDepth = 64,
+            WriteIndented = false,
+            PropertyNamingPolicy = null, // PascalCase (same as Newtonsoft default)
+            AllowTrailingCommas = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            Converters =
+            {
+                new TestPropertyConverter(),
+                new AttachmentSetConverter(),
+                new UriDataAttachmentConverter(),
+                new TestExecutionContextConverter(),
+            },
         };
 
-        JsonSettings = jsonSettings;
-
-        Serializer = JsonSerializer.Create();
-        PayloadSerializerV1 = JsonSerializer.Create(jsonSettings);
-        PayloadSerializerV2 = JsonSerializer.Create(jsonSettings);
-
-        var contractResolver = new DefaultTestPlatformContractResolver();
-        FastJsonSettings = new JsonSerializerSettings
+        // V2 options: TestObjectConverter and TestRunStatisticsConverter only
+        PayloadOptionsV2 = new JsonSerializerOptions
         {
-            DateFormatHandling = jsonSettings.DateFormatHandling,
-            DateParseHandling = jsonSettings.DateParseHandling,
-            DateTimeZoneHandling = jsonSettings.DateTimeZoneHandling,
-            TypeNameHandling = jsonSettings.TypeNameHandling,
-            ReferenceLoopHandling = jsonSettings.ReferenceLoopHandling,
-            MissingMemberHandling = jsonSettings.MissingMemberHandling,
-            // PERF: Null value handling has very small impact on serialization and deserialization. Enabling it does not warrant the risk we run
-            // of changing how our consumers get their data. so we leave it at the default value
-            NullValueHandling = jsonSettings.NullValueHandling,
-            DefaultValueHandling = jsonSettings.DefaultValueHandling,
-            ObjectCreationHandling = jsonSettings.ObjectCreationHandling,
-            PreserveReferencesHandling = jsonSettings.PreserveReferencesHandling,
-            ConstructorHandling = jsonSettings.ConstructorHandling,
-            MetadataPropertyHandling = jsonSettings.MetadataPropertyHandling,
-            Formatting = jsonSettings.Formatting,
-            FloatParseHandling = jsonSettings.FloatParseHandling,
-            FloatFormatHandling = jsonSettings.FloatFormatHandling,
-            StringEscapeHandling = jsonSettings.StringEscapeHandling,
-            TypeNameAssemblyFormatHandling = jsonSettings.TypeNameAssemblyFormatHandling,
-            Culture = jsonSettings.Culture,
-            CheckAdditionalContent = jsonSettings.CheckAdditionalContent,
-            DateFormatString = jsonSettings.DateFormatString,
-            MaxDepth = jsonSettings.MaxDepth,
-            ContractResolver = contractResolver,
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+            MaxDepth = 64,
+            WriteIndented = false,
+            PropertyNamingPolicy = null,
+            AllowTrailingCommas = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            Converters =
+            {
+                new TestPropertyConverter(),
+                new TestCaseConverterV2(),
+                new TestResultConverterV2(),
+                new TestObjectConverter(),
+                new TestRunStatisticsConverter(),
+                new AttachmentSetConverter(),
+                new UriDataAttachmentConverter(),
+                new TestExecutionContextConverter(),
+                new TestObjectBaseConverterFactory(),
+            },
         };
 
-        FastSerializer = JsonSerializer.Create(FastJsonSettings);
+        // V1 options: adds TestCaseConverter and TestResultConverter on top of V2 converters
+        PayloadOptionsV1 = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+            MaxDepth = 64,
+            WriteIndented = false,
+            PropertyNamingPolicy = null,
+            AllowTrailingCommas = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            Converters =
+            {
+                new TestPropertyConverter(),
+                new TestCaseConverter(),
+                new TestResultConverter(),
+                new TestObjectConverter(),
+                new TestRunStatisticsConverter(),
+                new AttachmentSetConverter(),
+                new UriDataAttachmentConverter(),
+                new TestExecutionContextConverter(),
+                new TestObjectBaseConverterFactory(),
+            },
+        };
 
-        PayloadSerializerV1.ContractResolver = new TestPlatformContractResolver1();
-        PayloadSerializerV2.ContractResolver = contractResolver;
-
-#if TRACE_JSON_SERIALIZATION
-        // MemoryTraceWriter can help diagnose serialization issues. Enable it for
-        // debug builds only.
-        // Note that MemoryTraceWriter is not thread safe, please don't use it in parallel
-        // test runs. See https://github.com/JamesNK/Newtonsoft.Json/issues/1279
-        payloadSerializer.TraceWriter = new MemoryTraceWriter();
-        payloadSerializer2.TraceWriter = new MemoryTraceWriter();
-#endif
+        // Fast options: same as V2
+        FastOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+            MaxDepth = 64,
+            WriteIndented = false,
+            PropertyNamingPolicy = null,
+            AllowTrailingCommas = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            Converters =
+            {
+                new TestPropertyConverter(),
+                new TestCaseConverterV2(),
+                new TestResultConverterV2(),
+                new TestObjectConverter(),
+                new TestRunStatisticsConverter(),
+                new AttachmentSetConverter(),
+                new UriDataAttachmentConverter(),
+                new TestExecutionContextConverter(),
+                new TestObjectBaseConverterFactory(),
+            },
+        };
     }
-
-
 
     /// <summary>
     /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
@@ -130,8 +147,8 @@ public class JsonDataSerializer : IDataSerializer
     {
         if (DisableFastJson)
         {
-            // PERF: This is slow, we deserialize the message, and the payload into JToken just to get the header. We then
-            // deserialize the data from the JToken, but that is twice as expensive as deserializing the whole object directly into the final object type.
+            // PERF: This is slow, we deserialize the message, and the payload into JsonElement just to get the header. We then
+            // deserialize the data from the JsonElement, but that is twice as expensive as deserializing the whole object directly into the final object type.
             // We need this for backward compatibility though.
             return Deserialize<VersionedMessage>(rawMessage)!;
         }
@@ -177,20 +194,20 @@ public class JsonDataSerializer : IDataSerializer
             //
             // Unit tests also provide a Message in places where using the deserializer would actually
             // produce a VersionedMessage or VersionedMessageWithRawMessage.
-            var serializerV1 = GetPayloadSerializer(null);
+            var optionsV1 = GetPayloadOptions(null);
             TPDebug.Assert(message.Payload is not null, "Payload should not be null");
-            return Deserialize<T>(serializerV1, message.Payload);
+            return DeserializeJsonElement<T>(optionsV1, message.Payload.Value);
         }
 
         var versionedMessage = (VersionedMessage)message;
-        var payloadSerializer = GetPayloadSerializer(versionedMessage.Version);
+        var payloadOptions = GetPayloadOptions(versionedMessage.Version);
 
         if (DisableFastJson)
         {
             // When fast json is disabled, then the message is a VersionedMessage
-            // with JToken payload.
+            // with JsonElement payload.
             TPDebug.Assert(message.Payload is not null, "Payload should not be null");
-            return Deserialize<T>(payloadSerializer, message.Payload);
+            return DeserializeJsonElement<T>(payloadOptions, message.Payload.Value);
         }
 
         // When fast json is enabled then the message is also a subtype of VersionedMessage, but
@@ -198,36 +215,35 @@ public class JsonDataSerializer : IDataSerializer
         var messageWithRawMessage = (VersionedMessageWithRawMessage)message;
         var rawMessage = messageWithRawMessage.RawMessage;
 
-        if (rawMessage == null)
+        if (rawMessage is null)
         {
             return default;
         }
 
         // The deserialized message can still have a version (0 or 1), that should use the old deserializer
-        if (payloadSerializer == PayloadSerializerV2)
+        if (payloadOptions == PayloadOptionsV2)
         {
-            // PERF: Fast path is compatibile only with protocol versions that use serializer_2,
-            // and this is faster than deserializing via deserializer_2.
+            // PERF: Fast path is compatible only with protocol versions that use options_2,
+            // and this is faster than deserializing via options_2.
             var messageWithPayload = DeserializeObjectFast<PayloadedMessage<T>>(rawMessage);
 
-            return messageWithPayload == null ? default : messageWithPayload.Payload;
+            return messageWithPayload is null ? default : messageWithPayload.Payload;
         }
         else
         {
-            // PERF: When payloadSerializer1 was resolved we need to deserialize JToken, and then deserialize that.
-            // This is still better than deserializing the JToken in DeserializeMessage because here we know that the payload
+            // PERF: When payloadOptionsV1 was resolved we need to deserialize JsonElement, and then deserialize that.
+            // This is still better than deserializing the JsonElement in DeserializeMessage because here we know that the payload
             // will actually be used.
             TPDebug.Assert(rawMessage is not null, "rawMessage should not be null");
             var rawMessagePayload = Deserialize<Message>(rawMessage)?.Payload;
             TPDebug.Assert(rawMessagePayload is not null, "rawMessagePayload should not be null");
-            return Deserialize<T>(payloadSerializer, rawMessagePayload);
+            return DeserializeJsonElement<T>(payloadOptions, rawMessagePayload.Value);
         }
     }
 
     private static T? DeserializeObjectFast<T>(string value)
     {
-        using JsonTextReader reader = new(new StringReader(value));
-        return (T?)FastSerializer.Deserialize(reader, typeof(T));
+        return JsonSerializer.Deserialize<T>(value, FastOptions);
     }
 
     private static bool FastHeaderParse(string rawMessage, out int version, out string? messageType)
@@ -338,8 +354,8 @@ public class JsonDataSerializer : IDataSerializer
     [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public T? Deserialize<T>(string json, int version = 1)
     {
-        var payloadSerializer = GetPayloadSerializer(version);
-        return Deserialize<T>(payloadSerializer, json);
+        var options = GetPayloadOptions(version);
+        return Deserialize<T>(options, json);
     }
 
     /// <summary>
@@ -349,7 +365,7 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializeMessage(string? messageType)
     {
-        return Serialize(Serializer, new Message { MessageType = messageType });
+        return Serialize(DefaultOptions, new Message { MessageType = messageType });
     }
 
     /// <summary>
@@ -372,23 +388,23 @@ public class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializePayload(string? messageType, object? payload, int version)
     {
-        var payloadSerializer = GetPayloadSerializer(version);
-        // Fast json is only equivalent to the serialization that is used for protocol version 2 and upwards (or more precisely for the paths that use PayloadSerializerV2)
-        // so when we resolved the old serializer we should use non-fast path.
-        if (DisableFastJson || payloadSerializer == PayloadSerializerV1)
+        var payloadOptions = GetPayloadOptions(version);
+        // Fast json is only equivalent to the serialization that is used for protocol version 2 and upwards (or more precisely for the paths that use PayloadOptionsV2)
+        // so when we resolved the old options we should use non-fast path.
+        if (DisableFastJson || payloadOptions == PayloadOptionsV1)
         {
-            if (payload == null)
+            if (payload is null)
                 return string.Empty;
 
-            var serializedPayload = JToken.FromObject(payload, payloadSerializer);
+            var serializedPayload = JsonSerializer.SerializeToElement(payload, payloadOptions);
 
             return version > 1 ?
-                Serialize(Serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
-                Serialize(Serializer, new Message { MessageType = messageType, Payload = serializedPayload });
+                Serialize(DefaultOptions, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
+                Serialize(DefaultOptions, new Message { MessageType = messageType, Payload = serializedPayload });
         }
         else
         {
-            return Serialize(FastSerializer, new VersionedMessageForSerialization { MessageType = messageType, Version = version, Payload = payload });
+            return Serialize(FastOptions, new VersionedMessageForSerialization { MessageType = messageType, Version = version, Payload = payload });
         }
     }
 
@@ -402,15 +418,15 @@ public class JsonDataSerializer : IDataSerializer
     [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public string Serialize<T>(T data, int version = 1)
     {
-        var payloadSerializer = GetPayloadSerializer(version);
-        return Serialize(payloadSerializer, data);
+        var options = GetPayloadOptions(version);
+        return Serialize(options, data);
     }
 
     /// <inheritdoc/>
     [return: NotNullIfNotNull("obj")]
     public T? Clone<T>(T? obj)
     {
-        if (obj == null)
+        if (obj is null)
         {
             return default;
         }
@@ -423,44 +439,39 @@ public class JsonDataSerializer : IDataSerializer
     /// Serialize data.
     /// </summary>
     /// <typeparam name="T">Type of data.</typeparam>
-    /// <param name="serializer">Serializer.</param>
+    /// <param name="options">Serializer options.</param>
     /// <param name="data">Data to be serialized.</param>
     /// <returns>Serialized data.</returns>
-    private static string Serialize<T>(JsonSerializer serializer, T data)
+    private static string Serialize<T>(JsonSerializerOptions options, T data)
     {
-        using var stringWriter = new StringWriter();
-        using var jsonWriter = new JsonTextWriter(stringWriter);
-        serializer.Serialize(jsonWriter, data);
-        return stringWriter.ToString();
+        return JsonSerializer.Serialize(data, options);
     }
 
     /// <summary>
     /// Deserialize data.
     /// </summary>
     /// <typeparam name="T">Type of data.</typeparam>
-    /// <param name="serializer">Serializer.</param>
+    /// <param name="options">Serializer options.</param>
     /// <param name="data">Data to be deserialized.</param>
     /// <returns>Deserialized data.</returns>
-    private static T? Deserialize<T>(JsonSerializer serializer, string data)
+    private static T? Deserialize<T>(JsonSerializerOptions options, string data)
     {
-        using var stringReader = new StringReader(data);
-        using var jsonReader = new JsonTextReader(stringReader);
-        return serializer.Deserialize<T>(jsonReader);
+        return JsonSerializer.Deserialize<T>(data, options);
     }
 
     /// <summary>
-    /// Deserialize JToken object to T object.
+    /// Deserialize JsonElement to T object.
     /// </summary>
     /// <typeparam name="T">Type of data.</typeparam>
-    /// <param name="serializer">Serializer.</param>
-    /// <param name="jToken">JToken to be deserialized.</param>
+    /// <param name="options">Serializer options.</param>
+    /// <param name="element">JsonElement to be deserialized.</param>
     /// <returns>Deserialized data.</returns>
-    private static T Deserialize<T>(JsonSerializer serializer, JToken jToken)
+    private static T DeserializeJsonElement<T>(JsonSerializerOptions options, JsonElement element)
     {
-        return jToken.ToObject<T>(serializer)!;
+        return JsonSerializer.Deserialize<T>(element.GetRawText(), options)!;
     }
 
-    private static JsonSerializer GetPayloadSerializer(int? version)
+    private static JsonSerializerOptions GetPayloadOptions(int? version)
     {
         version ??= 1;
 
@@ -471,8 +482,8 @@ public class JsonDataSerializer : IDataSerializer
             // serializer v2, we downgrade to protocol 2 when 3 would be negotiated
             // unless this is disabled by VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE
             // env variable.
-            0 or 1 or 3 => PayloadSerializerV1,
-            2 or 4 or 5 or 6 or 7 => PayloadSerializerV2,
+            0 or 1 or 3 => PayloadOptionsV1,
+            2 or 4 or 5 or 6 or 7 => PayloadOptionsV2,
 
             _ => throw new NotSupportedException($"Protocol version {version} is not supported. "
                 + "Ensure it is compatible with the latest serializer or add a new one."),
@@ -515,7 +526,7 @@ public class JsonDataSerializer : IDataSerializer
     }
 
     /// <summary>
-    /// For serialization directly into string, without first converting to JToken, and then from JToken to string.
+    /// For serialization directly into string, without first converting to JsonElement, and then from JsonElement to string.
     /// </summary>
     private class VersionedMessageForSerialization
     {
