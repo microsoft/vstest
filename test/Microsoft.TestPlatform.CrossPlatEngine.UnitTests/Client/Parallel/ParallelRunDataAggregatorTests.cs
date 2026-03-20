@@ -468,7 +468,7 @@ public class ParallelRunDataAggregatorTests
 
         const int threadCount = 10;
         const int iterationsPerThread = 100;
-        var barrier = new Barrier(threadCount);
+        var barrier = new Barrier(threadCount + 1);
 
         // Start threads that call Aggregate concurrently
         var aggregateTasks = Enumerable.Range(0, threadCount).Select(_ => Task.Run(() =>
@@ -484,7 +484,19 @@ public class ParallelRunDataAggregatorTests
             }
         })).ToArray();
 
-        Task.WaitAll(aggregateTasks.ToArray());
+        // Also start a reader thread that calls GetAggregatedRunStats concurrently
+        var readerTask = Task.Run(() =>
+        {
+            barrier.SignalAndWait();
+            for (int i = 0; i < iterationsPerThread; i++)
+            {
+                // This must not throw InvalidOperationException due to collection modification
+                var runStats = aggregator.GetAggregatedRunStats();
+                Assert.IsTrue(runStats.ExecutedTests >= 0, "Executed tests count should be non-negative");
+            }
+        });
+
+        Task.WaitAll(aggregateTasks.Append(readerTask).ToArray());
 
         var finalStats = aggregator.GetAggregatedRunStats();
         Assert.AreEqual(threadCount * iterationsPerThread, finalStats.ExecutedTests,

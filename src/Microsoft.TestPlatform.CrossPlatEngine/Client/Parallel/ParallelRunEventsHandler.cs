@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -77,7 +78,7 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
                 _runDataAggregator.IsAborted,
                 _runDataAggregator.GetAggregatedException(),
                 new Collection<AttachmentSet>(_runDataAggregator.RunCompleteArgsAttachments),
-                new Collection<InvokedDataCollector>(_runDataAggregator.InvokedDataCollectors),
+                new Collection<InvokedDataCollector>(_runDataAggregator.InvokedDataCollectors.ToList()),
                 _runDataAggregator.ElapsedTime);
 
             // Collect Final RunState
