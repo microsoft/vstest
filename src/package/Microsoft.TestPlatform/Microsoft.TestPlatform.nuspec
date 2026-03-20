@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     $CommonMetadataElements$
@@ -129,7 +129,6 @@
     <file src="net48\vstest.console.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\vstest.console.exe.config" />
     <file src="net48\vstest.console.arm64.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\vstest.console.arm64.exe" />
     <file src="net48\vstest.console.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\vstest.console.arm64.exe.config" />
-    <file src="net48\SettingsMigrator.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\SettingsMigrator.exe" />
 
     <file src="net48\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net48\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
@@ -143,7 +142,6 @@
     <file src="net48\cs\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\cs\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\cs\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\cs\vstest.console.resources.dll" />
-    <file src="net48\cs\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\cs\SettingsMigrator.resources.dll" />
     <file src="net48\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net48\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net48\de\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\de\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -156,7 +154,6 @@
     <file src="net48\de\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\de\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\de\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\de\vstest.console.resources.dll" />
-    <file src="net48\de\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\de\SettingsMigrator.resources.dll" />
     <file src="net48\es\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\es\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net48\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net48\es\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\es\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -169,7 +166,6 @@
     <file src="net48\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\es\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\es\vstest.console.resources.dll" />
-    <file src="net48\es\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\es\SettingsMigrator.resources.dll" />
 
     <file src="net48\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
     <file src="net48\DumpMinitool.exe" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\dump\DumpMinitool.exe" />
@@ -244,7 +240,6 @@
     <file src="net48\fr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\fr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\fr\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\fr\vstest.console.resources.dll" />
-    <file src="net48\fr\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\fr\SettingsMigrator.resources.dll" />
     <file src="net48\it\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\it\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net48\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net48\it\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\it\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -257,7 +252,6 @@
     <file src="net48\it\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\it\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\it\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\it\vstest.console.resources.dll" />
-    <file src="net48\it\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\it\SettingsMigrator.resources.dll" />
     <file src="net48\ja\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ja\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net48\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net48\ja\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ja\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -270,7 +264,6 @@
     <file src="net48\ja\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\ja\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\ja\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ja\vstest.console.resources.dll" />
-    <file src="net48\ja\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ja\SettingsMigrator.resources.dll" />
     <file src="net48\ko\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ko\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net48\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net48\ko\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ko\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -283,7 +276,6 @@
     <file src="net48\ko\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\ko\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\ko\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ko\vstest.console.resources.dll" />
-    <file src="net48\ko\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ko\SettingsMigrator.resources.dll" />
     <file src="net48\pl\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pl\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net48\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net48\pl\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pl\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -296,7 +288,6 @@
     <file src="net48\pl\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\pl\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\pl\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pl\vstest.console.resources.dll" />
-    <file src="net48\pl\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pl\SettingsMigrator.resources.dll" />
     <file src="net48\pt-BR\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pt-BR\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net48\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net48\pt-BR\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pt-BR\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -309,7 +300,6 @@
     <file src="net48\pt-BR\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\pt-BR\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\pt-BR\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pt-BR\vstest.console.resources.dll" />
-    <file src="net48\pt-BR\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\pt-BR\SettingsMigrator.resources.dll" />
     <file src="net48\ru\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ru\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net48\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net48\ru\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ru\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -322,7 +312,6 @@
     <file src="net48\ru\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\ru\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\ru\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ru\vstest.console.resources.dll" />
-    <file src="net48\ru\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\ru\SettingsMigrator.resources.dll" />
     <file src="net48\tr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net48\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net48\tr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -335,7 +324,6 @@
     <file src="net48\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\tr\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\vstest.console.resources.dll" />
-    <file src="net48\tr\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\tr\SettingsMigrator.resources.dll" />
     <file src="net48\Microsoft.Internal.Dia\x64\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x64\msdia140.dll" />
     <file src="net48\Microsoft.Internal.Dia\x64\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x64\msdia140.dll.manifest" />
     <file src="net48\Microsoft.Internal.Dia\x86\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x86\msdia140.dll" />
@@ -352,7 +340,6 @@
     <file src="net48\zh-Hans\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\zh-Hans\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\zh-Hans\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\vstest.console.resources.dll" />
-    <file src="net48\zh-Hans\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\SettingsMigrator.resources.dll" />
     <file src="net48\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net48\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="net48\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -365,7 +352,6 @@
     <file src="net48\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net48\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net48\zh-Hant\vstest.console.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hant\vstest.console.resources.dll" />
-    <file src="net48\zh-Hant\SettingsMigrator.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hant\SettingsMigrator.resources.dll" />
     <file src="net48\Microsoft.Internal.TestPlatform.Extensions\Microsoft.IntelliTrace.Core.dll" target="tools\net462\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.Core.dll" />
     <file src="net48\Microsoft.Internal.Intellitrace.Extensions\x86\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.ObjectModel.dll" target="tools\net462\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.ObjectModel.dll" />
     <file src="net48\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" target="tools\net462\Common7\IDE\PrivateAssemblies\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" />

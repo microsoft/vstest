@@ -273,11 +273,6 @@
       <VsixSourceItem Include="$(VSSDKBuildToolsFolder)System.Runtime.CompilerServices.Unsafe.dll" />
       <VsixSourceItem Include="$(VSQualityToolsFolder)Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" />
     </ItemGroup>
-
-    <ItemGroup>
-      <!-- For some reason, this is not included through the project reference so manually force adding it -->
-      <VsixSourceItem Include="$(OutputPath)SettingsMigrator.exe.config" />
-    </ItemGroup>
   </Target>
 
   <ItemGroup>
@@ -306,9 +301,6 @@
       <Ngen>false</Ngen>
     </ProjectReference>
     <ProjectReference Include="..\..\Microsoft.TestPlatform.AdapterUtilities\Microsoft.TestPlatform.AdapterUtilities.csproj">
-      <Ngen>false</Ngen>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SettingsMigrator\SettingsMigrator.csproj">
       <Ngen>false</Ngen>
     </ProjectReference>
     <ProjectReference Include="..\..\vstest.console.arm64\vstest.console.arm64.csproj">

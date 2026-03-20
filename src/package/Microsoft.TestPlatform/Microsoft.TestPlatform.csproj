@@ -59,7 +59,6 @@
     <ProjectReference Include="..\..\Microsoft.TestPlatform.Extensions.HtmlLogger\Microsoft.TestPlatform.Extensions.HtmlLogger.csproj" SetTargetFramework="TargetFramework=$(NetFrameworkRunnerTargetFramework)" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.PlatformAbstractions\Microsoft.TestPlatform.PlatformAbstractions.csproj" />
-    <ProjectReference Include="..\..\SettingsMigrator\SettingsMigrator.csproj" />
   </ItemGroup>
 
   <!--
