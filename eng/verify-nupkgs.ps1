@@ -183,8 +183,6 @@ function Verify-NugetPackageExe {
         "ProcessSnapshotCleanup.exe"                   = "x86-64"
         "TDEnvCleanup.exe"                             = "x86"
 
-        "TestPlatform\SettingsMigrator.exe"            = "x86"
-
         "dump\DumpMinitool.exe"                        = "x86-64"
 
         "VideoRecorder\VSTestVideoRecorder.exe"        = "x86"
