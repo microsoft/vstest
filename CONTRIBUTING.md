@@ -68,9 +68,33 @@ Additional tests that can be run locally, but typically you would run just the o
 
 With integration tests you typically want to run all integration tests that affect a particular component, for example when changing blame data collector you want to run all tests for blame. This can be done by providing a parameter `-filter` to the test run, providing part of the test name, or providing a more complete filter using [MSTest filter syntax](https://learn.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests?pivots=mstest)
 
+#### Windows
+
+On Windows, `test.cmd` wraps `eng/Build.ps1` which has a dedicated `-filter` parameter:
+
+```powershell
+test.cmd -integrationTest -filter blame
+test.cmd -integrationTest -filter "FullyQualifiedName~StackOverflow"
 ```
-Test.cmd -integrationTest -filter blame
+
+#### Linux / macOS
+
+On Linux/macOS, `test.sh` wraps arcade's `eng/common/build.sh` which does **not** have a dedicated `-filter` parameter. Instead, you pass the filter as an MSBuild property. This requires careful quoting to prevent bash from interpreting special characters:
+
+```bash
+# Run a specific test by name (use single quotes to protect the value from shell expansion):
+./test.sh --integrationTest --property:'TestRunnerAdditionalArguments=--filter "FullyQualifiedName~StackOverflow"'
+
+# Run tests matching a simple keyword:
+./test.sh --integrationTest --property:'TestRunnerAdditionalArguments=--filter "blame"'
+
+# Combine with -tl:off to disable terminal logger and see raw output:
+./test.sh --integrationTest --property:'TestRunnerAdditionalArguments=--filter "FullyQualifiedName~StackOverflow"' -tl:off
 ```
+
+> ⚠️ The single quotes around `--property:'...'` are critical — without them, bash will interpret `&`, `|`, spaces, and quotes inside the filter expression. If your filter contains `&` (AND), wrap the whole `--property:` argument in single quotes.
+
+> ⚠️ On non-Windows platforms, tests marked with `TestCategory=Windows` or `TestCategory=Windows-Review` are automatically excluded.
 
 ## Using the development packages
 
