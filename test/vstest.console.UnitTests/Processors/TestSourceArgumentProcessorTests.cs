@@ -74,16 +74,9 @@ public class TestSourceArgumentProcessorTests
         // This path is invalid
         string testFilePath = "TestFile.txt";
 
-        try
-        {
-            executor.Initialize(testFilePath);
-        }
-        catch (Exception ex)
-        {
-            Assert.IsTrue(ex is TestSourceException);
-            StringAssert.StartsWith(ex.Message, "The test source file \"");
-            StringAssert.EndsWith(ex.Message, testFilePath + "\" provided was not found.");
-        }
+        var ex = Assert.ThrowsExactly<TestSourceException>(() => executor.Initialize(testFilePath));
+        Assert.StartsWith(ex.Message, "The test source file \"");
+        Assert.EndsWith(ex.Message, testFilePath + "\" provided was not found.");
     }
 
     [TestMethod]

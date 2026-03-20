@@ -99,7 +99,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
         InvokeVsTest(arguments, env);
 
-        Assert.IsFalse(StdOut.Contains(".dmp"), "it should not collect a dump, because nothing crashed");
+        Assert.DoesNotContain(".dmp", StdOut, "it should not collect a dump, because nothing crashed");
     }
 
     [TestMethod]
@@ -123,7 +123,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
         InvokeVsTest(arguments, env);
 
-        StringAssert.Matches(StdOut, new Regex("\\.dmp"), "it should collect dump, even if nothing crashed");
+        Assert.MatchesRegex(new Regex("\\.dmp"), StdOut, "it should collect dump, even if nothing crashed");
     }
 
     [TestMethod]
@@ -260,7 +260,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
             out string standardTestOutput,
             out string standardErrorTestOutput,
             out int _);
-        Assert.IsTrue(standardErrorTestOutput.Trim().Length == 0);
+        Assert.AreEqual(0, standardErrorTestOutput.Trim().Length);
 
         // Run test under postmortem monitoring
         var assemblyPaths = GetAssetFullPath("BlameUnitTestProject.dll");
@@ -274,12 +274,12 @@ public class BlameDataCollectorTests : AcceptanceTestBase
             out standardTestOutput,
             out standardErrorTestOutput,
             out int _);
-        Assert.IsTrue(standardErrorTestOutput.Trim().Length == 0);
+        Assert.AreEqual(0, standardErrorTestOutput.Trim().Length);
 
         // We cannot be precise here procdump is at machine level so we can have more than one dump and not only the one for our test
         // We look for "at least" one dump file, is the best we can do without locking all tests.
-        Assert.IsTrue(Directory.GetFiles(TempDirectory.Path, "*.dmp", SearchOption.AllDirectories)
-            .Where(x => Path.GetFileNameWithoutExtension(x).StartsWith("testhost")).Count() > 0);
+        Assert.IsNotEmpty(Directory.GetFiles(TempDirectory.Path, "*.dmp", SearchOption.AllDirectories)
+            .Where(x => Path.GetFileNameWithoutExtension(x).StartsWith("testhost")));
     }
 
     private static bool IsAdministrator()

@@ -86,7 +86,7 @@ public class IntegrationTestBase
 
     public TempDirectory TempDirectory { get; }
 
-    public TestContext? TestContext { get; set; }
+    public TestContext TestContext { get; set; } = null!;
 
     public string BuildConfiguration { get; }
 
@@ -388,9 +388,9 @@ public class IntegrationTestBase
                 _standardTestError,
                 Environment.NewLine,
                 _arguments);
-            StringAssert.DoesNotMatch(
-                _standardTestOutput,
-                new Regex(summaryStatus), errorSummary)
+            Assert.DoesNotMatchRegex(
+                new Regex(summaryStatus),
+                _standardTestOutput, errorSummary)
                ;
         }
         else
@@ -417,8 +417,9 @@ public class IntegrationTestBase
                 _standardTestError,
                 Environment.NewLine,
                 _arguments);
-            Assert.IsTrue(
-                _standardTestOutput.Contains(summaryStatus),
+            Assert.Contains(
+                _standardTestOutput,
+                summaryStatus,
                 errorSummary
                 );
         }
@@ -442,9 +443,9 @@ public class IntegrationTestBase
                 _standardTestError,
                 Environment.NewLine,
                 _arguments);
-            StringAssert.DoesNotMatch(
-                _standardTestOutput,
+            Assert.DoesNotMatchRegex(
                 new Regex("Total tests\\:"),
+                _standardTestOutput,
                 errorSummary);
         }
         else
@@ -471,15 +472,16 @@ public class IntegrationTestBase
                 _standardTestError,
                 Environment.NewLine,
                 _arguments);
-            Assert.IsTrue(
-                _standardTestOutput.Contains(summaryStatus),
+            Assert.Contains(
+                _standardTestOutput,
+                summaryStatus,
                 errorSummary);
         }
     }
 
     public void StdErrorContains(string substring)
     {
-        Assert.IsTrue(_standardTestError.Contains(substring), $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
+        Assert.Contains(_standardTestError, substring, $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
     }
 
     public void StdErrorRegexIsMatch(string pattern)
@@ -489,17 +491,17 @@ public class IntegrationTestBase
 
     public void StdErrorDoesNotContains(string substring)
     {
-        Assert.IsFalse(_standardTestError.Contains(substring), $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
+        Assert.DoesNotContain(_standardTestError, substring, $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
     }
 
     public void StdOutputContains(string substring)
     {
-        Assert.IsTrue(_standardTestOutput.Contains(substring), $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.Contains(_standardTestOutput, substring, $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void StdOutputDoesNotContains(string substring)
     {
-        Assert.IsFalse(_standardTestOutput.Contains(substring), $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Not expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.DoesNotContain(_standardTestOutput, substring, $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Not expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void ExitCodeEquals(int exitCode)
@@ -545,7 +547,7 @@ public class IntegrationTestBase
             Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
 
             // Verify stack information as well.
-            Assert.IsTrue(_standardTestOutput.Contains(GetTestMethodName(test)), "No stack trace for failed test: {0}", test);
+            Assert.Contains(_standardTestOutput, GetTestMethodName(test), $"No stack trace for failed test: {test}");
         }
     }
 
@@ -599,7 +601,7 @@ public class IntegrationTestBase
     public void ValidateFullyQualifiedDiscoveredTests(string filePath, params string[] discoveredTestsList)
     {
         var fileOutput = File.ReadAllLines(filePath);
-        Assert.IsTrue(fileOutput.Length == 3);
+        Assert.HasCount(3, fileOutput);
 
         foreach (var test in discoveredTestsList)
         {

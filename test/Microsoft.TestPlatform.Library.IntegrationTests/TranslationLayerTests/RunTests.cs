@@ -55,7 +55,7 @@ public class RunTests : AcceptanceTestBase
         _vstestConsoleWrapper.RunTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, runEventHandler.TestResults.Count);
+        Assert.HasCount(6, runEventHandler.TestResults);
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
@@ -73,7 +73,7 @@ public class RunTests : AcceptanceTestBase
         _vstestConsoleWrapper.RunTests([GetAssetFullPath("SimpleTestProject.dll"), GetAssetFullPath("SimpleTestProject2.dll")], GetDefaultRunSettings(), runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, runEventHandler.TestResults.Count);
+        Assert.HasCount(6, runEventHandler.TestResults);
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
@@ -136,7 +136,7 @@ public class RunTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.HasCount(6, _runEventHandler.TestResults, _runEventHandler.ToString());
         Assert.IsTrue(_runEventHandler.Metrics!.ContainsKey(TelemetryDataConstants.TargetDevice));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetFramework));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOS));
@@ -159,8 +159,8 @@ public class RunTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
-        Assert.AreEqual(0, _runEventHandler.Metrics!.Count, _runEventHandler.ToString());
+        Assert.HasCount(6, _runEventHandler.TestResults, _runEventHandler.ToString());
+        Assert.HasCount(0, _runEventHandler.Metrics!, _runEventHandler.ToString());
     }
 
     [TestMethod]
@@ -216,8 +216,8 @@ public class RunTests : AcceptanceTestBase
         var expectedFilter = veryLongTestCaseFilter.Substring(0, 256) + "...";
 
         // Assert
-        StringAssert.StartsWith(_runEventHandler.LogMessage, $"No test matches the given testcase filter `{expectedFilter}` in");
-        StringAssert.EndsWith(_runEventHandler.LogMessage, testAssemblyName);
+        Assert.StartsWith(_runEventHandler.LogMessage, $"No test matches the given testcase filter `{expectedFilter}` in");
+        Assert.EndsWith(_runEventHandler.LogMessage, testAssemblyName);
 
         Assert.AreEqual(TestMessageLevel.Warning, _runEventHandler.TestMessageLevel);
     }

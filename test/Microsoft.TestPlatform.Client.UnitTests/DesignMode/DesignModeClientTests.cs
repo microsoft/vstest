@@ -42,6 +42,8 @@ public class DesignModeClientTests
     private readonly AutoResetEvent _completeEvent;
     private readonly Mock<IEnvironment> _mockPlatformEnvironment;
 
+    public TestContext TestContext { get; set; }
+
     public DesignModeClientTests()
     {
         _mockTestRequestManager = new Mock<ITestRequestManager>();
@@ -198,7 +200,7 @@ public class DesignModeClientTests
         // Assert.
         Assert.IsNotNull(receivedTestRunPayload);
         Assert.IsNotNull(receivedTestRunPayload.TestCases);
-        Assert.AreEqual(1, receivedTestRunPayload.TestCases.Count);
+        Assert.HasCount(1, receivedTestRunPayload.TestCases);
 
         // Validate traits
         var traits = receivedTestRunPayload.TestCases.ToArray()[0].Traits;
@@ -259,7 +261,7 @@ public class DesignModeClientTests
         // Assert.
         Assert.IsNotNull(receivedTestRunPayload);
         Assert.IsNotNull(receivedTestRunPayload.TestCases);
-        Assert.AreEqual(1, receivedTestRunPayload.TestCases.Count);
+        Assert.HasCount(1, receivedTestRunPayload.TestCases);
 
         // Validate traits
         var traits = receivedTestRunPayload.TestCases.ToArray()[0].Traits;
@@ -300,7 +302,7 @@ public class DesignModeClientTests
         Action sendMessageAction = () => testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, null);
 
         _mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>())).
-            Callback(() => Task.Run(sendMessageAction));
+            Callback(() => Task.Run(sendMessageAction, TestContext.CancellationToken));
 
         var info = new TestProcessStartInfo();
         var processId = testableDesignModeClient.LaunchCustomHost(info, CancellationToken.None);
@@ -320,7 +322,7 @@ public class DesignModeClientTests
 
         _mockCommunicationManager
             .Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>()))
-            .Callback(() => Task.Run(sendMessageAction));
+            .Callback(() => Task.Run(sendMessageAction, TestContext.CancellationToken));
 
         var info = new TestProcessStartInfo();
         Assert.ThrowsExactly<TestPlatformException>(() => testableDesignModeClient.LaunchCustomHost(info, CancellationToken.None));

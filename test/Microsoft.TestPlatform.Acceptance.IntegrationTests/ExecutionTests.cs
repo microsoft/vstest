@@ -391,7 +391,7 @@ public class ExecutionTests : AcceptanceTestBase
         arguments = string.Concat(arguments, " /logger:\"console;prefix=true\"");
         InvokeVsTest(arguments);
 
-        StringAssert.Contains(StdOut, $"Skipping source: {nonTestDll} (.NETStandard,Version=v2.0,");
+        Assert.Contains($"Skipping source: {nonTestDll} (.NETStandard,Version=v2.0,", StdOut);
 
         ExitCodeEquals(1);
     }

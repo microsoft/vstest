@@ -78,12 +78,12 @@ public class CodeCoverageDataAttachmentsHandlerTests
             _coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(_configurationElement, attachment, _mockProgressReporter.Object, null, CancellationToken.None);
 
         Assert.IsNotNull(resultAttachmentSets);
-        Assert.IsTrue(resultAttachmentSets.Count == 0);
+        Assert.IsEmpty(resultAttachmentSets);
 
         resultAttachmentSets = await _coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(_configurationElement, null, _mockProgressReporter.Object, null, CancellationToken.None);
 
         Assert.IsNotNull(resultAttachmentSets);
-        Assert.IsTrue(resultAttachmentSets.Count == 0);
+        Assert.IsEmpty(resultAttachmentSets);
 
         _mockProgressReporter.Verify(p => p.Report(It.IsAny<int>()), Times.Never);
     }
@@ -99,8 +99,8 @@ public class CodeCoverageDataAttachmentsHandlerTests
             _coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(_configurationElement, attachment, _mockProgressReporter.Object, null, CancellationToken.None);
 
         Assert.IsNotNull(resultAttachmentSets);
-        Assert.IsTrue(resultAttachmentSets.Count == 1);
-        Assert.IsTrue(resultAttachmentSets.First().Attachments.Count == 1);
+        Assert.HasCount(1, resultAttachmentSets);
+        Assert.HasCount(1, resultAttachmentSets.First().Attachments);
         Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", resultAttachmentSets.First().Uri.AbsoluteUri);
         Assert.AreEqual("file:///C:/temp/aa.coverage", resultAttachmentSets.First().Attachments.First().Uri.AbsoluteUri);
     }
@@ -119,8 +119,8 @@ public class CodeCoverageDataAttachmentsHandlerTests
             _coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(_configurationElement, attachment, _mockProgressReporter.Object, null, CancellationToken.None);
 
         Assert.IsNotNull(resultAttachmentSets);
-        Assert.IsTrue(resultAttachmentSets.Count == 1);
-        Assert.IsTrue(resultAttachmentSets.First().Attachments.Count == 2);
+        Assert.HasCount(1, resultAttachmentSets);
+        Assert.HasCount(2, resultAttachmentSets.First().Attachments);
         Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", resultAttachmentSets.First().Uri.AbsoluteUri);
         Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", resultAttachmentSets.Last().Uri.AbsoluteUri);
         Assert.AreEqual(_filePrefix + file1Path.Replace("\\", "/").Replace(" ", "%20"), resultAttachmentSets.First().Attachments.First().Uri.AbsoluteUri);
@@ -140,8 +140,8 @@ public class CodeCoverageDataAttachmentsHandlerTests
             _coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(_configurationElement, attachment, _mockProgressReporter.Object, null, CancellationToken.None);
 
         Assert.IsNotNull(resultAttachmentSets);
-        Assert.IsTrue(resultAttachmentSets.Count == 1);
-        Assert.IsTrue(resultAttachmentSets.First().Attachments.Count == 1);
+        Assert.HasCount(1, resultAttachmentSets);
+        Assert.HasCount(1, resultAttachmentSets.First().Attachments);
         Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", resultAttachmentSets.First().Uri.AbsoluteUri);
         Assert.AreEqual(_filePrefix + file1Path.Replace("\\", "/").Replace(" ", "%20"), resultAttachmentSets.First().Attachments.First().Uri.AbsoluteUri);
     }
@@ -157,8 +157,8 @@ public class CodeCoverageDataAttachmentsHandlerTests
             _coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(_configurationElement, attachment, _mockProgressReporter.Object, null, CancellationToken.None);
 
         Assert.IsNotNull(resultAttachmentSets);
-        Assert.IsTrue(resultAttachmentSets.Count == 1);
-        Assert.IsTrue(resultAttachmentSets.First().Attachments.Count == 1);
+        Assert.HasCount(1, resultAttachmentSets);
+        Assert.HasCount(1, resultAttachmentSets.First().Attachments);
         Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", resultAttachmentSets.First().Uri.AbsoluteUri);
         Assert.AreEqual("file:///C:/temp/aa.logs", resultAttachmentSets.First().Attachments.First().Uri.AbsoluteUri);
     }
@@ -178,9 +178,9 @@ public class CodeCoverageDataAttachmentsHandlerTests
             _coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(_configurationElement, attachment, _mockProgressReporter.Object, null, CancellationToken.None);
 
         Assert.IsNotNull(resultAttachmentSets);
-        Assert.IsTrue(resultAttachmentSets.Count == 2);
-        Assert.IsTrue(resultAttachmentSets.First().Attachments.Count == 1);
-        Assert.IsTrue(resultAttachmentSets.Last().Attachments.Count == 2);
+        Assert.HasCount(2, resultAttachmentSets);
+        Assert.HasCount(1, resultAttachmentSets.First().Attachments);
+        Assert.HasCount(2, resultAttachmentSets.Last().Attachments);
     }
 
     [TestMethod]
@@ -199,7 +199,7 @@ public class CodeCoverageDataAttachmentsHandlerTests
 
         await Assert.ThrowsExactlyAsync<OperationCanceledException>(async () => await _coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(_configurationElement, attachment, _mockProgressReporter.Object, null, cts.Token));
 
-        Assert.AreEqual(2, attachment.Count);
+        Assert.HasCount(2, attachment);
 
         _mockProgressReporter.Verify(p => p.Report(It.IsAny<int>()), Times.Never);
     }
@@ -220,8 +220,8 @@ public class CodeCoverageDataAttachmentsHandlerTests
             _coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(doc.DocumentElement!, attachment, _mockProgressReporter.Object, _messageLogger.Object, CancellationToken.None);
 
         Assert.IsNotNull(resultAttachmentSets);
-        Assert.IsTrue(resultAttachmentSets.Count == 1);
-        Assert.IsTrue(resultAttachmentSets.First().Attachments.Count == 1);
+        Assert.HasCount(1, resultAttachmentSets);
+        Assert.HasCount(1, resultAttachmentSets.First().Attachments);
         Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", resultAttachmentSets.First().Uri.AbsoluteUri);
     }
 }
