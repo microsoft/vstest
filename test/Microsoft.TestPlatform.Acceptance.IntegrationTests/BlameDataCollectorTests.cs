@@ -20,6 +20,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
 [TestCategory("Windows-Review")]
+[DoNotParallelize] // Blame tests collect crash/hang dumps from child processes and race when run in parallel.
 public class BlameDataCollectorTests : AcceptanceTestBase
 {
     public const string NETCOREANDFX = "net462;net472;net8.0";
