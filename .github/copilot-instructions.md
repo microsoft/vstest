@@ -22,6 +22,34 @@ In addition to the rules enforced by `.editorconfig`, you SHOULD:
 
 You MUST minimize adding public API surface area but any newly added public API MUST be declared in the related `PublicAPI.Unshipped.txt` file.
 
+## Working with Git Worktrees
+
+This repository uses git worktrees to work on multiple things at the same time. Worktrees live in `../vstest-tree/<branch>` relative to the main clone at `c:\p\vstest`.
+
+The following global git aliases are configured:
+
+```shell
+git config --global alias.wta '!f() { mkdir -p "$(git rev-parse --show-toplevel)/../vstest-tree" 2>/dev/null; git worktree add -b "$1" "../vstest-tree/$1"; }; f'
+git config --global alias.wtr '!f() { git worktree remove "../vstest-tree/$1"; }; f'
+git config --global alias.wtl '!f() { git worktree list; }; f'
+```
+
+Usage:
+
+```shell
+git wta my-feature-branch   # creates c:\p\vstest-tree\my-feature-branch
+git wtl                     # list all active worktrees
+git wtr my-feature-branch   # remove worktree when done
+```
+
+The upstream remote `upstream` points to `https://github.com/microsoft/vstest`. To sync with upstream:
+
+```shell
+git fetch upstream
+git checkout main
+git merge upstream/main
+```
+
 ## Localization Guidelines
 
 Anytime you add a new localization resource, you MUST:
