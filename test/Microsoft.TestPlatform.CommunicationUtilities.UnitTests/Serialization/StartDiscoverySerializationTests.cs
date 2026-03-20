@@ -49,10 +49,6 @@ public class StartDiscoverySerializationTests
         {
           "MessageType": "TestDiscovery.Start",
           "Payload": {
-            "Sources": [
-              "Contoso.Math.Tests.dll",
-              "Contoso.Core.Tests.dll"
-            ],
             "Package": null,
             "AdapterSourceMap": {
               "_none_": [
@@ -76,10 +72,6 @@ public class StartDiscoverySerializationTests
           "Version": 7,
           "MessageType": "TestDiscovery.Start",
           "Payload": {
-            "Sources": [
-              "Contoso.Math.Tests.dll",
-              "Contoso.Core.Tests.dll"
-            ],
             "Package": null,
             "AdapterSourceMap": {
               "_none_": [
@@ -118,7 +110,6 @@ public class StartDiscoverySerializationTests
 
     // ── Deserialize ──────────────────────────────────────────────────────
 
-    [Ignore("DiscoveryCriteria.AdapterSourceMap is not populated during STJ deserialization — Sources property is computed from it")]
     [TestMethod]
     public void DeserializePayloadV1()
     {
@@ -139,7 +130,6 @@ public class StartDiscoverySerializationTests
         Assert.IsNull(result.TestSessionInfo);
     }
 
-    [Ignore("DiscoveryCriteria.AdapterSourceMap is not populated during STJ deserialization — Sources property is computed from it")]
     [TestMethod]
     public void DeserializePayloadV7()
     {
@@ -162,7 +152,6 @@ public class StartDiscoverySerializationTests
 
     // ── Round-trip ───────────────────────────────────────────────────────
 
-    [Ignore("DiscoveryCriteria.AdapterSourceMap is not populated during STJ deserialization — Sources property is computed from it")]
     [TestMethod]
     [DataRow(1)]
     [DataRow(7)]
@@ -187,7 +176,6 @@ public class StartDiscoverySerializationTests
 
     // ── Newtonsoft comparison ────────────────────────────────────────────
 
-    [Ignore("STJ serializes computed Sources property that Newtonsoft omits — known serialization difference")]
     [TestMethod]
     public void NewtonsoftComparisonV1()
     {
@@ -195,7 +183,6 @@ public class StartDiscoverySerializationTests
             MessageType.StartDiscovery, Payload, version: 1);
     }
 
-    [Ignore("STJ serializes computed Sources property that Newtonsoft omits — known serialization difference")]
     [TestMethod]
     public void NewtonsoftComparisonV7()
     {

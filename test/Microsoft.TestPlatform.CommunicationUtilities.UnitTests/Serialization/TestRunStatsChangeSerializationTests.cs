@@ -397,7 +397,6 @@ public class TestRunStatsChangeSerializationTests
     // ── Deserialize ──────────────────────────────────────────────────────
 
     [TestMethod]
-    [Ignore("TestRunChangedEventArgs constructor params don't match property names for STJ — needs a custom JsonConverter")]
     public void DeserializePayloadV1()
     {
         var message = JsonDataSerializer.Instance.DeserializeMessage(Minify(V1Json));
@@ -407,7 +406,6 @@ public class TestRunStatsChangeSerializationTests
     }
 
     [TestMethod]
-    [Ignore("TestRunChangedEventArgs constructor params don't match property names for STJ — needs a custom JsonConverter")]
     public void DeserializePayloadV7()
     {
         var message = JsonDataSerializer.Instance.DeserializeMessage(Minify(V7Json));
@@ -421,7 +419,6 @@ public class TestRunStatsChangeSerializationTests
     [TestMethod]
     [DataRow(1)]
     [DataRow(7)]
-    [Ignore("TestRunChangedEventArgs constructor params don't match property names for STJ — needs a custom JsonConverter")]
     public void RoundTrip(int version)
     {
         var json = JsonDataSerializer.Instance.SerializePayload(

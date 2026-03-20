@@ -76,7 +76,6 @@ public class AttachDebuggerSerializationTests
 
     // ── Deserialize ──────────────────────────────────────────────────────
 
-    [Ignore("TestProcessAttachDebuggerPayload constructor parameter 'pid' does not match property 'ProcessID' — STJ cannot bind")]
     [TestMethod]
     public void DeserializePayloadV1()
     {
@@ -88,7 +87,6 @@ public class AttachDebuggerSerializationTests
         Assert.AreEqual(".NETCoreApp,Version=v8.0", result.TargetFramework);
     }
 
-    [Ignore("TestProcessAttachDebuggerPayload constructor parameter 'pid' does not match property 'ProcessID' — STJ cannot bind")]
     [TestMethod]
     public void DeserializePayloadV7()
     {
@@ -102,7 +100,6 @@ public class AttachDebuggerSerializationTests
 
     // ── Round-trip ───────────────────────────────────────────────────────
 
-    [Ignore("TestProcessAttachDebuggerPayload constructor parameter 'pid' does not match property 'ProcessID' — STJ cannot bind")]
     [TestMethod]
     [DataRow(1)]
     [DataRow(7)]

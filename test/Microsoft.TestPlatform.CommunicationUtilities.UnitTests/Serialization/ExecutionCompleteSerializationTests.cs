@@ -343,7 +343,6 @@ public class ExecutionCompleteSerializationTests
     // ── Deserialize ──────────────────────────────────────────────────────
 
     [TestMethod]
-    [Ignore("TestRunCompleteEventArgs has no public parameterless constructor visible to STJ — needs a custom JsonConverter")]
     public void DeserializePayloadV1()
     {
         var message = JsonDataSerializer.Instance.DeserializeMessage(Minify(V1Json));
@@ -353,7 +352,6 @@ public class ExecutionCompleteSerializationTests
     }
 
     [TestMethod]
-    [Ignore("TestRunCompleteEventArgs has no public parameterless constructor visible to STJ — needs a custom JsonConverter")]
     public void DeserializePayloadV7()
     {
         var message = JsonDataSerializer.Instance.DeserializeMessage(Minify(V7Json));
@@ -367,7 +365,6 @@ public class ExecutionCompleteSerializationTests
     [TestMethod]
     [DataRow(1)]
     [DataRow(7)]
-    [Ignore("TestRunCompleteEventArgs has no public parameterless constructor visible to STJ — needs a custom JsonConverter")]
     public void RoundTrip(int version)
     {
         var json = JsonDataSerializer.Instance.SerializePayload(

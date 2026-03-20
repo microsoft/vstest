@@ -145,7 +145,6 @@ public class AfterTestRunEndResultSerializationTests
 
     // ── Deserialize ──────────────────────────────────────────────────────
 
-    [Ignore("AfterTestRunEndResult has no parameterless constructor and no [JsonConstructor] — STJ cannot deserialize it")]
     [TestMethod]
     public void DeserializePayloadV1()
     {
@@ -166,7 +165,6 @@ public class AfterTestRunEndResultSerializationTests
         Assert.IsTrue(result.InvokedDataCollectors[0].HasAttachmentProcessor);
     }
 
-    [Ignore("AfterTestRunEndResult has no parameterless constructor and no [JsonConstructor] — STJ cannot deserialize it")]
     [TestMethod]
     public void DeserializePayloadV7()
     {
@@ -189,7 +187,6 @@ public class AfterTestRunEndResultSerializationTests
 
     // ── Round-trip ───────────────────────────────────────────────────────
 
-    [Ignore("AfterTestRunEndResult has no parameterless constructor and no [JsonConstructor] — STJ cannot deserialize it")]
     [TestMethod]
     [DataRow(1)]
     [DataRow(7)]

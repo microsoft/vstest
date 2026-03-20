@@ -93,7 +93,6 @@ public class StopTestSessionSerializationTests
 
     // ── Deserialize ──────────────────────────────────────────────────────
 
-    [Ignore("TestSessionInfo.Id has a private setter — STJ creates a new instance with a random GUID instead of populating Id")]
     [TestMethod]
     public void DeserializePayloadV1()
     {
@@ -106,7 +105,6 @@ public class StopTestSessionSerializationTests
         Assert.IsTrue(result.CollectMetrics);
     }
 
-    [Ignore("TestSessionInfo.Id has a private setter — STJ creates a new instance with a random GUID instead of populating Id")]
     [TestMethod]
     public void DeserializePayloadV7()
     {
@@ -121,7 +119,6 @@ public class StopTestSessionSerializationTests
 
     // ── Round-trip ───────────────────────────────────────────────────────
 
-    [Ignore("TestSessionInfo.Id has a private setter — STJ creates a new instance with a random GUID instead of populating Id")]
     [TestMethod]
     [DataRow(1)]
     [DataRow(7)]
