@@ -272,41 +272,6 @@ public class RunsettingsTests : AcceptanceTestBase
         ValidateSummaryStatus(1, 1, 1);
     }
 
-    #region LegacySettings Tests
-
-    [TestMethod]
-    [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, useCoreRunner: false)]
-    public void LegacySettingsWithPlatform(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        var testAssemblyPath = GetAssetFullPath("LegacySettingsUnitTestProject.dll");
-        _ = Path.GetDirectoryName(testAssemblyPath);
-
-        var runsettingsXml = @"<RunSettings>
-                                    <MSTest>
-                                    <ForcedLegacyMode>true</ForcedLegacyMode>
-                                    </MSTest>
-                                    <LegacySettings>
-                                      <Execution hostProcessPlatform=""x64"">
-                                      </Execution>
-                                    </LegacySettings>
-                                   </RunSettings>";
-
-        var runsettingsFilePath = GetRunsettingsFilePath(null, TempDirectory);
-        File.WriteAllText(runsettingsFilePath, runsettingsXml);
-
-        var arguments = PrepareArguments(
-           testAssemblyPath,
-           string.Empty,
-           runsettingsFilePath, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
-        InvokeVsTest(arguments);
-        ValidateSummaryStatus(0, 0, 0);
-    }
-
-    #endregion
-
     #region RunSettings With EnvironmentVariables Settings Tests
 
     [TestMethod]

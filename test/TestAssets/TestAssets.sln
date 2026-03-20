@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.4.11420.227 main
+VisualStudioVersion = 18.4.11420.227
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnit10kPassing", "performance\NUnit10kPassing\NUnit10kPassing.csproj", "{F22A8D65-0581-4CC7-9C1C-9BC9F9E80DA4}"
 EndProject
@@ -36,8 +36,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisableAppdomainTest2", "DisableAppdomainTest2\DisableAppdomainTest2.csproj", "{A09B21CC-F726-413A-B185-3AE1172BAED0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleManagedApp", "ConsoleManagedApp\ConsoleManagedApp.csproj", "{132E4690-DE43-4684-BA05-6942155EEAB5}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegacySettingsUnitTestProject", "LegacySettingsUnitTestProject\LegacySettingsUnitTestProject.csproj", "{8C38E692-FBE3-41A4-A008-4CA79B203985}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewtonSoftDependency", "NewtonSoftDependency\NewtonSoftDependency.csproj", "{79EDA259-5EA0-45F0-990A-F078427E198A}"
 EndProject
@@ -211,10 +209,6 @@ Global
 		{132E4690-DE43-4684-BA05-6942155EEAB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{132E4690-DE43-4684-BA05-6942155EEAB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{132E4690-DE43-4684-BA05-6942155EEAB5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8C38E692-FBE3-41A4-A008-4CA79B203985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C38E692-FBE3-41A4-A008-4CA79B203985}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8C38E692-FBE3-41A4-A008-4CA79B203985}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8C38E692-FBE3-41A4-A008-4CA79B203985}.Release|Any CPU.Build.0 = Release|Any CPU
 		{79EDA259-5EA0-45F0-990A-F078427E198A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{79EDA259-5EA0-45F0-990A-F078427E198A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79EDA259-5EA0-45F0-990A-F078427E198A}.Release|Any CPU.ActiveCfg = Release|Any CPU
