@@ -173,8 +173,12 @@ public class CompatibilityRowsBuilder
 
         if (distinctRows.Count == 0)
         {
-            // TODO: This needs to be way more specific about what happened. And possibly propagate as inconclusive state if we decide to update versions automatically?
-            throw new InvalidOperationException("There were no rows that matched the specified criteria.");
+            throw new InvalidOperationException(
+                $"No compatibility rows matched the specified criteria. "
+                + $"Runner version range: [{afterRunnerVersion}, {beforeRunnerVersion}), "
+                + $"TestHost version range: [{afterTestHostVersion}, {beforeTestHostVersion}), "
+                + $"Adapter version range: [{afterAdapterVersion}, {beforeAdapterVersion}). "
+                + $"Total candidate rows before filtering: {dataRows.Count}, after version filtering: {rows.Count}, after deduping: {distinctRows.Count}.");
         }
 
         var allRows = distinctRows.Values.ToList();
