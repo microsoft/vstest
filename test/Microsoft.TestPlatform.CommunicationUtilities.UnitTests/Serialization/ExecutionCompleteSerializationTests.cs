@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 
+using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -382,6 +383,22 @@ public class ExecutionCompleteSerializationTests
         var newResults = result.LastRunTests.NewTestResults!.ToList();
         Assert.AreEqual(1, newResults.Count);
         Assert.AreEqual(TestOutcome.Passed, newResults[0].Outcome);
+    }
+
+    // ── Newtonsoft comparison ────────────────────────────────────────────
+
+    [TestMethod]
+    public void NewtonsoftComparisonV1()
+    {
+        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
+            MessageType.ExecutionComplete, Payload, version: 1);
+    }
+
+    [TestMethod]
+    public void NewtonsoftComparisonV7()
+    {
+        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
+            MessageType.ExecutionComplete, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────

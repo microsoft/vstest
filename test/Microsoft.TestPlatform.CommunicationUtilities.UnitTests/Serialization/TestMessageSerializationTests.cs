@@ -3,6 +3,7 @@
 
 using System.Text.Json;
 
+using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -119,6 +120,22 @@ public class TestMessageSerializationTests
         Assert.IsNotNull(result);
         Assert.AreEqual(Payload.MessageLevel, result.MessageLevel);
         Assert.AreEqual(Payload.Message, result.Message);
+    }
+
+    // ── Newtonsoft comparison ────────────────────────────────────────────
+
+    [TestMethod]
+    public void NewtonsoftComparisonV1()
+    {
+        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
+            MessageType.TestMessage, Payload, version: 1);
+    }
+
+    [TestMethod]
+    public void NewtonsoftComparisonV7()
+    {
+        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
+            MessageType.TestMessage, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────
