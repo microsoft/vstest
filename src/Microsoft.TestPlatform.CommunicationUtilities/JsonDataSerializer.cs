@@ -47,6 +47,12 @@ public class JsonDataSerializer : IDataSerializer
                 new AttachmentSetConverter(),
                 new UriDataAttachmentConverter(),
                 new TestExecutionContextConverter(),
+                new TestRunCompleteEventArgsConverter(),
+                new TestRunChangedEventArgsConverter(),
+                new AfterTestRunEndResultConverter(),
+                new TestProcessAttachDebuggerPayloadConverter(),
+                new TestSessionInfoConverter(),
+                new DiscoveryCriteriaConverter(),
             },
         };
 
@@ -74,6 +80,12 @@ public class JsonDataSerializer : IDataSerializer
                 new UriDataAttachmentConverter(),
                 new TestExecutionContextConverter(),
                 new TestObjectBaseConverterFactory(),
+                new TestRunCompleteEventArgsConverter(),
+                new TestRunChangedEventArgsConverter(),
+                new AfterTestRunEndResultConverter(),
+                new TestProcessAttachDebuggerPayloadConverter(),
+                new TestSessionInfoConverter(),
+                new DiscoveryCriteriaConverter(),
             },
         };
 
@@ -101,6 +113,12 @@ public class JsonDataSerializer : IDataSerializer
                 new UriDataAttachmentConverter(),
                 new TestExecutionContextConverter(),
                 new TestObjectBaseConverterFactory(),
+                new TestRunCompleteEventArgsConverter(),
+                new TestRunChangedEventArgsConverter(),
+                new AfterTestRunEndResultConverter(),
+                new TestProcessAttachDebuggerPayloadConverter(),
+                new TestSessionInfoConverter(),
+                new DiscoveryCriteriaConverter(),
             },
         };
 
@@ -128,6 +146,12 @@ public class JsonDataSerializer : IDataSerializer
                 new UriDataAttachmentConverter(),
                 new TestExecutionContextConverter(),
                 new TestObjectBaseConverterFactory(),
+                new TestRunCompleteEventArgsConverter(),
+                new TestRunChangedEventArgsConverter(),
+                new AfterTestRunEndResultConverter(),
+                new TestProcessAttachDebuggerPayloadConverter(),
+                new TestSessionInfoConverter(),
+                new DiscoveryCriteriaConverter(),
             },
         };
     }

@@ -469,7 +469,6 @@ public class SerializationPerformanceTests
     #region ExecutionComplete — Deserialize
 
     [TestMethod]
-    [Ignore("TestRunCompleteEventArgs has no public parameterless constructor visible to STJ — needs a custom JsonConverter")]
     public void Deserialize_ExecutionComplete_V7_SystemTextJson()
     {
         var json = JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7);
