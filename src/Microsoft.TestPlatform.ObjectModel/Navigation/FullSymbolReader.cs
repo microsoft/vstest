@@ -379,12 +379,12 @@ internal class FullSymbolReader : ISymbolReader
 
         IDiaEnumSymbols? enumSymbols = null;
         IDiaSymbol? methodSymbol;
-        Dictionary<string, IDiaSymbol> methodSymbolsForType;
+        Dictionary<string, IDiaSymbol>? methodSymbolsForType;
 
         try
         {
             typeSymbol.GetName(out string symbolName);
-            if (_methodSymbols.TryGetValue(symbolName, out methodSymbolsForType!))
+            if (_methodSymbols.TryGetValue(symbolName, out methodSymbolsForType))
             {
                 if (methodSymbolsForType.TryGetValue(methodName, out var cachedMethodSymbol))
                 {

@@ -27,8 +27,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 
 static file class BlameParameterNames
 {
-    public static readonly HashSet<string> CrashDumpKeys = new(StringComparer.OrdinalIgnoreCase) { "CollectAlways", "DumpType" };
-    public static readonly HashSet<string> HangDumpKeys = new(StringComparer.OrdinalIgnoreCase) { "TestTimeout", "HangDumpType" };
+    public static readonly string[] CrashDumpKeys = ["CollectAlways", "DumpType"];
+    public static readonly string[] HangDumpKeys = ["TestTimeout", "HangDumpType"];
 }
 
 internal class EnableBlameArgumentProcessor : IArgumentProcessor
@@ -214,7 +214,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         if (enableCrashDump)
         {
             var dumpParameters = collectDumpParameters
-                ?.Where(p => BlameParameterNames.CrashDumpKeys.Contains(p.Key))
+                ?.Where(p => BlameParameterNames.CrashDumpKeys.Contains(p.Key, StringComparer.OrdinalIgnoreCase))
                 .ToDictionary(p => p.Key, p => p.Value, StringComparer.OrdinalIgnoreCase)
                 ?? new Dictionary<string, string>();
 
@@ -230,7 +230,7 @@ internal class EnableBlameArgumentExecutor : IArgumentExecutor
         if (enableHangDump)
         {
             var hangDumpParameters = collectDumpParameters
-                ?.Where(p => BlameParameterNames.HangDumpKeys.Contains(p.Key))
+                ?.Where(p => BlameParameterNames.HangDumpKeys.Contains(p.Key, StringComparer.OrdinalIgnoreCase))
                 .ToDictionary(p => p.Key, p => p.Value, StringComparer.OrdinalIgnoreCase)
                 ?? new Dictionary<string, string>();
 
