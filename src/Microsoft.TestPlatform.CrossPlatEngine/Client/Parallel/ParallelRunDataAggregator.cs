@@ -29,13 +29,15 @@ internal class ParallelRunDataAggregator
 
     private readonly object _dataUpdateSyncObject = new();
 
+    private readonly HashSet<InvokedDataCollector> _invokedDataCollectorsSet = new();
+
     public ParallelRunDataAggregator(string runSettingsXml)
     {
         RunSettings = runSettingsXml ?? throw new ArgumentNullException(nameof(runSettingsXml));
         ElapsedTime = TimeSpan.Zero;
         RunContextAttachments = new Collection<AttachmentSet>();
         RunCompleteArgsAttachments = new List<AttachmentSet>();
-        InvokedDataCollectors = new HashSet<InvokedDataCollector>();
+        InvokedDataCollectors = new Collection<InvokedDataCollector>();
         Exceptions = new List<Exception>();
         DiscoveredExtensions = new Dictionary<string, HashSet<string>>();
         _executorUris = new List<string>();
@@ -53,7 +55,7 @@ internal class ParallelRunDataAggregator
 
     public List<AttachmentSet> RunCompleteArgsAttachments { get; }
 
-    public HashSet<InvokedDataCollector> InvokedDataCollectors { get; set; }
+    public Collection<InvokedDataCollector> InvokedDataCollectors { get; set; }
 
     public List<Exception> Exceptions { get; }
 
@@ -81,13 +83,14 @@ internal class ParallelRunDataAggregator
                 foreach (var runStats in _testRunStatsList)
                 {
                     // TODO: we get nullref here if the stats are empty.
-                    foreach (var outcome in runStats.Stats!.Keys)
+                    foreach (var kvp in runStats.Stats!)
                     {
-                        if (!testOutcomeMap.TryGetValue(outcome, out long currentCount))
+                        if (!testOutcomeMap.TryGetValue(kvp.Key, out long currentCount))
                         {
                             currentCount = 0;
                         }
-                        testOutcomeMap[outcome] = currentCount + runStats.Stats[outcome];
+
+                        testOutcomeMap[kvp.Key] = currentCount + kvp.Value;
                     }
                     totalTests += runStats.ExecutedTests;
                 }
@@ -171,7 +174,10 @@ internal class ParallelRunDataAggregator
             {
                 foreach (var invokedDataCollector in invokedDataCollectors)
                 {
-                    InvokedDataCollectors.Add(invokedDataCollector);
+                    if (_invokedDataCollectorsSet.Add(invokedDataCollector))
+                    {
+                        InvokedDataCollectors.Add(invokedDataCollector);
+                    }
                 }
             }
 

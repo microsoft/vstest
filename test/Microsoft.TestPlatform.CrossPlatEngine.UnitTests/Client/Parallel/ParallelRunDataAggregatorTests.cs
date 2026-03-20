@@ -114,8 +114,23 @@ public class ParallelRunDataAggregatorTests
         aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors2, null);
 
         Assert.AreEqual(2, aggregator.InvokedDataCollectors.Count, "InvokedDataCollectors List must have aggregated data.");
-        Assert.IsTrue(aggregator.InvokedDataCollectors.Contains(invokedDataCollectors[0]));
-        Assert.IsTrue(aggregator.InvokedDataCollectors.Contains(invokedDataCollectors2[0]));
+
+        var firstCollector = invokedDataCollectors[0];
+        var secondCollector = invokedDataCollectors2[0];
+
+        Assert.IsTrue(
+            aggregator.InvokedDataCollectors.Any(
+                c => c.Uri == firstCollector.Uri
+                     && c.AssemblyQualifiedName == firstCollector.AssemblyQualifiedName
+                     && c.FilePath == firstCollector.FilePath),
+            "Aggregated data collectors must contain a collector matching the first input collector.");
+
+        Assert.IsTrue(
+            aggregator.InvokedDataCollectors.Any(
+                c => c.Uri == secondCollector.Uri
+                     && c.AssemblyQualifiedName == secondCollector.AssemblyQualifiedName
+                     && c.FilePath == secondCollector.FilePath),
+            "Aggregated data collectors must contain a collector matching the second input collector.");
     }
 
     [TestMethod]

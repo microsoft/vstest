@@ -101,13 +101,13 @@ public class TestSessionPool
         lock (_lockObject)
         {
             // Check if the session info exists.
-            if (!_sessionPool.TryGetValue(testSessionInfo, out var removed))
+            if (!_sessionPool.TryGetValue(testSessionInfo, out var proxyManagerFromPool))
             {
                 return false;
             }
 
             // Remove the session from the pool.
-            proxyManager = removed;
+            proxyManager = proxyManagerFromPool;
             _sessionPool.Remove(testSessionInfo);
         }
 
