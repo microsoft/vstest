@@ -792,6 +792,14 @@ public class IntegrationTestBase
 
         Console.WriteLine($"Console runner path: {consoleRunnerPath}");
 
+        // Old vstest.console.dll versions (e.g. 15.9.2 targeting netcoreapp2.0) need to roll forward
+        // to the current .NET runtime. Set DOTNET_ROLL_FORWARD=LatestMajor so dotnet.exe will run them.
+        if (consoleRunnerPath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+        {
+            environmentVariables ??= new();
+            environmentVariables["DOTNET_ROLL_FORWARD"] = "LatestMajor";
+        }
+
         // Providing any environment variable to vstest.console will clear all existing environment variables,
         // this works around it by copying all existing variables, and adding debug. But we only want to do that
         // when we are setting any debug variables.
