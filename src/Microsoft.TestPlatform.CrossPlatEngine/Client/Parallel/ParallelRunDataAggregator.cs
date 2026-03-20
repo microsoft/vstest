@@ -35,7 +35,7 @@ internal class ParallelRunDataAggregator
         ElapsedTime = TimeSpan.Zero;
         RunContextAttachments = new Collection<AttachmentSet>();
         RunCompleteArgsAttachments = new List<AttachmentSet>();
-        InvokedDataCollectors = new Collection<InvokedDataCollector>();
+        InvokedDataCollectors = new HashSet<InvokedDataCollector>();
         Exceptions = new List<Exception>();
         DiscoveredExtensions = new Dictionary<string, HashSet<string>>();
         _executorUris = new List<string>();
@@ -53,7 +53,7 @@ internal class ParallelRunDataAggregator
 
     public List<AttachmentSet> RunCompleteArgsAttachments { get; }
 
-    public Collection<InvokedDataCollector> InvokedDataCollectors { get; set; }
+    public HashSet<InvokedDataCollector> InvokedDataCollectors { get; set; }
 
     public List<Exception> Exceptions { get; }
 
@@ -74,20 +74,23 @@ internal class ParallelRunDataAggregator
     {
         var testOutcomeMap = new Dictionary<TestOutcome, long>();
         long totalTests = 0;
-        if (_testRunStatsList.Count > 0)
+        lock (_dataUpdateSyncObject)
         {
-            foreach (var runStats in _testRunStatsList)
+            if (_testRunStatsList.Count > 0)
             {
-                // TODO: we get nullref here if the stats are empty.
-                foreach (var outcome in runStats.Stats!.Keys)
+                foreach (var runStats in _testRunStatsList)
                 {
-                    if (!testOutcomeMap.ContainsKey(outcome))
+                    // TODO: we get nullref here if the stats are empty.
+                    foreach (var outcome in runStats.Stats!.Keys)
                     {
-                        testOutcomeMap.Add(outcome, 0);
+                        if (!testOutcomeMap.TryGetValue(outcome, out long currentCount))
+                        {
+                            currentCount = 0;
+                        }
+                        testOutcomeMap[outcome] = currentCount + runStats.Stats[outcome];
                     }
-                    testOutcomeMap[outcome] += runStats.Stats[outcome];
+                    totalTests += runStats.ExecutedTests;
                 }
-                totalTests += runStats.ExecutedTests;
             }
         }
 
@@ -168,10 +171,7 @@ internal class ParallelRunDataAggregator
             {
                 foreach (var invokedDataCollector in invokedDataCollectors)
                 {
-                    if (!InvokedDataCollectors.Contains(invokedDataCollector))
-                    {
-                        InvokedDataCollectors.Add(invokedDataCollector);
-                    }
+                    InvokedDataCollectors.Add(invokedDataCollector);
                 }
             }
 
@@ -198,9 +198,9 @@ internal class ParallelRunDataAggregator
                 var newValue = Convert.ToDouble(metric.Value, CultureInfo.InvariantCulture);
 
                 _metricsAggregator.AddOrUpdate(
-                                    metric.Key,
-                                    newValue,
-                                    (_, oldValue) => newValue + Convert.ToDouble(oldValue, CultureInfo.InvariantCulture));
+                    metric.Key,
+                    newValue,
+                    (_, oldValue) => newValue + Convert.ToDouble(oldValue, CultureInfo.InvariantCulture));
             }
         }
     }
