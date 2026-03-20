@@ -315,9 +315,9 @@ internal class FullSymbolReader : ISymbolReader
         try
         {
             typeName = typeName.Replace('+', '.');
-            if (_typeSymbols.ContainsKey(typeName))
+            if (_typeSymbols.TryGetValue(typeName, out var cachedSymbol))
             {
-                return _typeSymbols[typeName];
+                return cachedSymbol;
             }
 
             TPDebug.Assert(_session is not null, "_session is null");
@@ -379,17 +379,16 @@ internal class FullSymbolReader : ISymbolReader
 
         IDiaEnumSymbols? enumSymbols = null;
         IDiaSymbol? methodSymbol;
-        Dictionary<string, IDiaSymbol> methodSymbolsForType;
+        Dictionary<string, IDiaSymbol>? methodSymbolsForType;
 
         try
         {
             typeSymbol.GetName(out string symbolName);
-            if (_methodSymbols.ContainsKey(symbolName))
+            if (_methodSymbols.TryGetValue(symbolName, out methodSymbolsForType))
             {
-                methodSymbolsForType = _methodSymbols[symbolName];
-                if (methodSymbolsForType.ContainsKey(methodName))
+                if (methodSymbolsForType.TryGetValue(methodName, out var cachedMethodSymbol))
                 {
-                    return methodSymbolsForType[methodName];
+                    return cachedMethodSymbol;
                 }
             }
             else
