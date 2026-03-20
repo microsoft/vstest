@@ -122,10 +122,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataCollectors", "DataColle
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests", "test\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests\Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests.csproj", "{21DB138B-85B7-479E-91FE-01E0F972EC56}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SettingsMigrator", "src\SettingsMigrator\SettingsMigrator.csproj", "{69F5FF81-5615-4F06-B83C-FCF979BB84CA}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SettingsMigrator.UnitTests", "test\SettingsMigrator.UnitTests\SettingsMigrator.UnitTests.csproj", "{E7D4921C-F12D-4E1C-85AC-8B7F91C59B0E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Extensions.HtmlLogger", "src\Microsoft.TestPlatform.Extensions.HtmlLogger\Microsoft.TestPlatform.Extensions.HtmlLogger.csproj", "{236A71E3-01DA-4679-9DFF-16A8E079ACFF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests", "test\Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests\Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests.csproj", "{41248B96-6E15-4E5E-A78F-859897676814}"
@@ -352,14 +348,6 @@ Global
 		{21DB138B-85B7-479E-91FE-01E0F972EC56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21DB138B-85B7-479E-91FE-01E0F972EC56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21DB138B-85B7-479E-91FE-01E0F972EC56}.Release|Any CPU.Build.0 = Release|Any CPU
-		{69F5FF81-5615-4F06-B83C-FCF979BB84CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{69F5FF81-5615-4F06-B83C-FCF979BB84CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{69F5FF81-5615-4F06-B83C-FCF979BB84CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{69F5FF81-5615-4F06-B83C-FCF979BB84CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E7D4921C-F12D-4E1C-85AC-8B7F91C59B0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E7D4921C-F12D-4E1C-85AC-8B7F91C59B0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E7D4921C-F12D-4E1C-85AC-8B7F91C59B0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E7D4921C-F12D-4E1C-85AC-8B7F91C59B0E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{236A71E3-01DA-4679-9DFF-16A8E079ACFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{236A71E3-01DA-4679-9DFF-16A8E079ACFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{236A71E3-01DA-4679-9DFF-16A8E079ACFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -526,8 +514,6 @@ Global
 		{65A25D6E-C9CC-4F45-8925-04087AC82634} = {B705537C-B82C-4A30-AFA5-6244D9A7DAEB}
 		{D9A30E32-D466-4EC5-B4F2-62E17562279B} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
 		{21DB138B-85B7-479E-91FE-01E0F972EC56} = {D9A30E32-D466-4EC5-B4F2-62E17562279B}
-		{69F5FF81-5615-4F06-B83C-FCF979BB84CA} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
-		{E7D4921C-F12D-4E1C-85AC-8B7F91C59B0E} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
 		{236A71E3-01DA-4679-9DFF-16A8E079ACFF} = {5E7F18A8-F843-4C8A-AB02-4C7D9205C6CF}
 		{41248B96-6E15-4E5E-A78F-859897676814} = {020E15EA-731F-4667-95AF-226671E0C3AE}
 		{074F5BD6-DC05-460B-B78F-044D125FD787} = {D9A30E32-D466-4EC5-B4F2-62E17562279B}
