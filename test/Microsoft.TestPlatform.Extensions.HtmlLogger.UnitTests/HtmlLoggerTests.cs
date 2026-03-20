@@ -591,6 +591,66 @@ public class HtmlLoggerTests
         Assert.AreEqual(0, _htmlLogger.TestRunDetails.Summary.PassPercentage);
     }
 
+    [TestMethod]
+    public void TestResultHandlerShouldHandleSpecialCharactersInDataRowWithoutThrowingException()
+    {
+        // This test is for the issue where HTML logger throws exception when DataRow contains special characters
+        var testCase = CreateTestCase("TestWithSpecialChars");
+        testCase.DisplayName = "TestMethod(\"test with special chars: \\u0001\\u0002\\uFFFF\")";
+        
+        var testResult = new ObjectModel.TestResult(testCase)
+        {
+            Outcome = TestOutcome.Passed,
+            DisplayName = "TestMethod(\"test with special chars: \\u0001\\u0002\\uFFFF\")",
+            ErrorMessage = "Error with special chars: \u0001\u0002\uFFFF"
+        };
+
+        // This should not throw an exception
+        try 
+        {
+            _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(testResult).Object);
+            Assert.AreEqual(1, _htmlLogger.TotalTests, "Total Tests");
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail($"TestResultHandler threw an exception when handling special characters: {ex.Message}");
+        }
+    }
+
+    [TestMethod]
+    public void TestCompleteHandlerShouldHandleSpecialCharactersInDataRowDuringTransformation()
+    {
+        // Create a test case with special characters that would cause XML writing issues
+        var testCase = CreateTestCase("TestWithSpecialChars");
+        testCase.DisplayName = "TestMethod with special characters";
+        
+        var testResult = new ObjectModel.TestResult(testCase)
+        {
+            Outcome = TestOutcome.Failed,
+            DisplayName = "TestMethod(\"special chars: \u0001\u0002\")",
+            ErrorMessage = "Error message with special chars: \u0001\u0002\uFFFF",
+            ErrorStackTrace = "Stack trace with special chars: \u0001\u0002"
+        };
+
+        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            .Returns(new MemoryStream());
+
+        try 
+        {
+            _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(testResult).Object);
+            
+            // This is where the issue would typically occur - during TestRunCompleteHandler
+            // when XML is serialized and then transformed to HTML
+            _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
+            
+            Assert.AreEqual(1, _htmlLogger.TotalTests, "Total Tests");
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail($"HTML logger threw an exception when handling special characters during transformation: {ex.Message}");
+        }
+    }
+
     private static TestCase CreateTestCase(string testCaseName)
     {
         return new TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");
