@@ -52,7 +52,6 @@ public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
         ValidateSummaryStatus(0, 1, 0);
     }
 
-    [Ignore(@"Issue with TestSessionTimeout:  https://github.com/Microsoft/vstest/issues/980")]
     [TestMethod]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void CancelTestExectionShouldWorkWhenApartmentStateIsSTA(RunnerInfo runnerInfo)
