@@ -46,11 +46,12 @@ public class JsonDataSerializerTests
         {
             // System.Text.Json with ReferenceHandler.IgnoreCycles writes null for circular references
             // (Newtonsoft.Json wrote {} for empty objects)
-            Assert.AreEqual("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteReference\":{\"InfiniteReference\":null}}}", serializedPayload);
+            Assert.AreEqual("""{"MessageType":"dummy","Payload":{"InfiniteReference":{"InfiniteReference":null}}}""", serializedPayload);
         }
         else
         {
-            Assert.AreEqual($"{{\"Version\":{version},\"MessageType\":\"dummy\",\"Payload\":{{\"InfiniteReference\":{{\"InfiniteReference\":null}}}}}}", serializedPayload);
+            var expected = $$$$"""{"Version":{{{{version}}}},"MessageType":"dummy","Payload":{"InfiniteReference":{"InfiniteReference":null}}}""";
+            Assert.AreEqual(expected, serializedPayload);
         }
     }
 
