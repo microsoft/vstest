@@ -11,7 +11,7 @@ using System.Linq;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 using NuGet.Versioning;
 
@@ -37,9 +37,9 @@ public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
         // Patch the runner
         string sdkVersion = GetLatestSdkVersion(dotnetPath);
         string runtimeConfigFile = Path.Combine(dotnetRunnerPath.FullName, "vstest.console.runtimeconfig.json");
-        JObject patchRuntimeConfig = JObject.Parse(File.ReadAllText(runtimeConfigFile));
-        patchRuntimeConfig!["runtimeOptions"]!["framework"]!["version"] = sdkVersion;
-        File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToString());
+        var patchRuntimeConfig = JsonNode.Parse(File.ReadAllText(runtimeConfigFile))!;
+        patchRuntimeConfig["runtimeOptions"]!["framework"]!["version"] = sdkVersion;
+        File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToJsonString());
 
         var environmentVariables = new Dictionary<string, string?>
         {

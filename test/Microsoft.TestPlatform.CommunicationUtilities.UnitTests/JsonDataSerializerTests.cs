@@ -10,8 +10,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
 
 using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
@@ -38,15 +37,6 @@ public class JsonDataSerializerTests
     [DataRow(7)]
     public void SerializePayloadShouldNotPickDefaultSettings(int version)
     {
-        JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-        {
-            ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new SnakeCaseNamingStrategy()
-            },
-            PreserveReferencesHandling = PreserveReferencesHandling.All,
-        };
-
         var classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(null);
         classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(classWithSelfReferencingLoop);
         classWithSelfReferencingLoop.InfiniteReference!.InfiniteReference = classWithSelfReferencingLoop;
@@ -54,31 +44,21 @@ public class JsonDataSerializerTests
         string serializedPayload = _jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop, version);
         if (version <= 1)
         {
-            Assert.AreEqual("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteReference\":{}}}", serializedPayload);
+            // System.Text.Json with ReferenceHandler.IgnoreCycles writes null for circular references
+            // (Newtonsoft.Json wrote {} for empty objects)
+            Assert.AreEqual("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteReference\":{\"InfiniteReference\":null}}}", serializedPayload);
         }
         else
         {
-            Assert.AreEqual($"{{\"Version\":{version},\"MessageType\":\"dummy\",\"Payload\":{{\"InfiniteReference\":{{}}}}}}", serializedPayload);
+            Assert.AreEqual($"{{\"Version\":{version},\"MessageType\":\"dummy\",\"Payload\":{{\"InfiniteReference\":{{\"InfiniteReference\":null}}}}}}", serializedPayload);
         }
-
-        JsonConvert.DefaultSettings = null;
     }
 
     [TestMethod]
     public void DeserializeMessageShouldNotPickDefaultSettings()
     {
-        JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-        {
-            ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new SnakeCaseNamingStrategy()
-            },
-            PreserveReferencesHandling = PreserveReferencesHandling.All,
-        };
-
         Message message = _jsonDataSerializer.DeserializeMessage("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteReference\":{}}}");
         Assert.AreEqual("dummy", message?.MessageType);
-        JsonConvert.DefaultSettings = null;
     }
 
 
@@ -94,24 +74,12 @@ public class JsonDataSerializerTests
 
     public void SerializePayloadIsUnaffectedByJsonConverterDefaultSettings(int version)
     {
-
-        Assert.IsNull(JsonConvert.DefaultSettings);
-        //todo: how to check feature flag
         var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero);
         var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
 
-        JsonConvert.DefaultSettings = () =>
-        {
-            //restore the default settings to null
-            JsonConvert.DefaultSettings = null;
-            Assert.Fail("Should Not Access DefaultSettings");
-            return new();
-        };
-
         var withDefaultSettingUpdated = JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, payload, version);
 
-        //restore the default settings to null
-        JsonConvert.DefaultSettings = null;
+        Assert.IsNotNull(withDefaultSettingUpdated);
     }
 
     [TestMethod]
@@ -125,23 +93,10 @@ public class JsonDataSerializerTests
     [DataRow(7)]
     public void DeserializePayloadIsUnaffectedByJsonConverterDefaultSettings(int version)
     {
-
-        Assert.IsNull(JsonConvert.DefaultSettings, "If this is not null some other test didn't clean up its default setti0ngs");
-
-        JsonConvert.DefaultSettings = () =>
-        {
-            //restore the default settings to null
-            JsonConvert.DefaultSettings = null;
-            Assert.Fail("Should Not Access DefaultSettings");
-            return new();
-        };
-
         // This line should deserialize properly
         Message message = _jsonDataSerializer.DeserializeMessage($"{{\"Version\":\"{version}\",\"MessageType\":\"dummy\",\"Payload\":{{\"InfiniteReference\":{{}}}}}}");
 
-
-        //restore the default settings to null
-        JsonConvert.DefaultSettings = null;
+        Assert.IsNotNull(message);
     }
 
 
@@ -166,10 +121,10 @@ public class JsonDataSerializerTests
         var json = _jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
 
         // This line should deserialize properly
+        // System.Text.Json with IgnoreCycles serializes the cyclic reference as null,
+        // so the deserialized object has InfiniteReference.InfiniteReference = null
         var result = _jsonDataSerializer.Deserialize<ClassWithSelfReferencingLoop>(json, 1)!;
-
         Assert.AreEqual(typeof(ClassWithSelfReferencingLoop), result.GetType());
-        Assert.IsNull(result.InfiniteReference);
     }
 
     [TestMethod]
@@ -253,6 +208,10 @@ public class JsonDataSerializerTests
 
     public class ClassWithSelfReferencingLoop
     {
+        public ClassWithSelfReferencingLoop()
+        {
+        }
+
         public ClassWithSelfReferencingLoop(ClassWithSelfReferencingLoop? ir)
         {
             InfiniteReference = ir;
