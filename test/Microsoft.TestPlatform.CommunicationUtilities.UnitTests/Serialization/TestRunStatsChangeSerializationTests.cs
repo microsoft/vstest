@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 
+using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -434,6 +435,22 @@ public class TestRunStatsChangeSerializationTests
         Assert.AreEqual(1, newResults.Count);
         Assert.AreEqual(TestOutcome.Failed, newResults[0].Outcome);
         Assert.AreEqual("Assert.AreEqual failed. Expected:<0.5>. Actual:<0>.", newResults[0].ErrorMessage);
+    }
+
+    // ── Newtonsoft comparison ────────────────────────────────────────────
+
+    [TestMethod]
+    public void NewtonsoftComparisonV1()
+    {
+        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
+            MessageType.TestRunStatsChange, Payload, version: 1);
+    }
+
+    [TestMethod]
+    public void NewtonsoftComparisonV7()
+    {
+        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
+            MessageType.TestRunStatsChange, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────
