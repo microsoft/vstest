@@ -52,7 +52,7 @@ public class SocketClientTests : SocketTestsBase, IDisposable
         _socketClient.Start(connectionInfo);
 
 #pragma warning disable MSTEST0049 // AcceptTcpClientAsync(CancellationToken) unavailable on .NET Framework
-        var acceptClientTask = _tcpListener.AcceptTcpClientAsync(`);
+        var acceptClientTask = _tcpListener.AcceptTcpClientAsync();
         Assert.IsTrue(acceptClientTask.Wait(Timeout));
 #pragma warning restore MSTEST0049
         Assert.IsTrue(acceptClientTask.Result.Connected);
