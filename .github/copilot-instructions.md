@@ -53,7 +53,8 @@ When working autonomously on issues (e.g. from a milestone), follow this workflo
 
 ### Monitor PRs
 
-- Check PR status within 15–20 minutes — the Windows build and tests finish first, macOS/ubuntu take longer.
+- CI pipeline skips builds for doc-only changes (e.g. `.md` files) — these PRs go green in under a minute.
+- For code changes, check PR status within 15–20 minutes — the Windows build and tests finish first, macOS/ubuntu take longer.
 - Check **both** CI status (pass/fail) **and** mergeable state — PR checks can show green even when there are merge conflicts. Always verify with `gh pr view <number> --json mergeable`.
 - When a build fails, take hints from the automated PR review comments but reason about them — the reviewer is automated and may be wrong.
 - If a build fails, investigate the failure, push a fix to the same branch, and wait for the rebuild.
