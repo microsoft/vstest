@@ -33,8 +33,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 
@@ -922,19 +921,18 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 }
 
                 // Get probing path
-                using (StreamReader file = new(_fileHelper.GetStream(runtimeConfigDevPath, FileMode.Open, FileAccess.Read)))
-                using (JsonTextReader reader = new(file))
+                using (var stream = _fileHelper.GetStream(runtimeConfigDevPath, FileMode.Open, FileAccess.Read))
+                using (var doc = JsonDocument.Parse(stream))
                 {
-                    JObject context = (JObject)JToken.ReadFrom(reader);
-                    JObject runtimeOptions = (JObject)context.GetValue("runtimeOptions")!;
-                    JToken additionalProbingPaths = runtimeOptions.GetValue("additionalProbingPaths")!;
-                    foreach (var x in additionalProbingPaths)
+                    var runtimeOptions = doc.RootElement.GetProperty("runtimeOptions");
+                    var additionalProbingPaths = runtimeOptions.GetProperty("additionalProbingPaths");
+                    foreach (var x in additionalProbingPaths.EnumerateArray())
                     {
-                        EqtTrace.Verbose("DotnetTestHostmanager: Looking for path {0} in folder {1}", testHostPath, x.ToString());
+                        EqtTrace.Verbose("DotnetTestHostmanager: Looking for path {0} in folder {1}", testHostPath, x.GetString());
                         string testHostFullPath;
                         try
                         {
-                            testHostFullPath = Path.Combine(x.ToString(), testHostPath);
+                            testHostFullPath = Path.Combine(x.GetString()!, testHostPath);
                         }
                         catch (ArgumentException)
                         {

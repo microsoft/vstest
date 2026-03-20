@@ -21,6 +21,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
+using System.Text.Json;
+
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 [TestClass]
@@ -140,7 +142,7 @@ public class TestRequestHandlerTests
     [TestMethod]
     public void ProcessRequestsVersionCheckShouldAckMinimumOfGivenAndHighestSupportedVersion()
     {
-        var message = new Message { MessageType = MessageType.VersionCheck, Payload = 1 };
+        var message = new Message { MessageType = MessageType.VersionCheck, Payload = JsonSerializer.SerializeToElement(1) };
         ProcessRequestsAsync(_mockTestHostManagerFactory.Object);
 
         SendMessageOnChannel(message);
@@ -158,7 +160,7 @@ public class TestRequestHandlerTests
             return;
         }
         EqtTrace.ErrorOnInitialization = "non-existent-error";
-        var message = new Message { MessageType = MessageType.VersionCheck, Payload = 1 };
+        var message = new Message { MessageType = MessageType.VersionCheck, Payload = JsonSerializer.SerializeToElement(1) };
         ProcessRequestsAsync(_mockTestHostManagerFactory.Object);
 
         SendMessageOnChannel(message);
@@ -486,7 +488,7 @@ public class TestRequestHandlerTests
 
     private void SendSessionEnd()
     {
-        SendMessageOnChannel(new Message { MessageType = MessageType.SessionEnd, Payload = string.Empty });
+        SendMessageOnChannel(new Message { MessageType = MessageType.SessionEnd, Payload = JsonSerializer.SerializeToElement(string.Empty) });
     }
 
     private Task ProcessRequestsAsync()

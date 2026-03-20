@@ -7,7 +7,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Client;
 
@@ -15,9 +15,8 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Client;
 public class DiscoveryCriteriaTests
 {
     private readonly DiscoveryCriteria _discoveryCriteria;
-    private static readonly JsonSerializerSettings Settings = new()
+    private static readonly JsonSerializerOptions Settings = new()
     {
-        TypeNameHandling = TypeNameHandling.None
     };
 
     public DiscoveryCriteriaTests()
@@ -34,7 +33,7 @@ public class DiscoveryCriteriaTests
     {
         var expectedJson = "{\"Package\":null,\"AdapterSourceMap\":{\"_none_\":[\"sampleTest.dll\"]},\"FrequencyOfDiscoveredTestsEvent\":100,\"DiscoveredTestEventTimeout\":\"10675199.02:48:05.4775807\",\"RunSettings\":\"<RunConfiguration></RunConfiguration>\",\"TestCaseFilter\":\"TestFilter\",\"TestSessionInfo\":null}";
 
-        var json = JsonConvert.SerializeObject(_discoveryCriteria, Settings);
+        var json = JsonSerializer.Serialize(_discoveryCriteria, Settings);
 
         Assert.AreEqual(expectedJson, json);
     }
@@ -44,7 +43,7 @@ public class DiscoveryCriteriaTests
     {
         var json = "{\"Sources\":[\"sampleTest.dll\"],\"AdapterSourceMap\":{\"_none_\":[\"sampleTest.dll\"]},\"FrequencyOfDiscoveredTestsEvent\":100,\"DiscoveredTestEventTimeout\":\"10675199.02:48:05.4775807\",\"RunSettings\":\"<RunConfiguration></RunConfiguration>\",\"TestCaseFilter\":\"TestFilter\"}";
 
-        var criteria = JsonConvert.DeserializeObject<DiscoveryCriteria>(json, Settings)!;
+        var criteria = JsonSerializer.Deserialize<DiscoveryCriteria>(json, Settings)!;
 
         Assert.AreEqual(TimeSpan.MaxValue, criteria.DiscoveredTestEventTimeout);
         Assert.AreEqual(100, criteria.FrequencyOfDiscoveredTestsEvent);

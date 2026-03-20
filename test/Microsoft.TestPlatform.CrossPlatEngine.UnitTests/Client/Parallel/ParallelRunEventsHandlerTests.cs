@@ -17,6 +17,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
+using System.Text.Json;
+
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
 [TestClass]
@@ -51,7 +53,7 @@ public class ParallelRunEventsHandlerTests
     {
         string payload = "RunStats";
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-            .Returns(new Message() { MessageType = MessageType.TestRunStatsChange, Payload = payload });
+            .Returns(new Message() { MessageType = MessageType.TestRunStatsChange, Payload = JsonSerializer.SerializeToElement(payload) });
 
         _parallelRunEventsHandler.HandleRawMessage(payload);
 
@@ -63,7 +65,7 @@ public class ParallelRunEventsHandlerTests
     {
         string payload = "LogMessage";
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-            .Returns(new Message() { MessageType = MessageType.TestMessage, Payload = payload });
+            .Returns(new Message() { MessageType = MessageType.TestMessage, Payload = JsonSerializer.SerializeToElement(payload) });
 
         _parallelRunEventsHandler.HandleRawMessage(payload);
 
@@ -75,7 +77,7 @@ public class ParallelRunEventsHandlerTests
     {
         string payload = "ExecComplete";
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-            .Returns(new Message() { MessageType = MessageType.ExecutionComplete, Payload = payload });
+            .Returns(new Message() { MessageType = MessageType.ExecutionComplete, Payload = JsonSerializer.SerializeToElement(payload) });
 
         _parallelRunEventsHandler.HandleRawMessage(payload);
 

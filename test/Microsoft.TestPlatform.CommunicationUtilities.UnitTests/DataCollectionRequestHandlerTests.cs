@@ -26,7 +26,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests;
 
@@ -42,11 +42,11 @@ public class DataCollectionRequestHandlerTests
     private readonly Mock<IFileHelper> _mockFileHelper;
     private readonly Mock<IRequestData> _mockRequestData;
     private readonly Mock<IMetricsCollection> _mockMetricsCollection;
-    private readonly Message _afterTestRunEnd = new() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" };
+    private readonly Message _afterTestRunEnd = new() { MessageType = MessageType.AfterTestRunEnd, Payload = JsonSerializer.SerializeToElement("false") };
     private readonly Message _beforeTestRunStart = new()
     {
         MessageType = MessageType.BeforeTestRunStart,
-        Payload = JToken.FromObject(new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } })
+        Payload = JsonSerializer.SerializeToElement(new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } })
     };
 
     public DataCollectionRequestHandlerTests()
@@ -170,7 +170,7 @@ public class DataCollectionRequestHandlerTests
         testHostLaunchedPayload.ProcessId = 1234;
 
         _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(_beforeTestRunStart)
-            .Returns(new Message() { MessageType = MessageType.TestHostLaunched, Payload = JToken.FromObject(testHostLaunchedPayload) })
+            .Returns(new Message() { MessageType = MessageType.TestHostLaunched, Payload = JsonSerializer.SerializeToElement(testHostLaunchedPayload) })
             .Returns(_afterTestRunEnd);
 
         _mockDataCollectionManager.Setup(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>())).Returns(true);
@@ -202,7 +202,7 @@ public class DataCollectionRequestHandlerTests
     [TestMethod]
     public void ProcessRequestsShouldDisposeDataCollectorsOnAfterTestRunEnd()
     {
-        _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" });
+        _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = JsonSerializer.SerializeToElement("false") });
 
         _requestHandler.ProcessRequests();
 
@@ -219,7 +219,7 @@ public class DataCollectionRequestHandlerTests
         string runSettings = "<RunSettings><RunConfiguration><TestAdaptersPaths></TestAdaptersPaths></RunConfiguration></RunSettings>";
 
         _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(_beforeTestRunStart)
-            .Returns(new Message() { MessageType = MessageType.TestHostLaunched, Payload = JToken.FromObject(testHostLaunchedPayload) })
+            .Returns(new Message() { MessageType = MessageType.TestHostLaunched, Payload = JsonSerializer.SerializeToElement(testHostLaunchedPayload) })
             .Returns(_afterTestRunEnd);
 
         _mockDataCollectionManager.Setup(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>())).Returns(true);
@@ -322,7 +322,7 @@ public class DataCollectionRequestHandlerTests
         var beforeTestRunStartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } };
         _mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
             .Returns(beforeTestRunStartPayload);
-        var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+        var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JsonSerializer.SerializeToElement(beforeTestRunStartPayload) };
         _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(_afterTestRunEnd);
         _requestHandler.ProcessRequests();
 
@@ -335,7 +335,7 @@ public class DataCollectionRequestHandlerTests
         var beforeTestRunStartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } };
         _mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
             .Returns(beforeTestRunStartPayload);
-        var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+        var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JsonSerializer.SerializeToElement(beforeTestRunStartPayload) };
         _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(_afterTestRunEnd);
         _requestHandler.ProcessRequests();
 
@@ -348,7 +348,7 @@ public class DataCollectionRequestHandlerTests
         var beforeTestRunStartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll", "test2.dll" } };
         _mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
             .Returns(beforeTestRunStartPayload);
-        var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+        var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JsonSerializer.SerializeToElement(beforeTestRunStartPayload) };
         _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(_afterTestRunEnd);
         _requestHandler.ProcessRequests();
 
@@ -364,7 +364,7 @@ public class DataCollectionRequestHandlerTests
         _mockRequestData.Setup(r => r.IsTelemetryOptedIn).Returns(false);
         _mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
             .Returns(beforeTestRunStartPayload);
-        var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+        var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JsonSerializer.SerializeToElement(beforeTestRunStartPayload) };
         _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(_afterTestRunEnd);
         _requestHandler.ProcessRequests();
 
@@ -379,7 +379,7 @@ public class DataCollectionRequestHandlerTests
         _mockRequestData.Setup(r => r.IsTelemetryOptedIn).Returns(true);
         _mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
             .Returns(beforeTestRunStartPayload);
-        var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+        var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JsonSerializer.SerializeToElement(beforeTestRunStartPayload) };
         _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(_afterTestRunEnd);
         _requestHandler.ProcessRequests();
 
@@ -394,7 +394,7 @@ public class DataCollectionRequestHandlerTests
         _mockRequestData.Setup(r => r.IsTelemetryOptedIn).Returns(false);
         _mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
             .Returns(beforeTestRunStartPayload);
-        var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+        var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JsonSerializer.SerializeToElement(beforeTestRunStartPayload) };
         _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(_afterTestRunEnd);
         _requestHandler.ProcessRequests();
 

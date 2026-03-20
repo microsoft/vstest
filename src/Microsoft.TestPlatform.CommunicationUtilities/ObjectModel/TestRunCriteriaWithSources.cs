@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
