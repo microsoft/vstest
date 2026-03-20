@@ -42,17 +42,24 @@ When working autonomously on issues (e.g. from a milestone), follow this workflo
 
 - Create a feature branch from `main` (never commit to `main` directly).
 - Implement the change and write tests where applicable.
-- Build locally with `-c Release` before pushing — CI uses Release mode with `TreatWarningsAsErrors`, so warnings like IDE0005 (unnecessary using) become build errors.
-- Run relevant tests locally: `.dotnet\dotnet.exe test <project> --no-build -c Release --filter <testname>`.
+- Build locally to validate the change compiles. Debug configuration is fine for local builds.
 
 ### Create PR
 
-- Push the branch to `origin` (the fork).
+- Check `git remote -v` to identify which remote is the fork (has the user's name in the URL, e.g. `github.com/<user>/vstest`) and which is the upstream repo (`github.com/microsoft/vstest`).
+- Push the branch to the fork remote.
 - Create the PR against `microsoft/vstest` (the upstream repo) — **never PR to the fork**.
+- Do not create draft PRs — undrafting forces a re-build.
 
 ### Monitor PRs
 
-- CI builds take approximately one hour.
+- Check PR status within 15–20 minutes — the Windows build and tests finish first, macOS/ubuntu take longer.
 - Check **both** CI status (pass/fail) **and** mergeable state — PR checks can show green even when there are merge conflicts. Always verify with `gh pr view <number> --json mergeable`.
+- When a build fails, take hints from the automated PR review comments but reason about them — the reviewer is automated and may be wrong.
 - If a build fails, investigate the failure, push a fix to the same branch, and wait for the rebuild.
-- If a PR becomes CONFLICTING, rebase the branch onto `main` and force-push.
+- If a PR becomes CONFLICTING, rebase the branch onto `main` and force-push using `--force-with-lease` (e.g. `git push --force-with-lease`).
+- When a PR is fully green (all checks pass, no conflicts), mark it as ready to merge.
+
+### Troubleshooting
+
+- If a build fails with warnings treated as errors (e.g. IDE0005 unnecessary using), and you cannot reproduce locally, try building with `-c Release` to match CI: `./build.cmd -c Release`.
