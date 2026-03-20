@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
@@ -15,6 +15,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+using System.Text.Json;
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
@@ -179,7 +181,7 @@ public class ParallelDiscoveryEventsHandlerTests
     {
         string payload = "Tests";
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-            .Returns(new Message() { MessageType = MessageType.TestCasesFound, Payload = payload });
+            .Returns(new Message() { MessageType = MessageType.TestCasesFound, Payload = JsonSerializer.SerializeToElement(payload) });
 
         _parallelDiscoveryEventsHandler.HandleRawMessage(payload);
 
@@ -191,7 +193,7 @@ public class ParallelDiscoveryEventsHandlerTests
     {
         string payload = "DiscoveryComplete";
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-            .Returns(new Message() { MessageType = MessageType.DiscoveryComplete, Payload = payload });
+            .Returns(new Message() { MessageType = MessageType.DiscoveryComplete, Payload = JsonSerializer.SerializeToElement(payload) });
 
         _parallelDiscoveryEventsHandler.HandleRawMessage(payload);
 
@@ -203,7 +205,7 @@ public class ParallelDiscoveryEventsHandlerTests
     {
         string payload = "LogMessage";
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-            .Returns(new Message() { MessageType = MessageType.TestMessage, Payload = payload });
+            .Returns(new Message() { MessageType = MessageType.TestMessage, Payload = JsonSerializer.SerializeToElement(payload) });
 
         _parallelDiscoveryEventsHandler.HandleRawMessage(payload);
 

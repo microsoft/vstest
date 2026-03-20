@@ -25,7 +25,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode;
 
@@ -89,7 +89,7 @@ public class DesignModeClientTests
     [TestMethod]
     public void DesignModeClientConnectShouldSetupChannel()
     {
-        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = _protocolVersion };
+        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = JsonSerializer.SerializeToElement(_protocolVersion) };
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
@@ -105,7 +105,7 @@ public class DesignModeClientTests
     [TestMethod]
     public void DesignModeClientConnectShouldNotSendConnectedIfServerConnectionTimesOut()
     {
-        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = _protocolVersion };
+        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = JsonSerializer.SerializeToElement(_protocolVersion) };
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(false);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
@@ -122,7 +122,7 @@ public class DesignModeClientTests
     public void DesignModeClientDuringConnectShouldHighestCommonVersionWhenReceivedVersionIsGreaterThanSupportedVersion()
     {
         var reallyHighProtocolVersion = 10000;
-        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = reallyHighProtocolVersion };
+        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = JsonSerializer.SerializeToElement(reallyHighProtocolVersion) };
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
@@ -135,7 +135,7 @@ public class DesignModeClientTests
     [TestMethod]
     public void DesignModeClientDuringConnectShouldHighestCommonVersionWhenReceivedVersionIsSmallerThanSupportedVersion()
     {
-        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 1 };
+        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = JsonSerializer.SerializeToElement(1) };
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
@@ -158,7 +158,7 @@ public class DesignModeClientTests
         var getProcessStartInfoMessage = new Message
         {
             MessageType = MessageType.GetTestRunnerProcessStartInfoForRunSelected,
-            Payload = JToken.FromObject("random")
+            Payload = JsonSerializer.SerializeToElement("random")
         };
 
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
@@ -221,7 +221,7 @@ public class DesignModeClientTests
         var getProcessStartInfoMessage = new Message
         {
             MessageType = MessageType.TestRunSelectedTestCasesDefaultHost,
-            Payload = JToken.FromObject("random")
+            Payload = JsonSerializer.SerializeToElement("random")
         };
 
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
@@ -344,7 +344,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldSendTestMessageAndDiscoverCompleteOnExceptionInDiscovery()
     {
         var payload = new DiscoveryRequestPayload();
-        var startDiscovery = new Message { MessageType = MessageType.StartDiscovery, Payload = JToken.FromObject(payload) };
+        var startDiscovery = new Message { MessageType = MessageType.StartDiscovery, Payload = JsonSerializer.SerializeToElement(payload) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startDiscovery);
         _mockCommunicationManager
@@ -368,7 +368,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldSendTestMessageAndDiscoverCompleteOnTestPlatformExceptionInDiscovery()
     {
         var payload = new DiscoveryRequestPayload();
-        var startDiscovery = new Message { MessageType = MessageType.StartDiscovery, Payload = JToken.FromObject(payload) };
+        var startDiscovery = new Message { MessageType = MessageType.StartDiscovery, Payload = JsonSerializer.SerializeToElement(payload) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startDiscovery);
         _mockCommunicationManager
@@ -392,7 +392,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldSendTestMessageAndAttachmentsProcessingCompleteOnExceptionInAttachmentsProcessing()
     {
         var payload = new TestRunAttachmentsProcessingPayload();
-        var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JToken.FromObject(payload) };
+        var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JsonSerializer.SerializeToElement(payload) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
         _mockCommunicationManager
@@ -416,7 +416,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldSendTestMessageAndDiscoverCompleteOnTestPlatformExceptionInAttachmentsProcessing()
     {
         var payload = new TestRunAttachmentsProcessingPayload();
-        var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JToken.FromObject(payload) };
+        var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JsonSerializer.SerializeToElement(payload) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
         _mockCommunicationManager
@@ -440,7 +440,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldCallRequestManagerForAttachmentsProcessingStart()
     {
         var payload = new TestRunAttachmentsProcessingPayload();
-        var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JToken.FromObject(payload) };
+        var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JsonSerializer.SerializeToElement(payload) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
         _mockCommunicationManager.Setup(cm => cm.DeserializePayload<TestRunAttachmentsProcessingPayload>(It.IsAny<Message>())).Returns(payload);
@@ -479,7 +479,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldSendTestMessageAndExecutionCompleteOnExceptionInTestRun()
     {
         var payload = new TestRunRequestPayload();
-        var testRunAll = new Message { MessageType = MessageType.TestRunAllSourcesWithDefaultHost, Payload = JToken.FromObject(payload) };
+        var testRunAll = new Message { MessageType = MessageType.TestRunAllSourcesWithDefaultHost, Payload = JsonSerializer.SerializeToElement(payload) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(testRunAll);
         _mockCommunicationManager
@@ -503,7 +503,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldSendTestMessageAndExecutionCompleteOnTestPlatformExceptionInTestRun()
     {
         var payload = new TestRunRequestPayload();
-        var testRunAll = new Message { MessageType = MessageType.TestRunAllSourcesWithDefaultHost, Payload = JToken.FromObject(payload) };
+        var testRunAll = new Message { MessageType = MessageType.TestRunAllSourcesWithDefaultHost, Payload = JsonSerializer.SerializeToElement(payload) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(testRunAll);
         _mockCommunicationManager
@@ -530,7 +530,7 @@ public class DesignModeClientTests
         var startTestSessionMessage = new Message()
         {
             MessageType = MessageType.StartTestSession,
-            Payload = JToken.FromObject(payload)
+            Payload = JsonSerializer.SerializeToElement(payload)
         };
 
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
@@ -580,7 +580,7 @@ public class DesignModeClientTests
         var stopTestSessionMessage = new Message()
         {
             MessageType = MessageType.StopTestSession,
-            Payload = JToken.FromObject(stopTestSessionPayload)
+            Payload = JsonSerializer.SerializeToElement(stopTestSessionPayload)
         };
 
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
@@ -645,7 +645,7 @@ public class DesignModeClientTests
                 ErrorMessage = errorMessage
             };
             onCustomTestHostLaunchAckReceived?.Invoke(
-                new Message() { MessageType = MessageType.CustomTestHostLaunchCallback, Payload = JToken.FromObject(payload) });
+                new Message() { MessageType = MessageType.CustomTestHostLaunchCallback, Payload = JsonSerializer.SerializeToElement(payload) });
         }
     }
 }

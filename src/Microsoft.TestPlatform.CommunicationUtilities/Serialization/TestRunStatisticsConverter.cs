@@ -2,33 +2,27 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
-using Newtonsoft.Json;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 
 /// <summary>
 /// JSON converter for converting ITestRunStatistics to TestRunStatistics
 /// </summary>
-public class TestRunStatisticsConverter : JsonConverter
+public class TestRunStatisticsConverter : JsonConverter<ITestRunStatistics>
 {
     /// <inheritdoc/>
-    public override bool CanConvert(Type objectType)
+    public override ITestRunStatistics? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return objectType.Equals(typeof(TestRunStatistics));
+        return JsonSerializer.Deserialize<TestRunStatistics>(ref reader, options);
     }
 
     /// <inheritdoc/>
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+    public override void Write(Utf8JsonWriter writer, ITestRunStatistics value, JsonSerializerOptions options)
     {
-        return serializer.Deserialize<TestRunStatistics>(reader);
-    }
-
-    /// <inheritdoc/>
-    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
-    {
-        serializer.Serialize(writer, value);
+        JsonSerializer.Serialize(writer, value, value.GetType(), options);
     }
 }

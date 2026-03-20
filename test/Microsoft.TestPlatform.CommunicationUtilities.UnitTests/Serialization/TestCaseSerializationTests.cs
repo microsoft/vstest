@@ -8,8 +8,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization;
 
@@ -36,27 +35,28 @@ public class TestCaseSerializationTests
         var json = Serialize(TestCase);
 
         // Use raw deserialization to validate basic properties
-        dynamic data = JObject.Parse(json);
-        dynamic properties = data["Properties"];
+        using var doc = JsonDocument.Parse(json);
+        var data = doc.RootElement;
+        var properties = data.GetProperty("Properties");
 
-        Assert.AreEqual("TestCase.FullyQualifiedName", properties[0]["Key"]["Id"].Value);
-        Assert.AreEqual("sampleTestClass.sampleTestCase", properties[0]["Value"].Value);
-        Assert.AreEqual("TestCase.ExecutorUri", properties[1]["Key"]["Id"].Value);
-        Assert.AreEqual("executor://sampleTestExecutor", properties[1]["Value"].Value);
-        Assert.AreEqual("TestCase.Source", properties[2]["Key"]["Id"].Value);
-        Assert.AreEqual("sampleTest.dll", properties[2]["Value"].Value);
-        Assert.AreEqual("TestCase.CodeFilePath", properties[3]["Key"]["Id"].Value);
-        Assert.AreEqual("/user/src/testFile.cs", properties[3]["Value"].Value);
-        Assert.AreEqual("TestCase.DisplayName", properties[4]["Key"]["Id"].Value);
-        Assert.AreEqual("sampleTestCase", properties[4]["Value"].Value);
-        Assert.AreEqual("TestCase.Id", properties[5]["Key"]["Id"].Value);
-        Assert.AreEqual("be78d6fc-61b0-4882-9d07-40d796fd96ce", properties[5]["Value"].Value);
-        Assert.AreEqual("TestCase.LineNumber", properties[6]["Key"]["Id"].Value);
-        Assert.AreEqual(999, properties[6]["Value"].Value);
+        Assert.AreEqual("TestCase.FullyQualifiedName", properties[0].GetProperty("Key").GetProperty("Id").GetString());
+        Assert.AreEqual("sampleTestClass.sampleTestCase", properties[0].GetProperty("Value").GetString());
+        Assert.AreEqual("TestCase.ExecutorUri", properties[1].GetProperty("Key").GetProperty("Id").GetString());
+        Assert.AreEqual("executor://sampleTestExecutor", properties[1].GetProperty("Value").GetString());
+        Assert.AreEqual("TestCase.Source", properties[2].GetProperty("Key").GetProperty("Id").GetString());
+        Assert.AreEqual("sampleTest.dll", properties[2].GetProperty("Value").GetString());
+        Assert.AreEqual("TestCase.CodeFilePath", properties[3].GetProperty("Key").GetProperty("Id").GetString());
+        Assert.AreEqual("/user/src/testFile.cs", properties[3].GetProperty("Value").GetString());
+        Assert.AreEqual("TestCase.DisplayName", properties[4].GetProperty("Key").GetProperty("Id").GetString());
+        Assert.AreEqual("sampleTestCase", properties[4].GetProperty("Value").GetString());
+        Assert.AreEqual("TestCase.Id", properties[5].GetProperty("Key").GetProperty("Id").GetString());
+        Assert.AreEqual("be78d6fc-61b0-4882-9d07-40d796fd96ce", properties[5].GetProperty("Value").GetString());
+        Assert.AreEqual("TestCase.LineNumber", properties[6].GetProperty("Key").GetProperty("Id").GetString());
+        Assert.AreEqual(999, properties[6].GetProperty("Value").GetInt32());
 
         // Traits require special handling with TestPlatformContract resolver. It should be null without it.
-        Assert.AreEqual("TestObject.Traits", properties[7]["Key"]["Id"].Value);
-        Assert.IsNotNull(properties[7]["Value"]);
+        Assert.AreEqual("TestObject.Traits", properties[7].GetProperty("Key").GetProperty("Id").GetString());
+        Assert.IsTrue(properties[7].GetProperty("Value").ValueKind != JsonValueKind.Null);
     }
 
     [TestMethod]
@@ -90,10 +90,11 @@ public class TestCaseSerializationTests
         var json = Serialize(test);
 
         // Use raw deserialization to validate basic properties
-        dynamic data = JObject.Parse(json);
-        dynamic properties = data["Properties"];
-        Assert.AreEqual(@"TestCase.Source", properties[2]["Key"]["Id"].Value);
-        Assert.AreEqual(@"C:\Test\TestAssembly.dll", properties[2]["Value"].Value);
+        using var doc = JsonDocument.Parse(json);
+        var data = doc.RootElement;
+        var properties = data.GetProperty("Properties");
+        Assert.AreEqual(@"TestCase.Source", properties[2].GetProperty("Key").GetProperty("Id").GetString());
+        Assert.AreEqual(@"C:\Test\TestAssembly.dll", properties[2].GetProperty("Value").GetString());
     }
 
     [TestMethod]
@@ -117,10 +118,11 @@ public class TestCaseSerializationTests
         var json = Serialize(test);
 
         // Use raw deserialization to validate basic properties
-        dynamic data = JObject.Parse(json);
-        dynamic properties = data["Properties"];
-        Assert.AreEqual(@"TestObject.Traits", properties[7]["Key"]["Id"].Value);
-        Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", properties[7]["Value"].ToString(Formatting.None));
+        using var doc = JsonDocument.Parse(json);
+        var data = doc.RootElement;
+        var properties = data.GetProperty("Properties");
+        Assert.AreEqual(@"TestObject.Traits", properties[7].GetProperty("Key").GetProperty("Id").GetString());
+        Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", properties[7].GetProperty("Value").GetRawText());
     }
 
     [TestMethod]
@@ -147,20 +149,21 @@ public class TestCaseSerializationTests
         var json = Serialize(TestCase, 2);
 
         // Use raw deserialization to validate basic properties
-        dynamic data = JObject.Parse(json);
-        dynamic properties = data["Properties"];
+        using var doc = JsonDocument.Parse(json);
+        var data = doc.RootElement;
+        var properties = data.GetProperty("Properties");
 
         // Traits require special handling with TestPlatformContract resolver. It should be null without it.
-        Assert.AreEqual("TestObject.Traits", properties[0]["Key"]["Id"].Value);
-        Assert.IsNotNull(properties[0]["Value"]);
+        Assert.AreEqual("TestObject.Traits", properties[0].GetProperty("Key").GetProperty("Id").GetString());
+        Assert.IsTrue(properties[0].GetProperty("Value").ValueKind != JsonValueKind.Null);
 
-        Assert.AreEqual("be78d6fc-61b0-4882-9d07-40d796fd96ce", data["Id"].Value);
-        Assert.AreEqual("sampleTestClass.sampleTestCase", data["FullyQualifiedName"].Value);
-        Assert.AreEqual("sampleTestCase", data["DisplayName"].Value);
-        Assert.AreEqual("sampleTest.dll", data["Source"].Value);
-        Assert.AreEqual("executor://sampleTestExecutor", data["ExecutorUri"].Value);
-        Assert.AreEqual("/user/src/testFile.cs", data["CodeFilePath"].Value);
-        Assert.AreEqual(999, data["LineNumber"].Value);
+        Assert.AreEqual("be78d6fc-61b0-4882-9d07-40d796fd96ce", data.GetProperty("Id").GetString());
+        Assert.AreEqual("sampleTestClass.sampleTestCase", data.GetProperty("FullyQualifiedName").GetString());
+        Assert.AreEqual("sampleTestCase", data.GetProperty("DisplayName").GetString());
+        Assert.AreEqual("sampleTest.dll", data.GetProperty("Source").GetString());
+        Assert.AreEqual("executor://sampleTestExecutor", data.GetProperty("ExecutorUri").GetString());
+        Assert.AreEqual("/user/src/testFile.cs", data.GetProperty("CodeFilePath").GetString());
+        Assert.AreEqual(999, data.GetProperty("LineNumber").GetInt32());
     }
 
     [TestMethod]
@@ -190,10 +193,11 @@ public class TestCaseSerializationTests
         var json = Serialize(test, 2);
 
         // Use raw deserialization to validate basic properties
-        dynamic data = JObject.Parse(json);
-        dynamic properties = data["Properties"];
-        Assert.AreEqual(@"TestObject.Traits", properties[0]["Key"]["Id"].Value);
-        Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", properties[0]["Value"].ToString(Formatting.None));
+        using var doc = JsonDocument.Parse(json);
+        var data = doc.RootElement;
+        var properties = data.GetProperty("Properties");
+        Assert.AreEqual(@"TestObject.Traits", properties[0].GetProperty("Key").GetProperty("Id").GetString());
+        Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", properties[0].GetProperty("Value").GetRawText());
     }
 
     [TestMethod]
@@ -204,8 +208,9 @@ public class TestCaseSerializationTests
         var json = Serialize(test, 2);
 
         // Use raw deserialization to validate basic properties
-        dynamic data = JObject.Parse(json);
-        Assert.AreEqual(@"C:\Test\TestAssembly.dll", data["Source"].Value);
+        using var doc = JsonDocument.Parse(json);
+        var data = doc.RootElement;
+        Assert.AreEqual(@"C:\Test\TestAssembly.dll", data.GetProperty("Source").GetString());
     }
 
     [TestMethod]

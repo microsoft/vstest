@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -40,6 +40,7 @@ public class JsonDataSerializer : IDataSerializer
             ReadCommentHandling = JsonCommentHandling.Skip,
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
             Converters =
             {
                 new TestPropertyConverter(),
@@ -61,6 +62,7 @@ public class JsonDataSerializer : IDataSerializer
             ReadCommentHandling = JsonCommentHandling.Skip,
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
             Converters =
             {
                 new TestPropertyConverter(),
@@ -87,6 +89,7 @@ public class JsonDataSerializer : IDataSerializer
             ReadCommentHandling = JsonCommentHandling.Skip,
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
             Converters =
             {
                 new TestPropertyConverter(),
@@ -113,6 +116,7 @@ public class JsonDataSerializer : IDataSerializer
             ReadCommentHandling = JsonCommentHandling.Skip,
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
             Converters =
             {
                 new TestPropertyConverter(),
