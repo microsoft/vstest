@@ -28,3 +28,31 @@ Anytime you add a new localization resource, you MUST:
 - Add a corresponding entry in the localization resource file.
 - Add an entry in all `*.xlf` files related to the modified `.resx` file.
 - Do not modify existing entries in '*.xlf' files unless you are also modifying the corresponding `.resx` file.
+
+## Unattended Work Instructions
+
+When working autonomously on issues (e.g. from a milestone), follow this workflow:
+
+### Before Starting
+
+- **Assign the issue** to the user you are working on behalf of before starting work.
+- **Skip issues with active PRs** — if an issue already has a PR with recent activity, don't duplicate the work.
+
+### Implement
+
+- Create a feature branch from `main` (never commit to `main` directly).
+- Implement the change and write tests where applicable.
+- Build locally with `-c Release` before pushing — CI uses Release mode with `TreatWarningsAsErrors`, so warnings like IDE0005 (unnecessary using) become build errors.
+- Run relevant tests locally: `.dotnet\dotnet.exe test <project> --no-build -c Release --filter <testname>`.
+
+### Create PR
+
+- Push the branch to `origin` (the fork).
+- Create the PR against `microsoft/vstest` (the upstream repo) — **never PR to the fork**.
+
+### Monitor PRs
+
+- CI builds take approximately one hour.
+- Check **both** CI status (pass/fail) **and** mergeable state — PR checks can show green even when there are merge conflicts. Always verify with `gh pr view <number> --json mergeable`.
+- If a build fails, investigate the failure, push a fix to the same branch, and wait for the rebuild.
+- If a PR becomes CONFLICTING, rebase the branch onto `main` and force-push.
