@@ -90,11 +90,11 @@ public class RunTests : AcceptanceTestBase
 
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        // Use SimpleTestProject4 which has a minimal test adapter with no MSTest dependency,
-        // avoiding version incompatibilities (e.g. System.Runtime.CompilerServices.Unsafe)
-        // when running with older vstest.console versions.
-        var netFrameworkDll = GetNonCompatTestDll("SimpleTestProject4.dll", DEFAULT_HOST_NETFX);
-        var netDll = GetNonCompatTestDll("SimpleTestProject4.dll", DEFAULT_HOST_NETCORE);
+        // Use SimpleTestProject4 which has a minimal test adapter. This helps us test that the console / testhost are compatible.
+        // Rather than testing that the console & mstest (or other adapter) and compatible. If we use mstest directly it fails on
+        // very old versions of vstest.console.
+        var netFrameworkDll = GetTestDllForFramework("SimpleTestProject4.dll", DEFAULT_HOST_NETFX);
+        var netDll = GetTestDllForFramework("SimpleTestProject4.dll", DEFAULT_HOST_NETCORE);
 
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
@@ -104,24 +104,6 @@ public class RunTests : AcceptanceTestBase
         // Assert
         runEventHandler.Errors.Should().BeEmpty();
         runEventHandler.TestResults.Should().HaveCount(6, "we run all tests from both assemblies");
-    }
-
-    /// <summary>
-    /// Gets the path to a test DLL that does not participate in the compatibility build matrix.
-    /// This bypasses the hashed compatibility path resolution.
-    /// </summary>
-    private static string GetNonCompatTestDll(string assetName, string targetFramework)
-    {
-        var simpleAssetName = Path.GetFileNameWithoutExtension(assetName);
-        var assetPath = Path.Combine(
-            IntegrationTestEnvironment.RepoRootDirectory,
-            "artifacts", "bin", "TestAssets",
-            simpleAssetName,
-            IntegrationTestEnvironment.BuildConfiguration,
-            targetFramework,
-            assetName);
-        Assert.IsTrue(File.Exists(assetPath), $"Test asset not found: '{assetPath}'.");
-        return assetPath;
     }
 
     [TestMethod]

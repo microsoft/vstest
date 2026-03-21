@@ -792,12 +792,19 @@ public class IntegrationTestBase
 
         Console.WriteLine($"Console runner path: {consoleRunnerPath}");
 
-        // Old vstest.console.dll versions (e.g. 15.9.2 targeting netcoreapp2.0) need to roll forward
-        // to the current .NET runtime. Set DOTNET_ROLL_FORWARD=LatestMajor so dotnet.exe will run them.
-        if (consoleRunnerPath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+        // When testing with older vstest.console.dll they need to have an older runtime installed to run, but there are rarely
+        // incompatibilities between runtimes, so we roll forward to latest major to minimize the amount of runtimes we need to install.
+        // Especially very old runtimes like netcoreapp2.1, which makes us flagged by compliance.
+        //
+        // This is applicable only to vstest.console and datacollector, for testhost the project dictates the tfm that is used because
+        // we pass the test project runtimeconfig to the testhost.
+        if (IsNetCoreRunner())
         {
             environmentVariables ??= new();
-            environmentVariables["DOTNET_ROLL_FORWARD"] = "LatestMajor";
+            if (!environmentVariables.ContainsKey("DOTNET_ROLL_FORWARD"))
+            {
+                environmentVariables.Add("DOTNET_ROLL_FORWARD", "LatestMajor");
+            }
         }
 
         // Providing any environment variable to vstest.console will clear all existing environment variables,
