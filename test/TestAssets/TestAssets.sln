@@ -37,8 +37,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisableAppdomainTest2", "Di
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleManagedApp", "ConsoleManagedApp\ConsoleManagedApp.csproj", "{132E4690-DE43-4684-BA05-6942155EEAB5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegacySettingsUnitTestProject", "LegacySettingsUnitTestProject\LegacySettingsUnitTestProject.csproj", "{8C38E692-FBE3-41A4-A008-4CA79B203985}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewtonSoftDependency", "NewtonSoftDependency\NewtonSoftDependency.csproj", "{79EDA259-5EA0-45F0-990A-F078427E198A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppDomainGetAssembliesTestProject", "AppDomainGetAssembliesTestProject\AppDomainGetAssembliesTestProject.csproj", "{BF090BCE-CC7D-4359-93E2-30F2B454F751}"

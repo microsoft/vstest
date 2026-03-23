@@ -64,6 +64,7 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSource(useVsixRunner: true)]
     [TestCategory("Smoke")]
     public void RunAllTestsFromDlls(RunnerInfo runnerInfo)
     {
