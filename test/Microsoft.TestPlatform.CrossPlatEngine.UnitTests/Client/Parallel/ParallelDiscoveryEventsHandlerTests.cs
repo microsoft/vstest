@@ -16,7 +16,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using System.Text.Json;
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client;
 
@@ -181,7 +180,7 @@ public class ParallelDiscoveryEventsHandlerTests
     {
         string payload = "Tests";
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-            .Returns(new Message() { MessageType = MessageType.TestCasesFound, Payload = JsonSerializer.SerializeToElement(payload) });
+            .Returns(new Message() { MessageType = MessageType.TestCasesFound, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, payload, _protocolVersion) });
 
         _parallelDiscoveryEventsHandler.HandleRawMessage(payload);
 
@@ -193,7 +192,7 @@ public class ParallelDiscoveryEventsHandlerTests
     {
         string payload = "DiscoveryComplete";
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-            .Returns(new Message() { MessageType = MessageType.DiscoveryComplete, Payload = JsonSerializer.SerializeToElement(payload) });
+            .Returns(new Message() { MessageType = MessageType.DiscoveryComplete, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, payload, _protocolVersion) });
 
         _parallelDiscoveryEventsHandler.HandleRawMessage(payload);
 
@@ -205,7 +204,7 @@ public class ParallelDiscoveryEventsHandlerTests
     {
         string payload = "LogMessage";
         _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
-            .Returns(new Message() { MessageType = MessageType.TestMessage, Payload = JsonSerializer.SerializeToElement(payload) });
+            .Returns(new Message() { MessageType = MessageType.TestMessage, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, payload, _protocolVersion) });
 
         _parallelDiscoveryEventsHandler.HandleRawMessage(payload);
 

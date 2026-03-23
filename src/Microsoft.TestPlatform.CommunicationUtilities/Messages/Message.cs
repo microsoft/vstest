@@ -1,31 +1,35 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Text.Json;
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
-/// Construct used for communication
+/// Represents a communication message exchanged between vstest processes.
+/// Contains the message type (routing key), protocol version, and the raw
+/// JSON wire data. The payload is not deserialized until explicitly requested
+/// via <see cref="JsonDataSerializer.DeserializePayload{T}"/>.
 /// </summary>
 public class Message
 {
     /// <summary>
-    /// Gets or sets the message type.
+    /// Gets or sets the message type (routing key).
     /// </summary>
     public string? MessageType { get; set; }
 
     /// <summary>
-    /// Gets or sets the payload.
+    /// Gets or sets the protocol version.
     /// </summary>
-    public JsonElement? Payload { get; set; }
+    public int Version { get; set; }
 
     /// <summary>
-    /// To string implementation.
+    /// Gets or sets the raw JSON message as received from the wire.
+    /// This contains the full message including MessageType, Version, and Payload.
     /// </summary>
-    /// <returns> The <see cref="string"/>. </returns>
+    public string? RawMessage { get; set; }
+
+    /// <inheritdoc/>
     public override string ToString()
     {
-        return $"({MessageType}) -> {(Payload is null ? "null" : Payload.Value.ToString())}";
+        return $"({MessageType}) v{Version} -> {RawMessage}";
     }
 }

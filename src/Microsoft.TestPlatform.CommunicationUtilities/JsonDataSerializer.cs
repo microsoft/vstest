@@ -181,37 +181,28 @@ public class JsonDataSerializer : IDataSerializer
             return NewtonsoftFallback.DeserializeMessage(rawMessage);
         }
 
-        if (DisableFastJson)
-        {
-            // PERF: This is slow, we deserialize the message, and the payload into JsonElement just to get the header. We then
-            // deserialize the data from the JsonElement, but that is twice as expensive as deserializing the whole object directly into the final object type.
-            // We need this for backward compatibility though.
-            return Deserialize<VersionedMessage>(rawMessage)!;
-        }
-
-        // PERF: Try grabbing the version and message type from the string directly, we are pretty certain how the message is serialized
-        // when the format does not match all we do is that we check if 6th character in the message is 'V'
+        // Try fast header parse first (string parsing, no JSON library)
         if (!FastHeaderParse(rawMessage, out int version, out string? messageType))
         {
-            // PERF: If the fast path fails, deserialize into header object that does not have any Payload. When the message type info
-            // is at the start of the message, this is also pretty fast. Again, this won't touch the payload.
-            MessageHeader header = DeserializeObjectFast<MessageHeader>(rawMessage)!;
-            version = header.Version;
-            messageType = header.MessageType;
+            // Fallback: parse just the header fields from JSON
+            using var doc = JsonDocument.Parse(rawMessage);
+            var root = doc.RootElement;
+            version = root.TryGetProperty("Version", out var vProp)
+                ? (vProp.ValueKind == JsonValueKind.Number ? vProp.GetInt32() : int.TryParse(vProp.GetString(), out var v) ? v : 0)
+                : 0;
+            messageType = root.TryGetProperty("MessageType", out var mtProp) ? mtProp.GetString() : null;
         }
 
-        var message = new VersionedMessageWithRawMessage
+        return new Message
         {
             Version = version,
             MessageType = messageType,
             RawMessage = rawMessage,
         };
-
-        return message;
     }
 
     /// <summary>
-    /// Deserialize the <see cref="Message.Payload"/> for a message.
+    /// Deserialize the payload from a <see cref="Message"/>.
     /// </summary>
     /// <param name="message">A <see cref="Message"/> object.</param>
     /// <typeparam name="T">Payload type.</typeparam>
@@ -223,62 +214,29 @@ public class JsonDataSerializer : IDataSerializer
             return NewtonsoftFallback.DeserializePayload<T>(message);
         }
 
-        if (message is null)
+        if (message is null || message.RawMessage is null)
         {
             return default;
         }
 
-        if (message.GetType() == typeof(Message))
-        {
-            // Message is specifically a Message, and not any of it's child types like VersionedMessage.
-            // Get the default serializer and deserialize. This would be used for any message from very old test host.
-            //
-            // Unit tests also provide a Message in places where using the deserializer would actually
-            // produce a VersionedMessage or VersionedMessageWithRawMessage.
-            var optionsV1 = GetPayloadOptions(null);
-            TPDebug.Assert(message.Payload is not null, "Payload should not be null");
-            return DeserializeJsonElement<T>(optionsV1, message.Payload.Value);
-        }
+        var payloadOptions = GetPayloadOptions(message.Version);
 
-        var versionedMessage = (VersionedMessage)message;
-        var payloadOptions = GetPayloadOptions(versionedMessage.Version);
-
-        if (DisableFastJson)
-        {
-            // When fast json is disabled, then the message is a VersionedMessage
-            // with JsonElement payload.
-            TPDebug.Assert(message.Payload is not null, "Payload should not be null");
-            return DeserializeJsonElement<T>(payloadOptions, message.Payload.Value);
-        }
-
-        // When fast json is enabled then the message is also a subtype of VersionedMessage, but
-        // the Payload is not populated, and instead the rawMessage string it passed as is.
-        var messageWithRawMessage = (VersionedMessageWithRawMessage)message;
-        var rawMessage = messageWithRawMessage.RawMessage;
-
-        if (rawMessage is null)
-        {
-            return default;
-        }
-
-        // The deserialized message can still have a version (0 or 1), that should use the old deserializer
         if (payloadOptions == PayloadOptionsV2)
         {
-            // PERF: Fast path is compatible only with protocol versions that use options_2,
-            // and this is faster than deserializing via options_2.
-            var messageWithPayload = DeserializeObjectFast<PayloadedMessage<T>>(rawMessage);
-
+            // Fast path: deserialize payload directly from raw message
+            var messageWithPayload = DeserializeObjectFast<PayloadedMessage<T>>(message.RawMessage);
             return messageWithPayload is null ? default : messageWithPayload.Payload;
         }
         else
         {
-            // PERF: When payloadOptionsV1 was resolved we need to deserialize JsonElement, and then deserialize that.
-            // This is still better than deserializing the JsonElement in DeserializeMessage because here we know that the payload
-            // will actually be used.
-            TPDebug.Assert(rawMessage is not null, "rawMessage should not be null");
-            var rawMessagePayload = Deserialize<Message>(rawMessage)?.Payload;
-            TPDebug.Assert(rawMessagePayload is not null, "rawMessagePayload should not be null");
-            return DeserializeJsonElement<T>(payloadOptions, rawMessagePayload.Value);
+            // V1 path: need to parse the Payload field as a separate step
+            // because V1 converters (TestCaseConverter, TestResultConverter) need special handling
+            using var doc = JsonDocument.Parse(message.RawMessage);
+            if (doc.RootElement.TryGetProperty("Payload", out var payloadElement))
+            {
+                return JsonSerializer.Deserialize<T>(payloadElement.GetRawText(), payloadOptions);
+            }
+            return default;
         }
     }
 
@@ -416,7 +374,7 @@ public class JsonDataSerializer : IDataSerializer
             return NewtonsoftFallback.SerializeMessage(messageType);
         }
 
-        return Serialize(DefaultOptions, new Message { MessageType = messageType });
+        return Serialize(DefaultOptions, new MessageEnvelope { MessageType = messageType });
     }
 
     /// <summary>
@@ -460,8 +418,8 @@ public class JsonDataSerializer : IDataSerializer
             var serializedPayload = JsonSerializer.SerializeToElement(payload, payloadOptions);
 
             return version > 1 ?
-                Serialize(DefaultOptions, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
-                Serialize(DefaultOptions, new Message { MessageType = messageType, Payload = serializedPayload });
+                Serialize(DefaultOptions, new VersionedMessageEnvelope { MessageType = messageType, Version = version, Payload = serializedPayload }) :
+                Serialize(DefaultOptions, new MessageEnvelope { MessageType = messageType, Payload = serializedPayload });
         }
         else
         {
@@ -530,18 +488,6 @@ public class JsonDataSerializer : IDataSerializer
         return JsonSerializer.Deserialize<T>(data, options);
     }
 
-    /// <summary>
-    /// Deserialize JsonElement to T object.
-    /// </summary>
-    /// <typeparam name="T">Type of data.</typeparam>
-    /// <param name="options">Serializer options.</param>
-    /// <param name="element">JsonElement to be deserialized.</param>
-    /// <returns>Deserialized data.</returns>
-    private static T DeserializeJsonElement<T>(JsonSerializerOptions options, JsonElement element)
-    {
-        return JsonSerializer.Deserialize<T>(element.GetRawText(), options)!;
-    }
-
     private static JsonSerializerOptions GetPayloadOptions(int? version)
     {
         version ??= 1;
@@ -562,38 +508,33 @@ public class JsonDataSerializer : IDataSerializer
     }
 
     /// <summary>
-    /// Just the header from versioned messages, to avoid touching the Payload when we deserialize message.
-    /// </summary>
-    private class MessageHeader
-    {
-        public int Version { get; set; }
-        public string? MessageType { get; set; }
-    }
-
-    /// <summary>
-    /// Container for the rawMessage string, to avoid changing how messages are passed.
-    /// This allows us to pass MessageWithRawMessage the same way that Message is passed for protocol version 1.
-    /// And VersionedMessage is passed for later protocol versions, but without touching the payload string when we just
-    /// need to know the header.
-    /// !! This message does not populate the Payload property even though it is still present because that comes from Message.
-    /// </summary>
-    private class VersionedMessageWithRawMessage : VersionedMessage
-    {
-        public string? RawMessage { get; set; }
-
-        public override string ToString()
-        {
-            return $"({MessageType}) -> {RawMessage}";
-        }
-    }
-
-    /// <summary>
     /// This grabs payload from the message, we already know version and message type.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     private class PayloadedMessage<T>
     {
         public T? Payload { get; set; }
+    }
+
+    /// <summary>
+    /// Serialization-only DTO for building the JSON wire format (without Version).
+    /// NOT a Message — this is never returned to callers.
+    /// </summary>
+    private class MessageEnvelope
+    {
+        public string? MessageType { get; set; }
+        public object? Payload { get; set; }
+    }
+
+    /// <summary>
+    /// Serialization-only DTO for building the JSON wire format (with Version).
+    /// NOT a Message — this is never returned to callers.
+    /// </summary>
+    private class VersionedMessageEnvelope
+    {
+        public int Version { get; set; }
+        public string? MessageType { get; set; }
+        public object? Payload { get; set; }
     }
 
     /// <summary>

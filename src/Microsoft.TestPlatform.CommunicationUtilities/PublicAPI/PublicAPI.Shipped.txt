@@ -192,8 +192,10 @@ Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message.Message() -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message.MessageType.get -> string?
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message.MessageType.set -> void
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message.Payload.get -> System.Text.Json.JsonElement?
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message.Payload.set -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message.RawMessage.get -> string?
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message.RawMessage.set -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message.Version.get -> int
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message.Version.set -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.BeforeTestRunStartPayload
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.BeforeTestRunStartPayload.BeforeTestRunStartPayload() -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.BeforeTestRunStartPayload.IsTelemetryOptedIn.get -> bool
@@ -346,10 +348,6 @@ Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestSender.Sta
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestSender.StartTestRun(Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestRunCriteriaWithTests! runCriteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IInternalTestRunEventsHandler! eventHandler) -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestSender.TestRequestSender(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ProtocolConfig! protocolConfig, Microsoft.VisualStudio.TestPlatform.ObjectModel.Host.ITestRuntimeProvider! runtimeProvider) -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestSender.WaitForRequestHandlerConnection(int connectionTimeout, System.Threading.CancellationToken cancellationToken) -> bool
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.VersionedMessage
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.VersionedMessage.Version.get -> int
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.VersionedMessage.Version.set -> void
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.VersionedMessage.VersionedMessage() -> void
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message.ToString() -> string!
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestCaseConverter.Read(ref System.Text.Json.Utf8JsonReader reader, System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase?
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestCaseConverter.Write(System.Text.Json.Utf8JsonWriter! writer, Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase! value, System.Text.Json.JsonSerializerOptions! options) -> void

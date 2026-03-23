@@ -25,8 +25,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using System.Text.Json;
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode;
 
 [TestClass]
@@ -87,7 +85,7 @@ public class DesignModeClientTests
     [TestMethod]
     public void DesignModeClientConnectShouldSetupChannel()
     {
-        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = JsonSerializer.SerializeToElement(_protocolVersion) };
+        var verCheck = new Message { MessageType = MessageType.VersionCheck, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.VersionCheck, _protocolVersion, _protocolVersion) };
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
@@ -103,7 +101,7 @@ public class DesignModeClientTests
     [TestMethod]
     public void DesignModeClientConnectShouldNotSendConnectedIfServerConnectionTimesOut()
     {
-        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = JsonSerializer.SerializeToElement(_protocolVersion) };
+        var verCheck = new Message { MessageType = MessageType.VersionCheck, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.VersionCheck, _protocolVersion, _protocolVersion) };
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(false);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
@@ -120,7 +118,7 @@ public class DesignModeClientTests
     public void DesignModeClientDuringConnectShouldHighestCommonVersionWhenReceivedVersionIsGreaterThanSupportedVersion()
     {
         var reallyHighProtocolVersion = 10000;
-        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = JsonSerializer.SerializeToElement(reallyHighProtocolVersion) };
+        var verCheck = new Message { MessageType = MessageType.VersionCheck, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.VersionCheck, reallyHighProtocolVersion, _protocolVersion) };
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
@@ -133,7 +131,7 @@ public class DesignModeClientTests
     [TestMethod]
     public void DesignModeClientDuringConnectShouldHighestCommonVersionWhenReceivedVersionIsSmallerThanSupportedVersion()
     {
-        var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = JsonSerializer.SerializeToElement(1) };
+        var verCheck = new Message { MessageType = MessageType.VersionCheck, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.VersionCheck, 1, _protocolVersion) };
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
@@ -156,7 +154,8 @@ public class DesignModeClientTests
         var getProcessStartInfoMessage = new Message
         {
             MessageType = MessageType.GetTestRunnerProcessStartInfoForRunSelected,
-            Payload = JsonSerializer.SerializeToElement("random")
+            Version = _protocolVersion,
+            RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.GetTestRunnerProcessStartInfoForRunSelected, "random", _protocolVersion)
         };
 
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
@@ -219,7 +218,8 @@ public class DesignModeClientTests
         var getProcessStartInfoMessage = new Message
         {
             MessageType = MessageType.TestRunSelectedTestCasesDefaultHost,
-            Payload = JsonSerializer.SerializeToElement("random")
+            Version = _protocolVersion,
+            RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunSelectedTestCasesDefaultHost, "random", _protocolVersion)
         };
 
         var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
@@ -342,7 +342,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldSendTestMessageAndDiscoverCompleteOnExceptionInDiscovery()
     {
         var payload = new DiscoveryRequestPayload();
-        var startDiscovery = new Message { MessageType = MessageType.StartDiscovery, Payload = JsonSerializer.SerializeToElement(payload) };
+        var startDiscovery = new Message { MessageType = MessageType.StartDiscovery, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.StartDiscovery, payload, _protocolVersion) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startDiscovery);
         _mockCommunicationManager
@@ -366,7 +366,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldSendTestMessageAndDiscoverCompleteOnTestPlatformExceptionInDiscovery()
     {
         var payload = new DiscoveryRequestPayload();
-        var startDiscovery = new Message { MessageType = MessageType.StartDiscovery, Payload = JsonSerializer.SerializeToElement(payload) };
+        var startDiscovery = new Message { MessageType = MessageType.StartDiscovery, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.StartDiscovery, payload, _protocolVersion) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startDiscovery);
         _mockCommunicationManager
@@ -390,7 +390,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldSendTestMessageAndAttachmentsProcessingCompleteOnExceptionInAttachmentsProcessing()
     {
         var payload = new TestRunAttachmentsProcessingPayload();
-        var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JsonSerializer.SerializeToElement(payload) };
+        var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunAttachmentsProcessingStart, payload, _protocolVersion) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
         _mockCommunicationManager
@@ -414,7 +414,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldSendTestMessageAndDiscoverCompleteOnTestPlatformExceptionInAttachmentsProcessing()
     {
         var payload = new TestRunAttachmentsProcessingPayload();
-        var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JsonSerializer.SerializeToElement(payload) };
+        var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunAttachmentsProcessingStart, payload, _protocolVersion) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
         _mockCommunicationManager
@@ -438,7 +438,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldCallRequestManagerForAttachmentsProcessingStart()
     {
         var payload = new TestRunAttachmentsProcessingPayload();
-        var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Payload = JsonSerializer.SerializeToElement(payload) };
+        var startAttachmentsProcessing = new Message { MessageType = MessageType.TestRunAttachmentsProcessingStart, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunAttachmentsProcessingStart, payload, _protocolVersion) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startAttachmentsProcessing);
         _mockCommunicationManager.Setup(cm => cm.DeserializePayload<TestRunAttachmentsProcessingPayload>(It.IsAny<Message>())).Returns(payload);
@@ -477,7 +477,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldSendTestMessageAndExecutionCompleteOnExceptionInTestRun()
     {
         var payload = new TestRunRequestPayload();
-        var testRunAll = new Message { MessageType = MessageType.TestRunAllSourcesWithDefaultHost, Payload = JsonSerializer.SerializeToElement(payload) };
+        var testRunAll = new Message { MessageType = MessageType.TestRunAllSourcesWithDefaultHost, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunAllSourcesWithDefaultHost, payload, _protocolVersion) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(testRunAll);
         _mockCommunicationManager
@@ -501,7 +501,7 @@ public class DesignModeClientTests
     public void DesignModeClientConnectShouldSendTestMessageAndExecutionCompleteOnTestPlatformExceptionInTestRun()
     {
         var payload = new TestRunRequestPayload();
-        var testRunAll = new Message { MessageType = MessageType.TestRunAllSourcesWithDefaultHost, Payload = JsonSerializer.SerializeToElement(payload) };
+        var testRunAll = new Message { MessageType = MessageType.TestRunAllSourcesWithDefaultHost, Version = _protocolVersion, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunAllSourcesWithDefaultHost, payload, _protocolVersion) };
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(testRunAll);
         _mockCommunicationManager
@@ -528,7 +528,8 @@ public class DesignModeClientTests
         var startTestSessionMessage = new Message()
         {
             MessageType = MessageType.StartTestSession,
-            Payload = JsonSerializer.SerializeToElement(payload)
+            Version = _protocolVersion,
+            RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.StartTestSession, payload, _protocolVersion)
         };
 
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
@@ -578,7 +579,8 @@ public class DesignModeClientTests
         var stopTestSessionMessage = new Message()
         {
             MessageType = MessageType.StopTestSession,
-            Payload = JsonSerializer.SerializeToElement(stopTestSessionPayload)
+            Version = _protocolVersion,
+            RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.StopTestSession, stopTestSessionPayload, _protocolVersion)
         };
 
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
@@ -643,7 +645,7 @@ public class DesignModeClientTests
                 ErrorMessage = errorMessage
             };
             onCustomTestHostLaunchAckReceived?.Invoke(
-                new Message() { MessageType = MessageType.CustomTestHostLaunchCallback, Payload = JsonSerializer.SerializeToElement(payload) });
+                new Message() { MessageType = MessageType.CustomTestHostLaunchCallback, Version = 7, RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.CustomTestHostLaunchCallback, payload, 7) });
         }
     }
 }
