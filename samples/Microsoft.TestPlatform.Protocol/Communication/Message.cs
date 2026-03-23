@@ -3,8 +3,7 @@
 
 namespace Microsoft.TestPlatform.Protocol
 {
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
+    using System.Text.Json;
 
     public class Message
     {
@@ -16,7 +15,7 @@ namespace Microsoft.TestPlatform.Protocol
         /// <summary>
         /// Gets or sets the payload.
         /// </summary>
-        public JToken Payload { get; set; }
+        public JsonElement? Payload { get; set; }
 
         /// <summary>
         /// To string implementation.
@@ -24,7 +23,7 @@ namespace Microsoft.TestPlatform.Protocol
         /// <returns> The <see cref="string"/>. </returns>
         public override string ToString()
         {
-            return "(" + MessageType + ") -> " + (Payload == null ? "null" : Payload.ToString(Formatting.Indented));
+            return "(" + MessageType + ") -> " + (Payload == null ? "null" : JsonSerializer.Serialize(Payload, new JsonSerializerOptions { WriteIndented = true }));
         }
     }
 }
