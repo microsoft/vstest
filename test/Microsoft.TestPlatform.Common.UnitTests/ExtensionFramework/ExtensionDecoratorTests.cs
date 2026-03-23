@@ -69,7 +69,7 @@ public class ExtensionDecoratorTests
 #pragma warning disable MSTEST0049 // CancellationToken not relevant in Moq callback
             Task.Run(() =>
             {
-                Thread.Sleep(100);
+                Thread.Sleep(10);
                 currentCount = Interlocked.Decrement(ref currentCount);
                 frameworkHandle!.RecordEnd(tc, TestOutcome.Passed);
             });

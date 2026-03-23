@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,10 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-// ConnectAsync(IPAddress, int, CancellationToken) and AcceptTcpClientAsync(CancellationToken)
-// overloads are unavailable on .NET Framework; suppress CancellationToken usage warnings.
-#pragma warning disable MSTEST0049 // Use 'TestContext.CancellationToken'
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests;
 
@@ -35,8 +32,6 @@ public class SocketCommunicationManagerTests : IDisposable
     private readonly SocketCommunicationManager _communicationManager;
     private readonly TcpClient _tcpClient;
     private readonly TcpListener _tcpListener;
-
-    public TestContext TestContext { get; set; }
 
     public SocketCommunicationManagerTests()
     {
@@ -62,7 +57,7 @@ public class SocketCommunicationManagerTests : IDisposable
     {
         var port = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
 
-        Assert.IsGreaterThan(0, port);
+        Assert.IsTrue(port > 0);
         await _tcpClient.ConnectAsync(IPAddress.Loopback, port);
         Assert.IsTrue(_tcpClient.Connected);
     }
@@ -80,8 +75,7 @@ public class SocketCommunicationManagerTests : IDisposable
                 clientConnected = true;
                 waitEvent.Set();
             },
-            null,
-            TestContext.CancellationToken);
+            null);
 
         await _tcpClient.ConnectAsync(IPAddress.Loopback, port);
         Assert.IsTrue(_tcpClient.Connected);
@@ -162,9 +156,14 @@ public class SocketCommunicationManagerTests : IDisposable
     }
 
     [TestMethod]
-    [OSCondition(OperatingSystems.Windows | OperatingSystems.Linux)]
     public async Task StopClientShouldDisconnectClient()
     {
+        // TODO: This won't throw on MacOS? No way to try it.
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            return;
+        }
+
         var client = await StartServerAndWaitForConnection();
 
         _communicationManager.StopClient();
@@ -284,8 +283,8 @@ public class SocketCommunicationManagerTests : IDisposable
         var client = new SocketCommunicationManager();
 
         int port = server.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
-        client.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port)).Wait(TestContext.CancellationToken);
-        server.AcceptClientAsync().Wait(TestContext.CancellationToken);
+        client.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port)).Wait();
+        server.AcceptClientAsync().Wait();
 
         server.WaitForClientConnection(1000);
         client.WaitForServerConnection(1000);
@@ -297,7 +296,7 @@ public class SocketCommunicationManagerTests : IDisposable
         while (dataReceived < 2048 * 5)
         {
             dataReceived += server.ReceiveRawMessageAsync(CancellationToken.None).Result!.Length;
-            Task.Delay(1000, TestContext.CancellationToken).Wait(TestContext.CancellationToken);
+            Task.Delay(100).Wait();
         }
 
         clientThread.Join();

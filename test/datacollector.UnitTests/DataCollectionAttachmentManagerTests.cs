@@ -54,7 +54,7 @@ public class DataCollectionAttachmentManagerTests
         {
             _attachmentManager.Initialize(dataCollectorSessionId, outputDirectory, _messageSink.Object);
 
-            CancellationTokenSource cts = new(TimeSpan.FromSeconds(3));
+            CancellationTokenSource cts = new(TimeSpan.FromSeconds(1));
             List<Task> parallelTasks = new();
             int totalTasks = 3;
 

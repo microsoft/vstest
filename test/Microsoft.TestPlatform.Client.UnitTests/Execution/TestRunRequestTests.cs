@@ -197,7 +197,7 @@ public class TestRunRequestTests
         executionManager.Setup(o => o.Abort(It.IsAny<IInternalTestRunEventsHandler>())).Callback(() => onTestSessionTimeoutCalled.Set());
 
         testRunRequest.ExecuteAsync();
-        onTestSessionTimeoutCalled.WaitOne(20 * 1000);
+        onTestSessionTimeoutCalled.WaitOne(5 * 1000);
 
         executionManager.Verify(o => o.Abort(It.IsAny<IInternalTestRunEventsHandler>()), Times.Once);
     }
@@ -220,7 +220,7 @@ public class TestRunRequestTests
         var executionManager = new Mock<IProxyExecutionManager>();
         var testRunRequest = new TestRunRequest(_mockRequestData.Object, testRunCriteria, executionManager.Object, _loggerManager.Object);
 
-        executionManager.Setup(o => o.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<IInternalTestRunEventsHandler>())).Callback(() => Thread.Sleep(5 * 1000));
+        executionManager.Setup(o => o.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<IInternalTestRunEventsHandler>())).Callback(() => Thread.Sleep(500));
 
         testRunRequest.ExecuteAsync();
 
