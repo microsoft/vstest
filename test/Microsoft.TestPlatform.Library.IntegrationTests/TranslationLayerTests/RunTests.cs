@@ -82,7 +82,7 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [WrapperCompatibilityDataSource(AfterFeature = Features.MULTI_TFM)]
+    [WrapperCompatibilityDataSource()]
     public void RunAllTestsWithMixedTFMsWillRunTestsFromAllProvidedDllEvenWhenTheyMixTFMs(RunnerInfo runnerInfo)
     {
         // Arrange
@@ -93,8 +93,8 @@ public class RunTests : AcceptanceTestBase
         // Use SimpleTestProject4 which has a minimal test adapter. This helps us test that the console / testhost are compatible.
         // Rather than testing that the console & mstest (or other adapter) and compatible. If we use mstest directly it fails on
         // very old versions of vstest.console.
-        var netFrameworkDll = GetTestDllForFramework("SimpleTestProject4.dll", DEFAULT_HOST_NETFX);
-        var netDll = GetTestDllForFramework("SimpleTestProject4.dll", DEFAULT_HOST_NETCORE);
+        var netFrameworkDll = GetTestDllForFramework("SimpleTestProject4.dll", DEFAULT_HOST_NETFX, automaticallyResolveCompatibilityTestAsset: false);
+        var netDll = GetTestDllForFramework("SimpleTestProject4.dll", DEFAULT_HOST_NETCORE, automaticallyResolveCompatibilityTestAsset: false);
 
         // Act
         // We have no preference around what TFM is used. It will be autodetected.

@@ -621,9 +621,9 @@ public class IntegrationTestBase
         return _testEnvironment.GetTestAsset(assetName);
     }
 
-    protected string GetTestDllForFramework(string assetName, string targetFramework)
+    protected string GetTestDllForFramework(string assetName, string targetFramework, bool automaticallyResolveCompatibilityTestAsset = true)
     {
-        return _testEnvironment.GetTestAsset(assetName, targetFramework);
+        return _testEnvironment.GetTestAsset(assetName, targetFramework, automaticallyResolveCompatibilityTestAsset);
     }
 
     protected List<string> GetTestDlls(params string[] assetNames)
