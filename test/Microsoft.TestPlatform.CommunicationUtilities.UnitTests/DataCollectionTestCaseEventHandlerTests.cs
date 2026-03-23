@@ -16,8 +16,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using System.Text.Json;
-
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests;
 
 [TestClass]
@@ -103,11 +101,20 @@ public class DataCollectionTestCaseEventHandlerTests
     [TestMethod]
     public void ProcessRequestsShouldProcessBeforeTestCaseStartEvent()
     {
-        var message = new Message();
-        message.MessageType = MessageType.DataCollectionTestStart;
-        message.Payload = JsonSerializer.SerializeToElement(new TestCaseEndEventArgs());
+        var message = new Message
+        {
+            MessageType = MessageType.DataCollectionTestStart,
+            Version = 7,
+            RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.DataCollectionTestStart, new TestCaseEndEventArgs(), 7),
+        };
 
-        _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.SessionEnd, Payload = JsonSerializer.SerializeToElement("false") });
+        var sessionEndMessage = new Message
+        {
+            MessageType = MessageType.SessionEnd,
+            Version = 7,
+            RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.SessionEnd, "false", 7),
+        };
+        _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(sessionEndMessage);
 
         var requestHandler = new DataCollectionTestCaseEventHandler(_messageSink.Object, _mockCommunicationManager.Object, _mockDataCollectionManager.Object, _dataSerializer.Object);
         _dataSerializer.Setup(x => x.DeserializePayload<TestCaseStartEventArgs>(message)).Returns(new TestCaseStartEventArgs());
@@ -120,12 +127,21 @@ public class DataCollectionTestCaseEventHandlerTests
     [TestMethod]
     public void ProcessRequestsShouldProcessAfterTestCaseCompleteEvent()
     {
-        var message = new Message();
-        message.MessageType = MessageType.DataCollectionTestEnd;
         var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-        message.Payload = JsonDocument.Parse(JsonDataSerializer.Instance.Serialize(new TestResultEventArgs(new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)), 2)).RootElement.Clone();
+        var message = new Message
+        {
+            MessageType = MessageType.DataCollectionTestEnd,
+            Version = 7,
+            RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.DataCollectionTestEnd, new TestResultEventArgs(new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)), 7),
+        };
 
-        _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.SessionEnd, Payload = JsonSerializer.SerializeToElement("false") });
+        var sessionEndMessage = new Message
+        {
+            MessageType = MessageType.SessionEnd,
+            Version = 7,
+            RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.SessionEnd, "false", 7),
+        };
+        _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(sessionEndMessage);
 
         var requestHandler = new DataCollectionTestCaseEventHandler(_messageSink.Object, _mockCommunicationManager.Object, _mockDataCollectionManager.Object, _dataSerializer.Object);
         _dataSerializer.Setup(x => x.DeserializePayload<TestCaseEndEventArgs>(message)).Returns(new TestCaseEndEventArgs());

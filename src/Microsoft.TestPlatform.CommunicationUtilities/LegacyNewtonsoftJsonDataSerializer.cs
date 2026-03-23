@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
-using System.Text.Json;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.Legacy;
@@ -69,37 +68,35 @@ internal class LegacyNewtonsoftJsonDataSerializer : IDataSerializer
         var legacyMsg = Deserialize<LegacyVersionedMessage>(rawMessage);
         if (legacyMsg is null)
         {
-            return new VersionedMessage();
+            return new Message();
         }
 
-        return new VersionedMessage
+        return new Message
         {
             Version = legacyMsg.Version,
             MessageType = legacyMsg.MessageType,
-            Payload = legacyMsg.Payload is null ? null : ConvertJTokenToJsonElement(legacyMsg.Payload),
+            RawMessage = rawMessage,
         };
     }
 
     /// <inheritdoc/>
     public T? DeserializePayload<T>(Message? message)
     {
-        if (message is null)
+        if (message is null || message.RawMessage is null)
         {
             return default;
         }
 
-        int? version = message is VersionedMessage vm ? vm.Version : null;
-        var payloadSerializer = GetPayloadSerializer(version);
+        var payloadSerializer = GetPayloadSerializer(message.Version);
 
-        if (message.Payload is null)
+        // Parse the raw JSON to extract the Payload field, then deserialize via JToken
+        var legacyMsg = Deserialize<LegacyVersionedMessage>(message.RawMessage);
+        if (legacyMsg?.Payload is null)
         {
             return default;
         }
 
-        // Convert JsonElement → string → JToken → T
-        var jsonString = message.Payload.Value.GetRawText();
-        var jToken = JToken.Parse(jsonString);
-        return jToken.ToObject<T>(payloadSerializer);
+        return legacyMsg.Payload.ToObject<T>(payloadSerializer);
     }
 
     /// <inheritdoc/>
@@ -182,18 +179,6 @@ internal class LegacyNewtonsoftJsonDataSerializer : IDataSerializer
     private static T? Deserialize<T>(string data)
     {
         return Deserialize<T>(Serializer, data);
-    }
-
-    private static JsonElement ConvertJTokenToJsonElement(JToken? jToken)
-    {
-        if (jToken is null)
-        {
-            return default;
-        }
-
-        var json = jToken.ToString(Formatting.None);
-        using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.Clone();
     }
 
     private static JsonSerializer GetPayloadSerializer(int? version)
