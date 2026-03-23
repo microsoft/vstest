@@ -64,6 +64,22 @@ Additional tests that can be run locally, but typically you would run just the o
 > ⚠️Smoke, Integration, Compatibility and Performance tests do use the build packages that are produced by running `build.cmd -pack`, if you touch the production code (in src, e.g. in vstest.console) you should re-build before running these tests.
 > If you however touched just the integration test code, or test assets (in test/TestAssets) you can do `./build.cmd` for faster build (without -pack), or run the tests from IDE directly. The test assets will automatically re-build, but since you did not re-pack, there is no reason to fully clean and restore the dev packages, making it much faster to startup the integration tests.
 
+### Seeing raw test output
+
+By default, test output is captured into log files under `artifacts/log/`. When tests fail, the error message will show the path to the log file with the full output. If you prefer to see raw test output directly in the console, disable the MSBuild terminal logger by appending `-tl:off`:
+
+```powershell
+# Windows
+test.cmd -tl:off
+test.cmd -integrationTest -filter blame -tl:off
+```
+
+```bash
+# Linux / macOS
+./test.sh -tl:off
+./test.sh --integrationTest -tl:off
+```
+
 ### Running a specific test
 
 With integration tests you typically want to run all integration tests that affect a particular component, for example when changing blame data collector you want to run all tests for blame. This can be done by providing a parameter `-filter` to the test run, providing part of the test name, or providing a more complete filter using [MSTest filter syntax](https://learn.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests?pivots=mstest)

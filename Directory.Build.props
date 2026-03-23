@@ -138,8 +138,14 @@
     <TestRunnerAdditionalArguments Condition=" '$(TestRunnerExternalArguments)' != ''">$(TestRunnerExternalArguments)</TestRunnerAdditionalArguments>
     <!-- Skip windows only tests on non-windows systems. -->
     <TestRunnerAdditionalArguments Condition=" '$(OS)' != 'Windows_NT' ">$(TestRunnerAdditionalArguments) --filter "TestCategory!=Windows&amp;TestCategory!=Windows-Review"</TestRunnerAdditionalArguments>
-    <!-- Allow us to see errors instead of capturing everything into files. -->
-    <TestCaptureOutput>false</TestCaptureOutput>
+    <!--
+      Allow Arcade to capture test output into log files (the default behavior).
+      When tests fail, the error message will reference the log file path, so the file must exist.
+      Setting this to false breaks the local dev experience when MSBuild terminal logger is active
+      (the default in .NET 8+), because terminal logger eats the console output and the log files
+      are never created. See https://github.com/microsoft/vstest/issues/15509
+      To see raw test output in the console, pass -tl:off to your test command.
+    -->
   </PropertyGroup>
 
 </Project>
