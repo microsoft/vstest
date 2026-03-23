@@ -15,8 +15,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.JsoniteReferen
 /// <summary>
 /// A thin wrapper around the Jsonite library for test-level JSON operations.
 ///
-/// Jsonite deserializes JSON into <see cref="JsonObject"/> (Dictionary&lt;string, object&gt;)
-/// and <see cref="JsonArray"/> (List&lt;object&gt;). It does NOT support typed deserialization
+/// Jsonite deserializes JSON into JsonObject (Dictionary&lt;string, object&gt;)
+/// and JsonArray (List&lt;object&gt;). It does NOT support typed deserialization
 /// to arbitrary CLR types the way System.Text.Json or Newtonsoft do.
 ///
 /// This wrapper is used for:
