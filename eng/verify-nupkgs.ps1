@@ -75,6 +75,7 @@ function Verify-Nuget-Packages {
     # (artifacts/tmp/{Config}/extractedPackages/{PackageFileName}), so integration
     # tests can reuse these extractions via the .cache marker files written below.
     $extractedPackagesDir = Join-Path $tmpDirectory "extractedPackages"
+    New-Item -ItemType Directory -Path $extractedPackagesDir -Force | Out-Null
     Write-Host "Unzipping NuGet packages to '$extractedPackagesDir'."
     $unzipNugetPackageDirs = @()
     foreach ($nugetPackage in $nugetPackages) {
@@ -121,7 +122,7 @@ function Verify-Nuget-Packages {
     foreach ($nugetPackage in $nugetPackages) {
         $unzipNugetPackageDir = Join-Path $extractedPackagesDir $nugetPackage.Name
         $cacheMarkerPath = Join-Path $unzipNugetPackageDir ($nugetPackage.Name + ".cache")
-        $lastWriteTimeUtc = $nugetPackage.LastWriteTimeUtc.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+        $lastWriteTimeUtc = $nugetPackage.LastWriteTimeUtc.ToString("o", [System.Globalization.CultureInfo]::InvariantCulture)
         [System.IO.File]::WriteAllText($cacheMarkerPath, $lastWriteTimeUtc)
     }
 
