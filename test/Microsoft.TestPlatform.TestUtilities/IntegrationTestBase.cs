@@ -418,8 +418,8 @@ public class IntegrationTestBase
                 Environment.NewLine,
                 _arguments);
             Assert.Contains(
-                _standardTestOutput,
                 summaryStatus,
+                _standardTestOutput,
                 errorSummary
                 );
         }

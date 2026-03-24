@@ -3,6 +3,9 @@
 
   <PropertyGroup>
     <ExcludeFromSourceOnlyBuild>true</ExcludeFromSourceOnlyBuild>
+    <!-- MSTEST0001 (use [TestClass]) is suppressed because several test assemblies contain
+         helper/base classes and non-test classes that intentionally lack [TestClass].
+         Addressing individually would require changes across many files; tracked for follow-up. -->
     <NoWarn>$(NoWarn);MSTEST0001</NoWarn>
     <EnableMSTestRunner>true</EnableMSTestRunner>
     <!--

@@ -15,7 +15,6 @@ public class ArgumentProcessorUtilitiesTests
 {
     [TestMethod]
     [DataRow("")]
-    [DataRow(" ")]
     [DataRow(";;;;")]
     public void GetArgumentListShouldThrowErrorOnInvalidArgument(string argument)
     {

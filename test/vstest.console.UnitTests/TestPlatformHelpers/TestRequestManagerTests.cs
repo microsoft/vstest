@@ -2189,7 +2189,9 @@ public class TestRequestManagerTests
                 {
                     i++;
                     Console.WriteLine($"Iteration {i}");
-                    Task.Delay(5, token).Wait(token);
+#pragma warning disable MSTEST0049 // Intentionally not using CancellationToken - the mock must poll without throwing
+                    Task.Delay(5).Wait();
+#pragma warning restore MSTEST0049
                 }
 
                 r.MetricsCollection.Add(TelemetryDataConstants.AttachmentsProcessingState, "Canceled");

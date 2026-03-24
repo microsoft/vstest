@@ -597,7 +597,9 @@ public class TestRunRequestTests
         var testProcessStartInfo = new TestProcessStartInfo();
         _testRunRequest.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
-        mockCustomLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Never);
+#pragma warning disable MSTEST0049 // Moq Verify pattern - not an actual method invocation
+        mockCustomLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Never);
+#pragma warning restore MSTEST0049
     }
 
     [TestMethod]
@@ -613,7 +615,9 @@ public class TestRunRequestTests
         var testProcessStartInfo = new TestProcessStartInfo();
         _testRunRequest.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
-        mockCustomLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Never);
+#pragma warning disable MSTEST0049 // Moq Verify pattern - not an actual method invocation
+        mockCustomLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Never);
+#pragma warning restore MSTEST0049
     }
 
     [TestMethod]
@@ -630,7 +634,9 @@ public class TestRunRequestTests
         mockCustomLauncher.Setup(ml => ml.IsDebug).Returns(true);
         _testRunRequest.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
-        mockCustomLauncher.Verify(ml => ml.LaunchTestHost(testProcessStartInfo, It.IsAny<CancellationToken>()), Times.Once);
+#pragma warning disable MSTEST0049 // Moq Verify pattern - not an actual method invocation
+        mockCustomLauncher.Verify(ml => ml.LaunchTestHost(testProcessStartInfo), Times.Once);
+#pragma warning restore MSTEST0049
     }
 
     /// <summary>
