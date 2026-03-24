@@ -282,8 +282,6 @@ Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObj
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter.TestObjectConverter() -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter.TestResultConverter() -> void
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestRunStatisticsConverter
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestRunStatisticsConverter.TestRunStatisticsConverter() -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketClient
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketClient.Connected -> System.EventHandler<Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ConnectedEventArgs!>?
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketClient.Disconnected -> System.EventHandler<Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.DisconnectedEventArgs!>?
@@ -355,8 +353,6 @@ override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializatio
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter.Write(System.Text.Json.Utf8JsonWriter! writer, System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProperty!, object!>>! value, System.Text.Json.JsonSerializerOptions! options) -> void
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter.Read(ref System.Text.Json.Utf8JsonReader reader, System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult!
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter.Write(System.Text.Json.Utf8JsonWriter! writer, Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult! value, System.Text.Json.JsonSerializerOptions! options) -> void
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestRunStatisticsConverter.Read(ref System.Text.Json.Utf8JsonReader reader, System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunStatistics?
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestRunStatisticsConverter.Write(System.Text.Json.Utf8JsonWriter! writer, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunStatistics! value, System.Text.Json.JsonSerializerOptions! options) -> void
 static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollectionTestCaseEventSender.Create() -> Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollectionTestCaseEventSender!
 static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollectionTestCaseEventSender.Instance.get -> Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollectionTestCaseEventSender?
 static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer.Instance.get -> Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer!
