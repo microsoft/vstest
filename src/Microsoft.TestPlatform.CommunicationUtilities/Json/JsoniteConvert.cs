@@ -311,18 +311,26 @@ internal static class JsoniteConvert
 
                 try
                 {
-                    // Try setting via property setter
-                    if (prop.CanWrite)
+                    var converted = ConvertTo(kvp.Value, prop.PropertyType);
+
+                    if (prop.GetSetMethod() is not null)
                     {
-                        prop.SetValue(instance, ConvertTo(kvp.Value, prop.PropertyType));
+                        // Public setter available
+                        prop.SetValue(instance, converted);
                     }
                     else
                     {
-                        // Try setting via backing field (for properties with private setters)
+                        // Private setter or no setter — try backing field
                         var backingField = targetType.GetField($"<{prop.Name}>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance);
                         if (backingField is not null)
                         {
-                            backingField.SetValue(instance, ConvertTo(kvp.Value, prop.PropertyType));
+                            backingField.SetValue(instance, converted);
+                        }
+                        else
+                        {
+                            // Last resort: try private setter via reflection
+                            var privateSetter = prop.GetSetMethod(nonPublic: true);
+                            privateSetter?.Invoke(instance, new[] { converted });
                         }
                     }
                 }
