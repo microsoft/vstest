@@ -761,7 +761,7 @@ public class SerializationGoldenTests
         Assert.AreEqual(GoldenTestCase.Id, deserialized.Id);
         Assert.AreEqual(GoldenTestCase.LineNumber, deserialized.LineNumber);
         var traits = deserialized.Traits.ToArray();
-        Assert.AreEqual(2, traits.Length);
+        Assert.HasCount(traits, 2);
         Assert.AreEqual("Priority", traits[0].Name);
         Assert.AreEqual("0", traits[0].Value);
     }
@@ -780,7 +780,7 @@ public class SerializationGoldenTests
         Assert.AreEqual(GoldenTestCase.Id, deserialized.Id);
         Assert.AreEqual(GoldenTestCase.LineNumber, deserialized.LineNumber);
         var traits = deserialized.Traits.ToArray();
-        Assert.AreEqual(2, traits.Length);
+        Assert.HasCount(traits, 2);
         Assert.AreEqual("Priority", traits[0].Name);
         Assert.AreEqual("0", traits[0].Value);
     }
@@ -822,12 +822,12 @@ public class SerializationGoldenTests
         Assert.AreEqual(GoldenTestResult.StartTime, deserialized.StartTime);
         Assert.AreEqual(GoldenTestResult.EndTime, deserialized.EndTime);
         Assert.AreEqual(GoldenTestResult.TestCase.Id, deserialized.TestCase.Id);
-        Assert.AreEqual(1, deserialized.Attachments.Count);
+        Assert.HasCount(deserialized.Attachments, 1);
         Assert.AreEqual("Sample Collector", deserialized.Attachments[0].DisplayName);
         Assert.AreEqual(new Uri("datacollector://sample"), deserialized.Attachments[0].Uri);
-        Assert.AreEqual(1, deserialized.Attachments[0].Attachments.Count);
+        Assert.HasCount(deserialized.Attachments[0].Attachments, 1);
         Assert.AreEqual("Log File", deserialized.Attachments[0].Attachments[0].Description);
-        Assert.AreEqual(2, deserialized.Messages.Count);
+        Assert.HasCount(deserialized.Messages, 2);
         Assert.AreEqual(TestResultMessage.StandardOutCategory, deserialized.Messages[0].Category);
         Assert.AreEqual("sample stdout message", deserialized.Messages[0].Text);
     }
@@ -847,10 +847,10 @@ public class SerializationGoldenTests
         Assert.AreEqual(GoldenTestResult.StartTime, deserialized.StartTime);
         Assert.AreEqual(GoldenTestResult.EndTime, deserialized.EndTime);
         Assert.AreEqual(GoldenTestResult.TestCase.Id, deserialized.TestCase.Id);
-        Assert.AreEqual(1, deserialized.Attachments.Count);
+        Assert.HasCount(deserialized.Attachments, 1);
         Assert.AreEqual("Sample Collector", deserialized.Attachments[0].DisplayName);
-        Assert.AreEqual(1, deserialized.Attachments[0].Attachments.Count);
-        Assert.AreEqual(2, deserialized.Messages.Count);
+        Assert.HasCount(deserialized.Attachments[0].Attachments, 1);
+        Assert.HasCount(deserialized.Messages, 2);
         Assert.AreEqual(TestResultMessage.StandardOutCategory, deserialized.Messages[0].Category);
     }
 
@@ -890,7 +890,7 @@ public class SerializationGoldenTests
         Assert.IsTrue(deserialized.TestExecutionContext.KeepAlive);
 
         var tests = new List<TestCase>(deserialized.Tests);
-        Assert.AreEqual(1, tests.Count);
+        Assert.HasCount(tests, 1);
         Assert.AreEqual(GoldenTestCase.FullyQualifiedName, tests[0].FullyQualifiedName);
         Assert.AreEqual(GoldenTestCase.Id, tests[0].Id);
     }
@@ -909,7 +909,7 @@ public class SerializationGoldenTests
         Assert.IsTrue(deserialized.TestExecutionContext.KeepAlive);
 
         var tests = new List<TestCase>(deserialized.Tests);
-        Assert.AreEqual(1, tests.Count);
+        Assert.HasCount(tests, 1);
         Assert.AreEqual(GoldenTestCase.FullyQualifiedName, tests[0].FullyQualifiedName);
         Assert.AreEqual(GoldenTestCase.Id, tests[0].Id);
     }

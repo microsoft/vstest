@@ -429,7 +429,7 @@ public class TestRunStatsChangeSerializationTests
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.TestRunChangedArgs);
         var newResults = result.TestRunChangedArgs.NewTestResults!.ToList();
-        Assert.AreEqual(1, newResults.Count);
+        Assert.HasCount(1, newResults);
         Assert.AreEqual(TestOutcome.Failed, newResults[0].Outcome);
         Assert.AreEqual("Assert.AreEqual failed. Expected:<0.5>. Actual:<0>.", newResults[0].ErrorMessage);
     }
@@ -499,7 +499,7 @@ public class TestRunStatsChangeSerializationTests
 
         // Verify the failed test result
         var newResults = result.TestRunChangedArgs.NewTestResults!.ToList();
-        Assert.AreEqual(1, newResults.Count);
+        Assert.HasCount(1, newResults);
         Assert.AreEqual(TestOutcome.Failed, newResults[0].Outcome);
         Assert.AreEqual("Assert.AreEqual failed. Expected:<0.5>. Actual:<0>.", newResults[0].ErrorMessage);
         Assert.AreEqual(
@@ -515,7 +515,7 @@ public class TestRunStatsChangeSerializationTests
 
         // Verify active tests (in-progress)
         var activeTests = result.TestRunChangedArgs.ActiveTests!.ToList();
-        Assert.AreEqual(1, activeTests.Count);
+        Assert.HasCount(1, activeTests);
         Assert.AreEqual("Contoso.Math.Tests.CalculatorTests.MultiplyTest",
             activeTests[0].FullyQualifiedName);
 

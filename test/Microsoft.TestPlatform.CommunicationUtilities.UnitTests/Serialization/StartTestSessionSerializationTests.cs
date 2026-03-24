@@ -117,7 +117,7 @@ public class StartTestSessionSerializationTests
 
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.Sources);
-        Assert.AreEqual(1, result.Sources.Count);
+        Assert.HasCount(1, result.Sources);
         Assert.AreEqual("Contoso.Math.Tests.dll", result.Sources[0]);
         Assert.AreEqual(@"<RunSettings><RunConfiguration><ResultsDirectory>.\TestResults</ResultsDirectory></RunConfiguration></RunSettings>", result.RunSettings);
         Assert.IsFalse(result.IsDebuggingEnabled);
@@ -136,7 +136,7 @@ public class StartTestSessionSerializationTests
 
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.Sources);
-        Assert.AreEqual(1, result.Sources.Count);
+        Assert.HasCount(1, result.Sources);
         Assert.AreEqual("Contoso.Math.Tests.dll", result.Sources[0]);
         Assert.AreEqual(@"<RunSettings><RunConfiguration><ResultsDirectory>.\TestResults</ResultsDirectory></RunConfiguration></RunSettings>", result.RunSettings);
         Assert.IsFalse(result.IsDebuggingEnabled);
@@ -161,7 +161,7 @@ public class StartTestSessionSerializationTests
 
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.Sources);
-        Assert.AreEqual(Payload.Sources!.Count, result.Sources.Count);
+        Assert.HasCount(Payload.Sources!.Count, result.Sources);
         Assert.AreEqual(Payload.Sources![0], result.Sources[0]);
         Assert.AreEqual(Payload.RunSettings, result.RunSettings);
         Assert.AreEqual(Payload.IsDebuggingEnabled, result.IsDebuggingEnabled);

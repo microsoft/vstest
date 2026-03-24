@@ -56,7 +56,7 @@ public class TestCaseSerializationTests
 
         // Traits require special handling with TestPlatformContract resolver. It should be null without it.
         Assert.AreEqual("TestObject.Traits", properties[7].GetProperty("Key").GetProperty("Id").GetString());
-        Assert.IsTrue(properties[7].GetProperty("Value").ValueKind != JsonValueKind.Null);
+        Assert.AreNotEqual(JsonValueKind.Null, properties[7].GetProperty("Value").ValueKind);
     }
 
     [TestMethod]
@@ -155,7 +155,7 @@ public class TestCaseSerializationTests
 
         // Traits require special handling with TestPlatformContract resolver. It should be null without it.
         Assert.AreEqual("TestObject.Traits", properties[0].GetProperty("Key").GetProperty("Id").GetString());
-        Assert.IsTrue(properties[0].GetProperty("Value").ValueKind != JsonValueKind.Null);
+        Assert.AreNotEqual(JsonValueKind.Null, properties[0].GetProperty("Value").ValueKind);
 
         Assert.AreEqual("be78d6fc-61b0-4882-9d07-40d796fd96ce", data.GetProperty("Id").GetString());
         Assert.AreEqual("sampleTestClass.sampleTestCase", data.GetProperty("FullyQualifiedName").GetString());

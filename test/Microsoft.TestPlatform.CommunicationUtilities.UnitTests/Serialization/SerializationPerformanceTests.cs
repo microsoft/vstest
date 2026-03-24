@@ -541,7 +541,7 @@ public class SerializationPerformanceTests
 
         Console.WriteLine($"[{label}] STJ={stjMs}ms  Newtonsoft={newtonsoftMs}ms  Ratio={ratio:F2}x");
 
-        Assert.IsTrue(ratio <= RegressionTolerance,
+        Assert.IsLessThanOrEqualTo(ratio, RegressionTolerance,
             $"Performance regression: STJ ({stjMs}ms) is {ratio:F2}x slower than " +
             $"Newtonsoft ({newtonsoftMs}ms) for {label}. Threshold: {RegressionTolerance}x");
     }

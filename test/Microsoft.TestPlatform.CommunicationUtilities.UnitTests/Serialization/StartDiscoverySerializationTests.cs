@@ -120,7 +120,7 @@ public class StartDiscoverySerializationTests
         Assert.IsNotNull(result.AdapterSourceMap);
         Assert.IsTrue(result.AdapterSourceMap.ContainsKey("_none_"));
         var sources = result.AdapterSourceMap["_none_"].ToList();
-        Assert.AreEqual(2, sources.Count);
+        Assert.HasCount(2, sources);
         Assert.AreEqual("Contoso.Math.Tests.dll", sources[0]);
         Assert.AreEqual("Contoso.Core.Tests.dll", sources[1]);
         Assert.AreEqual(10, result.FrequencyOfDiscoveredTestsEvent);
@@ -140,7 +140,7 @@ public class StartDiscoverySerializationTests
         Assert.IsNotNull(result.AdapterSourceMap);
         Assert.IsTrue(result.AdapterSourceMap.ContainsKey("_none_"));
         var sources = result.AdapterSourceMap["_none_"].ToList();
-        Assert.AreEqual(2, sources.Count);
+        Assert.HasCount(2, sources);
         Assert.AreEqual("Contoso.Math.Tests.dll", sources[0]);
         Assert.AreEqual("Contoso.Core.Tests.dll", sources[1]);
         Assert.AreEqual(10, result.FrequencyOfDiscoveredTestsEvent);
@@ -166,7 +166,7 @@ public class StartDiscoverySerializationTests
         Assert.IsNotNull(result.AdapterSourceMap);
         Assert.IsTrue(result.AdapterSourceMap.ContainsKey("_none_"));
         var sources = result.AdapterSourceMap["_none_"].ToList();
-        Assert.AreEqual(2, sources.Count);
+        Assert.HasCount(2, sources);
         Assert.AreEqual("Contoso.Math.Tests.dll", sources[0]);
         Assert.AreEqual("Contoso.Core.Tests.dll", sources[1]);
         Assert.AreEqual(10, result.FrequencyOfDiscoveredTestsEvent);
