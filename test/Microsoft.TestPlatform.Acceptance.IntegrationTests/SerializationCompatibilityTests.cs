@@ -57,8 +57,7 @@ public class SerializationCompatibilityTests : AcceptanceTestBase
                 GetDefaultRunSettings(),
                 discoveryHandler);
 
-            Assert.IsTrue(
-                discoveryHandler.DiscoveredTestCases.Count > 0,
+            Assert.IsNotEmpty(discoveryHandler.DiscoveredTestCases,
                 $"Expected discovered tests but got 0. " +
                 $"Runner={runnerInfo.VSTestConsoleInfo}, TestHost={runnerInfo.TestHostInfo}. " +
                 $"This may indicate a serialization incompatibility between STJ and Newtonsoft.");
@@ -90,8 +89,7 @@ public class SerializationCompatibilityTests : AcceptanceTestBase
                 GetDefaultRunSettings(),
                 discoveryHandler);
 
-            Assert.IsTrue(
-                discoveryHandler.DiscoveredTestCases.Count > 0,
+            Assert.IsNotEmpty(discoveryHandler.DiscoveredTestCases,
                 $"Expected discovered tests but got 0. " +
                 $"Runner={runnerInfo.VSTestConsoleInfo}, TestHost={runnerInfo.TestHostInfo}. " +
                 $"This may indicate a serialization incompatibility between Newtonsoft and STJ.");
@@ -127,16 +125,17 @@ public class SerializationCompatibilityTests : AcceptanceTestBase
                 GetDefaultRunSettings(),
                 runHandler);
 
-            Assert.IsTrue(
-                runHandler.TestResults.Count > 0,
+            Assert.IsNotEmpty(runHandler.TestResults,
                 $"Expected test results but got 0. " +
                 $"Runner={runnerInfo.VSTestConsoleInfo}, TestHost={runnerInfo.TestHostInfo}. " +
                 $"This may indicate a serialization incompatibility between STJ and Newtonsoft.");
 
             // Verify we get a mix of outcomes — confirms full result fidelity across versions.
+            #pragma warning disable MSTEST0037
             Assert.IsTrue(
                 runHandler.TestResults.Any(r => r.Outcome == TestOutcome.Passed),
                 "Expected at least one passed test result.");
+#pragma warning restore MSTEST0037
         }
         finally
         {
@@ -165,15 +164,16 @@ public class SerializationCompatibilityTests : AcceptanceTestBase
                 GetDefaultRunSettings(),
                 runHandler);
 
-            Assert.IsTrue(
-                runHandler.TestResults.Count > 0,
+            Assert.IsNotEmpty(runHandler.TestResults,
                 $"Expected test results but got 0. " +
                 $"Runner={runnerInfo.VSTestConsoleInfo}, TestHost={runnerInfo.TestHostInfo}. " +
                 $"This may indicate a serialization incompatibility between Newtonsoft and STJ.");
 
+            #pragma warning disable MSTEST0037
             Assert.IsTrue(
                 runHandler.TestResults.Any(r => r.Outcome == TestOutcome.Passed),
                 "Expected at least one passed test result.");
+#pragma warning restore MSTEST0037
         }
         finally
         {
