@@ -27,6 +27,11 @@ public class IntegrationTestBuild : IntegrationTestBase
     private static readonly string DotnetDir = Path.GetFullPath(Path.Combine(Root, ".dotnet"));
     private static readonly string Dotnet = Path.GetFullPath(Path.Combine(Root, ".dotnet", OSUtils.IsWindows ? "dotnet.exe" : "dotnet"));
 
+    // Short-lived mutex held only during the build phase to serialize builds.
+    private static Mutex? s_buildMutex;
+    // Signaled once the build is complete so other assemblies can proceed to tests immediately.
+    private static EventWaitHandle? s_buildCompleteEvent;
+
     public static void BuildTestAssetsForIntegrationTests(TestContext context)
     {
         // This is common setup that should happen even when build will not run.
@@ -41,57 +46,84 @@ public class IntegrationTestBuild : IntegrationTestBase
 
         var buildCompatibility = GetTestParameter(context, "BuildCompatibility");
 
-        // Mostly just want to avoid using the same mutex across two clones of this repo.
-        var mutexName = "VSTest Acceptance Tests build " + IntegrationTestEnvironment.RepoRootDirectory!.Replace('\\', '-').Replace('/', '-').Replace(':', '-');
+        // Avoid collisions across different clones of this repo.
+        var baseName = "VSTest_AcceptanceTests_" + IntegrationTestEnvironment.RepoRootDirectory!
+            .Replace('\\', '-').Replace('/', '-').Replace(':', '-');
 
-        using var buildMutex = new Mutex(initiallyOwned: true, mutexName, out bool createdNew);
+        s_buildMutex = new Mutex(initiallyOwned: false, baseName + "_Build");
+        s_buildCompleteEvent = new EventWaitHandle(
+            initialState: false,
+            mode: EventResetMode.ManualReset,
+            name: baseName + "_BuildComplete");
+
+        // Acquire the build mutex to serialize the build phase.
         try
         {
-            Debug.WriteLine($"is mutex new: {createdNew}, name: {mutexName}");
-            if (createdNew)
+            var minutes = 15;
+            Debug.WriteLine($"Waiting for build mutex: {baseName}_Build");
+            if (!s_buildMutex.WaitOne(TimeSpan.FromMinutes(minutes)))
             {
-                // We are the first one of the parallel runs to do this. Build the projects and setup everything.
-                Debug.WriteLine("Starting to build.");
-                var sw = Stopwatch.StartNew();
+                throw new TimeoutException($"Timed out after {minutes} minutes waiting for the build mutex '{baseName}_Build'.");
+            }
+        }
+        catch (AbandonedMutexException)
+        {
+            // Previous holder crashed — we own the mutex now and need to rebuild.
+            s_buildCompleteEvent.Reset();
+            Debug.WriteLine("Previous build was interrupted (abandoned mutex), rebuilding.");
+        }
 
-                var nugetCache = IntegrationTestEnvironment.TestAssetsNuGetCacheDirectory;
-                var packagesAreNew = UnzipExecutablePackages();
-                if (packagesAreNew)
-                {
-                    CleanNugetCacheAndProjects(nugetCache);
-                }
-                Debug.WriteLine($"Unzipping packages took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
-                BuildTestAssets(nugetCache);
-                Debug.WriteLine($"Building test assets took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
-                if (buildCompatibility)
-                {
-                    BuildTestAssetsCompatibility(nugetCache);
-                    Debug.WriteLine($"Building compatibility test assets took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
-                }
-                else
-                {
-                    Debug.WriteLine("BuildCompatibility parameter is false, skipping build.");
-                }
-                CopyAndPatchDotnet();
-                Debug.WriteLine($"Copying and patching dotnet took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
+        try
+        {
+            // If another assembly already completed the build, just proceed to tests.
+            if (s_buildCompleteEvent.WaitOne(0))
+            {
+                Debug.WriteLine("Build already completed by another process, proceeding to tests.");
+                return;
+            }
+
+            // We need to build.
+            Debug.WriteLine("Starting to build.");
+            var sw = Stopwatch.StartNew();
+
+            var nugetCache = IntegrationTestEnvironment.TestAssetsNuGetCacheDirectory;
+            var packagesAreNew = UnzipExecutablePackages();
+            if (packagesAreNew)
+            {
+                CleanNugetCacheAndProjects(nugetCache);
+            }
+            Debug.WriteLine($"Unzipping packages took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
+            BuildTestAssets(nugetCache);
+            Debug.WriteLine($"Building test assets took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
+            if (buildCompatibility)
+            {
+                BuildTestAssetsCompatibility(nugetCache);
+                Debug.WriteLine($"Building compatibility test assets took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
             }
             else
             {
-                // Build is already in progress. Wait for it to finish.
-                var minutes = 15;
-                Debug.WriteLine("Other project is building, waiting for mutex to release.");
-                var gotOne = buildMutex.WaitOne(TimeSpan.FromMinutes(minutes));
-                if (!gotOne)
-                {
-                    throw new TimeoutException($"Timed out after {minutes} minutes, waiting for the other project to finish building. Mutex name: '{mutexName}'");
-                }
-                Debug.WriteLine("Other project is done building, I can start running tests now.");
+                Debug.WriteLine("BuildCompatibility parameter is false, skipping build.");
             }
+            CopyAndPatchDotnet();
+            Debug.WriteLine($"Copying and patching dotnet took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
+
+            // Signal that the build is complete so waiting assemblies can proceed to tests.
+            s_buildCompleteEvent.Set();
+            Debug.WriteLine("Build completed, signaled other processes.");
         }
         finally
         {
-            buildMutex.ReleaseMutex();
+            // Release the build mutex so other assemblies can check the event.
+            s_buildMutex.ReleaseMutex();
         }
+    }
+
+    public static void CleanupTestAssets()
+    {
+        s_buildMutex?.Dispose();
+        s_buildMutex = null;
+        s_buildCompleteEvent?.Dispose();
+        s_buildCompleteEvent = null;
     }
 
     private static void BuildTestAssets(string nugetCache)
