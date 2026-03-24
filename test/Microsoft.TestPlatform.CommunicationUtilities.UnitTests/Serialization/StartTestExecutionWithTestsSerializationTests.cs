@@ -282,7 +282,7 @@ public class StartTestExecutionWithTestsSerializationTests
     {
         Assert.IsNotNull(result);
         var tests = result.Tests.ToList();
-        Assert.AreEqual(1, tests.Count);
+        Assert.HasCount(1, tests);
         var tc = tests[0];
         Assert.AreEqual("Contoso.Math.Tests.CalculatorTests.AddTest", tc.FullyQualifiedName);
         Assert.AreEqual(new Uri("executor://MSTestAdapter/v2"), tc.ExecutorUri);

@@ -153,14 +153,14 @@ public class AfterTestRunEndResultSerializationTests
 
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.AttachmentSets);
-        Assert.AreEqual(1, result.AttachmentSets.Count);
+        Assert.HasCount(result.AttachmentSets, 1);
         var attachment = result.AttachmentSets[0];
         Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", attachment.Uri.AbsoluteUri);
         Assert.AreEqual("Code Coverage", attachment.DisplayName);
-        Assert.AreEqual(1, attachment.Attachments.Count);
+        Assert.HasCount(attachment.Attachments, 1);
         Assert.AreEqual("Coverage Report", attachment.Attachments[0].Description);
         Assert.IsNotNull(result.InvokedDataCollectors);
-        Assert.AreEqual(1, result.InvokedDataCollectors.Count);
+        Assert.HasCount(result.InvokedDataCollectors, 1);
         Assert.AreEqual("Code Coverage", result.InvokedDataCollectors[0].FriendlyName);
         Assert.IsTrue(result.InvokedDataCollectors[0].HasAttachmentProcessor);
     }
@@ -173,14 +173,14 @@ public class AfterTestRunEndResultSerializationTests
 
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.AttachmentSets);
-        Assert.AreEqual(1, result.AttachmentSets.Count);
+        Assert.HasCount(result.AttachmentSets, 1);
         var attachment = result.AttachmentSets[0];
         Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", attachment.Uri.AbsoluteUri);
         Assert.AreEqual("Code Coverage", attachment.DisplayName);
-        Assert.AreEqual(1, attachment.Attachments.Count);
+        Assert.HasCount(attachment.Attachments, 1);
         Assert.AreEqual("Coverage Report", attachment.Attachments[0].Description);
         Assert.IsNotNull(result.InvokedDataCollectors);
-        Assert.AreEqual(1, result.InvokedDataCollectors.Count);
+        Assert.HasCount(result.InvokedDataCollectors, 1);
         Assert.AreEqual("Code Coverage", result.InvokedDataCollectors[0].FriendlyName);
         Assert.IsTrue(result.InvokedDataCollectors[0].HasAttachmentProcessor);
     }
@@ -199,10 +199,10 @@ public class AfterTestRunEndResultSerializationTests
 
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.AttachmentSets);
-        Assert.AreEqual(1, result.AttachmentSets.Count);
+        Assert.HasCount(result.AttachmentSets, 1);
         Assert.AreEqual("Code Coverage", result.AttachmentSets[0].DisplayName);
         Assert.IsNotNull(result.InvokedDataCollectors);
-        Assert.AreEqual(1, result.InvokedDataCollectors.Count);
+        Assert.HasCount(result.InvokedDataCollectors, 1);
         Assert.AreEqual("Code Coverage", result.InvokedDataCollectors[0].FriendlyName);
     }
 

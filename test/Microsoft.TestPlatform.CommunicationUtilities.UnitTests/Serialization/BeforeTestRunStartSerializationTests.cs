@@ -95,7 +95,7 @@ public class BeforeTestRunStartSerializationTests
         Assert.AreEqual(Payload.SettingsXml, result.SettingsXml);
         Assert.IsNotNull(result.Sources);
         var sources = result.Sources.ToList();
-        Assert.AreEqual(2, sources.Count);
+        Assert.HasCount(sources, 2);
         Assert.AreEqual("Contoso.Math.Tests.dll", sources[0]);
         Assert.AreEqual("Contoso.Core.Tests.dll", sources[1]);
         Assert.IsTrue(result.IsTelemetryOptedIn);
@@ -111,7 +111,7 @@ public class BeforeTestRunStartSerializationTests
         Assert.AreEqual(Payload.SettingsXml, result.SettingsXml);
         Assert.IsNotNull(result.Sources);
         var sources = result.Sources.ToList();
-        Assert.AreEqual(2, sources.Count);
+        Assert.HasCount(sources, 2);
         Assert.AreEqual("Contoso.Math.Tests.dll", sources[0]);
         Assert.AreEqual("Contoso.Core.Tests.dll", sources[1]);
         Assert.IsTrue(result.IsTelemetryOptedIn);
@@ -133,7 +133,7 @@ public class BeforeTestRunStartSerializationTests
         Assert.AreEqual(Payload.SettingsXml, result.SettingsXml);
         Assert.IsNotNull(result.Sources);
         var sources = result.Sources.ToList();
-        Assert.AreEqual(2, sources.Count);
+        Assert.HasCount(sources, 2);
         Assert.AreEqual("Contoso.Math.Tests.dll", sources[0]);
         Assert.AreEqual("Contoso.Core.Tests.dll", sources[1]);
         Assert.IsTrue(result.IsTelemetryOptedIn);

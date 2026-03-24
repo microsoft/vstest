@@ -227,7 +227,7 @@ public class TestCasesFoundSerializationTests
         Assert.AreEqual(new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567890"), tc.Id);
         Assert.AreEqual(42, tc.LineNumber);
         var traits = tc.Traits.ToList();
-        Assert.AreEqual(2, traits.Count);
+        Assert.HasCount(2, traits);
         Assert.AreEqual("Category", traits[0].Name);
         Assert.AreEqual("Unit", traits[0].Value);
     }
@@ -248,7 +248,7 @@ public class TestCasesFoundSerializationTests
         Assert.AreEqual(new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567890"), tc.Id);
         Assert.AreEqual(42, tc.LineNumber);
         var traits = tc.Traits.ToList();
-        Assert.AreEqual(2, traits.Count);
+        Assert.HasCount(2, traits);
         Assert.AreEqual("Category", traits[0].Name);
         Assert.AreEqual("Unit", traits[0].Value);
     }

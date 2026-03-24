@@ -201,7 +201,7 @@ public class StartTestExecutionWithSourcesSerializationTests
         Assert.IsNotNull(result.AdapterSourceMap);
         Assert.IsTrue(result.AdapterSourceMap.ContainsKey("executor://MSTestAdapter/v2"));
         var sources = result.AdapterSourceMap["executor://MSTestAdapter/v2"].ToList();
-        Assert.AreEqual(2, sources.Count);
+        Assert.HasCount(2, sources);
         Assert.AreEqual("Contoso.Math.Tests.dll", sources[0]);
         Assert.AreEqual("Contoso.Core.Tests.dll", sources[1]);
         Assert.AreEqual(
