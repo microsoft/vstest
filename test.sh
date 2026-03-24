@@ -14,4 +14,4 @@ done
 
 scriptroot="$( cd -P "$( dirname "$source" )" && pwd )"
 export DOTNET_ROOT="$scriptroot/.dotnet"
-"$scriptroot/eng/common/build.sh" --test $@
+"$scriptroot/eng/common/build.sh" --test "$@"

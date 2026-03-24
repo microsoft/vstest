@@ -13,5 +13,7 @@ while [[ -h $source ]]; do
 done
 
 scriptroot="$( cd -P "$( dirname "$source" )" && pwd )"
-export DOTNET_ROOT="$scriptroot/.dotnet"
+if [[ -z "${DOTNET_ROOT:-}" && -d "$scriptroot/.dotnet" ]]; then
+  export DOTNET_ROOT="$scriptroot/.dotnet"
+fi
 "$scriptroot/eng/common/build.sh" --build --restore $@
