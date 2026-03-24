@@ -13,4 +13,5 @@ while [[ -h $source ]]; do
 done
 
 scriptroot="$( cd -P "$( dirname "$source" )" && pwd )"
+export DOTNET_ROOT="$scriptroot/.dotnet"
 "$scriptroot/eng/common/build.sh" --build --restore $@
