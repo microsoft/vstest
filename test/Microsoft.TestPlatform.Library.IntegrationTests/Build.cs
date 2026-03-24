@@ -22,4 +22,10 @@ public static class Build
 
         IntegrationTestBuild.BuildTestAssetsForIntegrationTests(testContext);
     }
+
+    [AssemblyCleanup]
+    public static void AssemblyCleanup()
+    {
+        IntegrationTestBuild.CleanupTestAssets();
+    }
 }
