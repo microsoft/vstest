@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
@@ -53,6 +54,7 @@ internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
     private readonly bool _isNetCoreRunner;
     private readonly string? _dotnetExePath;
     private readonly ManualResetEvent _processExitedEvent = new(false);
+    private readonly StringBuilder _vstestConsoleError = new StringBuilder();
     private Process? _process;
 
     private bool _vstestConsoleStarted;
@@ -62,7 +64,13 @@ internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
     internal IFileHelper FileHelper { get; set; }
 
     /// <inheritdoc/>
-    public int ProcessId { get; set; }
+    public int ProcessId { get; set; } = -1;
+
+    /// <inheritdoc/>
+    public string ErrorOutput { get => _vstestConsoleError.ToString(); }
+
+    /// <inheritdoc/>
+    public int ExitCode { get; set; } = -1;
 
     /// <inheritdoc/>
     public event EventHandler? ProcessExited;
@@ -105,6 +113,10 @@ internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
     /// </summary>
     public void StartProcess(ConsoleParameters consoleParameters)
     {
+        ProcessId = -1;
+        ExitCode = -1;
+        _vstestConsoleError.Clear();
+
         var consoleRunnerPath = GetConsoleRunner();
 
         // The console runner path we retrieve might have been escaped so we need to remove the
@@ -221,6 +233,7 @@ internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
         {
             _processExitedEvent.Set();
             _vstestConsoleExited = true;
+            ExitCode = ((Process)sender!).ExitCode;
             ProcessExited?.Invoke(sender, e);
         }
     }
@@ -230,6 +243,7 @@ internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
         if (e.Data != null)
         {
             EqtTrace.Error(e.Data);
+            _vstestConsoleError.AppendLine(e.Data);
         }
     }
 

@@ -22,6 +22,13 @@
         <target state="translated">Se ha anulado la detección de pruebas activa. Motivo: {0}</target>
         <note />
       </trans-unit>
+      <trans-unit id="ConnectionTimeoutWithErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+{5}</source>
+        <target state="new">{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+{5}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test host process.</source>
         <target state="translated">No se puede establecer comunicación con el proceso del host de pruebas.</target>
@@ -43,8 +50,8 @@
         <note />
       </trans-unit>
       <trans-unit id="ConnectionTimeoutErrorMessage">
-        <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</source>
-        <target state="translated">El proceso {0} no pudo conectar con el proceso {1} después de {2} segundos. Esto puede deberse a la lentitud de la máquina, configure la variable de entorno {3} para aumentar el tiempo de espera.</target>
+        <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout. The process  was still running when this message was reported.</source>
+        <target state="needs-review-translation">El proceso {0} no pudo conectar con el proceso {1} después de {2} segundos. Esto puede deberse a la lentitud de la máquina, configure la variable de entorno {3} para aumentar el tiempo de espera.</target>
         <note />
       </trans-unit>
       <trans-unit id="TestHostProcessCrashed">

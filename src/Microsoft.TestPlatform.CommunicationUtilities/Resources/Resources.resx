@@ -139,7 +139,7 @@
     <value>Failed to negotiate protocol, waiting for response timed out after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</value>
   </data>
   <data name="ConnectionTimeoutErrorMessage" xml:space="preserve">
-    <value>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</value>
+    <value>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout. The process  was still running when this message was reported.</value>
   </data>
   <data name="TestHostProcessCrashed" xml:space="preserve">
     <value>Test host process crashed</value>
@@ -149,5 +149,9 @@
   </data>
   <data name="AbortedTestDiscoveryWithReason" xml:space="preserve">
     <value>The active test discovery was aborted. Reason: {0}</value>
+  </data>
+  <data name="ConnectionTimeoutWithErrorMessage" xml:space="preserve">
+    <value>{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+{5}</value>
   </data>
 </root>

@@ -22,6 +22,13 @@
         <target state="translated">Die aktive Testermittlung wurde abgebrochen. Grund: {0}</target>
         <note />
       </trans-unit>
+      <trans-unit id="ConnectionTimeoutWithErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+{5}</source>
+        <target state="new">{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+{5}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test host process.</source>
         <target state="translated">Die Kommunikation mit dem Testhostprozess ist nicht möglich.</target>
@@ -43,8 +50,8 @@
         <note />
       </trans-unit>
       <trans-unit id="ConnectionTimeoutErrorMessage">
-        <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</source>
-        <target state="translated">Fehler beim Herstellen einer Verbindung des Prozesses "{0}" mit dem Prozess "{1}" nach {2} Sekunden. Möglicherweise ist der Computer langsam. Legen Sie die Umgebungsvariable "{3}" fest, um den Timeoutwert zu erhöhen.</target>
+        <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout. The process  was still running when this message was reported.</source>
+        <target state="needs-review-translation">Fehler beim Herstellen einer Verbindung des Prozesses "{0}" mit dem Prozess "{1}" nach {2} Sekunden. Möglicherweise ist der Computer langsam. Legen Sie die Umgebungsvariable "{3}" fest, um den Timeoutwert zu erhöhen.</target>
         <note />
       </trans-unit>
       <trans-unit id="TestHostProcessCrashed">

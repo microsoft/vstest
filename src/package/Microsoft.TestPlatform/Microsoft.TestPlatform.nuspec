@@ -74,6 +74,7 @@
     <file src="net48\Microsoft.VisualStudio.TestPlatform.Common.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="net48\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
     <file src="net48\System.Text.Json.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Text.Json.dll" />
+    <file src="net48\System.Text.Encodings.Web.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Text.Encodings.Web.dll" />
 
     <!-- This is needed by System.Reflection.Metadata and its dependencies. -->
     <file src="net48\System.Reflection.Metadata.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Reflection.Metadata.dll" />

@@ -22,6 +22,13 @@
         <target state="translated">La découverte de tests active a été abandonnée. Raison : {0}</target>
         <note />
       </trans-unit>
+      <trans-unit id="ConnectionTimeoutWithErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+{5}</source>
+        <target state="new">{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+{5}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test host process.</source>
         <target state="translated">Impossible de communiquer avec le processus hôte du test.</target>
@@ -43,8 +50,8 @@
         <note />
       </trans-unit>
       <trans-unit id="ConnectionTimeoutErrorMessage">
-        <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</source>
-        <target state="translated">Le processus {0} n’a pas réussi à se connecter au processus {1} après {2} secondes. Cette situation peut se produire à cause de la lenteur de la machine. Définissez la variable d’environnement {3} de sorte à augmenter le délai d’expiration.</target>
+        <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout. The process  was still running when this message was reported.</source>
+        <target state="needs-review-translation">Le processus {0} n’a pas réussi à se connecter au processus {1} après {2} secondes. Cette situation peut se produire à cause de la lenteur de la machine. Définissez la variable d’environnement {3} de sorte à augmenter le délai d’expiration.</target>
         <note />
       </trans-unit>
       <trans-unit id="TestHostProcessCrashed">
