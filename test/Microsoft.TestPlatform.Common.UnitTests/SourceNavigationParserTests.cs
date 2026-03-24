@@ -26,7 +26,7 @@ public class SourceNavigationParserTests
 
         var result = SourceNavigationParser.FindMethodLocations(lines, "MyMethod");
 
-        Assert.AreEqual(1, result.Count);
+        Assert.ContainsSingle(result);
         Assert.AreEqual(4, result[0].SignatureLine); // 1-based: "    public void MyMethod()"
         Assert.AreEqual(5, result[0].BodyStartLine); // 1-based: "    {"
     }
@@ -50,7 +50,7 @@ public class SourceNavigationParserTests
 
         var result = SourceNavigationParser.FindMethodLocations(lines, "OverLoaded");
 
-        Assert.AreEqual(2, result.Count);
+        Assert.HasCount(2, result);
         Assert.AreEqual(3, result[0].SignatureLine);
         Assert.AreEqual(4, result[0].BodyStartLine);
         Assert.AreEqual(7, result[1].SignatureLine);
@@ -73,7 +73,7 @@ public class SourceNavigationParserTests
 
         var result = SourceNavigationParser.FindMethodBodyStartLines(lines, "MyMethod");
 
-        Assert.AreEqual(1, result.Count);
+        Assert.ContainsSingle(result);
         Assert.AreEqual(4, result[0]); // 1-based: line "    {"
     }
 
@@ -94,7 +94,7 @@ public class SourceNavigationParserTests
 
         var result = SourceNavigationParser.FindMethodBodyStartLines(lines, "PassTestMethod1");
 
-        Assert.AreEqual(1, result.Count);
+        Assert.ContainsSingle(result);
         Assert.AreEqual(5, result[0]); // 1-based: line "    {"
     }
 
@@ -112,7 +112,7 @@ public class SourceNavigationParserTests
 
         var result = SourceNavigationParser.FindMethodBodyStartLines(lines, "Inline");
 
-        Assert.AreEqual(1, result.Count);
+        Assert.ContainsSingle(result);
         Assert.AreEqual(3, result[0]); // 1-based: brace is on same line as signature
     }
 
@@ -135,7 +135,7 @@ public class SourceNavigationParserTests
 
         var result = SourceNavigationParser.FindMethodBodyStartLines(lines, "OverLoaded");
 
-        Assert.AreEqual(2, result.Count);
+        Assert.HasCount(2, result);
         Assert.AreEqual(4, result[0]); // first overload brace
         Assert.AreEqual(8, result[1]); // second overload brace
     }
@@ -155,7 +155,7 @@ public class SourceNavigationParserTests
 
         var result = SourceNavigationParser.FindMethodBodyStartLines(lines, "NotExist");
 
-        Assert.AreEqual(0, result.Count);
+        Assert.IsEmpty(result);
     }
 
     [TestMethod]
@@ -173,7 +173,7 @@ public class SourceNavigationParserTests
         // "MyMethod" followed by ' =' should not match (no '(' after name).
         var result = SourceNavigationParser.FindMethodBodyStartLines(lines, "MyMethod");
 
-        Assert.AreEqual(0, result.Count);
+        Assert.IsEmpty(result);
     }
 
     [TestMethod]
@@ -192,7 +192,7 @@ public class SourceNavigationParserTests
 
         var result = SourceNavigationParser.FindMethodBodyStartLines(lines, "AsyncTestMethod");
 
-        Assert.AreEqual(1, result.Count);
+        Assert.ContainsSingle(result);
         Assert.AreEqual(4, result[0]);
     }
 
@@ -235,7 +235,7 @@ public class SourceNavigationParserTests
         Assert.AreEqual(15, SourceNavigationParser.FindMethodBodyStartLines(lines, "AsyncTestMethod")[0]);
 
         var overloads = SourceNavigationParser.FindMethodBodyStartLines(lines, "OverLoadedMethod");
-        Assert.AreEqual(2, overloads.Count);
+        Assert.HasCount(2, overloads);
         Assert.AreEqual(20, overloads[0]);
         Assert.AreEqual(24, overloads[1]);
     }

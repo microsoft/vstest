@@ -24,6 +24,8 @@ public class SocketClientTests : SocketTestsBase, IDisposable
 
     private TcpClient? _tcpClient;
 
+    public TestContext TestContext { get; set; }
+
     public SocketClientTests()
     {
         _socketClient = new SocketClient();
@@ -49,8 +51,10 @@ public class SocketClientTests : SocketTestsBase, IDisposable
 
         _socketClient.Start(connectionInfo);
 
+#pragma warning disable MSTEST0049 // AcceptTcpClientAsync(CancellationToken) unavailable on .NET Framework
         var acceptClientTask = _tcpListener.AcceptTcpClientAsync();
         Assert.IsTrue(acceptClientTask.Wait(Timeout));
+#pragma warning restore MSTEST0049
         Assert.IsTrue(acceptClientTask.Result.Connected);
     }
 
@@ -142,8 +146,10 @@ public class SocketClientTests : SocketTestsBase, IDisposable
         var connectionInfo = StartLocalServer();
         _socketClient.Start(connectionInfo);
 
+#pragma warning disable MSTEST0049 // Use 'TestContext.CancellationToken' - AcceptTcpClientAsync/Wait overloads unavailable on .NET Framework
         var acceptClientTask = _tcpListener.AcceptTcpClientAsync();
         if (acceptClientTask.Wait(TimeSpan.FromMilliseconds(1000)))
+#pragma warning restore MSTEST0049
         {
             _tcpClient = acceptClientTask.Result;
             waitEvent.WaitOne(1000);

@@ -280,7 +280,7 @@ public class RunConfigurationTests
     {
         var runConfiguration = new RunConfiguration { DesignMode = true };
 
-        StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<DesignMode>True</DesignMode>");
+        Assert.Contains("<DesignMode>True</DesignMode>", runConfiguration.ToXml().InnerXml);
     }
 
     [DataRow(true)]
@@ -324,7 +324,7 @@ public class RunConfigurationTests
     public void RunConfigurationToXmlShouldProvideCollectSourceInformationSameAsDesignMode(bool val)
     {
         var runConfiguration = new RunConfiguration { DesignMode = val };
-        StringAssert.Contains(runConfiguration.ToXml().InnerXml.ToUpperInvariant(), $"<CollectSourceInformation>{val}</CollectSourceInformation>".ToUpperInvariant());
+        Assert.Contains($"<CollectSourceInformation>{val}</CollectSourceInformation>".ToUpperInvariant(), runConfiguration.ToXml().InnerXml.ToUpperInvariant());
     }
 
     [TestMethod]
@@ -332,7 +332,7 @@ public class RunConfigurationTests
     {
         var runConfiguration = new RunConfiguration { ExecutionThreadApartmentState = PlatformApartmentState.STA };
 
-        StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<ExecutionThreadApartmentState>STA</ExecutionThreadApartmentState>");
+        Assert.Contains("<ExecutionThreadApartmentState>STA</ExecutionThreadApartmentState>", runConfiguration.ToXml().InnerXml);
     }
 
     [TestMethod]
