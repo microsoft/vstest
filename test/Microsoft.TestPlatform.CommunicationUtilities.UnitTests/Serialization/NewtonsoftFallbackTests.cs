@@ -474,7 +474,7 @@ public class NewtonsoftFallbackTests
         Assert.IsFalse(result.IsAborted);
         Assert.IsNotNull(result.LastDiscoveredTests);
         var tests = result.LastDiscoveredTests.ToList();
-        Assert.HasCount(tests, 1);
+        Assert.HasCount(1, tests);
         Assert.AreEqual("Contoso.Math.Tests.CalculatorTests.SubtractTest", tests[0].FullyQualifiedName);
         Assert.AreEqual(new Uri("executor://MSTestAdapter/v2"), tests[0].ExecutorUri);
         Assert.AreEqual("Contoso.Math.Tests.dll", tests[0].Source);
@@ -494,7 +494,7 @@ public class NewtonsoftFallbackTests
 
         Assert.IsNotNull(result.LastRunTests);
         var newResults = result.LastRunTests.NewTestResults!.ToList();
-        Assert.HasCount(newResults, 1);
+        Assert.HasCount(1, newResults);
         Assert.AreEqual(TestOutcome.Passed, newResults[0].Outcome);
         Assert.AreEqual("AddTest(1, 2, 3)", newResults[0].DisplayName);
         Assert.AreEqual("Contoso.Math.Tests.CalculatorTests.AddTest",
@@ -510,7 +510,7 @@ public class NewtonsoftFallbackTests
         Assert.IsNotNull(result.TestRunChangedArgs);
 
         var newResults = result.TestRunChangedArgs.NewTestResults!.ToList();
-        Assert.HasCount(newResults, 1);
+        Assert.HasCount(1, newResults);
         Assert.AreEqual(TestOutcome.Failed, newResults[0].Outcome);
         Assert.AreEqual("Assert.AreEqual failed. Expected:<0.5>. Actual:<0>.",
             newResults[0].ErrorMessage);
@@ -522,7 +522,7 @@ public class NewtonsoftFallbackTests
         Assert.AreEqual(1, result.TestRunChangedArgs.TestRunStatistics.ExecutedTests);
 
         var activeTests = result.TestRunChangedArgs.ActiveTests!.ToList();
-        Assert.HasCount(activeTests, 1);
+        Assert.HasCount(1, activeTests);
         Assert.AreEqual("Contoso.Math.Tests.CalculatorTests.MultiplyTest",
             activeTests[0].FullyQualifiedName);
     }
@@ -533,7 +533,7 @@ public class NewtonsoftFallbackTests
         Assert.IsNotNull(result.AdapterSourceMap);
         Assert.IsTrue(result.AdapterSourceMap.ContainsKey("executor://MSTestAdapter/v2"));
         var sources = result.AdapterSourceMap["executor://MSTestAdapter/v2"].ToList();
-        Assert.HasCount(sources, 2);
+        Assert.HasCount(2, sources);
         Assert.AreEqual("Contoso.Math.Tests.dll", sources[0]);
         Assert.AreEqual("Contoso.Core.Tests.dll", sources[1]);
         Assert.AreEqual(

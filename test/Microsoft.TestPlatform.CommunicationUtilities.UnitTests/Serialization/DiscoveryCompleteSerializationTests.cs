@@ -274,7 +274,7 @@ public class DiscoveryCompleteSerializationTests
         Assert.IsFalse(result.IsAborted);
         Assert.IsNotNull(result.LastDiscoveredTests);
         var tests = result.LastDiscoveredTests.ToList();
-        Assert.HasCount(tests, 1);
+        Assert.HasCount(1, tests);
         Assert.AreEqual("Contoso.Math.Tests.CalculatorTests.SubtractTest", tests[0].FullyQualifiedName);
         Assert.AreEqual(new Uri("executor://MSTestAdapter/v2"), tests[0].ExecutorUri);
         Assert.AreEqual("Contoso.Math.Tests.dll", tests[0].Source);
