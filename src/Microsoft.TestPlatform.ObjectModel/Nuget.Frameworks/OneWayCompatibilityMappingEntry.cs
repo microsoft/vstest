@@ -51,7 +51,7 @@ namespace NuGetClone.Frameworks
 
         public override bool Equals(object? obj)
         {
-            return Equals(obj as OneWayCompatibilityMappingEntry);
+            return obj is OneWayCompatibilityMappingEntry other && Equals(other);
         }
 
         public override int GetHashCode()
