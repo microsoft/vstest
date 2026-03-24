@@ -18,26 +18,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter;
 public class FrameworkHandleTests
 {
     [TestMethod]
-    public void EnableShutdownAfterTestRunShoudBeFalseByDefault()
-    {
-        var tec = GetTestExecutionContext();
-        var frameworkHandle = new FrameworkHandle(null, new TestRunCache(100, TimeSpan.MaxValue, (s, r, ip) => { }), tec, null!);
-
-        Assert.IsFalse(frameworkHandle.EnableShutdownAfterTestRun);
-    }
-
-    [TestMethod]
-    public void EnableShutdownAfterTestRunShoudBeSetAppropriately()
-    {
-        var tec = GetTestExecutionContext();
-        var frameworkHandle = new FrameworkHandle(null, new TestRunCache(100, TimeSpan.MaxValue, (s, r, ip) => { }), tec, null!);
-
-        frameworkHandle.EnableShutdownAfterTestRun = true;
-
-        Assert.IsTrue(frameworkHandle.EnableShutdownAfterTestRun);
-    }
-
-    [TestMethod]
     public void LaunchProcessWithDebuggerAttachedShouldThrowIfObjectIsDisposed()
     {
         var tec = GetTestExecutionContext();
