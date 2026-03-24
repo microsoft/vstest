@@ -597,27 +597,37 @@ public class HtmlLoggerTests
         // Verifies fix for https://github.com/microsoft/vstest/issues/15404
         // The temp XML file name should use millisecond-precision timestamps to avoid
         // collisions when multiple vstest processes run in parallel.
-        _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            .Returns(new Mock<Stream>().Object);
-
-        _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
-
-        Assert.IsNotNull(_htmlLogger.XmlFilePath);
-        // The filename should match the pattern with milliseconds: yyyyMMdd_HHmmssfff
-        // e.g., TestResult_user_MACHINE_20260304_153012345.xml
-        // The time part (HHmmssfff) should be 9 chars; previously it was 6 chars (HHmmss).
-        var fileName = Path.GetFileNameWithoutExtension(_htmlLogger.XmlFilePath);
-        var parts = fileName.Split('_');
-        // The last part is the time portion, possibly with an iteration suffix like [7]
-        var timePart = parts[parts.Length - 1];
-        var bracketIdx = timePart.IndexOf('[');
-        if (bracketIdx >= 0)
+        string? createdFilePath = null;
+        try
         {
-            timePart = timePart.Substring(0, bracketIdx);
-        }
+            _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
-        Assert.AreEqual(9, timePart.Length,
-            $"Time portion of timestamp should be 9 chars (HHmmssfff) but was '{timePart}' (length {timePart.Length}) in path: '{_htmlLogger.XmlFilePath}'");
+            Assert.IsNotNull(_htmlLogger.XmlFilePath);
+            createdFilePath = _htmlLogger.XmlFilePath;
+
+            // The filename should match the pattern with milliseconds: yyyyMMdd_HHmmssfff
+            // e.g., TestResult_user_MACHINE_20260304_153012345.xml
+            // The time part (HHmmssfff) should be 9 chars; previously it was 6 chars (HHmmss).
+            var fileName = Path.GetFileNameWithoutExtension(_htmlLogger.XmlFilePath);
+            var parts = fileName.Split('_');
+            // The last part is the time portion, possibly with an iteration suffix like [7]
+            var timePart = parts[parts.Length - 1];
+            var bracketIdx = timePart.IndexOf('[');
+            if (bracketIdx >= 0)
+            {
+                timePart = timePart.Substring(0, bracketIdx);
+            }
+
+            Assert.AreEqual(9, timePart.Length,
+                $"Time portion of timestamp should be 9 chars (HHmmssfff) but was '{timePart}' (length {timePart.Length}) in path: '{_htmlLogger.XmlFilePath}'");
+        }
+        finally
+        {
+            if (!string.IsNullOrEmpty(createdFilePath) && File.Exists(createdFilePath))
+            {
+                File.Delete(createdFilePath);
+            }
+        }
     }
 
     private static TestCase CreateTestCase(string testCaseName)

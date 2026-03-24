@@ -367,7 +367,7 @@ public class HtmlLogger : ITestLoggerWithParameters
 
     private static string FormatDateTimeForRunName(DateTime timeStamp)
     {
-        return timeStamp.ToString("yyyyMMdd_HHmmssfff", DateTimeFormatInfo.InvariantInfo);
+        return timeStamp.ToString("yyyyMMdd_HHmmss.fffffff", DateTimeFormatInfo.InvariantInfo);
     }
 
     /// <summary>
