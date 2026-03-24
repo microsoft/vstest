@@ -43,6 +43,8 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
     private bool _sessionStarted;
 
+    private bool _sessionEnded;
+
     /// <summary>
     /// Path to additional extensions to reinitialize vstest.console
     /// </summary>
@@ -651,6 +653,12 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void EndSession()
     {
+        if (_sessionEnded)
+        {
+            return;
+        }
+        _sessionEnded = true;
+
         EqtTrace.Info($"VsTestConsoleWrapper.EndSession: Ending VsTestConsoleWrapper session - process id:{_vstestConsoleProcessManager.ProcessId}");
 
         _requestSender.EndSession();

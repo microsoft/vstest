@@ -698,4 +698,15 @@ public class VsTestConsoleWrapperTests
         _mockRequestSender.Verify(rs => rs.Close(), Times.Once);
         _mockProcessManager.Verify(x => x.ShutdownProcess(), Times.Once);
     }
+
+    [TestMethod]
+    public void EndSessionCalledTwiceShouldNotThrow()
+    {
+        _consoleWrapper.EndSession();
+        _consoleWrapper.EndSession();
+
+        _mockRequestSender.Verify(rs => rs.EndSession(), Times.Once);
+        _mockRequestSender.Verify(rs => rs.Close(), Times.Once);
+        _mockProcessManager.Verify(x => x.ShutdownProcess(), Times.Once);
+    }
 }
