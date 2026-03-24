@@ -378,7 +378,7 @@ public class ExecutionCompleteSerializationTests
         Assert.AreEqual(Payload.TestRunCompleteArgs.IsAborted, result.TestRunCompleteArgs.IsAborted);
         Assert.IsNotNull(result.LastRunTests);
         var newResults = result.LastRunTests.NewTestResults!.ToList();
-        Assert.HasCount(newResults, 1);
+        Assert.HasCount(1, newResults);
         Assert.AreEqual(TestOutcome.Passed, newResults[0].Outcome);
     }
 
@@ -447,7 +447,7 @@ public class ExecutionCompleteSerializationTests
         // LastRunTests
         Assert.IsNotNull(result.LastRunTests);
         var newResults = result.LastRunTests.NewTestResults!.ToList();
-        Assert.HasCount(newResults, 1);
+        Assert.HasCount(1, newResults);
         Assert.AreEqual(TestOutcome.Passed, newResults[0].Outcome);
         Assert.AreEqual("AddTest(1, 2, 3)", newResults[0].DisplayName);
         Assert.AreEqual("Contoso.Math.Tests.CalculatorTests.AddTest", newResults[0].TestCase.FullyQualifiedName);

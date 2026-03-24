@@ -200,7 +200,7 @@ public class JsoniteComparisonTests
 
         Assert.IsInstanceOfType(payload, typeof(JsonArray), "TestCasesFound payload should be an array");
         var arr = (JsonArray)payload;
-        Assert.HasCount(arr, 1, "Should contain 1 test case");
+        Assert.HasCount(1, arr, "Should contain 1 test case");
 
         var tc = arr[0] as JsonObject;
         Assert.IsNotNull(tc, "Test case should be a JsonObject");
