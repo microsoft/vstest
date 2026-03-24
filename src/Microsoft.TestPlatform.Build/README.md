@@ -4,7 +4,7 @@ Build tasks and targets for running tests with the Visual Studio Test Platform. 
 
 ## Usage
 
-This package is typically referenced indirectly through `Microsoft.NET.Test.Sdk`. Direct references are needed only for advanced build customization scenarios.
+This package is consumed by .NET SDK. Direct references are needed only for advanced build customization scenarios.
 
 ```xml
 <PackageReference Include="Microsoft.TestPlatform.Build" Version="x.y.z" />

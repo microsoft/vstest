@@ -1,13 +1,13 @@
 # Microsoft.TestPlatform.ObjectModel
 
-The object model for the Visual Studio Test Platform. This package provides the public API surface for creating test adapters, loggers, and other test platform extensions.
+The object model for the Visual Studio Test Platform. This package provides the public API surface for creating test adapters, loggers, and other test platform extensions. This package is typically used as a reference.
 
 ## Usage
 
 Add this package to your test adapter or extension project:
 
 ```xml
-<PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="x.y.z" />
+<PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="x.y.z" PrivateAssets="All" />
 ```
 
 ## Key Types

@@ -11,7 +11,7 @@ The C# SDK for the Visual Studio Test Platform protocol. Use this package to pro
 ## Example
 
 ```csharp
-var vstestConsolePath = "<path to vstest.console>";
+var vstestConsolePath = "<path to vstest.console.exe or .dll>";
 var consoleWrapper = new VsTestConsoleWrapper(vstestConsolePath);
 
 consoleWrapper.StartSession();

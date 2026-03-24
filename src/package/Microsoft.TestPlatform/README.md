@@ -8,7 +8,6 @@ The full set of binaries for the Visual Studio Test Platform (vstest). This pack
 <PackageReference Include="Microsoft.TestPlatform" Version="x.y.z" />
 ```
 
-> **Note:** Most test projects should reference `Microsoft.NET.Test.Sdk` instead, which provides a lighter-weight integration. This package is intended for scenarios that require the full test platform toolset.
 
 ## Links
 

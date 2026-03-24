@@ -8,7 +8,6 @@ A portable subset of binaries for the Visual Studio Test Platform (vstest). This
 <PackageReference Include="Microsoft.TestPlatform.Portable" Version="x.y.z" />
 ```
 
-> **Note:** Most test projects should reference `Microsoft.NET.Test.Sdk` instead. This package is intended for scenarios that require the portable test platform toolset directly.
 
 ## Links
 
