@@ -1,10 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -37,9 +39,12 @@ public class SerializationCompatibilityTests : AcceptanceTestBase
     /// </summary>
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource]
+    [RunnerCompatibilityDataSource(DebugVSTestConsole = true)]
     public void DiscoverTests_LatestRunner_WithOlderTesthosts(RunnerInfo runnerInfo)
     {
+#pragma warning disable RS0030 // Do not use banned APIs
+        Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "10");
+#pragma warning restore RS0030 // Do not use banned APIs
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var wrapper = GetVsTestConsoleWrapper();
