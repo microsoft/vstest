@@ -70,7 +70,12 @@
     <_MicrosoftVSSDKBuildToolsVersion_>17.14.2119</_MicrosoftVSSDKBuildToolsVersion_>
     <MicrosoftWin32RegistryVersion>5.0.0</MicrosoftWin32RegistryVersion>
     <NewtonsoftJsonVersion>13.0.3</NewtonsoftJsonVersion>
-    <SystemTextJsonVersion>8.0.5</SystemTextJsonVersion>
+    <!--
+      System.Text.Json sets the version to <major>.0.0.0 for netstandard and net, but to exact version for netframework. Which makes it really difficult for us to ensure we get the right version when doing binding redirects.
+      Use a recent stable version that has the same major version for all TFMs to avoid issues with binding redirects. This is not sustainable, as it would allow us to update only once in major release, but it helps to get stuff
+      unblocked.
+    -->
+    <SystemTextJsonVersion>10.0.5</SystemTextJsonVersion>
     <SystemCollectionsImmutableVersion>9.0.11</SystemCollectionsImmutableVersion>
     <SystemMemoryVersion>4.5.5</SystemMemoryVersion>
     <SystemReflectionMetadataVersion>8.0.0</SystemReflectionMetadataVersion>

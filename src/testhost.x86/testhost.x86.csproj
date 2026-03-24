@@ -49,6 +49,10 @@
     </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="$(SystemTextJsonVersion)" />
+  </ItemGroup>
+
   <ItemGroup Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)')) AND '$(OS)' != 'Windows_NT' ">
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
