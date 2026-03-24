@@ -29,8 +29,8 @@ public class IntegrationTestBuild : IntegrationTestBase
 
     // Short-lived mutex held only during the build phase to serialize builds.
     private static Mutex? s_buildMutex;
-    // Signaled once the build is complete so other assemblies can proceed to tests immediately.
-    private static EventWaitHandle? s_buildCompleteEvent;
+    // Path to a marker file used to signal that the build is complete (cross-platform replacement for named EventWaitHandle).
+    private static string? s_buildCompleteMarkerPath;
 
     public static void BuildTestAssetsForIntegrationTests(TestContext context)
     {
@@ -51,10 +51,9 @@ public class IntegrationTestBuild : IntegrationTestBase
             .Replace('\\', '-').Replace('/', '-').Replace(':', '-');
 
         s_buildMutex = new Mutex(initiallyOwned: false, baseName + "_Build");
-        s_buildCompleteEvent = new EventWaitHandle(
-            initialState: false,
-            mode: EventResetMode.ManualReset,
-            name: baseName + "_BuildComplete");
+        s_buildCompleteMarkerPath = Path.Combine(
+            IntegrationTestEnvironment.ArtifactsTempDirectory,
+            baseName + "_BuildComplete.marker");
 
         // Acquire the build mutex to serialize the build phase.
         try
@@ -69,14 +68,17 @@ public class IntegrationTestBuild : IntegrationTestBase
         catch (AbandonedMutexException)
         {
             // Previous holder crashed — we own the mutex now and need to rebuild.
-            s_buildCompleteEvent.Reset();
+            if (s_buildCompleteMarkerPath != null && File.Exists(s_buildCompleteMarkerPath))
+            {
+                File.Delete(s_buildCompleteMarkerPath);
+            }
             Debug.WriteLine("Previous build was interrupted (abandoned mutex), rebuilding.");
         }
 
         try
         {
             // If another assembly already completed the build, just proceed to tests.
-            if (s_buildCompleteEvent.WaitOne(0))
+            if (File.Exists(s_buildCompleteMarkerPath))
             {
                 Debug.WriteLine("Build already completed by another process, proceeding to tests.");
                 return;
@@ -108,7 +110,7 @@ public class IntegrationTestBuild : IntegrationTestBase
             Debug.WriteLine($"Copying and patching dotnet took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
 
             // Signal that the build is complete so waiting assemblies can proceed to tests.
-            s_buildCompleteEvent.Set();
+            File.WriteAllText(s_buildCompleteMarkerPath!, DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture));
             Debug.WriteLine("Build completed, signaled other processes.");
         }
         finally
@@ -122,8 +124,7 @@ public class IntegrationTestBuild : IntegrationTestBase
     {
         s_buildMutex?.Dispose();
         s_buildMutex = null;
-        s_buildCompleteEvent?.Dispose();
-        s_buildCompleteEvent = null;
+        s_buildCompleteMarkerPath = null;
     }
 
     private static void BuildTestAssets(string nugetCache)
