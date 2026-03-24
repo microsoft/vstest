@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -47,6 +47,7 @@ public class JsonDataSerializer : IDataSerializer
             Converters =
             {
                 new TestPropertyConverter(),
+                new ObjectConverter(),
                 new AttachmentSetConverter(),
                 new UriDataAttachmentConverter(),
                 new TestExecutionContextConverter(),
@@ -75,6 +76,7 @@ public class JsonDataSerializer : IDataSerializer
             Converters =
             {
                 new TestPropertyConverter(),
+                new ObjectConverter(),
                 new TestCaseConverterV2(),
                 new TestResultConverterV2(),
                 new TestObjectConverter(),
@@ -108,6 +110,7 @@ public class JsonDataSerializer : IDataSerializer
             Converters =
             {
                 new TestPropertyConverter(),
+                new ObjectConverter(),
                 new TestCaseConverter(),
                 new TestResultConverter(),
                 new TestObjectConverter(),
@@ -141,6 +144,7 @@ public class JsonDataSerializer : IDataSerializer
             Converters =
             {
                 new TestPropertyConverter(),
+                new ObjectConverter(),
                 new TestCaseConverterV2(),
                 new TestResultConverterV2(),
                 new TestObjectConverter(),
