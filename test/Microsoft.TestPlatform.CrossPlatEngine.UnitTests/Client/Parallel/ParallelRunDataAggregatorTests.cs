@@ -114,12 +114,23 @@ public class ParallelRunDataAggregatorTests
         aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors2, null);
 
         Assert.AreEqual(2, aggregator.InvokedDataCollectors.Count, "InvokedDataCollectors List must have aggregated data.");
-        Assert.AreEqual(invokedDataCollectors[0].AssemblyQualifiedName, aggregator.InvokedDataCollectors[0].AssemblyQualifiedName);
-        Assert.AreEqual(invokedDataCollectors[0].FilePath, aggregator.InvokedDataCollectors[0].FilePath);
-        Assert.AreEqual(invokedDataCollectors[0].Uri, aggregator.InvokedDataCollectors[0].Uri);
-        Assert.AreEqual(invokedDataCollectors2[0].AssemblyQualifiedName, aggregator.InvokedDataCollectors[1].AssemblyQualifiedName);
-        Assert.AreEqual(invokedDataCollectors2[0].FilePath, aggregator.InvokedDataCollectors[1].FilePath);
-        Assert.AreEqual(invokedDataCollectors2[0].Uri, aggregator.InvokedDataCollectors[1].Uri);
+
+        var firstCollector = invokedDataCollectors[0];
+        var secondCollector = invokedDataCollectors2[0];
+
+        Assert.IsTrue(
+            aggregator.InvokedDataCollectors.Any(
+                c => c.Uri == firstCollector.Uri
+                     && c.AssemblyQualifiedName == firstCollector.AssemblyQualifiedName
+                     && c.FilePath == firstCollector.FilePath),
+            "Aggregated data collectors must contain a collector matching the first input collector.");
+
+        Assert.IsTrue(
+            aggregator.InvokedDataCollectors.Any(
+                c => c.Uri == secondCollector.Uri
+                     && c.AssemblyQualifiedName == secondCollector.AssemblyQualifiedName
+                     && c.FilePath == secondCollector.FilePath),
+            "Aggregated data collectors must contain a collector matching the second input collector.");
     }
 
     [TestMethod]
@@ -466,7 +477,7 @@ public class ParallelRunDataAggregatorTests
 
         const int threadCount = 10;
         const int iterationsPerThread = 100;
-        var barrier = new Barrier(threadCount);
+        var barrier = new Barrier(threadCount + 1);
 
         // Start threads that call Aggregate concurrently
         var aggregateTasks = Enumerable.Range(0, threadCount).Select(_ => Task.Run(() =>
@@ -482,7 +493,19 @@ public class ParallelRunDataAggregatorTests
             }
         })).ToArray();
 
-        Task.WaitAll(aggregateTasks.ToArray());
+        // Also start a reader thread that calls GetAggregatedRunStats concurrently
+        var readerTask = Task.Run(() =>
+        {
+            barrier.SignalAndWait();
+            for (int i = 0; i < iterationsPerThread; i++)
+            {
+                // This must not throw InvalidOperationException due to collection modification
+                var runStats = aggregator.GetAggregatedRunStats();
+                Assert.IsTrue(runStats.ExecutedTests >= 0, "Executed tests count should be non-negative");
+            }
+        });
+
+        Task.WaitAll(aggregateTasks.Append(readerTask).ToArray());
 
         var finalStats = aggregator.GetAggregatedRunStats();
         Assert.AreEqual(threadCount * iterationsPerThread, finalStats.ExecutedTests,

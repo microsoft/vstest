@@ -29,6 +29,8 @@ internal class ParallelRunDataAggregator
 
     private readonly object _dataUpdateSyncObject = new();
 
+    private readonly HashSet<InvokedDataCollector> _invokedDataCollectorsSet = new();
+
     public ParallelRunDataAggregator(string runSettingsXml)
     {
         RunSettings = runSettingsXml ?? throw new ArgumentNullException(nameof(runSettingsXml));
@@ -74,20 +76,24 @@ internal class ParallelRunDataAggregator
     {
         var testOutcomeMap = new Dictionary<TestOutcome, long>();
         long totalTests = 0;
-        if (_testRunStatsList.Count > 0)
+        lock (_dataUpdateSyncObject)
         {
-            foreach (var runStats in _testRunStatsList)
+            if (_testRunStatsList.Count > 0)
             {
-                // TODO: we get nullref here if the stats are empty.
-                foreach (var outcome in runStats.Stats!.Keys)
+                foreach (var runStats in _testRunStatsList)
                 {
-                    if (!testOutcomeMap.ContainsKey(outcome))
+                    // TODO: we get nullref here if the stats are empty.
+                    foreach (var kvp in runStats.Stats!)
                     {
-                        testOutcomeMap.Add(outcome, 0);
+                        if (!testOutcomeMap.TryGetValue(kvp.Key, out long currentCount))
+                        {
+                            currentCount = 0;
+                        }
+
+                        testOutcomeMap[kvp.Key] = currentCount + kvp.Value;
                     }
-                    testOutcomeMap[outcome] += runStats.Stats[outcome];
+                    totalTests += runStats.ExecutedTests;
                 }
-                totalTests += runStats.ExecutedTests;
             }
         }
 
@@ -168,7 +174,7 @@ internal class ParallelRunDataAggregator
             {
                 foreach (var invokedDataCollector in invokedDataCollectors)
                 {
-                    if (!InvokedDataCollectors.Contains(invokedDataCollector))
+                    if (_invokedDataCollectorsSet.Add(invokedDataCollector))
                     {
                         InvokedDataCollectors.Add(invokedDataCollector);
                     }
@@ -198,9 +204,9 @@ internal class ParallelRunDataAggregator
                 var newValue = Convert.ToDouble(metric.Value, CultureInfo.InvariantCulture);
 
                 _metricsAggregator.AddOrUpdate(
-                                    metric.Key,
-                                    newValue,
-                                    (_, oldValue) => newValue + Convert.ToDouble(oldValue, CultureInfo.InvariantCulture));
+                    metric.Key,
+                    newValue,
+                    (_, oldValue) => newValue + Convert.ToDouble(oldValue, CultureInfo.InvariantCulture));
             }
         }
     }
