@@ -114,21 +114,10 @@ public class CollectArgumentProcessorTests
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
 
-        bool exceptionThrown = false;
-
-        try
-        {
-            _executor.Initialize("MyDataCollector");
-        }
-        catch (SettingsException ex)
-        {
-            exceptionThrown = true;
-            Assert.AreEqual(
-                "--Collect|/Collect:\"MyDataCollector\" is not supported if test run is configured using testsettings.",
-                ex.Message);
-        }
-
-        Assert.IsTrue(exceptionThrown, "Initialize should throw exception");
+        var ex = Assert.ThrowsExactly<SettingsException>(() => _executor.Initialize("MyDataCollector"));
+        Assert.AreEqual(
+            "--Collect|/Collect:\"MyDataCollector\" is not supported if test run is configured using testsettings.",
+            ex.Message);
     }
 
     [TestMethod]

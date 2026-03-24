@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.Library.IntegrationTests;
 
-[TestClass]
 [TestCategory("Windows-Review")]
 // TODO: but where are some tests? :D
 public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase

@@ -72,7 +72,7 @@ public class PostProcessingTests : AcceptanceTestBase
         while (!streamReader.EndOfStream)
         {
             string line = streamReader.ReadLine();
-            Assert.IsTrue(line.StartsWith("SessionEnded_Handler_"));
+            Assert.StartsWith(line, "SessionEnded_Handler_");
             fileContent.Add(line);
         }
 

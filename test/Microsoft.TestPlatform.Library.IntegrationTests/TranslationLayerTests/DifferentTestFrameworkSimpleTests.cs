@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
@@ -56,12 +56,12 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
             _runEventHandler);
 
         var testResult = _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("PassTestMethod1")).First();
-        StringAssert.EndsWith(testResult.TestCase.FullyQualifiedName, "PassTestMethod1");
+        Assert.EndsWith(testResult.TestCase.FullyQualifiedName, "PassTestMethod1");
 
         // Assert
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
+        Assert.HasCount(2, _runEventHandler.TestResults, _runEventHandler.ToString());
+        Assert.ContainsSingle(_runEventHandler.TestResults.Where(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
+        Assert.ContainsSingle(_runEventHandler.TestResults.Where(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
 
         var nunitSourceFile = SourceAssert.FindSourceFile("NUTestProject.dll", "PassTestMethod1");
         SourceAssert.LineIsAtMethodBodyStart(nunitSourceFile, "PassTestMethod1", testResult.TestCase.LineNumber);
@@ -92,12 +92,12 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
             _runEventHandler);
 
         var testResult = _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("xUnitTestProject.Class1.PassTestMethod1")).First();
-        StringAssert.EndsWith(testResult.TestCase.FullyQualifiedName, "PassTestMethod1");
+        Assert.EndsWith(testResult.TestCase.FullyQualifiedName, "PassTestMethod1");
 
         // Assert
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
+        Assert.HasCount(2, _runEventHandler.TestResults, _runEventHandler.ToString());
+        Assert.ContainsSingle(_runEventHandler.TestResults.Where(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
+        Assert.ContainsSingle(_runEventHandler.TestResults.Where(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
 
         var xunitSourceFile = SourceAssert.FindSourceFile("XUTestProject.dll", "PassTestMethod1");
         SourceAssert.LineIsAtMethodBodyStart(xunitSourceFile, "PassTestMethod1", testResult.TestCase.LineNumber);
@@ -129,8 +129,8 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
         var testCase = _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("TestMethod1"));
 
         // Assert
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
+        Assert.ContainsSingle(_runEventHandler.TestResults, _runEventHandler.ToString());
+        Assert.ContainsSingle(_runEventHandler.TestResults.Where(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         Assert.AreEqual(0, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
     }
 }

@@ -141,12 +141,12 @@ public class JobQueueTests
 
             // Allow other threads to execute and verify no jobs processed because the queue is paused.
             Thread.Sleep(0);
-            Assert.AreEqual(0, processedJobs.Count);
+            Assert.IsEmpty(processedJobs);
 
             queue.Resume();
         }
 
-        Assert.AreEqual(3, processedJobs.Count);
+        Assert.HasCount(3, processedJobs);
     }
 
     [TestMethod]
@@ -360,7 +360,7 @@ public class JobQueueTests
     }
 
     [TestMethod]
-    [Timeout(60000)]
+    [Timeout(60000, CooperativeCancellation = true)]
     public void TestDisposeUnblocksBlockedThreads()
     {
         var allowJobProcessingHandlerToProceed = new ManualResetEvent(false);
