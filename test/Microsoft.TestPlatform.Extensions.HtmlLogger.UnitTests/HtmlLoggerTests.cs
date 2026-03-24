@@ -591,6 +591,21 @@ public class HtmlLoggerTests
         Assert.AreEqual(0, _htmlLogger.TestRunDetails.Summary.PassPercentage);
     }
 
+    [TestMethod]
+    public void XmlFilePathShouldContainFractionalSecondsForCrossProcessUniqueness()
+    {
+        _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
+
+        Assert.IsNotNull(_htmlLogger.XmlFilePath);
+        var fileName = Path.GetFileNameWithoutExtension(_htmlLogger.XmlFilePath);
+
+        // The filename should contain a fractional-seconds timestamp: yyyyMMdd_HHmmss.fffffff
+        // e.g., TestResult_user_MACHINE_20260324_065512.1234567
+        StringAssert.Matches(fileName, new System.Text.RegularExpressions.Regex(
+            @"\d{8}_\d{6}\.\d{7}$"),
+            $"Filename should end with yyyyMMdd_HHmmss.fffffff pattern: {fileName}");
+    }
+
     private static TestCase CreateTestCase(string testCaseName)
     {
         return new TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");
