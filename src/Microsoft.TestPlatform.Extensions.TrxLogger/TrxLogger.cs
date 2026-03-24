@@ -541,7 +541,7 @@ public class TrxLogger : ITestLoggerWithParameters
 
         if (_parametersDictionary is not null
             && _parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var framework)
-            && framework != null)
+            && !framework.IsNullOrWhiteSpace())
         {
             var shortName = Framework.FromString(framework)?.ShortName ?? framework;
             baseName = baseName + "_" + shortName;
