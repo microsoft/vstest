@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.Library.IntegrationTests;
 
 [TestClass]
-public class Build : IntegrationTestBase
+public static class Build
 {
     [AssemblyInitialize]
     public static void AssemblyInitialize(TestContext testContext)

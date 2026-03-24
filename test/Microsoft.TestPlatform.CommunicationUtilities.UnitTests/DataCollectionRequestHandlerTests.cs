@@ -244,7 +244,7 @@ public class DataCollectionRequestHandlerTests
         _requestHandler.ProcessRequests();
 
         _mockFileHelper.Verify(x => x.EnumerateFiles($@"{temp}dir1", SearchOption.AllDirectories, @"Collector.dll"), Times.Once);
-        Assert.IsTrue(TestPluginCache.Instance.GetExtensionPaths(@"Collector.dll").Contains(Path.Combine(temp, "dir1", "abc.DataCollector.dll")));
+        Assert.Contains(Path.Combine(temp, "dir1", "abc.DataCollector.dll"), TestPluginCache.Instance.GetExtensionPaths(@"Collector.dll"));
     }
 
     [TestMethod]

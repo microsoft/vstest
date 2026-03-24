@@ -43,6 +43,8 @@ public class TestRequestSenderTests
     private readonly ITestRequestSender _testRequestSender;
     private ConnectedEventArgs _connectedEventArgs;
 
+    public TestContext TestContext { get; set; } = null!;
+
     public TestRequestSenderTests()
     {
         _connectionInfo = new TestHostConnectionInfo
@@ -104,7 +106,7 @@ public class TestRequestSenderTests
         watch.Stop();
 
         Assert.IsFalse(connected);
-        Assert.IsTrue(watch.ElapsedMilliseconds < connectionTimeout);
+        Assert.IsLessThan(connectionTimeout, watch.ElapsedMilliseconds);
     }
 
     [TestMethod]
@@ -119,7 +121,7 @@ public class TestRequestSenderTests
         watch.Stop();
 
         Assert.IsFalse(connected);
-        Assert.IsTrue(watch.ElapsedMilliseconds < connectionTimeout);
+        Assert.IsLessThan(connectionTimeout, watch.ElapsedMilliseconds);
     }
 
     [TestMethod]
@@ -793,8 +795,8 @@ public class TestRequestSenderTests
         SetupFakeCommunicationChannel();
 
         // Note: Even if the calls get invoked on separate threads, the request sender should send back the complete message just once.
-        var t1 = Task.Run(RaiseClientDisconnectedEvent);
-        var t2 = Task.Run(() => _testRequestSender.StartTestRun(runCriteria, _mockExecutionEventsHandler.Object));
+        var t1 = Task.Run(RaiseClientDisconnectedEvent, TestContext.CancellationToken);
+        var t2 = Task.Run(() => _testRequestSender.StartTestRun(runCriteria, _mockExecutionEventsHandler.Object), TestContext.CancellationToken);
 
         await Task.WhenAll(t1, t2);
 

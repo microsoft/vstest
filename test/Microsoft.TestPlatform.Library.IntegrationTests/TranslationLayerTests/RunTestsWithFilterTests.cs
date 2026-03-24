@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
@@ -55,7 +55,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.ContainsSingle(_runEventHandler.TestResults, _runEventHandler.ToString());
         Assert.AreEqual(TestOutcome.Passed, _runEventHandler.TestResults.First().Outcome);
     }
 
@@ -76,8 +76,8 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
-        Assert.AreEqual(1, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
+        Assert.HasCount(2, _runEventHandler.TestResults, _runEventHandler.ToString());
+        Assert.ContainsSingle(_runEventHandler.TestResults.Where(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
+        Assert.ContainsSingle(_runEventHandler.TestResults.Where(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
     }
 }

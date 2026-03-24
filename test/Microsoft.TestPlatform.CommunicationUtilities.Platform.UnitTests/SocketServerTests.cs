@@ -23,6 +23,8 @@ public class SocketServerTests : SocketTestsBase, IDisposable
     private readonly string _defaultConnection = IPAddress.Loopback.ToString() + ":0";
     private readonly ICommunicationEndPoint _socketServer;
 
+    public TestContext TestContext { get; set; }
+
     public SocketServerTests()
     {
         _socketServer = new SocketServer();
@@ -109,7 +111,7 @@ public class SocketServerTests : SocketTestsBase, IDisposable
 
         _socketServer.Stop();
 
-        waitEvent.Wait();
+        waitEvent.Wait(TestContext.CancellationToken);
         Assert.ThrowsExactly<CommunicationException>(() => channel!.Send(Dummydata));
     }
 
@@ -170,6 +172,8 @@ public class SocketServerTests : SocketTestsBase, IDisposable
 
     private async Task ConnectToServer(int port)
     {
+#pragma warning disable MSTEST0049 // Use 'TestContext.CancellationToken' - ConnectAsync CancellationToken overload unavailable on .NET Framework
         await _tcpClient.ConnectAsync(IPAddress.Loopback, port);
+#pragma warning restore MSTEST0049
     }
 }

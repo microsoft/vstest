@@ -58,7 +58,7 @@ public class DiscoverTests : AcceptanceTestBase
         _vstestConsoleWrapper.DiscoverTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), _discoveryEventHandler);
 
         // Assert.
-        Assert.AreEqual(6, _discoveryEventHandler.DiscoveredTestCases.Count);
+        Assert.HasCount(6, _discoveryEventHandler.DiscoveredTestCases);
     }
 
     [TestMethod]
@@ -80,13 +80,14 @@ public class DiscoverTests : AcceptanceTestBase
             _discoveryEventHandler2);
 
         // Assert.
-        Assert.AreEqual(6, _discoveryEventHandler2.DiscoveredTestCases.Count);
-        Assert.AreEqual(0, _discoveryEventHandler2.Metrics!.Count);
+        Assert.HasCount(6, _discoveryEventHandler2.DiscoveredTestCases);
+        Assert.HasCount(0, _discoveryEventHandler2.Metrics!);
     }
 
     [TestMethod]
     [TestCategory("Smoke")]
     [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSource(useVsixRunner: true)]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -95,7 +96,7 @@ public class DiscoverTests : AcceptanceTestBase
         _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _discoveryEventHandler2);
 
         // Assert.
-        Assert.AreEqual(6, _discoveryEventHandler2.DiscoveredTestCases.Count);
+        Assert.HasCount(6, _discoveryEventHandler2.DiscoveredTestCases);
         Assert.IsTrue(_discoveryEventHandler2.Metrics!.ContainsKey(TelemetryDataConstants.TargetDevice));
         Assert.IsTrue(_discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests));
         Assert.IsTrue(_discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecByAllAdapters));
@@ -176,7 +177,7 @@ public class DiscoverTests : AcceptanceTestBase
             eventHandler2);
 
         // Assert.
-        Assert.AreEqual(2, eventHandler2.FullyDiscoveredSources!.Count);
+        Assert.HasCount(2, eventHandler2.FullyDiscoveredSources!);
     }
 
     [TestMethod]
@@ -197,7 +198,7 @@ public class DiscoverTests : AcceptanceTestBase
 
         // Assert.
         var testCase = _discoveryEventHandler.DiscoveredTestCases.Where(dt => dt.FullyQualifiedName.Equals("SampleUnitTestProject.UnitTest1.PassingTest")).First();
-        StringAssert.EndsWith(testCase.FullyQualifiedName, "PassingTest");
+        Assert.EndsWith("PassingTest", testCase.FullyQualifiedName);
 
         var sourceFile = SourceAssert.FindSourceFile("SimpleTestProject.dll", "PassingTest");
         SourceAssert.LineIsWithinMethod(sourceFile, "PassingTest", testCase.LineNumber);
@@ -263,7 +264,7 @@ public class DiscoverTests : AcceptanceTestBase
 
         // Act
         Console.WriteLine("Starting Discovery.");
-        await Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, runSettingsXml, discoveryEvents.Object));
+        await Task.Run(() => _vstestConsoleWrapper.DiscoverTests(testAssemblies, runSettingsXml, discoveryEvents.Object), TestContext.CancellationToken);
         Console.WriteLine("Discovery finished.");
 
         // Assert

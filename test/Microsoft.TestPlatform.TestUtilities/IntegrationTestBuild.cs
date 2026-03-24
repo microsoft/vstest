@@ -96,7 +96,7 @@ public class IntegrationTestBuild : IntegrationTestBase
 
     private static void BuildTestAssets(string nugetCache)
     {
-        var testAssets = Path.GetFullPath(Path.Combine(Root, "test", "TestAssets", "TestAssets.sln"));
+        var testAssets = Path.GetFullPath(Path.Combine(Root, "test", "TestAssets", "TestAssets.slnx"));
         var nugetFeeds = GetNugetSourceParameters(Root);
 
         var netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
@@ -452,7 +452,7 @@ public class IntegrationTestBuild : IntegrationTestBase
             var cacheMarkerPath = Path.Combine(unzipPath, packageName + ".cache");
             if (File.Exists(cacheMarkerPath))
             {
-                if (File.ReadAllText(cacheMarkerPath) == File.GetLastWriteTimeUtc(packagePath).ToString(CultureInfo.InvariantCulture))
+                if (File.ReadAllText(cacheMarkerPath) == File.GetLastWriteTimeUtc(packagePath).ToString("o", CultureInfo.InvariantCulture))
                 {
                     // Already extracted and using the latest built packages.
                     continue;
@@ -468,7 +468,7 @@ public class IntegrationTestBuild : IntegrationTestBase
             }
 
             ZipFile.ExtractToDirectory(packagePath, unzipPath);
-            File.WriteAllText(cacheMarkerPath, File.GetLastWriteTimeUtc(packagePath).ToString(CultureInfo.InvariantCulture));
+            File.WriteAllText(cacheMarkerPath, File.GetLastWriteTimeUtc(packagePath).ToString("o", CultureInfo.InvariantCulture));
         }
 
         return packagesAreNew;
