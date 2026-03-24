@@ -115,7 +115,7 @@ public class TestPluginDiscovererTests
         var pluginInformation = new TestSettingsProviderPluginInformation(typeof(ValidSettingsProvider));
         var pluginInformation2 = new TestSettingsProviderPluginInformation(typeof(ValidSettingsProvider2));
 
-        Assert.IsGreaterThanOrEqualTo(testExtensions.Keys.Select(k => k.Contains("ValidSettingsProvider")).Count(), 3);
+        Assert.IsGreaterThanOrEqualTo(3, testExtensions.Keys.Select(k => k.Contains("ValidSettingsProvider")).Count());
         Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData!));
         Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData!));
     }

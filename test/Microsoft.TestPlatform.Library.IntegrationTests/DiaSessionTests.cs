@@ -35,7 +35,7 @@ public class DiaSessionTests : AcceptanceTestBase
         DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "PassingTest");
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
-        Assert.EndsWith(diaNavigationData.FileName!.Replace("\\", "/"), @"\SimpleClassLibrary\Class1.cs".Replace("\\", "/"));
+        Assert.EndsWith(@"\SimpleClassLibrary\Class1.cs".Replace("\\", "/"), diaNavigationData.FileName!.Replace("\\", "/"));
 
         SourceAssert.LineIsAtMethodBodyStart(diaNavigationData.FileName!, "PassingTest", diaNavigationData.MinLineNumber, "Incorrect min line number");
 
@@ -52,7 +52,7 @@ public class DiaSessionTests : AcceptanceTestBase
         DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1+<AsyncTestMethod>d__1", "MoveNext");
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
-        Assert.EndsWith(diaNavigationData.FileName!.Replace("\\", "/"), @"\SimpleClassLibrary\Class1.cs".Replace("\\", "/"));
+        Assert.EndsWith(@"\SimpleClassLibrary\Class1.cs".Replace("\\", "/"), diaNavigationData.FileName!.Replace("\\", "/"));
 
         // The async state machine's MoveNext maps back to the original async method source lines.
         SourceAssert.LineIsAtMethodBodyStart(diaNavigationData.FileName!, "AsyncTestMethod", diaNavigationData.MinLineNumber, "Incorrect min line number");
@@ -70,9 +70,9 @@ public class DiaSessionTests : AcceptanceTestBase
         DiaNavigationData? diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "OverLoadedMethod");
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
-        Assert.EndsWith(diaNavigationData.FileName!.Replace("\\", "/"), @"\SimpleClassLibrary\Class1.cs".Replace("\\", "/"));
+        Assert.EndsWith(@"\SimpleClassLibrary\Class1.cs".Replace("\\", "/"), diaNavigationData.FileName!.Replace("\\", "/"));
 
-        // DiaSession may return any overload; verify min line falls within one of them.
+        // DiaSession may return any overload;verify min line falls within one of them.
         SourceAssert.LineIsAtMethodBodyStart(diaNavigationData.FileName!, "OverLoadedMethod", diaNavigationData.MinLineNumber,
             $"Min line number ({diaNavigationData.MinLineNumber}) is not at the body start of any OverLoadedMethod overload.");
 
@@ -111,12 +111,12 @@ public class DiaSessionTests : AcceptanceTestBase
         watch.Stop();
 
         Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
-        Assert.EndsWith(diaNavigationData.FileName!.Replace("\\", "/"), @"\SimpleClassLibrary\HugeMethodSet.cs".Replace("\\", "/"));
+        Assert.EndsWith(@"\SimpleClassLibrary\HugeMethodSet.cs".Replace("\\", "/"), diaNavigationData.FileName!.Replace("\\", "/"));
 
         SourceAssert.LineIsAtMethodBodyStart(diaNavigationData.FileName!, "MSTest_D1_01", diaNavigationData.MinLineNumber, "Incorrect min line number");
 
         var expectedTime = 150;
-        Assert.IsLessThan(watch.Elapsed.Milliseconds, expectedTime, $"DiaSession Perf test Actual time:{watch.Elapsed.Milliseconds} ms Expected time:{expectedTime} ms");
+        Assert.IsLessThan(expectedTime, watch.Elapsed.Milliseconds, $"DiaSession Perf test Actual time:{watch.Elapsed.Milliseconds} ms Expected time:{expectedTime} ms");
 
         _testEnvironment.TargetFramework = currentTargetFrameWork;
     }

@@ -72,13 +72,13 @@ public class DefaultTestHostManagerTests
 
         var info = _testHostManager.GetTestHostProcessStartInfo([], null, default);
 
-        Assert.EndsWith(info.FileName, "testhost.x86.exe");
+        Assert.EndsWith("testhost.x86.exe", info.FileName);
     }
 
     [TestMethod]
     public void ConstructorShouldSetX64ProcessForX64Architecture()
     {
-        Assert.EndsWith(_startInfo.FileName, "testhost.exe");
+        Assert.EndsWith("testhost.exe", _startInfo.FileName);
     }
 
     [TestMethod]
@@ -88,7 +88,7 @@ public class DefaultTestHostManagerTests
         _mockFileHelper.Setup(x => x.Exists(It.IsAny<string>())).Returns(false);
         var startInfo = _testHostManager.GetTestHostProcessStartInfo([], null, default);
 
-        Assert.EndsWith(startInfo.FileName!, Path.Combine("TestHostNetFramework", "testhost.exe"));
+        Assert.EndsWith(Path.Combine("TestHostNetFramework", "testhost.exe"), startInfo.FileName!);
     }
 
     [TestMethod]
@@ -98,8 +98,8 @@ public class DefaultTestHostManagerTests
         _mockFileHelper.Setup(x => x.Exists(It.IsAny<string>())).Returns(true);
         var startInfo = _testHostManager.GetTestHostProcessStartInfo([], null, default);
 
-        Assert.DoesNotEndWith(startInfo.FileName!, Path.Combine("TestHost", "testhost.exe"));
-        Assert.EndsWith(startInfo.FileName!, "testhost.exe");
+        Assert.DoesNotEndWith(Path.Combine("TestHost", "testhost.exe"), startInfo.FileName!);
+        Assert.EndsWith("testhost.exe", startInfo.FileName!);
     }
 
     [TestMethod]
@@ -108,8 +108,8 @@ public class DefaultTestHostManagerTests
         _mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("devenv.exe");
         var startInfo = _testHostManager.GetTestHostProcessStartInfo([], null, default);
 
-        Assert.DoesNotEndWith(startInfo.FileName!, Path.Combine("TestHost", "testhost.exe"));
-        Assert.EndsWith(startInfo.FileName!, "testhost.exe");
+        Assert.DoesNotEndWith(Path.Combine("TestHost", "testhost.exe"), startInfo.FileName!);
+        Assert.EndsWith("testhost.exe", startInfo.FileName!);
     }
 
     [TestMethod]
@@ -207,8 +207,8 @@ public class DefaultTestHostManagerTests
             default);
 
         var testHostPath = Path.Combine("TestHostNetFramework", "testhost.exe");
-        Assert.EndsWith(info.FileName, testHostPath);
-        Assert.DoesNotContain(info.Arguments!, testHostPath);
+        Assert.EndsWith(testHostPath, info.FileName);
+        Assert.DoesNotContain(testHostPath, info.Arguments!);
     }
 
     [TestMethod]

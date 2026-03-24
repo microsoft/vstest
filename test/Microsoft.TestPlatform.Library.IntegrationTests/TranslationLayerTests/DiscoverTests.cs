@@ -197,7 +197,7 @@ public class DiscoverTests : AcceptanceTestBase
 
         // Assert.
         var testCase = _discoveryEventHandler.DiscoveredTestCases.Where(dt => dt.FullyQualifiedName.Equals("SampleUnitTestProject.UnitTest1.PassingTest")).First();
-        Assert.EndsWith(testCase.FullyQualifiedName, "PassingTest");
+        Assert.EndsWith("PassingTest", testCase.FullyQualifiedName);
 
         var sourceFile = SourceAssert.FindSourceFile("SimpleTestProject.dll", "PassingTest");
         SourceAssert.LineIsWithinMethod(sourceFile, "PassingTest", testCase.LineNumber);

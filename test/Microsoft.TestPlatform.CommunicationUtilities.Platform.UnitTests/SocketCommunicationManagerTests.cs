@@ -62,7 +62,7 @@ public class SocketCommunicationManagerTests : IDisposable
     {
         var port = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
 
-        Assert.IsGreaterThan(port, 0);
+        Assert.IsGreaterThan(0, port);
         await _tcpClient.ConnectAsync(IPAddress.Loopback, port);
         Assert.IsTrue(_tcpClient.Connected);
     }

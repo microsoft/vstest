@@ -37,8 +37,8 @@ public class TestResultTests
     [TestMethod]
     public void TestResultShouldInitializeStartAndEndTimeToCurrent()
     {
-        Assert.IsLessThan(_result.StartTime.Subtract(DateTimeOffset.UtcNow), new TimeSpan(0, 0, 0, 10));
-        Assert.IsLessThan(_result.EndTime.Subtract(DateTimeOffset.UtcNow), new TimeSpan(0, 0, 0, 10));
+        Assert.IsLessThan(new TimeSpan(0, 0, 0, 10), _result.StartTime.Subtract(DateTimeOffset.UtcNow));
+        Assert.IsLessThan(new TimeSpan(0, 0, 0, 10), _result.EndTime.Subtract(DateTimeOffset.UtcNow));
     }
 
     #region GetSetPropertyValue Tests

@@ -106,7 +106,7 @@ public class TestRequestSenderTests
         watch.Stop();
 
         Assert.IsFalse(connected);
-        Assert.IsLessThan(watch.ElapsedMilliseconds, connectionTimeout);
+        Assert.IsLessThan(connectionTimeout, watch.ElapsedMilliseconds);
     }
 
     [TestMethod]
@@ -121,7 +121,7 @@ public class TestRequestSenderTests
         watch.Stop();
 
         Assert.IsFalse(connected);
-        Assert.IsLessThan(watch.ElapsedMilliseconds, connectionTimeout);
+        Assert.IsLessThan(connectionTimeout, watch.ElapsedMilliseconds);
     }
 
     [TestMethod]

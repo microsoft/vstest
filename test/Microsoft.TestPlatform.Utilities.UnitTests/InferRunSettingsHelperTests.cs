@@ -240,7 +240,7 @@ public class InferRunSettingsHelperTests
 
         var result = InferRunSettingsHelper.MakeRunsettingsCompatible(settings)!;
 
-        Assert.IsLessThan(result.IndexOf("DesignMode", StringComparison.OrdinalIgnoreCase), 0);
+        Assert.IsLessThan(0, result.IndexOf("DesignMode", StringComparison.OrdinalIgnoreCase));
     }
 
     [TestMethod]
@@ -263,14 +263,14 @@ public class InferRunSettingsHelperTests
 
         var result = InferRunSettingsHelper.MakeRunsettingsCompatible(settings)!;
 
-        Assert.IsGreaterThan(result.IndexOf("TargetPlatform", StringComparison.OrdinalIgnoreCase), 0);
-        Assert.IsGreaterThan(result.IndexOf("TargetFrameworkVersion", StringComparison.OrdinalIgnoreCase), 0);
-        Assert.IsGreaterThan(result.IndexOf("TestAdaptersPaths", StringComparison.OrdinalIgnoreCase), 0);
-        Assert.IsGreaterThan(result.IndexOf("ResultsDirectory", StringComparison.OrdinalIgnoreCase), 0);
-        Assert.IsGreaterThan(result.IndexOf("SolutionDirectory", StringComparison.OrdinalIgnoreCase), 0);
-        Assert.IsGreaterThan(result.IndexOf("MaxCpuCount", StringComparison.OrdinalIgnoreCase), 0);
-        Assert.IsGreaterThan(result.IndexOf("DisableParallelization", StringComparison.OrdinalIgnoreCase), 0);
-        Assert.IsGreaterThan(result.IndexOf("DisableAppDomain", StringComparison.OrdinalIgnoreCase), 0);
+        Assert.IsGreaterThan(0, result.IndexOf("TargetPlatform", StringComparison.OrdinalIgnoreCase));
+        Assert.IsGreaterThan(0, result.IndexOf("TargetFrameworkVersion", StringComparison.OrdinalIgnoreCase));
+        Assert.IsGreaterThan(0, result.IndexOf("TestAdaptersPaths", StringComparison.OrdinalIgnoreCase));
+        Assert.IsGreaterThan(0, result.IndexOf("ResultsDirectory", StringComparison.OrdinalIgnoreCase));
+        Assert.IsGreaterThan(0, result.IndexOf("SolutionDirectory", StringComparison.OrdinalIgnoreCase));
+        Assert.IsGreaterThan(0, result.IndexOf("MaxCpuCount", StringComparison.OrdinalIgnoreCase));
+        Assert.IsGreaterThan(0, result.IndexOf("DisableParallelization", StringComparison.OrdinalIgnoreCase));
+        Assert.IsGreaterThan(0, result.IndexOf("DisableAppDomain", StringComparison.OrdinalIgnoreCase));
     }
 
     [TestMethod]

@@ -897,7 +897,7 @@ public class TrxLoggerTests
 
     private static void ValidateTimeWithinUtcLimits(DateTimeOffset dateTime)
     {
-        Assert.IsLessThan(dateTime.UtcDateTime.Subtract(DateTime.UtcNow), new TimeSpan(0, 0, 0, 60));
+        Assert.IsLessThan(new TimeSpan(0, 0, 0, 60), dateTime.UtcDateTime.Subtract(DateTime.UtcNow));
     }
 
     private static string? GetElementValueFromTrx(string trxFileName, string fieldName)

@@ -75,8 +75,8 @@ public class TestSourceArgumentProcessorTests
         string testFilePath = "TestFile.txt";
 
         var ex = Assert.ThrowsExactly<TestSourceException>(() => executor.Initialize(testFilePath));
-        Assert.StartsWith(ex.Message, "The test source file \"");
-        Assert.EndsWith(ex.Message, testFilePath + "\" provided was not found.");
+        Assert.StartsWith("The test source file \"", ex.Message);
+        Assert.EndsWith(testFilePath + "\" provided was not found.", ex.Message);
     }
 
     [TestMethod]

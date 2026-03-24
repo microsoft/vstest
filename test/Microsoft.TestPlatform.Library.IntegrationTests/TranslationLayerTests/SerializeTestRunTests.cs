@@ -90,7 +90,7 @@ public class SerialTestRunDecoratorTests : AcceptanceTestBase
         // Assert
         Assert.HasCount(10, _discoveryEventHandler.DiscoveredTestCases);
         int failedTests = _runEventHandler.TestResults.Count(x => x.Outcome == TestOutcome.Failed);
-        Assert.IsGreaterThan(failedTests, 0, $"Number of failed tests {failedTests}");
+        Assert.IsGreaterThan(0, failedTests, $"Number of failed tests {failedTests}");
     }
 
     [TestMethod]

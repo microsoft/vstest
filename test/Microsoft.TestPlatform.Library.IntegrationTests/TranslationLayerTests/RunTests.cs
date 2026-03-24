@@ -216,8 +216,8 @@ public class RunTests : AcceptanceTestBase
         var expectedFilter = veryLongTestCaseFilter.Substring(0, 256) + "...";
 
         // Assert
-        Assert.StartsWith(_runEventHandler.LogMessage, $"No test matches the given testcase filter `{expectedFilter}` in");
-        Assert.EndsWith(_runEventHandler.LogMessage, testAssemblyName);
+        Assert.StartsWith($"No test matches the given testcase filter `{expectedFilter}` in", _runEventHandler.LogMessage);
+        Assert.EndsWith(testAssemblyName, _runEventHandler.LogMessage);
 
         Assert.AreEqual(TestMessageLevel.Warning, _runEventHandler.TestMessageLevel);
     }
