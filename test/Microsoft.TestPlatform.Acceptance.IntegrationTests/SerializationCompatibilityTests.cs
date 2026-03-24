@@ -39,7 +39,7 @@ public class SerializationCompatibilityTests : AcceptanceTestBase
     /// </summary>
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource(DebugVSTestConsole = true)]
+    [RunnerCompatibilityDataSource()]
     public void DiscoverTests_LatestRunner_WithOlderTesthosts(RunnerInfo runnerInfo)
     {
 #pragma warning disable RS0030 // Do not use banned APIs
