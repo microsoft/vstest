@@ -43,7 +43,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
 
     private bool _sessionStarted;
 
-    private bool _sessionEnded;
+    private int _sessionEnded;
 
     /// <summary>
     /// Path to additional extensions to reinitialize vstest.console
@@ -653,11 +653,11 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     /// <inheritdoc/>
     public void EndSession()
     {
-        if (_sessionEnded)
+        if (Interlocked.Exchange(ref _sessionEnded, 1) == 1)
         {
+            EqtTrace.Info("VsTestConsoleWrapper.EndSession: Session already ended, skipping.");
             return;
         }
-        _sessionEnded = true;
 
         EqtTrace.Info($"VsTestConsoleWrapper.EndSession: Ending VsTestConsoleWrapper session - process id:{_vstestConsoleProcessManager.ProcessId}");
 
@@ -1192,6 +1192,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
             EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process is not started.");
             StartSession();
             _sessionStarted = WaitForConnection();
+            Interlocked.Exchange(ref _sessionEnded, 0);
 
             if (_sessionStarted)
             {

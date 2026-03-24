@@ -700,7 +700,7 @@ public class VsTestConsoleWrapperTests
     }
 
     [TestMethod]
-    public void EndSessionCalledTwiceShouldNotThrow()
+    public void EndSessionCalledTwiceShouldOnlyEndSessionOnce()
     {
         _consoleWrapper.EndSession();
         _consoleWrapper.EndSession();
