@@ -34,7 +34,7 @@ public class RunSettingsProviderExtensionsTests
 
         _runSettingsProvider.UpdateRunSettings(runSettingsXml);
 
-        StringAssert.Contains(_runSettingsProvider.ActiveRunSettings!.SettingsXml, runSettingsXml);
+        Assert.Contains(runSettingsXml, _runSettingsProvider.ActiveRunSettings!.SettingsXml!);
     }
 
     [TestMethod]

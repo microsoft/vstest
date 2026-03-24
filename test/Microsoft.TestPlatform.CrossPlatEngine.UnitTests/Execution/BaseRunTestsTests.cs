@@ -372,7 +372,7 @@ public class BaseRunTestsTests
 
         _runTestsInstance.RunTests();
 
-        Assert.AreEqual(0, _runTestsInstance.GetExecutorUrisThatRanTests.Count);
+        Assert.IsEmpty(_runTestsInstance.GetExecutorUrisThatRanTests);
     }
 
     [TestMethod]

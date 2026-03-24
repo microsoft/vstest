@@ -1592,6 +1592,7 @@ internal static class KnownPlatformSourceFilter
 
         // NUnit
         "NUnit3.TestAdapter.dll",
+        "testcentric.engine.metadata.dll",
 
         // XUnit
         "xunit.runner.visualstudio.testadapter.dll",

@@ -26,7 +26,7 @@ public class ConsoleParametersTests
 
         string result = sut.LogFilePath;
 
-        Assert.IsTrue(result.StartsWith("\""));
+        Assert.StartsWith("\"", result); 
     }
 
     [TestMethod]
