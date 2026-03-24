@@ -25,9 +25,7 @@ using Moq;
 
 #pragma warning disable MSTEST0049 // Use 'TestContext.CancellationToken' - suppressed for Moq setup patterns
 
-using Newtonsoft.Json.Linq;
-
-using Payloads = Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+using Payloads= Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;

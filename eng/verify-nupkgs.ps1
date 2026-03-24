@@ -17,19 +17,19 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 function Verify-Nuget-Packages {
     Write-Host "Starting Verify-Nuget-Packages."
     $expectedNumOfFiles = @{
-        "Microsoft.CodeCoverage"                      = 75
-        "Microsoft.NET.Test.Sdk"                      = 25
-        "Microsoft.TestPlatform"                      = 546
+        "Microsoft.CodeCoverage"                      = 76
+        "Microsoft.NET.Test.Sdk"                      = 26
+        "Microsoft.TestPlatform"                      = 547
         "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI" = 392
-        "Microsoft.TestPlatform.Build"                = 20
+        "Microsoft.TestPlatform.Build"                = 21
         "Microsoft.TestPlatform.CLI"                  = 483
-        "Microsoft.TestPlatform.Extensions.TrxLogger" = 34
-        "Microsoft.TestPlatform.ObjectModel"          = 92
-        "Microsoft.TestPlatform.AdapterUtilities"     = 61
-        "Microsoft.TestPlatform.Portable"             = 608
-        "Microsoft.TestPlatform.TestHost"             = 63
-        "Microsoft.TestPlatform.TranslationLayer"     = 174
-        "Microsoft.TestPlatform.Internal.Uwp"         = 38
+        "Microsoft.TestPlatform.Extensions.TrxLogger" = 35
+        "Microsoft.TestPlatform.ObjectModel"          = 93
+        "Microsoft.TestPlatform.AdapterUtilities"     = 62
+        "Microsoft.TestPlatform.Portable"             = 609
+        "Microsoft.TestPlatform.TestHost"             = 64
+        "Microsoft.TestPlatform.TranslationLayer"     = 175
+        "Microsoft.TestPlatform.Internal.Uwp"         = 39
     }
 
     $packageDirectory = Resolve-Path "$PSScriptRoot/../artifacts/packages/$configuration"
