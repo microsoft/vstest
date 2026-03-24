@@ -70,6 +70,8 @@ internal class ParallelRunDataAggregator
 
     public string RunSettings { get; }
 
+    // Note: This method is called once at the end of the test run to aggregate results.
+    // It is NOT called in parallel, so thread-safety optimizations here would be misleading.
     public ITestRunStatistics GetAggregatedRunStats()
     {
         var testOutcomeMap = new Dictionary<TestOutcome, long>();
@@ -137,8 +139,6 @@ internal class ParallelRunDataAggregator
     /// Aggregate Run Data
     /// Must be thread-safe as this is expected to be called by parallel managers
     /// </summary>
-    // Note: This method is called once at the end of the test run to aggregate results.
-    // It is NOT called in parallel, so thread-safety optimizations here would be misleading.
     public void Aggregate(
         ITestRunStatistics? testRunStats,
         ICollection<string>? executorUris,
