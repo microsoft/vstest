@@ -213,9 +213,9 @@ public class IntegrationTestBase
     /// <param name="collectDiagnostics">When true, automatically adds --diag flag and attaches logs to test results on failure.</param>
     public void InvokeVsTest(string? arguments, Dictionary<string, string?>? environmentVariables = null, bool collectDiagnostics = true)
     {
-        if (collectDiagnostics && arguments?.Contains("--diag") != true)
+        if (collectDiagnostics && !IsDiagAlreadyEnabled(arguments ?? ""))
         {
-            var diagLogsDir = Path.Combine(TempDirectory.Path, "diag");
+            var diagLogsDir = Path.Combine(TempDirectory.Path, "logs");
             Directory.CreateDirectory(diagLogsDir);
             arguments = string.Concat(arguments, GetDiagArg(diagLogsDir));
             _attachments.Add(diagLogsDir);
@@ -283,9 +283,9 @@ public class IntegrationTestBase
         // https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestForwardingApp.cs#L30-L39
         debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
 
-        if (collectDiagnostics && !arguments.Contains("--diag"))
+        if (collectDiagnostics && !IsDiagAlreadyEnabled(arguments))
         {
-            var diagLogsDir = Path.Combine(TempDirectory.Path, "diag");
+            var diagLogsDir = Path.Combine(TempDirectory.Path, "logs");
             Directory.CreateDirectory(diagLogsDir);
             var diagPath = Path.Combine(diagLogsDir, "log.txt");
             var diagArg = " --diag " + diagPath.AddDoubleQuote();
@@ -1070,6 +1070,21 @@ public class IntegrationTestBase
     {
         // Double quoted sources separated by space.
         return string.Join(" ", GetTestDlls(assetNames).Select(a => a.AddDoubleQuote()));
+    }
+
+    private static bool IsDiagAlreadyEnabled(string arguments)
+    {
+        // Check args for --diag, /diag, -diag (case-insensitive)
+        if (arguments.Contains("--diag", StringComparison.OrdinalIgnoreCase)
+            || arguments.Contains("/diag", StringComparison.OrdinalIgnoreCase)
+            || arguments.Contains("-diag", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        // Check environment variable
+        var envDiag = Environment.GetEnvironmentVariable("VSTEST_DIAG");
+        return !StringUtils.IsNullOrEmpty(envDiag);
     }
 
     protected static string GetDiagArg(string rootDir)
