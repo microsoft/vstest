@@ -49,6 +49,16 @@ namespace NuGetClone.Frameworks
             return Comparer.Equals(this, other);
         }
 
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as OneWayCompatibilityMappingEntry);
+        }
+
+        public override int GetHashCode()
+        {
+            return Comparer.GetHashCode(this);
+        }
+
         public override string ToString()
         {
             return String.Format(CultureInfo.InvariantCulture, "{0} -> {1}", TargetFrameworkRange.ToString(), SupportedFrameworkRange.ToString());
