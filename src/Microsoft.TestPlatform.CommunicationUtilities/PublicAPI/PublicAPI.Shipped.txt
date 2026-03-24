@@ -276,12 +276,6 @@ Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestRunSt
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestRunStatsPayload.TestRunChangedArgs.set -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestRunStatsPayload.TestRunStatsPayload() -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestCaseConverter
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestCaseConverter.TestCaseConverter() -> void
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter.TestObjectConverter() -> void
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter.TestResultConverter() -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketClient
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketClient.Connected -> System.EventHandler<Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ConnectedEventArgs!>?
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketClient.Disconnected -> System.EventHandler<Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.DisconnectedEventArgs!>?
@@ -347,12 +341,6 @@ Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestSender.Sta
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestSender.TestRequestSender(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ProtocolConfig! protocolConfig, Microsoft.VisualStudio.TestPlatform.ObjectModel.Host.ITestRuntimeProvider! runtimeProvider) -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestSender.WaitForRequestHandlerConnection(int connectionTimeout, System.Threading.CancellationToken cancellationToken) -> bool
 override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message.ToString() -> string!
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestCaseConverter.Read(ref System.Text.Json.Utf8JsonReader reader, System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase?
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestCaseConverter.Write(System.Text.Json.Utf8JsonWriter! writer, Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase! value, System.Text.Json.JsonSerializerOptions! options) -> void
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter.Read(ref System.Text.Json.Utf8JsonReader reader, System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProperty!, object!>>?
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestObjectConverter.Write(System.Text.Json.Utf8JsonWriter! writer, System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProperty!, object!>>! value, System.Text.Json.JsonSerializerOptions! options) -> void
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter.Read(ref System.Text.Json.Utf8JsonReader reader, System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult!
-override Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization.TestResultConverter.Write(System.Text.Json.Utf8JsonWriter! writer, Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult! value, System.Text.Json.JsonSerializerOptions! options) -> void
 static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollectionTestCaseEventSender.Create() -> Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollectionTestCaseEventSender!
 static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollectionTestCaseEventSender.Instance.get -> Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollectionTestCaseEventSender?
 static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer.Instance.get -> Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.JsonDataSerializer!

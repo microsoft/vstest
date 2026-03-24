@@ -3,12 +3,18 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+
+#if !NETFRAMEWORK
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+#else
+using Jsonite;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+#endif
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -20,10 +26,12 @@ public class JsonDataSerializer : IDataSerializer
 {
     private static JsonDataSerializer? s_instance;
 
-    private static readonly bool DisableFastJson = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_FASTER_JSON_SERIALIZATION);
     private static readonly bool UseNewtonsoftFallback = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_USE_NEWTONSOFT_JSON_SERIALIZER);
     private static readonly LegacyNewtonsoftJsonDataSerializer? NewtonsoftFallback = UseNewtonsoftFallback
         ? new LegacyNewtonsoftJsonDataSerializer() : null;
+
+#if !NETFRAMEWORK
+    private static readonly bool DisableFastJson = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_FASTER_JSON_SERIALIZATION);
 
     private static readonly JsonSerializerOptions PayloadOptionsV1; // payload options for version <= 1
     private static readonly JsonSerializerOptions PayloadOptionsV2; // payload options for version >= 2
@@ -162,6 +170,7 @@ public class JsonDataSerializer : IDataSerializer
             },
         };
     }
+#endif
 
     /// <summary>
     /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
@@ -189,12 +198,18 @@ public class JsonDataSerializer : IDataSerializer
         if (!FastHeaderParse(rawMessage, out int version, out string? messageType))
         {
             // Fallback: parse just the header fields from JSON
+#if !NETFRAMEWORK
             using var doc = JsonDocument.Parse(rawMessage);
             var root = doc.RootElement;
             version = root.TryGetProperty("Version", out var vProp)
                 ? (vProp.ValueKind == JsonValueKind.Number ? vProp.GetInt32() : int.TryParse(vProp.GetString(), out var v) ? v : 0)
                 : 0;
             messageType = root.TryGetProperty("MessageType", out var mtProp) ? mtProp.GetString() : null;
+#else
+            var parsed = (JsonObject)Json.Deserialize(rawMessage);
+            version = parsed.TryGetValue("Version", out var vObj) ? Convert.ToInt32(vObj, System.Globalization.CultureInfo.InvariantCulture) : 0;
+            messageType = parsed.TryGetValue("MessageType", out var mtObj) ? (string?)mtObj : null;
+#endif
         }
 
         return new Message
@@ -223,6 +238,7 @@ public class JsonDataSerializer : IDataSerializer
             return default;
         }
 
+#if !NETFRAMEWORK
         var payloadOptions = GetPayloadOptions(message.Version);
 
         if (payloadOptions == PayloadOptionsV2)
@@ -242,12 +258,21 @@ public class JsonDataSerializer : IDataSerializer
             }
             return default;
         }
+#else
+        var parsed = (JsonObject)Json.Deserialize(message.RawMessage);
+        if (!parsed.TryGetValue("Payload", out var payloadObj))
+            return default;
+
+        return JsoniteConvert.To<T>(payloadObj);
+#endif
     }
 
+#if !NETFRAMEWORK
     private static T? DeserializeObjectFast<T>(string value)
     {
         return JsonSerializer.Deserialize<T>(value, FastOptions);
     }
+#endif
 
     private static bool FastHeaderParse(string rawMessage, out int version, out string? messageType)
     {
@@ -362,8 +387,13 @@ public class JsonDataSerializer : IDataSerializer
             return NewtonsoftFallback.Deserialize<T>(json, version);
         }
 
+#if !NETFRAMEWORK
         var options = GetPayloadOptions(version);
         return Deserialize<T>(options, json);
+#else
+        var obj = Json.Deserialize(json);
+        return JsoniteConvert.To<T>(obj);
+#endif
     }
 
     /// <summary>
@@ -378,7 +408,12 @@ public class JsonDataSerializer : IDataSerializer
             return NewtonsoftFallback.SerializeMessage(messageType);
         }
 
+#if !NETFRAMEWORK
         return Serialize(DefaultOptions, new MessageEnvelope { MessageType = messageType });
+#else
+        var envelope = new JsonObject { ["MessageType"] = messageType! };
+        return Json.Serialize(envelope);
+#endif
     }
 
     /// <summary>
@@ -411,6 +446,7 @@ public class JsonDataSerializer : IDataSerializer
             return NewtonsoftFallback.SerializePayload(messageType, payload, version);
         }
 
+#if !NETFRAMEWORK
         var payloadOptions = GetPayloadOptions(version);
         // Fast json is only equivalent to the serialization that is used for protocol version 2 and upwards (or more precisely for the paths that use PayloadOptionsV2)
         // so when we resolved the old options we should use non-fast path.
@@ -429,6 +465,32 @@ public class JsonDataSerializer : IDataSerializer
         {
             return Serialize(FastOptions, new VersionedMessageForSerialization { MessageType = messageType, Version = version, Payload = payload });
         }
+#else
+        if (payload is null)
+            return string.Empty;
+
+        var payloadValue = JsoniteConvert.ToJsonValue(payload);
+
+        if (version > 1)
+        {
+            var envelope = new JsonObject
+            {
+                ["Version"] = version,
+                ["MessageType"] = messageType!,
+                ["Payload"] = payloadValue!,
+            };
+            return Json.Serialize(envelope);
+        }
+        else
+        {
+            var envelope = new JsonObject
+            {
+                ["MessageType"] = messageType!,
+                ["Payload"] = payloadValue!,
+            };
+            return Json.Serialize(envelope);
+        }
+#endif
     }
 
     /// <summary>
@@ -446,8 +508,13 @@ public class JsonDataSerializer : IDataSerializer
             return NewtonsoftFallback.Serialize(data, version);
         }
 
+#if !NETFRAMEWORK
         var options = GetPayloadOptions(version);
         return Serialize(options, data);
+#else
+        var jsonValue = JsoniteConvert.ToJsonValue(data);
+        return Json.Serialize(jsonValue!);
+#endif
     }
 
     /// <inheritdoc/>
@@ -468,6 +535,7 @@ public class JsonDataSerializer : IDataSerializer
         return Deserialize<T>(stringObj, 2)!;
     }
 
+#if !NETFRAMEWORK
     /// <summary>
     /// Serialize data.
     /// </summary>
@@ -561,4 +629,5 @@ public class JsonDataSerializer : IDataSerializer
         /// </summary>
         public object? Payload { get; set; }
     }
+#endif
 }
