@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -23,9 +23,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-#pragma warning disable MSTEST0049 // Use '''TestContext.CancellationToken''' - suppressed for Moq setup patterns
+#pragma warning disable MSTEST0049 // Use 'TestContext.CancellationToken' - suppressed for Moq setup patterns
 
-using Payloads = Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+using Payloads= Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
