@@ -311,16 +311,27 @@ internal static class JsoniteConvert
 
                 try
                 {
-                    var converted = ConvertTo(kvp.Value, prop.PropertyType);
-
                     if (prop.GetSetMethod() is not null)
                     {
                         // Public setter available
-                        prop.SetValue(instance, converted);
+                        prop.SetValue(instance, ConvertTo(kvp.Value, prop.PropertyType));
+                    }
+                    else if (kvp.Value is IList itemsToAdd && prop.GetValue(instance) is IList targetList)
+                    {
+                        // Read-only collection property (e.g., TestResult.Messages, TestResult.Attachments)
+                        // — add items to the existing collection instead of replacing it
+                        var elemType = prop.PropertyType.IsGenericType
+                            ? prop.PropertyType.GetGenericArguments()[0]
+                            : typeof(object);
+                        foreach (var item in itemsToAdd)
+                        {
+                            targetList.Add(ConvertTo(item, elemType));
+                        }
                     }
                     else
                     {
-                        // Private setter or no setter — try backing field
+                        var converted = ConvertTo(kvp.Value, prop.PropertyType);
+                        // Try backing field
                         var backingField = targetType.GetField($"<{prop.Name}>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance);
                         if (backingField is not null)
                         {
@@ -328,7 +339,7 @@ internal static class JsoniteConvert
                         }
                         else
                         {
-                            // Last resort: try private setter via reflection
+                            // Try private setter via reflection
                             var privateSetter = prop.GetSetMethod(nonPublic: true);
                             privateSetter?.Invoke(instance, new[] { converted });
                         }
