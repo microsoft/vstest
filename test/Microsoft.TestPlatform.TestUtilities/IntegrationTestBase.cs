@@ -210,8 +210,18 @@ public class IntegrationTestBase
     /// </summary>
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     /// <param name="environmentVariables">Environment variables to set to the started process.</param>
-    public void InvokeVsTest(string? arguments, Dictionary<string, string?>? environmentVariables = null)
+    /// <param name="collectDiagnostics">When true, automatically adds --diag flag and attaches logs to test results on failure.</param>
+    public void InvokeVsTest(string? arguments, Dictionary<string, string?>? environmentVariables = null, bool collectDiagnostics = true)
     {
+        if (collectDiagnostics && !IsDiagAlreadyEnabled(arguments ?? ""))
+        {
+            var diagLogsDir = Path.Combine(TempDirectory.Path, "logs");
+            Directory.CreateDirectory(diagLogsDir);
+            arguments = string.Concat(arguments, GetDiagArg(diagLogsDir));
+            _attachments.Add(diagLogsDir);
+            Console.WriteLine($"Diagnostic logs directory: {diagLogsDir}");
+        }
+
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
         ExecuteVsTestConsole(arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
         FormatStandardOutCome();
@@ -223,7 +233,8 @@ public class IntegrationTestBase
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     /// <param name="environmentVariables">Environment variables to set to the started process.</param>
     /// <param name="workingDirectory"></param>
-    public void InvokeDotnetTest(string arguments, Dictionary<string, string?>? environmentVariables = null, string? workingDirectory = null)
+    /// <param name="collectDiagnostics">When true, automatically adds --diag flag and attaches logs to test results on failure.</param>
+    public void InvokeDotnetTest(string arguments, Dictionary<string, string?>? environmentVariables = null, string? workingDirectory = null, bool collectDiagnostics = true)
     {
         string globalJsonPath = Path.Combine(workingDirectory!, "global.json");
         if (workingDirectory is not null && !File.Exists(globalJsonPath))
@@ -272,6 +283,28 @@ public class IntegrationTestBase
         // https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestForwardingApp.cs#L30-L39
         debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
 
+        if (collectDiagnostics && !IsDiagAlreadyEnabled(arguments))
+        {
+            var diagLogsDir = Path.Combine(TempDirectory.Path, "logs");
+            Directory.CreateDirectory(diagLogsDir);
+            var diagPath = Path.Combine(diagLogsDir, "log.txt");
+            var diagArg = " --diag " + diagPath.AddDoubleQuote();
+
+            // Insert --diag before the -- separator so dotnet test forwards it to vstest.console.
+            var separatorPos = arguments.IndexOf(" -- ");
+            if (separatorPos == -1)
+            {
+                arguments += diagArg;
+            }
+            else
+            {
+                arguments = arguments.Insert(separatorPos, diagArg);
+            }
+
+            _attachments.Add(diagLogsDir);
+            Console.WriteLine($"Diagnostic logs directory: {diagLogsDir}");
+        }
+
         IntegrationTestBase.ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables, workingDirectory);
         FormatStandardOutCome();
     }
@@ -284,14 +317,16 @@ public class IntegrationTestBase
     /// <param name="framework">Dotnet Framework of test assembly.</param>
     /// <param name="runSettings">Run settings for execution.</param>
     /// <param name="environmentVariables">Environment variables to set to the started process.</param>
+    /// <param name="collectDiagnostics">When true, automatically adds --diag flag and attaches logs to test results on failure.</param>
     public void InvokeVsTestForExecution(string testAssembly,
         string? testAdapterPath,
         string framework,
         string? runSettings = "",
-        Dictionary<string, string?>? environmentVariables = null)
+        Dictionary<string, string?>? environmentVariables = null,
+        bool collectDiagnostics = true)
     {
         var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
-        InvokeVsTest(arguments, environmentVariables);
+        InvokeVsTest(arguments, environmentVariables, collectDiagnostics);
     }
 
     private Dictionary<string, string?> AddDebugEnvironmentVariables(Dictionary<string, string?>? environmentVariables)
@@ -1037,6 +1072,21 @@ public class IntegrationTestBase
     {
         // Double quoted sources separated by space.
         return string.Join(" ", GetTestDlls(assetNames).Select(a => a.AddDoubleQuote()));
+    }
+
+    private static bool IsDiagAlreadyEnabled(string arguments)
+    {
+        // Check args for --diag, /diag, -diag (case-insensitive)
+        if (arguments.Contains("--diag", StringComparison.OrdinalIgnoreCase)
+            || arguments.Contains("/diag", StringComparison.OrdinalIgnoreCase)
+            || arguments.Contains("-diag", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        // Check environment variable
+        var envDiag = Environment.GetEnvironmentVariable("VSTEST_DIAG");
+        return !StringUtils.IsNullOrEmpty(envDiag);
     }
 
     protected static string GetDiagArg(string rootDir)
