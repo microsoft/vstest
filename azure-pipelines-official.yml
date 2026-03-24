@@ -220,7 +220,7 @@ extends:
               # and some of them use dependencies that are now vulnerable.
               # We don't depend on those vulnerable versions anymore, but need to keep restoring them to ensure backwards compatibility.
               - pwsh: |
-                  Remove-Item -Path $(Build.SourcesDirectory)/artifacts/tmp/GeneratedTestAssets -Recurse -Force
+                  Remove-Item -Path $(Build.SourcesDirectory)/artifacts/tmp/GeneratedTestAssets -Recurse -Force -ErrorAction SilentlyContinue
                 displayName: Remove artifacts/tmp/GeneratedTestAssets
 
             - task: 1ES.PublishBuildArtifacts@1
@@ -274,7 +274,7 @@ extends:
                 # and some of them use dependencies that are now vulnerable.
                 # We don't depend on those vulnerable versions anymore, but need to keep restoring them to ensure backwards compatibility.
                 - pwsh: |
-                    Remove-Item -Path $(Build.SourcesDirectory)/artifacts/tmp/GeneratedTestAssets -Recurse -Force
+                    Remove-Item -Path $(Build.SourcesDirectory)/artifacts/tmp/GeneratedTestAssets -Recurse -Force -ErrorAction SilentlyContinue
                   displayName: Remove artifacts/tmp/GeneratedTestAssets
 
                 # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
