@@ -52,7 +52,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
         string coverageData = module.CoverageBuffer.Length == 0 ? module.LineCoverage : module.BlockCoverage;
         var coverage = double.Parse(coverageData, CultureInfo.InvariantCulture);
         Console.WriteLine($"Checking coverage for {module.Name}. Expected at least: {expectedCoverage}. Result: {coverage}");
-        Assert.IsGreaterThan(coverage, expectedCoverage, $"Coverage check failed for {module.Name}. Expected at least: {expectedCoverage}. Found: {coverage}");
+        Assert.IsGreaterThan(expectedCoverage, coverage, $"Coverage check failed for {module.Name}. Expected at least: {expectedCoverage}. Found: {coverage}");
     }
 
     protected static string GetCoverageFileNameFromTrx(string trxFilePath, string resultsDirectory)

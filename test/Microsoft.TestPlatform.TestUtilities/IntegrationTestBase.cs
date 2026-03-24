@@ -473,15 +473,15 @@ public class IntegrationTestBase
                 Environment.NewLine,
                 _arguments);
             Assert.Contains(
-                _standardTestOutput,
                 summaryStatus,
+                _standardTestOutput,
                 errorSummary);
         }
     }
 
     public void StdErrorContains(string substring)
     {
-        Assert.Contains(_standardTestError, substring, $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
+        Assert.Contains(substring, _standardTestError, $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
     }
 
     public void StdErrorRegexIsMatch(string pattern)
@@ -491,17 +491,17 @@ public class IntegrationTestBase
 
     public void StdErrorDoesNotContains(string substring)
     {
-        Assert.DoesNotContain(_standardTestError, substring, $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
+        Assert.DoesNotContain(substring, _standardTestError, $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
     }
 
     public void StdOutputContains(string substring)
     {
-        Assert.Contains(_standardTestOutput, substring, $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.Contains(substring, _standardTestOutput, $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void StdOutputDoesNotContains(string substring)
     {
-        Assert.DoesNotContain(_standardTestOutput, substring, $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Not expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.DoesNotContain(substring, _standardTestOutput, $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Not expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void ExitCodeEquals(int exitCode)
@@ -547,7 +547,7 @@ public class IntegrationTestBase
             Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
 
             // Verify stack information as well.
-            Assert.Contains(_standardTestOutput, GetTestMethodName(test), $"No stack trace for failed test: {test}");
+            Assert.Contains(GetTestMethodName(test), _standardTestOutput, $"No stack trace for failed test: {test}");
         }
     }
 

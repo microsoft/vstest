@@ -122,7 +122,7 @@ public class LoggerTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         var trxFilePaths = Directory.EnumerateFiles(TempDirectory.Path, trxFileNamePattern + "_net*.trx");
-        Assert.IsGreaterThan(trxFilePaths.Count(), 1);
+        Assert.IsGreaterThan(1, trxFilePaths.Count());
     }
 
     [TestMethod]

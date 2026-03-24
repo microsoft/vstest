@@ -86,7 +86,7 @@ public class TargetFrameworkTestHostDemultiplexer : AcceptanceTestBase
         // Assert
         Assert.HasCount(10, _discoveryEventHandler.DiscoveredTestCases);
         int failedTests = _runEventHandler.TestResults.Count(x => x.Outcome == TestOutcome.Failed);
-        Assert.IsLessThanOrEqualTo(failedTests, 0, $"Number of failed tests {failedTests}");
+        Assert.IsLessThanOrEqualTo(0, failedTests, $"Number of failed tests {failedTests}");
 
         string[] hosts = Directory.GetFiles(TempDirectory.Path, "TestHost*");
         Assert.HasCount(expectedHost == -1 ? 1 : expectedHost > 10 ? 10 : expectedHost, hosts);
@@ -111,7 +111,7 @@ public class TargetFrameworkTestHostDemultiplexer : AcceptanceTestBase
 
             if (expectedHost == 3)
             {
-                Assert.IsGreaterThanOrEqualTo(testsRunInsideHost, 3);
+                Assert.IsGreaterThanOrEqualTo(3, testsRunInsideHost);
             }
         }
 

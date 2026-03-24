@@ -157,7 +157,7 @@ public class DotnetTestHostManagerTests
         _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
         var startInfo = GetDefaultStartInfo();
 
-        Assert.StartsWith(startInfo.Arguments, "exec");
+        Assert.StartsWith("exec", startInfo.Arguments);
     }
 
     [TestMethod]

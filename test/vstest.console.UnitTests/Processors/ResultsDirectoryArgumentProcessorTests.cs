@@ -109,7 +109,7 @@ public class ResultsDirectoryArgumentProcessorTests
     private void InitializeExceptionTestTemplate(string? folder, string message)
     {
         var ex = Assert.ThrowsExactly<CommandLineException>(() => _executor.Initialize(folder));
-        Assert.StartsWith(ex.Message, message);
+        Assert.StartsWith(message, ex.Message);
     }
 
     [TestMethod]

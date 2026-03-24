@@ -17,7 +17,7 @@ public static class FileAssert
         var fileContent = File.ReadAllText(filePath);
         foreach (var substr in substrs)
         {
-            Assert.Contains(fileContent, substr,
+            Assert.Contains(substr, fileContent,
                 $"{filePath}: file doesn't contains {StringHighlighter} {substr} {StringHighlighter}");
         }
     }

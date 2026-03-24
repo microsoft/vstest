@@ -480,12 +480,13 @@ public class XmlRunSettingsUtilitiesTests
             exceptionMessage = ex.Message;
         }
 
-        Assert.Contains(exceptionMessage,
+        Assert.Contains(
             string.Format(
                 CultureInfo.CurrentCulture,
                 Resources.InvalidUriInSettings,
                 "invalidUri",
-                "Logger"));
+                "Logger"),
+            exceptionMessage);
     }
 
     [TestMethod]
@@ -609,7 +610,7 @@ public class XmlRunSettingsUtilitiesTests
             exceptionMessage = ex.Message;
         }
 
-        Assert.Contains(exceptionMessage, CommonResources.MalformedRunSettingsFile);
+        Assert.Contains(CommonResources.MalformedRunSettingsFile, exceptionMessage);
     }
 
     [TestMethod]
@@ -684,7 +685,7 @@ public class XmlRunSettingsUtilitiesTests
             exceptionMessage = ex.Message;
         }
 
-        Assert.Contains(exceptionMessage, CommonResources.MalformedRunSettingsFile);
+        Assert.Contains(CommonResources.MalformedRunSettingsFile, exceptionMessage);
     }
 
     [TestMethod]
@@ -713,11 +714,11 @@ public class XmlRunSettingsUtilitiesTests
             exceptionMessage = ex.Message;
         }
 
-        Assert.Contains(exceptionMessage, string.Format(
+        Assert.Contains(string.Format(
             CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlAttribute,
             "LoggerRunSettings",
-            "name"));
+            "name"), exceptionMessage);
     }
 
     [TestMethod]
@@ -777,11 +778,11 @@ public class XmlRunSettingsUtilitiesTests
             exceptionMessage = ex.Message;
         }
 
-        Assert.Contains(exceptionMessage, string.Format(
+        Assert.Contains(string.Format(
             CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlElement,
             "LoggerRUNSettings",
-            "LoggersInvalid"));
+            "LoggersInvalid"), exceptionMessage);
     }
 
     [TestMethod]
@@ -810,11 +811,11 @@ public class XmlRunSettingsUtilitiesTests
             exceptionMessage = ex.Message;
         }
 
-        Assert.Contains(exceptionMessage, string.Format(
+        Assert.Contains(string.Format(
             CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlAttribute,
             "Loggers",
-            "nameAttr"));
+            "nameAttr"), exceptionMessage);
     }
 
     [TestMethod]
@@ -878,11 +879,11 @@ public class XmlRunSettingsUtilitiesTests
             exceptionMessage = ex.Message;
         }
 
-        Assert.Contains(exceptionMessage, string.Format(
+        Assert.Contains(string.Format(
             CultureInfo.CurrentCulture,
             Resources.InvalidSettingsXmlElement,
             "Loggers",
-            "LoggerInvalid"));
+            "LoggerInvalid"), exceptionMessage);
     }
 
     [TestMethod]

@@ -56,7 +56,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
             _runEventHandler);
 
         var testResult = _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("PassTestMethod1")).First();
-        Assert.EndsWith(testResult.TestCase.FullyQualifiedName, "PassTestMethod1");
+        Assert.EndsWith("PassTestMethod1", testResult.TestCase.FullyQualifiedName);
 
         // Assert
         Assert.HasCount(2, _runEventHandler.TestResults, _runEventHandler.ToString());
@@ -92,7 +92,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
             _runEventHandler);
 
         var testResult = _runEventHandler.TestResults.Where(tr => tr.TestCase.DisplayName.Equals("xUnitTestProject.Class1.PassTestMethod1")).First();
-        Assert.EndsWith(testResult.TestCase.FullyQualifiedName, "PassTestMethod1");
+        Assert.EndsWith("PassTestMethod1", testResult.TestCase.FullyQualifiedName);
 
         // Assert
         Assert.HasCount(2, _runEventHandler.TestResults, _runEventHandler.ToString());

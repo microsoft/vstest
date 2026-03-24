@@ -86,7 +86,7 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false));
 
         var portOutput = _requestSender.InitializeCommunication();
-        Assert.IsLessThan(portOutput, 0, "Negative port number must be returned if Hosting Server fails.");
+        Assert.IsLessThan(0, portOutput, "Negative port number must be returned if Hosting Server fails.");
 
         var connectionSuccess = _requestSender.WaitForRequestHandlerConnection(_waitTimeout);
         Assert.IsFalse(connectionSuccess, "Connection must fail as server failed to host.");
@@ -104,7 +104,7 @@ public class VsTestConsoleRequestSenderTests
         _mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false));
 
         var portOutput = await _requestSender.InitializeCommunicationAsync(_waitTimeout);
-        Assert.IsLessThan(portOutput, 0, "Negative port number must be returned if Hosting Server fails.");
+        Assert.IsLessThan(0, portOutput, "Negative port number must be returned if Hosting Server fails.");
 
         _mockCommunicationManager.Verify(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0)), Times.Once);
         _mockCommunicationManager.Verify(cm => cm.AcceptClientAsync(), Times.Never);
