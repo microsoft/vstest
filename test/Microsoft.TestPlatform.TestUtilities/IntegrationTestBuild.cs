@@ -30,6 +30,7 @@ public class IntegrationTestBuild : IntegrationTestBase
     // Session mutex: held for the entire test session (build + tests).
     // The process that creates it (createdNew=true) is the builder.
     private static Mutex? s_sessionMutex;
+    private static bool s_isSessionMutexOwner;
 
     public static void BuildTestAssetsForIntegrationTests(TestContext context)
     {
@@ -52,6 +53,7 @@ public class IntegrationTestBuild : IntegrationTestBase
         // Session mutex: the process that creates it is the builder.
         // Held for the entire session (build + tests), destroyed in CleanupTestAssets.
         s_sessionMutex = CreateMutex(baseName + "_Session", out bool isBuilder);
+        s_isSessionMutexOwner = isBuilder;
 
         if (isBuilder)
         {
@@ -169,10 +171,12 @@ public class IntegrationTestBuild : IntegrationTestBase
 
     public static void CleanupTestAssets()
     {
-        // Destroy session mutex — signals that this test session is done.
         if (s_sessionMutex is not null)
         {
-            try { s_sessionMutex.ReleaseMutex(); } catch (ApplicationException) { }
+            if (s_isSessionMutexOwner)
+            {
+                try { s_sessionMutex.ReleaseMutex(); } catch (ApplicationException) { }
+            }
             s_sessionMutex.Dispose();
             s_sessionMutex = null;
         }
