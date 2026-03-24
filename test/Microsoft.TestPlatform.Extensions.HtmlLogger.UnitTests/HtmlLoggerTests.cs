@@ -598,8 +598,9 @@ public class HtmlLoggerTests
 
         // The filename should contain a fractional-seconds timestamp: yyyyMMdd_HHmmss.fffffff
         // e.g., TestResult_user_MACHINE_20260324_065512.1234567
-        StringAssert.Matches(fileName, new System.Text.RegularExpressions.Regex(
-            @"\d{8}_\d{6}\.\d{7}$"),
+        Assert.MatchesRegex(
+            @"\d{8}_\d{6}\.\d{7}$",
+            fileName,
             $"Filename should end with yyyyMMdd_HHmmss.fffffff pattern: {fileName}");
     }
 
