@@ -53,13 +53,21 @@ public class CodeCoverageDataAttachmentsHandlerTests
     [ClassInitialize]
     public static void ClassInitialize(TestContext context)
     {
-        // Copying test files to correct place,
-        var assemblyPath = AppDomain.CurrentDomain.BaseDirectory;
-        var testFilesDirectory = Path.Combine(context.DeploymentDirectory!, "TestFiles");
-        Directory.CreateDirectory(testFilesDirectory);
-        var files = Directory.GetFiles(Path.Combine(assemblyPath, "TestFiles"));
-        foreach (var file in files)
-            File.Copy(file, Path.Combine(testFilesDirectory, Path.GetFileName(file)));
+        // Annoyingly those paths are the same, but one does not end with slash,
+        // no matter how you compare, e.g. new DirectoryInfo(...).FullName, the slashes are not
+        // removed. And then you get obscure error: File already exists, or File is used by other process
+        // when you try to copy the file and provide both paths the same.
+        var assemblyPath = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
+        var deploymentDirectory = context.DeploymentDirectory!.TrimEnd(Path.DirectorySeparatorChar);
+        if (new DirectoryInfo(deploymentDirectory).FullName != new DirectoryInfo(assemblyPath).FullName)
+        {
+            // Copying test files to deployment directory place,
+            var testFilesDirectory = Path.Combine(deploymentDirectory!, "TestFiles");
+            Directory.CreateDirectory(testFilesDirectory);
+            var files = Directory.GetFiles(Path.Combine(assemblyPath, "TestFiles"));
+            foreach (var file in files)
+                File.Copy(file, Path.Combine(testFilesDirectory, Path.GetFileName(file)), overwrite: true);
+        }
     }
 
     [TestMethod]
@@ -189,7 +197,7 @@ public class CodeCoverageDataAttachmentsHandlerTests
             attachmentSet
         ];
 
-        await Assert.ThrowsExceptionAsync<OperationCanceledException>(async () => await _coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(_configurationElement, attachment, _mockProgressReporter.Object, null, cts.Token));
+        await Assert.ThrowsExactlyAsync<OperationCanceledException>(async () => await _coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(_configurationElement, attachment, _mockProgressReporter.Object, null, cts.Token));
 
         Assert.AreEqual(2, attachment.Count);
 

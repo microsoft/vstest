@@ -86,19 +86,19 @@ public class CollectArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldThrowIfArgumentIsNull()
     {
-        Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(null));
+        Assert.ThrowsExactly<CommandLineException>(() => _executor.Initialize(null));
     }
 
     [TestMethod]
     public void InitializeShouldNotThrowIfArgumentIsEmpty()
     {
-        Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(string.Empty));
+        Assert.ThrowsExactly<CommandLineException>(() => _executor.Initialize(string.Empty));
     }
 
     [TestMethod]
     public void InitializeShouldNotThrowIfArgumentIsWhiteSpace()
     {
-        Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(" "));
+        Assert.ThrowsExactly<CommandLineException>(() => _executor.Initialize(" "));
     }
 
     [TestMethod]
@@ -597,7 +597,7 @@ public class CollectArgumentProcessorTests
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
 
-        Assert.ThrowsException<CommandLineException>(() => _executor.Initialize("MyDataCollector=SomeSetting"));
+        Assert.ThrowsExactly<CommandLineException>(() => _executor.Initialize("MyDataCollector=SomeSetting"));
     }
 
     [TestMethod]
@@ -608,7 +608,7 @@ public class CollectArgumentProcessorTests
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
 
-        Assert.ThrowsException<CommandLineException>(() => _executor.Initialize("MyDataCollector;SomeSetting"));
+        Assert.ThrowsExactly<CommandLineException>(() => _executor.Initialize("MyDataCollector;SomeSetting"));
     }
 
     [TestMethod]

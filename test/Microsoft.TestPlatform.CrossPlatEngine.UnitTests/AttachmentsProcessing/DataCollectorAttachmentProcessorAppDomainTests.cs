@@ -68,7 +68,7 @@ public class DataCollectorAttachmentProcessorAppDomainTests
         Task runProcessing = dcap.ProcessAttachmentSetsAsync(doc.DocumentElement, attachments, new Progress<int>((int report) => cts.Cancel()), _loggerMock.Object, cts.Token);
 
         //assert
-        await Assert.ThrowsExceptionAsync<OperationCanceledException>(async () => await runProcessing);
+        await Assert.ThrowsExactlyAsync<OperationCanceledException>(async () => await runProcessing);
     }
 
     [TestMethod]

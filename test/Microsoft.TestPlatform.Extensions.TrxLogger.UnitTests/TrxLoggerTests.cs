@@ -7,6 +7,8 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -65,7 +67,7 @@ public class TrxLoggerTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfEventsIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(
+        Assert.ThrowsExactly<ArgumentNullException>(
             () => _testableTrxLogger.Initialize(null!, _parameters));
     }
 
@@ -79,7 +81,7 @@ public class TrxLoggerTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfTestRunDirectoryIsEmptyOrNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(
+        Assert.ThrowsExactly<ArgumentNullException>(
             () =>
             {
                 var events = new Mock<TestLoggerEvents>();
@@ -99,13 +101,13 @@ public class TrxLoggerTests
     public void InitializeShouldThrowExceptionIfParametersAreEmpty()
     {
         var events = new Mock<TestLoggerEvents>();
-        Assert.ThrowsException<ArgumentException>(() => _testableTrxLogger.Initialize(events.Object, new Dictionary<string, string?>()));
+        Assert.ThrowsExactly<ArgumentException>(() => _testableTrxLogger.Initialize(events.Object, new Dictionary<string, string?>()));
     }
 
     [TestMethod]
     public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _testableTrxLogger.TestMessageHandler(new object(), default!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => _testableTrxLogger.TestMessageHandler(new object(), default!));
     }
 
     [TestMethod]
@@ -533,7 +535,7 @@ public class TrxLoggerTests
 
         _testableTrxLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
-        Assert.AreEqual(_testableTrxLogger.TestResultOutcome, TrxLoggerObjectModel.TestOutcome.Failed);
+        Assert.AreEqual(TrxLoggerObjectModel.TestOutcome.Failed, _testableTrxLogger.TestResultOutcome);
     }
 
     [TestMethod]
@@ -854,7 +856,7 @@ public class TrxLoggerTests
         _parameters[TrxLoggerConstants.LogFilePrefixKey] = trxPrefix;
         _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
 
-        Assert.ThrowsException<ArgumentException>(() => _testableTrxLogger.Initialize(_events.Object, _parameters));
+        Assert.ThrowsExactly<ArgumentException>(() => _testableTrxLogger.Initialize(_events.Object, _parameters));
     }
 
     [TestMethod]
@@ -912,6 +914,40 @@ public class TrxLoggerTests
         }
 
         return null;
+    }
+
+    [TestMethod]
+    public void TestResultHandlerCountersShouldBeThreadSafe()
+    {
+        const int threadCount = 10;
+        const int testsPerThread = 100;
+        var barrier = new Barrier(threadCount);
+
+        var tasks = Enumerable.Range(0, threadCount).Select(t => Task.Run(() =>
+        {
+            barrier.SignalAndWait();
+            for (int i = 0; i < testsPerThread; i++)
+            {
+                var testCase = CreateTestCase($"Test_{t}_{i}");
+                var result = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)
+                {
+                    Outcome = t % 2 == 0 ? TestOutcome.Passed : TestOutcome.Failed
+                };
+                _testableTrxLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result).Object);
+            }
+        })).ToArray();
+
+        Task.WaitAll(tasks);
+
+        Assert.AreEqual(threadCount * testsPerThread, _testableTrxLogger.TotalTestCount,
+            "Total test count should be exact under concurrent updates");
+
+        int expectedPassed = (threadCount / 2) * testsPerThread;
+        int expectedFailed = (threadCount / 2) * testsPerThread;
+        Assert.AreEqual(expectedPassed, _testableTrxLogger.PassedTestCount,
+            "Passed test count should be exact under concurrent updates");
+        Assert.AreEqual(expectedFailed, _testableTrxLogger.FailedTestCount,
+            "Failed test count should be exact under concurrent updates");
     }
 
     private static TestCase CreateTestCase(string testCaseName)
