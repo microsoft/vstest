@@ -29,8 +29,6 @@ internal class ParallelRunDataAggregator
 
     private readonly object _dataUpdateSyncObject = new();
 
-    private readonly HashSet<InvokedDataCollector> _invokedDataCollectorsSet = new();
-
     public ParallelRunDataAggregator(string runSettingsXml)
     {
         RunSettings = runSettingsXml ?? throw new ArgumentNullException(nameof(runSettingsXml));
@@ -139,6 +137,8 @@ internal class ParallelRunDataAggregator
     /// Aggregate Run Data
     /// Must be thread-safe as this is expected to be called by parallel managers
     /// </summary>
+    // Note: This method is called once at the end of the test run to aggregate results.
+    // It is NOT called in parallel, so thread-safety optimizations here would be misleading.
     public void Aggregate(
         ITestRunStatistics? testRunStats,
         ICollection<string>? executorUris,
@@ -174,7 +174,7 @@ internal class ParallelRunDataAggregator
             {
                 foreach (var invokedDataCollector in invokedDataCollectors)
                 {
-                    if (_invokedDataCollectorsSet.Add(invokedDataCollector))
+                    if (!InvokedDataCollectors.Contains(invokedDataCollector))
                     {
                         InvokedDataCollectors.Add(invokedDataCollector);
                     }
