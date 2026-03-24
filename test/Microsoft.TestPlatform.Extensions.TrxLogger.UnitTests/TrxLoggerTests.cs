@@ -641,8 +641,8 @@ public class TrxLoggerTests
 
         var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
         Assert.IsNotNull(fileName);
-        Assert.Contains(fileName, "_net10.0", $"Expected TFM 'net10.0' in filename but got: {fileName}");
-        Assert.EndsWith(fileName, ".trx", $"Expected .trx extension but got: {fileName}");
+        Assert.Contains("_net10.0", fileName, $"Expected TFM 'net10.0' in filename but got: {fileName}");
+        Assert.EndsWith(".trx", fileName, $"Expected .trx extension but got: {fileName}");
     }
 
     [TestMethod]
@@ -655,7 +655,7 @@ public class TrxLoggerTests
 
         var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
         Assert.IsNotNull(fileName);
-        Assert.EndsWith(fileName, ".trx", $"Expected .trx extension but got: {fileName}");
+        Assert.EndsWith(".trx", fileName, $"Expected .trx extension but got: {fileName}");
     }
 
     [TestMethod]
@@ -669,8 +669,8 @@ public class TrxLoggerTests
 
         var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
         Assert.IsNotNull(fileName);
-        Assert.Contains(fileName, "_SomeCustomFramework", $"Expected raw framework string in filename but got: {fileName}");
-        Assert.EndsWith(fileName, ".trx", $"Expected .trx extension but got: {fileName}");
+        Assert.Contains("_SomeCustomFramework", fileName, $"Expected raw framework string in filename but got: {fileName}");
+        Assert.EndsWith(".trx", fileName, $"Expected .trx extension but got: {fileName}");
     }
 
     [TestMethod]
