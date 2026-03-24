@@ -71,10 +71,14 @@ function Verify-Nuget-Packages {
         $nugetPackages += $vsix
     }
 
-    Write-Host "Unzipping NuGet packages to '$tmpDirectory'."
+    # Extract into the same location that IntegrationTestBuild.cs expects
+    # (artifacts/tmp/{Config}/extractedPackages/{PackageFileName}), so integration
+    # tests can reuse these extractions via the .cache marker files written below.
+    $extractedPackagesDir = Join-Path $tmpDirectory "extractedPackages"
+    Write-Host "Unzipping NuGet packages to '$extractedPackagesDir'."
     $unzipNugetPackageDirs = @()
     foreach ($nugetPackage in $nugetPackages) {
-        $unzipNugetPackageDir = Join-Path $tmpDirectory $nugetPackage.BaseName
+        $unzipNugetPackageDir = Join-Path $extractedPackagesDir $nugetPackage.Name
         $unzipNugetPackageDirs += $unzipNugetPackageDir
 
         if (Test-Path -Path $unzipNugetPackageDir) {
@@ -87,33 +91,38 @@ function Verify-Nuget-Packages {
     Write-Host "Verify NuGet packages files."
     $errors = @()
     foreach ($unzipNugetPackageDir in $unzipNugetPackageDirs) {
-        try {
-            $packageBaseName = (Get-Item $unzipNugetPackageDir).BaseName
-            $packageKey = $packageBaseName.Replace([string]".$version", [string]"")
-            Write-Host "Verifying package '$packageBaseName'."
+        # Directory is named after the package file (e.g. "Microsoft.TestPlatform.18.6.0-dev.nupkg"),
+        # so strip the extension to get the base name for key derivation.
+        $packageBaseName = [System.IO.Path]::GetFileNameWithoutExtension((Get-Item $unzipNugetPackageDir).Name)
+        $packageKey = $packageBaseName.Replace([string]".$version", [string]"")
+        Write-Host "Verifying package '$packageBaseName'."
 
-            $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir | Where-Object { $_.Name -ne '.signature.p7s' }).Count
-            if (-not $expectedNumOfFiles.ContainsKey($packageKey)) {
-                $errors += "Package '$packageKey' is not present in file expectedNumOfFiles table. Is that package known?"
-                continue
-            }
-            if ($expectedNumOfFiles[$packageKey] -ne $actualNumOfFiles) {
-                $errors += "Number of files are not equal for '$packageBaseName', expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
-            }
-
-            if ($packageKey -eq "Microsoft.TestPlatform") {
-                Verify-Version -nugetDir $unzipNugetPackageDir -errors $errors
-            }
+        $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir | Where-Object { $_.Name -ne '.signature.p7s' }).Count
+        if (-not $expectedNumOfFiles.ContainsKey($packageKey)) {
+            $errors += "Package '$packageKey' is not present in file expectedNumOfFiles table. Is that package known?"
+            continue
         }
-        finally {
-            # if ($null -ne $unzipNugetPackageDir -and (Test-Path $unzipNugetPackageDir)) {
-            #     Remove-Item -Force -Recurse $unzipNugetPackageDir | Out-Null
-            # }
+        if ($expectedNumOfFiles[$packageKey] -ne $actualNumOfFiles) {
+            $errors += "Number of files are not equal for '$packageBaseName', expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
+        }
+
+        if ($packageKey -eq "Microsoft.TestPlatform") {
+            Verify-Version -nugetDir $unzipNugetPackageDir -errors $errors
         }
     }
 
     if ($errors) {
         Write-Error "There are $($errors.Count) errors:`n$($errors -join "`n")"
+    }
+
+    # Write .cache marker files so IntegrationTestBuild.cs detects these
+    # extractions and skips re-extracting the same packages during test init.
+    Write-Host "Writing cache markers for extracted packages."
+    foreach ($nugetPackage in $nugetPackages) {
+        $unzipNugetPackageDir = Join-Path $extractedPackagesDir $nugetPackage.Name
+        $cacheMarkerPath = Join-Path $unzipNugetPackageDir ($nugetPackage.Name + ".cache")
+        $lastWriteTimeUtc = $nugetPackage.LastWriteTimeUtc.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+        [System.IO.File]::WriteAllText($cacheMarkerPath, $lastWriteTimeUtc)
     }
 
     Write-Host "Completed Verify-Nuget-Packages."
