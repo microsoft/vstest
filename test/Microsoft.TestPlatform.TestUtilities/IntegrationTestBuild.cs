@@ -96,7 +96,7 @@ public class IntegrationTestBuild : IntegrationTestBase
 
     private static void BuildTestAssets(string nugetCache)
     {
-        var testAssets = Path.GetFullPath(Path.Combine(Root, "test", "TestAssets", "TestAssets.sln"));
+        var testAssets = Path.GetFullPath(Path.Combine(Root, "test", "TestAssets", "TestAssets.slnx"));
         var nugetFeeds = GetNugetSourceParameters(Root);
 
         var netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
