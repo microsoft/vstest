@@ -83,7 +83,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="$(SystemDiagnosticsDiagnosticSourceVersion)" PrivateAssets="All" GeneratePathProperty="true" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="$(SystemDiagnosticsDiagnosticSourceVersion)" PrivateAssets="All" GeneratePathProperty="true" ExcludeAssets="all" />
   </ItemGroup>
 
   <!--
