@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 using Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests.EventHandler;
 using Microsoft.TestPlatform.TestUtilities;
@@ -96,105 +95,6 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped), _runEventHandler.ToString());
         AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, _logsDir.Path, testHostNames);
-    }
-
-    [TestMethod]
-    [TestCategory("Windows-Review")]
-    // Uses testsettings, which is a concept that is more likely on .NET Framework because it comes from TPv0, so run on .NET Framework testhost.
-    // TODO: remove this test? we deprecated testsettings. 
-    [NetFullTargetFrameworkDataSource]
-    [Ignore("we don't support test settings anymore")]
-    public void RunTestsWithTestSettingsInTpv2(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
-
-        var testsettingsFile = Path.Combine(TempDirectory.Path, "tempsettings.testsettings");
-        string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
-
-        File.WriteAllText(testsettingsFile, testSettingsXml, Encoding.UTF8);
-        var runSettings = $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion></RunConfiguration><MSTest><SettingsFile>" + testsettingsFile + "</SettingsFile></MSTest></RunSettings>";
-        var sources = new List<string>
-        {
-            GetAssetFullPath("MstestV1UnitTestProject.dll")
-        };
-
-        _vstestConsoleWrapper.RunTests(
-            sources,
-            runSettings,
-            _runEventHandler);
-
-        // Assert
-        Assert.HasCount(5, _runEventHandler.TestResults, _runEventHandler.ToString());
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
-        Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
-        Assert.ContainsSingle(_runEventHandler.TestResults.Where(t => t.Outcome == TestOutcome.Skipped), _runEventHandler.ToString());
-    }
-
-    [TestMethod]
-    [TestCategory("Windows-Review")]
-    // Uses testsettings, which is a concept that is more likely on .NET Framework because it comes from TPv0, so run on .NET Framework testhost.
-    // TODO: remove this test? we deprecated and removed tpv0, check if we can also remove some test asset..
-    [Ignore("we don't ship tpv0 anymore it ignores test settings and falls up to tpv2")]
-    [NetFullTargetFrameworkDataSource]
-    public void RunTestsWithTestSettingsInTpv0(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-        Setup();
-
-        var testSettingsXml = """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <TestSettings name="VS19 repro." id="9b2f344b-e089-447e-8ed6-5e333b0a0361" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
-              <Description>This is a default test run configuration for a local test run.</Description>
-              <Deployment>
-                <DeploymentItem filename="UnitTest1.cs" />
-              </Deployment>
-              <Execution hostProcessPlatform="MSIL">
-                <Hosts skipUnhostableTests="false">
-                  <AspNet name="ASP.NET" executionType="WebDev" />
-                  <VSSDKTestHostRunConfig name="VS IDE" HiveKind="DevEnv" HiveName="10.0" xmlns="http://microsoft.com/schemas/VisualStudio/SDK/Tools/IdeHostAdapter/2006/06" />
-                </Hosts>
-                <Timeouts runTimeout="3540000" testTimeout="2400000" />
-                <TestTypeSpecific>
-                  <WebTestRunConfiguration testTypeId="4e7599fa-5ecb-43e9-a887-cd63cf72d207">
-                    <Browser name="Internet Explorer 6.0">
-                      <Headers>
-                        <Header name="User-Agent" value="Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)" />
-                        <Header name="Accept" value="*/*" />
-                        <Header name="Accept-Language" value="{{$IEAcceptLanguage}}" />
-                        <Header name="Accept-Encoding" value="GZIP" />
-                      </Headers>
-                    </Browser>
-                  </WebTestRunConfiguration>
-                  <UnitTestRunConfig testTypeId="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b">
-                    <AssemblyResolution>
-                      <TestDirectory useLoadContext="true" />
-                      <RuntimeResolution>
-                        <Directory path="%HOMEDRIVE%\t\UnitTestProject5\UnitTestProject5\bin\Debug" includeSubDirectories="true" />
-                      </RuntimeResolution>
-                    </AssemblyResolution>
-                  </UnitTestRunConfig>
-                </TestTypeSpecific>
-                <AgentRule name="LocalMachineDefaultRole">
-                </AgentRule>
-              </Execution>
-              <Properties />
-            </TestSettings>
-            """;
-
-        var testsettingsFile = Path.Combine(TempDirectory.Path, "tempsettings.testsettings");
-
-        File.WriteAllText(testsettingsFile, testSettingsXml, Encoding.UTF8);
-
-        var source = GetAssetFullPath("MstestV1UnitTestProject.dll");
-
-        InvokeVsTestForExecution(source, null, runnerInfo.TargetFramework, runSettings: testsettingsFile, null);
-
-        // Assert
-        // Ensure that we are trying to run via tpv0 and failing because that is no longer allowed.
-        Assert.Contains("An exception occurred while invoking executor 'executor://mstestadapter/v1': MSTest v1 run was offloaded to legacy TestPlatform runner", StdErrWithWhiteSpace);
-
-        ExitCodeEquals(1); // failing tests
     }
 
     [TestMethod]

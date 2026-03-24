@@ -32,7 +32,7 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useVsixRunner: true)]
     [NetCoreTargetFrameworkDataSource]
     [TestCategory("Smoke")]
     public void MultipleSourcesDiscoverAllTests(RunnerInfo runnerInfo)

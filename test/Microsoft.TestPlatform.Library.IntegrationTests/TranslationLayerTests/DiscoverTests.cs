@@ -87,6 +87,7 @@ public class DiscoverTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Smoke")]
     [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSource(useVsixRunner: true)]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

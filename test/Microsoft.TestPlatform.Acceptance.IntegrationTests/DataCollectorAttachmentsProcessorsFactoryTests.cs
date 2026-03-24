@@ -152,7 +152,7 @@ public class DataCollectorAttachmentsProcessorsFactoryTests : AcceptanceTestBase
         string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         while (true)
         {
-            if (File.Exists(Path.Combine(current, "TestPlatform.sln")))
+            if (File.Exists(Path.Combine(current, "TestPlatform.slnx")))
             {
                 string testAssetsPath = Path.Combine(current, @"test/TestAssets");
                 Assert.IsTrue(Directory.Exists(testAssetsPath), $"Directory not found '{testAssetsPath}'");

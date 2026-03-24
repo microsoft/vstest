@@ -623,9 +623,9 @@ public class IntegrationTestBase
         return _testEnvironment.GetTestAsset(assetName);
     }
 
-    protected string GetTestDllForFramework(string assetName, string targetFramework)
+    protected string GetTestDllForFramework(string assetName, string targetFramework, bool automaticallyResolveCompatibilityTestAsset = true)
     {
-        return _testEnvironment.GetTestAsset(assetName, targetFramework);
+        return _testEnvironment.GetTestAsset(assetName, targetFramework, automaticallyResolveCompatibilityTestAsset);
     }
 
     protected List<string> GetTestDlls(params string[] assetNames)
@@ -793,6 +793,21 @@ public class IntegrationTestBase
         }
 
         Console.WriteLine($"Console runner path: {consoleRunnerPath}");
+
+        // When testing with older vstest.console.dll they need to have an older runtime installed to run, but there are rarely
+        // incompatibilities between runtimes, so we roll forward to latest major to minimize the amount of runtimes we need to install.
+        // Especially very old runtimes like netcoreapp2.1, which makes us flagged by compliance.
+        //
+        // This is applicable only to vstest.console and datacollector, for testhost the project dictates the tfm that is used because
+        // we pass the test project runtimeconfig to the testhost.
+        if (IsNetCoreRunner())
+        {
+            environmentVariables ??= new();
+            if (!environmentVariables.ContainsKey("DOTNET_ROLL_FORWARD"))
+            {
+                environmentVariables.Add("DOTNET_ROLL_FORWARD", "LatestMajor");
+            }
+        }
 
         // Providing any environment variable to vstest.console will clear all existing environment variables,
         // this works around it by copying all existing variables, and adding debug. But we only want to do that
