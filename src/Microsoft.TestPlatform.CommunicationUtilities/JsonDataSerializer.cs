@@ -391,7 +391,7 @@ public class JsonDataSerializer : IDataSerializer
         var options = GetPayloadOptions(version);
         return Deserialize<T>(options, json);
 #else
-        var obj = Json.Deserialize(json);
+        var obj = Json.Deserialize(json, new JsonSettings { AllowTrailingCommas = true });
         return JsoniteConvert.To<T>(obj);
 #endif
     }
@@ -512,6 +512,7 @@ public class JsonDataSerializer : IDataSerializer
         var options = GetPayloadOptions(version);
         return Serialize(options, data);
 #else
+        ValidateVersion(version);
         var jsonValue = JsoniteConvert.ToJsonValue(data, version);
         return Json.Serialize(jsonValue!);
 #endif
@@ -534,6 +535,17 @@ public class JsonDataSerializer : IDataSerializer
         var stringObj = Serialize(obj, 2);
         return Deserialize<T>(stringObj, 2)!;
     }
+
+#if NETFRAMEWORK
+    private static void ValidateVersion(int version)
+    {
+        if (version is not (0 or 1 or 2 or 3 or 4 or 5 or 6 or 7))
+        {
+            throw new NotSupportedException($"Protocol version {version} is not supported. "
+                + "Ensure it is compatible with the latest serializer or add a new one.");
+        }
+    }
+#endif
 
 #if !NETFRAMEWORK
     /// <summary>

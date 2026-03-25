@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #if NETFRAMEWORK
@@ -336,7 +336,7 @@ internal static class JsoniteConvert
                 var tp = (TestProperty?)DeserializeTestProperty(ko); if (tp is null) continue;
                 pd.TryGetValue("Value", out var rv); var data = ConvertPropertyValueToString(rv);
                 tp = TestProperty.Register(tp.Id, tp.Label, tp.GetValueType(), tp.Attributes, typeof(TestObject));
-                inst.SetPropertyValue(tp, data, CultureInfo.InvariantCulture);
+                inst.SetPropertyValue(tp, (object?)data, CultureInfo.InvariantCulture);
             }
         return inst;
     }
@@ -530,10 +530,12 @@ internal static class JsoniteConvert
         }
         if (value is IDictionary<string, object> od)
         {
-            var inst = CreateInstance(targetType, od);
+            var inst = CreateInstance(targetType, od, out var usedKeys);
             var props = targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var kvp in od)
             {
+                // Skip keys already consumed by the constructor
+                if (usedKeys != null && usedKeys.Contains(kvp.Key)) continue;
                 var prop = FindProperty(props, kvp.Key); if (prop is null) continue;
                 if (prop.GetCustomAttribute<IgnoreDataMemberAttribute>() != null) continue;
                 try
@@ -561,21 +563,23 @@ internal static class JsoniteConvert
         return null;
     }
 
-    private static object CreateInstance(Type type, IDictionary<string, object> data)
+    private static object CreateInstance(Type type, IDictionary<string, object> data, out HashSet<string>? usedKeys)
     {
+        usedKeys = null;
         var pc = type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
         if (pc is not null) return pc.Invoke(Array.Empty<object>());
         foreach (var ctor in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance))
         {
             var pars = ctor.GetParameters(); var args = new object?[pars.Length]; bool ok = true;
+            var keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             for (int i = 0; i < pars.Length; i++)
             {
                 var k = data.Keys.FirstOrDefault(x => string.Equals(x, pars[i].Name, StringComparison.OrdinalIgnoreCase));
-                if (k is not null) args[i] = ConvertTo(data[k], pars[i].ParameterType);
+                if (k is not null) { args[i] = ConvertTo(data[k], pars[i].ParameterType); keys.Add(k); }
                 else if (pars[i].HasDefaultValue) args[i] = pars[i].DefaultValue;
                 else { ok = false; break; }
             }
-            if (ok) return ctor.Invoke(args);
+            if (ok) { usedKeys = keys; return ctor.Invoke(args); }
         }
         return FormatterServices.GetUninitializedObject(type);
     }
