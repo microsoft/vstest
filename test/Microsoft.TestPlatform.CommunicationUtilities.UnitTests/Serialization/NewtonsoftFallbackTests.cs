@@ -501,7 +501,7 @@ public class NewtonsoftFallbackTests
             newResults[0].TestCase.FullyQualifiedName);
 
         Assert.IsNotNull(result.ExecutorUris);
-        Assert.Contains(result.ExecutorUris, "executor://MSTestAdapter/v2");
+        Assert.Contains("executor://MSTestAdapter/v2", result.ExecutorUris);
     }
 
     private static void AssertTestRunStatsChangeFields(TestRunStatsPayload? result)

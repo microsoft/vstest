@@ -454,7 +454,7 @@ public class ExecutionCompleteSerializationTests
 
         // ExecutorUris
         Assert.IsNotNull(result.ExecutorUris);
-        Assert.Contains(result.ExecutorUris, "executor://MSTestAdapter/v2");
+        Assert.Contains("executor://MSTestAdapter/v2", result.ExecutorUris);
     }
 
     /// <summary>
