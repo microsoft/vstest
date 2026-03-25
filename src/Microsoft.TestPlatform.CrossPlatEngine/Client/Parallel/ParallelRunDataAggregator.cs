@@ -70,30 +70,25 @@ internal class ParallelRunDataAggregator
 
     public string RunSettings { get; }
 
-    // Note: This method is called once at the end of the test run to aggregate results.
-    // It is NOT called in parallel, so thread-safety optimizations here would be misleading.
     public ITestRunStatistics GetAggregatedRunStats()
     {
         var testOutcomeMap = new Dictionary<TestOutcome, long>();
         long totalTests = 0;
-        lock (_dataUpdateSyncObject)
+        if (_testRunStatsList.Count > 0)
         {
-            if (_testRunStatsList.Count > 0)
+            foreach (var runStats in _testRunStatsList)
             {
-                foreach (var runStats in _testRunStatsList)
+                // TODO: we get nullref here if the stats are empty.
+                foreach (var kvp in runStats.Stats!)
                 {
-                    // TODO: we get nullref here if the stats are empty.
-                    foreach (var kvp in runStats.Stats!)
+                    if (!testOutcomeMap.TryGetValue(kvp.Key, out long currentCount))
                     {
-                        if (!testOutcomeMap.TryGetValue(kvp.Key, out long currentCount))
-                        {
-                            currentCount = 0;
-                        }
-
-                        testOutcomeMap[kvp.Key] = currentCount + kvp.Value;
+                        currentCount = 0;
                     }
-                    totalTests += runStats.ExecutedTests;
+
+                    testOutcomeMap[kvp.Key] = currentCount + kvp.Value;
                 }
+                totalTests += runStats.ExecutedTests;
             }
         }
 
