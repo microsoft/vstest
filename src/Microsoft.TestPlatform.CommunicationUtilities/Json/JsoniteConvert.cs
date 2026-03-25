@@ -73,6 +73,145 @@ internal static class JsoniteConvert
         if (!type.IsValueType && !visited.Add(value))
             return null; // Already visited — break the cycle
 
+        // ── vstest-specific type handlers ──────────────────────────
+        // These must produce the exact same JSON as the STJ converters.
+
+        if (value is Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProperty tp)
+        {
+            return new JsonObject
+            {
+                ["Id"] = tp.Id,
+                ["Label"] = tp.Label,
+                ["Category"] = tp.Category,
+                ["Description"] = tp.Description,
+                ["Attributes"] = (int)tp.Attributes,
+                ["ValueType"] = tp.ValueType,
+            };
+        }
+
+        if (value is Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase tc)
+        {
+            // V2 flat format (used by default — V1 is handled by TestCaseConverter logic in JsonDataSerializer)
+#pragma warning disable CS8601 // JsonObject accepts null values at runtime
+            var obj = new JsonObject
+            {
+                ["Id"] = tc.Id.ToString("D"),
+                ["FullyQualifiedName"] = tc.FullyQualifiedName,
+                ["DisplayName"] = tc.DisplayName,
+                ["ExecutorUri"] = tc.ExecutorUri?.OriginalString,
+                ["Source"] = tc.Source,
+                ["CodeFilePath"] = tc.CodeFilePath,
+                ["LineNumber"] = tc.LineNumber,
+            };
+#pragma warning restore CS8601
+            // Serialize custom properties (Traits etc.)
+            var propsArray = new JsonArray();
+            foreach (var kvp in tc.GetProperties())
+            {
+                var propObj = new JsonObject
+                {
+                    ["Key"] = ToJsonValueCore(kvp.Key, visited, depth + 1)!,
+                    ["Value"] = ToJsonValueCore(kvp.Value, visited, depth + 1)!,
+                };
+                propsArray.Add(propObj);
+            }
+            obj["Properties"] = propsArray;
+            return obj;
+        }
+
+        if (value is Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult tr)
+        {
+            // V2 flat format
+#pragma warning disable CS8601
+            var obj = new JsonObject
+            {
+                ["TestCase"] = ToJsonValueCore(tr.TestCase, new HashSet<object>(ReferenceEqualityComparer.Instance), depth + 1),
+                ["Attachments"] = ToJsonValueCore(tr.Attachments, visited, depth + 1),
+                ["Outcome"] = (int)tr.Outcome,
+                ["ErrorMessage"] = tr.ErrorMessage,
+                ["ErrorStackTrace"] = tr.ErrorStackTrace,
+                ["DisplayName"] = tr.DisplayName,
+                ["Messages"] = ToJsonValueCore(tr.Messages, visited, depth + 1),
+                ["ComputerName"] = tr.ComputerName,
+                ["Duration"] = tr.Duration.ToString(),
+                ["StartTime"] = tr.StartTime.ToString("o", CultureInfo.InvariantCulture),
+                ["EndTime"] = tr.EndTime.ToString("o", CultureInfo.InvariantCulture),
+            };
+#pragma warning restore CS8601
+            var propsArray = new JsonArray();
+            foreach (var kvp in tr.GetProperties())
+            {
+                var propObj = new JsonObject
+                {
+                    ["Key"] = ToJsonValueCore(kvp.Key, visited, depth + 1)!,
+                    ["Value"] = ToJsonValueCore(kvp.Value, visited, depth + 1)!,
+                };
+                propsArray.Add(propObj);
+            }
+            obj["Properties"] = propsArray;
+            return obj;
+        }
+
+        if (value is Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet att)
+        {
+            return new JsonObject
+            {
+                ["Uri"] = att.Uri.OriginalString,
+                ["DisplayName"] = att.DisplayName,
+                ["Attachments"] = ToJsonValueCore(att.Attachments, visited, depth + 1)!,
+            };
+        }
+
+        if (value is Microsoft.VisualStudio.TestPlatform.ObjectModel.UriDataAttachment uda)
+        {
+#pragma warning disable CS8601
+            return new JsonObject
+            {
+                ["Uri"] = uda.Uri.OriginalString,
+                ["Description"] = uda.Description,
+            };
+#pragma warning restore CS8601
+        }
+
+        if (value is Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResultMessage msg)
+        {
+#pragma warning disable CS8601
+            return new JsonObject
+            {
+                ["Category"] = msg.Category,
+                ["Text"] = msg.Text,
+            };
+#pragma warning restore CS8601
+        }
+
+        // Skip [IgnoreDataMember] and delegate properties for DataContract types
+        if (type.GetCustomAttribute<DataContractAttribute>() is not null)
+        {
+            var result = new JsonObject();
+            foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (!prop.CanRead || prop.GetIndexParameters().Length > 0)
+                    continue;
+                if (prop.GetCustomAttribute<IgnoreDataMemberAttribute>() is not null)
+                    continue;
+                if (typeof(Delegate).IsAssignableFrom(prop.PropertyType))
+                    continue;
+
+                try
+                {
+                    var propValue = prop.GetValue(value);
+                    result[prop.Name] = ToJsonValueCore(propValue, visited, depth + 1)!;
+                }
+                catch
+                {
+                    // Skip properties that throw on access
+                }
+            }
+            return result;
+        }
+
+        // ── end vstest-specific handlers ───────────────────────────
+
         try
         {
             // Dictionary<string, *> → JsonObject
