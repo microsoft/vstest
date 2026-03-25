@@ -139,8 +139,12 @@ public class IntegrationTestBuild : IntegrationTestBase
                 try
                 {
                     // We didn't create it, try to acquire to check if it's alive.
-                    mutex.WaitOne(0);
-                    mutex.ReleaseMutex();
+                    if (mutex.WaitOne(0))
+                    {
+                        // We acquired it — previous owner released. Release and return.
+                        mutex.ReleaseMutex();
+                    }
+                    // If WaitOne returned false, mutex is held by another process — that's fine.
                 }
                 catch (AbandonedMutexException)
                 {
