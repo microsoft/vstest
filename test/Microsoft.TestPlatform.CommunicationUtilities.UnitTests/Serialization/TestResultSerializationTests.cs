@@ -7,9 +7,11 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#if NET
 using System.Text.Json;
+#endif
 
-using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+using TestResult= Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization;
 
@@ -38,6 +40,7 @@ public class TestResultSerializationTests
 
     #region v1 serializer Tests (used with protocol 1 and accidentally with 3)
 
+#if NET
     [TestMethod]
     [DataRow(1)]
     [DataRow(3)]
@@ -68,6 +71,7 @@ public class TestResultSerializationTests
         Assert.AreEqual("TestResult.EndTime", properties[7].GetProperty("Key").GetProperty("Id").GetString());
         Assert.AreEqual(DateTimeOffset.MaxValue.Year, DateTimeOffset.Parse(properties[7].GetProperty("Value").GetString()!, System.Globalization.CultureInfo.InvariantCulture).Year);
     }
+#endif
 
     [TestMethod]
     [DataRow(1)]
@@ -185,6 +189,7 @@ public class TestResultSerializationTests
 
     #region v2 serializer Tests (used with protocol 2 and 4)
 
+#if NET
     [TestMethod]
     [DataRow(2)]
     [DataRow(4)]
@@ -207,6 +212,7 @@ public class TestResultSerializationTests
         Assert.AreEqual(StartTime.Year, DateTimeOffset.Parse(data.GetProperty("StartTime").GetString()!, System.Globalization.CultureInfo.InvariantCulture).Year);
         Assert.AreEqual(DateTimeOffset.MaxValue.Year, DateTimeOffset.Parse(data.GetProperty("EndTime").GetString()!, System.Globalization.CultureInfo.InvariantCulture).Year);
     }
+#endif
 
     [TestMethod]
     [DataRow(2)]

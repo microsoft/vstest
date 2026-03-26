@@ -285,6 +285,7 @@ public class JsoniteComparisonTests
         Console.WriteLine($"Jsonite Parse TestMessage: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
     }
 
+#if NET
     [TestMethod]
     [TestCategory("Performance")]
     public void Perf_Parse_TestMessage_SystemTextJson()
@@ -303,6 +304,7 @@ public class JsoniteComparisonTests
         sw.Stop();
         Console.WriteLine($"STJ JsonDocument.Parse TestMessage: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
     }
+#endif
 
     [TestMethod]
     [TestCategory("Performance")]
@@ -323,6 +325,7 @@ public class JsoniteComparisonTests
         Console.WriteLine($"Jsonite Parse ExecutionComplete: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
     }
 
+#if NET
     [TestMethod]
     [TestCategory("Performance")]
     public void Perf_Parse_ExecutionComplete_SystemTextJson()
@@ -341,6 +344,7 @@ public class JsoniteComparisonTests
         sw.Stop();
         Console.WriteLine($"STJ JsonDocument.Parse ExecutionComplete: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
     }
+#endif
 
     [TestMethod]
     [TestCategory("Performance")]
