@@ -14,7 +14,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+#if NETCOREAPP
 using Microsoft.Extensions.DependencyModel;
+#endif
 using Microsoft.TestPlatform.TestHostProvider;
 using Microsoft.TestPlatform.TestHostProvider.Hosting;
 using Microsoft.TestPlatform.TestHostProvider.Resources;
@@ -897,6 +899,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 // Get testhost relative path
                 using (var stream = _fileHelper.GetStream(depsFilePath, FileMode.Open, FileAccess.Read))
                 {
+#if NETCOREAPP
                     var context = new DependencyContextJsonReader().Read(stream);
                     var testhostPackage = context.RuntimeLibraries.FirstOrDefault(lib => lib.Name.Equals(testHostPackageName, StringComparison.OrdinalIgnoreCase));
 
@@ -922,6 +925,24 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                         IsVersionCheckRequired = !_hostPackageVersion.StartsWith("15.0.0");
                         EqtTrace.Verbose("DotnetTestHostmanager: Relative path of testhost.dll with respect to package folder is {0}", testHostPath);
                     }
+#else
+                    var library = DepsJsonParser.FindRuntimeLibrary(stream, testHostPackageName);
+                    if (library != null)
+                    {
+                        testHostPath = library.RuntimeAssemblyPaths
+                            .FirstOrDefault(p => p.EndsWith("testhost.dll", StringComparison.OrdinalIgnoreCase))
+                            ?? testHostPath;
+
+                        if (library.Path is not null)
+                        {
+                            testHostPath = Path.Combine(library.Path, testHostPath);
+                        }
+
+                        _hostPackageVersion = library.Version;
+                        IsVersionCheckRequired = !_hostPackageVersion.StartsWith("15.0.0");
+                        EqtTrace.Verbose("DotnetTestHostmanager: Relative path of testhost.dll with respect to package folder is {0}", testHostPath);
+                    }
+#endif
                 }
 
                 // Get probing path
