@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
-#if !NETFRAMEWORK
+#if NETCOREAPP
 using System.Text.Json.Serialization;
 #endif
 
@@ -25,7 +25,7 @@ public class TestRunCriteriaWithSources
     /// </param>
     /// <param name="runSettings"> The run settings.  </param>
     /// <param name="testExecutionContext"> The test Execution Context. </param>
-#if !NETFRAMEWORK
+#if NETCOREAPP
     [JsonConstructor]
 #endif
     public TestRunCriteriaWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string? package, string? runSettings, TestExecutionContext testExecutionContext)

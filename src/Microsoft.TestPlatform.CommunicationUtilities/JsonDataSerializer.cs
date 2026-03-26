@@ -4,7 +4,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-#if !NETFRAMEWORK
+#if NETCOREAPP
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -30,7 +30,7 @@ public class JsonDataSerializer : IDataSerializer
     private static readonly LegacyNewtonsoftJsonDataSerializer? NewtonsoftFallback = UseNewtonsoftFallback
         ? new LegacyNewtonsoftJsonDataSerializer() : null;
 
-#if !NETFRAMEWORK
+#if NETCOREAPP
     private static readonly bool DisableFastJson = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_FASTER_JSON_SERIALIZATION);
 
     private static readonly JsonSerializerOptions PayloadOptionsV1; // payload options for version <= 1
@@ -198,7 +198,7 @@ public class JsonDataSerializer : IDataSerializer
         if (!FastHeaderParse(rawMessage, out int version, out string? messageType))
         {
             // Fallback: parse just the header fields from JSON
-#if !NETFRAMEWORK
+#if NETCOREAPP
             using var doc = JsonDocument.Parse(rawMessage);
             var root = doc.RootElement;
             version = root.TryGetProperty("Version", out var vProp)
@@ -238,7 +238,7 @@ public class JsonDataSerializer : IDataSerializer
             return default;
         }
 
-#if !NETFRAMEWORK
+#if NETCOREAPP
         var payloadOptions = GetPayloadOptions(message.Version);
 
         if (payloadOptions == PayloadOptionsV2)
@@ -267,7 +267,7 @@ public class JsonDataSerializer : IDataSerializer
 #endif
     }
 
-#if !NETFRAMEWORK
+#if NETCOREAPP
     private static T? DeserializeObjectFast<T>(string value)
     {
         return JsonSerializer.Deserialize<T>(value, FastOptions);
@@ -387,7 +387,7 @@ public class JsonDataSerializer : IDataSerializer
             return NewtonsoftFallback.Deserialize<T>(json, version);
         }
 
-#if !NETFRAMEWORK
+#if NETCOREAPP
         var options = GetPayloadOptions(version);
         return Deserialize<T>(options, json);
 #else
@@ -408,7 +408,7 @@ public class JsonDataSerializer : IDataSerializer
             return NewtonsoftFallback.SerializeMessage(messageType);
         }
 
-#if !NETFRAMEWORK
+#if NETCOREAPP
         return Serialize(DefaultOptions, new MessageEnvelope { MessageType = messageType });
 #else
         var envelope = new JsonObject { ["MessageType"] = messageType! };
@@ -446,7 +446,7 @@ public class JsonDataSerializer : IDataSerializer
             return NewtonsoftFallback.SerializePayload(messageType, payload, version);
         }
 
-#if !NETFRAMEWORK
+#if NETCOREAPP
         var payloadOptions = GetPayloadOptions(version);
         // Fast json is only equivalent to the serialization that is used for protocol version 2 and upwards (or more precisely for the paths that use PayloadOptionsV2)
         // so when we resolved the old options we should use non-fast path.
@@ -508,7 +508,7 @@ public class JsonDataSerializer : IDataSerializer
             return NewtonsoftFallback.Serialize(data, version);
         }
 
-#if !NETFRAMEWORK
+#if NETCOREAPP
         var options = GetPayloadOptions(version);
         return Serialize(options, data);
 #else
@@ -536,7 +536,7 @@ public class JsonDataSerializer : IDataSerializer
         return Deserialize<T>(stringObj, 2)!;
     }
 
-#if NETFRAMEWORK
+#if !NETCOREAPP
     private static void ValidateVersion(int version)
     {
         if (version is not (0 or 1 or 2 or 3 or 4 or 5 or 6 or 7))
@@ -547,7 +547,7 @@ public class JsonDataSerializer : IDataSerializer
     }
 #endif
 
-#if !NETFRAMEWORK
+#if NETCOREAPP
     /// <summary>
     /// Serialize data.
     /// </summary>
