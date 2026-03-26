@@ -9,62 +9,15 @@ function Verify-BindingRedirects {
 
     $errors = @()
 
-    # Step 1: Find ALL DLLs across all package dirs
-    $allDlls = @()
-    foreach ($packageDir in $PackageDirs) {
-        if (Test-Path $packageDir) {
-            $allDlls += Get-ChildItem -Recurse $packageDir -Filter "*.dll"
-        }
-    }
+    # Step 1: Parse ALL config files and collect unique DLL paths we need to check
+    $redirectEntries = @() # { ConfigFile, AssemblyName, ExpectedVersion, DllPath }
 
-    if ($allDlls.Count -eq 0) {
-        return $errors
-    }
-
-    # Step 2: Get assembly versions for ALL DLLs in ONE subprocess
-    Write-Host "Getting assembly versions for $($allDlls.Count) DLLs..."
-    $dllPaths = $allDlls | ForEach-Object { $_.FullName }
-    $pathsArg = $dllPaths -join "|"
-
-    $versionOutput = & pwsh -NoProfile -Command "
-        `$paths = '$pathsArg' -split '\|'
-        foreach (`$p in `$paths) {
-            try {
-                `$asm = [System.Reflection.Assembly]::LoadFile(`$p)
-                `$n = `$asm.GetName()
-                Write-Output `"`$p|`$(`$n.Name)|`$(`$n.Version)`"
-            } catch {
-                Write-Output `"`$p|ERROR|0.0.0.0`"
-            }
-        }
-    "
-
-    # Step 3: Build lookup — array of objects with path, name, version
-    $dllVersions = @()
-    foreach ($line in $versionOutput) {
-        if ($line -and $line.Contains("|")) {
-            $parts = $line -split '\|', 3
-            $dllVersions += [PSCustomObject]@{
-                Path = $parts[0]
-                Name = $parts[1]
-                Version = $parts[2]
-            }
-        }
-    }
-    Write-Host "Got versions for $($dllVersions.Count) assemblies."
-
-    # Step 4: Process each config file and compare (no more subprocess calls)
     foreach ($packageDir in $PackageDirs) {
         if (-not (Test-Path $packageDir)) { continue }
 
         $configFiles = @(Get-ChildItem -Recurse $packageDir -Filter "*.config" | Where-Object {
             $_.Extension -eq ".config" -and (Get-Content $_.FullName -Raw) -match "bindingRedirect"
         })
-
-        if ($configFiles.Count -eq 0) { continue }
-
-        $packageName = Split-Path $packageDir -Leaf
-        Write-Host "Verifying binding redirects in '$packageName' ($($configFiles.Count) config file(s))."
 
         foreach ($configFile in $configFiles) {
             [xml]$config = Get-Content $configFile.FullName
@@ -75,7 +28,6 @@ function Verify-BindingRedirects {
             $dependentAssemblies = $config.SelectNodes("//asm:dependentAssembly", $xmlNsMgr)
             if ($null -eq $dependentAssemblies -or $dependentAssemblies.Count -eq 0) { continue }
 
-            # Determine DLL search directories: config file's directory + probing paths.
             $configDir = Split-Path $configFile.FullName
             $searchDirs = @($configDir)
 
@@ -93,42 +45,88 @@ function Verify-BindingRedirects {
             foreach ($dep in $dependentAssemblies) {
                 $identityNode = $dep.SelectSingleNode("asm:assemblyIdentity", $xmlNsMgr)
                 $redirectNode = $dep.SelectSingleNode("asm:bindingRedirect", $xmlNsMgr)
-
                 if ($null -eq $identityNode -or $null -eq $redirectNode) { continue }
 
                 $assemblyName = $identityNode.GetAttribute("name")
                 $expectedVersion = $redirectNode.GetAttribute("newVersion")
 
-                # Find matching DLL from our pre-loaded version data
-                $matchingDll = $null
+                $dllPath = $null
                 foreach ($dir in $searchDirs) {
                     $candidate = Join-Path $dir "$assemblyName.dll"
-                    $matchingDll = $dllVersions | Where-Object { $_.Path -eq $candidate } | Select-Object -First 1
-                    if ($matchingDll) { break }
+                    if (Test-Path $candidate) { $dllPath = $candidate; break }
                 }
 
-                if (-not $matchingDll) {
-                    Write-Host "  INFO: $assemblyName referenced in $($configFile.Name) not found in package (may be runtime-provided)"
-                    continue
-                }
-
-                if ($matchingDll.Name -eq "ERROR") {
-                    Write-Host "  WARN: Could not read assembly version for $assemblyName"
-                    continue
-                }
-
-                $normalizedExpected = Normalize-Version $expectedVersion
-                $normalizedActual   = Normalize-Version $matchingDll.Version
-
-                if ($normalizedExpected -ne $normalizedActual) {
-                    $msg = "MISMATCH: $assemblyName in $($configFile.Name): redirect says $expectedVersion but DLL is $($matchingDll.Version)"
-                    $errors += $msg
-                    Write-Host "  ERROR: $msg"
+                if ($dllPath) {
+                    $redirectEntries += [PSCustomObject]@{
+                        ConfigFile = $configFile.Name
+                        AssemblyName = $assemblyName
+                        ExpectedVersion = $expectedVersion
+                        DllPath = $dllPath
+                    }
                 } else {
-                    Write-Host "  OK: $assemblyName $($matchingDll.Version)"
+                    Write-Host "  INFO: $assemblyName referenced in $($configFile.Name) not found in package (may be runtime-provided)"
                 }
             }
         }
+    }
+
+    if ($redirectEntries.Count -eq 0) {
+        Write-Host "No binding redirect entries with matching DLLs found."
+        return $errors
+    }
+
+    # Step 2: Get unique DLL paths, get versions in ONE subprocess using relative paths
+    $uniqueDlls = $redirectEntries | Select-Object -ExpandProperty DllPath -Unique
+
+    Write-Host "Checking assembly versions for $($uniqueDlls.Count) DLLs referenced in binding redirects..."
+
+    # Write paths to a temp file to avoid command line length limits
+    $tempFile = [IO.Path]::GetTempFileName()
+    $uniqueDlls | Set-Content $tempFile
+
+    $versionOutput = & pwsh -NoProfile -Command "
+        Get-Content '$tempFile' | ForEach-Object {
+            try {
+                `$asm = [System.Reflection.Assembly]::LoadFile(`$_)
+                `$n = `$asm.GetName()
+                Write-Output `"`$_|`$(`$n.Name)|`$(`$n.Version)`"
+            } catch {
+                Write-Output `"`$_|ERROR|0.0.0.0`"
+            }
+        }
+    "
+    Remove-Item $tempFile -ErrorAction SilentlyContinue
+
+    # Step 3: Build lookup
+    $versionMap = @{}
+    foreach ($line in $versionOutput) {
+        if ($line -and $line.Contains("|")) {
+            $parts = $line -split '\|', 3
+            $versionMap[$parts[0]] = [PSCustomObject]@{ Name = $parts[1]; Version = $parts[2] }
+        }
+    }
+
+    # Step 4: Compare
+    $packageName = ""
+    foreach ($entry in $redirectEntries) {
+        $info = $versionMap[$entry.DllPath]
+        if (-not $info -or $info.Name -eq "ERROR") {
+            Write-Host "  WARN: Could not read assembly version for $($entry.AssemblyName)"
+            continue
+        }
+
+        $normalizedExpected = Normalize-Version $entry.ExpectedVersion
+        $normalizedActual = Normalize-Version $info.Version
+
+        if ($normalizedExpected -ne $normalizedActual) {
+            $msg = "MISMATCH: $($entry.AssemblyName) in $($entry.ConfigFile): redirect says $($entry.ExpectedVersion) but DLL is $($info.Version)"
+            $errors += $msg
+            Write-Host "  ERROR: $msg"
+        }
+    }
+
+    if ($errors.Count -eq 0) {
+        Write-Host "All binding redirects match their DLL versions."
     }
 
     return $errors
