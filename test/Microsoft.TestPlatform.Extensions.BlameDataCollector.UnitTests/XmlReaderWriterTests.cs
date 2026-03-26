@@ -111,7 +111,7 @@ public class XmlReaderWriterTests
 
         // Assert it has some data
         var data = Encoding.UTF8.GetString(stream.ToArray());
-        Assert.IsTrue(data.Length > 0, "Stream should have some data.");
+        Assert.IsGreaterThan(0, data.Length, "Stream should have some data.");
     }
 
     /// <summary>

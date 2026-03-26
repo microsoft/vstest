@@ -84,12 +84,12 @@ public class TargetFrameworkTestHostDemultiplexer : AcceptanceTestBase
         _runEventHandler.EnsureSuccess();
 
         // Assert
-        Assert.AreEqual(10, _discoveryEventHandler.DiscoveredTestCases.Count);
+        Assert.HasCount(10, _discoveryEventHandler.DiscoveredTestCases);
         int failedTests = _runEventHandler.TestResults.Count(x => x.Outcome == TestOutcome.Failed);
-        Assert.IsFalse(failedTests > 0, $"Number of failed tests {failedTests}");
+        Assert.IsLessThanOrEqualTo(0, failedTests, $"Number of failed tests {failedTests}");
 
         string[] hosts = Directory.GetFiles(TempDirectory.Path, "TestHost*");
-        Assert.AreEqual(expectedHost == -1 ? 1 : expectedHost > 10 ? 10 : expectedHost, hosts.Length);
+        Assert.HasCount(expectedHost == -1 ? 1 : expectedHost > 10 ? 10 : expectedHost, hosts);
 
         List<string> tests = new();
         int testsRunInsideHost;
@@ -111,15 +111,15 @@ public class TargetFrameworkTestHostDemultiplexer : AcceptanceTestBase
 
             if (expectedHost == 3)
             {
-                Assert.IsTrue(testsRunInsideHost >= 3);
+                Assert.IsGreaterThanOrEqualTo(3, testsRunInsideHost);
             }
         }
 
-        Assert.AreEqual(10, tests.Count);
+        Assert.HasCount(10, tests);
         for (int i = 1; i <= 10; i++)
         {
             tests.Remove($"TestMethod{i}");
         }
-        Assert.AreEqual(0, tests.Count);
+        Assert.IsEmpty(tests);
     }
 }

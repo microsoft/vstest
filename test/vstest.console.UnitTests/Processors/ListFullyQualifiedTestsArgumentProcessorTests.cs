@@ -234,9 +234,9 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
         mockDiscoveryRequest.Verify(dr => dr.DiscoverAsync(), Times.Once);
 
         var fileOutput = File.ReadAllLines(_dummyFilePath);
-        Assert.IsTrue(fileOutput.Length == 2);
-        Assert.IsTrue(fileOutput.Contains("Test1"));
-        Assert.IsTrue(fileOutput.Contains("Test2"));
+        Assert.HasCount(2, fileOutput);
+        Assert.Contains("Test1", fileOutput);
+        Assert.Contains("Test2", fileOutput);
     }
 
     [TestMethod]
@@ -250,9 +250,9 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
         mockDiscoveryRequest.Verify(dr => dr.DiscoverAsync(), Times.Once);
 
         var fileOutput = File.ReadAllLines(_dummyFilePath);
-        Assert.IsTrue(fileOutput.Length == 1);
-        Assert.IsTrue(fileOutput.Contains("Test1"));
-        Assert.IsFalse(fileOutput.Contains("Test2"));
+        Assert.HasCount(1, fileOutput);
+        Assert.Contains("Test1", fileOutput);
+        Assert.DoesNotContain("Test2", fileOutput);
     }
 
     [TestMethod]

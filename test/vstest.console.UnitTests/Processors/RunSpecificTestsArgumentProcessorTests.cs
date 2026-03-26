@@ -101,8 +101,8 @@ public class RunSpecificTestsArgumentProcessorTests
     {
         RunSpecificTestsArgumentProcessorCapabilities capabilities = new();
         Assert.AreEqual("/Tests", capabilities.CommandName);
-        StringAssert.Contains(capabilities.HelpContentResourceName.NormalizeLineEndings(),
-            "/Tests:<Test Names>\r\n      Run tests with names that match the provided values.".NormalizeLineEndings());
+        Assert.Contains("/Tests:<Test Names>\r\n      Run tests with names that match the provided values.".NormalizeLineEndings(),
+            capabilities.HelpContentResourceName.NormalizeLineEndings());
 
         Assert.AreEqual(HelpContentPriority.RunSpecificTestsArgumentProcessorHelpPriority, capabilities.HelpPriority);
         Assert.IsTrue(capabilities.IsAction);

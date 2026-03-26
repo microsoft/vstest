@@ -57,7 +57,7 @@ public class LiveUnitTestingTests : AcceptanceTestBase
             _discoveryEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _discoveryEventHandler.DiscoveredTestCases.Count);
+        Assert.HasCount(6, _discoveryEventHandler.DiscoveredTestCases);
     }
 
     [TestMethod]
@@ -82,7 +82,7 @@ public class LiveUnitTestingTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.HasCount(6, _runEventHandler.TestResults, _runEventHandler.ToString());
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed), _runEventHandler.ToString());
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed), _runEventHandler.ToString());
         Assert.AreEqual(2, _runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped), _runEventHandler.ToString());

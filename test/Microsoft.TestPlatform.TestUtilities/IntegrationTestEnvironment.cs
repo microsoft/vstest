@@ -197,6 +197,7 @@ public class IntegrationTestEnvironment
     /// </summary>
     /// <param name="assetName">Name of the asset with extension. E.g. <c>SimpleUnitTest.dll</c></param>
     /// <param name="targetFramework">asset project target framework. E.g <c>net462</c></param>
+    /// <param name="automaticallyResolveCompatibilityTestAsset">Whether to automatically resolve the test asset from the compatibility matrix based on the DllInfos. This should be set to false only if you want to get a test asset that is not built from the compatibility matrix, e.g. a test project.</param>
     /// <returns>Full path to the test asset.</returns>
     /// <remarks>
     /// Test assets follow several conventions:
@@ -205,7 +206,7 @@ public class IntegrationTestEnvironment
     /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.csproj</c> must
     /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net462\SimpleUnitTest.dll</c>
     /// </remarks>
-    public string GetTestAsset(string assetName, string targetFramework)
+    public string GetTestAsset(string assetName, string targetFramework, bool automaticallyResolveCompatibilityTestAsset = true)
     {
         var simpleAssetName = Path.GetFileNameWithoutExtension(assetName);
         var assetPath = Path.Combine(
@@ -219,16 +220,16 @@ public class IntegrationTestEnvironment
             assetName);
 
         // Update the path to be taken from the compatibility matrix instead of from the root folder.
-        if (DllInfos.Count > 0)
+        if (automaticallyResolveCompatibilityTestAsset && DllInfos.Count > 0)
         {
             // The path is really ugly: S:\p\vstest3\test\GeneratedTestAssets\NETTestSdkLegacyStable-15.9.2--MSTestMostDownloaded-2.1.0--MSTestProject2\bin\Debug\net462\MSTestProject2-NETTestSdkLegacyStable-15.9.2--MSTestMostDownloaded-2.1.0.dll
             // And we need to hash the versions in it to get shorter path as well.
             var versions = string.Join("--", DllInfos.Select(d => d.Path));
             var versionsHash = GetPathHash(versions);
             assetPath = Path.Combine(RepoRootDirectory, "artifacts", "bin", "TestAssets", $"{simpleAssetName}--{versionsHash}", BuildConfiguration, targetFramework, $"{simpleAssetName}--{versionsHash}.dll");
+            Assert.IsTrue(File.Exists(assetPath), $"GetTestAsset: Path not found: '{assetPath}'. Compatibility test assets are not built automatically anymore in AssemblyInitialize.");
+            return assetPath;
         }
-
-        Assert.IsTrue(File.Exists(assetPath), $"GetTestAsset: Path not found: '{assetPath}'. Compatibility test assets are not built automatically anymore in AssemblyInitialize.");
 
         // If you are thinking about wrapping the path in double quotes here,
         // then don't. File.Exist cannot handle quoted paths, and we use it in a lot of places.

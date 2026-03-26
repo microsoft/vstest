@@ -29,7 +29,7 @@ On Windows, run `build.cmd` (or `.\build.cmd` in PowerShell); on Linux/macOS, ru
 
 ### Building with Visual Studio
 
-Open `C:\source\vstest\TestPlatform.sln` in VS.
+Open `C:\source\vstest\TestPlatform.slnx` in VS.
 
 Use `Build Solution` to build the source code.
 

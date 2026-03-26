@@ -34,7 +34,6 @@ public class HtmlLogger : ITestLoggerWithParameters
     private readonly IFileHelper _fileHelper;
     private readonly XmlObjectSerializer _xmlSerializer;
     private readonly IHtmlTransformer _htmlTransformer;
-    private static readonly object FileCreateLockObject = new();
     private Dictionary<string, string?>? _parametersDictionary;
 
     public HtmlLogger()
@@ -293,7 +292,7 @@ public class HtmlLogger : ITestLoggerWithParameters
                 logFilePrefixValue = logFilePrefixValue + "_" + framework;
             }
 
-            logFilePrefixValue = logFilePrefixValue + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
+            logFilePrefixValue = logFilePrefixValue + DateTime.Now.ToString("_yyyyMMdd_HHmmss.fffffff", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
             HtmlFilePath = Path.Combine(TestResultsDirPath!, logFilePrefixValue);
         }
         else
@@ -356,13 +355,14 @@ public class HtmlLogger : ITestLoggerWithParameters
         {
             var fileNameWithIter = i == 0 ? fileName : Path.GetFileNameWithoutExtension(fileName) + $"[{i}]";
             fullFilePath = Path.Combine(TestResultsDirPath!, $"TestResult_{fileNameWithIter}.{fileExtension}");
-            lock (FileCreateLockObject)
+            try
             {
-                if (!File.Exists(fullFilePath))
-                {
-                    using var _ = File.Create(fullFilePath);
-                    return fullFilePath;
-                }
+                using var _ = new FileStream(fullFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+                return fullFilePath;
+            }
+            catch (IOException) when (File.Exists(fullFilePath))
+            {
+                // File already exists (another process created it), try next iteration.
             }
         }
 
@@ -371,7 +371,7 @@ public class HtmlLogger : ITestLoggerWithParameters
 
     private static string FormatDateTimeForRunName(DateTime timeStamp)
     {
-        return timeStamp.ToString("yyyyMMdd_HHmmss", DateTimeFormatInfo.InvariantInfo);
+        return timeStamp.ToString("yyyyMMdd_HHmmss.fffffff", DateTimeFormatInfo.InvariantInfo);
     }
 
     /// <summary>

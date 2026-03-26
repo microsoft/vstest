@@ -65,9 +65,9 @@ public class SerialTestRunDecoratorTests : AcceptanceTestBase
         _runEventHandler.EnsureSuccess();
 
         // Assert
-        Assert.AreEqual(10, _discoveryEventHandler.DiscoveredTestCases.Count);
+        Assert.HasCount(10, _discoveryEventHandler.DiscoveredTestCases);
         int failedTests = _runEventHandler.TestResults.Count(x => x.Outcome == TestOutcome.Failed);
-        Assert.IsFalse(failedTests > 0, $"Number of failed tests {failedTests}");
+        Assert.AreEqual(0, failedTests, $"Number of failed tests {failedTests}");
     }
 
     [TestMethod]
@@ -88,9 +88,9 @@ public class SerialTestRunDecoratorTests : AcceptanceTestBase
         _runEventHandler.EnsureSuccess();
 
         // Assert
-        Assert.AreEqual(10, _discoveryEventHandler.DiscoveredTestCases.Count);
+        Assert.HasCount(10, _discoveryEventHandler.DiscoveredTestCases);
         int failedTests = _runEventHandler.TestResults.Count(x => x.Outcome == TestOutcome.Failed);
-        Assert.IsTrue(failedTests > 0, $"Number of failed tests {failedTests}");
+        Assert.IsGreaterThan(0, failedTests, $"Number of failed tests {failedTests}");
     }
 
     [TestMethod]
@@ -113,7 +113,7 @@ public class SerialTestRunDecoratorTests : AcceptanceTestBase
             builder.AppendLine(error);
         }
 
-        Assert.IsTrue(_runEventHandler.Errors.Count > 0, _runEventHandler.ToString());
-        Assert.IsTrue(_runEventHandler.Errors.Contains(VisualStudio.TestPlatform.Common.Resources.Resources.SerialTestRunInvalidScenario), $"Error messages\n:{builder}");
+        Assert.IsNotEmpty(_runEventHandler.Errors, _runEventHandler.ToString());
+        Assert.Contains(VisualStudio.TestPlatform.Common.Resources.Resources.SerialTestRunInvalidScenario, _runEventHandler.Errors, $"Error messages\n:{builder}");
     }
 }

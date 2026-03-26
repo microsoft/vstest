@@ -96,7 +96,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
         proxyExecutionManager.Initialize(false);
         Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.Messages);
         Assert.AreEqual(TestMessageLevel.Error, proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item1);
-        StringAssert.Contains(proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item2, "MyException");
+        Assert.Contains("MyException", proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item2!);
     }
 
     [TestMethod]
@@ -110,7 +110,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
         var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(_mockRequestSender.Object, _mockTestHostManager.Object, _mockDataCollectionManager.Object);
         proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
 
-        Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--datacollectionport 0"));
+        Assert.Contains("--datacollectionport 0", testProcessStartInfo.Arguments);
     }
 
     [TestMethod]
@@ -130,7 +130,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
         proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
 
         // Verify.
-        Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--telemetryoptedin true"));
+        Assert.Contains("--telemetryoptedin true", testProcessStartInfo.Arguments);
     }
 
     [TestMethod]
@@ -150,7 +150,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
         proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
 
         // Verify.
-        Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--telemetryoptedin false"));
+        Assert.Contains("--telemetryoptedin false", testProcessStartInfo.Arguments);
     }
 
     [TestMethod]
@@ -184,7 +184,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
         proxyExecutionManager.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
         // Verify.
-        Assert.IsTrue(launchedStartInfo != null, "Failed to get the start info");
+        Assert.IsNotNull(launchedStartInfo, "Failed to get the start info");
         foreach (var envVaribale in testProcessStartInfo.EnvironmentVariables)
         {
             Assert.AreEqual(envVaribale.Value, launchedStartInfo.EnvironmentVariables![envVaribale.Key], $"Expected environment variable {envVaribale.Key} : {envVaribale.Value} not found");
@@ -192,7 +192,7 @@ public class ProxyExecutionManagerWithDataCollectionTests
 
         mockRunEventsHandler.Verify(r => r.HandleRawMessage(raw1));
         mockRunEventsHandler.Verify(r => r.HandleRawMessage(raw2));
-        Assert.AreEqual(0, proxyExecutionManager.DataCollectionRunEventsHandler.RawMessages.Count);
+        Assert.IsEmpty(proxyExecutionManager.DataCollectionRunEventsHandler.RawMessages);
     }
 
     [TestMethod]

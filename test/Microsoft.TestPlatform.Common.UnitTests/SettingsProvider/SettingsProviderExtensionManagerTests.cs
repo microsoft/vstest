@@ -82,7 +82,7 @@ public class SettingsProviderExtensionManagerTests
         var extensionManager = SettingsProviderExtensionManager.Create();
 
         Assert.IsNotNull(extensionManager.SettingsProvidersMap);
-        Assert.IsTrue(extensionManager.SettingsProvidersMap.Count > 0);
+        Assert.IsNotEmpty(extensionManager.SettingsProvidersMap);
     }
 
     [TestMethod]
@@ -94,7 +94,7 @@ public class SettingsProviderExtensionManagerTests
         SettingsProviderExtensionManager.Create();
 
         Assert.IsNotNull(extensionManager.SettingsProvidersMap);
-        Assert.IsTrue(extensionManager.SettingsProvidersMap.Count > 0);
+        Assert.IsNotEmpty(extensionManager.SettingsProvidersMap);
     }
 
     #endregion

@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -55,7 +56,7 @@ public class RunTests : AcceptanceTestBase
         _vstestConsoleWrapper.RunTests(GetTestDlls("MSTestProject1.dll", "MSTestProject2.dll"), GetDefaultRunSettings(), runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, runEventHandler.TestResults.Count);
+        Assert.HasCount(6, runEventHandler.TestResults);
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
@@ -63,6 +64,7 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [NetCoreTargetFrameworkDataSource]
+    [NetFullTargetFrameworkDataSource(useVsixRunner: true)]
     [TestCategory("Smoke")]
     public void RunAllTestsFromDlls(RunnerInfo runnerInfo)
     {
@@ -73,7 +75,7 @@ public class RunTests : AcceptanceTestBase
         _vstestConsoleWrapper.RunTests([GetAssetFullPath("SimpleTestProject.dll"), GetAssetFullPath("SimpleTestProject2.dll")], GetDefaultRunSettings(), runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, runEventHandler.TestResults.Count);
+        Assert.HasCount(6, runEventHandler.TestResults);
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
         Assert.AreEqual(2, runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
@@ -81,7 +83,7 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [WrapperCompatibilityDataSource(AfterFeature = Features.MULTI_TFM)]
+    [WrapperCompatibilityDataSource()]
     public void RunAllTestsWithMixedTFMsWillRunTestsFromAllProvidedDllEvenWhenTheyMixTFMs(RunnerInfo runnerInfo)
     {
         // Arrange
@@ -89,8 +91,11 @@ public class RunTests : AcceptanceTestBase
 
         _vstestConsoleWrapper = GetVsTestConsoleWrapper();
         var runEventHandler = new RunEventHandler();
-        var netFrameworkDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETFX);
-        var netDll = GetTestDllForFramework("MSTestProject1.dll", DEFAULT_HOST_NETCORE);
+        // Use SimpleTestProject4 which has a minimal test adapter. This helps us test that the console / testhost are compatible.
+        // Rather than testing that the console & mstest (or other adapter) and compatible. If we use mstest directly it fails on
+        // very old versions of vstest.console.
+        var netFrameworkDll = GetTestDllForFramework("SimpleTestProject4.dll", DEFAULT_HOST_NETFX, automaticallyResolveCompatibilityTestAsset: false);
+        var netDll = GetTestDllForFramework("SimpleTestProject4.dll", DEFAULT_HOST_NETCORE, automaticallyResolveCompatibilityTestAsset: false);
 
         // Act
         // We have no preference around what TFM is used. It will be autodetected.
@@ -136,7 +141,7 @@ public class RunTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
+        Assert.HasCount(6, _runEventHandler.TestResults, _runEventHandler.ToString());
         Assert.IsTrue(_runEventHandler.Metrics!.ContainsKey(TelemetryDataConstants.TargetDevice));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetFramework));
         Assert.IsTrue(_runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TargetOS));
@@ -159,8 +164,8 @@ public class RunTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(6, _runEventHandler.TestResults.Count, _runEventHandler.ToString());
-        Assert.AreEqual(0, _runEventHandler.Metrics!.Count, _runEventHandler.ToString());
+        Assert.HasCount(6, _runEventHandler.TestResults, _runEventHandler.ToString());
+        Assert.HasCount(0, _runEventHandler.Metrics!, _runEventHandler.ToString());
     }
 
     [TestMethod]
@@ -216,8 +221,8 @@ public class RunTests : AcceptanceTestBase
         var expectedFilter = veryLongTestCaseFilter.Substring(0, 256) + "...";
 
         // Assert
-        StringAssert.StartsWith(_runEventHandler.LogMessage, $"No test matches the given testcase filter `{expectedFilter}` in");
-        StringAssert.EndsWith(_runEventHandler.LogMessage, testAssemblyName);
+        Assert.StartsWith($"No test matches the given testcase filter `{expectedFilter}` in", _runEventHandler.LogMessage);
+        Assert.EndsWith(testAssemblyName, _runEventHandler.LogMessage);
 
         Assert.AreEqual(TestMessageLevel.Warning, _runEventHandler.TestMessageLevel);
     }

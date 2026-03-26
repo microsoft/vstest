@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.Acceptance.IntegrationTests;
 
 [TestClass]
-public class Build : IntegrationTestBase
+public static class Build
 {
     [AssemblyInitialize]
     public static void AssemblyInitialize(TestContext testContext)
@@ -21,5 +21,11 @@ public class Build : IntegrationTestBase
         System.Threading.ThreadPool.SetMinThreads(workerThreads + additionalThreadsCount, completionPortThreads + additionalThreadsCount);
 
         IntegrationTestBuild.BuildTestAssetsForIntegrationTests(testContext);
+    }
+
+    [AssemblyCleanup]
+    public static void AssemblyCleanup()
+    {
+        IntegrationTestBuild.CleanupTestAssets();
     }
 }
