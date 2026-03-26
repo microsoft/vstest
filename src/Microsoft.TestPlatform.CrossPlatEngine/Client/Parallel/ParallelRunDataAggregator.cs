@@ -79,13 +79,14 @@ internal class ParallelRunDataAggregator
             foreach (var runStats in _testRunStatsList)
             {
                 // TODO: we get nullref here if the stats are empty.
-                foreach (var outcome in runStats.Stats!.Keys)
+                foreach (var kvp in runStats.Stats!)
                 {
-                    if (!testOutcomeMap.ContainsKey(outcome))
+                    if (!testOutcomeMap.TryGetValue(kvp.Key, out long currentCount))
                     {
-                        testOutcomeMap.Add(outcome, 0);
+                        currentCount = 0;
                     }
-                    testOutcomeMap[outcome] += runStats.Stats[outcome];
+
+                    testOutcomeMap[kvp.Key] = currentCount + kvp.Value;
                 }
                 totalTests += runStats.ExecutedTests;
             }
@@ -198,9 +199,9 @@ internal class ParallelRunDataAggregator
                 var newValue = Convert.ToDouble(metric.Value, CultureInfo.InvariantCulture);
 
                 _metricsAggregator.AddOrUpdate(
-                                    metric.Key,
-                                    newValue,
-                                    (_, oldValue) => newValue + Convert.ToDouble(oldValue, CultureInfo.InvariantCulture));
+                    metric.Key,
+                    newValue,
+                    (_, oldValue) => newValue + Convert.ToDouble(oldValue, CultureInfo.InvariantCulture));
             }
         }
     }
