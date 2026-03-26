@@ -67,6 +67,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private StringBuilder? _testHostProcessStdOut;
     private IMessageLogger? _messageLogger;
     private bool _captureOutput;
+    private bool _createNoNewWindow;
     private bool _hostExitedEventRaised;
     private TestHostManagerCallbacks? _testHostManagerCallbacks;
 
@@ -375,6 +376,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
 
         _messageLogger = logger;
         _captureOutput = runConfiguration.CaptureStandardOutput;
+        _createNoNewWindow = runConfiguration.CreateNoNewWindow;
         var forwardOutput = runConfiguration.ForwardStandardOutput;
         _testHostManagerCallbacks = new TestHostManagerCallbacks(forwardOutput, logger);
         _architecture = runConfiguration.TargetPlatform;
@@ -547,7 +549,8 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
                 testHostStartInfo.EnvironmentVariables,
                 ErrorReceivedCallback,
                 ExitCallBack,
-                outputCallback) as Process;
+                outputCallback,
+                _createNoNewWindow) as Process;
         }
         else
         {
