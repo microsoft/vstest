@@ -33,7 +33,11 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
+#if NETCOREAPP
 using System.Text.Json;
+#else
+using Jsonite;
+#endif
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 
@@ -922,8 +926,9 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
                 // Get probing path
                 using (var stream = _fileHelper.GetStream(runtimeConfigDevPath, FileMode.Open, FileAccess.Read))
-                using (var doc = JsonDocument.Parse(stream))
                 {
+#if NETCOREAPP
+                    using var doc = JsonDocument.Parse(stream);
                     var runtimeOptions = doc.RootElement.GetProperty("runtimeOptions");
                     var additionalProbingPaths = runtimeOptions.GetProperty("additionalProbingPaths");
                     foreach (var x in additionalProbingPaths.EnumerateArray())
@@ -947,6 +952,35 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                             return testHostFullPath;
                         }
                     }
+#else
+                    using var reader = new StreamReader(stream);
+                    var parsed = Json.Deserialize(reader) as IDictionary<string, object>;
+                    var runtimeOpts = parsed?["runtimeOptions"] as IDictionary<string, object>;
+                    var probingPaths = runtimeOpts?["additionalProbingPaths"] as IList<object>;
+                    if (probingPaths is not null)
+                    {
+                        foreach (var x in probingPaths)
+                        {
+                            var pathStr = x?.ToString();
+                            EqtTrace.Verbose("DotnetTestHostmanager: Looking for path {0} in folder {1}", testHostPath, pathStr);
+                            string testHostFullPath;
+                            try
+                            {
+                                testHostFullPath = Path.Combine(pathStr!, testHostPath);
+                            }
+                            catch (ArgumentException)
+                            {
+                                continue;
+                            }
+
+                            if (_fileHelper.Exists(testHostFullPath))
+                            {
+                                EqtTrace.Verbose("DotnetTestHostmanager: Found testhost.dll in {0}", testHostFullPath);
+                                return testHostFullPath;
+                            }
+                        }
+                    }
+#endif
                 }
             }
             else
