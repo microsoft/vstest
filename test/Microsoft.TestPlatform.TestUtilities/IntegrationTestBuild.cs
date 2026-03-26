@@ -27,6 +27,11 @@ public class IntegrationTestBuild : IntegrationTestBase
     private static readonly string DotnetDir = Path.GetFullPath(Path.Combine(Root, ".dotnet"));
     private static readonly string Dotnet = Path.GetFullPath(Path.Combine(Root, ".dotnet", OSUtils.IsWindows ? "dotnet.exe" : "dotnet"));
 
+    // Session mutex: held for the entire test session (build + tests).
+    // The process that creates it (createdNew=true) is the builder.
+    private static Mutex? s_sessionMutex;
+    private static bool s_isSessionMutexOwner;
+
     public static void BuildTestAssetsForIntegrationTests(TestContext context)
     {
         // This is common setup that should happen even when build will not run.
@@ -41,56 +46,143 @@ public class IntegrationTestBuild : IntegrationTestBase
 
         var buildCompatibility = GetTestParameter(context, "BuildCompatibility");
 
-        // Mostly just want to avoid using the same mutex across two clones of this repo.
-        var mutexName = "VSTest Acceptance Tests build " + IntegrationTestEnvironment.RepoRootDirectory!.Replace('\\', '-').Replace('/', '-').Replace(':', '-');
+        // Avoid collisions across different clones of this repo.
+        var baseName = "VSTest_AcceptanceTests_" + IntegrationTestEnvironment.RepoRootDirectory!
+            .Replace('\\', '-').Replace('/', '-').Replace(':', '-');
 
-        using var buildMutex = new Mutex(initiallyOwned: true, mutexName, out bool createdNew);
-        try
+        // Session mutex: the process that creates it is the builder.
+        // Held for the entire session (build + tests), destroyed in CleanupTestAssets.
+        s_sessionMutex = CreateMutex(baseName + "_Session", out bool isBuilder);
+        s_isSessionMutexOwner = isBuilder;
+
+        if (isBuilder)
         {
-            Debug.WriteLine($"is mutex new: {createdNew}, name: {mutexName}");
-            if (createdNew)
-            {
-                // We are the first one of the parallel runs to do this. Build the projects and setup everything.
-                Debug.WriteLine("Starting to build.");
-                var sw = Stopwatch.StartNew();
+            // We are the builder. Create a build mutex to signal "build in progress"
+            // to other processes. It exists while we're building, then we destroy it.
+            Debug.WriteLine("Session mutex created — we are the builder.");
+            using var buildMutex = CreateMutex(baseName + "_Build", out _);
 
-                var nugetCache = IntegrationTestEnvironment.TestAssetsNuGetCacheDirectory;
-                var packagesAreNew = UnzipExecutablePackages();
-                if (packagesAreNew)
-                {
-                    CleanNugetCacheAndProjects(nugetCache);
-                }
-                Debug.WriteLine($"Unzipping packages took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
-                BuildTestAssets(nugetCache);
-                Debug.WriteLine($"Building test assets took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
-                if (buildCompatibility)
-                {
-                    BuildTestAssetsCompatibility(nugetCache);
-                    Debug.WriteLine($"Building compatibility test assets took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
-                }
-                else
-                {
-                    Debug.WriteLine("BuildCompatibility parameter is false, skipping build.");
-                }
-                CopyAndPatchDotnet();
-                Debug.WriteLine($"Copying and patching dotnet took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
+            var sw = Stopwatch.StartNew();
+            var nugetCache = IntegrationTestEnvironment.TestAssetsNuGetCacheDirectory;
+            var packagesAreNew = UnzipExecutablePackages();
+            if (packagesAreNew)
+            {
+                CleanNugetCacheAndProjects(nugetCache);
+            }
+            Debug.WriteLine($"Unzipping packages took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
+            BuildTestAssets(nugetCache);
+            Debug.WriteLine($"Building test assets took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
+            if (buildCompatibility)
+            {
+                BuildTestAssetsCompatibility(nugetCache);
+                Debug.WriteLine($"Building compatibility test assets took: {sw.ElapsedMilliseconds} ms"); sw.Restart();
             }
             else
             {
-                // Build is already in progress. Wait for it to finish.
-                var minutes = 15;
-                Debug.WriteLine("Other project is building, waiting for mutex to release.");
-                var gotOne = buildMutex.WaitOne(TimeSpan.FromMinutes(minutes));
-                if (!gotOne)
+                Debug.WriteLine("BuildCompatibility parameter is false, skipping build.");
+            }
+            CopyAndPatchDotnet();
+            Debug.WriteLine($"Copying and patching dotnet took: {sw.ElapsedMilliseconds} ms");
+
+            // Build mutex is disposed here (end of using), signaling to other processes
+            // that the build is done.
+            Debug.WriteLine("Build complete, releasing build mutex.");
+        }
+        else
+        {
+            // We are NOT the builder. Check if a build is in progress.
+            Debug.WriteLine("Session mutex already exists — another process is the builder.");
+            var buildMutex = TryOpenMutex(baseName + "_Build");
+            if (buildMutex is not null)
+            {
+                // Build mutex exists — build is in progress. Wait for it to be destroyed.
+                Debug.WriteLine("Build in progress, waiting for it to finish...");
+                using (buildMutex)
                 {
-                    throw new TimeoutException($"Timed out after {minutes} minutes, waiting for the other project to finish building. Mutex name: '{mutexName}'");
+                    // Wait to acquire it (builder will release/destroy it when done).
+                    try
+                    {
+                        if (!buildMutex.WaitOne(TimeSpan.FromMinutes(15)))
+                        {
+                            throw new TimeoutException("Timed out waiting for the build to complete.");
+                        }
+                    }
+                    catch (AbandonedMutexException)
+                    {
+                        // Builder crashed — we got the mutex. Destroy it and retry
+                        // as a fresh session (we might become the builder).
+                        Debug.WriteLine("Build mutex was abandoned (builder crashed). Retrying.");
+                    }
                 }
-                Debug.WriteLine("Other project is done building, I can start running tests now.");
+                // Build mutex destroyed. Build is done (or builder crashed and we'll
+                // see a stale state — but test assets should still be usable).
+                Debug.WriteLine("Build finished, proceeding to tests.");
+            }
+            else
+            {
+                // Build mutex doesn't exist — build already completed.
+                Debug.WriteLine("No build mutex found — build already done, proceeding to tests.");
             }
         }
-        finally
+    }
+
+    /// <summary>
+    /// Create a named mutex. If abandoned by a previous process, destroy and retry.
+    /// </summary>
+    private static Mutex CreateMutex(string name, out bool createdNew)
+    {
+        while (true)
         {
-            buildMutex.ReleaseMutex();
+            var mutex = new Mutex(initiallyOwned: true, name, out createdNew);
+            if (!createdNew)
+            {
+                try
+                {
+                    // We didn't create it, try to acquire to check if it's alive.
+                    if (mutex.WaitOne(0))
+                    {
+                        // We acquired it — previous owner released. Release and return.
+                        mutex.ReleaseMutex();
+                    }
+                    // If WaitOne returned false, mutex is held by another process — that's fine.
+                }
+                catch (AbandonedMutexException)
+                {
+                    // Previous owner crashed. Destroy and retry.
+                    Debug.WriteLine($"Mutex '{name}' was abandoned, destroying and retrying.");
+                    mutex.Dispose();
+                    continue;
+                }
+            }
+            return mutex;
+        }
+    }
+
+    /// <summary>
+    /// Try to open an existing named mutex. Returns null if it doesn't exist.
+    /// </summary>
+    private static Mutex? TryOpenMutex(string name)
+    {
+        var mutex = new Mutex(initiallyOwned: false, name, out bool createdNew);
+        if (createdNew)
+        {
+            // We created it — meaning it didn't exist. Destroy it and return null.
+            mutex.Dispose();
+            return null;
+        }
+        return mutex;
+    }
+
+    public static void CleanupTestAssets()
+    {
+        if (s_sessionMutex is not null)
+        {
+            if (s_isSessionMutexOwner)
+            {
+                try { s_sessionMutex.ReleaseMutex(); } catch (ApplicationException) { }
+            }
+            s_sessionMutex.Dispose();
+            s_sessionMutex = null;
         }
     }
 
