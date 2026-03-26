@@ -10,11 +10,11 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />
     <PackageReference Include="System.Text.Json" Version="$(SystemTextJsonVersion)"
-        Condition="'$(TargetFramework)' != '$(NetFrameworkMinimum)'" />
+        Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'" />
     <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" PrivateAssets="All" />
   </ItemGroup>
-  <!-- Exclude STJ converter files from .NET Framework compilation (they use System.Text.Json types) -->
-  <ItemGroup Condition="'$(TargetFramework)' == '$(NetFrameworkMinimum)'">
+  <!-- Exclude STJ converter files from non-.NET Core compilation (they use System.Text.Json types) -->
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'">
     <Compile Remove="Serialization\*.cs" />
   </ItemGroup>
   <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)'))">
