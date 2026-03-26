@@ -10,6 +10,5 @@
     <!-- / CVE-2017-11770 -->
 
     <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
-    <PackageReference Include="System.Text.Json" Version="" />
   </ItemGroup>
 </Project>

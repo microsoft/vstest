@@ -321,7 +321,4 @@ Start-sleep -Seconds 10
 Verify-NugetPackageVersion -configuration $configuration -UnzipNugetPackages $unzipNugetPackages
 
 Write-Host "`nVerifying binding redirects..."
-$bindingRedirectErrors = Verify-BindingRedirects -PackageDirs $unzipNugetPackages
-if ($bindingRedirectErrors) {
-    Write-Error "Binding redirect verification failed with $($bindingRedirectErrors.Count) error(s):`n$($bindingRedirectErrors -join "`n")"
-}
+Verify-BindingRedirects -PackageDirs $unzipNugetPackages

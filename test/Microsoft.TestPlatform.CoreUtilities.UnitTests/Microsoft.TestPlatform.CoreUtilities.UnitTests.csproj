@@ -14,9 +14,6 @@
     <Folder Include="TestAssets\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="$(SystemTextJsonVersion)" />
-  </ItemGroup>
-  <ItemGroup>
     <None Update="TestAssets\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
