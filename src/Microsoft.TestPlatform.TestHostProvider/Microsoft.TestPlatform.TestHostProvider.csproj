@@ -29,6 +29,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="$(MicrosoftExtensionsDependencyModelPackageVersion)" />
   </ItemGroup>
+  <!-- Jsonite source for .NET Framework builds (no STJ dependency) -->
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'">
+    <Compile Include="..\Microsoft.TestPlatform.CommunicationUtilities\Json\Jsonite\Jsonite.cs" Link="Json\Jsonite\Jsonite.cs" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Update="NullableHelpers.cs">
       <DesignTime>True</DesignTime>
