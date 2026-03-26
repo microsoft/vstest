@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     $CommonMetadataElements$
@@ -484,7 +484,7 @@
     <file src="net48\datacollector.exe"	target="tools\net8.0\TestHostNetFramework\datacollector.exe" />
     <file src="net48\datacollector.exe.config"	target="tools\net8.0\TestHostNetFramework\datacollector.exe.config" />
 
-    <file src="net8.0\Microsoft.TestPlatform.CommunicationUtilities.dll"	target="tools\net8.0\TestHostNetFramework\Microsoft.TestPlatform.CommunicationUtilities.dll" />
+    <file src="net48\Microsoft.TestPlatform.CommunicationUtilities.dll"	target="tools\net8.0\TestHostNetFramework\Microsoft.TestPlatform.CommunicationUtilities.dll" />
     <file src="net8.0\Microsoft.TestPlatform.CoreUtilities.dll"	target="tools\net8.0\TestHostNetFramework\Microsoft.TestPlatform.CoreUtilities.dll" />
     <file src="net8.0\Microsoft.TestPlatform.CrossPlatEngine.dll"	target="tools\net8.0\TestHostNetFramework\Microsoft.TestPlatform.CrossPlatEngine.dll" />
     <file src="net8.0\Microsoft.TestPlatform.PlatformAbstractions.dll"	target="tools\net8.0\TestHostNetFramework\Microsoft.TestPlatform.PlatformAbstractions.dll" />
