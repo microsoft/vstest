@@ -18,7 +18,8 @@ public class ArgumentProcessorTests : AcceptanceTestBase
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        InvokeVsTest(null);
+        // Don't add --diag, it changes the output and prevents help from showing.
+        InvokeVsTest(null, collectDiagnostics: false);
 
         //Check for help usage, description and arguments text.
         StdOutputContains("Usage: vstest.console.exe");
