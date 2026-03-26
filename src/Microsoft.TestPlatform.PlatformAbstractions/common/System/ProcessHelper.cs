@@ -51,7 +51,7 @@ public partial class ProcessHelper : IProcessHelper
     internal static IDictionary<string, string?>? ExternalEnvironmentVariables { get; set; }
 
     /// <inheritdoc/>
-    public object LaunchProcess(string processPath, string? arguments, string? workingDirectory, IDictionary<string, string?>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack)
+    public object LaunchProcess(string processPath, string? arguments, string? workingDirectory, IDictionary<string, string?>? envVariables, Action<object?, string?>? errorCallback, Action<object?>? exitCallBack, Action<object?, string?>? outputCallBack, bool createNoNewWindow = true)
     {
         if (!File.Exists(processPath))
         {
@@ -77,7 +77,7 @@ public partial class ProcessHelper : IProcessHelper
         void InitializeAndStart()
         {
             process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.CreateNoWindow = createNoNewWindow;
             process.StartInfo.WorkingDirectory = workingDirectory;
 
             process.StartInfo.FileName = processPath;
