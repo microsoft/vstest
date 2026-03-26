@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+#if NET
 using System.Text.Json;
+#endif
 
 using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -321,12 +323,20 @@ public class NewtonsoftFallbackTests
             $"Newtonsoft:\n{newtonsoftJson}\n\nSTJ:\n{stjJson}");
     }
 
+#if NET
     private static string NormalizeJson(string json)
     {
         if (string.IsNullOrEmpty(json)) return json;
         using var doc = JsonDocument.Parse(json);
         return JsonSerializer.Serialize(doc.RootElement);
     }
+#else
+    private static string NormalizeJson(string json)
+    {
+        if (string.IsNullOrEmpty(json)) return json;
+        return global::Newtonsoft.Json.Linq.JToken.Parse(json).ToString(global::Newtonsoft.Json.Formatting.None);
+    }
+#endif
 
     // ══════════════════════════════════════════════════════════════════════
     //  Helpers — Payload builders

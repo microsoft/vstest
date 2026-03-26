@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NET
 using System.Text.Json;
+#endif
 
 using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -117,6 +119,7 @@ public class AttachDebuggerSerializationTests
 
     // ── Newtonsoft comparison ────────────────────────────────────────────
 
+#if NET
     [TestMethod]
     public void NewtonsoftComparisonV1()
     {
@@ -130,6 +133,7 @@ public class AttachDebuggerSerializationTests
         NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
             MessageType.AttachDebugger, Payload, version: 7);
     }
+#endif
 
     // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -137,6 +141,7 @@ public class AttachDebuggerSerializationTests
     /// Compare JSON ignoring whitespace differences (so the pretty-printed
     /// golden strings can be compared against the compact serializer output).
     /// </summary>
+#if NET
     private static void AssertJsonEqual(string expected, string actual)
     {
         static string Normalize(string json)
@@ -158,4 +163,17 @@ public class AttachDebuggerSerializationTests
         using var doc = JsonDocument.Parse(json);
         return JsonSerializer.Serialize(doc.RootElement);
     }
+#else
+    private static void AssertJsonEqual(string expected, string actual)
+    {
+        static string Normalize(string json)
+            => Newtonsoft.Json.Linq.JToken.Parse(json).ToString(Newtonsoft.Json.Formatting.None);
+
+        Assert.AreEqual(Normalize(expected), Normalize(actual),
+            $"JSON mismatch.\nExpected:\n{expected}\nActual:\n{actual}");
+    }
+
+    private static string Minify(string json)
+        => Newtonsoft.Json.Linq.JToken.Parse(json).ToString(Newtonsoft.Json.Formatting.None);
+#endif
 }

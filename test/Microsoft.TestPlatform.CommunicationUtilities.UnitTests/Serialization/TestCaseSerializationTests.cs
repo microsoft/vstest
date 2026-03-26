@@ -8,7 +8,9 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#if NET
 using System.Text.Json;
+#endif
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization;
 
@@ -29,6 +31,7 @@ public class TestCaseSerializationTests
 
     #region v1 Tests
 
+#if NET
     [TestMethod]
     public void TestCaseJsonShouldContainAllPropertiesOnSerialization()
     {
@@ -58,6 +61,7 @@ public class TestCaseSerializationTests
         Assert.AreEqual("TestObject.Traits", properties[7].GetProperty("Key").GetProperty("Id").GetString());
         Assert.AreNotEqual(JsonValueKind.Null, properties[7].GetProperty("Value").ValueKind);
     }
+#endif
 
     [TestMethod]
     public void TestCaseObjectShouldContainAllPropertiesOnDeserialization()
@@ -82,6 +86,7 @@ public class TestCaseSerializationTests
         Assert.AreEqual(TestCase.Id, test.Id);
     }
 
+#if NET
     [TestMethod]
     public void TestCaseObjectShouldSerializeWindowsPathWithEscaping()
     {
@@ -96,6 +101,7 @@ public class TestCaseSerializationTests
         Assert.AreEqual(@"TestCase.Source", properties[2].GetProperty("Key").GetProperty("Id").GetString());
         Assert.AreEqual(@"C:\Test\TestAssembly.dll", properties[2].GetProperty("Value").GetString());
     }
+#endif
 
     [TestMethod]
     public void TestCaseObjectShouldDeserializeEscapedWindowsPath()
@@ -109,6 +115,7 @@ public class TestCaseSerializationTests
         Assert.AreEqual(@"C:\Test\TestAssembly.dll", test.Source);
     }
 
+#if NET
     [TestMethod]
     public void TestCaseObjectShouldSerializeTraitsWithSpecialCharacters()
     {
@@ -124,6 +131,7 @@ public class TestCaseSerializationTests
         Assert.AreEqual(@"TestObject.Traits", properties[7].GetProperty("Key").GetProperty("Id").GetString());
         Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", properties[7].GetProperty("Value").GetRawText());
     }
+#endif
 
     [TestMethod]
     public void TestCasePropertiesShouldGetRegisteredAsPartOfDeserialization()
@@ -143,6 +151,7 @@ public class TestCaseSerializationTests
 
     #region v2 Tests
 
+#if NET
     [TestMethod]
     public void TestCaseJsonShouldContainAllPropertiesOnSerializationV2()
     {
@@ -165,6 +174,7 @@ public class TestCaseSerializationTests
         Assert.AreEqual("/user/src/testFile.cs", data.GetProperty("CodeFilePath").GetString());
         Assert.AreEqual(999, data.GetProperty("LineNumber").GetInt32());
     }
+#endif
 
     [TestMethod]
     public void TestCaseObjectShouldContainAllPropertiesOnDeserializationV2()
@@ -184,6 +194,7 @@ public class TestCaseSerializationTests
         Assert.AreEqual(TestCase.Id, test.Id);
     }
 
+#if NET
     [TestMethod]
     public void TestCaseObjectShouldSerializeTraitsWithSpecialCharactersV2()
     {
@@ -212,6 +223,7 @@ public class TestCaseSerializationTests
         var data = doc.RootElement;
         Assert.AreEqual(@"C:\Test\TestAssembly.dll", data.GetProperty("Source").GetString());
     }
+#endif
 
     [TestMethod]
     public void TestCaseObjectShouldDeserializeEscapedWindowsPathV2()

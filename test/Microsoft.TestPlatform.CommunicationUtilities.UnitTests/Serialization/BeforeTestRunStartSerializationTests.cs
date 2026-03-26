@@ -3,7 +3,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
+#if NET
 using System.Text.Json;
+#endif
 
 using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -141,6 +143,7 @@ public class BeforeTestRunStartSerializationTests
 
     // ── Newtonsoft comparison ────────────────────────────────────────────
 
+#if NET
     [TestMethod]
     public void NewtonsoftComparisonV1()
     {
@@ -154,6 +157,7 @@ public class BeforeTestRunStartSerializationTests
         NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
             MessageType.BeforeTestRunStart, Payload, version: 7);
     }
+#endif
 
     // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -161,6 +165,7 @@ public class BeforeTestRunStartSerializationTests
     /// Compare JSON ignoring whitespace differences (so the pretty-printed
     /// golden strings can be compared against the compact serializer output).
     /// </summary>
+#if NET
     private static void AssertJsonEqual(string expected, string actual)
     {
         static string Normalize(string json)
@@ -182,4 +187,17 @@ public class BeforeTestRunStartSerializationTests
         using var doc = JsonDocument.Parse(json);
         return JsonSerializer.Serialize(doc.RootElement);
     }
+#else
+    private static void AssertJsonEqual(string expected, string actual)
+    {
+        static string Normalize(string json)
+            => Newtonsoft.Json.Linq.JToken.Parse(json).ToString(Newtonsoft.Json.Formatting.None);
+
+        Assert.AreEqual(Normalize(expected), Normalize(actual),
+            $"JSON mismatch.\nExpected:\n{expected}\nActual:\n{actual}");
+    }
+
+    private static string Minify(string json)
+        => Newtonsoft.Json.Linq.JToken.Parse(json).ToString(Newtonsoft.Json.Formatting.None);
+#endif
 }

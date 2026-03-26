@@ -962,11 +962,16 @@ public class SerializationGoldenTests
     private static void AssertJsonEqual(string expected, string actual)
     {
         // Normalize both strings by parsing and re-serializing to remove whitespace differences
+#if NET
         static string Normalize(string json)
         {
             using var doc = System.Text.Json.JsonDocument.Parse(json);
             return System.Text.Json.JsonSerializer.Serialize(doc.RootElement);
         }
+#else
+        static string Normalize(string json)
+            => Newtonsoft.Json.Linq.JToken.Parse(json).ToString(Newtonsoft.Json.Formatting.None);
+#endif
 
         var normalizedExpected = Normalize(expected);
         var normalizedActual = Normalize(actual);

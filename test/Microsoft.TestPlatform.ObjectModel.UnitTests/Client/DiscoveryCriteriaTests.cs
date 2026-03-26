@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NET
 using System;
 using System.Linq;
+using System.Text.Json;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using System.Text.Json;
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Client;
 
@@ -53,3 +53,4 @@ public class DiscoveryCriteriaTests
         CollectionAssert.AreEqual(new[] { "sampleTest.dll" }, criteria.Sources.ToArray());
     }
 }
+#endif
