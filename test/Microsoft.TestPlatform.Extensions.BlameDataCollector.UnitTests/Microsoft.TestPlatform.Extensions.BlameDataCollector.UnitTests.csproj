@@ -30,6 +30,5 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Extensions.BlameDataCollector\Microsoft.TestPlatform.Extensions.BlameDataCollector.csproj" />
     <PackageReference Include="NETStandard.Library" Version="2.0.3" />
-    <PackageReference Include="System.Text.Json" Version="$(SystemTextJsonVersion)" />
   </ItemGroup>
 </Project>

@@ -10,9 +10,4 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>Microsoft.TestPlatform.ObjectModel.UnitTests</AssemblyName>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Text.Json">
-      <Version>$(SystemTextJsonVersion)</Version>
-    </PackageReference>
-  </ItemGroup>
 </Project>
