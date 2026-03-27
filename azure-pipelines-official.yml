@@ -360,10 +360,7 @@ extends:
             LclSource: lclFilesfromPackage
             LclPackageId: 'LCL-JUNO-PROD-VSTEST'
 
-    - template: eng\common\templates-official\post-build\post-build.yml@self
+    - template: eng/common/templates-official/post-build/post-build.yml@self
       parameters:
-        publishingInfraVersion: 3
-        SDLValidationParameters:
-          enable: false
-          continueOnError: false
-          params: ' -SourceToolsList @("policheck","credscan")'
+        # Temporarily skip validation until infra issues are resolved, based on advice from Arcade.
+        enableSigningValidation: false
