@@ -2,12 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-# if NETCOREAPP || NETSTANDARD2_0_OR_GREATER
 using System.Runtime.InteropServices;
-#endif
+
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -15,8 +13,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 public partial class ProcessHelper : IProcessHelper
 {
 #if NETFRAMEWORK || NETSTANDARD2_0_OR_GREATER
-    private PlatformArchitecture? _currentProcessArchitecture;
-
     /// <inheritdoc/>
     public string GetCurrentProcessLocation()
         => Path.GetDirectoryName(GetCurrentProcessFileName());
@@ -30,22 +26,14 @@ public partial class ProcessHelper : IProcessHelper
     /// <inheritdoc/>
     public PlatformArchitecture GetCurrentProcessArchitecture()
     {
-        // If we already cached the current process architecture, no need to figure it out again.
-        if (_currentProcessArchitecture is not null)
+        return RuntimeInformation.ProcessArchitecture switch
         {
-            return _currentProcessArchitecture.Value;
-        }
-
-        // When this is current process, we can just check if IntPointer size to get if we are 64-bit or 32-bit.
-        // When it is 32-bit we can just return, if it is 64-bit we need to clarify if x64 or arm64.
-        if (IntPtr.Size == 4)
-        {
-            _currentProcessArchitecture = PlatformArchitecture.X86;
-            return _currentProcessArchitecture.Value;
-        }
-
-        _currentProcessArchitecture ??= GetProcessArchitecture(_currentProcess.Id);
-        return _currentProcessArchitecture.Value;
+            Architecture.X86 => PlatformArchitecture.X86,
+            Architecture.X64 => PlatformArchitecture.X64,
+            Architecture.Arm => PlatformArchitecture.ARM,
+            Architecture.Arm64 => PlatformArchitecture.ARM64,
+            _ => throw new NotSupportedException(),
+        };
     }
 #endif
 
@@ -60,76 +48,48 @@ public partial class ProcessHelper : IProcessHelper
         }
 #endif
 
-        // If the current process is 64-bit, or this is any remote process, we need to query it via native api.
-        var process = processId == _currentProcess.Id ? _currentProcess : Process.GetProcessById(processId);
+        // For the current process, use RuntimeInformation directly.
+        if (processId == _currentProcess.Id)
+        {
+            return GetCurrentProcessArchitecture();
+        }
+
+        // For remote processes, we need Windows APIs.
+        var process = Process.GetProcessById(processId);
         try
         {
-            if (!NativeMethods.IsWow64Process2(process.Handle, out ushort processMachine, out ushort nativeMachine))
+            if (!Environment.Is64BitOperatingSystem)
             {
-                throw new Win32Exception();
-            }
-
-            if (processMachine != NativeMethods.IMAGE_FILE_MACHINE_UNKNOWN)
-            {
-                // The process is running using WOW64, which suggests it is 32-bit (or any of the other machines, that we cannot
-                // handle, so we just assume x86).
                 return PlatformArchitecture.X86;
             }
 
-            // If processMachine is IMAGE_FILE_MACHINE_UNKNOWN mean that we're not running using WOW64 emulation.
-            // If nativeMachine is IMAGE_FILE_MACHINE_ARM64 mean that we're running on ARM64 architecture device.
-            if (processMachine == NativeMethods.IMAGE_FILE_MACHINE_UNKNOWN && nativeMachine == NativeMethods.IMAGE_FILE_MACHINE_ARM64)
+            var isWow64Succeeded = NativeMethods.IsWow64Process(process.Handle, out var isWow64);
+            if (isWow64Succeeded && isWow64)
             {
-                // To distinguish between ARM64 and x64 emulated on ARM64 we check the PE header of the current running executable.
-                if (IsArm64Executable(process.MainModule!.FileName))
-                {
-                    return PlatformArchitecture.ARM64;
-                }
-                else
-                {
-                    return PlatformArchitecture.X64;
-                }
+                // The process is running using WOW64, which means it is 32-bit.
+                return PlatformArchitecture.X86;
             }
-            else
+
+            // Not WOW64 — this is a native 64-bit process.
+            // On ARM64 OS, distinguish ARM64 native from x64 emulated via the PE header.
+            if (RuntimeInformation.OSArchitecture == Architecture.Arm64)
             {
-                return PlatformArchitecture.X64;
+                return IsArm64Executable(process.MainModule!.FileName)
+                    ? PlatformArchitecture.ARM64
+                    : PlatformArchitecture.X64;
             }
+
+            return PlatformArchitecture.X64;
         }
         catch
         {
-            // At the moment we cannot log messages inside the Microsoft.TestPlatform.PlatformAbstractions.
-            // We did an attempt in https://github.com/microsoft/vstest/pull/3422 - 17.2.0-preview-20220301-01 - but we reverted after
-            // because we broke a scenario where for .NET Framework application inside the test host
-            // we loaded runner version of Microsoft.TestPlatform.PlatformAbstractions but newer version Microsoft.TestPlatform.ObjectModel(the one close
-            // to the test container) and the old PlatformAbstractions doesn't contain the methods expected by the new ObjectModel throwing
-            // a MissedMethodException.
-
             if (!Environment.Is64BitOperatingSystem)
             {
-                // When we know this is not 64-bit operating system, then all processes are running as 32-bit, both
-                // the current process and other processes.
                 return PlatformArchitecture.X86;
             }
 
-            try
-            {
-                var isWow64Process = NativeMethods.IsWow64Process(process.Handle, out var isWow64);
-                if (!isWow64Process)
-                {
-                    // Do nothing we cannot log errors here.
-                }
-
-                // The process is running using WOW64, which suggests it is 32-bit (or any of the other machines, that we cannot
-                // handle, so we just assume x86). If it is not wow, we assume x64, because we failed the call to more advanced api
-                // that can tell us if this is arm64, so we are probably on older version of OS which is x64.
-                // We could call PlatformArchitecture.Architecture, but that uses the same api that we just failed to invoke.
-                return isWow64 ? PlatformArchitecture.X86 : PlatformArchitecture.X64;
-            }
-            catch
-            {
-                // We are on 64-bit system, let's assume x64 when we fail to determine the value.
-                return PlatformArchitecture.X64;
-            }
+            // We are on 64-bit system, let's assume x64 when we fail to determine the value.
+            return PlatformArchitecture.X64;
         }
     }
 
