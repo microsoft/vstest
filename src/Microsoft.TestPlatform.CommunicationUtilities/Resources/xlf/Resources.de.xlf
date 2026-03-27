@@ -47,7 +47,11 @@
         <target state="translated">Fehler beim Herstellen einer Verbindung des Prozesses "{0}" mit dem Prozess "{1}" nach {2} Sekunden. Möglicherweise ist der Computer langsam. Legen Sie die Umgebungsvariable "{3}" fest, um den Timeoutwert zu erhöhen.</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestHostProcessCrashed">
+            <trans-unit id="ConnectionTimeoutWithErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: \n{5}</source>
+        <target state="new">{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: \n{5}</target>
+        <note />
+      </trans-unit>      <trans-unit id="TestHostProcessCrashed">
         <source>Test host process crashed</source>
         <target state="translated">Der Testhostprozess ist abgestürzt.</target>
         <note />

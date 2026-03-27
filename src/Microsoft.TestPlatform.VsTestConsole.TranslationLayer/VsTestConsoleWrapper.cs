@@ -1218,15 +1218,21 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
         var timeout = EnvironmentHelper.GetConnectionTimeout();
         if (!_requestSender.WaitForRequestHandlerConnection(timeout * 1000))
         {
-            var processName = _processHelper.GetCurrentProcessFileName();
+            var currentProcessName = _processHelper.GetCurrentProcessFileName();
+            var childProcessId = _vstestConsoleProcessManager.ProcessId;
+            var childProcessExitCode = _vstestConsoleProcessManager.ExitCode;
+            var childProcessErrorOutput = _vstestConsoleProcessManager.ErrorOutput;
+
             throw new TransationLayerException(
                 string.Format(
                     CultureInfo.CurrentCulture,
-                    CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
-                    processName,
+                    CommunicationUtilitiesResources.ConnectionTimeoutWithErrorMessage,
+                    currentProcessName,
                     CoreUtilitiesConstants.VstestConsoleProcessName,
                     timeout,
-                    EnvironmentHelper.VstestConnectionTimeout)
+                    childProcessId,
+                    childProcessExitCode,
+                    childProcessErrorOutput)
             );
         }
 
