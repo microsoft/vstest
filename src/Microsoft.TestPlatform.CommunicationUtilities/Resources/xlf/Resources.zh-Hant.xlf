@@ -22,6 +22,13 @@
         <target state="translated">使用中的測試探索已中止。原因: {0}</target>
         <note />
       </trans-unit>
+      <trans-unit id="ConnectionTimeoutWithErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+{5}</source>
+        <target state="new">{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+{5}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test host process.</source>
         <target state="translated">無法與測試主機處理序通訊。</target>
@@ -44,7 +51,7 @@
       </trans-unit>
       <trans-unit id="ConnectionTimeoutErrorMessage">
         <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</source>
-        <target state="translated">在 {2} 秒後，{0} 處理序無法連線到 {1} 處理序。原因可能是電腦太慢，請設定環境變數 {3}，加長逾時。</target>
+        <target state="needs-review-translation">在 {2} 秒後，{0} 處理序無法連線到 {1} 處理序。原因可能是電腦太慢，請設定環境變數 {3}，加長逾時。</target>
         <note />
       </trans-unit>
       <trans-unit id="TestHostProcessCrashed">

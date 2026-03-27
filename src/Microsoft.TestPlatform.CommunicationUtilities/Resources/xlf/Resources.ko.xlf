@@ -22,6 +22,13 @@
         <target state="translated">활성 테스트 검색이 중단되었습니다. 이유: {0}</target>
         <note />
       </trans-unit>
+      <trans-unit id="ConnectionTimeoutWithErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+{5}</source>
+        <target state="new">{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+{5}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test host process.</source>
         <target state="translated">테스트 호스트 프로세스와 통신할 수 없습니다.</target>
@@ -44,7 +51,7 @@
       </trans-unit>
       <trans-unit id="ConnectionTimeoutErrorMessage">
         <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</source>
-        <target state="translated">{0} 프로세스가 {2}초 후 {1} 프로세스에 연결하지 못했습니다. 이런 오류는 컴퓨터가 느려서 발생할 수 있습니다. 환경 변수 {3}을(를) 설정하여 시간 제한을 늘리세요.</target>
+        <target state="needs-review-translation">{0} 프로세스가 {2}초 후 {1} 프로세스에 연결하지 못했습니다. 이런 오류는 컴퓨터가 느려서 발생할 수 있습니다. 환경 변수 {3}을(를) 설정하여 시간 제한을 늘리세요.</target>
         <note />
       </trans-unit>
       <trans-unit id="TestHostProcessCrashed">

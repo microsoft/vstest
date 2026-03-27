@@ -1,2 +1,3 @@
 #nullable enable
 const Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.MessageType.TelemetryEventMessage = "TestPlatform.TelemetryEvent" -> string!
+~static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources.ConnectionTimeoutWithErrorMessage.get -> string

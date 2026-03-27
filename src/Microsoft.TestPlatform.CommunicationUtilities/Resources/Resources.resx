@@ -150,4 +150,8 @@
   <data name="AbortedTestDiscoveryWithReason" xml:space="preserve">
     <value>The active test discovery was aborted. Reason: {0}</value>
   </data>
+  <data name="ConnectionTimeoutWithErrorMessage" xml:space="preserve">
+    <value>{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+{5}</value>
+  </data>
 </root>

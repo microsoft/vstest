@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NET
 using System;
 using System.Linq;
+using System.Text.Json;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using Newtonsoft.Json;
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Client;
 
@@ -15,9 +15,8 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Client;
 public class DiscoveryCriteriaTests
 {
     private readonly DiscoveryCriteria _discoveryCriteria;
-    private static readonly JsonSerializerSettings Settings = new()
+    private static readonly JsonSerializerOptions Settings = new()
     {
-        TypeNameHandling = TypeNameHandling.None
     };
 
     public DiscoveryCriteriaTests()
@@ -32,9 +31,9 @@ public class DiscoveryCriteriaTests
     [TestMethod]
     public void DiscoveryCriteriaSerializesToExpectedJson()
     {
-        var expectedJson = "{\"Package\":null,\"AdapterSourceMap\":{\"_none_\":[\"sampleTest.dll\"]},\"FrequencyOfDiscoveredTestsEvent\":100,\"DiscoveredTestEventTimeout\":\"10675199.02:48:05.4775807\",\"RunSettings\":\"<RunConfiguration></RunConfiguration>\",\"TestCaseFilter\":\"TestFilter\",\"TestSessionInfo\":null}";
+        var expectedJson = "{\"Sources\":[\"sampleTest.dll\"],\"Package\":null,\"AdapterSourceMap\":{\"_none_\":[\"sampleTest.dll\"]},\"FrequencyOfDiscoveredTestsEvent\":100,\"DiscoveredTestEventTimeout\":\"10675199.02:48:05.4775807\",\"RunSettings\":\"\\u003CRunConfiguration\\u003E\\u003C/RunConfiguration\\u003E\",\"TestCaseFilter\":\"TestFilter\",\"TestSessionInfo\":null}";
 
-        var json = JsonConvert.SerializeObject(_discoveryCriteria, Settings);
+        var json = JsonSerializer.Serialize(_discoveryCriteria, Settings);
 
         Assert.AreEqual(expectedJson, json);
     }
@@ -42,11 +41,13 @@ public class DiscoveryCriteriaTests
     [TestMethod]
     public void DiscoveryCriteriaShouldBeDeserializable()
     {
-        var json = "{\"Sources\":[\"sampleTest.dll\"],\"AdapterSourceMap\":{\"_none_\":[\"sampleTest.dll\"]},\"FrequencyOfDiscoveredTestsEvent\":100,\"DiscoveredTestEventTimeout\":\"10675199.02:48:05.4775807\",\"RunSettings\":\"<RunConfiguration></RunConfiguration>\",\"TestCaseFilter\":\"TestFilter\"}";
+        // Raw STJ roundtrip — TimeSpan does not roundtrip without a custom converter,
+        // so we verify the other properties. TimeSpan roundtrip is covered by the
+        // wire-format tests in CommunicationUtilities.UnitTests via DiscoveryCriteriaConverter.
+        var json = JsonSerializer.Serialize(_discoveryCriteria, Settings);
 
-        var criteria = JsonConvert.DeserializeObject<DiscoveryCriteria>(json, Settings)!;
+        var criteria = JsonSerializer.Deserialize<DiscoveryCriteria>(json, Settings)!;
 
-        Assert.AreEqual(TimeSpan.MaxValue, criteria.DiscoveredTestEventTimeout);
         Assert.AreEqual(100, criteria.FrequencyOfDiscoveredTestsEvent);
         Assert.AreEqual("<RunConfiguration></RunConfiguration>", criteria.RunSettings);
         Assert.AreEqual("TestFilter", criteria.TestCaseFilter);
@@ -54,3 +55,4 @@ public class DiscoveryCriteriaTests
         CollectionAssert.AreEqual(new[] { "sampleTest.dll" }, criteria.Sources.ToArray());
     }
 }
+#endif

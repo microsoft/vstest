@@ -17,7 +17,7 @@ using System.Xml.Linq;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Microsoft.TestPlatform.TestUtilities;
 
@@ -349,7 +349,7 @@ public class IntegrationTestBuild : IntegrationTestBase
 
         cacheId["projects"] = projects;
 
-        var cacheIdText = JsonConvert.SerializeObject(cacheId, Formatting.Indented);
+        var cacheIdText = JsonSerializer.Serialize(cacheId, new JsonSerializerOptions { WriteIndented = true });
 
         var currentCacheId = File.Exists(Path.Combine(generated, "checksum.json")) ? File.ReadAllText(Path.Combine(generated, "checksum.json")) : null;
 

@@ -10,7 +10,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
     using System;
-    using System.Reflection;
     
     
     /// <summary>
@@ -20,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -40,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -107,11 +106,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout..
+        ///   Looks up a localized string similar to {0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout. The process  was still running when this message was reported..
         /// </summary>
         public static string ConnectionTimeoutErrorMessage {
             get {
                 return ResourceManager.GetString("ConnectionTimeoutErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: 
+        ///{5}.
+        /// </summary>
+        public static string ConnectionTimeoutWithErrorMessage {
+            get {
+                return ResourceManager.GetString("ConnectionTimeoutWithErrorMessage", resourceCulture);
             }
         }
         
