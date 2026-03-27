@@ -37,6 +37,7 @@
   <Project Path="child-hang/child-hang.csproj" />
   <Project Path="CodeCoverageTest/CodeCoverageTest.csproj" />
   <Project Path="ConsoleManagedApp/ConsoleManagedApp.csproj" />
+  <Project Path="ConsoleWindowCheck/ConsoleWindowCheck.csproj" />
   <Project Path="ConsoleRunners/ConsoleRunners.csproj" />
   <Project Path="CoverletCoverageTestProject/CoverletCoverageTestProject.csproj" />
   <Project Path="crash/crash.csproj" />
