@@ -7,9 +7,8 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#if NET
-using System.Text.Json;
-#endif
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using TestResult= Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
@@ -40,7 +39,6 @@ public class TestResultSerializationTests
 
     #region v1 serializer Tests (used with protocol 1 and accidentally with 3)
 
-#if NET
     [TestMethod]
     [DataRow(1)]
     [DataRow(3)]
@@ -48,30 +46,28 @@ public class TestResultSerializationTests
     {
         var json = Serialize(TestResult, version);
 
-        // Use raw deserialization to validate basic properties
-        using var doc = JsonDocument.Parse(json);
-        var data = doc.RootElement;
-        var properties = data.GetProperty("Properties");
-        Assert.AreEqual("TestResult.Outcome", properties[0].GetProperty("Key").GetProperty("Id").GetString());
-        Assert.AreEqual(1, properties[0].GetProperty("Value").GetInt32());
-        Assert.AreEqual("TestResult.ErrorMessage", properties[1].GetProperty("Key").GetProperty("Id").GetString());
-        Assert.AreEqual("sampleError", properties[1].GetProperty("Value").GetString());
-        Assert.AreEqual("TestResult.ErrorStackTrace", properties[2].GetProperty("Key").GetProperty("Id").GetString());
-        Assert.AreEqual("sampleStackTrace", properties[2].GetProperty("Value").GetString());
-        Assert.AreEqual("TestResult.DisplayName", properties[3].GetProperty("Key").GetProperty("Id").GetString());
-        Assert.AreEqual("sampleTestResult", properties[3].GetProperty("Value").GetString());
-        Assert.AreEqual("TestResult.ComputerName", properties[4].GetProperty("Key").GetProperty("Id").GetString());
-        Assert.AreEqual("sampleComputerName", properties[4].GetProperty("Value").GetString());
-        Assert.AreEqual("TestResult.Duration", properties[5].GetProperty("Key").GetProperty("Id").GetString());
-        Assert.AreEqual("10675199.02:48:05.4775807", properties[5].GetProperty("Value").GetString());
+        // Use raw deserialization to validate basic properties (disable date parsing to keep raw strings)
+        var data = ParseJsonNoDates(json);
+        var properties = (JArray)data["Properties"]!;
+        Assert.AreEqual("TestResult.Outcome", properties[0]!["Key"]!["Id"]!.ToString());
+        Assert.AreEqual(1, (int)properties[0]!["Value"]!);
+        Assert.AreEqual("TestResult.ErrorMessage", properties[1]!["Key"]!["Id"]!.ToString());
+        Assert.AreEqual("sampleError", properties[1]!["Value"]!.ToString());
+        Assert.AreEqual("TestResult.ErrorStackTrace", properties[2]!["Key"]!["Id"]!.ToString());
+        Assert.AreEqual("sampleStackTrace", properties[2]!["Value"]!.ToString());
+        Assert.AreEqual("TestResult.DisplayName", properties[3]!["Key"]!["Id"]!.ToString());
+        Assert.AreEqual("sampleTestResult", properties[3]!["Value"]!.ToString());
+        Assert.AreEqual("TestResult.ComputerName", properties[4]!["Key"]!["Id"]!.ToString());
+        Assert.AreEqual("sampleComputerName", properties[4]!["Value"]!.ToString());
+        Assert.AreEqual("TestResult.Duration", properties[5]!["Key"]!["Id"]!.ToString());
+        Assert.AreEqual("10675199.02:48:05.4775807", properties[5]!["Value"]!.ToString());
 
         // By default json.net converts DateTimes to current time zone
-        Assert.AreEqual("TestResult.StartTime", properties[6].GetProperty("Key").GetProperty("Id").GetString());
-        Assert.AreEqual(StartTime.Year, DateTimeOffset.Parse(properties[6].GetProperty("Value").GetString()!, System.Globalization.CultureInfo.InvariantCulture).Year);
-        Assert.AreEqual("TestResult.EndTime", properties[7].GetProperty("Key").GetProperty("Id").GetString());
-        Assert.AreEqual(DateTimeOffset.MaxValue.Year, DateTimeOffset.Parse(properties[7].GetProperty("Value").GetString()!, System.Globalization.CultureInfo.InvariantCulture).Year);
+        Assert.AreEqual("TestResult.StartTime", properties[6]!["Key"]!["Id"]!.ToString());
+        Assert.AreEqual(StartTime.Year, DateTimeOffset.Parse(properties[6]!["Value"]!.ToString(), System.Globalization.CultureInfo.InvariantCulture).Year);
+        Assert.AreEqual("TestResult.EndTime", properties[7]!["Key"]!["Id"]!.ToString());
+        Assert.AreEqual(DateTimeOffset.MaxValue.Year, DateTimeOffset.Parse(properties[7]!["Value"]!.ToString(), System.Globalization.CultureInfo.InvariantCulture).Year);
     }
-#endif
 
     [TestMethod]
     [DataRow(1)]
@@ -189,7 +185,6 @@ public class TestResultSerializationTests
 
     #region v2 serializer Tests (used with protocol 2 and 4)
 
-#if NET
     [TestMethod]
     [DataRow(2)]
     [DataRow(4)]
@@ -197,22 +192,20 @@ public class TestResultSerializationTests
     {
         var json = Serialize(TestResult, version);
 
-        // Use raw deserialization to validate basic properties
-        using var doc = JsonDocument.Parse(json);
-        var data = doc.RootElement;
+        // Use raw deserialization to validate basic properties (disable date parsing to keep raw strings)
+        var data = ParseJsonNoDates(json);
 
-        Assert.AreEqual(1, data.GetProperty("Outcome").GetInt32());
-        Assert.AreEqual("sampleError", data.GetProperty("ErrorMessage").GetString());
-        Assert.AreEqual("sampleStackTrace", data.GetProperty("ErrorStackTrace").GetString());
-        Assert.AreEqual("sampleTestResult", data.GetProperty("DisplayName").GetString());
-        Assert.AreEqual("sampleComputerName", data.GetProperty("ComputerName").GetString());
-        Assert.AreEqual("10675199.02:48:05.4775807", data.GetProperty("Duration").GetString());
+        Assert.AreEqual(1, (int)data["Outcome"]!);
+        Assert.AreEqual("sampleError", data["ErrorMessage"]!.ToString());
+        Assert.AreEqual("sampleStackTrace", data["ErrorStackTrace"]!.ToString());
+        Assert.AreEqual("sampleTestResult", data["DisplayName"]!.ToString());
+        Assert.AreEqual("sampleComputerName", data["ComputerName"]!.ToString());
+        Assert.AreEqual("10675199.02:48:05.4775807", data["Duration"]!.ToString());
 
         // By default json.net converts DateTimes to current time zone
-        Assert.AreEqual(StartTime.Year, DateTimeOffset.Parse(data.GetProperty("StartTime").GetString()!, System.Globalization.CultureInfo.InvariantCulture).Year);
-        Assert.AreEqual(DateTimeOffset.MaxValue.Year, DateTimeOffset.Parse(data.GetProperty("EndTime").GetString()!, System.Globalization.CultureInfo.InvariantCulture).Year);
+        Assert.AreEqual(StartTime.Year, DateTimeOffset.Parse(data["StartTime"]!.ToString(), System.Globalization.CultureInfo.InvariantCulture).Year);
+        Assert.AreEqual(DateTimeOffset.MaxValue.Year, DateTimeOffset.Parse(data["EndTime"]!.ToString(), System.Globalization.CultureInfo.InvariantCulture).Year);
     }
-#endif
 
     [TestMethod]
     [DataRow(2)]
@@ -305,6 +298,15 @@ public class TestResultSerializationTests
     private static T Deserialize<T>(string json, int version)
     {
         return JsonDataSerializer.Instance.Deserialize<T>(json, version)!;
+    }
+
+    /// <summary>
+    /// Parse JSON without Newtonsoft date auto-conversion so datetime strings stay as raw strings.
+    /// </summary>
+    private static JObject ParseJsonNoDates(string json)
+    {
+        using var reader = new JsonTextReader(new System.IO.StringReader(json)) { DateParseHandling = DateParseHandling.None };
+        return JObject.Load(reader);
     }
 
     private static void VerifyDummyPropertyIsRegistered()
