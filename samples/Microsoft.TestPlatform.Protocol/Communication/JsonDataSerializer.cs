@@ -3,7 +3,11 @@
 
 namespace Microsoft.TestPlatform.Protocol
 {
-    using System.Text.Json;
+    using System.IO;
+
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+    using Newtonsoft.Json.Serialization;
 
     /// <summary>
     /// JsonDataSerializer serializes and deserializes data using Json format
@@ -11,20 +15,29 @@ namespace Microsoft.TestPlatform.Protocol
     public class JsonDataSerializer
     {
         private static JsonDataSerializer instance;
-        private static JsonSerializerOptions payloadSerializerOptions;
-        private static JsonSerializerOptions defaultSerializerOptions;
+        private static JsonSerializer payloadSerializer; // used when data to be serialized/deserialized contains payload
+        private static JsonSerializer serializer; // generic serializer
 
         /// <summary>
         /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
         /// </summary>
         private JsonDataSerializer()
         {
-            defaultSerializerOptions = new JsonSerializerOptions();
-            payloadSerializerOptions = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = null,
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never,
-            };
+            serializer = JsonSerializer.Create();
+            payloadSerializer = JsonSerializer.Create(
+                            new JsonSerializerSettings
+                            {
+                                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                                DateParseHandling = DateParseHandling.DateTimeOffset,
+                                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                                TypeNameHandling = TypeNameHandling.None,
+                                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                            });
+#if DEBUG
+            // MemoryTraceWriter can help diagnose serialization issues. Enable it for
+            // debug builds only.
+            payloadSerializer.TraceWriter = new MemoryTraceWriter();
+#endif
         }
 
         /// <summary>
@@ -45,7 +58,7 @@ namespace Microsoft.TestPlatform.Protocol
         /// <returns>A <see cref="Message"/> instance.</returns>
         public Message DeserializeMessage(string rawMessage)
         {
-            return JsonSerializer.Deserialize<Message>(rawMessage);
+            return JsonConvert.DeserializeObject<Message>(rawMessage);
         }
 
         /// <summary>
@@ -56,12 +69,9 @@ namespace Microsoft.TestPlatform.Protocol
         /// <returns>The deserialized payload.</returns>
         public T DeserializePayload<T>(Message message)
         {
-            var options = MessageType.TestMessage.Equals(message.MessageType) ?
-                defaultSerializerOptions : payloadSerializerOptions;
-
-            return message.Payload.HasValue
-                ? message.Payload.Value.Deserialize<T>(options)
-                : default;
+            return MessageType.TestMessage.Equals(message.MessageType) ?
+                message.Payload.ToObject<T>(serializer) :
+                message.Payload.ToObject<T>(payloadSerializer);
         }
 
         /// <summary>
@@ -72,7 +82,11 @@ namespace Microsoft.TestPlatform.Protocol
         /// <returns>An instance of <see cref="T"/>.</returns>
         public T Deserialize<T>(string json)
         {
-            return JsonSerializer.Deserialize<T>(json, payloadSerializerOptions);
+            using (var stringReader = new StringReader(json))
+            using (var jsonReader = new JsonTextReader(stringReader))
+            {
+                return payloadSerializer.Deserialize<T>(jsonReader);
+            }
         }
 
         /// <summary>
@@ -82,7 +96,7 @@ namespace Microsoft.TestPlatform.Protocol
         /// <returns>Serialized message.</returns>
         public string SerializeMessage(string messageType)
         {
-            return JsonSerializer.Serialize(new Message { MessageType = messageType });
+            return JsonConvert.SerializeObject(new Message { MessageType = messageType });
         }
 
         /// <summary>
@@ -93,12 +107,11 @@ namespace Microsoft.TestPlatform.Protocol
         /// <returns>Serialized message.</returns>
         public string SerializePayload(string messageType, object payload)
         {
-            var options = MessageType.TestMessage.Equals(messageType) ?
-                defaultSerializerOptions : payloadSerializerOptions;
+            JToken serializedPayload = MessageType.TestMessage.Equals(messageType) ?
+                JToken.FromObject(payload, serializer) :
+                JToken.FromObject(payload, payloadSerializer);
 
-            JsonElement serializedPayload = JsonSerializer.SerializeToElement(payload, options);
-
-            return JsonSerializer.Serialize(new Message { MessageType = messageType, Payload = serializedPayload });
+            return JsonConvert.SerializeObject(new Message { MessageType = messageType, Payload = serializedPayload });
         }
 
         /// <summary>
@@ -109,7 +122,13 @@ namespace Microsoft.TestPlatform.Protocol
         /// <returns>JSON string.</returns>
         public string Serialize<T>(T data)
         {
-            return JsonSerializer.Serialize(data, payloadSerializerOptions);
+            using (var stringWriter = new StringWriter())
+            using (var jsonWriter = new JsonTextWriter(stringWriter))
+            {
+                payloadSerializer.Serialize(jsonWriter, data);
+
+                return stringWriter.ToString();
+            }
         }
     }
 }
