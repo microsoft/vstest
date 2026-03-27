@@ -291,6 +291,18 @@ public class DesignModeClient : IDesignModeClient
             catch (Exception ex)
             {
                 EqtTrace.Error("DesignModeClient: Error processing request: {0}", ex);
+
+                // Notify the caller (IDE) about the error so it does not hang
+                // waiting for a response that will never come.
+                try
+                {
+                    _communicationManager.SendMessage(MessageType.ProtocolError, ex.Message);
+                }
+                catch (Exception sendEx)
+                {
+                    EqtTrace.Error("DesignModeClient: Failed to send ProtocolError to client: {0}", sendEx);
+                }
+
                 Stop();
             }
         }
