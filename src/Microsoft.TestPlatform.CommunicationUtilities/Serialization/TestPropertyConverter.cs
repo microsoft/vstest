@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NETCOREAPP
+
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -78,3 +80,5 @@ internal class TestPropertyConverter : JsonConverter<TestProperty>
         writer.WriteEndObject();
     }
 }
+
+#endif

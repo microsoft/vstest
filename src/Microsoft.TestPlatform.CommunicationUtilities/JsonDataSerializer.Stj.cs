@@ -23,136 +23,53 @@ public partial class JsonDataSerializer
 
     static JsonDataSerializer()
     {
-        DefaultOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
-            MaxDepth = 64,
-            WriteIndented = false,
-            PropertyNamingPolicy = null, // PascalCase (same as Newtonsoft default)
-            AllowTrailingCommas = true,
-            ReadCommentHandling = JsonCommentHandling.Skip,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            Converters =
-            {
-                new TestPropertyConverter(),
-                new ObjectConverter(),
-                new AttachmentSetConverter(),
-                new UriDataAttachmentConverter(),
-                new TestExecutionContextConverter(),
-                new TestRunCompleteEventArgsConverter(),
-                new TestRunChangedEventArgsConverter(),
-                new AfterTestRunEndResultConverter(),
-                new TestProcessAttachDebuggerPayloadConverter(),
-                new TestSessionInfoConverter(),
-                new DiscoveryCriteriaConverter(),
-            },
-        };
+        // DefaultOptions: common converters shared by all option sets
+        DefaultOptions = CreateBaseOptions();
+        DefaultOptions.Converters.Add(new TestPropertyConverter());
+        DefaultOptions.Converters.Add(new ObjectConverter());
+        DefaultOptions.Converters.Add(new AttachmentSetConverter());
+        DefaultOptions.Converters.Add(new UriDataAttachmentConverter());
+        DefaultOptions.Converters.Add(new TestExecutionContextConverter());
+        DefaultOptions.Converters.Add(new TestRunCompleteEventArgsConverter());
+        DefaultOptions.Converters.Add(new TestRunChangedEventArgsConverter());
+        DefaultOptions.Converters.Add(new AfterTestRunEndResultConverter());
+        DefaultOptions.Converters.Add(new TestProcessAttachDebuggerPayloadConverter());
+        DefaultOptions.Converters.Add(new TestSessionInfoConverter());
+        DefaultOptions.Converters.Add(new DiscoveryCriteriaConverter());
 
-        // V2 options: TestObjectConverter and TestRunStatisticsConverter only
-        PayloadOptionsV2 = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
-            MaxDepth = 64,
-            WriteIndented = false,
-            PropertyNamingPolicy = null,
-            AllowTrailingCommas = true,
-            ReadCommentHandling = JsonCommentHandling.Skip,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            Converters =
-            {
-                new TestPropertyConverter(),
-                new ObjectConverter(),
-                new TestCaseConverterV2(),
-                new TestResultConverterV2(),
-                new TestObjectConverter(),
-                new TestRunStatisticsConverter(),
-                new AttachmentSetConverter(),
-                new UriDataAttachmentConverter(),
-                new TestExecutionContextConverter(),
-                new TestObjectBaseConverterFactory(),
-                new TestRunCompleteEventArgsConverter(),
-                new TestRunChangedEventArgsConverter(),
-                new AfterTestRunEndResultConverter(),
-                new TestProcessAttachDebuggerPayloadConverter(),
-                new TestSessionInfoConverter(),
-                new DiscoveryCriteriaConverter(),
-            },
-        };
+        // V2 options: clone DefaultOptions and add V2-specific converters
+        PayloadOptionsV2 = new JsonSerializerOptions(DefaultOptions);
+        PayloadOptionsV2.Converters.Add(new TestCaseConverterV2());
+        PayloadOptionsV2.Converters.Add(new TestResultConverterV2());
+        PayloadOptionsV2.Converters.Add(new TestObjectConverter());
+        PayloadOptionsV2.Converters.Add(new TestRunStatisticsConverter());
+        PayloadOptionsV2.Converters.Add(new TestObjectBaseConverterFactory());
 
-        // V1 options: adds TestCaseConverter and TestResultConverter on top of V2 converters
-        PayloadOptionsV1 = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
-            MaxDepth = 64,
-            WriteIndented = false,
-            PropertyNamingPolicy = null,
-            AllowTrailingCommas = true,
-            ReadCommentHandling = JsonCommentHandling.Skip,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            Converters =
-            {
-                new TestPropertyConverter(),
-                new ObjectConverter(),
-                new TestCaseConverter(),
-                new TestResultConverter(),
-                new TestObjectConverter(),
-                new TestRunStatisticsConverter(),
-                new AttachmentSetConverter(),
-                new UriDataAttachmentConverter(),
-                new TestExecutionContextConverter(),
-                new TestObjectBaseConverterFactory(),
-                new TestRunCompleteEventArgsConverter(),
-                new TestRunChangedEventArgsConverter(),
-                new AfterTestRunEndResultConverter(),
-                new TestProcessAttachDebuggerPayloadConverter(),
-                new TestSessionInfoConverter(),
-                new DiscoveryCriteriaConverter(),
-            },
-        };
+        // V1 options: clone DefaultOptions and add V1-specific converters
+        PayloadOptionsV1 = new JsonSerializerOptions(DefaultOptions);
+        PayloadOptionsV1.Converters.Add(new TestCaseConverter());
+        PayloadOptionsV1.Converters.Add(new TestResultConverter());
+        PayloadOptionsV1.Converters.Add(new TestObjectConverter());
+        PayloadOptionsV1.Converters.Add(new TestRunStatisticsConverter());
+        PayloadOptionsV1.Converters.Add(new TestObjectBaseConverterFactory());
 
-        // Fast options: same as V2
-        FastOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
-            MaxDepth = 64,
-            WriteIndented = false,
-            PropertyNamingPolicy = null,
-            AllowTrailingCommas = true,
-            ReadCommentHandling = JsonCommentHandling.Skip,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            Converters =
-            {
-                new TestPropertyConverter(),
-                new ObjectConverter(),
-                new TestCaseConverterV2(),
-                new TestResultConverterV2(),
-                new TestObjectConverter(),
-                new TestRunStatisticsConverter(),
-                new AttachmentSetConverter(),
-                new UriDataAttachmentConverter(),
-                new TestExecutionContextConverter(),
-                new TestObjectBaseConverterFactory(),
-                new TestRunCompleteEventArgsConverter(),
-                new TestRunChangedEventArgsConverter(),
-                new AfterTestRunEndResultConverter(),
-                new TestProcessAttachDebuggerPayloadConverter(),
-                new TestSessionInfoConverter(),
-                new DiscoveryCriteriaConverter(),
-            },
-        };
+        // Fast options: same converter set as V2
+        FastOptions = new JsonSerializerOptions(PayloadOptionsV2);
     }
+
+    private static JsonSerializerOptions CreateBaseOptions() => new()
+    {
+        PropertyNameCaseInsensitive = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+        MaxDepth = 64,
+        WriteIndented = false,
+        PropertyNamingPolicy = null, // PascalCase (same as Newtonsoft default)
+        AllowTrailingCommas = true,
+        ReadCommentHandling = JsonCommentHandling.Skip,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        ReferenceHandler = ReferenceHandler.IgnoreCycles,
+    };
 
     private static partial (int version, string? messageType) ParseHeaderFromJson(string rawMessage)
     {
@@ -182,7 +99,7 @@ public partial class JsonDataSerializer
             using var doc = JsonDocument.Parse(message.RawMessage!);
             if (doc.RootElement.TryGetProperty("Payload", out var payloadElement))
             {
-                return JsonSerializer.Deserialize<T>(payloadElement.GetRawText(), payloadOptions);
+                return JsonSerializer.Deserialize<T>(payloadElement, payloadOptions);
             }
             return default;
         }

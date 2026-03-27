@@ -1,5 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+#if NETCOREAPP
 
 using System;
 using System.Globalization;
@@ -22,7 +24,7 @@ public class TestResultConverter : JsonConverter<TestResult>
         var data = doc.RootElement;
 
         var testCaseElement = data.GetProperty("TestCase");
-        var testCase = JsonSerializer.Deserialize<TestCase>(testCaseElement.GetRawText(), options)!;
+        var testCase = JsonSerializer.Deserialize<TestCase>(testCaseElement, options)!;
         var testResult = new TestResult(testCase);
 
         // Add attachments for the result
@@ -32,7 +34,7 @@ public class TestResultConverter : JsonConverter<TestResult>
             {
                 if (attachment.ValueKind != JsonValueKind.Null)
                 {
-                    testResult.Attachments.Add(JsonSerializer.Deserialize<AttachmentSet>(attachment.GetRawText(), options)!);
+                    testResult.Attachments.Add(JsonSerializer.Deserialize<AttachmentSet>(attachment, options)!);
                 }
             }
         }
@@ -44,7 +46,7 @@ public class TestResultConverter : JsonConverter<TestResult>
             {
                 if (message.ValueKind != JsonValueKind.Null)
                 {
-                    testResult.Messages.Add(JsonSerializer.Deserialize<TestResultMessage>(message.GetRawText(), options)!);
+                    testResult.Messages.Add(JsonSerializer.Deserialize<TestResultMessage>(message, options)!);
                 }
             }
         }
@@ -58,7 +60,7 @@ public class TestResultConverter : JsonConverter<TestResult>
         // key value pairs.
         foreach (var property in properties.EnumerateArray())
         {
-            var testProperty = JsonSerializer.Deserialize<TestProperty>(property.GetProperty("Key").GetRawText(), options)!;
+            var testProperty = JsonSerializer.Deserialize<TestProperty>(property.GetProperty("Key"), options)!;
 
             // Let the null values be passed in as null data
             var token = property.GetProperty("Value");
@@ -87,11 +89,11 @@ public class TestResultConverter : JsonConverter<TestResult>
                 case "TestResult.Outcome":
                     testResult.Outcome = (TestOutcome)Enum.Parse(typeof(TestOutcome), propertyData!); break;
                 case "TestResult.Duration":
-                    testResult.Duration = TimeSpan.Parse(propertyData!, CultureInfo.CurrentCulture); break;
+                    testResult.Duration = TimeSpan.Parse(propertyData!, CultureInfo.InvariantCulture); break;
                 case "TestResult.StartTime":
-                    testResult.StartTime = DateTimeOffset.Parse(propertyData!, CultureInfo.CurrentCulture); break;
+                    testResult.StartTime = DateTimeOffset.Parse(propertyData!, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind); break;
                 case "TestResult.EndTime":
-                    testResult.EndTime = DateTimeOffset.Parse(propertyData!, CultureInfo.CurrentCulture); break;
+                    testResult.EndTime = DateTimeOffset.Parse(propertyData!, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind); break;
                 case "TestResult.ErrorMessage":
                     testResult.ErrorMessage = propertyData; break;
                 case "TestResult.ErrorStackTrace":
@@ -190,3 +192,5 @@ public class TestResultConverter : JsonConverter<TestResult>
         writer.WritePropertyName("Value");
     }
 }
+
+#endif
