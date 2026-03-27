@@ -80,8 +80,8 @@ internal partial class FeatureFlag : IFeatureFlag
 
     // When set, warns when vstest provides its own copy of a tracked assembly (e.g. Newtonsoft.Json)
     // to resolve a dependency of an extension that did not ship its own copy.
-    // Set VSTEST_WARN_MISSING_EXTENSIONS_DEPENDENCIES=1 to opt into warnings before enforcement.
-    public const string VSTEST_WARN_MISSING_EXTENSIONS_DEPENDENCIES = nameof(VSTEST_WARN_MISSING_EXTENSIONS_DEPENDENCIES);
+    // Set VSTEST_OPTIN_WARN_MISSING_EXTENSIONS_DEPENDENCIES=1 to opt into warnings before enforcement.
+    public const string VSTEST_OPTIN_WARN_MISSING_EXTENSIONS_DEPENDENCIES = nameof(VSTEST_OPTIN_WARN_MISSING_EXTENSIONS_DEPENDENCIES);
 
 
 
