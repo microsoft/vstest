@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests;
 [TestClass]
 public class SocketCommunicationManagerTests : IDisposable
 {
-    private const string TestDiscoveryStartMessageWithNullPayload = "{\"MessageType\":\"TestDiscovery.Start\",\"Payload\":null}";
+    private const string TestDiscoveryStartMessageWithNullPayload = "{\"MessageType\":\"TestDiscovery.Start\"}";
 
     private const string TestDiscoveryStartMessageWithDummyPayload = "{\"MessageType\":\"TestDiscovery.Start\",\"Payload\":\"Dummy Payload\"}";
 
