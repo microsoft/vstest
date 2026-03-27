@@ -8,9 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -43,20 +41,6 @@ internal class AssemblyResolver : IDisposable
     private readonly IAssemblyLoadContext _platformAssemblyLoadContext;
 
     private static readonly string[] SupportedFileExtensions = [".dll", ".exe"];
-
-    /// <summary>
-    /// Assemblies that extensions should ship themselves but tried to resolve through vstest.
-    /// Tracked globally so warnings are emitted only once per assembly per process.
-    /// </summary>
-    private static readonly HashSet<string> ReportedMissingAssemblies = new(StringComparer.OrdinalIgnoreCase);
-
-    /// <summary>
-    /// Known assemblies that vstest no longer ships and extensions must provide their own copy.
-    /// </summary>
-    private static readonly HashSet<string> KnownRemovedAssemblies = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "Newtonsoft.Json",
-    };
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AssemblyResolver"/> class.
@@ -227,43 +211,8 @@ internal class AssemblyResolver : IDisposable
 
             EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to load assembly.", args.Name);
 
-            ReportMissingKnownAssembly(requestedName, args.RequestingAssembly);
-
             _resolvedAssemblies[args.Name] = null;
             return null;
-        }
-    }
-
-    /// <summary>
-    /// When a known removed assembly (e.g. Newtonsoft.Json) fails to resolve, emit a one-time
-    /// user-visible warning identifying which assembly tried to load it.
-    /// </summary>
-    private static void ReportMissingKnownAssembly(AssemblyName requestedName, Assembly? requestingAssembly)
-    {
-        if (requestedName.Name is null || !KnownRemovedAssemblies.Contains(requestedName.Name))
-        {
-            return;
-        }
-
-        if (!ReportedMissingAssemblies.Add(requestedName.Name))
-        {
-            // Already reported this assembly.
-            return;
-        }
-
-        var requester = requestingAssembly?.GetName().Name ?? "unknown";
-        var message = $"Assembly '{requestedName.Name}' was requested by '{requester}' but was not found. "
-            + $"Test extensions that depend on '{requestedName.Name}' must ship their own copy of the assembly.";
-
-        EqtTrace.Warning("AssemblyResolver.ReportMissingKnownAssembly: {0}", message);
-
-        try
-        {
-            TestSessionMessageLogger.Instance.SendMessage(TestMessageLevel.Warning, message);
-        }
-        catch
-        {
-            // TestSessionMessageLogger may not be initialized in all contexts.
         }
     }
 
