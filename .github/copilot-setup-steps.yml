@@ -1,0 +1,18 @@
+# Copilot Setup Steps
+# This file configures the environment for GitHub Copilot coding agents
+# when assigned issues on this repository.
+
+steps:
+  - name: Install .NET SDK and runtimes
+    run: |
+      # The repo uses Arcade which auto-installs the SDK from global.json
+      # into .dotnet/ on first build. We just need to run restore.
+      if [ -f "build.sh" ]; then
+        chmod +x build.sh
+        chmod +x eng/build.sh
+        chmod +x eng/common/build.sh
+        chmod +x eng/common/tools.sh
+        ./build.sh --restore
+      elif [ -f "build.cmd" ]; then
+        ./build.cmd -restore
+      fi
