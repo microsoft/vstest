@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NETCOREAPP
+
 using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -25,7 +27,7 @@ internal class TestResultConverterV2 : JsonConverter<TestResult>
 
         // TestCase must come first to construct the TestResult
         var testCaseElement = data.GetProperty("TestCase");
-        var testCase = JsonSerializer.Deserialize<TestCase>(testCaseElement.GetRawText(), options)!;
+        var testCase = JsonSerializer.Deserialize<TestCase>(testCaseElement, options)!;
         var testResult = new TestResult(testCase);
 
         // Attachments
@@ -35,7 +37,7 @@ internal class TestResultConverterV2 : JsonConverter<TestResult>
             {
                 if (attachment.ValueKind != JsonValueKind.Null)
                 {
-                    testResult.Attachments.Add(JsonSerializer.Deserialize<AttachmentSet>(attachment.GetRawText(), options)!);
+                    testResult.Attachments.Add(JsonSerializer.Deserialize<AttachmentSet>(attachment, options)!);
                 }
             }
         }
@@ -47,7 +49,7 @@ internal class TestResultConverterV2 : JsonConverter<TestResult>
             {
                 if (message.ValueKind != JsonValueKind.Null)
                 {
-                    testResult.Messages.Add(JsonSerializer.Deserialize<TestResultMessage>(message.GetRawText(), options)!);
+                    testResult.Messages.Add(JsonSerializer.Deserialize<TestResultMessage>(message, options)!);
                 }
             }
         }
@@ -64,11 +66,11 @@ internal class TestResultConverterV2 : JsonConverter<TestResult>
         if (data.TryGetProperty("ComputerName", out var computerName) && computerName.ValueKind != JsonValueKind.Null)
             testResult.ComputerName = computerName.GetString();
         if (data.TryGetProperty("Duration", out var duration) && duration.ValueKind != JsonValueKind.Null)
-            testResult.Duration = TimeSpan.Parse(duration.GetString()!, CultureInfo.CurrentCulture);
+            testResult.Duration = TimeSpan.Parse(duration.GetString()!, CultureInfo.InvariantCulture);
         if (data.TryGetProperty("StartTime", out var startTime) && startTime.ValueKind != JsonValueKind.Null)
-            testResult.StartTime = DateTimeOffset.Parse(startTime.GetString()!, CultureInfo.CurrentCulture);
+            testResult.StartTime = DateTimeOffset.Parse(startTime.GetString()!, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
         if (data.TryGetProperty("EndTime", out var endTime) && endTime.ValueKind != JsonValueKind.Null)
-            testResult.EndTime = DateTimeOffset.Parse(endTime.GetString()!, CultureInfo.CurrentCulture);
+            testResult.EndTime = DateTimeOffset.Parse(endTime.GetString()!, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
         // Custom properties
         if (data.TryGetProperty("Properties", out var properties) && properties.GetArrayLength() > 0)
@@ -78,7 +80,7 @@ internal class TestResultConverterV2 : JsonConverter<TestResult>
                 if (!prop.TryGetProperty("Key", out var keyElement))
                     continue;
 
-                var testProperty = JsonSerializer.Deserialize<TestProperty>(keyElement.GetRawText(), options)!;
+                var testProperty = JsonSerializer.Deserialize<TestProperty>(keyElement, options)!;
 
                 if (!prop.TryGetProperty("Value", out var valueElement))
                     continue;
@@ -151,3 +153,5 @@ internal class TestResultConverterV2 : JsonConverter<TestResult>
         writer.WriteEndObject();
     }
 }
+
+#endif

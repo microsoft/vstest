@@ -1,5 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+#if NETCOREAPP
 
 using System;
 using System.Collections.Generic;
@@ -18,11 +20,11 @@ public class TestObjectConverter : JsonConverter<List<KeyValuePair<TestProperty,
     /// <inheritdoc/>
     public override List<KeyValuePair<TestProperty, object>>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var propertyList = new List<KeyValuePair<TestProperty, object?>>();
+        var propertyList = new List<KeyValuePair<TestProperty, object>>();
 
         if (reader.TokenType != JsonTokenType.StartArray)
         {
-            return (List<KeyValuePair<TestProperty, object>>)(object)propertyList;
+            return propertyList;
         }
 
         while (reader.Read())
@@ -39,7 +41,7 @@ public class TestObjectConverter : JsonConverter<List<KeyValuePair<TestProperty,
             if (!element.TryGetProperty("Key", out var keyElement))
                 continue;
 
-            var testProperty = JsonSerializer.Deserialize<TestProperty>(keyElement.GetRawText(), options);
+            var testProperty = JsonSerializer.Deserialize<TestProperty>(keyElement, options);
             if (testProperty is null)
                 continue;
 
@@ -59,10 +61,10 @@ public class TestObjectConverter : JsonConverter<List<KeyValuePair<TestProperty,
                 }
             }
 
-            propertyList.Add(new KeyValuePair<TestProperty, object?>(testProperty, propertyData));
+            propertyList.Add(new KeyValuePair<TestProperty, object>(testProperty, propertyData!));
         }
 
-        return (List<KeyValuePair<TestProperty, object>>)(object)propertyList;
+        return propertyList;
     }
 
     /// <inheritdoc/>
@@ -88,3 +90,5 @@ public class TestObjectConverter : JsonConverter<List<KeyValuePair<TestProperty,
         writer.WriteEndArray();
     }
 }
+
+#endif

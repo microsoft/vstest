@@ -489,7 +489,6 @@
     <file src="net8.0\Microsoft.TestPlatform.Utilities.dll"	target="tools\net8.0\TestHostNetFramework\Microsoft.TestPlatform.Utilities.dll" />
     <file src="net8.0\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\net8.0\TestHostNetFramework\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="net8.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\net8.0\TestHostNetFramework\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-    <!-- System.Text.Json removed - no longer needed after DepsJsonParser replaced DependencyModel -->
     <file src="netstandard2.0\System.Collections.Immutable.dll"	target="tools\net8.0\TestHostNetFramework\System.Collections.Immutable.dll" />
     <file src="netstandard2.0\System.Reflection.Metadata.dll"	target="tools\net8.0\TestHostNetFramework\System.Reflection.Metadata.dll" />
 
