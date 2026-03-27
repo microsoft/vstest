@@ -47,7 +47,11 @@
         <target state="translated">{0} işlemi, {2} saniye sonra {1} işlemine bağlanamadı. Bu durum makinenin yavaşlığından kaynaklanıyor olabilir, zaman aşımı süresini artırmak için lütfen ortam değişkenini {3} olarak ayarlayın.</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestHostProcessCrashed">
+            <trans-unit id="ConnectionTimeoutWithErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: \n{5}</source>
+        <target state="new">{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: \n{5}</target>
+        <note />
+      </trans-unit>      <trans-unit id="TestHostProcessCrashed">
         <source>Test host process crashed</source>
         <target state="translated">Test ana işlemi kilitlendi</target>
         <note />

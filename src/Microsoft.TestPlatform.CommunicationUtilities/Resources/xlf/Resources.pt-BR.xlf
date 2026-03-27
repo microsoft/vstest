@@ -47,7 +47,11 @@
         <target state="translated">O processo {0} falha ao se conectar ao processo {1} após {2} segundos. Isso pode ocorrer devido à lentidão do computador. Defina a variável de ambiente {3} para aumentar o tempo limite.</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestHostProcessCrashed">
+            <trans-unit id="ConnectionTimeoutWithErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: \n{5}</source>
+        <target state="new">{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: \n{5}</target>
+        <note />
+      </trans-unit>      <trans-unit id="TestHostProcessCrashed">
         <source>Test host process crashed</source>
         <target state="translated">Falha no processo do host de teste</target>
         <note />

@@ -116,6 +116,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: \n{5}.
+        /// </summary>
+        public static string ConnectionTimeoutWithErrorMessage {
+            get {
+                return ResourceManager.GetString("ConnectionTimeoutWithErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Test host process crashed.
         /// </summary>
         public static string TestHostProcessCrashed {

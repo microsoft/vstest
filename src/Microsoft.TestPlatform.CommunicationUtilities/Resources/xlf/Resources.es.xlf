@@ -47,7 +47,11 @@
         <target state="translated">El proceso {0} no pudo conectar con el proceso {1} después de {2} segundos. Esto puede deberse a la lentitud de la máquina, configure la variable de entorno {3} para aumentar el tiempo de espera.</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestHostProcessCrashed">
+            <trans-unit id="ConnectionTimeoutWithErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: \n{5}</source>
+        <target state="new">{0} process failed to connect to {1} process after {2} seconds. The process with id {3}, exited with exitCode {4}, and error output: \n{5}</target>
+        <note />
+      </trans-unit>      <trans-unit id="TestHostProcessCrashed">
         <source>Test host process crashed</source>
         <target state="translated">Proceso de host de pruebas bloqueado</target>
         <note />
