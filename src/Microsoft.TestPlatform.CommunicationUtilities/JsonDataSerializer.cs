@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
@@ -15,10 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 public partial class JsonDataSerializer : IDataSerializer
 {
     private static JsonDataSerializer? s_instance;
-
-    private static readonly bool UseNewtonsoftFallback = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_USE_NEWTONSOFT_JSON_SERIALIZER);
-    private static readonly LegacyNewtonsoftJsonDataSerializer? NewtonsoftFallback = UseNewtonsoftFallback
-        ? new LegacyNewtonsoftJsonDataSerializer() : null;
 
     /// <summary>
     /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
@@ -37,11 +32,6 @@ public partial class JsonDataSerializer : IDataSerializer
     /// <returns>A <see cref="Message"/> instance.</returns>
     public Message DeserializeMessage(string rawMessage)
     {
-        if (NewtonsoftFallback is not null)
-        {
-            return NewtonsoftFallback.DeserializeMessage(rawMessage);
-        }
-
         // Try fast header parse first (string parsing, no JSON library)
         if (!FastHeaderParse(rawMessage, out int version, out string? messageType))
         {
@@ -65,11 +55,6 @@ public partial class JsonDataSerializer : IDataSerializer
     /// <returns>The deserialized payload.</returns>
     public T? DeserializePayload<T>(Message? message)
     {
-        if (NewtonsoftFallback is not null)
-        {
-            return NewtonsoftFallback.DeserializePayload<T>(message);
-        }
-
         if (message is null || message.RawMessage is null)
         {
             return default;
@@ -186,11 +171,6 @@ public partial class JsonDataSerializer : IDataSerializer
     [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public T? Deserialize<T>(string json, int version = 1)
     {
-        if (NewtonsoftFallback is not null)
-        {
-            return NewtonsoftFallback.Deserialize<T>(json, version);
-        }
-
         return DeserializeCore<T>(json, version);
     }
 
@@ -201,11 +181,6 @@ public partial class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializeMessage(string? messageType)
     {
-        if (NewtonsoftFallback is not null)
-        {
-            return NewtonsoftFallback.SerializeMessage(messageType);
-        }
-
         return SerializeMessageCore(messageType);
     }
 
@@ -217,11 +192,6 @@ public partial class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializePayload(string? messageType, object? payload)
     {
-        if (NewtonsoftFallback is not null)
-        {
-            return NewtonsoftFallback.SerializePayload(messageType, payload);
-        }
-
         return SerializePayload(messageType, payload, 1);
     }
 
@@ -234,11 +204,6 @@ public partial class JsonDataSerializer : IDataSerializer
     /// <returns>Serialized message.</returns>
     public string SerializePayload(string? messageType, object? payload, int version)
     {
-        if (NewtonsoftFallback is not null)
-        {
-            return NewtonsoftFallback.SerializePayload(messageType, payload, version);
-        }
-
         return SerializePayloadCore(messageType, payload, version);
     }
 
@@ -252,11 +217,6 @@ public partial class JsonDataSerializer : IDataSerializer
     [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Part of the public API")]
     public string Serialize<T>(T data, int version = 1)
     {
-        if (NewtonsoftFallback is not null)
-        {
-            return NewtonsoftFallback.Serialize(data, version);
-        }
-
         return SerializeCore(data, version);
     }
 
@@ -264,11 +224,6 @@ public partial class JsonDataSerializer : IDataSerializer
     [return: NotNullIfNotNull("obj")]
     public T? Clone<T>(T? obj)
     {
-        if (NewtonsoftFallback is not null)
-        {
-            return NewtonsoftFallback.Clone(obj);
-        }
-
         if (obj is null)
         {
             return default;

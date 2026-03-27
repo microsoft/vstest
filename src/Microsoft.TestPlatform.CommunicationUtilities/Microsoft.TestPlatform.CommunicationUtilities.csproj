@@ -9,7 +9,6 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />
-    <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" PrivateAssets="All" />
   </ItemGroup>
   <!-- Exclude STJ converter files from non-.NET Core compilation (they use System.Text.Json types) -->
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'">
