@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -439,6 +440,15 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
 
                 // Fill in the time taken to complete the run
                 _requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForRun, executionTotalTimeTaken.TotalSeconds);
+
+                // Record assemblies that vstest provided from its own directory
+                var providedDeps = AssemblyResolver.GetProvidedDependencies();
+                foreach (var dep in providedDeps)
+                {
+                    _requestData.MetricsCollection.Add(
+                        $"{TelemetryDataConstants.ProvidedAssemblyDependency}.{dep.Key}",
+                        dep.Value);
+                }
 
                 // Fill in the Metrics From Test Host Process
                 var metrics = runCompleteArgs.Metrics;
