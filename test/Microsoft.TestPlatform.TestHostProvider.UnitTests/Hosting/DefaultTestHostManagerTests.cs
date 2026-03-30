@@ -601,6 +601,7 @@ public class DefaultTestHostManagerTests
                 {
                     var process = Process.GetCurrentProcess();
 
+                    Assert.IsTrue(createNoNewWindow, "createNoNewWindow should default to true");
                     errorCallback(process, errorMessage);
                     exitCallback(process);
                 }).Returns(Process.GetCurrentProcess());
@@ -635,6 +636,7 @@ public class DefaultTestHostManagerTests
                 (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback, createNoNewWindow) =>
                 {
                     var process = Process.GetCurrentProcess();
+                    Assert.IsTrue(createNoNewWindow, "createNoNewWindow should default to true");
                     exitCallback(process);
                 }).Returns(Process.GetCurrentProcess());
 

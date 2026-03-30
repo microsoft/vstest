@@ -30,7 +30,6 @@ public class CreateNoNewWindowTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         ExitCodeEquals(0);
-        StdOutputContains("HAS_CONSOLE_WINDOW=True");
     }
 
     [TestMethod]
@@ -51,8 +50,8 @@ public class CreateNoNewWindowTests : AcceptanceTestBase
 
         InvokeVsTest(arguments);
 
-        ExitCodeEquals(0);
-        StdOutputContains("HAS_CONSOLE_WINDOW=False");
+        ExitCodeEquals(1);
+        StdErrorContains("HAS_CONSOLE_WINDOW=False");
     }
 
     [TestMethod]
@@ -67,8 +66,8 @@ public class CreateNoNewWindowTests : AcceptanceTestBase
 
         InvokeVsTest(arguments);
 
-        ExitCodeEquals(0);
-        StdOutputContains("HAS_CONSOLE_WINDOW=False");
+        ExitCodeEquals(1);
+        StdErrorContains("HAS_CONSOLE_WINDOW=False");
     }
 
     private string GetRunsettingsFilePath(string runsettingsXml)

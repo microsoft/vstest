@@ -1004,7 +1004,7 @@ public class RunConfiguration : TestRunSettings
                             if (!bool.TryParse(element, out boolValue))
                             {
                                 throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, boolValue, elementName));
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, element, elementName));
                             }
 
                             runConfiguration.CreateNoNewWindow = boolValue;

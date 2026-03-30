@@ -15,13 +15,14 @@ public class UnitTest1
     private static extern IntPtr GetConsoleWindow();
 
     /// <summary>
-    /// Writes whether the current process has a console window to stdout.
-    /// The integration test checks this output to verify CreateNoNewWindow behavior.
+    /// Reports whether the current process has a console window.
+    /// The integration test checks the pass/fail result and error message
+    /// to verify CreateNoNewWindow behavior.
     /// </summary>
     [TestMethod]
     public void ReportConsoleWindowStatus()
     {
         var hasConsoleWindow = GetConsoleWindow() != IntPtr.Zero;
-        Console.WriteLine($"HAS_CONSOLE_WINDOW={hasConsoleWindow}");
+        Assert.IsTrue(hasConsoleWindow, $"HAS_CONSOLE_WINDOW={hasConsoleWindow}");
     }
 }
