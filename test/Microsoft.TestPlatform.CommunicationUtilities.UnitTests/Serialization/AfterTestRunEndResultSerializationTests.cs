@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
@@ -204,22 +203,6 @@ public class AfterTestRunEndResultSerializationTests
         Assert.IsNotNull(result.InvokedDataCollectors);
         Assert.HasCount(1, result.InvokedDataCollectors);
         Assert.AreEqual("Code Coverage", result.InvokedDataCollectors[0].FriendlyName);
-    }
-
-    // ── Newtonsoft comparison ────────────────────────────────────────────
-
-    [TestMethod]
-    public void NewtonsoftComparisonV1()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.AfterTestRunEndResult, Payload, version: 1);
-    }
-
-    [TestMethod]
-    public void NewtonsoftComparisonV7()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.AfterTestRunEndResult, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────

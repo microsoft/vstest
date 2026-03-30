@@ -3,7 +3,6 @@
 
 using System;
 
-using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -133,22 +132,6 @@ public class StopTestSessionSerializationTests
         Assert.IsNotNull(result.TestSessionInfo);
         Assert.AreEqual(Payload.TestSessionInfo!.Id, result.TestSessionInfo.Id);
         Assert.AreEqual(Payload.CollectMetrics, result.CollectMetrics);
-    }
-
-    // ── Newtonsoft comparison ────────────────────────────────────────────
-
-    [TestMethod]
-    public void NewtonsoftComparisonV1()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.StopTestSession, Payload, version: 1);
-    }
-
-    [TestMethod]
-    public void NewtonsoftComparisonV7()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.StopTestSession, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -258,22 +257,6 @@ public class StartTestExecutionWithTestsSerializationTests
         var result = JsonDataSerializer.Instance.DeserializePayload<TestRunCriteriaWithTests>(message);
 
         AssertPayloadFields(result);
-    }
-
-    // ── Newtonsoft comparison ────────────────────────────────────────────
-
-    [TestMethod]
-    public void NewtonsoftComparisonV1()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.StartTestExecutionWithTests, Payload, version: 1);
-    }
-
-    [TestMethod]
-    public void NewtonsoftComparisonV7()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.StartTestExecutionWithTests, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────

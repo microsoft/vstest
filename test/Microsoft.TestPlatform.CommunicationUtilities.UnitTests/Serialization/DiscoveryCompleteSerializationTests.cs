@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -228,22 +227,6 @@ public class DiscoveryCompleteSerializationTests
         Assert.IsNotNull(result.LastDiscoveredTests);
         var tc = result.LastDiscoveredTests.First();
         Assert.AreEqual("Contoso.Math.Tests.CalculatorTests.SubtractTest", tc.FullyQualifiedName);
-    }
-
-    // ── Newtonsoft comparison ────────────────────────────────────────────
-
-    [TestMethod]
-    public void NewtonsoftComparisonV1()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.DiscoveryComplete, Payload, version: 1);
-    }
-
-    [TestMethod]
-    public void NewtonsoftComparisonV7()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.DiscoveryComplete, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────

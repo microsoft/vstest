@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
 /// <summary>
 /// JSON converter for the <see cref="TestObject"/> and derived entities.
 /// </summary>
-public class TestObjectConverter : JsonConverter<List<KeyValuePair<TestProperty, object>>>
+internal class TestObjectConverter : JsonConverter<List<KeyValuePair<TestProperty, object>>>
 {
     /// <inheritdoc/>
     public override List<KeyValuePair<TestProperty, object>>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -92,3 +92,4 @@ public class TestObjectConverter : JsonConverter<List<KeyValuePair<TestProperty,
 }
 
 #endif
+

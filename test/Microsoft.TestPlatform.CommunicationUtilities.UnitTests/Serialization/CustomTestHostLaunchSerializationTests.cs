@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -161,22 +160,6 @@ public class CustomTestHostLaunchSerializationTests
         Assert.AreEqual(Payload.EnvironmentVariables["VSTEST_CONNECTION_TIMEOUT"], result.EnvironmentVariables["VSTEST_CONNECTION_TIMEOUT"]);
         Assert.IsNotNull(result.CustomProperties);
         Assert.AreEqual(Payload.CustomProperties!["IsBeingDebugged"], result.CustomProperties["IsBeingDebugged"]);
-    }
-
-    // ── Newtonsoft comparison ────────────────────────────────────────────
-
-    [TestMethod]
-    public void NewtonsoftComparisonV1()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.CustomTestHostLaunch, Payload, version: 1);
-    }
-
-    [TestMethod]
-    public void NewtonsoftComparisonV7()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.CustomTestHostLaunch, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────

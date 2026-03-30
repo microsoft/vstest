@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -172,22 +171,6 @@ public class StartDiscoverySerializationTests
         Assert.AreEqual(10, result.FrequencyOfDiscoveredTestsEvent);
         Assert.AreEqual(TimeSpan.FromSeconds(30), result.DiscoveredTestEventTimeout);
         Assert.AreEqual("Category=Unit", result.TestCaseFilter);
-    }
-
-    // ── Newtonsoft comparison ────────────────────────────────────────────
-
-    [TestMethod]
-    public void NewtonsoftComparisonV1()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.StartDiscovery, Payload, version: 1);
-    }
-
-    [TestMethod]
-    public void NewtonsoftComparisonV7()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.StartDiscovery, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────

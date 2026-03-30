@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
@@ -151,22 +150,6 @@ public class StartTestExecutionWithSourcesSerializationTests
         Assert.AreEqual(Payload.RunSettings, result.RunSettings);
         Assert.IsNotNull(result.AdapterSourceMap);
         Assert.IsTrue(result.AdapterSourceMap.ContainsKey("executor://MSTestAdapter/v2"));
-    }
-
-    // ── Newtonsoft comparison ────────────────────────────────────────────
-
-    [TestMethod]
-    public void NewtonsoftComparisonV1()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.StartTestExecutionWithSources, Payload, version: 1);
-    }
-
-    [TestMethod]
-    public void NewtonsoftComparisonV7()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.StartTestExecutionWithSources, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────

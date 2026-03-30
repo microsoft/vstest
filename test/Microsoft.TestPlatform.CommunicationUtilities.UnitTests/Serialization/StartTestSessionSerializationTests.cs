@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 
-using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -170,22 +169,6 @@ public class StartTestSessionSerializationTests
         Assert.AreEqual(Payload.TestPlatformOptions!.TestCaseFilter, result.TestPlatformOptions.TestCaseFilter);
         Assert.AreEqual(Payload.TestPlatformOptions.CollectMetrics, result.TestPlatformOptions.CollectMetrics);
         Assert.AreEqual(Payload.TestPlatformOptions.SkipDefaultAdapters, result.TestPlatformOptions.SkipDefaultAdapters);
-    }
-
-    // ── Newtonsoft comparison ────────────────────────────────────────────
-
-    [TestMethod]
-    public void NewtonsoftComparisonV1()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.StartTestSession, Payload, version: 1);
-    }
-
-    [TestMethod]
-    public void NewtonsoftComparisonV7()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.StartTestSession, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────

@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
 /// <summary>
 /// Converter used by v1 protocol serializer to serialize TestResult object to and from v1 json
 /// </summary>
-public class TestResultConverter : JsonConverter<TestResult>
+internal class TestResultConverter : JsonConverter<TestResult>
 {
     /// <inheritdoc/>
     public override TestResult Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -194,3 +194,4 @@ public class TestResultConverter : JsonConverter<TestResult>
 }
 
 #endif
+

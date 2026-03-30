@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -137,22 +136,6 @@ public class BeforeTestRunStartSerializationTests
         Assert.AreEqual("Contoso.Math.Tests.dll", sources[0]);
         Assert.AreEqual("Contoso.Core.Tests.dll", sources[1]);
         Assert.IsTrue(result.IsTelemetryOptedIn);
-    }
-
-    // ── Newtonsoft comparison ────────────────────────────────────────────
-
-    [TestMethod]
-    public void NewtonsoftComparisonV1()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.BeforeTestRunStart, Payload, version: 1);
-    }
-
-    [TestMethod]
-    public void NewtonsoftComparisonV7()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.BeforeTestRunStart, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────

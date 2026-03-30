@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 
-using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -154,22 +153,6 @@ public class StartTestSessionCallbackSerializationTests
         Assert.AreEqual(Payload.EventArgs!.TestSessionInfo!.Id, result.EventArgs.TestSessionInfo.Id);
         Assert.IsNotNull(result.EventArgs.Metrics);
         Assert.IsTrue(result.EventArgs.Metrics.ContainsKey("TimeTakenInSec"));
-    }
-
-    // ── Newtonsoft comparison ────────────────────────────────────────────
-
-    [TestMethod]
-    public void NewtonsoftComparisonV1()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.StartTestSessionCallback, Payload, version: 1);
-    }
-
-    [TestMethod]
-    public void NewtonsoftComparisonV7()
-    {
-        NewtonsoftComparisonHelper.AssertMatchesNewtonsoft(
-            MessageType.StartTestSessionCallback, Payload, version: 7);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────

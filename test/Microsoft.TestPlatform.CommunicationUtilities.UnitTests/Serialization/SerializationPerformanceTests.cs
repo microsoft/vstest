@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.NewtonsoftReference;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -134,20 +133,6 @@ public class SerializationPerformanceTests
     }
 
     [TestMethod]
-    public void Serialize_TestMessage_V1_Newtonsoft()
-    {
-        NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 1);
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++)
-        {
-            NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 1);
-        }
-        sw.Stop();
-        Console.WriteLine($"Newtonsoft Serialize TestMessage V1: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
-    }
-
-    [TestMethod]
     public void Serialize_TestMessage_V7_SystemTextJson()
     {
         JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
@@ -159,20 +144,6 @@ public class SerializationPerformanceTests
         }
         sw.Stop();
         Console.WriteLine($"STJ Serialize TestMessage V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
-    }
-
-    [TestMethod]
-    public void Serialize_TestMessage_V7_Newtonsoft()
-    {
-        NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++)
-        {
-            NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
-        }
-        sw.Stop();
-        Console.WriteLine($"Newtonsoft Serialize TestMessage V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
     }
 
     #endregion
@@ -197,24 +168,6 @@ public class SerializationPerformanceTests
         Console.WriteLine($"STJ Deserialize TestMessage V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
     }
 
-    [TestMethod]
-    public void Deserialize_TestMessage_V7_Newtonsoft()
-    {
-        var json = NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
-
-        var msg = NewtonsoftJsonDataSerializer.Instance.DeserializeMessage(json);
-        NewtonsoftJsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(msg);
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++)
-        {
-            msg = NewtonsoftJsonDataSerializer.Instance.DeserializeMessage(json);
-            NewtonsoftJsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(msg);
-        }
-        sw.Stop();
-        Console.WriteLine($"Newtonsoft Deserialize TestMessage V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
-    }
-
     #endregion
 
     #region TestCasesFound — Serialize
@@ -234,20 +187,6 @@ public class SerializationPerformanceTests
     }
 
     [TestMethod]
-    public void Serialize_TestCasesFound_V1_Newtonsoft()
-    {
-        NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, TestCases, 1);
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++)
-        {
-            NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, TestCases, 1);
-        }
-        sw.Stop();
-        Console.WriteLine($"Newtonsoft Serialize TestCasesFound V1: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
-    }
-
-    [TestMethod]
     public void Serialize_TestCasesFound_V7_SystemTextJson()
     {
         JsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, TestCases, 7);
@@ -259,20 +198,6 @@ public class SerializationPerformanceTests
         }
         sw.Stop();
         Console.WriteLine($"STJ Serialize TestCasesFound V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
-    }
-
-    [TestMethod]
-    public void Serialize_TestCasesFound_V7_Newtonsoft()
-    {
-        NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, TestCases, 7);
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++)
-        {
-            NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, TestCases, 7);
-        }
-        sw.Stop();
-        Console.WriteLine($"Newtonsoft Serialize TestCasesFound V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
     }
 
     #endregion
@@ -297,24 +222,6 @@ public class SerializationPerformanceTests
         Console.WriteLine($"STJ Deserialize TestCasesFound V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
     }
 
-    [TestMethod]
-    public void Deserialize_TestCasesFound_V7_Newtonsoft()
-    {
-        var json = NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, TestCases, 7);
-
-        var msg = NewtonsoftJsonDataSerializer.Instance.DeserializeMessage(json);
-        NewtonsoftJsonDataSerializer.Instance.DeserializePayload<List<TestCase>>(msg);
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++)
-        {
-            msg = NewtonsoftJsonDataSerializer.Instance.DeserializeMessage(json);
-            NewtonsoftJsonDataSerializer.Instance.DeserializePayload<List<TestCase>>(msg);
-        }
-        sw.Stop();
-        Console.WriteLine($"Newtonsoft Deserialize TestCasesFound V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
-    }
-
     #endregion
 
     #region DiscoveryComplete — Serialize
@@ -334,20 +241,6 @@ public class SerializationPerformanceTests
     }
 
     [TestMethod]
-    public void Serialize_DiscoveryComplete_V1_Newtonsoft()
-    {
-        NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, DiscoveryCompletePayload, 1);
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++)
-        {
-            NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, DiscoveryCompletePayload, 1);
-        }
-        sw.Stop();
-        Console.WriteLine($"Newtonsoft Serialize DiscoveryComplete V1: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
-    }
-
-    [TestMethod]
     public void Serialize_DiscoveryComplete_V7_SystemTextJson()
     {
         JsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, DiscoveryCompletePayload, 7);
@@ -359,20 +252,6 @@ public class SerializationPerformanceTests
         }
         sw.Stop();
         Console.WriteLine($"STJ Serialize DiscoveryComplete V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
-    }
-
-    [TestMethod]
-    public void Serialize_DiscoveryComplete_V7_Newtonsoft()
-    {
-        NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, DiscoveryCompletePayload, 7);
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++)
-        {
-            NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, DiscoveryCompletePayload, 7);
-        }
-        sw.Stop();
-        Console.WriteLine($"Newtonsoft Serialize DiscoveryComplete V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
     }
 
     #endregion
@@ -397,24 +276,6 @@ public class SerializationPerformanceTests
         Console.WriteLine($"STJ Deserialize DiscoveryComplete V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
     }
 
-    [TestMethod]
-    public void Deserialize_DiscoveryComplete_V7_Newtonsoft()
-    {
-        var json = NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, DiscoveryCompletePayload, 7);
-
-        var msg = NewtonsoftJsonDataSerializer.Instance.DeserializeMessage(json);
-        NewtonsoftJsonDataSerializer.Instance.DeserializePayload<DiscoveryCompletePayload>(msg);
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++)
-        {
-            msg = NewtonsoftJsonDataSerializer.Instance.DeserializeMessage(json);
-            NewtonsoftJsonDataSerializer.Instance.DeserializePayload<DiscoveryCompletePayload>(msg);
-        }
-        sw.Stop();
-        Console.WriteLine($"Newtonsoft Deserialize DiscoveryComplete V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
-    }
-
     #endregion
 
     #region ExecutionComplete — Serialize
@@ -434,20 +295,6 @@ public class SerializationPerformanceTests
     }
 
     [TestMethod]
-    public void Serialize_ExecutionComplete_V1_Newtonsoft()
-    {
-        NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 1);
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++)
-        {
-            NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 1);
-        }
-        sw.Stop();
-        Console.WriteLine($"Newtonsoft Serialize ExecutionComplete V1: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
-    }
-
-    [TestMethod]
     public void Serialize_ExecutionComplete_V7_SystemTextJson()
     {
         JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7);
@@ -459,20 +306,6 @@ public class SerializationPerformanceTests
         }
         sw.Stop();
         Console.WriteLine($"STJ Serialize ExecutionComplete V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
-    }
-
-    [TestMethod]
-    public void Serialize_ExecutionComplete_V7_Newtonsoft()
-    {
-        NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7);
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++)
-        {
-            NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7);
-        }
-        sw.Stop();
-        Console.WriteLine($"Newtonsoft Serialize ExecutionComplete V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
     }
 
     #endregion
@@ -497,130 +330,6 @@ public class SerializationPerformanceTests
         Console.WriteLine($"STJ Deserialize ExecutionComplete V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
     }
 
-    [TestMethod]
-    public void Deserialize_ExecutionComplete_V7_Newtonsoft()
-    {
-        var json = NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7);
-
-        var msg = NewtonsoftJsonDataSerializer.Instance.DeserializeMessage(json);
-        NewtonsoftJsonDataSerializer.Instance.DeserializePayload<TestRunCompletePayload>(msg);
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++)
-        {
-            msg = NewtonsoftJsonDataSerializer.Instance.DeserializeMessage(json);
-            NewtonsoftJsonDataSerializer.Instance.DeserializePayload<TestRunCompletePayload>(msg);
-        }
-        sw.Stop();
-        Console.WriteLine($"Newtonsoft Deserialize ExecutionComplete V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
-    }
-
     #endregion
 
-    #region Regression Comparison — STJ must not be slower than Newtonsoft
-
-    // These tests run both implementations side-by-side and fail if STJ is
-    // significantly slower than Newtonsoft. Tolerance is 2x — STJ should be
-    // faster, but we allow up to 2x slower to account for test machine variance.
-    private const double RegressionTolerance = 2.0;
-
-    private static (long stjMs, long newtonsoftMs) MeasureBoth(
-        Action stjAction, Action newtonsoftAction)
-    {
-        // Warm up both
-        stjAction();
-        newtonsoftAction();
-
-        var sw = Stopwatch.StartNew();
-        for (int i = 0; i < Iterations; i++) newtonsoftAction();
-        sw.Stop();
-        var newtonsoftMs = sw.ElapsedMilliseconds;
-
-        sw.Restart();
-        for (int i = 0; i < Iterations; i++) stjAction();
-        sw.Stop();
-        var stjMs = sw.ElapsedMilliseconds;
-
-        return (stjMs, newtonsoftMs);
-    }
-
-    private static void AssertNoRegression(string label, long stjMs, long newtonsoftMs)
-    {
-        Console.WriteLine($"[{label}] STJ={stjMs}ms  Newtonsoft={newtonsoftMs}ms");
-
-        // When absolute times are very small (< 10ms for 1000 iterations), ratio comparisons
-        // are unreliable due to OS scheduling noise. Skip the ratio check in that case.
-        if (newtonsoftMs < 10)
-        {
-            Console.WriteLine($"[{label}] Baseline too small ({newtonsoftMs}ms) for reliable ratio — skipping.");
-            return;
-        }
-
-        var ratio = (double)stjMs / newtonsoftMs;
-        Console.WriteLine($"[{label}] Ratio={ratio:F2}x (threshold: {RegressionTolerance}x)");
-
-        Assert.IsLessThanOrEqualTo(RegressionTolerance, ratio,
-            $"Performance regression: STJ ({stjMs}ms) is {ratio:F2}x slower than " +
-            $"Newtonsoft ({newtonsoftMs}ms) for {label}. Threshold: {RegressionTolerance}x");
-    }
-
-    [TestMethod]
-    public void Regression_Serialize_TestMessage_V7()
-    {
-        var (stj, ns) = MeasureBoth(
-            () => JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7),
-            () => NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7));
-        AssertNoRegression("Serialize TestMessage V7", stj, ns);
-    }
-
-    [TestMethod]
-    public void Regression_Serialize_TestCasesFound_V7()
-    {
-        var (stj, ns) = MeasureBoth(
-            () => JsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, TestCases, 7),
-            () => NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, TestCases, 7));
-        AssertNoRegression("Serialize TestCasesFound V7", stj, ns);
-    }
-
-    [TestMethod]
-    public void Regression_Serialize_DiscoveryComplete_V7()
-    {
-        var (stj, ns) = MeasureBoth(
-            () => JsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, DiscoveryCompletePayload, 7),
-            () => NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, DiscoveryCompletePayload, 7));
-        AssertNoRegression("Serialize DiscoveryComplete V7", stj, ns);
-    }
-
-    [TestMethod]
-    public void Regression_Serialize_ExecutionComplete_V7()
-    {
-        var (stj, ns) = MeasureBoth(
-            () => JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7),
-            () => NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7));
-        AssertNoRegression("Serialize ExecutionComplete V7", stj, ns);
-    }
-
-    [TestMethod]
-    public void Regression_Deserialize_TestMessage_V7()
-    {
-        var stjJson = JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
-        var nsJson = NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
-        var (stj, ns) = MeasureBoth(
-            () => { var m = JsonDataSerializer.Instance.DeserializeMessage(stjJson); JsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(m); },
-            () => { var m = NewtonsoftJsonDataSerializer.Instance.DeserializeMessage(nsJson); NewtonsoftJsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(m); });
-        AssertNoRegression("Deserialize TestMessage V7", stj, ns);
-    }
-
-    [TestMethod]
-    public void Regression_Deserialize_TestCasesFound_V7()
-    {
-        var stjJson = JsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, TestCases, 7);
-        var nsJson = NewtonsoftJsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, TestCases, 7);
-        var (stj, ns) = MeasureBoth(
-            () => { var m = JsonDataSerializer.Instance.DeserializeMessage(stjJson); JsonDataSerializer.Instance.DeserializePayload<List<TestCase>>(m); },
-            () => { var m = NewtonsoftJsonDataSerializer.Instance.DeserializeMessage(nsJson); NewtonsoftJsonDataSerializer.Instance.DeserializePayload<List<TestCase>>(m); });
-        AssertNoRegression("Deserialize TestCasesFound V7", stj, ns);
-    }
-
-    #endregion
 }
