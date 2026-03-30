@@ -23,6 +23,17 @@ public class SerializationPerformanceTests
 {
     private const int Iterations = 1000;
 
+    [TestMethod]
+    public void VerifySerializerName()
+    {
+#if NETCOREAPP
+        Assert.AreEqual("System.Text.Json", JsonDataSerializer.SerializerName);
+#else
+        Assert.AreEqual("Jsonite", JsonDataSerializer.SerializerName);
+#endif
+        Console.WriteLine($"Serializer: {JsonDataSerializer.SerializerName}");
+    }
+
     #region Payloads
 
     private static readonly TestMessagePayload TestMessagePayload = new()

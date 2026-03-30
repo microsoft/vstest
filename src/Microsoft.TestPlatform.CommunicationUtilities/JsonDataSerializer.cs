@@ -16,6 +16,15 @@ public partial class JsonDataSerializer : IDataSerializer
     private static JsonDataSerializer? s_instance;
 
     /// <summary>
+    /// Gets the name of the underlying serializer (for diagnostics/tests).
+    /// </summary>
+#if NETCOREAPP
+    internal static string SerializerName => "System.Text.Json";
+#else
+    internal static string SerializerName => "Jsonite";
+#endif
+
+    /// <summary>
     /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
     /// </summary>
     private JsonDataSerializer() { }
