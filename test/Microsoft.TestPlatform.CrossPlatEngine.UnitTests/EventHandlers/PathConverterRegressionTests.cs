@@ -18,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.UnitTests.EventHan
 /// Regression tests for PathConverter — path conversion for UWP deployment.
 /// </summary>
 [TestClass]
+[TestCategory("Windows")]
 public class PathConverterRegressionTests
 {
     private readonly PathConverter _pathConverter;
