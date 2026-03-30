@@ -536,9 +536,8 @@ public class SerializerComparisonTests
 
         if (swRef.ElapsedMilliseconds >= 10)
         {
-            var ratio = (double)swOurs.ElapsedMilliseconds / swRef.ElapsedMilliseconds;
-            Assert.IsLessThanOrEqualTo(ratio, 3.0,
-                $"Performance regression: {ratio:F2}x slower than Newtonsoft");
+            Assert.IsLessThanOrEqualTo(swRef.ElapsedMilliseconds * 3, swOurs.ElapsedMilliseconds,
+                $"Performance regression: Ours={swOurs.ElapsedMilliseconds}ms Newtonsoft={swRef.ElapsedMilliseconds}ms");
         }
     }
 
@@ -566,9 +565,8 @@ public class SerializerComparisonTests
 
         if (swRef.ElapsedMilliseconds >= 10)
         {
-            var ratio = (double)swOurs.ElapsedMilliseconds / swRef.ElapsedMilliseconds;
-            Assert.IsLessThanOrEqualTo(ratio, 3.0,
-                $"Performance regression: {ratio:F2}x slower than Newtonsoft");
+            Assert.IsLessThanOrEqualTo(swRef.ElapsedMilliseconds * 3, swOurs.ElapsedMilliseconds,
+                $"Performance regression: Ours={swOurs.ElapsedMilliseconds}ms Newtonsoft={swRef.ElapsedMilliseconds}ms");
         }
     }
 
@@ -605,9 +603,8 @@ public class SerializerComparisonTests
 
         if (swRef.ElapsedMilliseconds >= 10)
         {
-            var ratio = (double)swOurs.ElapsedMilliseconds / swRef.ElapsedMilliseconds;
-            Assert.IsLessThanOrEqualTo(ratio, 3.0,
-                $"Performance regression: {ratio:F2}x slower than Newtonsoft");
+            Assert.IsLessThanOrEqualTo(swRef.ElapsedMilliseconds * 3, swOurs.ElapsedMilliseconds,
+                $"Performance regression: Ours={swOurs.ElapsedMilliseconds}ms Newtonsoft={swRef.ElapsedMilliseconds}ms");
         }
     }
 
@@ -644,9 +641,8 @@ public class SerializerComparisonTests
 
         if (swRef.ElapsedMilliseconds >= 10)
         {
-            var ratio = (double)swOurs.ElapsedMilliseconds / swRef.ElapsedMilliseconds;
-            Assert.IsLessThanOrEqualTo(ratio, 3.0,
-                $"Performance regression: {ratio:F2}x slower than Newtonsoft");
+            Assert.IsLessThanOrEqualTo(swRef.ElapsedMilliseconds * 3, swOurs.ElapsedMilliseconds,
+                $"Performance regression: Ours={swOurs.ElapsedMilliseconds}ms Newtonsoft={swRef.ElapsedMilliseconds}ms");
         }
     }
 
@@ -842,3 +838,5 @@ public class SerializerComparisonTests
             ctx);
     }
 }
+
+
