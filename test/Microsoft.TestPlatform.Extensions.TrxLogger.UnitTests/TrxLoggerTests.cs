@@ -631,6 +631,49 @@ public class TrxLoggerTests
     }
 
     [TestMethod]
+    public void DefaultTrxFileNameShouldIncludeFrameworkWhenAvailable()
+    {
+        _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v10.0";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
+        Assert.IsNotNull(fileName);
+        Assert.Contains("_net10.0", fileName, $"Expected TFM 'net10.0' in filename but got: {fileName}");
+        Assert.EndsWith(".trx", fileName, $"Expected .trx extension but got: {fileName}");
+    }
+
+    [TestMethod]
+    public void DefaultTrxFileNameShouldWorkWithoutFramework()
+    {
+        _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
+        Assert.IsNotNull(fileName);
+        Assert.EndsWith(".trx", fileName, $"Expected .trx extension but got: {fileName}");
+    }
+
+    [TestMethod]
+    public void DefaultTrxFileNameShouldUseRawStringWhenFrameworkCannotBeParsed()
+    {
+        _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = "SomeCustomFramework";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
+        Assert.IsNotNull(fileName);
+        Assert.Contains("_SomeCustomFramework", fileName, $"Expected raw framework string in filename but got: {fileName}");
+        Assert.EndsWith(".trx", fileName, $"Expected .trx extension but got: {fileName}");
+    }
+
+    [TestMethod]
     public void DefaultTrxFileNameVerification()
     {
         _parameters.Remove(TrxLoggerConstants.LogFileNameKey);

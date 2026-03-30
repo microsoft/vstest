@@ -22,7 +22,7 @@ internal class SerialTestRunDecoratorFrameworkHandle : IFrameworkHandle
         _testEnd = testEnd;
     }
 
-    [Obsolete("This property has no effect", error: true)]
+    [Obsolete("This property has no effect", error: false)]
     public bool EnableShutdownAfterTestRun { get => _frameworkHandle.EnableShutdownAfterTestRun; set => _frameworkHandle.EnableShutdownAfterTestRun = value; }
 
     public int LaunchProcessWithDebuggerAttached(string filePath, string? workingDirectory, string? arguments, IDictionary<string, string?>? environmentVariables)
