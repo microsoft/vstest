@@ -271,12 +271,15 @@ public class VsTestConsoleWrapperTests
     {
         _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("DummyProcess");
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
-        _mockProcessManager.Setup(pm => pm.ProcessId).Returns(0);
-        _mockProcessManager.Setup(pm => pm.ExitCode).Returns(0);
-        _mockProcessManager.Setup(pm => pm.ErrorOutput).Returns("");
+        _mockProcessManager.Setup(pm => pm.ProcessId).Returns(1234);
+        _mockProcessManager.Setup(pm => pm.ProcessName).Returns("vstest.console");
+        _mockProcessManager.Setup(pm => pm.ExitCode).Returns(1);
+        _mockProcessManager.Setup(pm => pm.ErrorOutput).Returns("some error");
 
         var exception = Assert.ThrowsExactly<TransationLayerException>(() => _consoleWrapper.InitializeExtensions(new List<string> { "Hello", "World" }));
-        Assert.AreEqual("DummyProcess process failed to connect to vstest.console process after 90 seconds. The process with id 0, exited with exitCode 0, and error output: \\n", exception.Message);
+        Assert.Contains("1234", exception.Message);
+        Assert.Contains("exitCode 1", exception.Message);
+        Assert.Contains("some error", exception.Message);
         _mockRequestSender.Verify(rs => rs.InitializeExtensions(It.IsAny<IEnumerable<string>>()), Times.Never);
     }
 
@@ -332,12 +335,14 @@ public class VsTestConsoleWrapperTests
     {
         _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("DummyProcess");
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
-        _mockProcessManager.Setup(pm => pm.ProcessId).Returns(0);
-        _mockProcessManager.Setup(pm => pm.ExitCode).Returns(0);
+        _mockProcessManager.Setup(pm => pm.ProcessId).Returns((int?)0);
+        _mockProcessManager.Setup(pm => pm.ProcessName).Returns("vstest.console");
+        _mockProcessManager.Setup(pm => pm.ExitCode).Returns((int?)0);
         _mockProcessManager.Setup(pm => pm.ErrorOutput).Returns("");
 
         var exception = Assert.ThrowsExactly<TransationLayerException>(() => _consoleWrapper.DiscoverTests(new List<string> { "Hello", "World" }, null, null, new Mock<ITestDiscoveryEventsHandler2>().Object));
-        Assert.AreEqual("DummyProcess process failed to connect to vstest.console process after 90 seconds. The process with id 0, exited with exitCode 0, and error output: \\n", exception.Message);
+        Assert.Contains("DummyProcess", exception.Message);
+        Assert.Contains("exitCode 0", exception.Message);
         _mockRequestSender.Verify(rs => rs.DiscoverTests(It.IsAny<IEnumerable<string>>(), It.IsAny<string>(), null, null, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Never);
     }
 
@@ -710,8 +715,9 @@ public class VsTestConsoleWrapperTests
     {
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
-        _mockProcessManager.Setup(pm => pm.ProcessId).Returns(5432);
-        _mockProcessManager.Setup(pm => pm.ExitCode).Returns(1);
+        _mockProcessManager.Setup(pm => pm.ProcessId).Returns((int?)5432);
+        _mockProcessManager.Setup(pm => pm.ProcessName).Returns("vstest.console");
+        _mockProcessManager.Setup(pm => pm.ExitCode).Returns((int?)1);
         _mockProcessManager.Setup(pm => pm.ErrorOutput).Returns("Unhandled exception: System.OutOfMemoryException");
         _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("TestRunner");
 
@@ -727,15 +733,16 @@ public class VsTestConsoleWrapperTests
     {
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
-        _mockProcessManager.Setup(pm => pm.ProcessId).Returns(5432);
-        _mockProcessManager.Setup(pm => pm.ExitCode).Returns(-1);
+        _mockProcessManager.Setup(pm => pm.ProcessId).Returns((int?)5432);
+        _mockProcessManager.Setup(pm => pm.ProcessName).Returns("vstest.console");
+        _mockProcessManager.Setup(pm => pm.ExitCode).Returns((int?)null);
         _mockProcessManager.Setup(pm => pm.ErrorOutput).Returns("");
         _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("TestRunner");
 
         var ex = Assert.ThrowsExactly<TransationLayerException>(() => _consoleWrapper.InitializeExtensions(new[] { "path" }));
 
         Assert.Contains("5432", ex.Message);
-        Assert.Contains("exitCode -1", ex.Message);
+        Assert.Contains("still running", ex.Message);
     }
 
     [TestMethod]
@@ -743,13 +750,14 @@ public class VsTestConsoleWrapperTests
     {
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
-        _mockProcessManager.Setup(pm => pm.ProcessId).Returns(-1);
-        _mockProcessManager.Setup(pm => pm.ExitCode).Returns(-1);
-        _mockProcessManager.Setup(pm => pm.ErrorOutput).Returns("");
+        _mockProcessManager.Setup(pm => pm.ProcessId).Returns((int?)null);
+        _mockProcessManager.Setup(pm => pm.ProcessName).Returns((string?)null);
+        _mockProcessManager.Setup(pm => pm.ExitCode).Returns((int?)null);
+        _mockProcessManager.Setup(pm => pm.ErrorOutput).Returns((string?)null);
         _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("TestRunner");
 
         var ex = Assert.ThrowsExactly<TransationLayerException>(() => _consoleWrapper.InitializeExtensions(new[] { "path" }));
 
-        Assert.Contains("-1", ex.Message);
+        Assert.Contains("failed to start", ex.Message);
     }
 }

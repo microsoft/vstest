@@ -1260,6 +1260,7 @@ public class VsTestConsoleWrapper : IVsTestConsoleWrapper
                         CoreUtilitiesConstants.VstestConsoleProcessName,
                         timeout,
                         childProcessId,
+                        childProcessName,
                         childProcessExitCode,
                         childProcessErrorOutput)
                 );
