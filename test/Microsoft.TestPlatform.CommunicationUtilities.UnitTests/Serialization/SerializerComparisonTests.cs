@@ -572,6 +572,84 @@ public class SerializerComparisonTests
         }
     }
 
+    [TestMethod]
+    [TestCategory("Performance")]
+    public void Performance_RoundTrip_TestMessage()
+    {
+        const int iterations = 1000;
+        var json = Reference.SerializePayload(MessageType.TestMessage, TestMessagePayloadData, 7);
+
+        // Warm up
+        var msg = Serializer.DeserializeMessage(json);
+        Serializer.DeserializePayload<TestMessagePayload>(msg);
+        var refMsg = Reference.DeserializeMessage(json);
+        Reference.DeserializePayload<TestMessagePayload>(refMsg);
+
+        var swOurs = Stopwatch.StartNew();
+        for (int i = 0; i < iterations; i++)
+        {
+            msg = Serializer.DeserializeMessage(json);
+            Serializer.DeserializePayload<TestMessagePayload>(msg);
+        }
+        swOurs.Stop();
+
+        var swRef = Stopwatch.StartNew();
+        for (int i = 0; i < iterations; i++)
+        {
+            refMsg = Reference.DeserializeMessage(json);
+            Reference.DeserializePayload<TestMessagePayload>(refMsg);
+        }
+        swRef.Stop();
+
+        Console.WriteLine($"[{JsonDataSerializer.SerializerName}] RoundTrip TestMessage: Ours={swOurs.ElapsedMilliseconds}ms Newtonsoft={swRef.ElapsedMilliseconds}ms");
+
+        if (swRef.ElapsedMilliseconds >= 10)
+        {
+            var ratio = (double)swOurs.ElapsedMilliseconds / swRef.ElapsedMilliseconds;
+            Assert.IsLessThanOrEqualTo(ratio, 3.0,
+                $"Performance regression: {ratio:F2}x slower than Newtonsoft");
+        }
+    }
+
+    [TestMethod]
+    [TestCategory("Performance")]
+    public void Performance_RoundTrip_ExecutionComplete()
+    {
+        const int iterations = 1000;
+        var json = Reference.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayloadData, 7);
+
+        // Warm up
+        var msg = Serializer.DeserializeMessage(json);
+        Serializer.DeserializePayload<TestRunCompletePayload>(msg);
+        var refMsg = Reference.DeserializeMessage(json);
+        Reference.DeserializePayload<TestRunCompletePayload>(refMsg);
+
+        var swOurs = Stopwatch.StartNew();
+        for (int i = 0; i < iterations; i++)
+        {
+            msg = Serializer.DeserializeMessage(json);
+            Serializer.DeserializePayload<TestRunCompletePayload>(msg);
+        }
+        swOurs.Stop();
+
+        var swRef = Stopwatch.StartNew();
+        for (int i = 0; i < iterations; i++)
+        {
+            refMsg = Reference.DeserializeMessage(json);
+            Reference.DeserializePayload<TestRunCompletePayload>(refMsg);
+        }
+        swRef.Stop();
+
+        Console.WriteLine($"[{JsonDataSerializer.SerializerName}] RoundTrip ExecutionComplete: Ours={swOurs.ElapsedMilliseconds}ms Newtonsoft={swRef.ElapsedMilliseconds}ms");
+
+        if (swRef.ElapsedMilliseconds >= 10)
+        {
+            var ratio = (double)swOurs.ElapsedMilliseconds / swRef.ElapsedMilliseconds;
+            Assert.IsLessThanOrEqualTo(ratio, 3.0,
+                $"Performance regression: {ratio:F2}x slower than Newtonsoft");
+        }
+    }
+
     // ══════════════════════════════════════════════════════════════════════
     //  Test Data
     // ══════════════════════════════════════════════════════════════════════
