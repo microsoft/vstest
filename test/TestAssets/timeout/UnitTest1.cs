@@ -17,13 +17,5 @@ namespace timeout
         {
             Thread.Sleep(30_000);
         }
-
-        [TestMethod]
-        public void TestMethod2()
-        {
-            // Sleep long enough so the blame TestTimeout (10s) always fires
-            // while the test is still running.
-            Thread.Sleep(30_000);
-        }
     }
 }
