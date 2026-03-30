@@ -49,7 +49,7 @@ internal class TestCaseConverterV2 : JsonConverter<TestCase>
                 if (!prop.TryGetProperty("Key", out var keyElement))
                     continue;
 
-                var testProperty = JsonSerializer.Deserialize<TestProperty>(keyElement.GetRawText(), options);
+                var testProperty = JsonSerializer.Deserialize<TestProperty>(keyElement, options);
                 if (testProperty is null)
                     continue;
 

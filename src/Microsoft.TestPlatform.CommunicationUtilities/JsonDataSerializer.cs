@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
@@ -29,6 +30,17 @@ public partial class JsonDataSerializer : IDataSerializer
     /// </summary>
     private JsonDataSerializer() { }
 
+    private static bool s_serializerNameLogged;
+
+    private static void LogSerializerNameOnce()
+    {
+        if (!s_serializerNameLogged && EqtTrace.IsInfoEnabled)
+        {
+            s_serializerNameLogged = true;
+            EqtTrace.Info("JsonDataSerializer: Using {0} serializer", SerializerName);
+        }
+    }
+
     /// <summary>
     /// Gets the JSON Serializer instance.
     /// </summary>
@@ -41,6 +53,8 @@ public partial class JsonDataSerializer : IDataSerializer
     /// <returns>A <see cref="Message"/> instance.</returns>
     public Message DeserializeMessage(string rawMessage)
     {
+        LogSerializerNameOnce();
+
         // Try fast header parse first (string parsing, no JSON library)
         if (!FastHeaderParse(rawMessage, out int version, out string? messageType))
         {

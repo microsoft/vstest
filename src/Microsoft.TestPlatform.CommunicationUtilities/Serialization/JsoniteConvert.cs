@@ -81,7 +81,8 @@ internal static class JsoniteConvert
             {
                 if (!prop.CanRead || prop.GetIndexParameters().Length > 0) continue;
                 if (prop.GetCustomAttribute<IgnoreDataMemberAttribute>() != null) continue;
-                try { result[prop.Name] = ToJsonValueCore(prop.GetValue(value), visited, depth + 1, version)!; } catch { }
+                try { result[prop.Name] = ToJsonValueCore(prop.GetValue(value), visited, depth + 1, version)!; }
+                catch (Exception ex) { EqtTrace.Warning("JsoniteConvert: Failed to serialize property '{0}' on type '{1}': {2}", prop.Name, type.FullName, ex.Message); }
             }
             return result;
         }
@@ -464,6 +465,13 @@ internal static class JsoniteConvert
 
     public static T? To<T>(object? value) => (T?)ConvertTo(value, typeof(T));
 
+    // Overload accepting version for API symmetry with ToJsonValue.
+    // Currently version is unused during deserialization (format is auto-detected),
+    // but having the plumbing here allows version-specific logic in the future.
+#pragma warning disable IDE0060 // Remove unused parameter
+    public static T? To<T>(object? value, int version) => (T?)ConvertTo(value, typeof(T));
+#pragma warning restore IDE0060
+
     private static object? ConvertTo(object? value, Type targetType)
     {
         if (value is null) return targetType.IsValueType && Nullable.GetUnderlyingType(targetType) is null ? Activator.CreateInstance(targetType) : null;
@@ -549,11 +557,13 @@ internal static class JsoniteConvert
                         var bf = targetType.GetField($"<{prop.Name}>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance);
                         if (bf is not null) bf.SetValue(inst, cv); else prop.GetSetMethod(nonPublic: true)?.Invoke(inst, new[] { cv });
                     }
-                } catch { }
+                }
+                catch (Exception ex) { EqtTrace.Warning("JsoniteConvert: Failed to set property '{0}' on type '{1}': {2}", prop.Name, targetType.FullName, ex.Message); }
             }
             return inst;
         }
-        try { return Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture); } catch { return targetType.IsValueType ? Activator.CreateInstance(targetType) : null; }
+        try { return Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture); }
+        catch (Exception ex) { EqtTrace.Warning("JsoniteConvert: Failed to convert value of type '{0}' to '{1}': {2}", value.GetType().FullName, targetType.FullName, ex.Message); return targetType.IsValueType ? Activator.CreateInstance(targetType) : null; }
     }
 
     private static PropertyInfo? FindProperty(PropertyInfo[] props, string name)

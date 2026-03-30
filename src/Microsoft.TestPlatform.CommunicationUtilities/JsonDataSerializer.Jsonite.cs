@@ -26,13 +26,13 @@ public partial class JsonDataSerializer
         if (!parsed.TryGetValue("Payload", out var payloadObj))
             return default;
 
-        return JsoniteConvert.To<T>(payloadObj);
+        return JsoniteConvert.To<T>(payloadObj, message.Version);
     }
 
     private static partial T? DeserializeCore<T>(string json, int version)
     {
         var obj = Json.Deserialize(json, new JsonSettings { AllowTrailingCommas = true });
-        return JsoniteConvert.To<T>(obj);
+        return JsoniteConvert.To<T>(obj, version);
     }
 
     private static partial string SerializeMessageCore(string? messageType)

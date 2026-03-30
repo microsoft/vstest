@@ -13,33 +13,37 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class SerializerSelectionTests : AcceptanceTestBase
 {
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
-    public void OnNetCore_ShouldUseSystemTextJson(RunnerInfo runnerInfo)
+    [NetCoreRunner("net8.0")]
+    public void OnNetCoreRunner_ShouldUseSystemTextJson(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = GetAssetFullPath("SimpleTestProject.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+        var diagLogPath = Path.Combine(TempDirectory.Path, "logs", "log.txt");
+        arguments = string.Concat(arguments, $" /Diag:{diagLogPath}");
 
         InvokeVsTest(arguments);
 
         var diagLogs = GetDiagLogContents();
         Assert.Contains("Using System.Text.Json serializer", diagLogs,
-            $"Expected 'Using System.Text.Json serializer' in diag logs but not found. SerializerName log missing or wrong serializer used.");
+            "Expected 'Using System.Text.Json serializer' in diag logs but not found.");
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    public void OnNetFramework_ShouldUseJsonite(RunnerInfo runnerInfo)
+    [NetFrameworkRunner("net462")]
+    public void OnNetFrameworkRunner_ShouldUseJsonite(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
         var assemblyPaths = GetAssetFullPath("SimpleTestProject.dll");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+        var diagLogPath = Path.Combine(TempDirectory.Path, "logs", "log.txt");
+        arguments = string.Concat(arguments, $" /Diag:{diagLogPath}");
 
         InvokeVsTest(arguments);
 
         var diagLogs = GetDiagLogContents();
         Assert.Contains("Using Jsonite serializer", diagLogs,
-            $"Expected 'Using Jsonite serializer' in diag logs but not found. SerializerName log missing or wrong serializer used.");
+            "Expected 'Using Jsonite serializer' in diag logs but not found.");
     }
 
     /// <summary>
@@ -54,6 +58,7 @@ public class SerializerSelectionTests : AcceptanceTestBase
         }
 
         var logFiles = Directory.GetFiles(logsDir, "*.txt");
+
         return string.Join("\n", logFiles.Select(File.ReadAllText));
     }
 }
