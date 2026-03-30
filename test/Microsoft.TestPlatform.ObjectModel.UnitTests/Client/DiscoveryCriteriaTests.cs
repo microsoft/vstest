@@ -33,13 +33,12 @@ public class DiscoveryCriteriaTests
     {
         var json = JsonSerializer.Serialize(_discoveryCriteria, Settings);
 
-        // Verify key properties are present in JSON
-        Assert.IsTrue(json.Contains("\"Sources\""), "Missing Sources");
-        Assert.IsTrue(json.Contains("sampleTest.dll"), "Missing source path");
-        Assert.IsTrue(json.Contains("\"FrequencyOfDiscoveredTestsEvent\":100"), "Missing frequency");
-        Assert.IsTrue(json.Contains("\"TestCaseFilter\":\"TestFilter\""), "Missing filter");
-        Assert.IsTrue(json.Contains("\"AdapterSourceMap\""), "Missing adapter map");
-        Assert.IsTrue(json.Contains("RunConfiguration"), "Missing run settings");
+        Assert.Contains("\"Sources\"", json);
+        Assert.Contains("sampleTest.dll", json);
+        Assert.Contains("\"FrequencyOfDiscoveredTestsEvent\":100", json);
+        Assert.Contains("\"TestCaseFilter\":\"TestFilter\"", json);
+        Assert.Contains("\"AdapterSourceMap\"", json);
+        Assert.Contains("RunConfiguration", json);
     }
 
     [TestMethod]
