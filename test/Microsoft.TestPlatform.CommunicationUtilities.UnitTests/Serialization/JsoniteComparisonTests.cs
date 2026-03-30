@@ -263,121 +263,123 @@ public class JsoniteComparisonTests
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    //  Performance — Jsonite parse vs STJ JsonDocument.Parse
+    //  Performance — Production code path (JsonDataSerializer)
+    //  Tests the actual serialize/deserialize path used in vstest,
+    //  including our custom converters and options.
     // ══════════════════════════════════════════════════════════════════════
 
     [TestMethod]
     [TestCategory("Performance")]
-    public void Perf_Parse_TestMessage_Jsonite()
+    public void Perf_DeserializeMessage_TestMessage()
     {
-        var json = Stj.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
+        var json = JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
 
         // Warm up
-        Jsonite.Parse(json);
+        JsonDataSerializer.Instance.DeserializeMessage(json);
 
         var sw = Stopwatch.StartNew();
         for (int i = 0; i < PerfIterations; i++)
         {
-            Jsonite.Parse(json);
+            JsonDataSerializer.Instance.DeserializeMessage(json);
         }
 
         sw.Stop();
-        Console.WriteLine($"Jsonite Parse TestMessage: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
+        Console.WriteLine($"DeserializeMessage TestMessage: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
     }
 
     [TestMethod]
     [TestCategory("Performance")]
-    public void Perf_Parse_TestMessage_SystemTextJson()
+    public void Perf_DeserializeMessage_ExecutionComplete()
     {
-        var json = Stj.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
+        var json = JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7);
 
         // Warm up
-        System.Text.Json.JsonDocument.Parse(json).Dispose();
+        JsonDataSerializer.Instance.DeserializeMessage(json);
 
         var sw = Stopwatch.StartNew();
         for (int i = 0; i < PerfIterations; i++)
         {
-            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            JsonDataSerializer.Instance.DeserializeMessage(json);
         }
 
         sw.Stop();
-        Console.WriteLine($"STJ JsonDocument.Parse TestMessage: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
+        Console.WriteLine($"DeserializeMessage ExecutionComplete: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
     }
 
     [TestMethod]
     [TestCategory("Performance")]
-    public void Perf_Parse_ExecutionComplete_Jsonite()
+    public void Perf_SerializePayload_TestMessage()
     {
-        var json = Stj.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7);
-
         // Warm up
-        Jsonite.Parse(json);
+        JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
 
         var sw = Stopwatch.StartNew();
         for (int i = 0; i < PerfIterations; i++)
         {
-            Jsonite.Parse(json);
+            JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
         }
 
         sw.Stop();
-        Console.WriteLine($"Jsonite Parse ExecutionComplete: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
+        Console.WriteLine($"SerializePayload TestMessage: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
     }
 
     [TestMethod]
     [TestCategory("Performance")]
-    public void Perf_Parse_ExecutionComplete_SystemTextJson()
+    public void Perf_SerializePayload_ExecutionComplete()
     {
-        var json = Stj.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7);
-
         // Warm up
-        System.Text.Json.JsonDocument.Parse(json).Dispose();
+        JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7);
 
         var sw = Stopwatch.StartNew();
         for (int i = 0; i < PerfIterations; i++)
         {
-            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7);
         }
 
         sw.Stop();
-        Console.WriteLine($"STJ JsonDocument.Parse ExecutionComplete: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
+        Console.WriteLine($"SerializePayload ExecutionComplete: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
     }
 
     [TestMethod]
     [TestCategory("Performance")]
-    public void Perf_RoundTrip_TestMessage_Jsonite()
+    public void Perf_RoundTrip_TestMessage()
     {
-        var json = Stj.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
+        var json = JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, TestMessagePayload, 7);
 
         // Warm up
-        Jsonite.RoundTrip(json);
+        var msg = JsonDataSerializer.Instance.DeserializeMessage(json);
+        JsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(msg);
 
         var sw = Stopwatch.StartNew();
         for (int i = 0; i < PerfIterations; i++)
         {
-            Jsonite.RoundTrip(json);
+            msg = JsonDataSerializer.Instance.DeserializeMessage(json);
+            JsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(msg);
         }
 
         sw.Stop();
-        Console.WriteLine($"Jsonite RoundTrip TestMessage: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
+        Console.WriteLine($"RoundTrip TestMessage: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
     }
 
     [TestMethod]
     [TestCategory("Performance")]
-    public void Perf_RoundTrip_ExecutionComplete_Jsonite()
+    public void Perf_RoundTrip_ExecutionComplete()
     {
-        var json = Stj.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7);
+        var json = JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, ExecutionCompletePayload, 7);
 
         // Warm up
-        Jsonite.RoundTrip(json);
+        var msg = JsonDataSerializer.Instance.DeserializeMessage(json);
+        JsonDataSerializer.Instance.DeserializePayload<TestRunCompletePayload>(msg);
 
         var sw = Stopwatch.StartNew();
         for (int i = 0; i < PerfIterations; i++)
         {
-            Jsonite.RoundTrip(json);
+            msg = JsonDataSerializer.Instance.DeserializeMessage(json);
+            JsonDataSerializer.Instance.DeserializePayload<TestRunCompletePayload>(msg);
         }
 
         sw.Stop();
-        Console.WriteLine($"Jsonite RoundTrip ExecutionComplete: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
+        Console.WriteLine($"RoundTrip ExecutionComplete: {sw.ElapsedMilliseconds}ms for {PerfIterations} iterations");
     }
 
     // ══════════════════════════════════════════════════════════════════════
