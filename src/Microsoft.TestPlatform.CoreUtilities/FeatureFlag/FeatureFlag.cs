@@ -83,6 +83,9 @@ internal partial class FeatureFlag : IFeatureFlag
     // Set VSTEST_OPTIN_WARN_MISSING_EXTENSIONS_DEPENDENCIES=1 to opt into warnings before enforcement.
     public const string VSTEST_OPTIN_WARN_MISSING_EXTENSIONS_DEPENDENCIES = nameof(VSTEST_OPTIN_WARN_MISSING_EXTENSIONS_DEPENDENCIES);
 
+    // Disables the warning about missing extension dependencies, even after enforcement.
+    public const string VSTEST_DISABLE_WARN_MISSING_EXTENSIONS_DEPENDENCIES = nameof(VSTEST_DISABLE_WARN_MISSING_EXTENSIONS_DEPENDENCIES);
+
 
 
     [Obsolete("Only use this in tests.")]

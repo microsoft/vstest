@@ -457,7 +457,10 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                 }
 
                 // Opt-in warning: show all provided assemblies in summary when feature flag is set.
-                if ((userCount > 0 || msCount > 0) && FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_OPTIN_WARN_MISSING_EXTENSIONS_DEPENDENCIES))
+                // Disable flag takes precedence over opt-in.
+                if ((userCount > 0 || msCount > 0)
+                    && !FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_WARN_MISSING_EXTENSIONS_DEPENDENCIES)
+                    && FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_OPTIN_WARN_MISSING_EXTENSIONS_DEPENDENCIES))
                 {
                     var allAssemblies = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                     foreach (var kvp in AssemblyResolver.GetProvidedDependencies())
@@ -465,9 +468,10 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                         allAssemblies.Add(kvp.Key);
                     }
 
-                    var message = $"The test platform provided the following assemblies to resolve dependencies of test extensions "
-                        + $"that did not ship their own copy: {string.Join(", ", allAssemblies)}. "
-                        + "Test extensions should ship all their dependencies.";
+                    var message = string.Format(
+                        CultureInfo.CurrentCulture,
+                        ClientResources.ProvidedDependenciesWarning,
+                        string.Join(", ", allAssemblies));
 
                     LoggerManager.HandleTestRunMessage(
                         new TestRunMessageEventArgs(TestMessageLevel.Warning, message));
