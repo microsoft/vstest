@@ -135,6 +135,8 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         // Don't reduce this, 10s is about the safe minimum to not have flakiness.
         arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=mini;TestTimeout=10s"" /Diag:{TempDirectory.Path}/log.txt");
+        // Run only TestMethod2 which sleeps for 30s, well above the 10s TestTimeout.
+        arguments = string.Concat(arguments, " /testcasefilter:TestMethod2");
 
         var env = new Dictionary<string, string?>
         {
@@ -157,6 +159,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=mini;CollectAlways=true;CollectHangDump;HangDumpType=mini""");
+        arguments = string.Concat(arguments, " /testcasefilter:TestMethod1");
 
         var env = new Dictionary<string, string?>
         {
@@ -179,6 +182,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
         arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=mini;CollectAlways=true""");
+        arguments = string.Concat(arguments, " /testcasefilter:TestMethod1");
 
         var env = new Dictionary<string, string?>
         {
