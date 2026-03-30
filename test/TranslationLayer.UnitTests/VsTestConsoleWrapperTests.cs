@@ -271,6 +271,9 @@ public class VsTestConsoleWrapperTests
     {
         _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("DummyProcess");
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+        _mockProcessManager.Setup(pm => pm.ProcessId).Returns(0);
+        _mockProcessManager.Setup(pm => pm.ExitCode).Returns(0);
+        _mockProcessManager.Setup(pm => pm.ErrorOutput).Returns("");
 
         var exception = Assert.ThrowsExactly<TransationLayerException>(() => _consoleWrapper.InitializeExtensions(new List<string> { "Hello", "World" }));
         Assert.AreEqual("DummyProcess process failed to connect to vstest.console process after 90 seconds. The process with id 0, exited with exitCode 0, and error output: \\n", exception.Message);
@@ -329,6 +332,9 @@ public class VsTestConsoleWrapperTests
     {
         _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("DummyProcess");
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+        _mockProcessManager.Setup(pm => pm.ProcessId).Returns(0);
+        _mockProcessManager.Setup(pm => pm.ExitCode).Returns(0);
+        _mockProcessManager.Setup(pm => pm.ErrorOutput).Returns("");
 
         var exception = Assert.ThrowsExactly<TransationLayerException>(() => _consoleWrapper.DiscoverTests(new List<string> { "Hello", "World" }, null, null, new Mock<ITestDiscoveryEventsHandler2>().Object));
         Assert.AreEqual("DummyProcess process failed to connect to vstest.console process after 90 seconds. The process with id 0, exited with exitCode 0, and error output: \\n", exception.Message);
@@ -697,5 +703,53 @@ public class VsTestConsoleWrapperTests
         _mockRequestSender.Verify(rs => rs.EndSession(), Times.Once);
         _mockRequestSender.Verify(rs => rs.Close(), Times.Once);
         _mockProcessManager.Verify(x => x.ShutdownProcess(), Times.Once);
+    }
+
+    [TestMethod]
+    public void StartSessionShouldReportProcessCrashDetailsOnTimeout()
+    {
+        _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+        _mockProcessManager.Setup(pm => pm.ProcessId).Returns(5432);
+        _mockProcessManager.Setup(pm => pm.ExitCode).Returns(1);
+        _mockProcessManager.Setup(pm => pm.ErrorOutput).Returns("Unhandled exception: System.OutOfMemoryException");
+        _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("TestRunner");
+
+        var ex = Assert.ThrowsExactly<TransationLayerException>(() => _consoleWrapper.InitializeExtensions(new[] { "path" }));
+
+        Assert.Contains("5432", ex.Message);
+        Assert.Contains("exitCode 1", ex.Message);
+        Assert.Contains("OutOfMemoryException", ex.Message);
+    }
+
+    [TestMethod]
+    public void StartSessionShouldReportHangingProcessDetailsOnTimeout()
+    {
+        _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+        _mockProcessManager.Setup(pm => pm.ProcessId).Returns(5432);
+        _mockProcessManager.Setup(pm => pm.ExitCode).Returns(-1);
+        _mockProcessManager.Setup(pm => pm.ErrorOutput).Returns("");
+        _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("TestRunner");
+
+        var ex = Assert.ThrowsExactly<TransationLayerException>(() => _consoleWrapper.InitializeExtensions(new[] { "path" }));
+
+        Assert.Contains("5432", ex.Message);
+        Assert.Contains("exitCode -1", ex.Message);
+    }
+
+    [TestMethod]
+    public void StartSessionShouldReportNotStartedProcessOnTimeout()
+    {
+        _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+        _mockProcessManager.Setup(pm => pm.ProcessId).Returns(-1);
+        _mockProcessManager.Setup(pm => pm.ExitCode).Returns(-1);
+        _mockProcessManager.Setup(pm => pm.ErrorOutput).Returns("");
+        _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("TestRunner");
+
+        var ex = Assert.ThrowsExactly<TransationLayerException>(() => _consoleWrapper.InitializeExtensions(new[] { "path" }));
+
+        Assert.Contains("-1", ex.Message);
     }
 }
