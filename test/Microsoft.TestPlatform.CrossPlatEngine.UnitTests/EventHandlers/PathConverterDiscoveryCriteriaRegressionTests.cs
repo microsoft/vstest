@@ -18,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.UnitTests.EventHan
 /// Regression tests for PathConverter DiscoveryCriteria and TestRunCriteria handling.
 /// </summary>
 [TestClass]
+[TestCategory("Windows")]
 public class PathConverterDiscoveryCriteriaRegressionTests
 {
     private readonly PathConverter _pathConverter;
