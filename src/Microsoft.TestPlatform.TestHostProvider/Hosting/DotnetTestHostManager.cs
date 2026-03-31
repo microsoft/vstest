@@ -849,6 +849,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             }
 
             cancellationToken.ThrowIfCancellationRequested();
+            EqtTrace.Verbose("DotnetTestHostManager: Launching testhost with CreateNoWindow={0}", _createNoNewWindow);
 
             var outputCallback = _captureOutput ? OutputReceivedCallback : null;
             _testHostProcess = _processHelper.LaunchProcess(

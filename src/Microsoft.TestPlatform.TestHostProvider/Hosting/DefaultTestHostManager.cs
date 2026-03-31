@@ -539,7 +539,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         if (_customTestHostLauncher == null
             || (_customTestHostLauncher.IsDebug && _customTestHostLauncher is ITestHostLauncher2))
         {
-            EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
+            EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}', CreateNoWindow={2}", testHostStartInfo.FileName, testHostStartInfo.Arguments, _createNoNewWindow);
             cancellationToken.ThrowIfCancellationRequested();
             var outputCallback = _captureOutput ? OutputReceivedCallback : null;
             _testHostProcess = _processHelper.LaunchProcess(
