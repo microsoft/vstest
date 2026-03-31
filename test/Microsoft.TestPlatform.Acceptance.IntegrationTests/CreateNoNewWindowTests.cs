@@ -13,7 +13,7 @@ public class CreateNoNewWindowTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: true)]
+    [NetFullTargetFrameworkDataSource(useDesktopRunner: true, useCoreRunner: false, inIsolation: true, inProcess: false)]
     public void WhenCreateNoNewWindowIsFalseTestHostHasConsoleWindow(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -29,12 +29,15 @@ public class CreateNoNewWindowTests : AcceptanceTestBase
 
         InvokeVsTest(arguments);
 
-        ExitCodeEquals(0);
+        // Test always fails (throws), but the error message reports console window status.
+        // With CreateNoNewWindow=false, testhost gets its own console window.
+        ExitCodeEquals(1);
+        StdOutputContains("HAS_CONSOLE_WINDOW=True");
     }
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: true)]
+    [NetFullTargetFrameworkDataSource(useDesktopRunner: true, useCoreRunner: false, inIsolation: true, inProcess: false)]
     public void WhenCreateNoNewWindowIsTrueTestHostHasNoConsoleWindow(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -51,12 +54,12 @@ public class CreateNoNewWindowTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         ExitCodeEquals(1);
-        StdErrorContains("HAS_CONSOLE_WINDOW=False");
+        StdOutputContains("HAS_CONSOLE_WINDOW=False");
     }
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: true)]
+    [NetFullTargetFrameworkDataSource(useDesktopRunner: true, useCoreRunner: false, inIsolation: true, inProcess: false)]
     public void WhenCreateNoNewWindowIsNotSetDefaultIsTrueAndTestHostHasNoConsoleWindow(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -67,7 +70,7 @@ public class CreateNoNewWindowTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         ExitCodeEquals(1);
-        StdErrorContains("HAS_CONSOLE_WINDOW=False");
+        StdOutputContains("HAS_CONSOLE_WINDOW=False");
     }
 
     private string GetRunsettingsFilePath(string runsettingsXml)
