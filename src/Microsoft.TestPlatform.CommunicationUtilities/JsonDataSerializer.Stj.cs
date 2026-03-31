@@ -208,6 +208,8 @@ public partial class JsonDataSerializer
     private class MessageEnvelope
     {
         public string? MessageType { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public object? Payload { get; set; }
     }
 
@@ -219,6 +221,8 @@ public partial class JsonDataSerializer
     {
         public int Version { get; set; }
         public string? MessageType { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public object? Payload { get; set; }
     }
 
