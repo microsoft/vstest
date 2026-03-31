@@ -3,11 +3,15 @@
 
 #if NETCOREAPP
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -26,6 +30,7 @@ public partial class JsonDataSerializer
         // DefaultOptions: common converters shared by all option sets
         DefaultOptions = CreateBaseOptions();
         DefaultOptions.Converters.Add(new TestPropertyConverter());
+        DefaultOptions.Converters.Add(new ObjectDictionaryConverterFactory());
         DefaultOptions.Converters.Add(new ObjectConverter());
         DefaultOptions.Converters.Add(new AttachmentSetConverter());
         DefaultOptions.Converters.Add(new UriDataAttachmentConverter());
@@ -86,11 +91,12 @@ public partial class JsonDataSerializer
     {
         var payloadOptions = GetPayloadOptions(message.Version);
 
+        T? result;
         if (payloadOptions == PayloadOptionsV2)
         {
             // Fast path: deserialize payload directly from raw message
             var messageWithPayload = DeserializeObjectFast<PayloadedMessage<T>>(message.RawMessage!);
-            return messageWithPayload is null ? default : messageWithPayload.Payload;
+            result = messageWithPayload is null ? default : messageWithPayload.Payload;
         }
         else
         {
@@ -99,9 +105,65 @@ public partial class JsonDataSerializer
             using var doc = JsonDocument.Parse(message.RawMessage!);
             if (doc.RootElement.TryGetProperty("Payload", out var payloadElement))
             {
-                return JsonSerializer.Deserialize<T>(payloadElement, payloadOptions);
+                result = JsonSerializer.Deserialize<T>(payloadElement, payloadOptions);
             }
-            return default;
+            else
+            {
+                result = default;
+            }
+        }
+
+        // STJ's built-in dictionary converter deserializes JSON integers as double
+        // when the value type is object. Fix up any IDictionary<string, object> metrics
+        // so integer values remain int/long (matching Newtonsoft behavior).
+        FixUpObjectDictionaries(result);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Walks known properties with IDictionary&lt;string, object&gt; and converts
+    /// double values that represent whole numbers back to int/long.
+    /// STJ deserializes JSON integers as double for object-typed dictionary values.
+    /// </summary>
+    private static void FixUpObjectDictionaries(object? obj)
+    {
+        switch (obj)
+        {
+            case IDictionary<string, object> d:
+                FixUpDictionary(d);
+                break;
+            case TestRunCompleteEventArgs args:
+                FixUpDictionary(args.Metrics);
+                break;
+            case TestRunAttachmentsProcessingCompleteEventArgs args:
+                FixUpDictionary(args.Metrics);
+                break;
+            case AfterTestRunEndResult r:
+                FixUpDictionary(r.Metrics);
+                break;
+            case ObjectModel.DiscoveryCompletePayload p:
+                FixUpDictionary(p.Metrics);
+                break;
+            case ObjectModel.TestRunAttachmentsProcessingCompletePayload p:
+                FixUpObjectDictionaries(p.AttachmentsProcessingCompleteEventArgs);
+                break;
+        }
+    }
+
+    private static void FixUpDictionary(IDictionary<string, object>? dict)
+    {
+        if (dict is null)
+        {
+            return;
+        }
+
+        foreach (var key in dict.Keys.ToArray())
+        {
+            if (dict[key] is double d && d == Math.Truncate(d) && d is >= int.MinValue and <= int.MaxValue)
+            {
+                dict[key] = (int)d;
+            }
         }
     }
 
