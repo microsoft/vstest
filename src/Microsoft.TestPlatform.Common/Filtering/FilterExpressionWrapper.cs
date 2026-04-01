@@ -21,14 +21,6 @@ public class FilterExpressionWrapper
     /// </summary>
     private readonly FilterExpression? _filterExpression;
 
-    /// <remarks>
-    /// Exposed for testing purpose.
-    /// </remarks>
-    internal readonly FastFilter? FastFilter;
-
-    [MemberNotNullWhen(true, nameof(FastFilter))]
-    private bool UseFastFilter => FastFilter != null;
-
     /// <summary>
     /// Initializes FilterExpressionWrapper with given filterString and options.
     /// </summary>
@@ -81,32 +73,28 @@ public class FilterExpressionWrapper
     {
     }
 
+    /// <remarks>
+    /// Exposed for testing purpose.
+    /// </remarks>
+    internal FastFilter? FastFilter { get; }
+
+    [MemberNotNullWhen(true, nameof(FastFilter))]
+    private bool UseFastFilter => FastFilter != null;
+
     /// <summary>
     /// User specified filter criteria.
     /// </summary>
-    public string FilterString
-    {
-        get;
-        private set;
-    }
+    public string FilterString { get; }
 
     /// <summary>
     /// User specified additional filter options.
     /// </summary>
-    public FilterOptions? FilterOptions
-    {
-        get;
-        private set;
-    }
+    public FilterOptions? FilterOptions { get; }
 
     /// <summary>
     /// Parsing error (if any), when parsing 'FilterString' with built-in parser.
     /// </summary>
-    public string? ParseError
-    {
-        get;
-        private set;
-    }
+    public string? ParseError { get; }
 
     /// <summary>
     /// Validate if underlying filter expression is valid for given set of supported properties.
