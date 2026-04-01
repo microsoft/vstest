@@ -21,6 +21,11 @@ public class FilterExpressionWrapper
     /// </summary>
     private readonly FilterExpression? _filterExpression;
 
+    /// <remarks>
+    /// Exposed for testing purpose.
+    /// </remarks>
+    internal readonly FastFilter? FastFilter;
+
     /// <summary>
     /// Initializes FilterExpressionWrapper with given filterString and options.
     /// </summary>
@@ -72,11 +77,6 @@ public class FilterExpressionWrapper
         : this(filterString, null)
     {
     }
-
-    /// <remarks>
-    /// Exposed for testing purpose.
-    /// </remarks>
-    internal FastFilter? FastFilter { get; }
 
     [MemberNotNullWhen(true, nameof(FastFilter))]
     private bool UseFastFilter => FastFilter != null;
