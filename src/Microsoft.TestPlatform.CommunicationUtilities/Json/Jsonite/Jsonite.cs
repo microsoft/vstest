@@ -1177,10 +1177,11 @@ namespace Jsonite
                         default:
                             if (c < ' ')
                             {
-                                throw new ArgumentException($"Invalid control character '{EscapeChar(c)}' found in string");
+                                writer.Write('\\');
+                                writer.Write('u');
+                                writer.Write(((int)c).ToString("X4", CultureInfo.InvariantCulture));
                             }
-
-                            if (IsHighSurrogate(c) || IsLowSurrogate(c))
+                            else if (IsHighSurrogate(c) || IsLowSurrogate(c))
                             {
                                 writer.Write('\\');
                                 writer.Write('u');

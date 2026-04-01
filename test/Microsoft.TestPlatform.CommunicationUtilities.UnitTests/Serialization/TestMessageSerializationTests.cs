@@ -120,6 +120,111 @@ public class TestMessageSerializationTests
         Assert.AreEqual(Payload.Message, result.Message);
     }
 
+    // ── Edge cases: special characters ───────────────────────────────────
+    // These verify that control characters, unicode escapes, newlines, and
+    // other tricky strings round-trip correctly through both STJ and Jsonite.
+    // See testfx#5120 — Jsonite previously threw on control chars < 0x20.
+
+    [TestMethod]
+    [DataRow(1)]
+    [DataRow(7)]
+    public void RoundTrip_ControlCharacters(int version)
+    {
+        var payload = new TestMessagePayload
+        {
+            MessageLevel = TestMessageLevel.Error,
+            Message = "Output contained \u0003ETX and \u0001SOH control chars"
+        };
+
+        var json = JsonDataSerializer.Instance.SerializePayload(
+            MessageType.TestMessage, payload, version);
+        var message = JsonDataSerializer.Instance.DeserializeMessage(json);
+        var result = JsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(message);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(payload.Message, result.Message);
+    }
+
+    [TestMethod]
+    [DataRow(1)]
+    [DataRow(7)]
+    public void RoundTrip_NewlinesAndTabs(int version)
+    {
+        var payload = new TestMessagePayload
+        {
+            MessageLevel = TestMessageLevel.Informational,
+            Message = "Line1\nLine2\r\nLine3\tTabbed"
+        };
+
+        var json = JsonDataSerializer.Instance.SerializePayload(
+            MessageType.TestMessage, payload, version);
+        var message = JsonDataSerializer.Instance.DeserializeMessage(json);
+        var result = JsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(message);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(payload.Message, result.Message);
+    }
+
+    [TestMethod]
+    [DataRow(1)]
+    [DataRow(7)]
+    public void RoundTrip_UnicodeAndEmoji(int version)
+    {
+        var payload = new TestMessagePayload
+        {
+            MessageLevel = TestMessageLevel.Warning,
+            Message = "日本語テスト — Ñoño — Ü — 🎯 emoji"
+        };
+
+        var json = JsonDataSerializer.Instance.SerializePayload(
+            MessageType.TestMessage, payload, version);
+        var message = JsonDataSerializer.Instance.DeserializeMessage(json);
+        var result = JsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(message);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(payload.Message, result.Message);
+    }
+
+    [TestMethod]
+    [DataRow(1)]
+    [DataRow(7)]
+    public void RoundTrip_BackslashesAndQuotes(int version)
+    {
+        var payload = new TestMessagePayload
+        {
+            MessageLevel = TestMessageLevel.Error,
+            Message = "Path: C:\\Users\\test\\\"file\".txt"
+        };
+
+        var json = JsonDataSerializer.Instance.SerializePayload(
+            MessageType.TestMessage, payload, version);
+        var message = JsonDataSerializer.Instance.DeserializeMessage(json);
+        var result = JsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(message);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(payload.Message, result.Message);
+    }
+
+    [TestMethod]
+    [DataRow(1)]
+    [DataRow(7)]
+    public void RoundTrip_NullAndEmptyStrings(int version)
+    {
+        var payload = new TestMessagePayload
+        {
+            MessageLevel = TestMessageLevel.Informational,
+            Message = ""
+        };
+
+        var json = JsonDataSerializer.Instance.SerializePayload(
+            MessageType.TestMessage, payload, version);
+        var message = JsonDataSerializer.Instance.DeserializeMessage(json);
+        var result = JsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(message);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("", result.Message);
+    }
+
     // ── Helpers ──────────────────────────────────────────────────────────
 
 }
