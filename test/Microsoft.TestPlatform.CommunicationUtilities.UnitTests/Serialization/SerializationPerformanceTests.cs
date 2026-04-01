@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -328,6 +330,122 @@ public class SerializationPerformanceTests
         }
         sw.Stop();
         Console.WriteLine($"STJ Deserialize ExecutionComplete V7: {sw.ElapsedMilliseconds}ms for {Iterations} iterations");
+    }
+
+    #endregion
+
+    #region Batch TestRunStatsChange — 1000 test results per message
+
+    private static TestRunStatsPayload BuildBatchStatsPayload(int testCount)
+    {
+        var results = new List<TestResult>(testCount);
+        var stats = new Dictionary<TestOutcome, long>
+        {
+            [TestOutcome.Passed] = 0,
+            [TestOutcome.Failed] = 0,
+        };
+
+        for (int i = 0; i < testCount; i++)
+        {
+            var outcome = i % 10 == 0 ? TestOutcome.Failed : TestOutcome.Passed;
+            stats[outcome]++;
+
+            var tc = new TestCase(
+                $"Contoso.Tests.Generated.TestClass{i / 10}.TestMethod{i}",
+                new Uri("executor://MSTestAdapter/v2"),
+                "Contoso.Tests.dll")
+            {
+                Id = new Guid(i, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+                DisplayName = $"TestMethod{i}(input: \"value with 'quotes' and \\backslash\")",
+                CodeFilePath = $@"C:\src\Tests\TestClass{i / 10}.cs",
+                LineNumber = i + 1,
+                Traits = { new Trait("Category", "Generated"), new Trait("Priority", (i % 3).ToString(CultureInfo.InvariantCulture)) }
+            };
+
+            var tr = new TestResult(tc)
+            {
+                Outcome = outcome,
+                Duration = TimeSpan.FromMilliseconds(i),
+                StartTime = new DateTimeOffset(2026, 3, 20, 10, 0, 0, TimeSpan.Zero),
+                EndTime = new DateTimeOffset(2026, 3, 20, 10, 0, 0, i, TimeSpan.Zero),
+                ComputerName = "BUILD-AGENT-01",
+            };
+
+            if (outcome == TestOutcome.Failed)
+            {
+                tr.ErrorMessage = $"Assert.AreEqual failed. Expected: {i} Actual: {i + 1}";
+                tr.ErrorStackTrace = $"   at Contoso.Tests.Generated.TestClass{i / 10}.TestMethod{i}() in C:\\src\\Tests\\TestClass{i / 10}.cs:line {i + 1}";
+            }
+
+            results.Add(tr);
+        }
+
+        var runStats = new TestRunStatistics(testCount, stats);
+        return new TestRunStatsPayload
+        {
+            TestRunChangedArgs = new TestRunChangedEventArgs(
+                runStats, results, Array.Empty<TestCase>()),
+        };
+    }
+
+    [TestMethod]
+    public void Serialize_BatchStatsChange_1000Results_V7()
+    {
+        var payload = BuildBatchStatsPayload(1000);
+        // Warmup
+        JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunStatsChange, payload, 7);
+
+        var sw = Stopwatch.StartNew();
+        for (int i = 0; i < 10; i++)
+        {
+            JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunStatsChange, payload, 7);
+        }
+        sw.Stop();
+        Console.WriteLine($"Serialize 1000-result StatsChange V7: {sw.ElapsedMilliseconds}ms for 10 iterations ({sw.ElapsedMilliseconds / 10.0}ms avg)");
+    }
+
+    [TestMethod]
+    public void Deserialize_BatchStatsChange_1000Results_V7()
+    {
+        var payload = BuildBatchStatsPayload(1000);
+        var json = JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunStatsChange, payload, 7);
+        Console.WriteLine($"JSON size: {json.Length:N0} chars");
+
+        // Warmup
+        var msg = JsonDataSerializer.Instance.DeserializeMessage(json);
+        JsonDataSerializer.Instance.DeserializePayload<TestRunStatsPayload>(msg);
+
+        var sw = Stopwatch.StartNew();
+        for (int i = 0; i < 10; i++)
+        {
+            msg = JsonDataSerializer.Instance.DeserializeMessage(json);
+            JsonDataSerializer.Instance.DeserializePayload<TestRunStatsPayload>(msg);
+        }
+        sw.Stop();
+        Console.WriteLine($"Deserialize 1000-result StatsChange V7: {sw.ElapsedMilliseconds}ms for 10 iterations ({sw.ElapsedMilliseconds / 10.0}ms avg)");
+    }
+
+    [TestMethod]
+    public void RoundTrip_BatchStatsChange_1000Results_V7()
+    {
+        var payload = BuildBatchStatsPayload(1000);
+        var json = JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunStatsChange, payload, 7);
+        var msg = JsonDataSerializer.Instance.DeserializeMessage(json);
+        var result = JsonDataSerializer.Instance.DeserializePayload<TestRunStatsPayload>(msg);
+
+        Assert.IsNotNull(result?.TestRunChangedArgs);
+        Assert.AreEqual(1000, result.TestRunChangedArgs.NewTestResults!.Count());
+        Assert.AreEqual(900L, result.TestRunChangedArgs.TestRunStatistics!.Stats![TestOutcome.Passed]);
+        Assert.AreEqual(100L, result.TestRunChangedArgs.TestRunStatistics.Stats[TestOutcome.Failed]);
+
+        // Spot-check a result
+        var first = result.TestRunChangedArgs.NewTestResults!.First();
+        Assert.AreEqual("Contoso.Tests.Generated.TestClass0.TestMethod0", first.TestCase.FullyQualifiedName);
+        Assert.AreEqual(TestOutcome.Failed, first.Outcome);
+        Assert.Contains("Assert.AreEqual failed", first.ErrorMessage!);
+
+        var passed = result.TestRunChangedArgs.NewTestResults!.ElementAt(1);
+        Assert.AreEqual(TestOutcome.Passed, passed.Outcome);
     }
 
     #endregion
