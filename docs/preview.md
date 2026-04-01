@@ -44,7 +44,7 @@ Solutions that use central package management through `Directory.Packages.props`
   </packageSource>
   <packageSource key="test-tools">
     <package pattern="Microsoft.TestPlatform.*" />
-    <package pattern="Microsoft.Testing.*" />
+    <package pattern="Microsoft.NET.Test.SDK" />
   </packageSource>
 </packageSourceMapping>
 ```
