@@ -20,8 +20,8 @@ public class UnitTest1
     public void TestUsingNewtonsoftWithoutShippingDll()
     {
         // This test uses Newtonsoft.Json but the project excludes the runtime asset.
-        // At runtime, Newtonsoft.Json.dll is NOT present next to this assembly.
-        // vstest should emit a warning about the missing assembly.
+        // At runtime, Newtonsoft.Json.dll is NOT present next to this assembly,
+        // so vstest's own copy is used. This should be tracked in telemetry.
         string json = @"{""Email"": ""john@example.com"", ""Active"": true}";
 
         Account account = JsonConvert.DeserializeObject<Account>(json);

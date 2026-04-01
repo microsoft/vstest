@@ -16,7 +16,8 @@
     <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestTestAdapterVersion)" />
     <PackageReference Include="MSTest.TestFramework" Version="$(MSTestTestAdapterVersion)" />
     <!-- Reference Newtonsoft.Json but exclude from output — simulates an extension
-         that depends on Newtonsoft.Json but does not ship its own copy. -->
+         that depends on Newtonsoft.Json but does not ship its own copy.
+         At runtime, vstest's own copy will be used to resolve this dependency. -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
