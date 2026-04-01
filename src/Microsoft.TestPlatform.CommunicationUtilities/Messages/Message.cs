@@ -30,7 +30,6 @@ public class Message
     /// <inheritdoc/>
     public override string ToString()
     {
-        var rawLength = RawMessage?.Length ?? 0;
-        return $"({MessageType}) v{Version} -> RawMessageLength={rawLength}";
+        return RawMessage ?? "{}";
     }
 }

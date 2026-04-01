@@ -48,7 +48,6 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
         arguments = string.Concat(arguments, $" /Blame");
         arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
-        arguments = string.Concat(arguments, $" /diag:logs\\log.txt");
         InvokeVsTest(arguments);
 
         VaildateOutput(TempDirectory, "BlameUnitTestProject.UnitTest1.TestMethod2");

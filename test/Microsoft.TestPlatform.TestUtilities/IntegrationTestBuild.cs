@@ -193,8 +193,8 @@ public class IntegrationTestBuild : IntegrationTestBase
 
         var netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
 
-        ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -p:PackageVersion={netTestSdkVersion} -p:NodeReuse=false "{testAssets}" """);
-        ExecuteApplication2(Dotnet, $"""build "{testAssets}" --configuration {IntegrationTestEnvironment.BuildConfiguration} --no-restore -p:NodeReuse=false""");
+        ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -p:PackageVersion={netTestSdkVersion} -nodereuse:false "{testAssets}" """);
+        ExecuteApplication2(Dotnet, $"""build "{testAssets}" --configuration {IntegrationTestEnvironment.BuildConfiguration} --no-restore -nodereuse:false""");
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -202,8 +202,8 @@ public class IntegrationTestBuild : IntegrationTestBase
             // This project is used on Windows only Tests. On non-Windows the build fails with: "IlasmToolPath must be set in order to build ilproj's outside of Windows.".
             var cilProject = Path.Combine(Root, "test", "TestAssets", "CILProject", "CILProject.proj");
             var binPath = Path.Combine(Root, "artifacts", "bin", "TestAssets", "CILProject", IntegrationTestEnvironment.BuildConfiguration, "net462");
-            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -p:NodeReuse=false "{cilProject}" """);
-            ExecuteApplication2(Dotnet, $"""build "{cilProject}" --configuration {IntegrationTestEnvironment.BuildConfiguration} --no-restore --output {binPath} -p:NodeReuse=false""");
+            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -nodereuse:false "{cilProject}" """);
+            ExecuteApplication2(Dotnet, $"""build "{cilProject}" --configuration {IntegrationTestEnvironment.BuildConfiguration} --no-restore --output {binPath} -nodereuse:false""");
         }
     }
 
@@ -338,7 +338,7 @@ public class IntegrationTestBuild : IntegrationTestBase
             // We restore this project to download TestPlatform and TestPlatform.CLI nugets, into our package cache.
             // Using nuget.exe install errors out in various weird ways.
             var tools = Path.Combine(Root, "test", "TestAssets", "Tools", "Tools.csproj");
-            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -p:NodeReuse=false "{tools}" -p:PackageVersion={netTestSdkVersionDir} """);
+            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -nodereuse:false "{tools}" -p:PackageVersion={netTestSdkVersionDir} """);
         }
 
         foreach (var propertyName in msTestVersionProperties)
@@ -357,8 +357,8 @@ public class IntegrationTestBuild : IntegrationTestBase
         if (cacheIdText == currentCacheId)
         {
             // Project cache is up-to-date, just rebuilding solution.
-            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -p:NodeReuse=false "{generatedSln}" """);
-            ExecuteApplication2(Dotnet, $"build {generatedSln} --no-restore --configuration {IntegrationTestEnvironment.BuildConfiguration} -v:minimal -p:NodeReuse=false");
+            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -nodereuse:false "{generatedSln}" """);
+            ExecuteApplication2(Dotnet, $"build {generatedSln} --no-restore --configuration {IntegrationTestEnvironment.BuildConfiguration} -v:minimal -nodereuse:false");
             rebuild = false;
         }
 
@@ -471,8 +471,8 @@ public class IntegrationTestBuild : IntegrationTestBase
 
             ExecuteApplication2(Dotnet, $"""sln {generatedSln} add "{string.Join("\" \"", projectsToAdd)}" """);
 
-            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -p:NodeReuse=false "{generatedSln}" """);
-            ExecuteApplication2(Dotnet, $"""build --no-restore --configuration {IntegrationTestEnvironment.BuildConfiguration} -p:NodeReuse=false "{generatedSln}" """);
+            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -nodereuse:false "{generatedSln}" """);
+            ExecuteApplication2(Dotnet, $"""build --no-restore --configuration {IntegrationTestEnvironment.BuildConfiguration} -nodereuse:false "{generatedSln}" """);
 
             File.WriteAllText(Path.Combine(generated, "checksum.json"), cacheIdText);
         }
