@@ -75,6 +75,7 @@
     <Project Path="src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj" />
     <Project Path="src/Microsoft.TestPlatform.CoreUtilities/Microsoft.TestPlatform.CoreUtilities.csproj" />
     <Project Path="src/Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine.csproj" />
+    <Project Path="src/Microsoft.TestPlatform.Filter.Source/Microsoft.TestPlatform.Filter.Source.csproj" />
     <Project Path="src/Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel.csproj" />
     <Project Path="src/Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions.csproj" />
     <Project Path="src/Microsoft.TestPlatform.Utilities/Microsoft.TestPlatform.Utilities.csproj" />
