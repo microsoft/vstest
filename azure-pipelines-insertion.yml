@@ -95,14 +95,6 @@ extends:
       jobs:
         - template: /eng/common/templates-official/jobs/jobs.yml@self
           parameters:
-            enableMicrobuild: true
-            enablePublishBuildArtifacts: true
-            enablePublishBuildAssets: true
-            enablePublishUsingPipelines: true
-            enablePublishTestResults: true
-            testResultsFormat: 'vstest'
-            enableTelemetry: true
-            enableSourceBuild: true
             jobs:
             - job: insert
               displayName: Insert
