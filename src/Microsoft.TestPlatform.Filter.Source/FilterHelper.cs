@@ -6,13 +6,30 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
+#if !IS_VSTEST_REPO
+using Microsoft.CodeAnalysis;
+#endif
+
+#if IS_VSTEST_REPO
+using static Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.Resources;
+#endif
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
+#if IS_VSTEST_REPO
 public static class FilterHelper
+#else
+[Embedded]
+internal static class FilterHelper
+#endif
 {
     public const char EscapeCharacter = '\\';
     private static readonly char[] SpecialCharacters = ['\\', '(', ')', '&', '|', '=', '!', '~'];
     private static readonly HashSet<char> SpecialCharactersSet = new(SpecialCharacters);
+
+#if !IS_VSTEST_REPO
+    private const string TestCaseFilterEscapeException = "Filter string '{0}' includes unrecognized escape sequence.";
+#endif
 
     /// <summary>
     /// Escapes a set of special characters for filter (%, (, ), &amp;, |, =, !, ~) by replacing them with their escape sequences.
@@ -21,7 +38,10 @@ public static class FilterHelper
     /// <returns>A string of characters with special characters converted to their escaped form.</returns>
     public static string Escape(string str)
     {
+#if IS_VSTEST_REPO
         ValidateArg.NotNull(str, nameof(str));
+#endif
+
         if (str.IndexOfAny(SpecialCharacters) < 0)
         {
             return str;
@@ -48,7 +68,10 @@ public static class FilterHelper
     /// <returns>A filter string of characters with any escaped characters converted to their un-escaped form.</returns>
     public static string Unescape(string str)
     {
+#if IS_VSTEST_REPO
         ValidateArg.NotNull(str, nameof(str));
+#endif
+
         if (str.IndexOf(EscapeCharacter) < 0)
         {
             return str;
@@ -63,7 +86,7 @@ public static class FilterHelper
                 if (++i == str.Length || !SpecialCharactersSet.Contains(currentChar = str[i]))
                 {
                     // "\" should be followed by a special character.
-                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.TestCaseFilterEscapeException, str));
+                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterEscapeException, str));
                 }
             }
 

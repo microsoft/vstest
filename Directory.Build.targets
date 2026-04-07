@@ -4,7 +4,11 @@
     <!-- Temporary workaround for Arcade issue in net9-preview5 -->
     <_NetFrameworkHostedCompilersVersion Condition="'$(_NetFrameworkHostedCompilersVersion)' == ''">4.11.0-3.24280.3</_NetFrameworkHostedCompilersVersion>
   </PropertyGroup>
-  
+
+  <PropertyGroup>
+    <DefineConstants Condition="'$(IsFilterSourcePackage)' != 'true'">$(DefineConstants);IS_VSTEST_REPO</DefineConstants>
+  </PropertyGroup>
+
   <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
   <!-- Override the version of imported package to avoid infinite restore loop in VisualStudio, https://github.com/dotnet/arcade/issues/16228 -->
   <ItemGroup>

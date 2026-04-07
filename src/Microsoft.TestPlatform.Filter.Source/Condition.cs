@@ -3,18 +3,32 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+#if IS_VSTEST_REPO
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Linq;
 using System.Text;
 
+#if !IS_VSTEST_REPO
+using Microsoft.CodeAnalysis;
+#endif
+
+#if IS_VSTEST_REPO
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+#endif
+
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+#if IS_VSTEST_REPO
+using static Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+#endif
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
+#if !IS_VSTEST_REPO
+[Embedded]
+#endif
 internal enum Operation
 {
     Equal,
@@ -28,6 +42,9 @@ internal enum Operation
 /// Precedence(And) > Precedence(Or)
 /// Precedence of OpenBrace and CloseBrace operators is not used, instead parsing code takes care of same.
 /// </summary>
+#if !IS_VSTEST_REPO
+[Embedded]
+#endif
 internal enum Operator
 {
     None,
@@ -40,6 +57,9 @@ internal enum Operator
 /// <summary>
 /// Represents a condition in filter expression.
 /// </summary>
+#if !IS_VSTEST_REPO
+[Embedded]
+#endif
 internal sealed class Condition
 {
     /// <summary>
@@ -51,6 +71,14 @@ internal sealed class Condition
     ///  Default operation which will be used when filter has only property value.
     /// </summary>
     public const Operation DefaultOperation = Operation.Contains;
+
+#if !IS_VSTEST_REPO
+    private const string TestCaseFilterFormatException = "Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.";
+
+    private const string InvalidCondition = "Error: Invalid Condition '{0}'";
+
+    private const string InvalidOperator = "Error: Invalid operator '{0}'";
+#endif
 
     internal Condition(string name, Operation operation, string value)
     {
@@ -97,8 +125,10 @@ internal sealed class Condition
         {
             foreach (string propertyValue in multiValue)
             {
+#if IS_VSTEST_REPO
                 TPDebug.Assert(null != propertyValue, "PropertyValue can not be null.");
-                if (propertyValue.IndexOf(Value, StringComparison.OrdinalIgnoreCase) != -1)
+#endif
+                if (propertyValue!.IndexOf(Value, StringComparison.OrdinalIgnoreCase) != -1)
                 {
                     return true;
                 }
@@ -113,7 +143,9 @@ internal sealed class Condition
     /// </summary>
     internal bool Evaluate(Func<string, object?> propertyValueProvider)
     {
+#if IS_VSTEST_REPO
         ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
+#endif
         var multiValue = GetPropertyValue(propertyValueProvider);
         var result = Operation switch
         {
@@ -136,17 +168,21 @@ internal sealed class Condition
     /// </summary>
     internal static Condition Parse(string? conditionString)
     {
+#if IS_VSTEST_REPO
         if (conditionString.IsNullOrWhiteSpace())
+#else
+        if (string.IsNullOrWhiteSpace(conditionString))
+#endif
         {
             ThrownFormatExceptionForInvalidCondition(conditionString);
         }
 
-        var parts = TokenizeFilterConditionString(conditionString).ToArray();
+        var parts = TokenizeFilterConditionString(conditionString!).ToArray();
         if (parts.Length == 1)
         {
             // If only parameter values is passed, create condition with default property name,
             // default operation and given condition string as parameter value.
-            return new Condition(DefaultPropertyName, DefaultOperation, FilterHelper.Unescape(conditionString.Trim()));
+            return new Condition(DefaultPropertyName, DefaultOperation, FilterHelper.Unescape(conditionString!.Trim()));
         }
 
         if (parts.Length != 3)
@@ -156,7 +192,11 @@ internal sealed class Condition
 
         for (int index = 0; index < 3; index++)
         {
+#if IS_VSTEST_REPO
             if (parts[index].IsNullOrWhiteSpace())
+#else
+            if (string.IsNullOrWhiteSpace(parts[index]))
+#endif
             {
                 ThrownFormatExceptionForInvalidCondition(conditionString);
             }
@@ -168,17 +208,23 @@ internal sealed class Condition
         return condition;
     }
 
+#if IS_VSTEST_REPO
     [DoesNotReturn]
+#endif
     private static void ThrownFormatExceptionForInvalidCondition(string? conditionString)
     {
-        throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException,
-            string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidCondition, conditionString)));
+        throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException,
+            string.Format(CultureInfo.CurrentCulture, InvalidCondition, conditionString)));
     }
 
     /// <summary>
     /// Check if condition validates any property in properties.
     /// </summary>
+#if IS_VSTEST_REPO
     internal bool ValidForProperties(IEnumerable<string> properties, Func<string, TestProperty?>? propertyProvider)
+#else
+    internal bool ValidForProperties(IEnumerable<string> properties)
+#endif
     {
         bool valid = false;
 
@@ -186,15 +232,18 @@ internal sealed class Condition
         {
             valid = true;
 
+#if IS_VSTEST_REPO
             // Check if operation ~ (Contains) is on property of type string.
             if (Operation == Operation.Contains)
             {
                 valid = ValidForContainsOperation(propertyProvider);
             }
+#endif
         }
         return valid;
     }
 
+#if IS_VSTEST_REPO
     private bool ValidForContainsOperation(Func<string, TestProperty?>? propertyProvider)
     {
         bool valid = true;
@@ -215,6 +264,7 @@ internal sealed class Condition
         }
         return valid;
     }
+#endif
 
     /// <summary>
     /// Return Operation corresponding to the operationString
@@ -227,7 +277,7 @@ internal sealed class Condition
             "!=" => Operation.NotEqual,
             "~" => Operation.Contains,
             "!~" => Operation.NotContains,
-            _ => throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidOperator, operationString))),
+            _ => throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, InvalidOperator, operationString))),
         };
     }
 
