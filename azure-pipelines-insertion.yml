@@ -157,3 +157,8 @@ extends:
 
               - script: 'echo. && echo. && type "$(System.DefaultWorkingDirectory)\prid.txt" && echo. && echo.'
                 displayName: 'Report PR URL'
+              
+              # Avoid warning from subsequent steps.
+              - powershell: |
+                  mkdir artifacts
+                  displayName: 'Create artifacts dir'
