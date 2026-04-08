@@ -8,6 +8,6 @@
   <files>
     $CommonFileElements$
     <file src="$ProjectDirectory$\README.md" target="" />
-    <file src="*.cs" target="contentFiles/cs/netstandard2.0/VSTestFilterSource/"/>
+    <file src="$ProjectDirectory$\**\*.cs" target="contentFiles/cs/netstandard2.0/VSTestFilterSource/"/>
   </files>
 </package>
