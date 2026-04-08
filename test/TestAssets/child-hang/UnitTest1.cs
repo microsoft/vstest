@@ -31,6 +31,9 @@ namespace child_hang
             process.WaitForExit();
 
             // then hang self (+1 hang)
+            // To make tests reliable this needs to survive the dump of itself and its child process being taken
+            // even on slow system. Otherwise we get inconsistent number of dumps. Shortening this time does not make sense.
+            // The process will get killed after we dump its memory.
             Thread.Sleep(30_000);
 
             // we should get 3 hang dumps in total from this test
