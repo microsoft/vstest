@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TestProject>true</TestProject>
+    <IsTestProject>true</IsTestProject>
+    <!--
+      This prevents IS_VSTEST_REPO from being defined (see Directory.Build.targets),
+      simulating how end-users consume the source-only package.
+    -->
+    <IsFilterSourcePackage>true</IsFilterSourcePackage>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net48</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Microsoft.TestPlatform.Filter.Source.UnitTests</AssemblyName>
+  </PropertyGroup>
+
+  <!--
+    Remove the vstest project references added by Directory.Build.targets for TestProject==true.
+    This test project only compiles the source-only filter package files directly and
+    does not depend on any vstest assemblies at compile time.
+    The removal is done in a target so it runs after Directory.Build.targets has added the items.
+  -->
+  <Target Name="RemoveConflictingProjectReferences" BeforeTargets="ResolveProjectReferences">
+    <ItemGroup>
+      <ProjectReference Remove="@(ProjectReference)" Condition="'%(ProjectReference.FromP2P)' == 'true'" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Include source files from the source-only package directly, simulating how end-users consume the package. -->
+  <ItemGroup>
+    <Compile Include="$(RepoRoot)src/Microsoft.TestPlatform.Filter.Source/Condition.cs" Link="Sources/Condition.cs" />
+    <Compile Include="$(RepoRoot)src/Microsoft.TestPlatform.Filter.Source/EmbeddedAttribute.cs" Link="Sources/EmbeddedAttribute.cs" />
+    <Compile Include="$(RepoRoot)src/Microsoft.TestPlatform.Filter.Source/FastFilter.cs" Link="Sources/FastFilter.cs" />
+    <Compile Include="$(RepoRoot)src/Microsoft.TestPlatform.Filter.Source/FilterExpression.cs" Link="Sources/FilterExpression.cs" />
+    <Compile Include="$(RepoRoot)src/Microsoft.TestPlatform.Filter.Source/FilterExpressionWrapper.cs" Link="Sources/FilterExpressionWrapper.cs" />
+    <Compile Include="$(RepoRoot)src/Microsoft.TestPlatform.Filter.Source/FilterHelper.cs" Link="Sources/FilterHelper.cs" />
+    <Compile Include="$(RepoRoot)src/Microsoft.TestPlatform.Filter.Source/TestCaseFilterExpression.cs" Link="Sources/TestCaseFilterExpression.cs" />
+  </ItemGroup>
+
+</Project>
