@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks></TargetFrameworks>
     <IsFilterSourcePackage>true</IsFilterSourcePackage>
     <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
