@@ -116,6 +116,7 @@
     <Project Path="test/Microsoft.TestPlatform.CommunicationUtilities.UnitTests/Microsoft.TestPlatform.CommunicationUtilities.UnitTests.csproj" />
     <Project Path="test/Microsoft.TestPlatform.CoreUtilities.UnitTests/Microsoft.TestPlatform.CoreUtilities.UnitTests.csproj" />
     <Project Path="test/Microsoft.TestPlatform.CrossPlatEngine.UnitTests/Microsoft.TestPlatform.CrossPlatEngine.UnitTests.csproj" />
+    <Project Path="test/Microsoft.TestPlatform.Filter.Source.UnitTests/Microsoft.TestPlatform.Filter.Source.UnitTests.csproj" />
     <Project Path="test/Microsoft.TestPlatform.ObjectModel.UnitTests/Microsoft.TestPlatform.ObjectModel.UnitTests.csproj" />
     <Project Path="test/Microsoft.TestPlatform.Utilities.UnitTests/Microsoft.TestPlatform.Utilities.UnitTests.csproj" />
   </Folder>
