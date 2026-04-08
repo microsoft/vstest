@@ -9,7 +9,7 @@
       </trans-unit>
       <trans-unit id="ProvidedDependenciesWarning">
         <source>The test platform provided the following assemblies to resolve dependencies of test extensions that did not ship their own copy: {0}. Test extensions should ship all their dependencies.</source>
-        <target state="new">The test platform provided the following assemblies to resolve dependencies of test extensions that did not ship their own copy: {0}. Test extensions should ship all their dependencies.</target>
+        <target state="translated">La plataforma de prueba proporcionó los siguientes ensamblados para resolver las dependencias de las extensiones de prueba que no enviaron su propia copia: {0}. Las extensiones de prueba deben incluir todas sus dependencias.</target>
         <note />
       </trans-unit>
       <trans-unit id="WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive">
