@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <TargetFrameworks></TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <IsFilterSourcePackage>true</IsFilterSourcePackage>
     <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
