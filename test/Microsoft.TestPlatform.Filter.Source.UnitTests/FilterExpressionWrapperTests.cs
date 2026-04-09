@@ -133,7 +133,7 @@ public class FilterExpressionWrapperTests
         string[]? invalidProperties = wrapper.ValidForProperties(supportedProperties);
 
         Assert.IsNotNull(invalidProperties);
-        Assert.AreEqual(1, invalidProperties.Length);
+        Assert.HasCount(1, invalidProperties);
         Assert.AreEqual("UnknownProperty", invalidProperties[0]);
     }
 
