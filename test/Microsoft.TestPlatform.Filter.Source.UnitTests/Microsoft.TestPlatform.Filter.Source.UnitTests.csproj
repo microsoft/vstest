@@ -4,6 +4,7 @@
     <IsFilterSourcePackage>true</IsFilterSourcePackage>
     <TargetFrameworks>$(NetCurrent);net48</TargetFrameworks>
     <OutputType>Exe</OutputType>
+    <ExcludeRepoTestProjectSettings>true</ExcludeRepoTestProjectSettings>
   </PropertyGroup>
 
   <!-- Include source files from the source-only package directly, simulating how end-users consume the package. -->
