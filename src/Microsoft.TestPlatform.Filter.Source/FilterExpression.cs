@@ -42,6 +42,8 @@ internal sealed class FilterExpression
 
     private const string MissingOperand = "Error: Missing operand";
 
+    private const string MissingCloseParenthesis = "Error: Missing ')'";
+
     private const string EmptyParenthesis = "Error: Empty parenthesis ( )";
 
     private const string MissingOpenParenthesis = "Error: Missing '('";
@@ -124,7 +126,7 @@ internal sealed class FilterExpression
         }
         else if (op == Operator.OpenBrace)
         {
-            throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException, MissingOperand));
+            throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException, MissingCloseParenthesis));
         }
         else
         {

@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 /// Implements ITestCaseFilterExpression, providing test case filtering functionality.
 /// </summary>
 #if IS_VSTEST_REPO
-public class TestCaseFilterExpression: ITestCaseFilterExpression
+public class TestCaseFilterExpression : ITestCaseFilterExpression
 #else
 [Embedded]
 internal sealed class TestCaseFilterExpression
