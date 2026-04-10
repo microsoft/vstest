@@ -135,7 +135,7 @@ public class TestCaseFilterExpressionPackageTests
     {
         var wrapper = new FilterExpressionWrapper("Name=Test1");
         var expression = new TestCaseFilterExpression(wrapper);
-        string[]? invalid = expression.ValidForProperties(new List<string> { "Name" });
+        string[] invalid = expression.ValidForProperties(new List<string> { "Name" });
         Assert.IsNull(invalid);
     }
 
@@ -144,7 +144,7 @@ public class TestCaseFilterExpressionPackageTests
     {
         var wrapper = new FilterExpressionWrapper("UnknownProp=Value");
         var expression = new TestCaseFilterExpression(wrapper);
-        string[]? invalid = expression.ValidForProperties(new List<string> { "Name" });
+        string[] invalid = expression.ValidForProperties(new List<string> { "Name" });
         Assert.IsNotNull(invalid);
         Assert.AreEqual(1, invalid.Length);
         Assert.AreEqual("UnknownProp", invalid[0]);
