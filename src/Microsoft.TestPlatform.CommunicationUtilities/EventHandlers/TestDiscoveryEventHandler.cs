@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 /// <summary>
 /// The test discovery event handler.
 /// </summary>
-public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler2
+public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler2, IProtocolEnvelopeHandler
 {
     private readonly ITestRequestHandler _requestHandler;
 
@@ -81,5 +81,11 @@ public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler2
     {
         // No-Op
         // TestHost at this point has no functionality where it requires rawmessage
+    }
+
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
+        // No-op by design. This handler has no raw protocol consumers, but implementing the
+        // interface keeps the message on the shared internal pipeline.
     }
 }

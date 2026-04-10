@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery;
 /// <summary>
 /// The discovery request.
 /// </summary>
-public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHandler2
+public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHandler2, IProtocolEnvelopeHandler
 {
     private readonly IDataSerializer _dataSerializer;
 
@@ -358,20 +358,29 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <param name="rawMessage">Raw message.</param>
     public void HandleRawMessage(string rawMessage)
     {
+        ((IProtocolEnvelopeHandler)this).HandleProtocolMessage(new ProtocolEnvelope(rawMessage, _dataSerializer.DeserializeMessage(rawMessage), _dataSerializer));
+    }
+
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
         // Note: Deserialize rawMessage only if required.
 
         var message = LoggerManager.LoggersInitialized || RequestData.IsTelemetryOptedIn
-            ? _dataSerializer.DeserializeMessage(rawMessage)
+            ? protocolEnvelope.Message
             : null;
 
         if (MessageType.DiscoveryComplete.Equals(message?.MessageType))
         {
-            var discoveryCompletePayload = _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
-            rawMessage = UpdateRawMessageWithTelemetryInfo(discoveryCompletePayload, message) ?? rawMessage;
+            var discoveryCompletePayload = protocolEnvelope.GetPayload<DiscoveryCompletePayload>();
+            if (UpdateRawMessageWithTelemetryInfo(discoveryCompletePayload, message) is string updatedRawMessage)
+            {
+                protocolEnvelope.UpdateRawMessage(updatedRawMessage);
+            }
+
             HandleLoggerManagerDiscoveryComplete(discoveryCompletePayload);
         }
 
-        OnRawMessageReceived?.SafeInvoke(this, rawMessage, "DiscoveryRequest.RawMessageReceived");
+        OnRawMessageReceived?.SafeInvoke(this, protocolEnvelope.RawMessage, "DiscoveryRequest.RawMessageReceived");
     }
 
     /// <summary>

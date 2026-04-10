@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -142,12 +143,12 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
             DataCollectionRunEventsHandler.Messages.Clear();
         }
 
-        // Push all raw messages
+        // Replay all queued raw/protocol messages through the compatibility-aware pipeline.
         if (DataCollectionRunEventsHandler.RawMessages.Count > 0)
         {
             foreach (var message in DataCollectionRunEventsHandler.RawMessages)
             {
-                currentEventHandler.HandleRawMessage(message);
+                currentEventHandler.DispatchRawMessage(message, JsonDataSerializer.Instance);
             }
 
             DataCollectionRunEventsHandler.RawMessages.Clear();
@@ -204,7 +205,7 @@ internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
 /// <summary>
 /// Handles Log and raw messages and stores them in list. Messages in the list will be logged after test execution begins.
 /// </summary>
-internal class DataCollectionRunEventsHandler : ITestMessageEventHandler
+internal class DataCollectionRunEventsHandler : ITestMessageEventHandler, IProtocolEnvelopeHandler
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="DataCollectionRunEventsHandler"/> class.
@@ -235,5 +236,10 @@ internal class DataCollectionRunEventsHandler : ITestMessageEventHandler
     public void HandleRawMessage(string rawMessage)
     {
         RawMessages.Add(rawMessage);
+    }
+
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
+        RawMessages.Add(protocolEnvelope.RawMessage);
     }
 }

@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 /// <summary>
 /// Orchestrates discovery operations for the engine communicating with the client.
 /// </summary>
-public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2
+public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2, IProtocolEnvelopeHandler
 {
     private readonly TestSessionInfo? _testSessionInfo;
     private readonly Func<string, ProxyDiscoveryManager, ProxyOperationManager>? _proxyOperationManagerCreator;
@@ -324,13 +324,17 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     /// <inheritdoc/>
     public void HandleRawMessage(string rawMessage)
     {
-        var message = _dataSerializer.DeserializeMessage(rawMessage);
-        if (string.Equals(message.MessageType, MessageType.DiscoveryComplete))
+        ((IProtocolEnvelopeHandler)this).HandleProtocolMessage(new ProtocolEnvelope(rawMessage, _dataSerializer.DeserializeMessage(rawMessage), _dataSerializer));
+    }
+
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
+        if (string.Equals(protocolEnvelope.MessageType, MessageType.DiscoveryComplete))
         {
             Close();
         }
 
-        _baseTestDiscoveryEventsHandler?.HandleRawMessage(rawMessage);
+        _baseTestDiscoveryEventsHandler.DispatchProtocolMessage(protocolEnvelope);
     }
 
     /// <inheritdoc/>

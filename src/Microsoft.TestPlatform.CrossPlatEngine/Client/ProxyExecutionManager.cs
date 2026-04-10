@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 /// <summary>
 /// Orchestrates test execution operations for the engine communicating with the client.
 /// </summary>
-internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInternalTestRunEventsHandler
+internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInternalTestRunEventsHandler, IProtocolEnvelopeHandler
 {
     private readonly TestSessionInfo? _testSessionInfo;
     private readonly Func<string, ProxyExecutionManager, ProxyOperationManager>? _proxyOperationManagerCreator;
@@ -431,17 +431,17 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
     /// <inheritdoc/>
     public void HandleRawMessage(string rawMessage)
     {
-        // TODO: PERF: - why do we have to deserialize the messages here only to read that this is
-        // execution complete? Why can't we act on it somewhere else where the result of deserialization is not
-        // thrown away?
-        var message = _dataSerializer.DeserializeMessage(rawMessage);
+        ((IProtocolEnvelopeHandler)this).HandleProtocolMessage(new ProtocolEnvelope(rawMessage, _dataSerializer.DeserializeMessage(rawMessage), _dataSerializer));
+    }
 
-        if (string.Equals(message.MessageType, MessageType.ExecutionComplete))
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
+        if (string.Equals(protocolEnvelope.MessageType, MessageType.ExecutionComplete))
         {
             Close();
         }
 
-        _baseTestRunEventsHandler?.HandleRawMessage(rawMessage);
+        _baseTestRunEventsHandler.DispatchProtocolMessage(protocolEnvelope);
     }
 
     /// <inheritdoc/>

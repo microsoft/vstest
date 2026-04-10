@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 /// <summary>
 /// ParallelRunEventsHandler for handling the run events in case of parallel execution
 /// </summary>
-internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
+internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler, IProtocolEnvelopeHandler
 {
     private readonly IProxyExecutionManager _proxyExecutionManager;
 
@@ -165,15 +165,15 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
 
     public void HandleRawMessage(string rawMessage)
     {
-        // In case of parallel - we can send everything but handle complete
-        // HandleComplete is not true-end of the overall execution as we only get completion of one executor here
-        // Always aggregate data, deserialize and raw for complete events
-        var message = _dataSerializer.DeserializeMessage(rawMessage);
+        ((IProtocolEnvelopeHandler)this).HandleProtocolMessage(new ProtocolEnvelope(rawMessage, _dataSerializer.DeserializeMessage(rawMessage), _dataSerializer));
+    }
 
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
         // Do not deserialize further - just send if not execution complete
-        if (!string.Equals(MessageType.ExecutionComplete, message.MessageType))
+        if (!string.Equals(MessageType.ExecutionComplete, protocolEnvelope.MessageType))
         {
-            _actualRunEventsHandler.HandleRawMessage(rawMessage);
+            _actualRunEventsHandler.DispatchProtocolMessage(protocolEnvelope);
         }
     }
 
@@ -201,6 +201,6 @@ internal class ParallelRunEventsHandler : IInternalTestRunEventsHandler
     private void ConvertToRawMessageAndSend(string messageType, object payload)
     {
         var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig!.Version);
-        _actualRunEventsHandler.HandleRawMessage(rawMessage);
+        _actualRunEventsHandler.DispatchRawMessage(rawMessage, _dataSerializer);
     }
 }

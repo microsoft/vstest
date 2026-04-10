@@ -4,13 +4,15 @@
 using System;
 using System.Collections.Generic;
 
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace Microsoft.VisualStudio.TestPlatform.Client;
 
-internal class InProcessTestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProcessingEventsHandler
+internal class InProcessTestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProcessingEventsHandler, IProtocolEnvelopeHandler
 {
     private readonly ITestRunAttachmentsProcessingEventsHandler _eventsHandler;
 
@@ -44,6 +46,12 @@ internal class InProcessTestRunAttachmentsProcessingEventsHandler : ITestRunAtta
         //
         // Consider changing this logic in the future if TW changes the handling logic for raw
         // messages.
+    }
+
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
+        // Intentionally no-op. In-process translation layer callers should not surface raw
+        // attachments-processing messages to the wrapped handler.
     }
 
     public void HandleTestRunAttachmentsProcessingComplete(

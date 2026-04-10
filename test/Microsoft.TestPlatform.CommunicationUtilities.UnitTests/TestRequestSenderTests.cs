@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -373,6 +374,36 @@ public class TestRequestSenderTests
     }
 
     [TestMethod]
+    public void DiscoverTestsShouldUseProtocolEnvelopeMutationsForDiscoveryComplete()
+    {
+        var originalPayload = new DiscoveryCompletePayload { TotalTests = 10, IsAborted = false };
+        var mutatedPayload = new DiscoveryCompletePayload { TotalTests = 42, IsAborted = true };
+        var originalMessage = new Message { MessageType = MessageType.DiscoveryComplete };
+        var mutatedMessage = new Message { MessageType = MessageType.DiscoveryComplete };
+
+        _mockDataSerializer.SetupSequence(ds => ds.DeserializeMessage(It.IsAny<string>()))
+            .Returns(originalMessage)
+            .Returns(mutatedMessage);
+        _mockDataSerializer.Setup(ds => ds.DeserializePayload<DiscoveryCompletePayload>(originalMessage))
+            .Returns(originalPayload);
+        _mockDataSerializer.Setup(ds => ds.DeserializePayload<DiscoveryCompletePayload>(mutatedMessage))
+            .Returns(mutatedPayload);
+        _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.DiscoveryComplete, mutatedPayload))
+            .Returns("MutatedDiscoveryComplete");
+        SetupFakeCommunicationChannel();
+
+        var handler = new ProtocolAwareDiscoveryEventsHandler(mutatedPayload);
+        _testRequestSender.DiscoverTests(new DiscoveryCriteria(), handler);
+
+        RaiseMessageReceivedEvent();
+
+        Assert.IsFalse(handler.RawMessageFallbackHit);
+        Assert.IsNotNull(handler.CompleteArgs);
+        Assert.IsTrue(handler.CompleteArgs.IsAborted);
+        Assert.AreEqual(42, handler.CompleteArgs.TotalCount);
+    }
+
+    [TestMethod]
     public void DiscoverTestsShouldStopServerOnCompleteMessageReceived()
     {
         var completePayload = new DiscoveryCompletePayload { TotalTests = 10, IsAborted = false };
@@ -612,6 +643,41 @@ public class TestRequestSenderTests
                 testRunCompletePayload.RunAttachments,
                 It.IsAny<ICollection<string>>()),
             Times.Once);
+    }
+
+    [TestMethod]
+    public void StartTestRunShouldUseProtocolEnvelopeMutationsForExecutionComplete()
+    {
+        var originalPayload = new TestRunCompletePayload
+        {
+            TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.Zero),
+        };
+        var mutatedPayload = new TestRunCompletePayload
+        {
+            TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero),
+        };
+        var originalMessage = new Message { MessageType = MessageType.ExecutionComplete };
+        var mutatedMessage = new Message { MessageType = MessageType.ExecutionComplete };
+
+        _mockDataSerializer.SetupSequence(ds => ds.DeserializeMessage(It.IsAny<string>()))
+            .Returns(originalMessage)
+            .Returns(mutatedMessage);
+        _mockDataSerializer.Setup(ds => ds.DeserializePayload<TestRunCompletePayload>(originalMessage))
+            .Returns(originalPayload);
+        _mockDataSerializer.Setup(ds => ds.DeserializePayload<TestRunCompletePayload>(mutatedMessage))
+            .Returns(mutatedPayload);
+        _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.ExecutionComplete, mutatedPayload))
+            .Returns("MutatedExecutionComplete");
+        SetupFakeCommunicationChannel();
+
+        var handler = new ProtocolAwareRunEventsHandler(mutatedPayload);
+        _testRequestSender.StartTestRun(_testRunCriteriaWithSources, handler);
+
+        RaiseMessageReceivedEvent();
+
+        Assert.IsFalse(handler.RawMessageFallbackHit);
+        Assert.IsNotNull(handler.CompleteArgs);
+        Assert.IsTrue(handler.CompleteArgs.IsAborted);
     }
 
     [TestMethod]
@@ -926,6 +992,90 @@ public class TestRequestSenderTests
     private void ResetRaiseMessageReceivedOnCheckVersion()
     {
         _mockChannel.Reset();
+    }
+
+    private sealed class ProtocolAwareRunEventsHandler : IInternalTestRunEventsHandler, IProtocolEnvelopeHandler
+    {
+        private readonly TestRunCompletePayload _mutatedPayload;
+
+        public ProtocolAwareRunEventsHandler(TestRunCompletePayload mutatedPayload)
+        {
+            _mutatedPayload = mutatedPayload;
+        }
+
+        public bool RawMessageFallbackHit { get; private set; }
+
+        public TestRunCompleteEventArgs? CompleteArgs { get; private set; }
+
+        public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo) => false;
+
+        public void HandleLogMessage(TestMessageLevel level, string? message)
+        {
+        }
+
+        public void HandleRawMessage(string rawMessage)
+        {
+            RawMessageFallbackHit = true;
+        }
+
+        public void HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+        {
+            if (protocolEnvelope.MessageType == MessageType.ExecutionComplete)
+            {
+                protocolEnvelope.UpdatePayload(MessageType.ExecutionComplete, _mutatedPayload);
+            }
+        }
+
+        public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris)
+        {
+            CompleteArgs = testRunCompleteArgs;
+        }
+
+        public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
+        {
+        }
+
+        public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo) => 0;
+    }
+
+    private sealed class ProtocolAwareDiscoveryEventsHandler : ITestDiscoveryEventsHandler2, IProtocolEnvelopeHandler
+    {
+        private readonly DiscoveryCompletePayload _mutatedPayload;
+
+        public ProtocolAwareDiscoveryEventsHandler(DiscoveryCompletePayload mutatedPayload)
+        {
+            _mutatedPayload = mutatedPayload;
+        }
+
+        public bool RawMessageFallbackHit { get; private set; }
+
+        public DiscoveryCompleteEventArgs? CompleteArgs { get; private set; }
+
+        public void HandleDiscoveredTests(IEnumerable<TestCase>? discoveredTestCases)
+        {
+        }
+
+        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase>? lastChunk)
+        {
+            CompleteArgs = discoveryCompleteEventArgs;
+        }
+
+        public void HandleLogMessage(TestMessageLevel level, string? message)
+        {
+        }
+
+        public void HandleRawMessage(string rawMessage)
+        {
+            RawMessageFallbackHit = true;
+        }
+
+        public void HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+        {
+            if (protocolEnvelope.MessageType == MessageType.DiscoveryComplete)
+            {
+                protocolEnvelope.UpdatePayload(MessageType.DiscoveryComplete, _mutatedPayload);
+            }
+        }
     }
 
     private class TestableTestRequestSender : TestRequestSender

@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 /// Handles DataCollection attachments by calling DataCollection Process on Test Run Complete.
 /// Existing functionality of ITestRunEventsHandler is decorated with additional call to Data Collection Process.
 /// </summary>
-internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandler
+internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandler, IProtocolEnvelopeHandler
 {
     private readonly IProxyDataCollectionManager _proxyDataCollectionManager;
     private readonly IInternalTestRunEventsHandler _testRunEventsHandler;
@@ -90,16 +90,18 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
     /// </param>
     public void HandleRawMessage(string rawMessage)
     {
-        // In case of data collection, data collection attachments should be attached to raw message for ExecutionComplete
-        var message = _dataSerializer.DeserializeMessage(rawMessage);
+        ((IProtocolEnvelopeHandler)this).HandleProtocolMessage(new ProtocolEnvelope(rawMessage, _dataSerializer.DeserializeMessage(rawMessage), _dataSerializer));
+    }
 
-        if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
+        // In case of data collection, data collection attachments should be attached to raw message for ExecutionComplete
+        if (string.Equals(MessageType.ExecutionComplete, protocolEnvelope.MessageType))
         {
             var dataCollectionResult = _proxyDataCollectionManager?.AfterTestRunEnd(_cancellationToken.IsCancellationRequested, this);
             _dataCollectionAttachmentSets = dataCollectionResult?.Attachments;
 
-            var testRunCompletePayload =
-                _dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+            var testRunCompletePayload = protocolEnvelope.GetPayload<TestRunCompletePayload>();
 
             if (_dataCollectionAttachmentSets != null && _dataCollectionAttachmentSets.Count != 0)
             {
@@ -117,12 +119,12 @@ internal class DataCollectionTestRunEventsHandler : IInternalTestRunEventsHandle
                 }
             }
 
-            rawMessage = _dataSerializer.SerializePayload(
+            protocolEnvelope.UpdatePayload(
                 MessageType.ExecutionComplete,
                 testRunCompletePayload);
         }
 
-        _testRunEventsHandler.HandleRawMessage(rawMessage);
+        _testRunEventsHandler.DispatchProtocolMessage(protocolEnvelope);
     }
 
     /// <summary>

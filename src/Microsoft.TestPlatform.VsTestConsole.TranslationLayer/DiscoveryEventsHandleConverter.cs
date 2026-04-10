@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -14,7 +16,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 /// The Discovery Events Handler Converter.
 /// Converts the ITestDiscoveryEventsHandler to ITestDiscoveryEventsHandler2
 /// </summary>
-public class DiscoveryEventsHandleConverter : ITestDiscoveryEventsHandler2
+public class DiscoveryEventsHandleConverter : ITestDiscoveryEventsHandler2, IProtocolEnvelopeHandler
 {
     private readonly ITestDiscoveryEventsHandler _testDiscoveryEventsHandler;
 
@@ -34,7 +36,12 @@ public class DiscoveryEventsHandleConverter : ITestDiscoveryEventsHandler2
     /// <param name="rawMessage"></param>
     public void HandleRawMessage(string rawMessage)
     {
-        _testDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+        _testDiscoveryEventsHandler.DispatchRawMessage(rawMessage, JsonDataSerializer.Instance);
+    }
+
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
+        _testDiscoveryEventsHandler.DispatchProtocolMessage(protocolEnvelope);
     }
 
     /// <summary>

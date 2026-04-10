@@ -26,10 +26,11 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
+using TPDebug = Microsoft.VisualStudio.TestPlatform.Common.TPDebug;
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.Execution;
 
-public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
+public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler, IProtocolEnvelopeHandler
 {
     /// <summary>
     /// Specifies whether the run is disposed or not
@@ -563,19 +564,29 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// <param name="rawMessage"></param>
     public void HandleRawMessage(string rawMessage)
     {
+        ((IProtocolEnvelopeHandler)this).HandleProtocolMessage(new ProtocolEnvelope(rawMessage, _dataSerializer.DeserializeMessage(rawMessage), _dataSerializer));
+    }
+
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
         // Note: Deserialize rawMessage only if required.
 
-        var message = LoggerManager.LoggersInitialized || _requestData.IsTelemetryOptedIn ?
-            _dataSerializer.DeserializeMessage(rawMessage) : null;
+        var message = LoggerManager.LoggersInitialized || _requestData.IsTelemetryOptedIn
+            ? protocolEnvelope.Message
+            : null;
 
         if (MessageType.ExecutionComplete.Equals(message?.MessageType))
         {
-            var testRunCompletePayload = _dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
-            rawMessage = UpdateRawMessageWithTelemetryInfo(testRunCompletePayload, message) ?? rawMessage;
+            var testRunCompletePayload = protocolEnvelope.GetPayload<TestRunCompletePayload>();
+            if (UpdateRawMessageWithTelemetryInfo(testRunCompletePayload, message) is string updatedRawMessage)
+            {
+                protocolEnvelope.UpdateRawMessage(updatedRawMessage);
+            }
+
             HandleLoggerManagerTestRunComplete(testRunCompletePayload);
         }
 
-        OnRawMessageReceived?.SafeInvoke(this, rawMessage, "TestRunRequest.RawMessageReceived");
+        OnRawMessageReceived?.SafeInvoke(this, protocolEnvelope.RawMessage, "TestRunRequest.RawMessageReceived");
     }
 
     /// <summary>

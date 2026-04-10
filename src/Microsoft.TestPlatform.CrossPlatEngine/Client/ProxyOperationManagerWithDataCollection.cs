@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -121,12 +122,12 @@ public class ProxyOperationManagerWithDataCollection : ProxyOperationManager
             DataCollectionRunEventsHandler.Messages.Clear();
         }
 
-        // Push all raw messages
+        // Replay all queued raw/protocol messages through the compatibility-aware pipeline.
         if (DataCollectionRunEventsHandler.RawMessages.Count > 0)
         {
             foreach (var message in DataCollectionRunEventsHandler.RawMessages)
             {
-                eventHandler.HandleRawMessage(message);
+                eventHandler.DispatchRawMessage(message, JsonDataSerializer.Instance);
             }
 
             DataCollectionRunEventsHandler.RawMessages.Clear();

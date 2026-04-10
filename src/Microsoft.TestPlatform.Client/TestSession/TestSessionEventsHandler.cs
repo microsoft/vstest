@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -12,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client;
 /// <summary>
 /// Defines the way in which test session events should be handled.
 /// </summary>
-internal class TestSessionEventsHandler : ITestSessionEventsHandler
+internal class TestSessionEventsHandler : ITestSessionEventsHandler, IProtocolEnvelopeHandler
 {
     private readonly ICommunicationManager _communicationManager;
 
@@ -66,5 +67,10 @@ internal class TestSessionEventsHandler : ITestSessionEventsHandler
     public void HandleRawMessage(string rawMessage)
     {
         // No-op.
+    }
+
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
+        // No-op by design. Test session callbacks use typed messages at this boundary.
     }
 }

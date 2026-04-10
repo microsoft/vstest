@@ -306,6 +306,31 @@ public class TestRunRequestTests
     }
 
     [TestMethod]
+    public void HandleRawMessageShouldForwardUpdatedRawMessageToListeners()
+    {
+        const string rawMessage = "raw-message";
+        const string updatedRawMessage = "updated-raw-message";
+        string? forwardedMessage = null;
+
+        _mockRequestData.Setup(x => x.IsTelemetryOptedIn).Returns(true);
+        _mockDataSerializer.Setup(x => x.DeserializeMessage(rawMessage))
+            .Returns(new Message() { MessageType = MessageType.ExecutionComplete });
+        _mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+            .Returns(new TestRunCompletePayload
+            {
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.Zero)
+            });
+        _mockDataSerializer.Setup(x => x.SerializePayload(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()))
+            .Returns(updatedRawMessage);
+
+        _testRunRequest.OnRawMessageReceived += (_, message) => forwardedMessage = message;
+
+        _testRunRequest.HandleRawMessage(rawMessage);
+
+        Assert.AreEqual(updatedRawMessage, forwardedMessage);
+    }
+
+    [TestMethod]
     public void HandleRawMessageShouldInvokeHandleTestRunCompleteOfLoggerManager()
     {
         _loggerManager.Setup(x => x.LoggersInitialized).Returns(true);

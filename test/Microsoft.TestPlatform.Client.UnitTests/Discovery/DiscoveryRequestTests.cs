@@ -230,6 +230,28 @@ public class DiscoveryRequestTests
     }
 
     [TestMethod]
+    public void HandleRawMessageShouldForwardUpdatedRawMessageToListeners()
+    {
+        const string rawMessage = "raw-message";
+        const string updatedRawMessage = "updated-raw-message";
+        string? forwardedMessage = null;
+
+        _mockRequestData.Setup(x => x.IsTelemetryOptedIn).Returns(true);
+        _mockDataSerializer.Setup(x => x.DeserializeMessage(rawMessage))
+            .Returns(new Message() { MessageType = MessageType.DiscoveryComplete });
+        _mockDataSerializer.Setup(x => x.DeserializePayload<DiscoveryCompletePayload>(It.IsAny<Message>()))
+            .Returns(new DiscoveryCompletePayload());
+        _mockDataSerializer.Setup(x => x.SerializePayload(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>()))
+            .Returns(updatedRawMessage);
+
+        _discoveryRequest.OnRawMessageReceived += (_, message) => forwardedMessage = message;
+
+        _discoveryRequest.HandleRawMessage(rawMessage);
+
+        Assert.AreEqual(updatedRawMessage, forwardedMessage);
+    }
+
+    [TestMethod]
     public void HandleRawMessageShouldInvokeHandleDiscoveryCompleteOfLoggerManager()
     {
         _loggerManager.Setup(x => x.LoggersInitialized).Returns(true);

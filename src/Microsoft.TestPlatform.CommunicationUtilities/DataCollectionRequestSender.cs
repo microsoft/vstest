@@ -137,7 +137,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
             }
             else if (message.MessageType == MessageType.TelemetryEventMessage)
             {
-                runEventsHandler?.HandleRawMessage(rawMessage);
+                runEventsHandler.DispatchProtocolMessage(new ProtocolEnvelope(rawMessage, message, _dataSerializer));
             }
         }
 
@@ -179,7 +179,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
             }
             else if (message.MessageType == MessageType.TelemetryEventMessage)
             {
-                runEventsHandler?.HandleRawMessage(rawMessage);
+                runEventsHandler.DispatchProtocolMessage(new ProtocolEnvelope(rawMessage, message, _dataSerializer));
             }
         }
 

@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -15,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessin
 /// The test run attachments processing events handler.
 /// </summary>
 ///
-public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProcessingEventsHandler
+public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProcessingEventsHandler, IProtocolEnvelopeHandler
 {
     private readonly ICommunicationManager _communicationManager;
 
@@ -70,5 +71,10 @@ public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProc
     public void HandleRawMessage(string rawMessage)
     {
         // No-Op
+    }
+
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
+        // No-op by design. Attachments processing uses typed progress/complete callbacks here.
     }
 }

@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
 /// <summary>
 /// The test run events handler.
 /// </summary>
-public class TestInitializeEventsHandler : ITestMessageEventHandler
+public class TestInitializeEventsHandler : ITestMessageEventHandler, IProtocolEnvelopeHandler
 {
     private readonly ITestRequestHandler _requestHandler;
 
@@ -58,5 +58,11 @@ public class TestInitializeEventsHandler : ITestMessageEventHandler
     {
         // No-Op
         // TestHost at this point has no functionality where it requires rawmessage
+    }
+
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
+        // No-op by design. This handler has no raw protocol consumers, but implementing the
+        // interface keeps the message on the shared internal pipeline.
     }
 }

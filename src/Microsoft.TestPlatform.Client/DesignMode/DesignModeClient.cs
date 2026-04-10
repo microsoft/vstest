@@ -28,6 +28,7 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+using TPDebug = Microsoft.VisualStudio.TestPlatform.Common.TPDebug;
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 

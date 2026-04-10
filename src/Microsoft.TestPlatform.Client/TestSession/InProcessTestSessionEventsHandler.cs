@@ -3,12 +3,14 @@
 
 using System;
 
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace Microsoft.VisualStudio.TestPlatform.Client;
 
-internal class InProcessTestSessionEventsHandler : ITestSessionEventsHandler
+internal class InProcessTestSessionEventsHandler : ITestSessionEventsHandler, IProtocolEnvelopeHandler
 {
     private readonly ITestSessionEventsHandler _testSessionEventsHandler;
 
@@ -38,6 +40,12 @@ internal class InProcessTestSessionEventsHandler : ITestSessionEventsHandler
         //
         // Consider changing this logic in the future if TW changes the handling logic for raw
         // messages.
+    }
+
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
+        // Intentionally no-op. In-process translation layer callers should not surface raw
+        // session messages to the wrapped handler.
     }
 
     public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs? eventArgs)

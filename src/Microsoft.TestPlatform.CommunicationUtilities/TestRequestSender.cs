@@ -534,20 +534,22 @@ public class TestRequestSender : ITestRequestSender
             TPDebug.Assert(rawMessage is not null, "rawMessage is null");
             TPDebug.Assert(_channel is not null, "_channel is null");
 
-            // Send raw message first to unblock handlers waiting to send message to IDEs
-            testRunEventsHandler.HandleRawMessage(rawMessage);
+            var protocolEnvelope = CreateProtocolEnvelope(rawMessage);
 
-            // PERF: DeserializeMessage happens in HandleRawMessage above, as well as here. But with fastJson path where we just grab the routing info from
-            // the raw string, it is not a big issue, it adds a handful of ms at worst. The payload does not get deserialized twice.
-            var message = _dataSerializer.DeserializeMessage(rawMessage);
+            // Send raw message first to unblock handlers waiting to send message to IDEs.
+            // Handlers that participate in the internal pipeline can reuse the parsed message and
+            // mutate the envelope when they need to enrich or aggregate the payload.
+            testRunEventsHandler.DispatchProtocolMessage(protocolEnvelope);
+
+            var message = protocolEnvelope.Message;
             switch (message.MessageType)
             {
                 case MessageType.TestRunStatsChange:
-                    var testRunChangedArgs = _dataSerializer.DeserializePayload<TestRunChangedEventArgs>(message);
+                    var testRunChangedArgs = protocolEnvelope.GetPayload<TestRunChangedEventArgs>();
                     testRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
                     break;
                 case MessageType.ExecutionComplete:
-                    var testRunCompletePayload = _dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+                    var testRunCompletePayload = protocolEnvelope.GetPayload<TestRunCompletePayload>();
                     TPDebug.Assert(testRunCompletePayload is not null, "testRunCompletePayload is null");
 
                     testRunEventsHandler.HandleTestRunComplete(
@@ -559,12 +561,12 @@ public class TestRequestSender : ITestRequestSender
                     SetOperationComplete();
                     break;
                 case MessageType.TestMessage:
-                    var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                    var testMessagePayload = protocolEnvelope.GetPayload<TestMessagePayload>();
                     TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
                     testRunEventsHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
                     break;
                 case MessageType.LaunchAdapterProcessWithDebuggerAttached:
-                    var testProcessStartInfo = _dataSerializer.DeserializePayload<TestProcessStartInfo>(message);
+                    var testProcessStartInfo = protocolEnvelope.GetPayload<TestProcessStartInfo>();
                     int processId = testRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo!);
 
                     var data =
@@ -578,7 +580,7 @@ public class TestRequestSender : ITestRequestSender
                     break;
 
                 case MessageType.AttachDebugger:
-                    var testProcessAttachDebuggerPayload = _dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
+                    var testProcessAttachDebuggerPayload = protocolEnvelope.GetPayload<TestProcessAttachDebuggerPayload>();
                     TPDebug.Assert(testProcessAttachDebuggerPayload is not null, "testProcessAttachDebuggerPayload is null");
                     AttachDebuggerInfo attachDebugerInfo = MessageConverter.ConvertToAttachDebuggerInfo(testProcessAttachDebuggerPayload, message, _protocolVersion);
                     bool result = testRunEventsHandler.AttachDebuggerToProcess(attachDebugerInfo);
@@ -613,10 +615,12 @@ public class TestRequestSender : ITestRequestSender
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
             EqtTrace.Verbose("TestRequestSender.OnDiscoveryMessageReceived: Received message: {0}", rawMessage);
 
-            // Send raw message first to unblock handlers waiting to send message to IDEs
-            discoveryEventsHandler.HandleRawMessage(rawMessage);
+            var protocolEnvelope = CreateProtocolEnvelope(rawMessage);
 
-            var data = _dataSerializer.DeserializeMessage(rawMessage);
+            // Send raw message first to unblock handlers waiting to send message to IDEs.
+            discoveryEventsHandler.DispatchProtocolMessage(protocolEnvelope);
+
+            var data = protocolEnvelope.Message;
             if (data is null)
             {
                 EqtTrace.Error("TestRequestSender.OnDiscoveryMessageReceived: Deserialized message is null: {0}", rawMessage);
@@ -627,11 +631,11 @@ public class TestRequestSender : ITestRequestSender
             switch (data.MessageType)
             {
                 case MessageType.TestCasesFound:
-                    var testCases = _dataSerializer.DeserializePayload<IEnumerable<TestCase>>(data);
+                    var testCases = protocolEnvelope.GetPayload<IEnumerable<TestCase>>();
                     discoveryEventsHandler.HandleDiscoveredTests(testCases);
                     break;
                 case MessageType.DiscoveryComplete:
-                    var payload = _dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
+                    var payload = protocolEnvelope.GetPayload<DiscoveryCompletePayload>();
                     TPDebug.Assert(payload is not null, "payload is null");
                     var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs
                     {
@@ -651,8 +655,7 @@ public class TestRequestSender : ITestRequestSender
                     SetOperationComplete();
                     break;
                 case MessageType.TestMessage:
-                    var testMessagePayload = _dataSerializer.DeserializePayload<TestMessagePayload>(
-                        data);
+                    var testMessagePayload = protocolEnvelope.GetPayload<TestMessagePayload>();
                     TPDebug.Assert(testMessagePayload is not null, "testMessagePayload is null");
                     discoveryEventsHandler.HandleLogMessage(
                         testMessagePayload.MessageLevel,
@@ -685,7 +688,7 @@ public class TestRequestSender : ITestRequestSender
         var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, null, TimeSpan.Zero);
         var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
         var rawMessage = _dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
-        testRunEventsHandler.HandleRawMessage(rawMessage);
+        testRunEventsHandler.DispatchRawMessage(rawMessage, _dataSerializer);
 
         // notify of a test run complete and bail out.
         testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
@@ -722,7 +725,7 @@ public class TestRequestSender : ITestRequestSender
             TotalTests = -1
         };
         var rawMessage = _dataSerializer.SerializePayload(MessageType.DiscoveryComplete, payload);
-        eventHandler.HandleRawMessage(rawMessage);
+        eventHandler.DispatchRawMessage(rawMessage, _dataSerializer);
 
         // Complete discovery
         eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
@@ -780,7 +783,12 @@ public class TestRequestSender : ITestRequestSender
         // Log to vs ide test output
         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
         var rawMessage = _dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-        _messageEventHandler.HandleRawMessage(rawMessage);
+        _messageEventHandler.DispatchRawMessage(rawMessage, _dataSerializer);
+    }
+
+    private ProtocolEnvelope CreateProtocolEnvelope(string rawMessage)
+    {
+        return new ProtocolEnvelope(rawMessage, _dataSerializer.DeserializeMessage(rawMessage), _dataSerializer);
     }
 
     private bool IsOperationComplete()

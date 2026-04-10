@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 /// <summary>
 /// ParallelDiscoveryEventsHandler for handling the discovery events in case of parallel discovery
 /// </summary>
-internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
+internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2, IProtocolEnvelopeHandler
 {
     private readonly IProxyDiscoveryManager _proxyDiscoveryManager;
     private readonly ITestDiscoveryEventsHandler2 _actualDiscoveryEventsHandler;
@@ -161,22 +161,22 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     /// <inheritdoc/>
     public void HandleRawMessage(string rawMessage)
     {
-        // In case of parallel - we can send everything but handle complete
-        // DiscoveryComplete is not true-end of the overall discovery as we only get completion of one host here
-        // Always aggregate data, deserialize and raw for complete events
-        var message = _dataSerializer.DeserializeMessage(rawMessage);
+        ((IProtocolEnvelopeHandler)this).HandleProtocolMessage(new ProtocolEnvelope(rawMessage, _dataSerializer.DeserializeMessage(rawMessage), _dataSerializer));
+    }
 
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
         // Do not send CancellationRequested message to Output window in IDE, as it is not useful for user
-        if (string.Equals(message.MessageType, MessageType.TestMessage)
-            && rawMessage.IndexOf(CommonResources.CancellationRequested) >= 0)
+        if (string.Equals(protocolEnvelope.MessageType, MessageType.TestMessage)
+            && protocolEnvelope.RawMessage.IndexOf(CommonResources.CancellationRequested) >= 0)
         {
             return;
         }
 
         // Do not deserialize further
-        if (!string.Equals(MessageType.DiscoveryComplete, message.MessageType))
+        if (!string.Equals(MessageType.DiscoveryComplete, protocolEnvelope.MessageType))
         {
-            _actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+            _actualDiscoveryEventsHandler.DispatchProtocolMessage(protocolEnvelope);
         }
     }
 
@@ -200,6 +200,6 @@ internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     private void ConvertToRawMessageAndSend(string messageType, object payload)
     {
         var rawMessage = _dataSerializer.SerializePayload(messageType, payload, _requestData.ProtocolConfig!.Version);
-        _actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+        _actualDiscoveryEventsHandler.DispatchRawMessage(rawMessage, _dataSerializer);
     }
 }

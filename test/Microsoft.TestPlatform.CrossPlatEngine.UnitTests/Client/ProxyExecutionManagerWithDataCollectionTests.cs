@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -196,6 +197,26 @@ public class ProxyExecutionManagerWithDataCollectionTests
     }
 
     [TestMethod]
+    public void DataCollectionRunEventsHandlerShouldReplayCachedRawMessagesThroughProtocolEnvelopeHandlers()
+    {
+        var protocolAwareHandler = new ProtocolAwareRunEventsHandler();
+        string rawMessage = JsonDataSerializer.Instance.SerializePayload(
+            MessageType.TestMessage,
+            new TestMessagePayload { MessageLevel = TestMessageLevel.Informational, Message = "hello" });
+
+        _proxyExecutionManager.DataCollectionRunEventsHandler.HandleRawMessage(rawMessage);
+        foreach (var message in _proxyExecutionManager.DataCollectionRunEventsHandler.RawMessages)
+        {
+            protocolAwareHandler.DispatchRawMessage(message, JsonDataSerializer.Instance);
+        }
+        _proxyExecutionManager.DataCollectionRunEventsHandler.RawMessages.Clear();
+
+        CollectionAssert.Contains(protocolAwareHandler.ProtocolMessages, rawMessage);
+        Assert.IsEmpty(protocolAwareHandler.RawMessages);
+        Assert.IsEmpty(_proxyExecutionManager.DataCollectionRunEventsHandler.RawMessages);
+    }
+
+    [TestMethod]
     public void TestHostManagerHostLaunchedTriggerShouldSendTestHostLaunchedEvent()
     {
         var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, Framework.DefaultFramework, _mockDataCollectionManager.Object);
@@ -224,5 +245,44 @@ internal class TestableProxyExecutionManagerWithDataCollection : ProxyExecutionM
     public override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
     {
         return base.UpdateTestProcessStartInfo(testProcessStartInfo);
+    }
+}
+
+internal sealed class ProtocolAwareRunEventsHandler : IInternalTestRunEventsHandler, IProtocolEnvelopeHandler
+{
+    public List<string> ProtocolMessages { get; } = [];
+
+    public List<string> RawMessages { get; } = [];
+
+    public void HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
+    {
+        ProtocolMessages.Add(protocolEnvelope.RawMessage);
+    }
+
+    public void HandleRawMessage(string rawMessage)
+    {
+        RawMessages.Add(rawMessage);
+    }
+
+    public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs? lastChunkArgs, ICollection<AttachmentSet>? runContextAttachments, ICollection<string>? executorUris)
+    {
+    }
+
+    public void HandleTestRunStatsChange(TestRunChangedEventArgs? testRunChangedArgs)
+    {
+    }
+
+    public void HandleLogMessage(TestMessageLevel level, string? message)
+    {
+    }
+
+    public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo? testProcessStartInfo)
+    {
+        return -1;
+    }
+
+    public bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo)
+    {
+        return false;
     }
 }

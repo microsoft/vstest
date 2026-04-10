@@ -5,6 +5,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -14,7 +16,7 @@ using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
 
-internal class PostProcessingTestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProcessingEventsHandler
+internal class PostProcessingTestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProcessingEventsHandler, IProtocolEnvelopeHandler
 {
     private readonly IOutput _consoleOutput;
     private readonly ConcurrentBag<AttachmentSet> _attachmentsSet = new();
@@ -28,6 +30,9 @@ internal class PostProcessingTestRunAttachmentsProcessingEventsHandler : ITestRu
     { }
 
     public void HandleRawMessage(string rawMessage)
+    { }
+
+    void IProtocolEnvelopeHandler.HandleProtocolMessage(ProtocolEnvelope protocolEnvelope)
     { }
 
     public void HandleTestRunAttachmentsProcessingProgress(TestRunAttachmentsProcessingProgressEventArgs attachmentsProcessingProgressEventArgs)
