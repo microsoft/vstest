@@ -310,7 +310,7 @@ public class HtmlLogger : ITestLoggerWithParameters
     {
         try
         {
-            var fileName = string.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}",
+            var fileName = string.Format(CultureInfo.InvariantCulture, "{0}_{1}_{2}",
                 Environment.GetEnvironmentVariable("UserName"), Environment.MachineName,
                 FormatDateTimeForRunName(DateTime.Now));
 
@@ -359,7 +359,7 @@ public class HtmlLogger : ITestLoggerWithParameters
             {
                 // Use FileMode.CreateNew for atomic "create if not exists" to avoid
                 // cross-process race conditions when multiple vstest processes run in parallel.
-                using var _ = new FileStream(fullFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+                using var _ = _fileHelper.GetStream(fullFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
                 return fullFilePath;
             }
             catch (IOException) when (File.Exists(fullFilePath))
@@ -373,7 +373,7 @@ public class HtmlLogger : ITestLoggerWithParameters
 
     private static string FormatDateTimeForRunName(DateTime timeStamp)
     {
-        return timeStamp.ToString("yyyyMMdd_HHmmss.fffffff", DateTimeFormatInfo.InvariantInfo);
+        return timeStamp.ToString("yyyyMMdd_HHmmssfff", DateTimeFormatInfo.InvariantInfo);
     }
 
     /// <summary>
