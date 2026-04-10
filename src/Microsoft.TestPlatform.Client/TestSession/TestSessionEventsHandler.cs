@@ -62,9 +62,11 @@ internal class TestSessionEventsHandler : ITestSessionEventsHandler
         _communicationManager.SendMessage(MessageType.TestMessage, messagePayload);
     }
 
+#if !NET
     /// <inheritdoc />
     public void HandleRawMessage(string rawMessage)
     {
         // No-op.
     }
+#endif
 }

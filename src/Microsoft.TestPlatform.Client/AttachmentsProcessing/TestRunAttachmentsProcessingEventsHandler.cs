@@ -66,9 +66,11 @@ public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProc
         _communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
     }
 
+#if !NET
     /// <inheritdoc/>
     public void HandleRawMessage(string rawMessage)
     {
         // No-Op
     }
+#endif
 }

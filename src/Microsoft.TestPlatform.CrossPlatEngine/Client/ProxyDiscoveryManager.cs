@@ -311,6 +311,8 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
             _discoveryDataAggregator.MarkSourcesWithStatus(new[] { _previousSource }, DiscoveryStatus.FullyDiscovered);
             _previousSource = null;
         }
+
+        Close();
         _baseTestDiscoveryEventsHandler?.HandleDiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
     }
 
@@ -324,12 +326,6 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     /// <inheritdoc/>
     public void HandleRawMessage(string rawMessage)
     {
-        var message = _dataSerializer.DeserializeMessage(rawMessage);
-        if (string.Equals(message.MessageType, MessageType.DiscoveryComplete))
-        {
-            Close();
-        }
-
         _baseTestDiscoveryEventsHandler?.HandleRawMessage(rawMessage);
     }
 

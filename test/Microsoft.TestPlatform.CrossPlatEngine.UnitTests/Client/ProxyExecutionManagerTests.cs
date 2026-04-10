@@ -567,7 +567,7 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     }
 
     [TestMethod]
-    public void ExecuteTestsCloseTestHostIfRawMessageIfOfTypeExecutionComplete()
+    public void ExecuteTestsClosesTestHostWhenHandleTestRunCompleteIsCalled()
     {
         Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
 
@@ -575,17 +575,6 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
 
         _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
         _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>())).Returns(MessageType.ExecutionComplete);
-
-        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
-        {
-            var messageType = rawMessage.Contains(MessageType.ExecutionComplete) ? MessageType.ExecutionComplete : MessageType.TestMessage;
-            var message = new Message
-            {
-                MessageType = messageType
-            };
-
-            return message;
-        });
 
         // Act.
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
@@ -595,26 +584,60 @@ public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     }
 
     [TestMethod]
-    public void ExecuteTestsShouldNotCloseTestHostIfRawMessageIsNotOfTypeExecutionComplete()
+    public void HandleRawMessageShouldNotDeserializeAndShouldForwardToBaseHandler()
     {
         Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
+
+        // Act - HandleRawMessage should be a pure passthrough.
+        _testExecutionManager.HandleRawMessage("some raw message");
+
+        // Verify - raw message is forwarded, no deserialization happens.
+        _mockDataSerializer.Verify(ds => ds.DeserializeMessage(It.IsAny<string>()), Times.Never);
+    }
+
+    [TestMethod]
+    public void HandleRawMessageShouldForwardToBaseHandlerWhenHandlerIsRegistered()
+    {
+        // Arrange: register handler via StartTestRun (connection fails, but handler gets registered).
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
         _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
-
-        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
-        {
-            var message = new Message
-            {
-                MessageType = MessageType.ExecutionInitialize
-            };
-
-            return message;
-        });
-
-        // Act.
+        _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns("test-message-payload");
+        _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>())).Returns("execution-complete-payload");
         _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
-        // Verify
-        _mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Never);
+        // Clear invocations from the error-handling path so we only track the direct call.
+        mockTestRunEventsHandler.Invocations.Clear();
+        _mockDataSerializer.Invocations.Clear();
+
+        // Act
+        _testExecutionManager.HandleRawMessage("any-raw-message");
+
+        // Assert - message forwarded as-is, no DeserializeMessage call.
+        mockTestRunEventsHandler.Verify(h => h.HandleRawMessage("any-raw-message"), Times.Once);
+        _mockDataSerializer.Verify(ds => ds.DeserializeMessage(It.IsAny<string>()), Times.Never);
+    }
+
+    [TestMethod]
+    public void HandleTestRunCompleteShouldCloseProxy()
+    {
+        // Arrange: register handler via StartTestRun to initialize the proxy.
+        Mock<IInternalTestRunEventsHandler> mockTestRunEventsHandler = new();
+        _mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
+        _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns("test-message-payload");
+        _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>())).Returns("execution-complete-payload");
+        _testExecutionManager.StartTestRun(_mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+        // Clear invocations from the error-handling path.
+        _mockTestHostManager.Invocations.Clear();
+        mockTestRunEventsHandler.Invocations.Clear();
+
+        // Act: directly call HandleTestRunComplete.
+        var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, new System.Collections.ObjectModel.Collection<AttachmentSet>(), new System.Collections.ObjectModel.Collection<InvokedDataCollector>(), TimeSpan.Zero);
+        _testExecutionManager.HandleTestRunComplete(completeArgs, null, null, null);
+
+        // Assert: Close() was called which triggers CleanTestHostAsync.
+        _mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Once);
+        mockTestRunEventsHandler.Verify(h => h.HandleTestRunComplete(completeArgs, null, null, null), Times.Once);
     }
 
     [TestMethod]

@@ -27,8 +27,10 @@ internal class PostProcessingTestRunAttachmentsProcessingEventsHandler : ITestRu
     public void HandleLogMessage(TestMessageLevel level, string? message)
     { }
 
+#if !NET
     public void HandleRawMessage(string rawMessage)
     { }
+#endif
 
     public void HandleTestRunAttachmentsProcessingProgress(TestRunAttachmentsProcessingProgressEventArgs attachmentsProcessingProgressEventArgs)
     { }

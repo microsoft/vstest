@@ -77,9 +77,11 @@ public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler2
         _requestHandler.SendLog(level, message);
     }
 
+#if !NET
     public void HandleRawMessage(string rawMessage)
     {
         // No-Op
         // TestHost at this point has no functionality where it requires rawmessage
     }
+#endif
 }

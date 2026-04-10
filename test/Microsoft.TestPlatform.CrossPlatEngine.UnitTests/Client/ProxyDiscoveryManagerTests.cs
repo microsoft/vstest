@@ -385,23 +385,12 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
     }
 
     [TestMethod]
-    public void DiscoverTestsCloseTestHostIfRawMessageIsOfTypeDiscoveryComplete()
+    public void DiscoverTestsClosesTestHostWhenHandleDiscoveryCompleteIsCalled()
     {
         Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
 
         _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
         _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>())).Returns(MessageType.DiscoveryComplete);
-
-        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
-        {
-            var messageType = rawMessage.Contains(MessageType.DiscoveryComplete) ? MessageType.DiscoveryComplete : MessageType.TestMessage;
-            var message = new Message
-            {
-                MessageType = messageType
-            };
-
-            return message;
-        });
 
         // Act.
         _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
@@ -411,25 +400,59 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
     }
 
     [TestMethod]
-    public void DiscoverTestsShouldNotCloseTestHostIfRawMessageIsNotOfTypeDiscoveryComplete()
+    public void HandleRawMessageShouldNotDeserializeAndShouldForwardToBaseHandler()
     {
         Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
 
-        _mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
-        {
-            var message = new Message
-            {
-                MessageType = MessageType.DiscoveryInitialize
-            };
-
-            return message;
-        });
-
-        // Act.
+        // Arrange - register the handler so the proxy has somewhere to forward.
         _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
-        // Verify
-        _mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Never);
+        // Act - HandleRawMessage should be a pure passthrough.
+        _discoveryManager.HandleRawMessage("some raw message");
+
+        // Verify - raw message is forwarded, no deserialization happens.
+        _mockDataSerializer.Verify(ds => ds.DeserializeMessage("some raw message"), Times.Never);
+    }
+
+    [TestMethod]
+    public void HandleRawMessageShouldForwardToBaseHandlerWhenHandlerIsRegistered()
+    {
+        // Arrange: register handler via DiscoverTests.
+        Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+        // Clear invocations from the error-handling path so we only track the direct call.
+        mockTestDiscoveryEventsHandler.Invocations.Clear();
+        _mockDataSerializer.Invocations.Clear();
+
+        // Act
+        _discoveryManager.HandleRawMessage("any-raw-message");
+
+        // Assert - message forwarded as-is, no DeserializeMessage call.
+        mockTestDiscoveryEventsHandler.Verify(h => h.HandleRawMessage("any-raw-message"), Times.Once);
+        _mockDataSerializer.Verify(ds => ds.DeserializeMessage(It.IsAny<string>()), Times.Never);
+    }
+
+    [TestMethod]
+    public void HandleDiscoveryCompleteShouldCloseProxy()
+    {
+        // Arrange: register handler via DiscoverTests.
+        Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new();
+        _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
+        _mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>())).Returns(MessageType.DiscoveryComplete);
+        _discoveryManager.DiscoverTests(_discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+        // Clear invocations from the error-handling path.
+        _mockTestHostManager.Invocations.Clear();
+        mockTestDiscoveryEventsHandler.Invocations.Clear();
+
+        // Act: directly call HandleDiscoveryComplete.
+        var completeArgs = new DiscoveryCompleteEventArgs(-1, false);
+        _discoveryManager.HandleDiscoveryComplete(completeArgs, null);
+
+        // Assert: Close() was called which triggers CleanTestHostAsync.
+        _mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Once);
+        mockTestDiscoveryEventsHandler.Verify(h => h.HandleDiscoveryComplete(completeArgs, null), Times.Once);
     }
 
     [TestMethod]

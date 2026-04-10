@@ -52,6 +52,18 @@ public class DataCollectionTestRunEventsHandlerTests
     }
 
     [TestMethod]
+    public void HandleRawMessageShouldNotCallAfterTestRunEndForNonCompleteMessages()
+    {
+        _mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.TestMessage });
+        _testRunEventHandler.HandleRawMessage("non-complete-message");
+
+        _baseTestRunEventsHandler.Verify(th => th.HandleRawMessage("non-complete-message"), Times.Once);
+        _proxyDataCollectionManager.Verify(
+            dcm => dcm.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<IInternalTestRunEventsHandler>()),
+            Times.Never);
+    }
+
+    [TestMethod]
     public void HandleRawMessageShouldGetDataCollectorAttachments()
     {
         var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());

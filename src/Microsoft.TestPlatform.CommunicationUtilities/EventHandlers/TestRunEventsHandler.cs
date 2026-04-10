@@ -80,11 +80,13 @@ public class TestRunEventsHandler : IInternalTestRunEventsHandler
         _requestHandler.SendLog(level, message);
     }
 
+#if !NET
     public void HandleRawMessage(string rawMessage)
     {
         // No-Op
         // TestHost at this point has no functionality where it requires rawmessage
     }
+#endif
 
     /// <summary>
     /// Launches a process with a given process info under debugger

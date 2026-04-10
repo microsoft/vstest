@@ -45,7 +45,11 @@ public interface ITestMessageEventHandler
     /// Raw Message from the host directly
     /// </summary>
     /// <param name="rawMessage">raw message args from host</param>
+#if NET
+    void HandleRawMessage(string rawMessage) { }
+#else
     void HandleRawMessage(string rawMessage);
+#endif
 
     /// <summary>
     /// Handle a IMessageLogger message event from Adapter
