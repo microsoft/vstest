@@ -632,7 +632,7 @@ public class HtmlLoggerTests
             _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
             Assert.IsNotNull(_htmlLogger.XmlFilePath);
-            StringAssert.Contains(_htmlLogger.XmlFilePath, "[1].xml");
+            Assert.Contains("[1].xml", _htmlLogger.XmlFilePath);
             _mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.CreateNew, FileAccess.Write, FileShare.None), Times.AtLeast(2));
         }
         finally
