@@ -42,6 +42,8 @@ public class TrxLoggerTests
 
     private TestableTrxLogger _testableTrxLogger;
 
+    public TestContext TestContext { get; set; }
+
     public TrxLoggerTests()
     {
         _events = new Mock<TestLoggerEvents>();
@@ -81,13 +83,10 @@ public class TrxLoggerTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfTestRunDirectoryIsEmptyOrNull()
     {
+        var events = new Mock<TestLoggerEvents>();
+        _parameters[DefaultLoggerParameterNames.TestRunDirectory] = null!;
         Assert.ThrowsExactly<ArgumentNullException>(
-            () =>
-            {
-                var events = new Mock<TestLoggerEvents>();
-                _parameters[DefaultLoggerParameterNames.TestRunDirectory] = null!;
-                _testableTrxLogger.Initialize(events.Object, _parameters);
-            });
+            () => _testableTrxLogger.Initialize(events.Object, _parameters));
     }
 
     [TestMethod]
@@ -133,7 +132,7 @@ public class TrxLoggerTests
         _testableTrxLogger.TestMessageHandler(new object(), trme);
         _testableTrxLogger.TestMessageHandler(new object(), trme);
 
-        Assert.AreEqual(2, _testableTrxLogger.GetRunLevelErrorsAndWarnings().Count);
+        Assert.HasCount(2, _testableTrxLogger.GetRunLevelErrorsAndWarnings());
     }
 
     [TestMethod]
@@ -143,7 +142,7 @@ public class TrxLoggerTests
         TestRunMessageEventArgs trme = new(TestMessageLevel.Error, message);
         _testableTrxLogger.TestMessageHandler(new object(), trme);
 
-        Assert.AreEqual(1, _testableTrxLogger.GetRunLevelErrorsAndWarnings().Count);
+        Assert.HasCount(1, _testableTrxLogger.GetRunLevelErrorsAndWarnings());
     }
 
     [TestMethod]
@@ -632,6 +631,49 @@ public class TrxLoggerTests
     }
 
     [TestMethod]
+    public void DefaultTrxFileNameShouldIncludeFrameworkWhenAvailable()
+    {
+        _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v10.0";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
+        Assert.IsNotNull(fileName);
+        Assert.Contains("_net10.0", fileName, $"Expected TFM 'net10.0' in filename but got: {fileName}");
+        Assert.EndsWith(".trx", fileName, $"Expected .trx extension but got: {fileName}");
+    }
+
+    [TestMethod]
+    public void DefaultTrxFileNameShouldWorkWithoutFramework()
+    {
+        _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
+        Assert.IsNotNull(fileName);
+        Assert.EndsWith(".trx", fileName, $"Expected .trx extension but got: {fileName}");
+    }
+
+    [TestMethod]
+    public void DefaultTrxFileNameShouldUseRawStringWhenFrameworkCannotBeParsed()
+    {
+        _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = "SomeCustomFramework";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        MakeTestRunComplete();
+
+        var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
+        Assert.IsNotNull(fileName);
+        Assert.Contains("_SomeCustomFramework", fileName, $"Expected raw framework string in filename but got: {fileName}");
+        Assert.EndsWith(".trx", fileName, $"Expected .trx extension but got: {fileName}");
+    }
+
+    [TestMethod]
     public void DefaultTrxFileNameVerification()
     {
         _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
@@ -658,7 +700,7 @@ public class TrxLoggerTests
 
         var files = TestMultipleTrxLoggers();
 
-        Assert.AreEqual(MultipleLoggerInstanceCount, files.Length, "All logger instances should get different file names!");
+        Assert.HasCount(MultipleLoggerInstanceCount, files, "All logger instances should get different file names!");
     }
 
     [TestMethod]
@@ -666,7 +708,7 @@ public class TrxLoggerTests
     {
         var files = TestMultipleTrxLoggers();
 
-        Assert.AreEqual(1, files.Length, "All logger instances should get the same file name!");
+        Assert.HasCount(1, files, "All logger instances should get the same file name!");
     }
 
     [TestMethod]
@@ -677,7 +719,7 @@ public class TrxLoggerTests
 
         var files = TestMultipleTrxLoggers();
 
-        Assert.AreEqual(MultipleLoggerInstanceCount, files.Length, "All logger instances should get different file names!");
+        Assert.HasCount(MultipleLoggerInstanceCount, files, "All logger instances should get different file names!");
     }
 
     private string?[] TestMultipleTrxLoggers()
@@ -898,7 +940,7 @@ public class TrxLoggerTests
 
     private static void ValidateTimeWithinUtcLimits(DateTimeOffset dateTime)
     {
-        Assert.IsTrue(dateTime.UtcDateTime.Subtract(DateTime.UtcNow) < new TimeSpan(0, 0, 0, 60));
+        Assert.IsLessThan(new TimeSpan(0, 0, 0, 60), dateTime.UtcDateTime.Subtract(DateTime.UtcNow));
     }
 
     private static string? GetElementValueFromTrx(string trxFileName, string fieldName)
@@ -925,7 +967,7 @@ public class TrxLoggerTests
 
         var tasks = Enumerable.Range(0, threadCount).Select(t => Task.Run(() =>
         {
-            barrier.SignalAndWait();
+            barrier.SignalAndWait(TestContext.CancellationToken);
             for (int i = 0; i < testsPerThread; i++)
             {
                 var testCase = CreateTestCase($"Test_{t}_{i}");
@@ -935,9 +977,9 @@ public class TrxLoggerTests
                 };
                 _testableTrxLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result).Object);
             }
-        })).ToArray();
+        }, TestContext.CancellationToken)).ToArray();
 
-        Task.WaitAll(tasks);
+        Task.WaitAll(tasks, TestContext.CancellationToken);
 
         Assert.AreEqual(threadCount * testsPerThread, _testableTrxLogger.TotalTestCount,
             "Total test count should be exact under concurrent updates");

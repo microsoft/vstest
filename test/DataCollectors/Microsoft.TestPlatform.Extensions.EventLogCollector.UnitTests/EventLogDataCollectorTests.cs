@@ -220,21 +220,21 @@ public class EventLogDataCollectorTests
     public void TestSessionStartEventShouldCreateEventLogContainer()
     {
         var eventLogDataCollector = new EventLogDataCollector();
-        Assert.AreEqual(0, eventLogDataCollector.ContextMap.Count);
+        Assert.IsEmpty(eventLogDataCollector.ContextMap);
         eventLogDataCollector.Initialize(null, _mockDataCollectionEvents.Object, _mockDataCollectionSink, _mockDataCollectionLogger.Object, _dataCollectionEnvironmentContext);
         _mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs());
-        Assert.AreEqual(1, eventLogDataCollector.ContextMap.Count);
+        Assert.HasCount(1, eventLogDataCollector.ContextMap);
     }
 
     [TestMethod]
     public void TestCaseStartEventShouldCreateEventLogContainer()
     {
         var eventLogDataCollector = new EventLogDataCollector();
-        Assert.AreEqual(0, eventLogDataCollector.ContextMap.Count);
+        Assert.IsEmpty(eventLogDataCollector.ContextMap);
 
         eventLogDataCollector.Initialize(null, _mockDataCollectionEvents.Object, _mockDataCollectionSink, _mockDataCollectionLogger.Object, _dataCollectionEnvironmentContext);
         _mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid())), new TestCase()));
-        Assert.AreEqual(1, eventLogDataCollector.ContextMap.Count);
+        Assert.HasCount(1, eventLogDataCollector.ContextMap);
     }
 
     [TestMethod]

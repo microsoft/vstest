@@ -22,7 +22,7 @@ public class UnitTestClientTests
         var argument = "--port 8080 --endpoint 127.0.0.1:8020 --diag \"abc txt\"";
         string[] argsArr = UnitTestClient.SplitArguments(argument);
 
-        Assert.AreEqual(6, argsArr.Length);
+        Assert.HasCount(6, argsArr);
         CollectionAssert.AreEqual(argsArr, expected);
     }
 
@@ -33,7 +33,7 @@ public class UnitTestClientTests
         var argument = "--port 8080 --endpoint 127.0.0.1:8020 --diag \'abc txt\'";
         string[] argsArr = UnitTestClient.SplitArguments(argument);
 
-        Assert.AreEqual(6, argsArr.Length);
+        Assert.HasCount(6, argsArr);
         CollectionAssert.AreEqual(expected, argsArr);
     }
 
@@ -44,7 +44,7 @@ public class UnitTestClientTests
         var argument = "--port 8080 --endpoint 127.0.0.1:8020 --diag abc txt";
         string[] argsArr = UnitTestClient.SplitArguments(argument);
 
-        Assert.AreEqual(7, argsArr.Length);
+        Assert.HasCount(7, argsArr);
         CollectionAssert.AreEqual(expected, argsArr);
     }
 

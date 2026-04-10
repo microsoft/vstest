@@ -41,6 +41,8 @@ public class BlameCollectorTests
     private readonly XmlElement? _configurationElement;
     private readonly string _filepath;
 
+    public TestContext TestContext { get; set; } = null!;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="BlameCollectorTests"/> class.
     /// </summary>
@@ -186,7 +188,7 @@ public class BlameCollectorTests
             _mockLogger.Object,
             _context);
 
-        hangBasedDumpcollected.Wait(1000);
+        hangBasedDumpcollected.Wait(1000, TestContext.CancellationToken);
         _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
         _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
         _mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
@@ -220,7 +222,7 @@ public class BlameCollectorTests
             _mockLogger.Object,
             _context);
 
-        hangBasedDumpcollected.Wait(1000);
+        hangBasedDumpcollected.Wait(1000, TestContext.CancellationToken);
         _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
         _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
     }
@@ -255,7 +257,7 @@ public class BlameCollectorTests
             _mockLogger.Object,
             _context);
 
-        hangBasedDumpcollected.Wait(1000);
+        hangBasedDumpcollected.Wait(1000, TestContext.CancellationToken);
         _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
         _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
         _mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
@@ -764,7 +766,7 @@ public class BlameCollectorTests
         {
             var task = Task.Run(() =>
             {
-                barrier.SignalAndWait();
+                barrier.SignalAndWait(TestContext.CancellationToken);
                 for (int i = 0; i < 50; i++)
                 {
                     var testcase = new TestCase($"TestProject.UnitTest.TestMethod{Guid.NewGuid()}", new Uri("test:/abc"), "abc.dll");
@@ -776,12 +778,12 @@ public class BlameCollectorTests
                     _mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testcase));
                     _mockDataColectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testcase, TestOutcome.Passed));
                 }
-            });
+            }, TestContext.CancellationToken);
             tasks.Add(task);
         }
 
         // This must not throw due to concurrent collection modifications
-        Task.WaitAll(tasks.ToArray());
+        Task.WaitAll(tasks.ToArray(), TestContext.CancellationToken);
 
         // Raise session end - all tests completed so no sequence file should be written
         _mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(_dataCollectionContext));

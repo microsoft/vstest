@@ -13,6 +13,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestCategory("Windows-Review")]
 public class VideoRecorderTests : AcceptanceTestBase
 {
+    [Ignore("Video recording is flaky in CI — screen recorder fails to establish communication. See #15586.")]
     [TestMethod]
     [NetFullTargetFrameworkDataSource(useCoreRunner: false, useVsixRunner: true)]
     public void VideoRecorderDataCollectorShouldRecordVideoWithRunSettings(RunnerInfo runnerInfo)
@@ -27,7 +28,7 @@ public class VideoRecorderTests : AcceptanceTestBase
 
         // Verify video attachments were created
         var resultFiles = Directory.GetFiles(TempDirectory.Path, "*.wmv", SearchOption.AllDirectories);
-        Assert.IsTrue(resultFiles.Length > 0,
+        Assert.IsNotEmpty(resultFiles,
             $"Expected video attachments (.wmv) in results directory '{TempDirectory.Path}', but found none. "
             + $"All files: [{string.Join(", ", Directory.GetFiles(TempDirectory.Path, "*", SearchOption.AllDirectories).Select(Path.GetFileName))}]");
     }

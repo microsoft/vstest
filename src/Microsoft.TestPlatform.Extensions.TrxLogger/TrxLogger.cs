@@ -536,7 +536,18 @@ public class TrxLogger : ITestLoggerWithParameters
         TPDebug.Assert(LoggerTestRun != null, "LoggerTestRun is null");
         TPDebug.Assert(LoggerTestRun.RunConfiguration != null, "LoggerTestRun.RunConfiguration is null");
         TPDebug.Assert(IsInitialized, "Logger is not initialized");
-        var defaultTrxFileName = LoggerTestRun.RunConfiguration.RunDeploymentRootDirectory + ".trx";
+
+        var baseName = LoggerTestRun.RunConfiguration.RunDeploymentRootDirectory;
+
+        if (_parametersDictionary is not null
+            && _parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var framework)
+            && !framework.IsNullOrWhiteSpace())
+        {
+            var shortName = Framework.FromString(framework)?.ShortName ?? framework;
+            baseName = baseName + "_" + shortName;
+        }
+
+        var defaultTrxFileName = baseName + ".trx";
 
         return TrxFileHelper.GetNextIterationFileName(_testResultsDirPath, defaultTrxFileName, false);
     }

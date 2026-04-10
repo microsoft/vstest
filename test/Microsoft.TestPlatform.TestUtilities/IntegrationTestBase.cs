@@ -86,7 +86,7 @@ public class IntegrationTestBase
 
     public TempDirectory TempDirectory { get; }
 
-    public TestContext? TestContext { get; set; }
+    public TestContext TestContext { get; set; } = null!;
 
     public string BuildConfiguration { get; }
 
@@ -210,8 +210,18 @@ public class IntegrationTestBase
     /// </summary>
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     /// <param name="environmentVariables">Environment variables to set to the started process.</param>
-    public void InvokeVsTest(string? arguments, Dictionary<string, string?>? environmentVariables = null)
+    /// <param name="collectDiagnostics">When true, automatically adds --diag flag and attaches logs to test results on failure.</param>
+    public void InvokeVsTest(string? arguments, Dictionary<string, string?>? environmentVariables = null, bool collectDiagnostics = true)
     {
+        if (collectDiagnostics && !IsDiagAlreadyEnabled(arguments ?? ""))
+        {
+            var diagLogsDir = Path.Combine(TempDirectory.Path, "logs");
+            Directory.CreateDirectory(diagLogsDir);
+            arguments = string.Concat(arguments, GetDiagArg(diagLogsDir));
+            _attachments.Add(diagLogsDir);
+            Console.WriteLine($"Diagnostic logs directory: {diagLogsDir}");
+        }
+
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
         ExecuteVsTestConsole(arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables);
         FormatStandardOutCome();
@@ -223,7 +233,8 @@ public class IntegrationTestBase
     /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
     /// <param name="environmentVariables">Environment variables to set to the started process.</param>
     /// <param name="workingDirectory"></param>
-    public void InvokeDotnetTest(string arguments, Dictionary<string, string?>? environmentVariables = null, string? workingDirectory = null)
+    /// <param name="collectDiagnostics">When true, automatically adds --diag flag and attaches logs to test results on failure.</param>
+    public void InvokeDotnetTest(string arguments, Dictionary<string, string?>? environmentVariables = null, string? workingDirectory = null, bool collectDiagnostics = true)
     {
         string globalJsonPath = Path.Combine(workingDirectory!, "global.json");
         if (workingDirectory is not null && !File.Exists(globalJsonPath))
@@ -272,6 +283,28 @@ public class IntegrationTestBase
         // https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestForwardingApp.cs#L30-L39
         debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
 
+        if (collectDiagnostics && !IsDiagAlreadyEnabled(arguments))
+        {
+            var diagLogsDir = Path.Combine(TempDirectory.Path, "logs");
+            Directory.CreateDirectory(diagLogsDir);
+            var diagPath = Path.Combine(diagLogsDir, "log.txt");
+            var diagArg = " --diag " + diagPath.AddDoubleQuote();
+
+            // Insert --diag before the -- separator so dotnet test forwards it to vstest.console.
+            var separatorPos = arguments.IndexOf(" -- ");
+            if (separatorPos == -1)
+            {
+                arguments += diagArg;
+            }
+            else
+            {
+                arguments = arguments.Insert(separatorPos, diagArg);
+            }
+
+            _attachments.Add(diagLogsDir);
+            Console.WriteLine($"Diagnostic logs directory: {diagLogsDir}");
+        }
+
         IntegrationTestBase.ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables, workingDirectory);
         FormatStandardOutCome();
     }
@@ -284,14 +317,16 @@ public class IntegrationTestBase
     /// <param name="framework">Dotnet Framework of test assembly.</param>
     /// <param name="runSettings">Run settings for execution.</param>
     /// <param name="environmentVariables">Environment variables to set to the started process.</param>
+    /// <param name="collectDiagnostics">When true, automatically adds --diag flag and attaches logs to test results on failure.</param>
     public void InvokeVsTestForExecution(string testAssembly,
         string? testAdapterPath,
         string framework,
         string? runSettings = "",
-        Dictionary<string, string?>? environmentVariables = null)
+        Dictionary<string, string?>? environmentVariables = null,
+        bool collectDiagnostics = true)
     {
         var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
-        InvokeVsTest(arguments, environmentVariables);
+        InvokeVsTest(arguments, environmentVariables, collectDiagnostics);
     }
 
     private Dictionary<string, string?> AddDebugEnvironmentVariables(Dictionary<string, string?>? environmentVariables)
@@ -388,9 +423,9 @@ public class IntegrationTestBase
                 _standardTestError,
                 Environment.NewLine,
                 _arguments);
-            StringAssert.DoesNotMatch(
-                _standardTestOutput,
-                new Regex(summaryStatus), errorSummary)
+            Assert.DoesNotMatchRegex(
+                new Regex(summaryStatus),
+                _standardTestOutput, errorSummary)
                ;
         }
         else
@@ -417,8 +452,9 @@ public class IntegrationTestBase
                 _standardTestError,
                 Environment.NewLine,
                 _arguments);
-            Assert.IsTrue(
-                _standardTestOutput.Contains(summaryStatus),
+            Assert.Contains(
+                summaryStatus,
+                _standardTestOutput,
                 errorSummary
                 );
         }
@@ -442,9 +478,9 @@ public class IntegrationTestBase
                 _standardTestError,
                 Environment.NewLine,
                 _arguments);
-            StringAssert.DoesNotMatch(
-                _standardTestOutput,
+            Assert.DoesNotMatchRegex(
                 new Regex("Total tests\\:"),
+                _standardTestOutput,
                 errorSummary);
         }
         else
@@ -471,15 +507,16 @@ public class IntegrationTestBase
                 _standardTestError,
                 Environment.NewLine,
                 _arguments);
-            Assert.IsTrue(
-                _standardTestOutput.Contains(summaryStatus),
+            Assert.Contains(
+                summaryStatus,
+                _standardTestOutput,
                 errorSummary);
         }
     }
 
     public void StdErrorContains(string substring)
     {
-        Assert.IsTrue(_standardTestError.Contains(substring), $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
+        Assert.Contains(substring, _standardTestError, $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
     }
 
     public void StdErrorRegexIsMatch(string pattern)
@@ -489,17 +526,17 @@ public class IntegrationTestBase
 
     public void StdErrorDoesNotContains(string substring)
     {
-        Assert.IsFalse(_standardTestError.Contains(substring), $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
+        Assert.DoesNotContain(substring, _standardTestError, $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
     }
 
     public void StdOutputContains(string substring)
     {
-        Assert.IsTrue(_standardTestOutput.Contains(substring), $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.Contains(substring, _standardTestOutput, $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void StdOutputDoesNotContains(string substring)
     {
-        Assert.IsFalse(_standardTestOutput.Contains(substring), $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Not expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
+        Assert.DoesNotContain(substring, _standardTestOutput, $"{Environment.NewLine}StdOutput:{Environment.NewLine}{Environment.NewLine}Not expected substring: {substring}{Environment.NewLine}{Environment.NewLine}Actual string: {_standardTestOutput}");
     }
 
     public void ExitCodeEquals(int exitCode)
@@ -545,7 +582,7 @@ public class IntegrationTestBase
             Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
 
             // Verify stack information as well.
-            Assert.IsTrue(_standardTestOutput.Contains(GetTestMethodName(test)), "No stack trace for failed test: {0}", test);
+            Assert.Contains(GetTestMethodName(test), _standardTestOutput, $"No stack trace for failed test: {test}");
         }
     }
 
@@ -599,7 +636,7 @@ public class IntegrationTestBase
     public void ValidateFullyQualifiedDiscoveredTests(string filePath, params string[] discoveredTestsList)
     {
         var fileOutput = File.ReadAllLines(filePath);
-        Assert.IsTrue(fileOutput.Length == 3);
+        Assert.HasCount(3, fileOutput);
 
         foreach (var test in discoveredTestsList)
         {
@@ -1035,6 +1072,21 @@ public class IntegrationTestBase
     {
         // Double quoted sources separated by space.
         return string.Join(" ", GetTestDlls(assetNames).Select(a => a.AddDoubleQuote()));
+    }
+
+    private static bool IsDiagAlreadyEnabled(string arguments)
+    {
+        // Check args for --diag, /diag, -diag (case-insensitive)
+        if (arguments.Contains("--diag", StringComparison.OrdinalIgnoreCase)
+            || arguments.Contains("/diag", StringComparison.OrdinalIgnoreCase)
+            || arguments.Contains("-diag", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        // Check environment variable
+        var envDiag = Environment.GetEnvironmentVariable("VSTEST_DIAG");
+        return !StringUtils.IsNullOrEmpty(envDiag);
     }
 
     protected static string GetDiagArg(string rootDir)

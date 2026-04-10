@@ -32,6 +32,8 @@ pr:
       - CONTRIBUTING.md
       - README.md
       - SECURITY.md
+      - azure-pipelines-official.yml
+      - azure-pipelines-insertion.yml
 
 variables:
   # Cannot use key:value syntax in root defined variables

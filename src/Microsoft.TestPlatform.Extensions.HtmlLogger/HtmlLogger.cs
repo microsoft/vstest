@@ -292,7 +292,7 @@ public class HtmlLogger : ITestLoggerWithParameters
                 logFilePrefixValue = logFilePrefixValue + "_" + framework;
             }
 
-            logFilePrefixValue = logFilePrefixValue + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
+            logFilePrefixValue = logFilePrefixValue + DateTime.Now.ToString("_yyyyMMdd_HHmmss.fffffff", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
             HtmlFilePath = Path.Combine(TestResultsDirPath!, logFilePrefixValue);
         }
         else
@@ -373,7 +373,7 @@ public class HtmlLogger : ITestLoggerWithParameters
 
     private static string FormatDateTimeForRunName(DateTime timeStamp)
     {
-        return timeStamp.ToString("yyyyMMdd_HHmmssfff", DateTimeFormatInfo.InvariantInfo);
+        return timeStamp.ToString("yyyyMMdd_HHmmss.fffffff", DateTimeFormatInfo.InvariantInfo);
     }
 
     /// <summary>
