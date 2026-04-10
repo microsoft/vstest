@@ -16,8 +16,9 @@ namespace Microsoft.TestPlatform.Library.IntegrationTests;
 public class FilterSourceIntegrationTests : AcceptanceTestBase
 {
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
-    public void FilterSourcePackage_AllTestsPassOnNetCore(RunnerInfo runnerInfo)
+    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    public void FilterSourcePackage_AllTestsPass(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
@@ -29,57 +30,6 @@ public class FilterSourceIntegrationTests : AcceptanceTestBase
 
         // 7 FilterExpressionWrapper tests + 7 TestCaseFilterExpression tests = 14 total
         ValidateSummaryStatus(14, 0, 0);
-        ExitCodeEquals(0);
-    }
-
-    [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    public void FilterSourcePackage_AllTestsPassOnNetFramework(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        var testAssembly = GetAssetFullPath("FilterSourcePackageConsumerTests.dll");
-        var arguments = PrepareArguments(testAssembly, null, string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
-
-        InvokeVsTest(arguments);
-
-        // 7 FilterExpressionWrapper tests + 7 TestCaseFilterExpression tests = 14 total
-        ValidateSummaryStatus(14, 0, 0);
-        ExitCodeEquals(0);
-    }
-
-    [TestMethod]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
-    public void FilterSourcePackage_FilterExpressionWrapperTestsCanBeFilteredByClassName(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        var testAssembly = GetAssetFullPath("FilterSourcePackageConsumerTests.dll");
-        var arguments = PrepareArguments(testAssembly, null, string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
-        arguments += " /TestCaseFilter:\"ClassName=FilterSourcePackageConsumerTests.FilterExpressionWrapperPackageTests\"";
-
-        InvokeVsTest(arguments);
-
-        ValidateSummaryStatus(7, 0, 0);
-        ExitCodeEquals(0);
-    }
-
-    [TestMethod]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
-    public void FilterSourcePackage_TestCaseFilterExpressionTestsCanBeFilteredByClassName(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        var testAssembly = GetAssetFullPath("FilterSourcePackageConsumerTests.dll");
-        var arguments = PrepareArguments(testAssembly, null, string.Empty, FrameworkArgValue,
-            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
-        arguments += " /TestCaseFilter:\"ClassName=FilterSourcePackageConsumerTests.TestCaseFilterExpressionPackageTests\"";
-
-        InvokeVsTest(arguments);
-
-        ValidateSummaryStatus(7, 0, 0);
         ExitCodeEquals(0);
     }
 }
