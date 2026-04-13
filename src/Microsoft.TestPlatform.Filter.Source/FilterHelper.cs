@@ -16,7 +16,13 @@ using Microsoft.CodeAnalysis;
 using static Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.Resources;
 #endif
 
+// Because FilterHelper is public, changing the namespace for filter package to avoid collisions.
+// This also makes it such that all types in filter source package use the same Common.Filtering namespace.
+#if IS_VSTEST_REPO
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+#else
+namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
+#endif
 
 #if IS_VSTEST_REPO
 public static class FilterHelper
