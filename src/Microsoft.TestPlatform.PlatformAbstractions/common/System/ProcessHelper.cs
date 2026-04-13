@@ -136,7 +136,6 @@ public partial class ProcessHelper : IProcessHelper
             {
                 process.Exited += async (sender, args) =>
                 {
-                    const int timeout = 500;
 
                     if (sender is Process p)
                     {
@@ -148,15 +147,25 @@ public partial class ProcessHelper : IProcessHelper
                             // See ticket https://github.com/microsoft/vstest/issues/3375 to get the links to all
                             // issues, discussions and documentations.
                             //
-                            // On .NET 5+, we use WaitForExitAsync for a non-blocking, cancellable wait,
-                            // then call the parameterless WaitForExit() to ensure all asynchronous
-                            // output/error readers (ErrorDataReceived, OutputDataReceived) are fully
-                            // drained. Without the second call, the Exited event can fire before the
-                            // final stderr data arrives (e.g. "Stack overflow." from a crashing
-                            // testhost), causing the exit callback to read incomplete stderr.
-                            // See https://github.com/microsoft/vstest/issues/3375 for details.
-                            using var cts = new CancellationTokenSource(timeout);
-#if !NET5_0_OR_GREATER
+                            // On .NET 5+, WaitForExitAsync waits for process exit AND drains all
+                            // asynchronous output/error readers (ErrorDataReceived, OutputDataReceived).
+                            // We run it WITHOUT a CancellationToken so the drain cannot be interrupted
+                            // by threadpool starvation. Instead, we race it against a delay task to
+                            // handle zombie pipes (child process inheriting stdout/stderr handles
+                            // prevents EOF, which would block the drain indefinitely).
+                            //
+                            // For older frameworks, the solution is more tricky but it seems we can get the expected
+                            // behavior using the parameterless 'WaitForExit()' combined with an awaited Task.Run call.
+                            const int zombiePipeTimeout = 2_000;
+#if NET5_0_OR_GREATER
+                            var exitTask = p.WaitForExitAsync(CancellationToken.None);
+                            if (await Task.WhenAny(exitTask, Task.Delay(zombiePipeTimeout)).ConfigureAwait(false) != exitTask)
+                            {
+                                // Timed out — a child process likely holds the stderr/stdout pipe
+                                // handle open (e.g. Selenium WebDriver's Edge Driver). The exitTask
+                                // continues in the background and will complete when the child exits.
+                            }
+#else
                             // NOTE: In case we run on Windows we must call 'WaitForExit(timeout)' instead of calling
                             // the parameterless overload. The reason for this requirement stems from the behavior of
                             // the Selenium WebDriver when debugging a test. If the debugger is detached, the default
@@ -172,10 +181,11 @@ public partial class ProcessHelper : IProcessHelper
                             // the testhost to become a zombie process in the first place.
                             if (_environment.OperatingSystem is PlatformOperatingSystem.Windows)
                             {
-                                p.WaitForExit(timeout);
+                                p.WaitForExit(zombiePipeTimeout);
                             }
                             else
                             {
+                                using var cts = new CancellationTokenSource(zombiePipeTimeout);
                                 cts.Token.Register(() =>
                                 {
                                     try
@@ -194,12 +204,6 @@ public partial class ProcessHelper : IProcessHelper
                                 });
                                 await Task.Run(() => p.WaitForExit(), cts.Token).ConfigureAwait(false);
                             }
-#else
-                            await p.WaitForExitAsync(cts.Token);
-                            // Process has exited; drain async readers. This should be near-instant
-                            // since the process is already dead. If WaitForExitAsync was cancelled
-                            // (zombie/hung process), we skip this via the catch block.
-                            p.WaitForExit();
 #endif
                         }
                         catch

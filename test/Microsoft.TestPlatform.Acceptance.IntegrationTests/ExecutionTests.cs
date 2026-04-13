@@ -156,6 +156,39 @@ public class ExecutionTests : AcceptanceTestBase
         StdOutputDoesNotContains("Total tests: 6");
     }
 
+    /// <summary>
+    /// Verifies that aborting a hanging test run via TestSessionTimeout completes quickly.
+    /// After the timeout fires, vstest.console should kill the testhost and exit without
+    /// significant delay. This guards against regressions in ProcessHelper's Exited handler
+    /// where the async reader drain wait could slow down the abort path.
+    /// </summary>
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    public void AbortOnTimeoutShouldCompleteQuickly(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPaths = GetAssetFullPath("SimpleTestProject3.dll");
+        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /TestCaseFilter:TestSessionTimeoutTest");
+
+        // 3 second session timeout — the first test sleeps 3s so this fires quickly.
+        arguments = string.Concat(arguments, " -- RunConfiguration.TestSessionTimeout=3000");
+
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        InvokeVsTest(arguments);
+        stopwatch.Stop();
+
+        ExitCodeEquals(1);
+
+        // The session timeout is 3s. After abort, vstest.console should tear down testhost
+        // and exit quickly. Allow generous overhead for CI, but catch egregious delays
+        // (e.g., a 30s hang from a broken drain wait).
+        stopwatch.Elapsed.Should().BeLessThan(TimeSpan.FromSeconds(30),
+            "vstest.console should complete abort within a reasonable time after session timeout");
+    }
+
     [TestMethod]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
