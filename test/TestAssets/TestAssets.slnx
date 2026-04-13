@@ -72,8 +72,10 @@
   <Project Path="SimpleTestProjectARM64/SimpleTestProjectARM64.csproj" />
   <Project Path="SimpleTestProjectMessedUpTargetFramework/SimpleTestProjectMessedUpTargetFramework.csproj" />
   <Project Path="SimpleTestProjectx86/SimpleTestProjectx86.csproj" />
+  <Project Path="sleeping-child/sleeping-child.csproj" />
   <Project Path="TerminalLoggerTestProject/TerminalLoggerTestProject.csproj" />
   <Project Path="timeout/timeout.csproj" />
   <Project Path="Tools/Tools.csproj" />
   <Project Path="XUTestProject/XUTestProject.csproj" />
+  <Project Path="zombie-child-process/zombie-child-process.csproj" />
 </Solution>

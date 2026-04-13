@@ -9,9 +9,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Threading;
-#if !NET5_0_OR_GREATER
 using System.Threading.Tasks;
-#endif
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -150,16 +148,15 @@ public partial class ProcessHelper : IProcessHelper
                             // See ticket https://github.com/microsoft/vstest/issues/3375 to get the links to all
                             // issues, discussions and documentations.
                             //
-                            // On .NET 5 and later, the solution is simple, we can simply use WaitForExitAsync which
-                            // correctly ensure that some time is given to the child process (or any grandchild) to
-                            // flush before exit happens.
-                            //
-                            // For older frameworks, the solution is more tricky but it seems we can get the expected
-                            // behavior using the parameterless 'WaitForExit()' combined with an awaited Task.Run call.
-                            var cts = new CancellationTokenSource(timeout);
-#if NET5_0_OR_GREATER
-                            await p.WaitForExitAsync(cts.Token);
-#else
+                            // On .NET 5+, we use WaitForExitAsync for a non-blocking, cancellable wait,
+                            // then call the parameterless WaitForExit() to ensure all asynchronous
+                            // output/error readers (ErrorDataReceived, OutputDataReceived) are fully
+                            // drained. Without the second call, the Exited event can fire before the
+                            // final stderr data arrives (e.g. "Stack overflow." from a crashing
+                            // testhost), causing the exit callback to read incomplete stderr.
+                            // See https://github.com/microsoft/vstest/issues/3375 for details.
+                            using var cts = new CancellationTokenSource(timeout);
+#if !NET5_0_OR_GREATER
                             // NOTE: In case we run on Windows we must call 'WaitForExit(timeout)' instead of calling
                             // the parameterless overload. The reason for this requirement stems from the behavior of
                             // the Selenium WebDriver when debugging a test. If the debugger is detached, the default
@@ -197,6 +194,12 @@ public partial class ProcessHelper : IProcessHelper
                                 });
                                 await Task.Run(() => p.WaitForExit(), cts.Token).ConfigureAwait(false);
                             }
+#else
+                            await p.WaitForExitAsync(cts.Token);
+                            // Process has exited; drain async readers. This should be near-instant
+                            // since the process is already dead. If WaitForExitAsync was cancelled
+                            // (zombie/hung process), we skip this via the catch block.
+                            p.WaitForExit();
 #endif
                         }
                         catch
