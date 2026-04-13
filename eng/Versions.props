@@ -58,6 +58,7 @@
     <SystemMemoryVersion>4.5.5</SystemMemoryVersion>
     <SystemNetHttpVersion>4.3.4</SystemNetHttpVersion>
     <SystemReflectionMetadataVersion>1.6.0</SystemReflectionMetadataVersion>
+    <SystemRuntimeCompilerServicesUnsafePackageVersion>6.0.0</SystemRuntimeCompilerServicesUnsafePackageVersion>
     <SystemUriVersion>4.3.2</SystemUriVersion>
     <TestPlatformExternalsVersion>17.10.0-preview-2-34602-162</TestPlatformExternalsVersion>
     <MicrosoftInternalTestPlatformExtensions>17.10.0-preview-2-34602-162</MicrosoftInternalTestPlatformExtensions>

@@ -42,6 +42,11 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>8470979eb44c2218025515234d3e01138bd74afb</Sha>
     </Dependency>
+    <!-- Necessary for source-build. This allows the live version of the package to be used by source-build. -->
+    <Dependency Name="System.Runtime.CompilerServices.Unsafe" Version="6.0.0">
+      <Uri>https://github.com/dotnet/runtime</Uri>
+      <Sha>8470979eb44c2218025515234d3e01138bd74afb</Sha>
+    </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
     <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="9.0.0-beta.24408.2">
