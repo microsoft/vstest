@@ -66,7 +66,7 @@ public class FilterExpressionWrapperPackageTests
     public void ValidForPropertiesShouldReturnNullForSupportedProperties()
     {
         var wrapper = new FilterExpressionWrapper("Name=Test1");
-        string[]? invalid = wrapper.ValidForProperties(new List<string> { "Name" });
+        string[] invalid = wrapper.ValidForProperties(new List<string> { "Name" });
         Assert.IsNull(invalid);
     }
 
@@ -74,7 +74,7 @@ public class FilterExpressionWrapperPackageTests
     public void ValidForPropertiesShouldReturnUnsupportedPropertyNames()
     {
         var wrapper = new FilterExpressionWrapper("UnknownProp=Value");
-        string[]? invalid = wrapper.ValidForProperties(new List<string> { "Name" });
+        string[] invalid = wrapper.ValidForProperties(new List<string> { "Name" });
         Assert.IsNotNull(invalid);
         Assert.AreEqual(1, invalid.Length);
         Assert.AreEqual("UnknownProp", invalid[0]);
