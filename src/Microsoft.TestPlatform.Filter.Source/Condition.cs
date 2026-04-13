@@ -18,9 +18,8 @@ using Microsoft.CodeAnalysis;
 
 #if IS_VSTEST_REPO
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-#endif
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+#endif
 
 #if IS_VSTEST_REPO
 using static Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
